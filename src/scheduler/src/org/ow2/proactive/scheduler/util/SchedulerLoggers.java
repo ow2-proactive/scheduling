@@ -52,7 +52,7 @@ public interface SchedulerLoggers {
 
     static final public String FACTORY = SCHEDULER + ".factory";
 
-    static final public String EXTENSIONS = CORE + ".ext";
+    static final public String EXTENSIONS = SCHEDULER + ".ext";
 
     static final public String MATLAB = EXTENSIONS + ".matlab";
 

@@ -143,22 +143,11 @@ public enum PASchedulerProperties {
     UNIX_HOME_ENV_VAR("pa.scheduler.launcher.unixenv", PAPropertiesType.STRING),
 
     /** Scheduler home directory */
-    SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING),
+    SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING);
 
     /* ------------------------------------
      *  SCHEDULER EXTENSIONS
      */
-    /** Matlab finder under linux/unix */
-    MATLAB_SCRIPT_LINUX("pa.scheduler.ext.matlab.script.linux", PAPropertiesType.STRING),
-
-    /** Matlab finder under windows */
-    MATLAB_SCRIPT_WINDOWS("pa.scheduler.ext.matlab.script.windows", PAPropertiesType.STRING),
-
-    /** Scilab finder under linux/unix */
-    SCILAB_SCRIPT_LINUX("pa.scheduler.ext.scilab.script.linux", PAPropertiesType.STRING),
-
-    /** Scilab finder under windows */
-    SCILAB_SCRIPT_WINDOWS("pa.scheduler.ext.scilab.script.windows", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

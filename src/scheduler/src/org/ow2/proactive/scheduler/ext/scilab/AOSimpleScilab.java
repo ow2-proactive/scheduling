@@ -64,7 +64,7 @@ public class AOSimpleScilab implements Serializable {
 
     /** logger **/
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);
-    protected static boolean debug = logger.isDebugEnabled();
+    protected static boolean debug = true; /*logger.isDebugEnabled();*/
 
     public AOSimpleScilab() {
     }

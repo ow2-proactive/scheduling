@@ -31,13 +31,14 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.util;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import org.objectweb.proactive.core.util.OperatingSystem;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.ext.common.util.IOTools;
+import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
+import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
+import org.ow2.proactive.scheduler.util.Shell;
+
+import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,24 +46,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.ext.common.util.IOTools;
-import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
-import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.util.Shell;
-
 
 public class MatlabFinder {
 
-    /** logger **/
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.MATLAB);
-
     /** the OS where this JVM is running **/
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
+
+    private static String MATLAB_SCRIPT_LINUX = "find_matlab_command.sh";
+    private static String MATLAB_SCRIPT_WINDOWS = "find_matlab_command.bat";
 
     /**
      * Utility function to find Matlab
@@ -80,25 +71,21 @@ public class MatlabFinder {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
             if (debug) {
-                System.out.println("Using script at " +
-                    PASchedulerProperties.MATLAB_SCRIPT_LINUX.getValueAsString());
+                System.out.println("Using script at " + MATLAB_SCRIPT_LINUX);
             }
-            InputStream is = MatlabFinder.class.getResourceAsStream(PASchedulerProperties.MATLAB_SCRIPT_LINUX
-                    .getValueAsString());
+            InputStream is = MatlabFinder.class.getResourceAsStream(MATLAB_SCRIPT_LINUX);
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
             if (debug) {
-                System.out.println("Using script at " +
-                    PASchedulerProperties.MATLAB_SCRIPT_WINDOWS.getValueAsString());
+                System.out.println("Using script at " + MATLAB_SCRIPT_WINDOWS);
             }
-            InputStream is = MatlabFinder.class
-                    .getResourceAsStream(PASchedulerProperties.MATLAB_SCRIPT_WINDOWS.getValueAsString());
+            InputStream is = MatlabFinder.class.getResourceAsStream(MATLAB_SCRIPT_WINDOWS);
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
-            File batchFile = new File("find_matlab_command.bat");
+            File batchFile = new File(MATLAB_SCRIPT_WINDOWS);
 
             if (batchFile.exists()) {
                 batchFile.delete();
@@ -123,7 +110,7 @@ public class MatlabFinder {
             // End of this code
 
             // finally we launch the batch file
-            p1 = Runtime.getRuntime().exec("find_matlab_command.bat");
+            p1 = Runtime.getRuntime().exec(MATLAB_SCRIPT_WINDOWS);
         } else {
             throw new UnsupportedOperationException("Finding Matlab on " + os + " is not supported yet");
         }

@@ -31,26 +31,14 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.util;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.scilab.exception.ScilabInitException;
 import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.util.Shell;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+
+import java.io.*;
+import java.util.List;
 
 
 public class ScilabFinder {
@@ -58,8 +46,8 @@ public class ScilabFinder {
     // the OS where this JVM is running
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
-    /** logger **/
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);
+    private static String SCILAB_SCRIPT_LINUX = "find_matlab_command.sh";
+    private static String SCILAB_SCRIPT_WINDOWS = "find_matlab_command.bat";
 
     /**
      * Utility function to find Scilab
@@ -67,8 +55,8 @@ public class ScilabFinder {
      * @throws InterruptedException
      * @throws ScilabInitException
      */
-    public static final ScilabConfiguration findScilab() throws IOException, InterruptedException,
-            ScilabInitException {
+    public static final ScilabConfiguration findScilab(boolean debug) throws IOException,
+            InterruptedException, ScilabInitException {
 
         Process p1 = null;
         ScilabConfiguration answer = null;
@@ -76,18 +64,16 @@ public class ScilabFinder {
         if (os.equals(OperatingSystem.unix)) {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
-            InputStream is = ScilabFinder.class.getResourceAsStream(PASchedulerProperties.SCILAB_SCRIPT_LINUX
-                    .getValueAsString());
+            InputStream is = ScilabFinder.class.getResourceAsStream(SCILAB_SCRIPT_LINUX);
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
-            InputStream is = ScilabFinder.class
-                    .getResourceAsStream(PASchedulerProperties.SCILAB_SCRIPT_WINDOWS.getValueAsString());
+            InputStream is = ScilabFinder.class.getResourceAsStream(SCILAB_SCRIPT_WINDOWS);
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
-            File batchFile = new File("find_scilab_command.bat");
+            File batchFile = new File(SCILAB_SCRIPT_WINDOWS);
 
             if (batchFile.exists()) {
                 batchFile.delete();
@@ -112,17 +98,17 @@ public class ScilabFinder {
             // End of this code
 
             // finally we launch the batch file
-            p1 = Runtime.getRuntime().exec("find_scilab_command.bat");
+            p1 = Runtime.getRuntime().exec(SCILAB_SCRIPT_WINDOWS);
         } else {
             throw new UnsupportedOperationException("Finding Scilab on " + os + " is not supported yet");
         }
 
         List<String> lines = IOTools.getContentAsList(p1.getInputStream());
 
-        if (logger.isDebugEnabled()) {
-            logger.info("Result of script :");
+        if (debug) {
+            System.out.println("Result of script :");
             for (String ln : lines) {
-                logger.info(ln);
+                System.out.println(ln);
             }
         }
 

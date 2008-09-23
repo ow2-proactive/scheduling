@@ -31,17 +31,6 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.Constants;
@@ -49,23 +38,26 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools.LoggingThread;
 import org.ow2.proactive.scheduler.ext.scilab.util.ScilabConfiguration;
 import org.ow2.proactive.scheduler.ext.scilab.util.ScilabFinder;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
-import org.apache.log4j.Logger;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
 
 
 public class SimpleScilab extends JavaExecutable {
 
     final private static String[] DEFAULT_OUT_VARIABLE_SET = { "out" };
 
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);
-    protected static boolean debug = logger.isDebugEnabled();
+    protected boolean debug;
 
     /**
      * This hostname, for debugging purpose
@@ -147,11 +139,11 @@ public class SimpleScilab extends JavaExecutable {
 
         // First we try to find SCILAB
         if (debug) {
-            logger.info("[" + host + " SCILAB TASK] launching script to find Scilab");
+            System.out.println("[" + host + " SCILAB TASK] launching script to find Scilab");
         }
-        scilabConfig = ScilabFinder.findScilab();
+        scilabConfig = ScilabFinder.findScilab(debug);
         if (debug) {
-            logger.info(scilabConfig);
+            System.out.println(scilabConfig);
         }
 
         // We create a custom URI as the node name
@@ -160,7 +152,7 @@ public class SimpleScilab extends JavaExecutable {
                 Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
                 .toString();
         if (debug) {
-            logger.info("[" + host + " SCILAB TASK] Starting the Java Process");
+            System.out.println("[" + host + " SCILAB TASK] Starting the Java Process");
         }
         // We spawn a new JVM with the SCILAB library paths
         process = startProcess(uri);
@@ -178,7 +170,7 @@ public class SimpleScilab extends JavaExecutable {
         t2.start();
 
         if (debug) {
-            logger.info("[" + host + " SCILAB TASK] Executing the task");
+            System.out.println("[" + host + " SCILAB TASK] Executing the task");
         }
 
         // finally we call the internal version of the execute method
@@ -228,6 +220,11 @@ public class SimpleScilab extends JavaExecutable {
                 "Either one of \"script\" \"scripturl\" \"scriptfile\" must be given");
         }
 
+        String d = args.get("debug");
+        if (d != null) {
+            debug = Boolean.parseBoolean(d);
+        }
+
         String input = (String) args.get("input");
 
         if (input != null) {
@@ -253,7 +250,7 @@ public class SimpleScilab extends JavaExecutable {
         Exception ex = null;
         AOSimpleScilab worker = null;
         if (debug) {
-            logger.info("[" + host + " SCILAB TASK] Deploying the Worker");
+            System.out.println("[" + host + " SCILAB TASK] Deploying the Worker");
         }
 
         // We create an active object on the given node URI, the JVM corresponding to this node URI is starting,
@@ -294,11 +291,11 @@ public class SimpleScilab extends JavaExecutable {
      */
     protected Serializable executeInternal(String uri, TaskResult... results) throws Throwable {
         if (debug) {
-            logger.info("[" + host + " SCILAB TASK] Deploying Worker (SimpleScilab)");
+            System.out.println("[" + host + " SCILAB TASK] Deploying Worker (SimpleScilab)");
         }
         scilabWorker = deploy(uri, AOSimpleScilab.class.getName(), inputScript, scriptLines, out_set);
         if (debug) {
-            logger.info("[" + host + " SCILAB TASK] Executing (SimpleScilab)");
+            System.out.println("[" + host + " SCILAB TASK] Executing (SimpleScilab)");
         }
 
         // We execute the task on the worker
@@ -313,7 +310,7 @@ public class SimpleScilab extends JavaExecutable {
 
     private final Process startProcess(String uri) throws Throwable {
         if (debug) {
-            logger.info("[" + host + " SCILAB TASK] Starting a new JVM");
+            System.out.println("[" + host + " SCILAB TASK] Starting a new JVM");
         }
         // Build java command
         javaCommandBuilder = new DummyJVMProcess();
