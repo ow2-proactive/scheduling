@@ -2912,7 +2912,7 @@ echo $ECHO_N "checking finding Matlab version... $ECHO_C" >&6; }
             		;;
             	CYGWIN*)
             		"${MATLAB}" -automation -logfile "version.txt" -r "disp(version()); quit;"
-            		MATLAB_VERSION=$(cat version.txt|cut -s -d '.' -f 1-2)
+            		MATLAB_VERSION=$(cat version.txt|tail -n1|cut -s -d '.' -f 1-2)
             		;;
             	*)
             		;;

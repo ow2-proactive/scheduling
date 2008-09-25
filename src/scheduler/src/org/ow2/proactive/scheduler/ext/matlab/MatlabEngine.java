@@ -88,6 +88,8 @@ public class MatlabEngine {
 
                 eng.setDebugging((byte) 0);
 
+                System.out.println("Starting a new Matlab engine...");
+
                 // we build the matlab command, depending on the os
                 if (os.equals(OperatingSystem.unix)) {
                     engineHandle = eng.open(commandName + " -nodisplay -nosplash -nodesktop", true);

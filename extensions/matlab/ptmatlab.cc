@@ -98,8 +98,15 @@ extern "C"
   {
     const char *cmd = NULL;
     jlong retval = 0;
+    Engine *ep;
+    int retStatus = 0;
     if (cmdString != NULL) cmd = jni->GetStringUTFChars(cmdString, 0);
-    Engine *ep = engOpen(cmd);
+
+    #ifdef _WIN32
+        ep = engOpenSingleUse(cmd, NULL, &retStatus); 
+    #else
+        ep = engOpen(cmd);
+    #endif
     if (ep != NULL) {
       retval = (ptrint)ep;
     }

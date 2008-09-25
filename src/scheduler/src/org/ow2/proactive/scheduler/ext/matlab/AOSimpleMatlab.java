@@ -108,8 +108,13 @@ public class AOSimpleMatlab implements Serializable {
             }
 
             executeScript(conn);
-
+            if (debug) {
+                System.out.println("Receiving output:");
+            }
             out = conn.get("out");
+            if (debug) {
+                System.out.println(out);
+            }
         } finally {
             conn.release();
         }
@@ -133,14 +138,16 @@ public class AOSimpleMatlab implements Serializable {
     protected final void executeScript(MatlabEngine.Connection conn) throws Throwable {
         if (inputScript != null) {
             if (debug) {
-                System.out.println("Feeding input");
+                System.out.println("Feeding input:");
+                System.out.println(inputScript);
             }
             conn.evalString(inputScript);
         }
 
         String execScript = prepareScript();
         if (debug) {
-            System.out.println("Executing Matlab command");
+            System.out.println("Executing Matlab command:");
+            System.out.println(execScript);
         }
         conn.evalString(execScript);
         if (debug) {
