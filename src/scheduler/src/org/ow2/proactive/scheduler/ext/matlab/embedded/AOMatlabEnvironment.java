@@ -435,7 +435,6 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
                 Token computedResult = null;
                 try {
                     computedResult = (Token) res.getValue().value();
-                    System.out.println(res.getKey()+" "+res.getValue().value());
                     results.add(computedResult);
                     // We print the logs of the job, if any
                     if (logs.length() > 0) {
