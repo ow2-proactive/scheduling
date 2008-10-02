@@ -118,7 +118,8 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 
             logger.info("Registering scheduler...");
 
-            String schedulerUrl = "//localhost/" + SchedulerConnection.SCHEDULER_DEFAULT_NAME;
+            String schedulerUrl = "//" + NodeFactory.getDefaultNode().getVMInformation().getHostName() + "/" +
+                SchedulerConnection.SCHEDULER_DEFAULT_NAME;
             PAActiveObject.register(schedulerAuth, schedulerUrl);
             // setting the proxy to the admin scheduler API
             adminScheduler.schedulerFrontend = schedulerFrontend;
