@@ -72,15 +72,14 @@ public class IOTools {
             t2.join();
 
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
         }
-
 
         int retValue = 0;
         try {
             retValue = process.waitFor();
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
         }
         return new ProcessResult(retValue, out_lines.toArray(new String[0]), err_lines.toArray(new String[0]));
     }
@@ -95,7 +94,6 @@ public class IOTools {
         final ArrayList<String> lines = new ArrayList<String>();
         final BufferedReader d = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
 
-
         String line = null;
 
         try {
@@ -108,7 +106,7 @@ public class IOTools {
             lines.add(line);
 
             try {
-                line = d.readLine();                
+                line = d.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
                 line = null;
@@ -119,7 +117,6 @@ public class IOTools {
             is.close();
         } catch (IOException e) {
         }
-
 
         return lines;
     }

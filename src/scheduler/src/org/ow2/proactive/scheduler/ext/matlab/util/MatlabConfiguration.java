@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.ext.matlab.util;
 
 import java.io.Serializable;
 
+
 public class MatlabConfiguration implements Serializable {
 
     /**
@@ -67,8 +68,8 @@ public class MatlabConfiguration implements Serializable {
 
     private String nl = System.getProperty("line.separator");
 
-    public MatlabConfiguration(String matlabHome, String matlabVersion, String matlabLibDirName, String matlabBinDir,
-            String matlabCommandName, String ptolemyPath) {
+    public MatlabConfiguration(String matlabHome, String matlabVersion, String matlabLibDirName,
+            String matlabBinDir, String matlabCommandName, String ptolemyPath) {
         this.matlabHome = matlabHome;
         this.matlabVersion = matlabVersion;
         this.matlabLibDirName = matlabLibDirName;
@@ -123,9 +124,9 @@ public class MatlabConfiguration implements Serializable {
 
     public String toString() {
         return "Matlab home : " + matlabHome + nl + "Matlab version : " + matlabVersion + nl +
-            "Matlab lib directory name : " + matlabLibDirName + nl + "Matlab bin directory  : " + matlabBinDir + nl + 
-                "Matlab command name:" +
-            matlabCommandName + nl + "Ptolemy lib dir : " + ptolemyPath;
+            "Matlab lib directory name : " + matlabLibDirName + nl + "Matlab bin directory  : " +
+            matlabBinDir + nl + "Matlab command name:" + matlabCommandName + nl + "Ptolemy lib dir : " +
+            ptolemyPath;
     }
 
 }

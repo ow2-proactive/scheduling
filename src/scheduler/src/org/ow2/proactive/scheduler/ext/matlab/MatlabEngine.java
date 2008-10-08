@@ -94,7 +94,8 @@ public class MatlabEngine {
 
                 // we build the matlab command, depending on the os
                 if (os.equals(OperatingSystem.unix)) {
-                    engineHandle = eng.open(configuration.getMatlabCommandName() + " -nodisplay -nosplash -nodesktop", true);
+                    engineHandle = eng.open(configuration.getMatlabCommandName() +
+                        " -nodisplay -nosplash -nodesktop", true);
                 } else {
                     engineHandle = eng.open(configuration.getMatlabCommandName() + " -automation", true);
                 }

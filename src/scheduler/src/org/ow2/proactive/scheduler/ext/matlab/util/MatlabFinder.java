@@ -84,7 +84,7 @@ public class MatlabFinder {
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
             String tmpDir = System.getProperty("java.io.tmpdir");
-            File batchFile = new File(tmpDir,MATLAB_SCRIPT_WINDOWS);
+            File batchFile = new File(tmpDir, MATLAB_SCRIPT_WINDOWS);
 
             if (batchFile.exists()) {
                 batchFile.delete();
@@ -109,11 +109,11 @@ public class MatlabFinder {
             if (debug) {
                 System.out.println("Using script at " + batchFile.getAbsolutePath());
             }
-            while(!batchFile.exists()&& !batchFile.canExecute()) {
-                  Thread.sleep(100);
+            while (!batchFile.exists() && !batchFile.canExecute()) {
+                Thread.sleep(100);
             }
             // finally we launch the batch file
-            p1 = Runtime.getRuntime().exec("cmd /c "+batchFile.getAbsolutePath());
+            p1 = Runtime.getRuntime().exec("cmd /c " + batchFile.getAbsolutePath());
         } else {
             throw new UnsupportedOperationException("Finding Matlab on " + os + " is not supported yet");
         }
@@ -134,8 +134,6 @@ public class MatlabFinder {
             System.out.flush();
         }
 
-
-
         // The batch file is supposed to write, if it's successful, two lines :
         // 1st line : the full path to the matlab command
         // 2nd line : the name of the os-dependant arch dir
@@ -145,20 +143,20 @@ public class MatlabFinder {
             int i = 0;
             String[] output = pres.getOutput();
             while (!(line = output[i++]).startsWith("----")) {
-                 home = line;
+                home = line;
             }
 
             File file = new File(home);
             String matlabHome = file.getAbsolutePath();
 
             String matlabBinPath = output[i++];
-            File binpath= new File(matlabBinPath);
+            File binpath = new File(matlabBinPath);
             String matlabCommandName = binpath.getName();
             String matlabBinDir = binpath.getParent();
             String matlabLibDirName = output[i++];
             String matlabVersion = null;
             while (!(line = output[i++]).startsWith("----")) {
-                 matlabVersion = line;
+                matlabVersion = line;
             }
             String ptolemyPath;
             try {
@@ -167,8 +165,8 @@ public class MatlabFinder {
                 throw new MatlabInitException(e);
             }
 
-            answer = new MatlabConfiguration(matlabHome, matlabVersion, matlabLibDirName, matlabBinDir, matlabCommandName,
-                ptolemyPath);
+            answer = new MatlabConfiguration(matlabHome, matlabVersion, matlabLibDirName, matlabBinDir,
+                matlabCommandName, ptolemyPath);
 
         } else {
             StringWriter error_message = new StringWriter();

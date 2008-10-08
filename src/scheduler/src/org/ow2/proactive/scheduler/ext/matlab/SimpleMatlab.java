@@ -448,10 +448,13 @@ public class SimpleMatlab extends JavaExecutable {
             lastDir = matlabConfig.getMatlabLibDirName();
         }
 
-        newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabBinDir()) + newPath;
-        newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabLibDirName()) + os.pathSeparator() + newPath;
+        newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabBinDir()) +
+            newPath;
+        newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabLibDirName()) +
+            os.pathSeparator() + newPath;
         newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + "sys" + os.fileSeparator() + "os" +
-                os.fileSeparator() + lastDir) + os.pathSeparator() + newPath;
+            os.fileSeparator() + lastDir) +
+            os.pathSeparator() + newPath;
 
         return newPath;
     }

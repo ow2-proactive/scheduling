@@ -12,10 +12,9 @@ public class ProcessResult {
 
     public ProcessResult(int returnValue, String[] output, String[] error) {
         this.returnValue = returnValue;
-        this.output = (output != null)?output:new String[0];
-        this.error = (error != null)?error:new String[0];
+        this.output = (output != null) ? output : new String[0];
+        this.error = (error != null) ? error : new String[0];
     }
-
 
     public int getReturnValue() {
         return returnValue;
