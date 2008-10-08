@@ -31,7 +31,9 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab.util;
 
-public class MatlabConfiguration {
+import java.io.Serializable;
+
+public class MatlabConfiguration implements Serializable {
 
     /**
      * The home dir of Matlab on this machine
@@ -42,6 +44,11 @@ public class MatlabConfiguration {
      * The name of the arch dir to find native libraries (can be win32, glnx86, ...)
      */
     private String matlabLibDirName = null;
+
+    /**
+     * The path to matlab bin dir
+     */
+    private String matlabBinDir = null;
 
     /**
      * Version of Matlab 
@@ -60,11 +67,12 @@ public class MatlabConfiguration {
 
     private String nl = System.getProperty("line.separator");
 
-    public MatlabConfiguration(String matlabHome, String matlabVersion, String matlabLibDirName,
+    public MatlabConfiguration(String matlabHome, String matlabVersion, String matlabLibDirName, String matlabBinDir,
             String matlabCommandName, String ptolemyPath) {
         this.matlabHome = matlabHome;
         this.matlabVersion = matlabVersion;
         this.matlabLibDirName = matlabLibDirName;
+        this.matlabBinDir = matlabBinDir;
         this.matlabCommandName = matlabCommandName;
         this.ptolemyPath = ptolemyPath;
     }
@@ -83,6 +91,10 @@ public class MatlabConfiguration {
      */
     public String getMatlabLibDirName() {
         return matlabLibDirName;
+    }
+
+    public String getMatlabBinDir() {
+        return matlabBinDir;
     }
 
     /**
@@ -111,7 +123,8 @@ public class MatlabConfiguration {
 
     public String toString() {
         return "Matlab home : " + matlabHome + nl + "Matlab version : " + matlabVersion + nl +
-            "Matlab lib directory name : " + matlabLibDirName + nl + "Matlab command name:" +
+            "Matlab lib directory name : " + matlabLibDirName + nl + "Matlab bin directory  : " + matlabBinDir + nl + 
+                "Matlab command name:" +
             matlabCommandName + nl + "Ptolemy lib dir : " + ptolemyPath;
     }
 

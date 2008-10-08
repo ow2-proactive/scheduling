@@ -36,6 +36,7 @@ import java.io.Serializable;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidParameterException;
+import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
 import ptolemy.data.ArrayToken;
 import ptolemy.data.Token;
 
@@ -50,10 +51,10 @@ public class AOMatlabCollector extends AOSimpleMatlab {
 
     /**
      * Constructor for the Collector task
-     * @param matlabCommandName the name of the Matlab command
+     * @param matlabConfig the configuration of the MatlabEngine
      */
-    public AOMatlabCollector(String matlabCommandName) {
-        super(matlabCommandName);
+    public AOMatlabCollector(MatlabConfiguration matlabConfig) {
+        super(matlabConfig);
     }
 
     public Serializable execute(TaskResult... results) throws Throwable {

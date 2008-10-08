@@ -2645,7 +2645,7 @@ echo "$as_me: WARNING: Failed to find matlab executable in the path.
 echo $ECHO_N "checking the value of the Matlab root directory ... $ECHO_C" >&6; }
 		case "`uname -s`" in
 		CYGWIN*)
-			MATLAB_DIR_TMP=$(readlink -f "$(dirname "$(readlink -f "$MATLAB")")/..")
+			MATLAB_DIR_TMP=$(readlink -f "$(dirname "$(readlink -f "$MATLAB")")/../..")
 			;;
 		*)
 			MATLAB_DIR_TMP=$(readlink -f $(dirname $(readlink -f $MATLAB))/..)

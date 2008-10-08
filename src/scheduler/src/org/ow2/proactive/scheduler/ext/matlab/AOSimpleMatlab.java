@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidParameterException;
+import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import ptolemy.data.Token;
 
@@ -65,10 +66,10 @@ public class AOSimpleMatlab implements Serializable {
 
     /**
      * Constructor for the Simple task
-     * @param matlabCommandName the name of the Matlab command
+     * @param matlabConfig the configuration for the matlab engine
      */
-    public AOSimpleMatlab(String matlabCommandName) {
-        MatlabEngine.setCommandName(matlabCommandName);
+    public AOSimpleMatlab(MatlabConfiguration matlabConfig) {
+        MatlabEngine.setConfiguration(matlabConfig);
     }
 
     public void init(String inputScript, ArrayList<String> scriptLines, boolean debug) {

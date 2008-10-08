@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.ext.matlab.util;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
+import org.ow2.proactive.scheduler.ext.common.util.ProcessResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.util.Shell;
@@ -78,14 +79,12 @@ public class MatlabFinder {
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
-            if (debug) {
-                System.out.println("Using script at " + MATLAB_SCRIPT_WINDOWS);
-            }
             InputStream is = MatlabFinder.class.getResourceAsStream(MATLAB_SCRIPT_WINDOWS);
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
-            File batchFile = new File(MATLAB_SCRIPT_WINDOWS);
+            String tmpDir = System.getProperty("java.io.tmpdir");
+            File batchFile = new File(tmpDir,MATLAB_SCRIPT_WINDOWS);
 
             if (batchFile.exists()) {
                 batchFile.delete();
@@ -101,40 +100,66 @@ public class MatlabFinder {
                     pw.println(line);
                     pw.flush();
                 }
-
                 pw.close();
             } else {
                 throw new MatlabInitException("can't write in : " + batchFile);
             }
 
             // End of this code
-
+            if (debug) {
+                System.out.println("Using script at " + batchFile.getAbsolutePath());
+            }
+            while(!batchFile.exists()&& !batchFile.canExecute()) {
+                  Thread.sleep(100);
+            }
             // finally we launch the batch file
-            p1 = Runtime.getRuntime().exec(MATLAB_SCRIPT_WINDOWS);
+            p1 = Runtime.getRuntime().exec("cmd /c "+batchFile.getAbsolutePath());
         } else {
             throw new UnsupportedOperationException("Finding Matlab on " + os + " is not supported yet");
         }
 
-        ArrayList<String> lines = IOTools.getContentAsList(p1.getInputStream());
+        ProcessResult pres = IOTools.blockingGetProcessResult(p1);
+        //ArrayList<String> lines = IOTools.getContentAsList(p1.getInputStream());
 
         if (debug) {
-            System.out.println("Result of script :");
-            for (String ln : lines) {
+            System.out.println("Output of script :");
+            for (String ln : pres.getOutput()) {
                 System.out.println(ln);
             }
+            System.out.flush();
+            System.err.println("Error output of script :");
+            for (String ln : pres.getError()) {
+                System.out.println(ln);
+            }
+            System.out.flush();
         }
+
+
 
         // The batch file is supposed to write, if it's successful, two lines :
         // 1st line : the full path to the matlab command
         // 2nd line : the name of the os-dependant arch dir
         if (p1.waitFor() == 0) {
-            String full_command = lines.get(0);
+            String line;
+            String home = null;
+            int i = 0;
+            String[] output = pres.getOutput();
+            while (!(line = output[i++]).startsWith("----")) {
+                 home = line;
+            }
 
-            File file = new File(full_command);
-            String matlabCommandName = file.getName();
-            String matlabHome = file.getParentFile().getParentFile().getAbsolutePath();
-            String matlabLibDirName = lines.get(1);
-            String matlabVersion = lines.get(2);
+            File file = new File(home);
+            String matlabHome = file.getAbsolutePath();
+
+            String matlabBinPath = output[i++];
+            File binpath= new File(matlabBinPath);
+            String matlabCommandName = binpath.getName();
+            String matlabBinDir = binpath.getParent();
+            String matlabLibDirName = output[i++];
+            String matlabVersion = null;
+            while (!(line = output[i++]).startsWith("----")) {
+                 matlabVersion = line;
+            }
             String ptolemyPath;
             try {
                 ptolemyPath = findPtolemyLibDir(matlabVersion, matlabLibDirName);
@@ -142,15 +167,21 @@ public class MatlabFinder {
                 throw new MatlabInitException(e);
             }
 
-            answer = new MatlabConfiguration(matlabHome, matlabVersion, matlabLibDirName, matlabCommandName,
+            answer = new MatlabConfiguration(matlabHome, matlabVersion, matlabLibDirName, matlabBinDir, matlabCommandName,
                 ptolemyPath);
 
         } else {
             StringWriter error_message = new StringWriter();
             PrintWriter pw = new PrintWriter(error_message);
-            pw.println("Error during find_matlab script execution:");
-
-            for (String l : lines) {
+            pw.println("Error during find_matlab script execution !");
+            pw.println("Output log:");
+            String[] output = pres.getOutput();
+            String[] error = pres.getOutput();
+            for (String l : output) {
+                pw.println(l);
+            }
+            pw.println("Error log:");
+            for (String l : error) {
                 pw.println(l);
             }
 

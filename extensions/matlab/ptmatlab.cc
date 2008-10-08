@@ -111,7 +111,7 @@ extern "C"
       retval = (ptrint)ep;
     }
     else {
-      printf("ptmatlabEngOpen: %s failed!\n", cmd==NULL?"":cmd); fflush(stdout);
+      printf("ptmatlabEngOpen: %s failed!\nIf your operating system is microsoft windows, it might be because the COM registration of Matlab is corrupted (did you install several instances of Matlab?).\n You can solve this problem by running \"matlab /regserver\" from the command line as explained here:\nhttp://www.mathworks.com/access/helpdesk_r13/help/techdoc/apiref/engopensingleuse.shtml\n", cmd==NULL?"":cmd); fflush(stdout);
     }
     if (cmdString != NULL) jni->ReleaseStringUTFChars(cmdString, cmd);
     return retval;

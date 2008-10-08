@@ -325,7 +325,7 @@ public class SimpleMatlab extends JavaExecutable {
             if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
             }
-            matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabConfig.getMatlabCommandName());
+            matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabConfig);
 
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
@@ -377,8 +377,8 @@ public class SimpleMatlab extends JavaExecutable {
         Map<String, String> env = pb.environment();
 
         // Classpath specific
-        //String classpath = prependPtolemyLibDirToClassPath(javaCommandBuilder.getClasspath());
-        //javaCommandBuilder.setClasspath(classpath);
+        String classpath = prependPtolemyLibDirToClassPath(javaCommandBuilder.getClasspath());
+        javaCommandBuilder.setClasspath(classpath);
 
         // we add matlab directories to LD_LIBRARY_PATH
         String libPath = env.get("LD_LIBRARY_PATH");
@@ -437,7 +437,7 @@ public class SimpleMatlab extends JavaExecutable {
         if (path == null) {
             newPath = "";
         } else {
-            newPath = path + os.pathSeparator();
+            newPath = os.pathSeparator() + path;
         }
 
         String lastDir = null;
@@ -448,13 +448,10 @@ public class SimpleMatlab extends JavaExecutable {
             lastDir = matlabConfig.getMatlabLibDirName();
         }
 
-        newPath = newPath + (matlabConfig.getMatlabHome() + os.fileSeparator() + "bin");
-        newPath = newPath + os.pathSeparator() +
-            (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabLibDirName());
-        newPath = newPath +
-            os.pathSeparator() +
-            (matlabConfig.getMatlabHome() + os.fileSeparator() + "sys" + os.fileSeparator() + "os" +
-                os.fileSeparator() + lastDir);
+        newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabBinDir()) + newPath;
+        newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabLibDirName()) + os.pathSeparator() + newPath;
+        newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + "sys" + os.fileSeparator() + "os" +
+                os.fileSeparator() + lastDir) + os.pathSeparator() + newPath;
 
         return newPath;
     }

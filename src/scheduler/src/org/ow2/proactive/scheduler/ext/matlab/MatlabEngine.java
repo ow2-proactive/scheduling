@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.ext.matlab;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
 
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
@@ -63,7 +64,7 @@ public class MatlabEngine {
     /**
      * Name of the matlab command
      */
-    private static String commandName;
+    private static MatlabConfiguration configuration;
     /**
      * Is the engine currently used by a thread ?
      */
@@ -88,13 +89,14 @@ public class MatlabEngine {
 
                 eng.setDebugging((byte) 0);
 
-                System.out.println("Starting a new Matlab engine...");
+                System.out.println("Starting a new Matlab engine:");
+                System.out.println(configuration);
 
                 // we build the matlab command, depending on the os
                 if (os.equals(OperatingSystem.unix)) {
-                    engineHandle = eng.open(commandName + " -nodisplay -nosplash -nodesktop", true);
+                    engineHandle = eng.open(configuration.getMatlabCommandName() + " -nodisplay -nosplash -nodesktop", true);
                 } else {
-                    engineHandle = eng.open(commandName + " -automation", true);
+                    engineHandle = eng.open(configuration.getMatlabCommandName() + " -automation", true);
                 }
                 // highly verbose exceptions
             } catch (UnsatisfiedLinkError e) {
@@ -126,12 +128,12 @@ public class MatlabEngine {
         eng.setDebugging(debug);
     }
 
-    public static void setCommandName(String name) {
-        commandName = name;
+    public static void setConfiguration(MatlabConfiguration config) {
+        configuration = config;
     }
 
     public static String getCommandName() {
-        return commandName;
+        return configuration.getMatlabCommandName();
     }
 
     /**

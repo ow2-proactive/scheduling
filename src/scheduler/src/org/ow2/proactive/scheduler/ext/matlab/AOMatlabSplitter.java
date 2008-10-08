@@ -35,6 +35,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.IllegalReturnTypeException;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidParameterException;
+import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
 import ptolemy.data.ArrayToken;
 import ptolemy.data.IntToken;
 import ptolemy.data.Token;
@@ -55,10 +56,10 @@ public class AOMatlabSplitter extends AOSimpleMatlab {
 
     /**
      * Constructor for a Splitter task
-     * @param matlabCommandName the name of the Matlab command
+     * @param matlabConfig the configuration of the MatlabEngine
      */
-    public AOMatlabSplitter(String matlabCommandName) {
-        super(matlabCommandName);
+    public AOMatlabSplitter(MatlabConfiguration matlabConfig) {
+        super(matlabConfig);
 
     }
 
