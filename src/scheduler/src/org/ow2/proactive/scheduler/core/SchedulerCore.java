@@ -923,7 +923,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             logger.info("Terminated task on job " + jobId + " [ " + taskId + " ]");
 
-            //if an exception occurred and the user wanted to cancel on exception, cancel the job.
+            //if an exception occurred and the user wanted to cancel on error, cancel the job.
             boolean errorOccured = false;
             if (descriptor instanceof InternalNativeTask) {
                 try {
@@ -956,24 +956,23 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             job,
                             descriptor,
                             "An error has occured due to a user error caught in the task and user wanted to cancel on error.",
-                            JobState.CANCELLED);
+                            JobState.CANCELLED);//TODO <<<<<< FAILED OR CANCEL
                     return;
                 }
-                //if the task threw an exception OR is native and the result is an error code (1-255)
-                if (res.hadException() ||
-                    ((descriptor instanceof InternalNativeTask) && nativeIntegerResult > 0)) {
-                    //if the task has to restart
-                    if (descriptor.getRestartOnError() != RestartMode.NOWHERE) {
-                        //check the number of reruns left
-                        if (descriptor.getRerunnableLeft() <= 0) {
-                            //if no rerun left, failed the job
-                            endJob(
-                                    job,
-                                    descriptor,
-                                    "An error occurred in your task and the maximum amout of retries property has been reached.",
-                                    JobState.FAILED);
-                            return;
-                        }
+                //the task threw an exception OR is native and the result is an error code (1-255)
+                //if the task has to restart
+                if (descriptor.getRestartOnError() != RestartMode.NOWHERE) {
+                    //check the number of reruns left and fail the job if it is cancelOnError
+                    if (descriptor.getRerunnableLeft() <= 0 && job.isCancelOnError()) {
+                        //if no rerun left, failed the job
+                        endJob(
+                                job,
+                                descriptor,
+                                "An error occurred in your task and the maximum amout of retries property has been reached.",
+                                JobState.FAILED);//TODO <<<<<< FAILED OR CANCEL
+                        return;
+                    }
+                    if (descriptor.getRerunnableLeft() > 0) {
                         if (descriptor.getRestartOnError() == RestartMode.ELSEWHERE) {
                             //if the task restart ELSEWHERE
                             descriptor.setNodeExclusion(descriptor.getExecuterInformations().getNodes());
@@ -985,6 +984,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         frontend.taskWaitingForRestart(descriptor.getTaskInfo());
 
                         descriptor.setRerunnableLeft(descriptor.getRerunnableLeft() - 1);
+                        //the job is not restarted directly
                         RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
                         new Timer().schedule(jtt, job.getNextWaitingTime());
 

@@ -146,7 +146,6 @@ public class NativeExecutable extends Executable {
         //WARNING : if this.command is unknown, it will create a defunct process
         //it's due to a known java bug
         try {
-
             process = Runtime.getRuntime().exec(this.command, this.envp);
         } catch (Exception e) {
             //in this case, the error is certainly due to the user (ie : command not found)
@@ -187,8 +186,8 @@ public class NativeExecutable extends Executable {
     }
 
     /**
-     * interrupt native process and its childs (if launched)
-     * set killEdState boolean to finalize ThreadReaders 
+     * interrupt native process and its children (if launched)
+     * set killedState boolean to finalize ThreadReaders 
      * which listen SDTOUT/STDERR of the native process
      */
     @Override
@@ -197,7 +196,7 @@ public class NativeExecutable extends Executable {
         if (process != null) {
             ProcessTreeKiller.get().kill(process, modelEnvVar);
             //TODO jlscheef destroy() may be useless but it's not working yet without it.
-            //processTreeKiller seems to not kill current process...
+            //processTreeKiller seems not to kill current process...
             process.destroy();
         }
     }

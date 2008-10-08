@@ -39,7 +39,6 @@ import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**

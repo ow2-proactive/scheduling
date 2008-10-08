@@ -58,9 +58,9 @@ import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 @PublicAPI
 public abstract class Job implements Serializable, GenericInformationsProvider {
 
-    // TODO cdelbe, jscheffer
+    // TODO cdelbe, jscheefer
     // all setters are needed only for InternalJob creation.
-    // Is there a more elegant way...?
+    // Is there a more elegant way...? (JL) Constructors ?
 
     /** Name of the job */
     protected String name = JobId.DEFAULT_JOB_NAME;
