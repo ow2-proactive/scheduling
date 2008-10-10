@@ -59,6 +59,8 @@ else
     exit 1
 fi
 if [ "$matlab_lib_dir" != "" ]; then
+    beta="${cmd_line/$matlab_home\//}"
+    echo $beta
     echo $matlab_lib_dir
 else
     echo "Matlab lib dir not found"
