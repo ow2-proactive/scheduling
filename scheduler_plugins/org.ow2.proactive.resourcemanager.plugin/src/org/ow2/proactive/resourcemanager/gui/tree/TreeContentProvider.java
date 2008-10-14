@@ -63,7 +63,6 @@ public class TreeContentProvider implements IStructuredContentProvider, ITreeCon
     /**
      * @see org.eclipse.jface.viewers.IContentProvider#dispose()
      */
-    @Override
     public void dispose() {
     }
 }

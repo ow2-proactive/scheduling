@@ -7,12 +7,10 @@ import org.eclipse.swt.graphics.Image;
 
 public class StatsLabelProvider implements ITableLabelProvider {
 
-    @Override
     public Image getColumnImage(Object element, int columnIndex) {
         return null;
     }
 
-    @Override
     public String getColumnText(Object element, int columnIndex) {
         switch (columnIndex) {
             case 0:
@@ -23,28 +21,23 @@ public class StatsLabelProvider implements ITableLabelProvider {
         return null;
     }
 
-    @Override
+
     public void addListener(ILabelProviderListener listener) {
         // TODO Auto-generated method stub
-
     }
 
-    @Override
     public void dispose() {
         // TODO Auto-generated method stub
-
     }
 
-    @Override
+
     public boolean isLabelProperty(Object element, String property) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    @Override
     public void removeListener(ILabelProviderListener listener) {
         // TODO Auto-generated method stub
-
     }
 
 }

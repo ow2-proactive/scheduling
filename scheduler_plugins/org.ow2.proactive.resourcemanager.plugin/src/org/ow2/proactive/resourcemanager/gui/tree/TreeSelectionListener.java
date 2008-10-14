@@ -14,7 +14,6 @@ import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 
 public class TreeSelectionListener implements ISelectionChangedListener {
 
-    @Override
     public void selectionChanged(SelectionChangedEvent event) {
         List<TreeLeafElement> list;
         ArrayList<String> selectionList = new ArrayList<String>();

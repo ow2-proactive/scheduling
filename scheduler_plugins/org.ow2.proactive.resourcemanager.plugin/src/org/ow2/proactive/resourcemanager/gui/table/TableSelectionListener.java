@@ -12,7 +12,6 @@ import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 
 public class TableSelectionListener implements ISelectionChangedListener {
 
-    @Override
     public void selectionChanged(SelectionChangedEvent event) {
         Object selection = event.getSelectionProvider().getSelection();
         List<NodeTableItem> list = (List<NodeTableItem>) ((IStructuredSelection) selection).toList();

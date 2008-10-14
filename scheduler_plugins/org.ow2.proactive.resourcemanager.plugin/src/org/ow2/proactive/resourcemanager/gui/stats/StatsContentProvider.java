@@ -7,7 +7,6 @@ import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 
 public class StatsContentProvider implements IStructuredContentProvider {
 
-    @Override
     public Object[] getElements(Object model) {
         if (model instanceof RMModel) {
             StatsItem freeNodesStat = new StatsItem("# free nodes", Integer.toString(((RMModel) model)
@@ -22,12 +21,10 @@ public class StatsContentProvider implements IStructuredContentProvider {
         return new Object[] {};
     }
 
-    @Override
     public void dispose() {
         // TODO Auto-generated method stub
     }
 
-    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         // TODO Auto-generated method stub
 

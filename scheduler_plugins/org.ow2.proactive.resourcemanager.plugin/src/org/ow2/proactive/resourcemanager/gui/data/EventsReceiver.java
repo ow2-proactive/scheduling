@@ -128,17 +128,15 @@ public class EventsReceiver implements InitActive, RMEventListener {
         model.removeNodeSource(nodeSourceEvent);
     }
 
-    @Override
     public void rmShutDownEvent(RMEvent arg0) {
         RMStore.getInstance().shutDownActions();
     }
 
     //TODO add a status bar that show these states ?
-    @Override
+    
     public void rmShuttingDownEvent(RMEvent arg0) {
     }
 
-    @Override
     public void rmStartedEvent(RMEvent arg0) {
     }
 }
