@@ -27,22 +27,20 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
-import org.eclipse.jface.dialogs.MessageDialog;
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.tree.TreeManager;
 
 
 /**
@@ -55,74 +53,64 @@ public class RemoveNodeDialog extends Dialog {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
-    private RemoveNodeDialog(Shell parent, String source) {
+    private RemoveNodeDialog(Shell parent, ArrayList<String> nodesUrls) {
 
         // Pass the default styles here
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-
-        // Load the proactive default configuration
-        ProActiveConfiguration.load();
 
         // Init the display
         Display display = parent.getDisplay();
 
         // Init the shell
         final Shell shell = new Shell(parent, SWT.BORDER | SWT.CLOSE);
-        shell.setText("Remove a node");
+        shell.setText("Remove nodes");
         FormLayout layout = new FormLayout();
-        layout.marginHeight = 5;
-        layout.marginWidth = 5;
+        layout.marginHeight = 15;
+        layout.marginWidth = 20;
         shell.setLayout(layout);
 
         // creation
         Label urlLabel = new Label(shell, SWT.NONE);
-        final Combo sourceNameCombo = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
         final Button preemptCheck = new Button(shell, SWT.CHECK);
+        preemptCheck.setSelection(true);
         Button okButton = new Button(shell, SWT.NONE);
         Button cancelButton = new Button(shell, SWT.NONE);
 
-        // label sourceName
-        urlLabel.setText("Node :");
-        FormData urlLabelFormData = new FormData();
-        urlLabelFormData.top = new FormAttachment(sourceNameCombo, 0, SWT.CENTER);
-        urlLabel.setLayoutData(urlLabelFormData);
+        String message;
+        if (nodesUrls.size() == 1) {
+            message = "Confirm removal of node : \n\n" + nodesUrls.get(0);
+        } else {
+            message = "Confirm removal of " + Integer.toString(nodesUrls.size()) + " nodes";
+        }
 
-        // combo sourceName
+        // label sourceName
+        urlLabel.setText(message);
         FormData urlFormData = new FormData();
-        urlFormData.top = new FormAttachment(0, -1);
-        urlFormData.left = new FormAttachment(urlLabel, 5);
-        urlFormData.right = new FormAttachment(100, -5);
-        urlFormData.width = 400;
-        sourceNameCombo.setLayoutData(urlFormData);
-        sourceNameCombo.setItems(TreeManager.getInstance().getNodesNames());
-        if ((source != null) && (!source.equals("")))
-            sourceNameCombo.setText(source);
+        urlFormData.top = new FormAttachment(0, 10);
+        urlLabel.setLayoutData(urlFormData);
 
         // preempt check
-        preemptCheck.setText("preemptively");
+        preemptCheck.setText("wait tasks end on busy nodes");
         FormData checkFormData = new FormData();
-        checkFormData.top = new FormAttachment(sourceNameCombo, 5);
-        checkFormData.left = new FormAttachment(50, -50);
+        checkFormData.top = new FormAttachment(urlLabel, 20, SWT.BOTTOM);
         preemptCheck.setLayoutData(checkFormData);
 
+        final ArrayList<String> urls = nodesUrls;
         // button "OK"
         okButton.setText("OK");
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
-                String src = sourceNameCombo.getText();
-                if (src.equals(""))
-                    MessageDialog.openError(shell, "Error", "You didn't choose a node to remove");
-                else {
-                    RMStore.getInstance().getRMAdmin().removeNode(src, preemptCheck.getSelection());
-                    shell.close();
+                for (String url : urls) {
+                    RMStore.getInstance().getRMAdmin().removeNode(url, !preemptCheck.getSelection());
                 }
+                shell.close();
             }
         });
 
         FormData okFormData = new FormData();
-        okFormData.top = new FormAttachment(preemptCheck, 5);
-        okFormData.left = new FormAttachment(25, 20);
-        okFormData.right = new FormAttachment(50, -10);
+        okFormData.top = new FormAttachment(preemptCheck, 30);
+        okFormData.left = new FormAttachment(25, 30);
+        okFormData.width = 70;
         okButton.setLayoutData(okFormData);
         shell.setDefaultButton(okButton);
 
@@ -135,11 +123,12 @@ public class RemoveNodeDialog extends Dialog {
         });
 
         FormData cancelFormData = new FormData();
-        cancelFormData.top = new FormAttachment(preemptCheck, 5);
-        cancelFormData.left = new FormAttachment(50, 10);
-        cancelFormData.right = new FormAttachment(75, -20);
+        cancelFormData.top = new FormAttachment(preemptCheck, 30);
+        cancelFormData.left = new FormAttachment(okButton, 10, SWT.RIGHT);
+        cancelFormData.width = 70;
         cancelButton.setLayoutData(cancelFormData);
 
+        shell.setMinimumSize(450, 200);
         shell.pack();
         shell.open();
 
@@ -159,7 +148,7 @@ public class RemoveNodeDialog extends Dialog {
      * @param parent
      *            the parent
      */
-    public static void showDialog(Shell parent, String url) {
-        new RemoveNodeDialog(parent, url);
+    public static void showDialog(Shell parent, ArrayList<String> nodesUrls) {
+        new RemoveNodeDialog(parent, nodesUrls);
     }
 }

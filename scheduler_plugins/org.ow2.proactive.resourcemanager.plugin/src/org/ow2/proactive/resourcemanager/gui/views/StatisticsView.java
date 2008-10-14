@@ -3,13 +3,11 @@ package org.ow2.proactive.resourcemanager.gui.views;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
-import org.ow2.proactive.resourcemanager.gui.tree.TreeManager;
-import org.ow2.proactive.resourcemanager.gui.tree.TreeStatistic;
+import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.stats.RMStatsViewer;
 
 
 /**
@@ -17,79 +15,37 @@ import org.ow2.proactive.resourcemanager.gui.tree.TreeStatistic;
  */
 public class StatisticsView extends ViewPart {
 
-    /** the view part id */
-    public static final String ID = "org.ow2.proactive.resourcemanager.gui.views.StatisticsView";
-
-    // the shared instance
-    private static StatisticsView instance = null;
-    private static boolean isDisposed = true;
-    private Table table = null;
-
     /**
-     * The constructor.
+     * view part id
      */
-    public StatisticsView() {
-        instance = this;
+    public static final String ID = "org.ow2.proactive.resourcemanager.gui.views.StatisticsView";
+    private static RMStatsViewer statsViewer = null;
+
+    public static void init() {
+        statsViewer.init();
     }
 
-    public void maj() {
-        TreeManager treeManager = TreeManager.getInstance();
-        if (treeManager != null) {
-            final TreeStatistic statistic = treeManager.getStatistic();
-            if (statistic != null) {
-                Display.getDefault().asyncExec(new Runnable() {
-                    public void run() {
-                        if (!table.isDisposed()) {
-                            // Turn off drawing to avoid flicker
-                            table.setRedraw(false);
-
-                            table.removeAll();
-                            TableItem item;
-
-                            // free
-                            item = new TableItem(table, SWT.NONE);
-                            item.setText(new String[] { "# free nodes", statistic.getFreeNodes() + "" });
-                            // busy
-                            item = new TableItem(table, SWT.NONE);
-                            item.setText(new String[] { "# busy nodes", statistic.getBusyNodes() + "" });
-                            // down
-                            item = new TableItem(table, SWT.NONE);
-                            item.setText(new String[] { "# down nodes", statistic.getDownNodes() + "" });
-
-                            //                            TableColumn[] cols = table.getColumns();
-                            //                            for (TableColumn tc : cols) {
-                            //                                tc.pack();
-                            //                            }
-
-                            // Turn on drawing
-                            table.setRedraw(true);
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    /**
-     * This is a callback that will allow us to create the viewer and initialize it.
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
     @Override
     public void createPartControl(Composite parent) {
-        isDisposed = false;
-        table = new Table(parent, SWT.BORDER | SWT.SINGLE);
+        statsViewer = new RMStatsViewer(parent);
+        Table table = statsViewer.getTable();
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
-
         TableColumn tc1 = new TableColumn(table, SWT.LEFT);
         TableColumn tc2 = new TableColumn(table, SWT.LEFT);
-        tc1.setText("name");
-        tc2.setText("value");
+        tc1.setText("state");
+        tc2.setText("aggregate");
         tc1.setWidth(120);
         tc2.setWidth(150);
         tc1.setMoveable(true);
         tc2.setMoveable(true);
-        //maj();
+        if (RMStore.isConnected()) {
+            statsViewer.init();
+        }
     }
 
     /**
@@ -103,52 +59,24 @@ public class StatisticsView extends ViewPart {
     }
 
     /**
-     * Returns the shared instance
-     * 
-     * @return the shared instance
-     */
-    public static StatisticsView getInstance() {
-        if (isDisposed) {
-            return null;
-        }
-        return instance;
-    }
-
-    /**
+     * Called when view is closed
+     * sacrifices statsViewer to garbage collector
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
      */
     @Override
     public void dispose() {
-        isDisposed = true;
         super.dispose();
-    }
-
-    /**
-     * To clear the view
-     */
-    public void clear() {
-        table.removeAll();
-    }
-
-    /**
-     * to display or not the view
-     * 
-     * @param isVisible
-     */
-    public void setVisible(boolean isVisible) {
-        if (table != null) {
-            table.setVisible(isVisible);
+        if (statsViewer != null) {
+            statsViewer.setInput(null);
+            statsViewer = null;
         }
     }
 
     /**
-     * To enabled or not the view
-     * 
-     * @param isEnabled
+     * @return statsViewer if view is activated,
+     * null otherwise
      */
-    public void setEnabled(boolean isEnabled) {
-        if (table != null) {
-            table.setEnabled(isEnabled);
-        }
+    public static RMStatsViewer getStatsViewer() {
+        return statsViewer;
     }
 }

@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.tree.TreeManager;
 
 
 /**
@@ -98,7 +97,7 @@ public class AddNodeByURLDialog extends Dialog {
         nsFormData.right = new FormAttachment(100, -5);
         nsFormData.width = 320;
         sourceNameCombo.setLayoutData(nsFormData);
-        sourceNameCombo.setItems(TreeManager.getInstance().getSourcesNames(false, true, true));
+        sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(false, true, true));
         if ((source != null) && (!source.equals("")))
             sourceNameCombo.setText(source);
         else

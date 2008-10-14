@@ -34,6 +34,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
 
@@ -67,12 +68,16 @@ public class ResourceManagerPerspective implements IPerspectiveFactory {
         String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(false);
 
-        IFolderLayout topFolder = layout.createFolder(ID_TOP_FOLDER, IPageLayout.TOP, 0.7f, editorArea);
-        topFolder.addView(ResourceExplorerView.ID);
+        IFolderLayout topFolderTab = layout.createFolder(ID_TOP_FOLDER, IPageLayout.TOP, 0.7f, editorArea);
+        topFolderTab.addView(ResourcesTabView.ID);
+
+        IFolderLayout topFolderTree = layout.createFolder(ID_TOP_FOLDER, IPageLayout.TOP, 0.7f, editorArea);
+        topFolderTree.addView(ResourceExplorerView.ID);
 
         IFolderLayout subleftFolder = layout.createFolder(ID_LEFT_FOLDER, IPageLayout.BOTTOM, 0.3f,
                 editorArea);
         subleftFolder.addView(StatisticsView.ID);
+
         //
         //        IFolderLayout subsubleftFolder = layout.createFolder(ID_BOTTOM_FOLDER, IPageLayout.RIGHT, 0.5f,
         //                ID_LEFT_FOLDER);

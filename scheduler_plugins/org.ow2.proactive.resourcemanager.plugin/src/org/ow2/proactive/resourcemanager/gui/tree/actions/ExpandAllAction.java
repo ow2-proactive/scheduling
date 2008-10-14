@@ -28,23 +28,41 @@
  *
  * ################################################################
  */
-package org.ow2.proactive.resourcemanager.gui.dialog;
+package org.ow2.proactive.resourcemanager.gui.tree.actions;
 
-import java.io.Serializable;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.TreeViewer;
 
 
 /**
  * @author The ProActive Team
  *
  */
-public class SelectResourceManagerDialogResult implements Serializable {
-    private String url = null;
+public class ExpandAllAction extends Action {
+    public static final boolean ENABLED_AT_CONSTRUCTION = false;
+    private static ExpandAllAction instance = null;
+    private TreeViewer viewer = null;
 
-    public SelectResourceManagerDialogResult(String url) {
-        this.url = url;
+    private ExpandAllAction(TreeViewer viewer) {
+        this.viewer = viewer;
+        this.setText("Expand All");
+        this.setToolTipText("To expand all items");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "../icons/expandall.gif"));
+        this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
-    public String getUrl() {
-        return url;
+    @Override
+    public void run() {
+        viewer.expandAll();
+    }
+
+    public static ExpandAllAction newInstance(TreeViewer viewer) {
+        instance = new ExpandAllAction(viewer);
+        return instance;
+    }
+
+    public static ExpandAllAction getInstance() {
+        return instance;
     }
 }

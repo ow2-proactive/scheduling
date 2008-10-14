@@ -11,14 +11,12 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.ProActiveException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
 public class ShutdownDialog extends Dialog {
     private Shell shell = null;
-    private Text text;
     private Button okButton;
     private Button cancelButton;
 
@@ -27,7 +25,6 @@ public class ShutdownDialog extends Dialog {
 
         /* Init the display */
         Display display = getParent().getDisplay();
-
         FormData fd;
 
         /* Init the shell */

@@ -43,7 +43,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.tree.TreeManager;
 
 
 /**
@@ -95,7 +94,7 @@ public class RemoveSourceDialog extends Dialog {
         urlFormData.right = new FormAttachment(100, -5);
         urlFormData.width = 320;
         sourceNameCombo.setLayoutData(urlFormData);
-        sourceNameCombo.setItems(TreeManager.getInstance().getSourcesNames(true, true, false));
+        sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(true, true, false));
         if ((source != null) && (!source.equals("")))
             sourceNameCombo.setText(source);
 

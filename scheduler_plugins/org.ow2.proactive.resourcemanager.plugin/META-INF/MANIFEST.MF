@@ -13,11 +13,15 @@ Eclipse-RegisterBuddy: org.ow2.proactive.scheduler.lib
 Bundle-ClassPath: .,
  classes/
 Export-Package: org.ow2.proactive.resourcemanager.gui,
- org.ow2.proactive.resourcemanager.gui.actions,
- org.ow2.proactive.resourcemanager.gui.actions.icons,
  org.ow2.proactive.resourcemanager.gui.data,
+ org.ow2.proactive.resourcemanager.gui.data.model,
  org.ow2.proactive.resourcemanager.gui.dialog,
- org.ow2.proactive.resourcemanager.gui.interfaces,
+ org.ow2.proactive.resourcemanager.gui.handlers,
+ org.ow2.proactive.resourcemanager.gui.icons,
+ org.ow2.proactive.resourcemanager.gui.stats,
+ org.ow2.proactive.resourcemanager.gui.table,
+ org.ow2.proactive.resourcemanager.gui.table.icons,
  org.ow2.proactive.resourcemanager.gui.tree,
+ org.ow2.proactive.resourcemanager.gui.tree.actions,
  org.ow2.proactive.resourcemanager.gui.tree.icons,
  org.ow2.proactive.resourcemanager.gui.views
