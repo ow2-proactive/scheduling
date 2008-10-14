@@ -109,7 +109,7 @@ public class MatlabFinder {
             if (debug) {
                 System.out.println("Using script at " + batchFile.getAbsolutePath());
             }
-            while (!batchFile.exists() && !batchFile.canExecute()) {
+            while (!batchFile.exists()) {
                 Thread.sleep(100);
             }
             // finally we launch the batch file
