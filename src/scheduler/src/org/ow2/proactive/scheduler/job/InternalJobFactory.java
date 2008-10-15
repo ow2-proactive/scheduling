@@ -88,16 +88,8 @@ public class InternalJobFactory implements Serializable {
         }
 
         try {
-            iJob.setName(job.getName());
-            iJob.setPriority(job.getPriority());
-            iJob.setCancelOnError(job.isCancelOnError());
-            iJob.setDescription(job.getDescription());
-            iJob.setLogFile(job.getLogFile());
-            iJob.setProjectName(job.getProjectName());
-            for (Entry<String, String> e : job.getGenericInformations().entrySet()) {
-                iJob.addGenericInformation(e.getKey(), e.getValue());
-            }
-            iJob.setEnv(job.getEnv());
+            //set the job common properties
+            setJobCommonProperties(job, iJob);
             return iJob;
         } catch (Exception e) {
             throw new SchedulerException("Error while creating the internalJob !", e);
@@ -131,8 +123,8 @@ public class InternalJobFactory implements Serializable {
 
         InternalProActiveTask iajt = job.getTask();
         userTask.setPreciousResult(true);
-        //set common fields
-        setCommonProperties(userTask, iajt);
+        //set task common properties
+        setTaskCommonProperties(userJob, userTask, iajt);
 
         return job;
     }
@@ -190,7 +182,7 @@ public class InternalJobFactory implements Serializable {
         boolean hasPreciousResult = false;
 
         for (Task t : userJob.getTasks()) {
-            tasksList.put(t, createTask(t));
+            tasksList.put(t, createTask(userJob, t));
 
             if (hasPreciousResult == false) {
                 hasPreciousResult = t.isPreciousResult();
@@ -213,11 +205,11 @@ public class InternalJobFactory implements Serializable {
         return job;
     }
 
-    private static InternalTask createTask(Task task) throws SchedulerException {
+    private static InternalTask createTask(Job userJob, Task task) throws SchedulerException {
         if (task instanceof NativeTask) {
-            return createTask((NativeTask) task);
+            return createTask(userJob, (NativeTask) task);
         } else if (task instanceof JavaTask) {
-            return createTask((JavaTask) task);
+            return createTask(userJob, (JavaTask) task);
         } else {
             throw new SchedulerException("The task you intend to add is unknown !");
         }
@@ -230,7 +222,7 @@ public class InternalJobFactory implements Serializable {
      * @return the created internal task.
      * @throws SchedulerException an exception if the factory cannot create the given task.
      */
-    private static InternalTask createTask(JavaTask task) throws SchedulerException {
+    private static InternalTask createTask(Job userJob, JavaTask task) throws SchedulerException {
         InternalJavaTask javaTask;
 
         if (task.getExecutableClassName() != null) {
@@ -243,9 +235,8 @@ public class InternalJobFactory implements Serializable {
 
         javaTask.setFork(task.isFork());
         javaTask.setForkEnvironment(task.getForkEnvironment());
-        //set common fields
-        setCommonProperties(task, javaTask);
-
+        //set task common properties
+        setTaskCommonProperties(userJob, task, javaTask);
         return javaTask;
     }
 
@@ -256,16 +247,37 @@ public class InternalJobFactory implements Serializable {
      * @return the created internal task.
      * @throws SchedulerException an exception if the factory cannot create the given task.
      */
-    private static InternalTask createTask(NativeTask task) throws SchedulerException {
+    private static InternalTask createTask(Job userJob, NativeTask task) throws SchedulerException {
         if (((task.getCommandLine() == null) || (task.getCommandLine() == "")) &&
             (task.getGenerationScript() == null)) {
             throw new SchedulerException("The command line is null or empty and not generated !!");
         }
         InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
                 .getCommandLine(), task.getGenerationScript()));
-        setCommonProperties(task, nativeTask);
-
+        //set task common properties
+        setTaskCommonProperties(userJob, task, nativeTask);
         return nativeTask;
+    }
+
+    /**
+     * Set some properties between the user Job and internal Job.
+     *
+     * @param job the user job.
+     * @param jobToSet the internal job to set.
+     */
+    private static void setJobCommonProperties(Job job, InternalJob jobToSet) {
+        jobToSet.setName(job.getName());
+        jobToSet.setPriority(job.getPriority());
+        jobToSet.setCancelJobOnError(job.isCancelJobOnError());
+        jobToSet.setRestartTaskOnError(job.getRestartTaskOnError());
+        jobToSet.setMaxNumberOfExecution(job.getMaxNumberOfExecution());
+        jobToSet.setDescription(job.getDescription());
+        jobToSet.setLogFile(job.getLogFile());
+        jobToSet.setProjectName(job.getProjectName());
+        jobToSet.setEnv(job.getEnv());
+        for (Entry<String, String> e : job.getGenericInformations().entrySet()) {
+            jobToSet.addGenericInformation(e.getKey(), e.getValue());
+        }
     }
 
     /**
@@ -274,18 +286,33 @@ public class InternalJobFactory implements Serializable {
      * @param task the user task.
      * @param taskToSet the internal task to set.
      */
-    private static void setCommonProperties(Task task, InternalTask taskToSet) {
+    private static void setTaskCommonProperties(Job userJob, Task task, InternalTask taskToSet) {
         taskToSet.setDescription(task.getDescription());
         taskToSet.setPreciousResult(task.isPreciousResult());
         taskToSet.setName(task.getName());
         taskToSet.setPreScript(task.getPreScript());
         taskToSet.setPostScript(task.getPostScript());
         taskToSet.setCleaningScript(task.getCleaningScript());
-        taskToSet.setRerunnable(task.getRerunnable());
         taskToSet.setSelectionScript(task.getSelectionScript());
         taskToSet.setResultPreview(task.getResultPreview());
         taskToSet.setWallTime(task.getWallTime());
-        taskToSet.setRestartOnError(task.getRestartOnError());
+        //Properties with priority between job and tasks
+        if (task.getCancelJobOnErrorProperty().isSet()) {
+            taskToSet.setCancelJobOnError(task.isCancelJobOnError());
+        } else {
+            taskToSet.setCancelJobOnError(userJob.isCancelJobOnError());
+        }
+        if (task.getRestartTaskOnErrorProperty().isSet()) {
+            taskToSet.setRestartTaskOnError(task.getRestartTaskOnError());
+        } else {
+            taskToSet.setRestartTaskOnError(userJob.getRestartTaskOnError());
+        }
+        if (task.getNumberOfExecutionProperty().isSet()) {
+            taskToSet.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
+        } else {
+            taskToSet.setMaxNumberOfExecution(userJob.getMaxNumberOfExecution());
+        }
+        //Generic informations
         for (Entry<String, String> e : task.getGenericInformations().entrySet()) {
             taskToSet.addGenericInformation(e.getKey(), e.getValue());
         }

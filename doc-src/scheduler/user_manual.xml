@@ -10,7 +10,7 @@
 		<section xml:id="Create_job_xml"><info><title>Job XML descriptor</title></info>
 			<para>
 			The  Job  XML descriptor is created 
-			following the <link xlink:href="http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd">descriptor schema</link>:
+			following the <link xlink:href="http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd">descriptor schema</link>:
 			</para>
 			<para>
 				Several parameters can be set for a job :
@@ -697,7 +697,7 @@ job.addTask(aTask);
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>generic information</emphasis> (optional)
+							<emphasis>genericInformation</emphasis> (optional)
 							is a way to define some information inside your task.
 							This information could be read inside the policy (similar to job's one).
 							It can be useful to add new complex scheduling behavior.
@@ -714,9 +714,9 @@ job.addTask(aTask);
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>retries</emphasis> (optional - default is 1)
-							is a way to define how many times a task will be reran if a network
-							problems occur. Set this value to <emphasis>n</emphasis>
+							<emphasis>maxNumberOfExecution</emphasis> (optional - default is 1)
+							is a way to define how many times a task will run if it ends with an exception
+							or error code. Set this value to <emphasis>n</emphasis>
 							if you want the task to be restarted <emphasis>n</emphasis> times and so,
 							started a maximum of <emphasis>n+1</emphasis> times.
 						</para>

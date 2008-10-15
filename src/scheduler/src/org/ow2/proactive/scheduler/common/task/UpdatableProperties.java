@@ -31,57 +31,58 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import org.objectweb.proactive.annotation.PublicAPI;
+import java.io.Serializable;
 
 
 /**
- * This class represents the different restart mode for a task if an error occurred during its execution.<br>
+ * UpdatableProperties allow to know if a specified value has been modified or not.<br />
+ * Useful to know if the default value has been kept.
  *
  * @author The ProActive Team
- * @since ProActive 4.0
+ * @since ProActive Scheduling 0.9.1
  */
-@PublicAPI
-public enum RestartMode implements java.io.Serializable {
+public class UpdatableProperties<T> implements Serializable {
+
+    /** The value of this property. */
+    private T value = null;
+    /** If the property has been set. */
+    private boolean set = false;
 
     /**
-     * The task will be restarted according to its possible resources.
+     * Create a new instance of UpdatableProperties using a specified value.<br />
+     * This value will be considered has the default one.
      */
-    ANYWHERE("Anywhere"),
-    /**
-     * The task will be restarted on an other node.
-     */
-    ELSEWHERE("Elsewhere");
-
-    private String name;
-
-    /**
-     * Implicit constructor of a restart mode.
-     *
-     * @param name the name of the restart mode.
-     */
-    RestartMode(String name) {
-        this.name = name;
+    public UpdatableProperties(T defaultValue) {
+        this.value = defaultValue;
     }
 
     /**
-     * Return the RestartMode as an Enumeration corresponding to the given sMode String. 
-     *
-     * @param sMode
-     * @return the RestartMode as an Enumeration.
+     * Get the value of the property.
+     * 
+     * @return the value of the property.
      */
-    public static RestartMode getMode(String sMode) {
-        if ("elsewhere".equalsIgnoreCase(sMode)) {
-            return ELSEWHERE;
-        } else {
-            return ANYWHERE;
-        }
+    public T getValue() {
+        return value;
     }
 
     /**
-     * @see java.lang.Enum#toString()
+     * Set the value of the property.
+     * This action will remember that the value is not the default one anymore.
+     * 
+     * @param value the new value to be set.
      */
-    @Override
-    public String toString() {
-        return name;
+    public void setValue(T value) {
+        this.value = value;
+        this.set = true;
     }
+
+    /**
+     * Tell if the value has been set or if it is the default one.
+     * 
+     * @return true if the default value has been changed.
+     */
+    public boolean isSet() {
+        return set;
+    }
+
 }

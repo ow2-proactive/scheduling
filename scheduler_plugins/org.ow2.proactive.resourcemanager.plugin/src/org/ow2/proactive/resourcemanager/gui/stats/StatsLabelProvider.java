@@ -21,7 +21,6 @@ public class StatsLabelProvider implements ITableLabelProvider {
         return null;
     }
 
-
     public void addListener(ILabelProviderListener listener) {
         // TODO Auto-generated method stub
     }
@@ -29,7 +28,6 @@ public class StatsLabelProvider implements ITableLabelProvider {
     public void dispose() {
         // TODO Auto-generated method stub
     }
-
 
     public boolean isLabelProperty(Object element, String property) {
         // TODO Auto-generated method stub

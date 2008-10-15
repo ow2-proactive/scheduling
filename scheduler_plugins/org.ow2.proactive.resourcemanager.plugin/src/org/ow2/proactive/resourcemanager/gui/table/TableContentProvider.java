@@ -12,7 +12,6 @@ import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
 
 public class TableContentProvider implements IStructuredContentProvider {
 
-
     public Object[] getElements(Object inputElement) {
         return (getAllTableItems((Root) inputElement)).toArray();
     }
@@ -20,7 +19,6 @@ public class TableContentProvider implements IStructuredContentProvider {
     public void dispose() {
         // TODO Auto-generated method stub
     }
-
 
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         // TODO Auto-generated method stub

@@ -180,7 +180,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             TaskFlowJob job = new TaskFlowJob();
             job.setName("Master-Worker Framework Job " + pendingTasks.peek().getId());
             job.setPriority(JobPriority.NORMAL);
-            job.setCancelOnError(true);
+            job.setCancelJobOnError(true);
             job.setDescription("Set of parallel master-worker tasks");
             Collection<TaskIntern<Serializable>> newTasks = new ArrayList<TaskIntern<Serializable>>();
             while (pendingTasks.size() > 0) {

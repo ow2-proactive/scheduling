@@ -94,7 +94,7 @@ public class SimpleHelloWorld {
             //@snippet-end task_flow_job_creation
             job.setName("job name");
             job.setPriority(JobPriority.NORMAL);
-            job.setCancelOnError(false);
+            job.setCancelJobOnError(false);
             job.setDescription("A simple hello world example !");
             //@snippet-end taskflow_params
             //******************** CREATE A NEW TASK ***********************

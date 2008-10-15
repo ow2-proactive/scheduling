@@ -106,11 +106,11 @@ public class JobFactory {
 
     public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
     /** Location of the schema used to parse job descriptor. */
-    public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/0.91/schedulerjob.rng";
+    public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng";
     /** Variables styleScheet location. */
     public static final String STYLESHEET_LOCATION = "/org/ow2/proactive/scheduler/common/xml/stylesheets/variables.xsl";
     /** Job name space. */
-    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:0.91";
+    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:dev";
     /** Job prefix. */
     public static final String JOB_PREFIX = "js";
 
@@ -119,10 +119,12 @@ public class JobFactory {
     private static final String JOB_TASKFLOW = "taskFlow";
     private static final String JOB_PROACTIVE = "proActive";
     private static final String JOB_ATTRIBUTE_PRIORITY = "@priority";
-    private static final String JOB_ATTRIBUTE_CANCELONERROR = "@cancelOnError";
     private static final String JOB_ATTRIBUTE_PROJECTNAME = "@projectName";
     private static final String JOB_ATTRIBUTE_LOGFILE = "@logFile";
     //COMMON
+    private static final String ATTRIBUTE_CANCELJOBONERROR = "@cancelJobOnError";
+    private static final String ATTRIBUTE_RESTARTTASKONERROR = "@restartTaskOnError";
+    private static final String ATTRIBUTE_MAXNUMBEROFEXECUTION = "@maxNumberOfExecution";
     private static final String ATTRIBUTE_ID = "@name";
     private static final String TAG_DESCRIPTION = "description";
     private static final String GENERIC_INFORMATION = "genericInformation/info";
@@ -136,8 +138,6 @@ public class JobFactory {
     private static final String TASK_DEPENDENCES_REF = "depends/task/@ref";
     private static final String TASK_ATTRIBUTE_RESULTPREVIEW = "@resultPreviewClass";
     private static final String TASK_ATTRIBUTE_PRECIOUSRESULT = "@preciousResult";
-    private static final String TASK_ATTRIBUTE_TASKRETRIES = "@retries";
-    private static final String TASK_ATTRIBUTE_RESTARTONERROR = "@restartOnError";
     private static final String TASK_ATTRIBUTE_CLASSNAME = "@class";
     private static final String TASK_TAG_PARAMETERS = "parameters/parameter";
     private static final String TASK_ATTRIBUTE_NEEDEDNODES = "@neededNodes";
@@ -287,9 +287,7 @@ public class JobFactory {
 
         // JOB
         XPathExpression exp = xpath.compile(addPrefixes("/" + JOB_TAG));
-
         Node jobNode = (Node) exp.evaluate(rootNode, XPathConstants.NODE);
-
         JobType jt = null;
 
         // JOB TYPE
@@ -317,21 +315,30 @@ public class JobFactory {
         }
         // JOB NAME
         job.setName((String) xpath.evaluate(ATTRIBUTE_ID, jobNode, XPathConstants.STRING));
-        logger.debug("Job : " + job.getName());
+        logger.debug(ATTRIBUTE_ID + " : " + job.getName());
+
         // JOB PRIORITY
         String prio = xpath.evaluate(JOB_ATTRIBUTE_PRIORITY, jobNode);
-        if (!"".equals(prio)) {
-            job.setPriority(JobPriority.findPriority(prio));
-        } else {
-            job.setPriority(JobPriority.NORMAL);
+        job.setPriority(JobPriority.findPriority(prio));
+        logger.debug(JOB_ATTRIBUTE_PRIORITY + "priority = " + job.getPriority());
+
+        // CANCEL JOB ON ERROR
+        String cancel = xpath.evaluate(ATTRIBUTE_CANCELJOBONERROR, jobNode);
+        if (!"".equals(cancel)) {
+            job.setCancelJobOnError(Boolean.parseBoolean(cancel));
+            logger.debug(ATTRIBUTE_CANCELJOBONERROR + " = " + job.isCancelJobOnError());
         }
 
-        // JOB CANCEL ON EXCEPTION
-        String cancel = xpath.evaluate(JOB_ATTRIBUTE_CANCELONERROR, jobNode);
-        if (!"".equals(cancel)) {
-            job.setCancelOnError(Boolean.parseBoolean(cancel));
-        } else {
-            job.setCancelOnError(false);
+        // RESTART TASK ON ERROR
+        String restart = xpath.evaluate(ATTRIBUTE_RESTARTTASKONERROR, jobNode);
+        job.setRestartTaskOnError(RestartMode.getMode(restart));
+        logger.debug(ATTRIBUTE_RESTARTTASKONERROR + " = " + job.getRestartTaskOnError());
+
+        // MAX NUMBER OF EXECUTION ON ERROR
+        String number = xpath.evaluate(ATTRIBUTE_MAXNUMBEROFEXECUTION, jobNode);
+        if (!"".equals(number)) {
+            job.setMaxNumberOfExecution(Integer.parseInt(number));
+            logger.debug(ATTRIBUTE_MAXNUMBEROFEXECUTION + " = " + job.getMaxNumberOfExecution());
         }
 
         // JOB PROJECT NAME
@@ -339,22 +346,22 @@ public class JobFactory {
                 XPathConstants.STRING);
         if (!"".equals(projectName)) {
             job.setProjectName(projectName);
+            logger.debug(JOB_ATTRIBUTE_PROJECTNAME + " = " + projectName);
         }
-        logger.debug("Project name = " + projectName);
 
         // JOB LOG FILE
         String logFile = xpath.evaluate(JOB_ATTRIBUTE_LOGFILE, jobNode);
         if (!"".equals(logFile)) {
             job.setLogFile(logFile);
+            logger.debug(JOB_ATTRIBUTE_LOGFILE + " = " + logFile);
         }
 
         // JOB DESCRIPTION
         Object description = xpath.evaluate(addPrefixes(JOB_TAG + "/" + TAG_DESCRIPTION), rootNode,
                 XPathConstants.STRING);
-
         if (description != null) {
-            logger.debug("Job description = " + description);
             job.setDescription((String) description);
+            logger.debug(JOB_TAG + "/" + TAG_DESCRIPTION + " = " + description);
         }
 
         //JOB GENERIC INFORMATION
@@ -436,8 +443,8 @@ public class JobFactory {
                 //if the walltime is set and fork not, fork must be true.
                 if ((task instanceof JavaTask) && task.getWallTime() > 0 && !((JavaTask) task).isFork()) {
                     ((JavaTask) task).setFork(true);
-                    System.out
-                            .println("For javatask, setting a walltime implies the task to be forked, so your task will be forked anyway !");
+                    logger
+                            .info("For javatask, setting a walltime implies the task to be forked, so your task will be forked anyway !");
                 }
                 switch (job.getType()) {
                     case PROACTIVE:
@@ -488,12 +495,12 @@ public class JobFactory {
             ClassNotFoundException, InvalidScriptException, MalformedURLException {
         // TASK NAME
         task.setName((String) xpath.evaluate(ATTRIBUTE_ID, taskNode, XPathConstants.STRING));
-        logger.debug("TaskId = " + task.getName());
+        logger.debug(ATTRIBUTE_ID + " = " + task.getName());
 
         // TASK DESCRIPTION
         task.setDescription((String) xpath.evaluate(addPrefixes(TAG_DESCRIPTION), taskNode,
                 XPathConstants.STRING));
-        logger.debug("Description = " + task.getDescription());
+        logger.debug(TAG_DESCRIPTION + " = " + task.getDescription());
 
         // TASK GENERIC INFORMATION
         NodeList list = (NodeList) xpath.evaluate(addPrefixes(GENERIC_INFORMATION), taskNode,
@@ -504,7 +511,7 @@ public class JobFactory {
                 String name = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_NAME, n, XPathConstants.STRING);
                 String value = (String) xpath
                         .evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, n, XPathConstants.STRING);
-                logger.debug("Generic Info = " + name + ":" + value);
+                logger.debug(GENERIC_INFORMATION + " = " + name + ":" + value);
                 if ((name != null) && (value != null)) {
                     task.addGenericInformation(name, value);
                 }
@@ -515,66 +522,72 @@ public class JobFactory {
         String previewClassName = (String) xpath.evaluate(TASK_ATTRIBUTE_RESULTPREVIEW, taskNode,
                 XPathConstants.STRING);
         if (!previewClassName.equals("")) {
-            logger.debug("Preview className = " + previewClassName);
             task.setResultPreview(previewClassName);
+            logger.debug(TASK_ATTRIBUTE_RESULTPREVIEW + " = " + previewClassName);
         }
         // TASK WALLTIME
         String wallTime = (String) xpath.evaluate(TASK_ATTRIBUTE_WALLTIME, taskNode, XPathConstants.STRING);
         if (wallTime != null && !wallTime.equals("")) {
             task.setWallTime(Tools.formatDate(wallTime));
-            logger.debug("WallTime = " + wallTime + " ( " + Tools.formatDate(wallTime) + "ms )");
+            logger.debug(TASK_ATTRIBUTE_WALLTIME + " = " + wallTime + " ( " + Tools.formatDate(wallTime) +
+                "ms )");
         }
 
         // TASK PRECIOUS RESULT
         task.setPreciousResult(((String) xpath.evaluate(TASK_ATTRIBUTE_PRECIOUSRESULT, taskNode,
                 XPathConstants.STRING)).equals("true"));
-        logger.debug("Precious = " + task.isPreciousResult());
+        logger.debug(TASK_ATTRIBUTE_PRECIOUSRESULT + " = " + task.isPreciousResult());
 
-        // TASK RETRIES
-        String rerunnable = (String) xpath.evaluate(TASK_ATTRIBUTE_TASKRETRIES, taskNode,
-                XPathConstants.STRING);
-        if (rerunnable != "") {
-            task.setRerunnable(Integer.parseInt(rerunnable));
-        } else {
-            task.setRerunnable(1);
+        // CANCEL JOB ON ERROR
+        String cancel = (String) xpath.evaluate(ATTRIBUTE_CANCELJOBONERROR, taskNode, XPathConstants.STRING);
+        if (!"".equals(cancel)) {
+            task.setCancelJobOnError(Boolean.parseBoolean(cancel));
+            logger.debug(ATTRIBUTE_CANCELJOBONERROR + " = " + task.isCancelJobOnError());
         }
-        logger.debug("reRun = " + task.getRerunnable());
 
         // TASK RESTART ON ERROR
-        String restart = (String) xpath.evaluate(TASK_ATTRIBUTE_RESTARTONERROR, taskNode,
+        String restart = (String) xpath.evaluate(ATTRIBUTE_RESTARTTASKONERROR, taskNode,
                 XPathConstants.STRING);
-        task.setRestartOnError(RestartMode.getMode(restart));
-        logger.debug("restartOnError = " + task.getRestartOnError());
+        task.setRestartTaskOnError(RestartMode.getMode(restart));
+        logger.debug(ATTRIBUTE_RESTARTTASKONERROR + " = " + task.getRestartTaskOnError());
+
+        // TASK NUMBER OF EXECUTION ON ERROR
+        String noe = (String) xpath.evaluate(ATTRIBUTE_MAXNUMBEROFEXECUTION, taskNode, XPathConstants.STRING);
+        if (noe != "") {
+            task.setMaxNumberOfExecution(Integer.parseInt(noe));
+            logger.debug(ATTRIBUTE_MAXNUMBEROFEXECUTION + " = " + task.getMaxNumberOfExecution());
+        }
 
         // TASK VERIF
         Node verifNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_SELECTION + "/" + TASK_TAG_SCRIPT),
                 taskNode, XPathConstants.NODE);
         if (verifNode != null) {
             task.setSelectionScript(createSelectionScript(verifNode));
+            logger.debug(TASK_TAG_SELECTION + "/" + TASK_TAG_SCRIPT + " set");
         }
 
         // TASK PRE
         Node preNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_PRE + "/" + TASK_TAG_SCRIPT), taskNode,
                 XPathConstants.NODE);
         if (preNode != null) {
-            logger.debug("PRE");
             task.setPreScript(createScript(preNode));
+            logger.debug(TASK_TAG_PRE + "/" + TASK_TAG_SCRIPT + " set");
         }
 
         // TASK POST
         Node postNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_POST + "/" + TASK_TAG_SCRIPT), taskNode,
                 XPathConstants.NODE);
         if (postNode != null) {
-            logger.debug("POST");
             task.setPostScript(createScript(postNode));
+            logger.debug(TASK_TAG_POST + "/" + TASK_TAG_SCRIPT + " set");
         }
 
-        // TASK POST
+        // TASK CLEAN
         Node cleaningNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_CLEANING + "/" + TASK_TAG_SCRIPT),
                 taskNode, XPathConstants.NODE);
         if (cleaningNode != null) {
-            logger.debug("CLEANING");
             task.setCleaningScript(createScript(cleaningNode));
+            logger.debug(TASK_TAG_CLEANING + "/" + TASK_TAG_SCRIPT + " set");
         }
 
         return task;
@@ -620,16 +633,16 @@ public class JobFactory {
     private JavaTask createJavaTask(Node process) throws XPathExpressionException, ClassNotFoundException,
             IOException {
         JavaTask desc = new JavaTask();
+        //EXECUTABLE CLASS NAME
         desc.setExecutableClassName((String) xpath.compile(TASK_ATTRIBUTE_CLASSNAME).evaluate(process,
                 XPathConstants.STRING));
-
-        logger.debug("task = " + desc.getExecutableClassName());
+        logger.debug(TASK_ATTRIBUTE_CLASSNAME + " = " + desc.getExecutableClassName());
 
         //FORKED JAVA TASK PARAMETERS
         boolean fork = "true".equals((String) xpath.evaluate(TASK_ATTRIBUTE_FORK, process,
                 XPathConstants.STRING));
         desc.setFork(fork);
-        logger.debug("Fork = " + fork);
+        logger.debug(TASK_ATTRIBUTE_FORK + " = " + fork);
 
         //javaEnvironment
         ForkEnvironment forkEnv = new ForkEnvironment();
@@ -638,14 +651,14 @@ public class JobFactory {
         logger.debug(process.getLocalName());
         if (javaHome != null) {
             forkEnv.setJavaHome(javaHome);
-            logger.debug("javaHome = " + javaHome);
+            logger.debug(FORK_TAG_ENVIRONMENT + "/" + FORK_ATTRIBUTE_JAVAHOME + " = " + javaHome);
         }
 
         String jvmParameters = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
             FORK_ATTRIBUTE_JVMPARAMETERS), process, XPathConstants.STRING);
         if (jvmParameters != null) {
             forkEnv.setJVMParameters(jvmParameters);
-            logger.debug("jvmParameters = " + jvmParameters);
+            logger.debug(FORK_TAG_ENVIRONMENT + "/" + FORK_ATTRIBUTE_JVMPARAMETERS + " = " + jvmParameters);
         }
         desc.setForkEnvironment(forkEnv);
 
@@ -679,7 +692,7 @@ public class JobFactory {
 
         desc.setExecutableClassName((String) xpath.compile(TASK_ATTRIBUTE_CLASSNAME).evaluate(process,
                 XPathConstants.STRING));
-        logger.debug("task = " + desc.getExecutableClassName());
+        logger.debug(TASK_ATTRIBUTE_CLASSNAME + " = " + desc.getExecutableClassName());
 
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
                 XPathConstants.NODESET);

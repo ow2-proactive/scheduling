@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 	name="job_with_dep" priority="normal" projectName="my_Project_Name">
 	<description>Test of 8 tasks with variable durations and dependencies</description>
 	<genericInformation>
@@ -9,7 +9,7 @@
 		<info name="info2" value="value2"/>
 	</genericInformation>
 	<taskFlow>
-		<task name="task1" retries="2">
+		<task name="task1" maxNumberOfExecution="3">
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
@@ -42,7 +42,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task4" retries="2">
+		<task name="task4" maxNumberOfExecution="3">
 			<!-- Task human description -->
 			<description>This task will sleep 5s</description>
 			<depends>
@@ -83,7 +83,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task7" retries="2" preciousResult="true">
+		<task name="task7" maxNumberOfExecution="3" preciousResult="true">
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
 			<depends>

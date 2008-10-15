@@ -59,12 +59,10 @@ public class TableLabelProvider implements ITableLabelProvider {
         // TODO Auto-generated method stub
     }
 
-
     public void dispose() {
         // TODO Auto-generated method stub
 
     }
-
 
     public boolean isLabelProperty(Object element, String property) {
         // TODO Auto-generated method stub

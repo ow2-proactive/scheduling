@@ -201,7 +201,7 @@ public class TaskComposite extends Composite {
         tc7.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalTask.SORT_BY_RERUNNABLE);
+                sort(event, InternalTask.SORT_BY_EXECUTIONLEFT);
             }
         });
         //        tc8.addSelectionListener(new SelectionAdapter() {
@@ -296,7 +296,7 @@ public class TaskComposite extends Composite {
                 InternalTask task = job.getHMTasks().get(taskId);
 
                 // update its tasks informations if task is finished
-                if (task.getStatus() == TaskState.FINISHED) {
+                if (task.getStatus() == TaskState.FINISHED || task.getStatus() == TaskState.FAULTY) {
                     TaskResult tr = getTaskResult(job.getId(), taskId);
                     if (tr != null) {
                         if (doubleClick) {
@@ -321,7 +321,7 @@ public class TaskComposite extends Composite {
                     } else {
                         throw new RuntimeException("Task " + taskId + " is finished but result is null");
                     }
-                } else { //Available 
+                } else { //Not available 
                     resultPreview.update(new SimpleTextPanel("No preview is available because the task is " +
                         task.getStatus() + "..."));
                 }
@@ -437,7 +437,8 @@ public class TaskComposite extends Composite {
                 case SUBMITTED:
             }
 
-            if (!setFont && ((internalTask.getRerunnable() - internalTask.getRerunnableLeft()) > 0)) {
+            if (!setFont &&
+                ((internalTask.getMaxNumberOfExecution() - internalTask.getNumberOfExecutionLeft()) > 0)) {
                 setFont = true;
             }
             if (setFont) {
@@ -448,7 +449,7 @@ public class TaskComposite extends Composite {
 
             TableColumn[] cols = table.getColumns();
 
-            // I'm must fill item by this way, because all columns are movable
+            // I must fill item by this way, because all columns are movable
             // !
             // So i don't know if the column "Id" is at the first or the "nth"
             // position
@@ -457,7 +458,26 @@ public class TaskComposite extends Composite {
                 if (title.equals(COLUMN_ID_TITLE)) {
                     item.setText(i, "" + internalTask.getId().hashCode());
                 } else if (title.equals(COLUMN_STATUS_TITLE)) {
-                    item.setText(i, internalTask.getStatus().toString());
+                    String tmp = internalTask.getStatus().toString();
+                    switch (internalTask.getStatus()) {
+                        case RUNNING:
+                        case FINISHED:
+                            tmp = tmp +
+                                " (" +
+                                (internalTask.getMaxNumberOfExecution() -
+                                    internalTask.getNumberOfExecutionLeft() + 1) + "/" +
+                                internalTask.getMaxNumberOfExecution() + ")";
+                            break;
+                        case FAULTY:
+                        case WAITING_ON_ERROR:
+                            tmp = tmp +
+                                " (" +
+                                (internalTask.getMaxNumberOfExecution() - internalTask
+                                        .getNumberOfExecutionLeft()) + "/" +
+                                internalTask.getMaxNumberOfExecution() + ")";
+                            break;
+                    }
+                    item.setText(i, tmp);
                 } else if (title.equals(COLUMN_NAME_TITLE)) {
                     item.setText(i, internalTask.getName());
                 } else if (title.equals(COLUMN_DESCRIPTION_TITLE)) {
@@ -468,8 +488,9 @@ public class TaskComposite extends Composite {
                 } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
                     item.setText(i, Tools.getFormattedDate(internalTask.getFinishedTime()));
                 } else if (title.equals(COLUMN_RERUN_TITLE)) {
-                    item.setText(i, (internalTask.getRerunnable() - internalTask.getRerunnableLeft()) + "/" +
-                        internalTask.getRerunnable());
+                    item.setText(i, (internalTask.getMaxNumberOfExecution() - internalTask
+                            .getNumberOfExecutionLeft()) +
+                        "/" + internalTask.getMaxNumberOfExecution());
                     //                } else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE)) {
                     //                    item.setText(i,
                     //                        Tools.getFormattedDate(internalTask.getRunTimeLimit()));

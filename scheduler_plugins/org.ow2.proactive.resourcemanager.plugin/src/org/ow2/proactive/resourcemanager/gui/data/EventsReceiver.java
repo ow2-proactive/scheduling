@@ -133,7 +133,7 @@ public class EventsReceiver implements InitActive, RMEventListener {
     }
 
     //TODO add a status bar that show these states ?
-    
+
     public void rmShuttingDownEvent(RMEvent arg0) {
     }
 

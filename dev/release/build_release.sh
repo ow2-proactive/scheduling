@@ -60,7 +60,7 @@ output=$(mkdir ${TMP_DIR} 2>&1)
 if [ "$?" -ne 0 ] ; then
 	if [ -e ${TMP_DIR} ] ; then
 		echo " [w] ${TMP_DIR} already exists. Delete it !"
-		rm -Rf ${TMP_DIR}
+		rm -rf ${TMP_DIR}
 		mkdir ${TMP_DIR}
 		if [ "$?" -ne 0 ] ; then
 			warn_and_exit "Cannot create ${TMP_DIR}: $output"
@@ -70,6 +70,7 @@ if [ "$?" -ne 0 ] ; then
 	fi
 fi
 
+echo Copying files to $TMP_DIR
 cp -Rf ${SCHEDULER_DIR}/* ${TMP_DIR}
 cp -Rf ${SCHEDULER_DIR}/.classpath ${TMP_DIR}
 cp -Rf ${SCHEDULER_DIR}/.project ${TMP_DIR}
@@ -81,6 +82,17 @@ if [ "$(find src/ -name "*.java" | xargs grep serialVersionUID | grep -v `echo $
 	fi
 fi
 
+# Subversion
+find . -type d -a -name ".svn" -exec rm -rf {} \;
+
+# Remove database directory if exist
+find . -type d -name "SCHEDULER_DB" -exec rm -rf {} \;
+
+# Replace all 'dev' version number by this version number in every XML, XSD, RNC files
+echo Replacing 'dev' tag with current version for XML files
+find . -type f -exec sed -i "s#urn:proactive:jobdescriptor:dev#urn:proactive:jobdescriptor:$VERSION#g" {} \;
+find . -type f -exec sed -i "s#http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd#http://proactive.inria.fr/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
+find . -type f -exec sed -i "s#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
 
 # Handle JSR223
 cp $JSR_223_HOME/script-js.jar ./lib/common/
@@ -89,8 +101,15 @@ cp $JSR_223_HOME/script-api.jar ./lib/common/
 
 cd compile || warn_and_exit "Cannot move in compile"
 ./build clean
+./build convertSchemas
 ./build -Dversion="${VERSION}" deploy.all
 ./build -Dversion="${VERSION}" manualPdf
+
+cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
+# Update the website with new schema version
+echo Update the website with new schema version
+ssh sea.inria.fr mkdir /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
+scp src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd $USER@sea.inria.fr:/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
 
 cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 echo " [i] Clean"
@@ -104,27 +123,24 @@ rm -rf ./dist/lib/js.jar
 rm -rf ./dist/lib/script-api.jar
 
 # Clean RCP plugins
-find ./scheduler_plugins/ -name "*.jar" -exec rm -Rf {} \;
-find ./scheduler_plugins/ -name "*.class" -exec rm -Rf {} \;
-
-# Subversion
-find . -type d -a -name ".svn" -exec rm -Rf {} \;
+find ./scheduler_plugins/ -name "*.jar" -exec rm -rf {} \;
+find ./scheduler_plugins/ -name "*.class" -exec rm -rf {} \;
 
 # Git
-rm -Rf .git
+rm -rf .git
 
 # Remove useless parts of ProActive
 rm ./doc-src/ProActiveRefBook.doc
 find . -type f -a -name "*.svg" -exec rm {} \; # svg are converted in png by hands
 
 # Remove non GPL stuff
-rm -Rf ./compile/lib/clover.*
+rm -rf ./compile/lib/clover.*
 
 # Remove temporary files
 rm compile/junit*properties
-rm -Rf classes/
-rm -Rf docs/tmp/
-rm -Rf doc-src/*_snippets/
+rm -rf classes/
+rm -rf docs/tmp/
+rm -rf doc-src/*_snippets/
 
 sed -i "s/{version}/$VERSION/" README.txt
 

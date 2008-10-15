@@ -64,14 +64,17 @@ public class TaskEvent implements Serializable {
     /** task finished time : HAS TO BE SET TO -1 */
     private long finishedTime = -1;
 
-    /** Number of reRunnable left */
-    private int rerunnableLeft = 1;
-
     /** Current taskState of the task */
     private TaskState taskState = TaskState.SUBMITTED;
 
     /** name of the host where the task is executed */
     private String executionHostName;
+
+    /** Number of executions left */
+    private int numberOfExecutionLeft = 1;
+
+    /** Number of execution left for this task in case of failure (node down) */
+    private int numberOfExecutionOnFailureLeft = 1;
 
     /**
      * To get the jobEvent
@@ -225,20 +228,43 @@ public class TaskEvent implements Serializable {
     }
 
     /**
-     * Get the number of rerun left.
+     * Get the number of execution left.
      *
-     * @return the rerunnableLeft
+     * @return the number of execution left.
      */
-    public int getRerunnableLeft() {
-        return rerunnableLeft;
+    public int getNumberOfExecutionLeft() {
+        return numberOfExecutionLeft;
     }
 
     /**
-     * Set the number of rerun left.
+     * Set the number of execution left.
      *
-     * @param rerunnableLeft the rerunnableLeft to set
+     * @param numberOfExecutionLeft the number of execution left to set.
      */
-    public void setRerunnableLeft(int rerunnableLeft) {
-        this.rerunnableLeft = rerunnableLeft;
+    public void setNumberOfExecutionLeft(int numberOfExecutionLeft) {
+        this.numberOfExecutionLeft = numberOfExecutionLeft;
+    }
+
+    /**
+     * Get the numberOfExecutionOnFailureLeft value.
+     * 
+     * @return the numberOfExecutionOnFailureLeft value.
+     */
+    public int getNumberOfExecutionOnFailureLeft() {
+        return numberOfExecutionOnFailureLeft;
+    }
+
+    /**
+     * Decrease the number of execution left.
+     */
+    public void decreaseNumberOfExecutionLeft() {
+        numberOfExecutionLeft--;
+    }
+
+    /**
+     * Decrease the number of execution on failure left.
+     */
+    public void decreaseNumberOfExecutionOnFailureLeft() {
+        numberOfExecutionOnFailureLeft--;
     }
 }

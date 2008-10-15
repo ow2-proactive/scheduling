@@ -37,6 +37,7 @@ import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 
 
@@ -79,11 +80,9 @@ public class TaskFlowJob extends Job {
         if (task.getName() == null) {
             throw new UserException("The name of the task must not be null !");
         }
-
         if (tasks.containsKey(task.getName())) {
             throw new UserException("The name of the task is already used !");
         }
-
         tasks.put(task.getName(), task);
     }
 

@@ -29,31 +29,23 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.examples;
-
-import org.ow2.proactive.scheduler.common.job.JobFactory;
-
+package org.ow2.proactive.scheduler.exception;
 
 /**
- * JobFactoryTest is a class that can be used to test the job factory without starting a scheduler or a whole job process.
+ *
+ * Exceptions Generated during the run of a native process.
  *
  * @author The ProActive Team
- * @date 2 juil. 08
- * @since ProActive 4.0
+ * @since ProActive Scheduling 0.9
  *
  */
-public class JobFactoryTest {
+public class RunningProcessException extends ProcessException {
+
     /**
-     * Start the test with the job factory
-     *
-     * @param args
-     * @throws Exception
+     * Attaches a message to the Exception
+     * @param msg message attached
      */
-    public static void main(String[] args) throws Exception {
-        String path = "jobs_descriptors/Job_2_tasks.xml";
-        if (args.length > 0) {
-            path = args[0];
-        }
-        JobFactory.getFactory().createJob(path);
+    public RunningProcessException(String msg) {
+        super(msg);
     }
 }

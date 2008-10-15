@@ -381,10 +381,7 @@
 	<!-- ================================================================ -->
 	<!--  Scheduler Specific - Convert Schemas from Relax NG to XMLSchema -->
 	<!-- ================================================================ -->
-	<!-- MUST BE CALLED FROM AN INRIA MACHINE ON PRODUCTION NETWORK -->
 	<target name="convertSchemas" description="convert Schemas from Relax NG Compact Syntax to Relax NG XML Syntax and to XMLSchema inside the scheduler.">
-		<property name="schedulerSchemas.website.dir" value="/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/0.91" />
-		<property name="schedulerSchemas.job.name" value="schedulerjob" />
 		<taskdef name="trang" classname="net.amadan.trang.ant.TrangTask">
 			<classpath>
 				<fileset dir="${base.dir}/dev/lib/trang">
@@ -393,19 +390,18 @@
 			</classpath>
 		</taskdef>
 		<!-- Convert Relax NG schema from compact syntax to xml syntax -->
-		<trang failonerror="true" input="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rng" />
+		<trang failonerror="true" input="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.rnc" output="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng" />
 
 		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
-		<trang failonerror="true" input="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.rnc" output="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
-		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" out="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/temp.xsd" />
+		<trang failonerror="true" input="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.rnc" output="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd" />
+		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd" out="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/temp.xsd" />
 		<delete>
-			<fileset dir="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/">
+			<fileset dir="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/">
 				<include name="xsi.xsd" />
 				<include name="schedulerjob.xsd" />
 			</fileset>
 		</delete>
-		<move file="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/temp.xsd" tofile="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" />
-		<copy file="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/0.91/${schedulerSchemas.job.name}.xsd" tofile="${schedulerSchemas.website.dir}/${schedulerSchemas.job.name}.xsd" />
+		<move file="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/temp.xsd" tofile="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd" />
 	</target>
 	
 	<target name="scheduler.libClean" description="Clean all required libraries for scheduler/rm plugins">

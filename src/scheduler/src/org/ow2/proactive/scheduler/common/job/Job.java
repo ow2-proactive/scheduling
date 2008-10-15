@@ -31,11 +31,11 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.io.Serializable;
 import java.util.HashMap;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 
 
 /**
@@ -56,10 +56,10 @@ import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public abstract class Job implements Serializable, GenericInformationsProvider {
+public abstract class Job extends CommonAttribute implements GenericInformationsProvider {
 
-    // TODO cdelbe, jscheefer
-    // all setters are needed only for InternalJob creation.
+    // TODO cdelbe, jlscheef
+    // all setters are needed only for InternalJob creation. (JL) (also for (user API) job creation (?))
     // Is there a more elegant way...? (JL) Constructors ?
 
     /** Name of the job */
@@ -67,9 +67,6 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
 
     /** Execution environment for this job */
     protected JobEnvironment env = new JobEnvironment();
-
-    /** Is this job has to cancel when an exception occurs in a task */
-    protected boolean cancelOnError = false;
 
     /** logs are written in logFile if not null */
     protected String logFile = null;
@@ -104,24 +101,6 @@ public abstract class Job implements Serializable, GenericInformationsProvider {
      * @return the id
      */
     public abstract JobId getId();
-
-    /**
-     * To get the cancelOnError
-     *
-     * @return the cancelOnError
-     */
-    public boolean isCancelOnError() {
-        return cancelOnError;
-    }
-
-    /**
-     * Set to true if you want to cancel the job when an exception occurs in a task.
-     *
-     * @param cancelOnError the cancelOnError to set
-     */
-    public void setCancelOnError(boolean cancelOnError) {
-        this.cancelOnError = cancelOnError;
-    }
 
     /**
      * To get the description

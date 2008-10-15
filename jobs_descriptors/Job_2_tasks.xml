@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:0.91" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:jobdescriptor:0.91 http://proactive.inria.fr/schemas/jobdescriptor/0.91/schedulerjob.xsd"
-	name="job_2_tasks" priority="low" projectName="myProject" cancelOnError="true">
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="job_2_tasks" priority="low" projectName="myProject" cancelJobOnError="true">
 	<description>2 tasks with variable durations</description>
 	<genericInformation>
 		<info name="var1" value="val1"/>
 		<info name="var2" value="val2"/>
 	</genericInformation>
 	<taskFlow>
-		<task name="task1" retries="3">
+		<task name="task1" maxNumberOfExecution="4">
 			<!-- Task human description -->
 			<description>task WaitAndPrint - will sleep for 3s</description>
 			<genericInformation>

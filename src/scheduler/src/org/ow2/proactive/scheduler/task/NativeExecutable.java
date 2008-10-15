@@ -39,6 +39,8 @@ import java.util.Map;
 import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.exception.RunningProcessException;
+import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 
@@ -150,7 +152,8 @@ public class NativeExecutable extends Executable {
         } catch (Exception e) {
             //in this case, the error is certainly due to the user (ie : command not found)
             //we have to inform him about the cause.
-            throw new RuntimeException(e);
+            System.err.println(e.getMessage());
+            throw new StartProcessException(e.getMessage());
         }
 
         try {
@@ -170,10 +173,9 @@ public class NativeExecutable extends Executable {
             //killTreeProcess(process);
             return process.exitValue();
         } catch (Exception e) {
-            //return an error code that is not 0-255
-            //It means that if we are here user is not responsible
-            e.printStackTrace();
-            return -1;
+            //exception during process
+            //means that for most cases, user is not responsible
+            throw new RunningProcessException(e.getMessage());
         }
     }
 

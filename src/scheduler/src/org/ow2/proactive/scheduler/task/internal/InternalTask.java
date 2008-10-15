@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 
@@ -62,8 +63,8 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     public static final int SORT_BY_NAME = 2;
     public static final int SORT_BY_STATUS = 3;
     public static final int SORT_BY_DESCRIPTION = 4;
-    public static final int SORT_BY_RUN_TIME_LIMIT = 5;
-    public static final int SORT_BY_RERUNNABLE = 6;
+    public static final int SORT_BY_EXECUTIONLEFT = 5;
+    public static final int SORT_BY_EXECUTIONONFAILURELEFT = 6;
     public static final int SORT_BY_SUBMITTED_TIME = 7;
     public static final int SORT_BY_STARTED_TIME = 8;
     public static final int SORT_BY_FINISHED_TIME = 9;
@@ -87,6 +88,10 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
 
     /** Contains the user executable */
     protected ExecutableContainer executableContainer = null;
+
+    /** Maximum number of execution for this task in case of failure (node down) */
+    private int maxNumberOfExecutionOnFailure = PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
+            .getValueAsInt();
 
     /**
      * ProActive Empty constructor
@@ -116,7 +121,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     /**
      * Set the order for the next sort.
      *
-     * @param order
+     * @param order ASC_ORDER or DESC_ORDER
      */
     public static void setSortingOrder(int order) {
         if ((order == ASC_ORDER) || (order == DESC_ORDER)) {
@@ -149,10 +154,15 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
             case SORT_BY_FINISHED_TIME:
                 return (currentOrder == ASC_ORDER) ? ((int) (getFinishedTime() - task.getFinishedTime()))
                         : ((int) (task.getFinishedTime() - getFinishedTime()));
-            case SORT_BY_RERUNNABLE:
-                return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getRerunnable()).compareTo(Integer
-                        .valueOf(task.getRerunnable()))) : (Integer.valueOf(task.getRerunnable())
-                        .compareTo(Integer.valueOf(getRerunnable())));
+            case SORT_BY_EXECUTIONLEFT:
+                return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getNumberOfExecutionLeft())
+                        .compareTo(Integer.valueOf(task.getNumberOfExecutionLeft()))) : (Integer.valueOf(task
+                        .getNumberOfExecutionLeft()).compareTo(Integer.valueOf(getNumberOfExecutionLeft())));
+            case SORT_BY_EXECUTIONONFAILURELEFT:
+                return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getNumberOfExecutionOnFailureLeft())
+                        .compareTo(Integer.valueOf(task.getNumberOfExecutionOnFailureLeft()))) : (Integer
+                        .valueOf(task.getNumberOfExecutionOnFailureLeft()).compareTo(Integer
+                        .valueOf(getNumberOfExecutionOnFailureLeft())));
             case SORT_BY_HOST_NAME:
                 return (currentOrder == ASC_ORDER) ? (getExecutionHostName().compareTo(task
                         .getExecutionHostName())) : (task.getExecutionHostName()
@@ -214,14 +224,12 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * Set the number of possible rerun for this task.
-     *
-     * @param rerunnable the number of rerun possible for this task.
+     * @see org.ow2.proactive.scheduler.common.task.CommonAttribute#setNumberOfExecution(int)
      */
     @Override
-    public void setRerunnable(int rerunnable) {
-        this.rerunnable = rerunnable;
-        this.taskInfo.setRerunnableLeft(rerunnable);
+    public void setMaxNumberOfExecution(int numberOfExecution) {
+        super.setMaxNumberOfExecution(numberOfExecution);
+        this.taskInfo.setNumberOfExecutionLeft(numberOfExecution);
     }
 
     /**
@@ -428,21 +436,44 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * Get the number of rerun left.
+     * Get the number of execution left.
      *
-     * @return the rerunnableLeft
+     * @return the number of execution left.
      */
-    public int getRerunnableLeft() {
-        return taskInfo.getRerunnableLeft();
+    public int getNumberOfExecutionLeft() {
+        return taskInfo.getNumberOfExecutionLeft();
     }
 
     /**
-     * Set the number of re-run left.
-     *
-     * @param rerunnableLeft the rerunnableLeft to set
+     * Decrease the number of re-run left.
      */
-    public void setRerunnableLeft(int rerunnableLeft) {
-        taskInfo.setRerunnableLeft(rerunnableLeft);
+    public void decreaseNumberOfExecutionLeft() {
+        taskInfo.decreaseNumberOfExecutionLeft();
+    }
+
+    /**
+     * Get the numberOfExecutionOnFailureLeft value.
+     * 
+     * @return the numberOfExecutionOnFailureLeft value.
+     */
+    public int getNumberOfExecutionOnFailureLeft() {
+        return taskInfo.getNumberOfExecutionOnFailureLeft();
+    }
+
+    /**
+     * Decrease the number of execution on failure left.
+     */
+    public void decreaseNumberOfExecutionOnFailureLeft() {
+        taskInfo.decreaseNumberOfExecutionOnFailureLeft();
+    }
+
+    /**
+     * Get the number of execution on failure allowed by the task.
+     * 
+     * @return the number of execution on failure allowed by the task
+     */
+    public int getMaxNumberOfExecutionOnFailure() {
+        return maxNumberOfExecutionOnFailure;
     }
 
     /**

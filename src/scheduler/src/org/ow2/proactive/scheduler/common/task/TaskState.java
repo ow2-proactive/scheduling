@@ -61,13 +61,18 @@ public enum TaskState implements java.io.Serializable {
      */
     RUNNING("Running"),
     /**
-     * The task is waiting for restart.
+     * The task is waiting for restart after an error. (ie:native code != 0 or exception)
      */
-    WAITING("Waiting for restart"),
+    WAITING_ON_ERROR("Faulty"),
     /**
-     * The task is failed.
+     * The task is waiting for restart after a failure. (ie:node down)
      */
-    FAILED("Failed"),
+    WAITING_ON_FAILURE("Failed"),
+    /**
+     * The task is failed 
+     * (only if max execution time has been reached and the node on which it was started is down).
+     */
+    FAILED("Resource down"),
     /**
      * The task could not be started.<br>
      * It means that the task could not be started due to
@@ -79,13 +84,18 @@ public enum TaskState implements java.io.Serializable {
      */
     CANCELED("Canceled"),
     /**
-     * The task has been aborted by an exception on an other task.
+     * The task has been aborted by an exception on an other task. (job is cancelOnError)
      */
     ABORTED("Aborted"),
+    /**
+     * The task has finished execution with error code (!=0) or exception.
+     */
+    FAULTY("Faulty"),
     /**
      * The task has finished execution.
      */
     FINISHED("Finished");
+
     /** The name of the current status. */
     private String name;
 

@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
@@ -100,8 +101,12 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /** Job result */
     private JobResult jobResult;
 
-    /** Initial waiting time for a task before restarting in millis */
-    private long restartWaitingTimer = 1000;
+    /** Initial waiting time for a task before restarting in millisecond */
+    private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
+
+    /** Multiplicative factor for the task waiting time */
+    private int restartMultiplicativeFactor = PASchedulerProperties.REEXECUTION_MULTIPLICATIVE_FACTOR
+            .getValueAsInt();
 
     /**
      * ProActive empty constructor.
@@ -115,14 +120,14 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @param name the current job name.
      * @param priority the priority of this job between 1 and 5.
-     * @param cancelOnError true if the job has to run until its end or an user intervention.
+     * @param cancelJobOnError true if the job has to run until its end or an user intervention.
      * @param description a short description of the job and what it will do.
      */
 
-    public InternalJob(String name, JobPriority priority, boolean cancelOnError, String description) {
+    public InternalJob(String name, JobPriority priority, boolean cancelJobOnError, String description) {
         this.name = name;
         this.jobInfo.setPriority(priority);
-        this.cancelOnError = cancelOnError;
+        this.setCancelJobOnError(cancelJobOnError);
         this.description = description;
     }
 
@@ -299,13 +304,14 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /**
      * Terminate a task, change status, managing dependences
      *
+     * @param errorOccured has an error occurred for this termination
      * @param taskId the task to terminate.
      * @return the taskDescriptor that has just been terminated.
      */
-    public InternalTask terminateTask(TaskId taskId) {
+    public InternalTask terminateTask(boolean errorOccurred, TaskId taskId) {
         InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
-        descriptor.setStatus(TaskState.FINISHED);
+        descriptor.setStatus(errorOccurred ? TaskState.FAULTY : TaskState.FINISHED);
         setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
         setNumberOfFinishedTasks(getNumberOfFinishedTask() + 1);
 
@@ -352,7 +358,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         setFinishedTime(System.currentTimeMillis());
         setNumberOfPendingTasks(0);
         setNumberOfRunningTasks(0);
-        descriptor.setStatus((jobState == JobState.FAILED) ? TaskState.FAILED : TaskState.CANCELED);
+        descriptor.setStatus((jobState == JobState.FAILED) ? TaskState.FAILED : TaskState.FAULTY);
         setState(jobState);
         //terminate this job descriptor
         jobDescriptor.failed();
@@ -823,7 +829,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     public long getNextWaitingTime() {
         long toReturn = restartWaitingTimer;
-        restartWaitingTimer = restartWaitingTimer * 2;
+        restartWaitingTimer = restartWaitingTimer * restartMultiplicativeFactor;
         return toReturn;
     }
 

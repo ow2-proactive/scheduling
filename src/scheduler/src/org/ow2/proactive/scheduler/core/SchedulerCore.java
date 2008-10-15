@@ -98,6 +98,8 @@ import org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB;
 import org.ow2.proactive.scheduler.core.db.RecoverableState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.DataBaseNotFoundException;
+import org.ow2.proactive.scheduler.exception.RunningProcessException;
+import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobDescriptor;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
@@ -701,9 +703,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //free execution node even if it is dead
                     resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
 
-                    if (td.getRerunnableLeft() > 0) {
-                        td.setRerunnableLeft(td.getRerunnableLeft() - 1);
-                        td.setStatus(TaskState.WAITING);
+                    td.decreaseNumberOfExecutionOnFailureLeft();
+                    if (td.getNumberOfExecutionOnFailureLeft() > 0) {
+                        td.setStatus(TaskState.WAITING_ON_FAILURE);
                         frontend.taskWaitingForRestart(td.getTaskInfo());
                         job.reStartTask(td);
                         //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
@@ -899,7 +901,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //if the node has died, a runtimeException is sent instead of the result
             TaskResult res = null;
             res = job.getJobResult().getAllResults().get(descriptor.getName());
-            // unwrap future
+            //unwrap future
             res = (TaskResult) PAFuture.getFutureValue(res);
 
             if (res != null) {
@@ -907,12 +909,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 res.setPreviewerClassName(descriptor.getResultPreview());
                 res.setJobClasspath(job.getEnv().getJobClasspath()); // can be null
                 if (PAException.isException(res)) {
-                    //in this case, it is a node error.
+                    //in this case, it is a node error. (should never come)
                     //this is not user exception or usage,
-                    //so we restart independently of re-runnable properties
+                    //so we restart independently of user or admin execution property
                     logger.debug("Node failed on job " + jobId + ", task [ " + taskId + " ]");
                     //change status and update GUI
-                    descriptor.setStatus(TaskState.WAITING);
+                    descriptor.setStatus(TaskState.WAITING_ON_FAILURE);
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
                     job.reStartTask(descriptor);
                     //free execution node even if it is dead
@@ -923,80 +925,74 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             logger.info("Terminated task on job " + jobId + " [ " + taskId + " ]");
 
-            //if an exception occurred and the user wanted to cancel on error, cancel the job.
-            boolean errorOccured = false;
+            //Check if an exception or error occurred during task execution...
+            boolean errorOccurred = false;
             if (descriptor instanceof InternalNativeTask) {
                 try {
+                    // try to get the result, res.value can throw an exception,
+                    // it means that the process has failed before the end.
                     nativeIntegerResult = ((Integer) res.value());
                     // an error occurred if res is not 0
-                    errorOccured = (nativeIntegerResult != 0);
-                    if (nativeIntegerResult == -1) {
-                        //in this case, the user is not responsible
-                        //change status and update GUI
-                        descriptor.setStatus(TaskState.WAITING);
-                        frontend.taskWaitingForRestart(descriptor.getTaskInfo());
-                        job.reStartTask(descriptor);
-                        //free execution node even if it is dead
-                        resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
-                                .getCleaningScript());
-                        return;
-                    }
+                    errorOccurred = (nativeIntegerResult != 0);
+                } catch (RunningProcessException rpe) {
+                    //if res.value throws a RunningProcessException, user is not responsible
+                    //change status and update GUI
+                    descriptor.setStatus(TaskState.WAITING_ON_FAILURE);
+                    frontend.taskWaitingForRestart(descriptor.getTaskInfo());
+                    job.reStartTask(descriptor);
+                    //free execution node even if it is dead
+                    resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
+                            .getCleaningScript());
+                    return;
+                } catch (StartProcessException spe) {
+                    //if res.value throws a StartProcessException, it can be due to an IOException thrown by the process
+                    //ie:command not found
+                    //just note that an error occurred.
+                    errorOccurred = true;
                 } catch (Throwable e) {
-                    errorOccured = true;
+                    //in any other case, note that an error occurred but the user must be informed.
+                    errorOccurred = true;
                 }
             } else {
-                errorOccured = res.hadException();
+                errorOccurred = res.hadException();
             }
 
             //if an error occurred
-            if (errorOccured) {
-                //if job is cancelOnError and the task has not to restart
-                if (job.isCancelOnError() && descriptor.getRestartOnError() == RestartMode.NOWHERE) {
-                    endJob(
-                            job,
-                            descriptor,
-                            "An error has occured due to a user error caught in the task and user wanted to cancel on error.",
-                            JobState.CANCELLED);//TODO <<<<<< FAILED OR CANCEL
+            if (errorOccurred) {
+                //the task threw an exception OR the result is an error code (1-255)
+                //if the task has to restart
+                descriptor.decreaseNumberOfExecutionLeft();
+                //check the number of execution left and fail the job if it is cancelOnError
+                if (descriptor.getNumberOfExecutionLeft() <= 0 && descriptor.isCancelJobOnError()) {
+                    //if no rerun left, failed the job
+                    endJob(job, descriptor,
+                            "An error occurred in your task and the maximum number of executions has been reached. "
+                                + "You also ask to cancel the job in such a situation !", JobState.CANCELLED);
                     return;
                 }
-                //the task threw an exception OR is native and the result is an error code (1-255)
-                //if the task has to restart
-                if (descriptor.getRestartOnError() != RestartMode.NOWHERE) {
-                    //check the number of reruns left and fail the job if it is cancelOnError
-                    if (descriptor.getRerunnableLeft() <= 0 && job.isCancelOnError()) {
-                        //if no rerun left, failed the job
-                        endJob(
-                                job,
-                                descriptor,
-                                "An error occurred in your task and the maximum amout of retries property has been reached.",
-                                JobState.FAILED);//TODO <<<<<< FAILED OR CANCEL
-                        return;
+                if (descriptor.getNumberOfExecutionLeft() > 0) {
+                    if (descriptor.getRestartTaskOnError() == RestartMode.ELSEWHERE) {
+                        //if the task restart ELSEWHERE
+                        descriptor.setNodeExclusion(descriptor.getExecuterInformations().getNodes());
                     }
-                    if (descriptor.getRerunnableLeft() > 0) {
-                        if (descriptor.getRestartOnError() == RestartMode.ELSEWHERE) {
-                            //if the task restart ELSEWHERE
-                            descriptor.setNodeExclusion(descriptor.getExecuterInformations().getNodes());
-                        }
-                        resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
-                                .getCleaningScript());
-                        //change status and update GUI
-                        descriptor.setStatus(TaskState.WAITING);
-                        frontend.taskWaitingForRestart(descriptor.getTaskInfo());
+                    resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
+                            .getCleaningScript());
+                    //change status and update GUI
+                    descriptor.setStatus(TaskState.WAITING_ON_ERROR);
+                    frontend.taskWaitingForRestart(descriptor.getTaskInfo());
 
-                        descriptor.setRerunnableLeft(descriptor.getRerunnableLeft() - 1);
-                        //the job is not restarted directly
-                        RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
-                        new Timer().schedule(jtt, job.getNextWaitingTime());
+                    //the job is not restarted directly
+                    RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
+                    new Timer().schedule(jtt, job.getNextWaitingTime());
 
-                        //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
-                        return;
-                    }
+                    //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
+                    return;
                 }
             }
 
             //to be done before terminating the task, once terminated it is not running anymore..
             TaskDescriptor currentTD = job.getRunningTaskDescriptor(taskId);
-            descriptor = job.terminateTask(taskId);
+            descriptor = job.terminateTask(errorOccurred, taskId);
             //send event
             frontend.taskRunningToFinishedEvent(descriptor.getTaskInfo());
             //store this task result in the job result.

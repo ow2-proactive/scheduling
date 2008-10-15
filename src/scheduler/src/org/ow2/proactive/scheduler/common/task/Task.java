@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +59,7 @@ import org.ow2.proactive.scheduler.common.job.GenericInformationsProvider;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public abstract class Task implements Serializable, GenericInformationsProvider {
+public abstract class Task extends CommonAttribute implements GenericInformationsProvider {
 
     /** Number of nodes asked by the user. */
     protected int numberOfNodesNeeded = 1;
@@ -100,17 +99,11 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
      */
     protected Script<?> cleaningScript;
 
-    /** Tell whether or not this task is re-runnable and how many times (0 if not, default 1) */
-    protected int rerunnable = 1;
-
     /** Tell whether this task has a precious result or not. */
     protected boolean preciousResult;
 
     /** List of dependences if necessary. */
     protected ArrayList<Task> dependences = null;
-
-    /** Restart the task if an error occurred. It will be restart according to the number of reRun remaining */
-    protected RestartMode restartOnError = RestartMode.NOWHERE;
 
     /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     protected long wallTime = 0;
@@ -283,23 +276,10 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     }
 
     /**
-     * To get number of times this task can be restart if an error occurs.
+     * To get the number of execution for this task.
      *
-     * @return the number of times this task can be restart.
+     * @return the number of times this task can be executed.
      */
-    public int getRerunnable() {
-        return rerunnable;
-    }
-
-    /**
-     * To set number of times this task can be restart if an error occurs.
-     *
-     * @param rerunnable
-     *            the number of times this task can be restart.
-     */
-    public void setRerunnable(int rerunnable) {
-        this.rerunnable = rerunnable;
-    }
 
     /**
      * To get the selection script. This is the script that will select a node.
@@ -339,24 +319,6 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     }
 
     /**
-     * Returns the restartOnError state.
-     * 
-     * @return the restartOnError state.
-     */
-    public RestartMode getRestartOnError() {
-        return restartOnError;
-    }
-
-    /**
-     * Sets the restartOnError to the given restartOnError value.
-     *
-     * @param restartOnError the restartOnError to set.
-     */
-    public void setRestartOnError(RestartMode restartOnError) {
-        this.restartOnError = restartOnError;
-    }
-
-    /**
      * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
      */
     public HashMap<String, String> getGenericInformations() {
@@ -378,14 +340,15 @@ public abstract class Task implements Serializable, GenericInformationsProvider 
     }
 
     /**
-     * Set the wall time to the task
+     * Set the wall time to the task in millisecond.
      * 
-     * @param walltime the walltime to set
+     * @param walltime the walltime to set in millisecond.
      */
     public void setWallTime(long walltime) {
-        if (walltime > 0) {
-            this.wallTime = walltime;
+        if (walltime < 0) {
+            throw new IllegalArgumentException("The walltime must be a positive or nul integer value (>=0) !");
         }
+        this.wallTime = walltime;
     }
 
     /**
