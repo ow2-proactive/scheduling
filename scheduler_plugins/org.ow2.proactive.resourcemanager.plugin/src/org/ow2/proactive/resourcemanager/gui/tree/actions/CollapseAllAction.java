@@ -33,6 +33,7 @@ package org.ow2.proactive.resourcemanager.gui.tree.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.ow2.proactive.resourcemanager.gui.tree.RMTreeViewer;
 
 
 /**
@@ -52,7 +53,7 @@ public class CollapseAllAction extends Action {
         this.viewer = viewer;
         this.setText("Collapse All");
         this.setToolTipText("To collapse all items");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "../icons/collapseall.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/collapseall.gif"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
