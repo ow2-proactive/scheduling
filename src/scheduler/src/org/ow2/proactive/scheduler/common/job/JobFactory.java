@@ -706,9 +706,10 @@ public class JobFactory {
                         XPathConstants.STRING);
 
                 // TASK NEEDED_NODES
-                int neededNodes = ((Double) xpath.evaluate(addPrefixes(JOB_TAG + "/" + JOB_PROACTIVE + "/" +
-                    TASK_ATTRIBUTE_NEEDEDNODES), arg, XPathConstants.NUMBER)).intValue();
+                int neededNodes = ((Double) xpath.evaluate(addPrefixes("/" + JOB_TAG + "/" + JOB_PROACTIVE +
+                    "/" + TASK_ATTRIBUTE_NEEDEDNODES), arg, XPathConstants.NUMBER)).intValue();
                 desc.setNumberOfNodesNeeded(neededNodes);
+                logger.debug(TASK_ATTRIBUTE_NEEDEDNODES + " = " + neededNodes);
 
                 if ((name != null) && (value != null)) {
                     desc.getArguments().put(name, value);
