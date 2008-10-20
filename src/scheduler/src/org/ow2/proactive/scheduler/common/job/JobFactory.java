@@ -694,9 +694,13 @@ public class JobFactory {
                 XPathConstants.STRING));
         logger.debug(TASK_ATTRIBUTE_CLASSNAME + " = " + desc.getExecutableClassName());
 
-        NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
-                XPathConstants.NODESET);
+        // TASK NEEDED_NODES
+        int neededNodes = ((Double) xpath.evaluate(addPrefixes("/job/proActive/" + TASK_ATTRIBUTE_NEEDEDNODES),process,XPathConstants.NUMBER)).intValue();
+        desc.setNumberOfNodesNeeded(neededNodes);
+        logger.debug(TASK_ATTRIBUTE_NEEDEDNODES + " = " + neededNodes);
 
+        NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
+        		XPathConstants.NODESET);
         if (args != null) {
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
@@ -705,11 +709,6 @@ public class JobFactory {
                 String value = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, arg,
                         XPathConstants.STRING);
 
-                // TASK NEEDED_NODES
-                int neededNodes = ((Double) xpath.evaluate(addPrefixes("/" + JOB_TAG + "/" + JOB_PROACTIVE +
-                    "/" + TASK_ATTRIBUTE_NEEDEDNODES), arg, XPathConstants.NUMBER)).intValue();
-                desc.setNumberOfNodesNeeded(neededNodes);
-                logger.debug(TASK_ATTRIBUTE_NEEDEDNODES + " = " + neededNodes);
 
                 if ((name != null) && (value != null)) {
                     desc.getArguments().put(name, value);
