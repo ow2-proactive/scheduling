@@ -5,7 +5,7 @@
 <property name="docs.published.extraclasses" 		value="${docs.tmp.dir}/publishedExtraClasses" />
 
 
-    <target name="javadoc.complete" depends="compile.util, deploy" description="Make complete Javadoc">
+    <target name="javadoc.complete"  description="Make complete Javadoc">
         <mkdir dir="${docs.tmp.dir}" />
         <javadoc  
             destdir="${docs.api.complete.dir}" 
@@ -13,76 +13,46 @@
             version="true" 
             source="${source}" 
             use="true" 
-            windowtitle="ProActive complete API" 
+            windowtitle="Scheduler and Resource Manager Complete API" 
             breakiterator="yes" 
             additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> 
             
             <classpath>
-                <path refid="compile.libs"/>
-                <pathelement path="${cl.proactive.dir}"/>
-                <pathelement path="${cl.extensions.dir}"/>
+                <path refid="scheduler.libs"/>
+                <path refid="rm.libs"/>
+                <pathelement path="${cl.scheduler.dir}"/>
+                <pathelement path="${cl.rm.dir}"/>
             </classpath>
             
-            <packageset dir="${src.proactive.dir}" />
-            <packageset dir="${src.extensions.dir}" />
-            <packageset dir="${src.extra.dir}" />
+            <packageset dir="${src.scheduler.dir}" />
+            <packageset dir="${src.rm.dir}" />
+            
             
             <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
             <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-            <doctitle><![CDATA[ProActive ${version}]]></doctitle>
+            <doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
             <bottom><![CDATA[<i>Copyright 1997-2008 INRIA All Rights Reserved.</i>]]></bottom>
             
-            <group title="ProActive packages for end user" packages="org.objectweb.proactive" />
-            <group title="ProActive Core" packages="org.objectweb.proactive.core*" />
-            <group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
-            <group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
-            <group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.extra.p2p*" />
-            <group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
-            <group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
-            <group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.extra.branchnbound*" />
-            <group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />
-            <group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />
-            <group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
-            <group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
-            <group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
-            <group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
-            <group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
+            <group title="Scheduler">
+                <package name="org.ow2.proactive.scheduler*" />
+            </group>
             
-            
+            <group title="Resource Manager">
+                <package name="org.ow2.proactive.resourcemanager*" />
+            </group>
         </javadoc>			
     </target>
     
-    <target name="javadoc.published" depends="compile.util, deploy" description="Make published Javadoc">
+    <target name="javadoc.published" depends="compile.all" description="Make published Javadoc">
         <mkdir dir="${docs.tmp.dir}" />
-        <javadoc source="${source}"	classpathref="compile.libs">
-            <doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
+        <javadoc source="${source}"	classpathref="scheduler.libs">
+            <doclet name="doc.PublishedAPIDoclet" path="${proactive.utils.jar}">
                 <param name="-file" value="${docs.published.coreclasses}" />
             </doclet>
-            <packageset dir="${src.proactive.dir}"/>
+            <packageset dir="${src.scheduler.dir}"/>
+            <packageset dir="${src.rm.dir}" />
         </javadoc>
         
-        <javadoc source="${source}">
-            <classpath>
-                <path refid="compile.libs"/>
-                <pathelement path="${cl.proactive.dir}"/>
-            </classpath>
-            <doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
-                <param name="-file" value="${docs.published.extensionsclasses}" />
-            </doclet>
-            <packageset dir="${src.extensions.dir}"/>
-        </javadoc>
-        
-        <javadoc source="${source}">
-            <classpath>
-                <path refid="compile.libs"/>
-                <pathelement path="${cl.proactive.dir}"/>
-                <pathelement path="${cl.extensions.dir}"/>
-            </classpath>
-            <doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
-                <param name="-file" value="${docs.published.extraclasses}" />
-            </doclet>
-            <packageset dir="${src.extra.dir}"/>
-        </javadoc>
         
         <javadoc  
             destdir="${docs.api.published.dir}" 
@@ -90,49 +60,30 @@
             version="true" 
             source="${source}" 
             use="true" 
-            windowtitle="ProActive API" 
+            windowtitle="Scheduler and Resource Manager User API" 
             breakiterator="yes" 
             additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> 
             
             <classpath>
-                <path refid="compile.libs"/>
-                <pathelement path="${cl.proactive.dir}"/>
-                <pathelement path="${cl.extensions.dir}"/>
-                <pathelement path="${cl.extra.dir}"/>
+                <path refid="scheduler.libs"/>
+                <path refid="rm.libs"/>
+                <pathelement path="${cl.scheduler.dir}"/>
+                <pathelement path="${cl.rm.dir}"/>
             </classpath>
             
             
-            <fileset dir="${src.proactive.dir}" includesfile="${docs.published.coreclasses}"/>
-            <fileset dir="${src.extensions.dir}" includesfile="${docs.published.extensionsclasses}"/>
-            <fileset dir="${src.extra.dir}" includesfile="${docs.published.extraclasses}"/>
-            
+            <fileset dir="${src.scheduler.dir}" includesfile="${docs.published.coreclasses}"/>
             <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
             <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-            <doctitle><![CDATA[ProActive ${version}<br>]]></doctitle>
+            <doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
             <bottom><![CDATA[<i>Copyright 1997-2008 INRIA All Rights Reserved.</i>]]></bottom>
             
-            <group title="ProActive entry point">
-                <package name="org.objectweb.proactive.api" />
+            <group title="Scheduler">
+                <package name="org.ow2.proactive.scheduler*" />
             </group>
             
-            <group title="ProActive Core">
-                <package name="org.objectweb.proactive.core*" />
-                <package name="org.objectweb.proactive.core.filetransfer*" />
-                <package name="org.objectweb.proactive.ext*" />
-                <package name="org.objectweb.proactive.gcmdeployment*" />
-                <package name="org.objectweb.proactive.mpi*" />  
-                <package name="org.objectweb.proactive.benchmarks*" />
-                <package name="org.objectweb.proactive" />
-                <package name="org.objectweb.proactive.annotation" /> 
-                
-            </group>
-            
-            <group title="ProActive Extensions">
-                <package name="org.objectweb.proactive.extensions.*" />
-            </group>
-            
-            <group title="ProActive Extra">
-                <package name="org.objectweb.proactive.extra.*" /> 
+            <group title="Resource Manager">
+                <package name="org.ow2.proactive.resourcemanager*" />
             </group>
             
         </javadoc>			
