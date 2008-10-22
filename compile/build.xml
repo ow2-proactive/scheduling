@@ -414,6 +414,6 @@
 	</target>		
 	
 	
-	<import file="../doc/toolchain/doc.xml" />
+	<import file="../doc/toolchain/doc.xml" optional="true"/>
 	
 </project>
