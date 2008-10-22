@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    xmlns="urn:proactive:jobdescriptor:dev" id="Matlab_job" priority="normal" logFile="${HOME}/matlab_job.log" >
+    <description>A simple Matlab taskflow, which computes the sum of a randomly-generated array</description>
+    <!-- @snippet-start SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE -->
+    <variables>
+        <variable name="PROACTIVE_HOME"
+            value="/home/user/ProActive" />
+        <variable name="MATLAB_SCRIPTS"
+            value="${PROACTIVE_HOME}/scripts/unix/matlab/examples" />
+    </variables>
+    <!-- @snippet-end SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE -->
+    <taskFlow>
+        <task id="splitter">
+            <description>Splits a big array</description>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+<!-- @snippet-start SCHEDULER_MATLAB_JOB_SPLITTER -->
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabSplitter">
+                <parameters>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/splitter.m"/>
+                    <parameter name="input" value="in=round(rand(1,1000000)*100-50)"/>
+                    <parameter name="number_of_children" value="6"/>
+                </parameters>
+            </javaExecutable>
+<!-- @snippet-end SCHEDULER_MATLAB_JOB_SPLITTER -->
+        </task>
+<!-- @snippet-start SCHEDULER_MATLAB_JOB_DEPENDENCIES -->
+        <task id="sum1">
+            <description>Calculates the sum of the elements in the array</description>
+            <depends>
+                <task ref="splitter"/>
+            </depends>
+<!-- @snippet-end SCHEDULER_MATLAB_JOB_DEPENDENCIES -->             
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+<!-- @snippet-start SCHEDULER_MATLAB_JOB_INDEX -->
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="index" value="0"/>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
+                </parameters>
+            </javaExecutable>
+<!-- @snippet-end SCHEDULER_MATLAB_JOB_INDEX -->             
+        </task>
+        <task id="sum2">
+            <description>Calculates the sum of the elements in the array</description>
+            <depends>
+                <task ref="splitter"/>
+            </depends>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="index" value="1"/>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task id="sum3">
+            <description>Calculates the sum of the elements in the array</description>
+            <depends>
+                <task ref="splitter"/>
+            </depends>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="index" value="2"/>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task id="sum4">
+            <description>Calculates the sum of the elements in the array</description>
+            <depends>
+                <task ref="splitter"/>
+            </depends>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="index" value="3"/>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task id="sum5">
+            <description>Calculates the sum of the elements in the array</description>
+            <depends>
+                <task ref="splitter"/>
+            </depends>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="index" value="4"/>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task id="sum6">
+            <description>Calculates the sum of the elements in the array</description>
+            <depends>
+                <task ref="splitter"/>
+            </depends>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="index" value="5"/>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task id="collector" preciousResult="true">
+            <description>Calculates the global sum of each intermediate sum</description>
+            <depends>
+                <task ref="sum1"/>
+                <task ref="sum2"/>
+                <task ref="sum3"/>
+                <task ref="sum4"/>
+                <task ref="sum5"/>
+                <task ref="sum6"/>
+            </depends>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+<!-- @snippet-start SCHEDULER_MATLAB_JOB_COLLECTOR -->
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabCollector">
+                <parameters>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/collector.m"/>
+                </parameters>
+            </javaExecutable>
+<!-- @snippet-end SCHEDULER_MATLAB_JOB_COLLECTOR -->            
+        </task>
+    </taskFlow>
+</job>

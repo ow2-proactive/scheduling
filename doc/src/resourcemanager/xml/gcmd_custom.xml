@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment xmlns="urn:gcm:deployment:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd	">
+
+	<resources>
+		<group refid="remoteThroughSSH1">
+			<host refid="id_computer1" />
+		</group>
+		<group refid="remoteThroughSSH2">
+			<host refid="id_computer2" />
+		</group>	
+	</resources>
+
+	<infrastructure>
+		<hosts>		
+			<host id="id_computer1" os="unix" hostCapacity="1" vmCapacity="1">
+				<homeDirectory base="root" relpath="/user/smith/home" />
+				<tool id="java" path="/user/smith/home/bin/java/jdk1.5.0_12/bin/java"/>		
+			</host>
+			<host id="id_computer2" os="unix" hostCapacity="1" vmCapacity="1">
+				<homeDirectory base="root" relpath="/home/smith" />
+				<tool id="java" path="/usr/bin/java/"/>
+			</host>
+		</hosts>
+		
+		<groups>
+			<sshGroup id="remoteThroughSSH1" hostList="computer1" />
+			<sshGroup id="remoteThroughSSH2" hostList="computer2" />
+		</groups>
+	</infrastructure>
+	
+</GCMDeployment>

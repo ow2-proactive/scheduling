@@ -1,0 +1,15 @@
+// Specification of a method to execute before migration <emphasis role="bold">
+void onDeparture(String MethodName); 
+
+// Specification of a method to execute after migration, upon the 
+// arrival in a new JVM
+void onArrival(String MethodName); 
+
+// Specifies a migration itinerary <emphasis role="bold">
+void setMigrationStrategy(MigrationStrategy); 
+
+// Adds a JVM destination to an itinerary <emphasis role="bold">
+void add(Destination); 
+
+// Remove a JVM destination in an itinerary
+void remove(Destination d); 

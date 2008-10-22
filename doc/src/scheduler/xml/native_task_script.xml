@@ -1,0 +1,35 @@
+<task name="taskName" preciousResult="true">
+	<description>Testing the pre and post scripts.</description>
+	<selection>
+		<script type="static">
+			<file path="${SCRIPT_DIR}/host_selection.js">
+			<arguments>
+				<argument value="${ECLUSION_STRING}"/>				
+			</arguments>
+			</file>
+		</script>
+	</selection>
+	<pre>
+		<script>
+			<file path="${SCRIPT_DIR}/set.js"/>
+		</script>
+	</pre>
+	<nativeExecutable>
+		<staticCommand
+			value="${WORK_DIR}/native_exec">
+			<arguments>
+				<argument value="1"/>
+			</arguments>
+		</staticCommand>
+	</nativeExecutable>
+	<post>
+		<script>
+			<file path="${SCRIPT_DIR}/unset.js"/>
+		</script>
+	</post>
+	<cleaning>
+		<script>
+			<file path="${SCRIPT_DIR}/clean.js"/>
+		</script>
+	</cleaning>
+</task>

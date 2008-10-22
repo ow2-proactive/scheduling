@@ -1,0 +1,19 @@
+public class BusyButReactive implements RunActive {
+	public void  runActivity(Body body) {
+		Service service = new Service(body);
+		while ( !hasToTerminate ) {
+        	...    // Do some activity on its own
+        	...
+        	...    // Non blocking service
+        	...
+        	service.serveOldest("changeParameters", "terminate");   
+        	... 
+		}
+	}
+	public void changeParameters () {
+		...   // change computation parameters
+	}
+	public void terminate (){ 
+		hasToTerminate=true;
+	}
+}

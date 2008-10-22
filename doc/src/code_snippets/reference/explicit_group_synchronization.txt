@@ -1,0 +1,14 @@
+// Returns True if object is a group and all members are still awaited
+boolean PAGroup.allAwaited (Object); 
+
+// Returns False only if at least one member is still awaited
+boolean PAGroup.allArrived (Object); 
+
+// Wait for all the members in group to arrive (all no longer awaited)
+void PAGroup.waitAll (Object); 
+
+// Wait for at least nb members in group to arrive
+void PAGroup.waitN (Object, int nb); 
+
+// Waits for at least one member to arrived, and returns its index
+int PAGroup.waitOneAndGetIndex (Object); 

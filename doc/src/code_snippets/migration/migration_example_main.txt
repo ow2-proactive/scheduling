@@ -1,0 +1,19 @@
+package active;
+import java.io.IOException;
+
+public class Main{
+	public static void main(String args[])
+	{
+		try{
+			SimpleAgent ao = (SimpleAget)PAActiveObject.newActive(
+					MigratableHello.class.getName(),
+		            new Object [] {},
+		            null);
+		//the first parameter past to the program is the node location
+		ao.moveTo(args[0]);
+		}
+		catch (ActiveObjectCreationException aoExcep){
+			System.err.println(aoExcep.getMessage());
+		}
+	}
+}

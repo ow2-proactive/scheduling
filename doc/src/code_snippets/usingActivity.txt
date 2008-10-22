@@ -1,0 +1,25 @@
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+
+public class Main  {
+	public static void main(String[] args)  {
+		Worker w = new Worker();
+		try {
+			w = (Worker) PAActiveObject.turnActive(w, 
+						null,   new LIFOActivity(), null);
+			w.doNothingGracefully();
+			w.doNothingGracefully();
+			w.doNothingGracefully();
+			w.doNothingGracefully();
+
+		} 
+		catch (ActiveObjectCreationException aoExcep) {
+			System.err.println(aoExcep.getMessage());
+		}
+		catch (NodeException nodeExcep) {
+			System.err.println(nodeExcep.getMessage());
+		}
+	
+	}
+}

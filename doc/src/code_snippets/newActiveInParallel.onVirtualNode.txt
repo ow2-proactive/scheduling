@@ -1,0 +1,12 @@
+Worker[] workers;
+//the virtual nodes needs to be initialized before using it
+try{
+	Worker[] workers = (Worker[]) PAActiveObject.newActiveInParallel(Worker.class.getName(), 
+						new Object [], someVirtualNode);
+}						
+catch (ActiveObjectCreationException aoExcep){
+	System.err.println(aoExcep.getMessage());
+}
+catch (ClassNotFoundException classExcep) {
+	System.err.println(classExcep.getMessage());
+}

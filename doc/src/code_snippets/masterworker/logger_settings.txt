@@ -1,0 +1,2 @@
+log4j.logger.proactive.masterworker = DEBUG
+log4j.additivity.proactive.masterworker = false

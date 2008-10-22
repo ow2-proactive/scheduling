@@ -1,0 +1,14 @@
+<task name="PI_Computation" walltime="00:10" >
+	<genericInformation>
+		<info name="name1" value="val1"/>
+	</genericInformation>
+	<nativeExecutable>
+		<!-- Consider that the ${VAR_NAME} has been defined in the job description as describe in the job creation section -->
+		<staticCommand
+			value="${WORK_DIR}/native_exec">
+			<arguments>
+				<argument value="1"/>
+			</arguments>
+		</staticCommand>
+	</nativeExecutable>
+</task>

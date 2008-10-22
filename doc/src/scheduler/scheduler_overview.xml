@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Overview"><info><title>Overview</title></info>
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->	
+	<section xml:id="overview"><info><title>Overview</title></info>
+		<para>
+			The execution of parallel tasks on a pool of distributed
+			resources (what we call 'nodes'), such as networks of desktops or clusters, requires
+			a main system for managing resources and handling task
+			execution: <emphasis role="bold">a batch scheduler</emphasis>.
+			 A batch scheduler provides an abstraction of resources for the 
+			users. Users submit jobs containing tasks to the
+			scheduler, which is in charge of executing these tasks on the
+			resources available. A scheduler allows several users to share a same pool of resources and
+			also to manage all issues related to distributed
+			environment, such as failing resources.
+			The ProActive Scheduler is connected to a Resource Manager that does the resource
+			abstraction (see <xref linkend="Resource_Manager"/>).
+		</para>
+
+		<para>
+			In this chapter we give  a  overview of the ProActive Scheduler.
+			The Scheduler is accessible either from
+			a Java programming API  or 
+			a command-line based job submitter.
+			In the following chapters we will also present how the
+			scheduler works, what policies govern the job management,
+			how to create a job and how to get the jobs and the nodes
+			state using either the administration shell or the GUI.
+			The graphical user and administration interface
+			which can be plugged in the scheduler core application.
+			is presented in <xref linkend="Scheduler_Eclipse_Plugin"/>). 
+			The graphical interface has been developed as an Eclipse RCP Plugin.
+
+			
+		</para>
+	</section>
+	<section xml:id="scheduler_installation"><info><title>Scheduler Installation</title></info>
+		<para>
+			The Scheduler archive contains a sources folder, a distribution folder that contains every library used
+			by the ProActive Scheduler, a bin folder that contains every starting script, and a jobs descriptor directory including
+			lots of job XML descriptors. More folders are available but these are the ones we will need to start.
+		</para>
+		<itemizedlist>
+			<listitem><para>
+				First of all, start a command shell and go into the <emphasis>bin/[os]</emphasis> directory
+				 into your installed scheduler home path.</para>
+			</listitem>
+			<listitem><para>
+				Then launch the <code>startScheduler_newDB.[sh|bat] </code> script to create the database
+				and launch the Scheduler.
+				This database will be used to store ProActive Scheduler activities and to offer fault tolerance.
+				The scheduler will be started
+				and connected to this Resources Manager. Scheduler starting sequence is finished when 
+				<code>[SCHEDULER] Scheduler has just been started !</code> is displayed.</para>
+				<para>
+					At this point the ProActive Scheduler is started with 4 nodes available.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					What you can do now is submitting a job. To do so, just start the <emphasis>submit.[sh|bat]</emphasis> script with
+					proper parameters. Use 
+					<emphasis>submit.[sh|bat] -j ../../jobs_descriptors/Job_8_tasks.xml -n 1</emphasis>,
+					this will request for login and password, and then submit this job to the scheduler. The default login and password, 
+					is <emphasis>user1 pwd1</emphasis>.
+				</para>
+				<para>
+					Once executed, you can see that the scheduler is now scheduling this job. You can also see the Scheduler activity
+					by starting the Scheduler Eclipse Plugin the Graphical User Interface for the Scheduler.
+					To do so, just uncompress the Scheduler_Plugin archive and start the <emphasis>Scheduler[.exe]</emphasis> launcher.
+					The first screen presents a non-connected Scheduler interface. Just right click, then connect.
+					You will be requested for a started Scheduler URL, user name and password. If you followed this quick start step by step,
+					just fill URL field with <emphasis>rmi//localhost:1099/</emphasis> where 1099 is the default ProActive port for RMIRegistry.
+					Finally, enter <emphasis>user1</emphasis> for the user name and <emphasis>pwd1</emphasis> in the password field.
+					For further information on the GUI, please refer to the Scheduler Eclipse plugin documentation.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<warning>
+		<para>
+		
+			Some parts of the ProActive Scheduler and ProActive Resource
+			Manager rely on Java Scripting capabilities (
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>).
+			As a consequence, it requires either:
+			<itemizedlist>
+				<listitem>
+					<para>
+						a 1.6 or greater Java Runtime Environment, without any modifications,
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						or, with a 1.5 JRE, the
+						<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">
+							JSR 223 jar files</link> :
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								First, the <literal>script-api.jar</literal>, <literal>script-js.jar</literal>
+								and <literal>js.jar</literal> files must be added in the <literal>ProActive/dist/lib/</literal>
+								directory if you are using the bin release of ProActive Scheduler, or in the
+								<literal>ProActive/lib/</literal> directory if you build ProActive Scheduler from the source release.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Then the <literal>java5_jsr223_patch.jar</literal> patch (released with the Scheduler RCP
+								Client) should be executed in the Scheduler RCP Client directory : unzip the
+								<literal>java5_jsr223_patch.zip</literal> file and execute
+								<literal> java -jar java5_jsr223_patch.jar </literal>.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</itemizedlist>
+		</para>
+		</warning>
+	</section>
+	<section xml:id="scheduler_concept"><info><title>Scheduler Basics</title></info>
+
+		<section xml:id="what_is_job"><info><title>What is a Job ?</title></info>
+			<para>
+				A <emphasis role="bold">Job</emphasis> is the entity to be submitted to the scheduler. It is
+				composed of one or more <emphasis role="bold">tasks</emphasis>. A Job can have one of the following types :
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">TASKSFLOW</emphasis>, represents a Job that contains a bag of
+							Tasks, which can be executed either in parallel or
+							according to a dependency tree. Tasks
+							inside this Job type can be either Java (A task written in Java extending
+							a given interface) or Native (Any native process).
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							<emphasis role="bold">PROACTIVE</emphasis>,
+							 represents a Job that contains a ProActive
+							application (embedded in
+							<emphasis>only one ProActive Task</emphasis>).
+							Its execution starts with a given
+							predefined number of resources on which the user
+							can start the ProActive application. This
+							kind of Job requires  the
+							ProActive API, in order to build a
+							ProActive application.
+						</para>
+					</listitem>
+
+					<!--  <listitem>
+						<para><emphasis role="bold">PARAMETER SWEEPING (not yet implemented)</emphasis>, is a
+						Job that represents multiple executions of one type of Task with
+						different given parameters. It is typically executed in parallel.
+						The Tasks inside this job can also be Java or Native. </para>
+						</listitem>-->
+				</itemizedlist>
+			</para>
+
+			<para>
+				A finished job contains a result that is provided by the scheduler
+				once the job terminated, which in term contains
+				all of its tasks' results. However, it is possible to
+				mark some task as
+				<emphasis role="bold">precious</emphasis>
+				in order to retrieve their result easily in the job
+				result. A job termination could have been caused by a failure, the finished Job
+				contains the causes of the exception. Further details on how to
+				create a Job and the different options can be found in
+				<xref linkend="Create_job"/>
+				.
+			</para>
+		</section>
+
+		<section xml:id="what_is_task"><info><title>What is a Task ?</title></info>
+			
+			<para>
+				The
+				<emphasis role="bold">Task</emphasis>
+				is the smallest schedulable entity. It is included in a
+				<emphasis role="bold">Job</emphasis>
+				(see
+				<xref linkend="what_is_job"/>
+				) and will be executed in accordance with the scheduling
+				policy (see
+				<xref linkend="scheduling_policy"/>
+				) on the available resources.
+			</para>
+
+			<para>
+				There are three types of Tasks :
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">JAVA</emphasis> - its execution is defined by a Java class
+							extending the
+							<code>
+								org.ow2.proactive.scheduler.common.task.executable.JavaExecutable
+							</code>
+							class.
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							<emphasis role="bold">NATIVE</emphasis> - its execution can be any user program, a compiled C/C++ application, a shell
+							or batch script. A native task can be specified by a simple command line,
+							 or by a 'generation script', that can dynamically
+							generate the command line to be executed (according to the computing node's operating system
+							wherein	the task is executed).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">PROACTIVE</emphasis> - its execution is defined by a Java class
+							extending the
+							<code>
+								org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable
+							</code>
+							class, which defines a ProActive application.
+							When writing ProActive applications for the 
+							Scheduler the programmer needs to 
+							know how to manipulate Virtual Nodes (see ADD_LINK).
+							However, for the users, the Scheduler permits deployment
+							without knowledge of the underlying infrastructure. 
+							The infrastructure definition is done by the 
+							administrator of the Scheduler.  
+
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+			<para>
+				During its execution, a Task can crash due to the host (computing node) or
+				code failure.The Scheduler solves this potential problem 
+				by offering  parameterizable Tasks
+				which can be restarted a set number of times (see re-runnable in section <xref linkend="Create_add_task"/>).
+			</para>
+
+			<para>
+				A Task may optionally be accompanied by 4 kinds of
+				scripts (selection-script, pre-script, post-script and cleaning-script),
+				that allow selection  and configuration of suitable resource for a given
+				task  before and after task
+				execution (see	<xref linkend="Create_add_task"/>).
+			</para>
+
+			<para>
+				Dependencies between Tasks can also be defined; this
+				aspect is detailed in next section.
+			</para>
+		</section>
+
+
+		<section xml:id="how_dependences"><info><title>Dependencies between Tasks</title></info>
+
+			<para>
+				Dependencies can be set between Tasks in a TaskFlow Job.
+				It provides a way to execute your tasks in a specified
+				order, but also to forward result of an ancestor
+				task to its children as parameter. Dependency between
+				tasks is then both a temporal dependency and a data
+				dependency.
+			</para>
+
+			<figure xml:id="scheduler_job_img"><info><title>Taskflow job example</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="70%" contentdepth="70%" align="center" fileref="scheduler/pics/core/schedulerJob.jpg" format="JPG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+
+			<para>
+				In this example we define a 8 tasks Job (where job's
+				type is TaskFlow). As you can see, task 4 depends on
+				task 1, task 5 depends on tasks 2 and 3, etc... In other
+				words, task 4 will wait for task 1 to finish before
+				starting, task 5 will wait for task 2
+				<emphasis>AND</emphasis>
+				3, etc... In addition, the order in which you specify
+				that task 5 depends of Task 2 and 3 is very important.
+				Indeed, if you set the list of dependencies for task 5
+				as : 2 then 3, the result of these two task will be
+				given to task 5 in this order.
+			</para>
+		</section>
+		<section xml:id="scheduling_policy"><info><title>Scheduling Policy</title></info>
+
+			<para>
+				By default the Scheduler will schedule tasks 
+				according to the default <emphasis role="bold">
+				FIFO </emphasis> (First In First Out) priority
+				policy. If a job needs to be scheduled quickly, increase its priority, 
+				or ask your administrator for another policy.
+			</para>
+		</section>
+	</section>
+</chapter>

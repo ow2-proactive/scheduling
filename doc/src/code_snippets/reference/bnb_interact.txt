@@ -1,0 +1,8 @@
+// the worker will broadcast the solution in all Tasks
+this.worker.setBestCurrentResult(newBestSolution); 
+
+// send a set of sub-tasks for computation to the framework
+this.worker.sendSubTasksToTheManager(subTaskList); 
+
+// for a smart split, check for free workers
+BooleanWrapper workersAvailable = this.worker.isHungry(); 

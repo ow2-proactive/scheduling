@@ -1,0 +1,43 @@
+import java.io.Serializable;
+import org.objectweb.proactive.core.body.MetaObjectFactory;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.body.request.RequestImpl;
+import org.objectweb.proactive.core.mop.MethodCall;
+
+public class CustomMetaObjectFactory extends ProActiveMetaObjectFactory {
+	private static final MetaObjectFactory instance = new CustomMetaObjectFactory();
+	//return a new factory instance 
+	public static MetaObjectFactory newInstance() {
+		return instance;
+	}
+
+	private CustomMetaObjectFactory() {
+		super();
+	}
+
+	protected RequestFactory newRequestFactorySingleton() {
+		System.out.println("Creating the  custom metaobject factory...");
+		return new CustomRequestFactory();
+	}
+
+	protected class CustomRequestFactory extends RequestFactoryImpl implements
+			Serializable {
+		public Request newRequest(MethodCall methodCall,
+				UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+			System.out.println("Received a new request...");
+			return new CustomRequest(methodCall, sourceBody, isOneWay,
+					sequenceID);
+		}
+
+		protected class CustomRequest extends RequestImpl {
+			public CustomRequest(MethodCall methodCall,
+					UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+				super(methodCall, sourceBody, isOneWay, sequenceID);
+				System.out.println("I am a custom request handler");
+			}
+		}//end inner class RequestHandler
+	}//end inner class CustomRequestFactory
+}

@@ -1,0 +1,15 @@
+<Rule>
+   <From>
+    <Entity type='VN' name='VN1'/> 
+   </From>
+   <To> 
+      <Entity type='VN' name='VN2'/> 
+   </To> 
+   <Communication> 
+      <Request value='authorized'> 
+        <Attributes authentication='required' integrity='required' confidentiality='optional'/> 
+      </Request> 
+   </Communication> 
+   <Migration>denied</Migration> 
+   <AOCreation>denied</AOCreation> 
+</Rule>

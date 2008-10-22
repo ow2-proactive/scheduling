@@ -1,0 +1,6 @@
+// Wait until a request is available or until the body terminates 
+void waitForRequest(); 
+
+// Wait until a request is available on the given method name, 
+// or until the body terminates
+void  waitForRequest(String methodName); 

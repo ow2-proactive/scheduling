@@ -1,0 +1,3 @@
+Value v;
+v = Worker.foo();
+v.bar();

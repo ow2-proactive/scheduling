@@ -1,0 +1,28 @@
+<task name="taskName" preciousResult="true">
+	<description>Testing the pre and post scripts.</description>
+	<selection>
+		<script type="static">
+			<file path="${SCRIPT_DIR}/host_selection.js">
+			<arguments>
+				<argument value="${EXCLUSION_STRING}"/>				
+			</arguments>
+			</file>
+		</script>
+	</selection>
+	<pre>
+		<script>
+			<file path="${SCRIPT_DIR}/set.js"/>
+		</script>
+	</pre>
+	<javaExecutable class="org.ow2.proactive.scheduler.examples.PropertyTask"/>
+	<post>
+		<script>
+			<file path="${SCRIPT_DIR}/unset.js"/>
+		</script>
+	</post>
+	<cleaning>
+		<script>
+			<file path="${SCRIPT_DIR}/clean.js"/>
+		</script>
+	</cleaning>
+</task>

@@ -1,0 +1,25 @@
+... 
+<jvms> 
+  <jvm name='Jvm1'> 
+     <acquisition>
+       <serviceReference refid='p2plookup'/> 
+    </acquisition>
+  </jvm> 
+ ... 
+</jvms> 
+... 
+<infrastructure> 
+  ...
+  <services> 
+    <serviceDefinition id='p2plookup'> 
+      <P2PService nodesAsked='2' acq='rmi' port='6666'> 
+        <peerSet>
+          <peer>//second.peer.host</peer> 
+        </peerSet>
+     </P2PService> 
+   </serviceDefinition> 
+   ... 
+ </services> 
+ ...
+</infrastructure> 
+...

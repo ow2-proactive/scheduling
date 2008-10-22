@@ -1,0 +1,9 @@
+<task name="Controller">
+	<description>Will control the workers in order to find the prime number</description>
+	<proActiveExecutable
+		class="org.ow2.proactive.scheduler.examples.ProActiveExample">
+		<parameters>
+			<parameter name="numberToFind" value="200"/>
+		</parameters>
+	</proActiveExecutable>
+</task>
