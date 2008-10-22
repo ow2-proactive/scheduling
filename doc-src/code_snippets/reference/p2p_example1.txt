@@ -1,5 +1,0 @@
-public void  nodeCreated(NodeCreationEvent event) { 
-   // get the node Node 
-   newNode = event.getNode(); 
-  // now you can create an active object on your node.
-}

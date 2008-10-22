@@ -1,1 +1,0 @@
--Dlog4j.configuration=file:ProActive/compile/proactive-log4j

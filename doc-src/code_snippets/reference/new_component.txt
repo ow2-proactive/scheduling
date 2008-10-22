@@ -1,6 +1,0 @@
-// Creates a new ProActive component from the specified class A. 
-// The component is distributed on JVMs specified by the Virtual Node 
-// The ComponentParameters defines the configuration of a component: 
-// name of component, interfaces (server and client), etc. 
-// Returns a reference to a component, as defined in the Fractal API
-Component PAComponent.newActiveComponent('A', params, VirtualNode, ComponentParameters); 

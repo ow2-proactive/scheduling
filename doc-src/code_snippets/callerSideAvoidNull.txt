@@ -1,5 +1,0 @@
-MyObject o = new MyObject();
-Object result_from_method = o.getObject();
-if(result_from_method == null){
-	...... 
-}
