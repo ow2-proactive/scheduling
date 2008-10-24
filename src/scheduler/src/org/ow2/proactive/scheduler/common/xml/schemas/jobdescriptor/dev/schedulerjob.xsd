@@ -6,9 +6,9 @@
     </xs:annotation>
     <xs:complexType>
       <xs:sequence>
+        <xs:element minOccurs="0" ref="jd:variables"/>
         <xs:group minOccurs="0" ref="jd:jobDescription"/>
         <xs:element minOccurs="0" ref="jd:jobClasspath"/>
-        <xs:element minOccurs="0" ref="jd:variables"/>
         <xs:element minOccurs="0" ref="jd:genericInformation"/>
         <xs:choice>
           <xs:element ref="jd:taskFlow"/>

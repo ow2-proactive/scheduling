@@ -4,7 +4,7 @@
 	name="job_proActive" priority="low">
 	<description>A ProActive job that will find out the Nth first prime number where N is given as
 		argument.</description>
-	<proActive neededNodes="5">
+	<proActive neededNodes="3">
 		<task name="Controller">
 			<description>Will control the workers in order to find the prime number</description>
 			<proActiveExecutable

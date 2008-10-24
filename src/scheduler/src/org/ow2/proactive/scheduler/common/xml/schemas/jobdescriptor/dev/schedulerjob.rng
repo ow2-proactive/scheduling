@@ -7,13 +7,13 @@
     <element name="job">
       <doc:documentation>Definition of a job for the scheduler </doc:documentation>
       <optional>
+        <ref name="variables"/>
+      </optional>
+      <optional>
         <ref name="jobDescription"/>
       </optional>
       <optional>
         <ref name="jobClasspath"/>
-      </optional>
-      <optional>
-        <ref name="variables"/>
       </optional>
       <ref name="jobName"/>
       <optional>

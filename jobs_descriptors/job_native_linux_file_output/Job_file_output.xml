@@ -3,11 +3,11 @@
 	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 	name="job_file_output" priority="normal" cancelJobOnError="false"
 	logFile="${WORK_DIR}/job_file_output.log" >
-	<description>Will execute a 4 native C tasks, avoiding files output collision</description>
 	<variables>
 		<variable name="HOME" value="/user/gsigety/home"/>
 		<variable name="WORK_DIR" value="${HOME}/scheduler_workspace/Scheduler/jobs_descriptors/job_native_linux_file_output"/>			
 	</variables>
+	<description>Will execute a 4 native C tasks, avoiding files output collision</description>
 	<taskFlow>
 		<task name="Native_task_file_output_1" preciousResult="true">
 			<description>Will display 10 dots every 2s an log in an output.txt file</description>

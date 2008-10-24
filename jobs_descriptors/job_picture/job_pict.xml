@@ -2,13 +2,13 @@
 <job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 	name="job_denoise" priority="normal" cancelJobOnError="true" logFile="${WORK_DIR}/denoise.log">
-	<description>denoise a picture</description>
-		<variables>
+	<variables>
 		<variable name="HOME" value="/user/gsigety/home"/>
 		<variable name="WORK_DIR" value="${HOME}/scheduler_workspace/Scheduler/jobs_descriptors/job_picture"/>				
 		<variable name="FILE_NAME" value="ISS"/>
 		<variable name="FILE_EXT" value="jpg"/>
-		</variables>
+	</variables>
+	<description>denoise a picture</description>
 	<taskFlow>
 		<task name="crop">
 			<description>crop a picture in n parts</description>

@@ -2,12 +2,12 @@
 <job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 	name="job_fork" priority="normal" cancelJobOnError="true">
-	<description> Computing PI according to MonteCarlo method.</description>
 	<variables>
 		<variable name="HOME" value="/user/gsigety/home"/>
 		<variable name="PROACTIVE" value="${HOME}/scheduler_workspace/Scheduler"/>
 		<variable name="WORK_DIR" value="${PROACTIVE}/jobs_descriptors/job_native_linux"/>
 	</variables>
+	<description> Computing PI according to MonteCarlo method.</description>
 	<taskFlow>
 		<task name="Computation" walltime="00:10">
 			<description>Compute Pi and return it</description>

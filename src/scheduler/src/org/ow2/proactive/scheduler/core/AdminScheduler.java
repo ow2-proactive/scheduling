@@ -37,7 +37,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -102,7 +101,6 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
         //creating admin API and scheduler
         AdminScheduler adminScheduler = new AdminScheduler();
         SchedulerFrontend schedulerFrontend;
-        SchedulerAuthentication schedulerAuth;
 
         try {
             // creating the scheduler proxy.
@@ -110,21 +108,10 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             logger.info("Creating scheduler frontend...");
             schedulerFrontend = (SchedulerFrontend) PAActiveObject.newActive(SchedulerFrontend.class
                     .getName(), new Object[] { rm, policyFullClassName });
-            // creating the scheduler authentication interface.
-            // if this fails then it will not continue.
-            logger.info("Creating scheduler authentication interface...");
-            schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class
-                    .getName(), new Object[] { schedulerFrontend });
-
-            logger.info("Registering scheduler...");
-
-            String schedulerUrl = "//" + NodeFactory.getDefaultNode().getVMInformation().getHostName() + "/" +
-                SchedulerConnection.SCHEDULER_DEFAULT_NAME;
-            PAActiveObject.register(schedulerAuth, schedulerUrl);
+            
             // setting the proxy to the admin scheduler API
             adminScheduler.schedulerFrontend = schedulerFrontend;
-            // run forest run !!
-            logger.info("Scheduler Created on " + schedulerUrl);
+            //ready
             logger.info("Scheduler is now ready to be started !");
         } catch (Exception e) {
             e.printStackTrace();

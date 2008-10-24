@@ -44,6 +44,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -55,6 +56,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
@@ -151,14 +153,27 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public void initActivity(Body body) {
         try {
+        	//scheduler URL
+        	String schedulerUrl = "//" + NodeFactory.getDefaultNode().getVMInformation().getHostName() + "/" +
+        	SchedulerConnection.SCHEDULER_DEFAULT_NAME;
+        	//creating scheduler authentication
+        	// creating the scheduler authentication interface.
+            // if this fails then it will not continue.
+            logger.info("Creating scheduler authentication interface...");
+            SchedulerAuthentication schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class
+                    .getName(), new Object[] { PAActiveObject.getStubOnThis() });
+        	//creating scheduler core
             scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
                     resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
             logger.debug("Scheduler successfully created on " +
                 PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
-        } catch (ActiveObjectCreationException e) {
+            logger.info("Registering scheduler...");
+            PAActiveObject.register(schedulerAuth, schedulerUrl);
+            // run forest run !!
+            logger.info("Scheduler Created on " + schedulerUrl);
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
+            System.exit(1);
         }
     }
 

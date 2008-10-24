@@ -2,10 +2,10 @@
 <job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 	name="job_pre_post" cancelJobOnError="true" priority="normal">
-	<description>Set a java Property in PreTask and unset it in PostScript</description>
 	<variables>
 		<variable name="HOME" value="/user/gsigety/home/scheduler_workspace/Scheduler/jobs_descriptors"/>
 	</variables>
+	<description>Set a java Property in PreTask and unset it in PostScript</description>
 	<taskFlow>
 		<task name="main_task" preciousResult="true">
 			<description>Testing the pre and post scripts.</description>

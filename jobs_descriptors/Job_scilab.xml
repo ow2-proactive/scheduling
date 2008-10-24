@@ -4,16 +4,16 @@
     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
     xmlns="urn:proactive:jobdescriptor:dev" name="Scilab_job"
     priority="normal" logFile="${HOME}/scilab_job.log">
-    <description>
-        A simple Scilab batch job, which computes the numerical
-        integration of sin(x) between 0 and PI
-    </description>
     <variables>
         <variable name="PROACTIVE_HOME"
             value="/home/user/ProActive" />
         <variable name="SCILAB_SCRIPTS"
             value="${PROACTIVE_HOME}/scripts/unix/scilab/examples" />
     </variables>
+    <description>
+        A simple Scilab batch job, which computes the numerical
+        integration of sin(x) between 0 and PI
+    </description>
     <taskFlow>
         <task name="t1">
             <description>

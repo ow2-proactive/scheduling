@@ -2,14 +2,14 @@
 <job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 	name="Job_with_verif" priority="normal">
-	<description>8 parallel tasks with variable durations.
-			Each task has a selection script which select a HostName( i.e. a node) that not contains 
-			the string ${ECLUSION_STRING} in its HostName. 
-	</description>
 	<variables>
 		<variable name="HOME" value="/user/gsigety/home/scheduler_workspace/Scheduler/jobs_descriptors"/>
 		<variable name="ECLUSION_STRING" value="paquit"/>
 	</variables>
+	<description>8 parallel tasks with variable durations.
+			Each task has a selection script which select a HostName( i.e. a node) that not contains 
+			the string ${ECLUSION_STRING} in its HostName. 
+	</description>
 	<taskFlow>
 		<task name="task1">
 			<description>Parallel Tasks - Task 1</description>
