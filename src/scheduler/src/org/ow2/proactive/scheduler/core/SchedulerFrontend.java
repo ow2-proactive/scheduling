@@ -153,16 +153,16 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public void initActivity(Body body) {
         try {
-        	//scheduler URL
-        	String schedulerUrl = "//" + NodeFactory.getDefaultNode().getVMInformation().getHostName() + "/" +
-        	SchedulerConnection.SCHEDULER_DEFAULT_NAME;
-        	//creating scheduler authentication
-        	// creating the scheduler authentication interface.
+            //scheduler URL
+            String schedulerUrl = "//" + NodeFactory.getDefaultNode().getVMInformation().getHostName() + "/" +
+                SchedulerConnection.SCHEDULER_DEFAULT_NAME;
+            //creating scheduler authentication
+            // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger.info("Creating scheduler authentication interface...");
-            SchedulerAuthentication schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class
-                    .getName(), new Object[] { PAActiveObject.getStubOnThis() });
-        	//creating scheduler core
+            SchedulerAuthentication schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(
+                    SchedulerAuthentication.class.getName(), new Object[] { PAActiveObject.getStubOnThis() });
+            //creating scheduler core
             scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
                     resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
             logger.debug("Scheduler successfully created on " +

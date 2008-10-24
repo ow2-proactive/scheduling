@@ -108,7 +108,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             logger.info("Creating scheduler frontend...");
             schedulerFrontend = (SchedulerFrontend) PAActiveObject.newActive(SchedulerFrontend.class
                     .getName(), new Object[] { rm, policyFullClassName });
-            
+
             // setting the proxy to the admin scheduler API
             adminScheduler.schedulerFrontend = schedulerFrontend;
             //ready
