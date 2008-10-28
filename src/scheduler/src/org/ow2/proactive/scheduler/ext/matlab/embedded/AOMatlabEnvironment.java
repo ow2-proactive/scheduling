@@ -60,10 +60,7 @@ import java.io.Serializable;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 
 /**
@@ -291,6 +288,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             schedulerTask.setPreciousResult(true);
             schedulerTask.addArgument("input", inputScripts[i]);
             schedulerTask.addArgument("script", mainScripts[i]);
+            schedulerTask.setDescription(mainScripts[i]);
             if (debugCurrentJob) {
                 schedulerTask.addArgument("debug", "true");
             }
@@ -403,38 +401,44 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             task_results = jResult.getExceptionResults();
         } else {
             // sorted results
-            task_results = new TreeMap(jResult.getAllResults());
-        }
 
+            task_results = jResult.getAllResults();
+        }
+        ArrayList<Integer> keys = new ArrayList<Integer>();
+        for (String key : task_results.keySet()) {
+            keys.add(Integer.parseInt(key));
+        }
+        Collections.sort(keys);
         // Iterating over the task results
-        for (Map.Entry<String, TaskResult> res : task_results.entrySet()) {
+        for (Integer key : keys) {
+            TaskResult res = task_results.get("" + key);
             if (debugCurrentJob) {
-                System.out.println("Looking for result of task: " + res.getKey());
+                System.out.println("Looking for result of task: " + key);
             }
-            String logs = res.getValue().getOuput().getAllLogs(false);
+            String logs = res.getOuput().getAllLogs(false);
 
             // No result received
-            if (res.getValue() == null) {
-                jobDidNotSucceed(event.getJobId(), new RuntimeException("Task id = " + res.getKey() +
+            if (res == null) {
+                jobDidNotSucceed(event.getJobId(), new RuntimeException("Task id = " + key +
                     " was not returned by the scheduler"), false, null);
 
-            } else if (res.getValue().hadException()) {
+            } else if (res.hadException()) {
 
                 //Exception took place inside the framework
-                if (res.getValue().getException() instanceof ptolemy.kernel.util.IllegalActionException) {
+                if (res.getException() instanceof ptolemy.kernel.util.IllegalActionException) {
                     // We filter this specific exception which means that the "out" variable was not set by the function 
                     // due to an error inside the script or a missing licence 
 
                     jobDidNotSucceed(event.getJobId(), new MatlabTaskException(logs), false, logs);
                 } else {
                     // For other types of exception we forward it as it is.
-                    jobDidNotSucceed(event.getJobId(), res.getValue().getException(), true, logs);
+                    jobDidNotSucceed(event.getJobId(), res.getException(), true, logs);
                 }
             } else {
                 // Normal success
                 Token computedResult = null;
                 try {
-                    computedResult = (Token) res.getValue().value();
+                    computedResult = (Token) res.value();
                     results.add(computedResult);
                     // We print the logs of the job, if any
                     if (logs.length() > 0) {
