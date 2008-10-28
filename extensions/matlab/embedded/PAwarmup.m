@@ -73,7 +73,7 @@ for i=1:X
 end
 % Waiting for the results of these tasks
 [pathstr, name, ext, versn] = fileparts(mfilename('fullpath'));
-url = java.net.URL(['file:' pathstr 'checkMatlab' '.js']);
+url = java.net.URL(['file:' pathstr filesep 'checkMatlab' '.js']);
 solver = PAgetsolver();
 res = solver.solve(inputScripts,mainScripts, url, org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug);
 res = org.objectweb.proactive.api.PAFuture.getFutureValue(res);
