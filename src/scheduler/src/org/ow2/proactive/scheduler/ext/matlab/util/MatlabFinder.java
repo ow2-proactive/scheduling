@@ -211,12 +211,12 @@ public class MatlabFinder {
 
         if (!answer.exists() || !answer.canRead()) {
             throw new MatlabInitException("Can't find ptolemy native library at " + answer +
-                ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab. Refer to README file.");
+                ". The native library is generated from scripts in SCHEDULER/extensions/matlab. Refer to README file.");
         } else {
             File libraryFile = new File(ptolemyLibDirURI.resolve(System.mapLibraryName("ptmatlab")));
             if (!libraryFile.exists() || !libraryFile.canRead()) {
                 throw new MatlabInitException("Can't find ptolemy native library at " + libraryFile +
-                    ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab. Refer to README file.");
+                    ". The native library is generated from scripts in SCHEDULER/extensions/matlab. Refer to README file.");
             }
         }
         return answer.getAbsolutePath();
