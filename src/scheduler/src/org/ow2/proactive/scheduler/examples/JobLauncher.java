@@ -166,7 +166,7 @@ public class JobLauncher {
                 char password[] = null;
                 try {
                     password = PasswordField.getPassword(System.in, pwdMsg);
-                    pwd = String.valueOf(password);
+                    pwd = (password == null) ? "" : String.valueOf(password);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }

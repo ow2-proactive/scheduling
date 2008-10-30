@@ -383,7 +383,8 @@ public class AdminShell {
                                 try {
                                     System.out.println("\t " + e.getKey() + " : " + tRes.value());
                                 } catch (Throwable e1) {
-                                    System.out.println("\t ERROR during execution of " + e.getKey() + "... ");
+                                    System.out.print("\t " + e.getKey() + " : ERROR - " +
+                                        tRes.getException().getMessage() + "\n");
                                     tRes.getException().printStackTrace();
                                 }
                             }

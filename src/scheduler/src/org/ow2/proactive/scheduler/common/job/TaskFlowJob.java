@@ -108,6 +108,16 @@ public class TaskFlowJob extends Job {
     }
 
     /**
+     * Get the task corresponding to the given name.
+     *
+     * @param name the name of the task to look for. 
+     * @return the task corresponding to the given name.
+     */
+    public Task getTask(String name) {
+        return tasks.get(name);
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.job.Job#getId()
      */
     @Override

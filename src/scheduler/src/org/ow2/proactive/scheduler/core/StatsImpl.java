@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.core;
 import java.util.HashMap;
 
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 import org.ow2.proactive.scheduler.common.scheduler.Stats;
 import org.ow2.proactive.scheduler.common.scheduler.Tools;
 
@@ -53,6 +54,15 @@ public class StatsImpl implements Stats {
      * ProActive Empty constructor
      */
     public StatsImpl() {
+    }
+
+    /**
+     * Create a new instance of StatsImpl.
+     * 
+     * @param init the initial state of the scheduler.
+     */
+    public StatsImpl(SchedulerState init) {
+        properties.put("Status", init);
     }
 
     /**
@@ -124,6 +134,15 @@ public class StatsImpl implements Stats {
     public void increaseFinishedJobCount(int nbTasks) {
         increaseProperty("Jobs finished", 1);
         increaseTaskCount(nbTasks);
+    }
+
+    /**
+     * Update the status of the Scheduler using the given one.
+     * 
+     * @param sState The new state.
+     */
+    public void updateStatus(SchedulerState sState) {
+        properties.put("Status", sState);
     }
 
     /**

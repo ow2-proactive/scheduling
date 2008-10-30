@@ -28,7 +28,6 @@
 				<task ref="task1"/>
 			</depends>
 			<nativeExecutable>
-
 				<staticCommand
 					value="${WORK_DIR}/nativTask">
 					<arguments>

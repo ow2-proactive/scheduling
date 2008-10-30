@@ -189,6 +189,13 @@ public abstract class Job extends CommonAttribute implements GenericInformations
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#setGenericInformations(java.util.HashMap)
+     */
+    public void setGenericInformations(HashMap<String, String> genericInformations) {
+        this.genericInformations = genericInformations;
+    }
+
+    /**
      * Returns the project Name.
      * 
      * @return the project Name.

@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
+import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.scheduler.Stats;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
@@ -117,7 +118,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     private HashMap<UniqueID, SchedulerEventListener<? extends Job>> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener<? extends Job>>();
 
     /** Scheduler's statistics */
-    private StatsImpl stats = new StatsImpl();
+    private StatsImpl stats = new StatsImpl(SchedulerState.STARTED);
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -505,10 +506,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             return new BooleanWrapper(false);
         }
 
-        //stats
-        stats.startTime();
-
-        return scheduler.start();
+        BooleanWrapper bool = scheduler.start();
+        if (bool.booleanValue()) {
+            //stats
+            stats.startTime();
+            stats.updateStatus(SchedulerState.STARTED);
+        }
+        return bool;
     }
 
     /**
@@ -519,10 +523,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             return new BooleanWrapper(false);
         }
 
-        //stats
-        stats.stopTime();
-
-        return scheduler.stop();
+        BooleanWrapper bool = scheduler.stop();
+        if (bool.booleanValue()) {
+            //stats
+            stats.stopTime();
+            stats.updateStatus(SchedulerState.STOPPED);
+        }
+        return bool;
     }
 
     /**
@@ -533,10 +540,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             return new BooleanWrapper(false);
         }
 
-        //stats
-        stats.pauseTime();
-
-        return scheduler.pause();
+        BooleanWrapper bool = scheduler.pause();
+        if (bool.booleanValue()) {
+            //stats
+            stats.pauseTime();
+            stats.updateStatus(SchedulerState.PAUSED);
+        }
+        return bool;
     }
 
     /**
@@ -547,10 +557,13 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             return new BooleanWrapper(false);
         }
 
-        //stats
-        stats.pauseTime();
-
-        return scheduler.freeze();
+        BooleanWrapper bool = scheduler.freeze();
+        if (bool.booleanValue()) {
+            //stats
+            stats.pauseTime();
+            stats.updateStatus(SchedulerState.FROZEN);
+        }
+        return bool;
     }
 
     /**
@@ -561,7 +574,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             return new BooleanWrapper(false);
         }
 
-        return scheduler.resume();
+        BooleanWrapper bool = scheduler.resume();
+        if (bool.booleanValue()) {
+            //stats
+            stats.updateStatus(SchedulerState.STARTED);
+        }
+        return bool;
     }
 
     /**
@@ -572,7 +590,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             return new BooleanWrapper(false);
         }
 
-        return scheduler.shutdown();
+        BooleanWrapper bool = scheduler.shutdown();
+        if (bool.booleanValue()) {
+            //stats
+            stats.updateStatus(SchedulerState.SHUTTING_DOWN);
+        }
+        return bool;
     }
 
     /**
@@ -583,7 +606,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             return new BooleanWrapper(false);
         }
 
-        return scheduler.kill();
+        BooleanWrapper bool = scheduler.kill();
+        if (bool.booleanValue()) {
+            //stats
+            stats.updateStatus(SchedulerState.KILLED);
+        }
+        return bool;
     }
 
     /**

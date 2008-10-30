@@ -142,11 +142,11 @@ public abstract class CommonAttribute implements Serializable {
     }
 
     /**
-     * Get the NnumberOfExecution updatable property.
+     * Get the maximum number Of Execution updatable property.
      * 
-     * @return the numberOfExecution updatable property.
+     * @return the maximum number Of Execution updatable property.
      */
-    public UpdatableProperties<Integer> getNumberOfExecutionProperty() {
+    public UpdatableProperties<Integer> getMaxNumberOfExecutionProperty() {
         return maxNumberOfExecution;
     }
 

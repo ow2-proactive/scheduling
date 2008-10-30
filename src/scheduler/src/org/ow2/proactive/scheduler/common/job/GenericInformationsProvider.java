@@ -60,4 +60,11 @@ public interface GenericInformationsProvider {
      * @param genericInformation the information to store.
      */
     public void addGenericInformation(String key, String genericInformation);
+
+    /**
+     * Set the generic information as a hash map.
+     * 
+     * @param genericInformations the generic information to set.
+     */
+    public void setGenericInformations(HashMap<String, String> genericInformations);
 }

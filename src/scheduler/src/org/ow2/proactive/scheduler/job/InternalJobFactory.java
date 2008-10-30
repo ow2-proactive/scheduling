@@ -275,9 +275,7 @@ public class InternalJobFactory implements Serializable {
         jobToSet.setLogFile(job.getLogFile());
         jobToSet.setProjectName(job.getProjectName());
         jobToSet.setEnv(job.getEnv());
-        for (Entry<String, String> e : job.getGenericInformations().entrySet()) {
-            jobToSet.addGenericInformation(e.getKey(), e.getValue());
-        }
+        jobToSet.setGenericInformations(job.getGenericInformations());
     }
 
     /**
@@ -307,14 +305,12 @@ public class InternalJobFactory implements Serializable {
         } else {
             taskToSet.setRestartTaskOnError(userJob.getRestartTaskOnError());
         }
-        if (task.getNumberOfExecutionProperty().isSet()) {
+        if (task.getMaxNumberOfExecutionProperty().isSet()) {
             taskToSet.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         } else {
             taskToSet.setMaxNumberOfExecution(userJob.getMaxNumberOfExecution());
         }
         //Generic informations
-        for (Entry<String, String> e : task.getGenericInformations().entrySet()) {
-            taskToSet.addGenericInformation(e.getKey(), e.getValue());
-        }
+        taskToSet.setGenericInformations(task.getGenericInformations());
     }
 }

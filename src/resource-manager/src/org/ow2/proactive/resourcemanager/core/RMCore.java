@@ -553,7 +553,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                 } else {
                     // script has not been executed on remote host
                     // nothing to do, just let the node in the free list
-                    logger.info("Error occured executing verifying script" + sr.getException().getMessage());
+                    logger.info("Error occured executing verifying script : " +
+                        sr.getException().getMessage());
                 }
                 nodes.remove(0);
             }

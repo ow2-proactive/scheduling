@@ -9,7 +9,7 @@
 	</variables>
 	<description> Computing PI according to MonteCarlo method.</description>
 	<taskFlow>
-		<task name="Computation" walltime="00:10">
+		<task name="Computation" walltime="00:30">
 			<description>Compute Pi and return it</description>
 			<javaExecutable fork="true" class="org.ow2.proactive.scheduler.examples.MonteCarlo" >
 			    <forkEnvironment javaHome="" jvmParameters="-D32" /> 

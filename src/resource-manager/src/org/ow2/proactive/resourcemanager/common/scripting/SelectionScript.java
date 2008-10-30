@@ -173,8 +173,10 @@ public class SelectionScript extends Script<Boolean> {
         stringId += this.dynamic;
 
         //concatenate parameters if any
-        for (String param : this.parameters) {
-            stringId += param;
+        if (this.parameters != null) {
+            for (String param : this.parameters) {
+                stringId += param;
+            }
         }
 
         try {

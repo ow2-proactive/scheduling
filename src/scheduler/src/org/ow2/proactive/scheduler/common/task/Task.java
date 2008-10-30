@@ -48,7 +48,8 @@ import org.ow2.proactive.scheduler.common.job.GenericInformationsProvider;
  * <li>A selection script that can be used to select a specific execution node for this task.</li>
  * <li>A preScript that will be launched before the real task (can be used to set environment vars).</li>
  * <li>A postScript that will be launched just after the end of the real task.
- * (this can be used to unset vars you set in the preScript).</li>
+ * (this can be used to transfer files that have been created by the task).</li>
+ * <li>A CleaningScript that will be launched by the resource manager to perform some cleaning. (deleting files or resources).</li>
  * </ul>
  * You will also be able to add dependences (if necessary) to
  * this task. The dependences mechanism are best describe below.
@@ -330,6 +331,13 @@ public abstract class Task extends CommonAttribute implements GenericInformation
      */
     public void addGenericInformation(String key, String genericInformation) {
         this.genericInformations.put(key, genericInformation);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#setGenericInformations(java.util.HashMap)
+     */
+    public void setGenericInformations(HashMap<String, String> genericInformations) {
+        this.genericInformations = genericInformations;
     }
 
     /**
