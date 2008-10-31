@@ -793,7 +793,7 @@ job.setTask(aTask);
 							<figure xml:id="cancel_restart"><info><title>CancelJobOnError and RestartTaskOnError behavior</title></info>
 								<mediaobject>
 									<imageobject>
-										<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
+										<imagedata scalefit="1" width="70%" contentdepth="70%" align="center" fileref="scheduler/pics/core/cancel-restart.png" format="PNG"/>
 									</imageobject>
 								</mediaobject>
 							</figure>
