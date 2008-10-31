@@ -112,8 +112,8 @@ public class SchedulerStarter {
             "policy",
             true,
             "the complete name of the scheduling policy to use (default org.ow2.proactive.scheduler.policy.PriorityPolicy)");
-        rmURL.setArgName("policy");
-        rmURL.setRequired(false);
+        policy.setArgName("policy");
+        policy.setRequired(false);
         options.addOption(policy);
 
         boolean displayHelp = false;

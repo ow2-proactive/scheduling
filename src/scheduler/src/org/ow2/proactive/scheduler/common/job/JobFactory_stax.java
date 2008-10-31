@@ -71,7 +71,7 @@ import org.xml.sax.SAXParseException;
 
 
 /**
- * JobFactory_stax is am implementation of the JobFactory using XPATH
+ * JobFactory_stax provide an implementation of the JobFactory using StAX
  *
  * @author The ProActive Team
  * @date 2 July 07
