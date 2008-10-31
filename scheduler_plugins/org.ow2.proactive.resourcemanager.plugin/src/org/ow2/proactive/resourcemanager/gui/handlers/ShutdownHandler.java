@@ -18,9 +18,8 @@ public class ShutdownHandler extends AbstractHandler implements IHandler {
     public boolean isEnabled() {
         //hack for toolbar menu (bug?), force event throwing if state changed.
         // Otherwise command stills disabled in toolbar menu
-        //
-        //No mood to implements callbacks to static field of my handlers
-        //from RMStore, regarding connected state, just do business code  
+        //No mood to implement callbacks to static field of my handlers
+        //to RMStore, just do business code  
         //and let RCP API manages buttons...
         if (previousState != RMStore.isConnected()) {
             previousState = RMStore.isConnected();

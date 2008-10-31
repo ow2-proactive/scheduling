@@ -55,7 +55,7 @@ public class RemoveSourceDialog extends Dialog {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
-    private RemoveSourceDialog(Shell parent, String source) {
+    private RemoveSourceDialog(Shell parent) {
 
         // Pass the default styles here
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -76,7 +76,7 @@ public class RemoveSourceDialog extends Dialog {
 
         // creation
         Label urlLabel = new Label(shell, SWT.NONE);
-        final Combo sourceNameCombo = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
+        final Combo sourceNameCombo = new Combo(shell, SWT.READ_ONLY);
         final Button preemptCheck = new Button(shell, SWT.CHECK);
         Button okButton = new Button(shell, SWT.NONE);
         Button cancelButton = new Button(shell, SWT.NONE);
@@ -95,11 +95,11 @@ public class RemoveSourceDialog extends Dialog {
         urlFormData.width = 320;
         sourceNameCombo.setLayoutData(urlFormData);
         sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(true, true, false));
-        if ((source != null) && (!source.equals("")))
-            sourceNameCombo.setText(source);
+        sourceNameCombo.select(0);
 
         // preempt check
-        preemptCheck.setText("preemptively");
+        preemptCheck.setText("wait tasks end on busy nodes");
+        preemptCheck.setSelection(true);
         FormData checkFormData = new FormData();
         checkFormData.top = new FormAttachment(sourceNameCombo, 5);
         checkFormData.left = new FormAttachment(50, -50);
@@ -114,11 +114,12 @@ public class RemoveSourceDialog extends Dialog {
                     MessageDialog.openError(shell, "Error", "You didn't choose a source to remove");
                 else {
                     try {
-                        RMStore.getInstance().getRMAdmin().removeSource(src, preemptCheck.getSelection());
+                        RMStore.getInstance().getRMAdmin().removeSource(src, !preemptCheck.getSelection());
                         shell.close();
                     } catch (RMException e) {
-                        //FIXME ne devrait jamais arriver
                         e.printStackTrace();
+                        MessageDialog.openError(shell, "Error", "Error in node source removal :\n" +
+                            e.getMessage());
                     }
                 }
             }
@@ -163,7 +164,7 @@ public class RemoveSourceDialog extends Dialog {
      * 
      * @param parent the parent
      */
-    public static void showDialog(Shell parent, String url) {
-        new RemoveSourceDialog(parent, url);
+    public static void showDialog(Shell parent) {
+        new RemoveSourceDialog(parent);
     }
 }

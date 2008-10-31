@@ -6,6 +6,7 @@ import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective;
 
 
 /**
@@ -44,6 +45,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
      */
     @Override
     public String getInitialWindowPerspectiveId() {
-        return "org.ow2.proactive.scheduler.gui.ResourceManagerPerspective";
+        return ResourceManagerPerspective.ID;
     }
 }

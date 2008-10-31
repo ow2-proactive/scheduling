@@ -33,7 +33,6 @@ package org.ow2.proactive.resourcemanager.gui.tree.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.ow2.proactive.resourcemanager.gui.tree.RMTreeViewer;
 
 
 /**

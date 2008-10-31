@@ -6,6 +6,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
@@ -13,6 +15,7 @@ import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.tree.RMTreeViewer;
+import org.ow2.proactive.resourcemanager.gui.tree.TreeLabelProvider;
 import org.ow2.proactive.resourcemanager.gui.tree.TreeSelectionListener;
 import org.ow2.proactive.resourcemanager.gui.tree.actions.CollapseAllAction;
 import org.ow2.proactive.resourcemanager.gui.tree.actions.ExpandAllAction;
@@ -54,6 +57,11 @@ public class ResourceExplorerView extends ViewPart {
     public void createPartControl(Composite theParent) {
         parent = theParent;
         treeViewer = new RMTreeViewer(this, parent);
+
+        TreeViewerColumn column = new TreeViewerColumn(treeViewer, SWT.LEFT, 0);
+        column.setLabelProvider(new TreeLabelProvider());
+        column.getColumn().setWidth(200);
+
         drillDownAdapter = new DrillDownAdapter(treeViewer);
         makeActions();
         hookContextMenu();
@@ -107,10 +115,7 @@ public class ResourceExplorerView extends ViewPart {
      */
     public void dispose() {
         super.dispose();
-        if (treeViewer != null) {
-            treeViewer.setInput(null);
-            treeViewer = null;
-        }
+        treeViewer = null;
     }
 
     /**

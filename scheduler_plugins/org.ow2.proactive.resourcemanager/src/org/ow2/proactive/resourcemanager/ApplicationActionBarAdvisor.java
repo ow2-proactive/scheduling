@@ -4,6 +4,7 @@ import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -16,6 +17,7 @@ import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
+import org.ow2.proactive.resourcemanager.gui.data.RMStatusBarItem;
 
 
 /**
@@ -101,8 +103,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.OPEN_EXT));
         fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.SAVE_GROUP));
         fileToolBar.add(saveAction);
-
         // Add to the cool bar manager
         coolBar.add(new ToolBarContributionItem(fileToolBar, IWorkbenchActionConstants.TOOLBAR_FILE));
+    }
+
+    @Override
+    protected void fillStatusLine(IStatusLineManager statusLine) {
+        RMStatusBarItem statusItem = RMStatusBarItem.getInstance();
+        statusItem.setText("disconnected");
+        statusLine.add(statusItem);
     }
 }

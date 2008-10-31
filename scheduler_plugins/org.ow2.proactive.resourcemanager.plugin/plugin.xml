@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective"
+            id="org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective"
+            name="Resource Manager">
+      </perspective>
+   </extension>
 
    <extension
          point="org.eclipse.ui.views">
       <category
-            id="RM"
-            name="RM"
-            parentCategory="org.eclipse.ui.views">
+            id="org.ow2.proactive.resourcemanager.gui.views.category"
+            name="RM">
       </category>
       <view
             allowMultiple="false"
-            category="org.eclipse.ui.views/RM"
+            category="org.ow2.proactive.resourcemanager.gui.views.category"
             class="org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView"
             icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView"
@@ -19,7 +26,7 @@
       </view>
       <view
             allowMultiple="false"
-            category="org.eclipse.ui.views/RM"
+            category="org.ow2.proactive.resourcemanager.gui.views.category"
             class="org.ow2.proactive.resourcemanager.gui.views.StatisticsView"
             icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.StatisticsView"
@@ -27,7 +34,7 @@
       </view>
       <view
             allowMultiple="false"
-            category="org.eclipse.ui.views/RM"
+            category="org.ow2.proactive.resourcemanager.gui.views.category"
             class="org.ow2.proactive.resourcemanager.gui.views.NodeInfoView"
             icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.NodeInfoView"
@@ -35,20 +42,12 @@
       </view>
       <view
             allowMultiple="false"
-            category="org.eclipse.ui.views/RM"
+            category="org.ow2.proactive.resourcemanager.gui.views.category"
             class="org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView"
             icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView"
             name="Tab Explorer">
       </view>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            class="org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective"
-            id="org.ow2.proactive.scheduler.gui.ResourceManagerPerspective"
-            name="Resource Manager">
-      </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -267,6 +266,49 @@
             </command>
          </toolbar>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <scheme
+            id="org.ow2.proactive.resourcemanager.plugin.scheme"
+            name="RM keys bindings Scheme"
+            parentId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </scheme>
+      <key
+            commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
+            schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
+            sequence="DEL">
+      </key>
+      <key
+            commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
+            schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
+            sequence="C">
+      </key>
+      <key
+            commandId="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
+            schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
+            sequence="D">
+      </key>
+      <key
+            commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
+            schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
+            sequence="A">
+      </key>
+      <key
+            commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
+            schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
+            sequence="S">
+      </key>
+      <key
+            commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
+            schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
+            sequence="N">
+      </key>
+      <key
+            commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
+            schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
+            sequence="R">
+      </key>
    </extension>
 
 </plugin>

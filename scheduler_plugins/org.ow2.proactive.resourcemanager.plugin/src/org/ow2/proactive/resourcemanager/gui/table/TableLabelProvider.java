@@ -1,52 +1,57 @@
 package org.ow2.proactive.resourcemanager.gui.table;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 
 
-public class TableLabelProvider implements ITableLabelProvider {
+public class TableLabelProvider extends ColumnLabelProvider {
 
-    public static TableLabelProvider instance = null;
+    private static final int NS_COLUMN_NUMBER = 0;
+    private static final int HOST_COLUMN_NUMBER = 1;
+    private static final int STATE_COLUMN_NUMBER = 2;
+    private static final int URL_COLUMN_NUMBER = 3;
 
-    public Image getColumnImage(Object element, int columnIndex) {
-        if (element instanceof NodeTableItem) {
-            switch (columnIndex) {
-                case 2:
-                    switch (((NodeTableItem) element).getState()) {
-                        case DOWN:
-                            return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/down.gif")
-                                    .createImage();
-                        case FREE:
-                            return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/free.gif")
-                                    .createImage();
-                        case BUSY:
-                            return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/busy.gif")
-                                    .createImage();
-                        case TO_BE_RELEASED:
-                            return ImageDescriptor
-                                    .createFromFile(RMTableViewer.class, "icons/to_release.gif")
-                                    .createImage();
-                    }
+    private int columnIndex;
+
+    public TableLabelProvider(int columnNumber) {
+        super();
+        this.columnIndex = columnNumber;
+    }
+
+    public Image getImage(Object element) {
+        if (element instanceof NodeTableItem && columnIndex == STATE_COLUMN_NUMBER) {
+            switch (((NodeTableItem) element).getState()) {
+                case DOWN:
+                    return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/down.gif")
+                            .createImage();
+                case FREE:
+                    return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/free.gif")
+                            .createImage();
+                case BUSY:
+                    return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/busy.gif")
+                            .createImage();
+                case TO_BE_RELEASED:
+                    return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/to_release.gif")
+                            .createImage();
             }
-            return null;
         }
         return null;
     }
 
-    public String getColumnText(Object element, int columnIndex) {
+    public String getText(Object element) {
         if (element instanceof NodeTableItem) {
             NodeTableItem nodeItem = (NodeTableItem) element;
             String str = null;
             switch (columnIndex) {
-                case 0:
+                case NS_COLUMN_NUMBER:
                     str = nodeItem.getNodeSource();
                     break;
-                case 1:
+                case HOST_COLUMN_NUMBER:
                     str = nodeItem.getHost();
                     break;
-                case 3:
+                case URL_COLUMN_NUMBER:
                     str = nodeItem.getNodeUrl();
                     break;
             }
@@ -55,21 +60,35 @@ public class TableLabelProvider implements ITableLabelProvider {
         return null;
     }
 
-    public void addListener(ILabelProviderListener listener) {
-        // TODO Auto-generated method stub
+    public int getToolTipDisplayDelayTime(Object object) {
+        return 800;
     }
 
-    public void dispose() {
-        // TODO Auto-generated method stub
-
+    public int getToolTipTimeDisplayed(Object object) {
+        return 3000;
     }
 
-    public boolean isLabelProperty(Object element, String property) {
-        // TODO Auto-generated method stub
+    public Point getToolTipShift(Object object) {
+        return new Point(5, 5);
+    }
+
+    public boolean useNativeToolTip(Object object) {
         return false;
     }
 
-    public void removeListener(ILabelProviderListener listener) {
-        // TODO Auto-generated method stub
+    public String getToolTipText(Object element) {
+        if (element instanceof NodeTableItem && columnIndex == STATE_COLUMN_NUMBER) {
+            switch (((NodeTableItem) element).getState()) {
+                case DOWN:
+                    return "Node is down or unreachable";
+                case FREE:
+                    return "Node is ready to perform tasks";
+                case BUSY:
+                    return "Node is currently performing a task";
+                case TO_BE_RELEASED:
+                    return "Node is busy and will be removed at task's end";
+            }
+        }
+        return null;
     }
 }

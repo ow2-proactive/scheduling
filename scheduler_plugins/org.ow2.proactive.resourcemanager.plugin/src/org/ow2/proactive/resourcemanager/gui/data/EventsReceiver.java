@@ -14,6 +14,7 @@ import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
+import org.unicore.resources.Application;
 
 
 public class EventsReceiver implements InitActive, RMEventListener {
@@ -32,7 +33,6 @@ public class EventsReceiver implements InitActive, RMEventListener {
         model = RMStore.getInstance().getModel();
         RMInitialState initialState = monitor.addRMEventListener((RMEventListener) PAActiveObject
                 .getStubOnThis());
-
         for (RMNodeSourceEvent nodeSourceEvent : initialState.getNodeSource()) {
             model.addNodeSource(nodeSourceEvent);
         }
@@ -49,8 +49,9 @@ public class EventsReceiver implements InitActive, RMEventListener {
             model.addNode(nodeEvent);
         }
 
+        model.setUpdateViews(true);
         // Init opened views AFTER model's construction
-        Display.getDefault().asyncExec(new Runnable() {
+        Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 //init Tab view if tab panel is displayed
                 if (ResourcesTabView.getTabViewer() != null) {
@@ -135,6 +136,11 @@ public class EventsReceiver implements InitActive, RMEventListener {
     //TODO add a status bar that show these states ?
 
     public void rmShuttingDownEvent(RMEvent arg0) {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                RMStatusBarItem.getInstance().setText("RM shutting down");
+            }
+        });
     }
 
     public void rmStartedEvent(RMEvent arg0) {

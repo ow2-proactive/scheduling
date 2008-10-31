@@ -48,4 +48,15 @@ public class NodeTableItem {
     public void setNodeUrl(String nodeUrl) {
         this.nodeUrl = nodeUrl;
     }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object o) {
+        if (o instanceof NodeTableItem && this.nodeUrl.equals(((NodeTableItem) o).getNodeUrl())) {
+            return true;
+        } else
+            return false;
+    }
 }

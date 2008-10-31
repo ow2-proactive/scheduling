@@ -26,11 +26,17 @@ public class RMStore {
     private static RMStore instance = null;
     private static boolean isConnected = false;
 
+    /*    public static StatusLineContributionItem statusItem =
+     new StatusLineContributionItem("LoggedInStatus");*/
     private RMAdmin rmAdmin = null;
     private RMMonitoring rmMonitoring = null;
     private EventsReceiver receiver = null;
     private RMModel model = null;
     private String baseURL;
+
+    /*    static {
+     statusItem.setText("diconnected");
+     }*/
 
     private RMStore(String url) throws RMException {
         try {
@@ -45,10 +51,13 @@ public class RMStore {
                     new Object[] { rmMonitoring });
             SelectResourceManagerDialog.saveInformations();
             isConnected = true;
+            RMStatusBarItem.getInstance().setText("connected");
         } catch (ActiveObjectCreationException e) {
+            RMStatusBarItem.getInstance().setText("disconnected");
             e.printStackTrace();
             throw new RMException(e.getMessage(), e);
         } catch (NodeException e) {
+            RMStatusBarItem.getInstance().setText("disconnected");
             e.printStackTrace();
             throw new RMException(e.getMessage(), e);
         }
@@ -126,5 +135,6 @@ public class RMStore {
         baseURL = null;
         isConnected = false;
         PAActiveObject.terminateActiveObject(receiver, true);
+        RMStatusBarItem.getInstance().setText("disconnected");
     }
 }

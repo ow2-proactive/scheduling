@@ -7,5 +7,8 @@ Bundle-Activator: org.ow2.proactive.resourcemanager.Activator
 Bundle-Vendor: ProActive Team
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.ui.editors,
+ org.ow2.proactive.resourcemanager.gui
 Eclipse-LazyStart: true
+Export-Package: org.ow2.proactive.resourcemanager

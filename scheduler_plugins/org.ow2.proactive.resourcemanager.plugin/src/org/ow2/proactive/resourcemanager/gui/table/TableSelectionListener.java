@@ -20,7 +20,6 @@ public class TableSelectionListener implements ISelectionChangedListener {
         for (NodeTableItem item : list) {
             selectionList.add(item.getNodeUrl());
         }
-
         //normally RM is connected if I can select something...
         if (RMStore.isConnected()) {
             RemoveNodesHandler.getInstance().setSelectedNodes(selectionList);

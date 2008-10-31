@@ -12,27 +12,42 @@ import org.ow2.proactive.resourcemanager.gui.dialog.RemoveSourceDialog;
 
 public class RemoveNodeSourceHandler extends AbstractHandler implements IHandler {
 
+    private static RemoveNodeSourceHandler instance;
     boolean previousState = true;
+
+    public RemoveNodeSourceHandler() {
+        super();
+        instance = this;
+    }
+
+    public static RemoveNodeSourceHandler getInstance() {
+        return instance;
+    }
 
     @Override
     public boolean isEnabled() {
+        boolean state;
+        if (RMStore.isConnected() &&
+            RMStore.getInstance().getModel().getSourcesNames(true, true, false).length > 0) {
+            state = true;
+        } else
+            state = false;
+
         //hack for toolbar menu (bug?), force event throwing if state changed.
         // Otherwise command stills disabled in toolbar menu
-        //
-        //No mood to implements callbacks to static field of my handlers
-        //from RMStore, regarding connected state, just do business code  
+        //No mood to implement callbacks to static field of my handlers
+        //to RMStore, just do business code  
         //and let RCP API manages buttons... 
-        if (previousState != RMStore.isConnected()) {
-            previousState = RMStore.isConnected();
+        if (previousState != state) {
+            previousState = state;
             fireHandlerChanged(new HandlerEvent(this, true, false));
         }
-        return RMStore.isConnected();
+        return state;
     }
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        RemoveSourceDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell(), null);
+        RemoveSourceDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell());
         return null;
     }
-
 }

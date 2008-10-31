@@ -47,7 +47,7 @@ import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 public class ResourceManagerPerspective implements IPerspectiveFactory {
 
     /** the id */
-    public static final String ID = "org.ow2.proactive.scheduler.gui.ResourceManagerPerspective";
+    public static final String ID = "org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective";
 
     /** Top folder's id. */
     public static final String ID_TOP_FOLDER = ID + ".topFolder";
@@ -65,6 +65,7 @@ public class ResourceManagerPerspective implements IPerspectiveFactory {
      * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
      */
     public void createInitialLayout(IPageLayout layout) {
+
         String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(false);
 

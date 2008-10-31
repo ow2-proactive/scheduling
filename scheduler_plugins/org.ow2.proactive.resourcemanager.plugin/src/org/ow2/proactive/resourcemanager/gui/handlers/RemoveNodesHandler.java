@@ -37,10 +37,9 @@ public class RemoveNodesHandler extends AbstractHandler implements IHandler {
             enabled = false;
         }
         //hack for toolbar menu (bug?), force event throwing if state changed.
-        // Otherwise command stills disabled in toolbar menu
-        //
-        //No mood to implements callbacks to static field of my handlers
-        //from RMStore, regarding connected state, just do business code  
+        // Otherwise command stills disabled in toolbar menu.
+        //No mood to implement callbacks to static field of my handler
+        //to RMStore, just do business code  
         //and let RCP API manages buttons... 
         if (previousState != enabled) {
             previousState = enabled;

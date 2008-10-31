@@ -66,10 +66,7 @@ public class StatisticsView extends ViewPart {
     @Override
     public void dispose() {
         super.dispose();
-        if (statsViewer != null) {
-            statsViewer.setInput(null);
-            statsViewer = null;
-        }
+        statsViewer = null;
     }
 
     /**

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodeSourceHandler;
+import org.ow2.proactive.resourcemanager.gui.table.TableLabelProvider;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
@@ -15,6 +18,13 @@ import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 public class RMModel {
 
     private Root root = null;
+
+    /**
+     * Use to (un)active view updates
+     * Just used at Model initialization
+     * Fill the model then refresh the views  
+     */
+    private boolean updateViews = false;
 
     //nodes states aggregates
     private int freeNodesNumber;
@@ -37,6 +47,8 @@ public class RMModel {
     /****************************************************/
     public void addNode(RMNodeEvent nodeEvent) {
         TreeParentElement parentToRefresh = null;
+
+        Node newNode;
         synchronized (root) {
             TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
 
@@ -56,7 +68,8 @@ public class RMModel {
                     parentToRefresh = host;
             }
 
-            vm.addChild(new Node(nodeEvent.getNodeUrl(), nodeEvent.getState()));
+            newNode = new Node(nodeEvent.getNodeUrl(), nodeEvent.getState());
+            vm.addChild(newNode);
 
             if (parentToRefresh == null)
                 parentToRefresh = vm;
@@ -73,7 +86,10 @@ public class RMModel {
             case TO_BE_RELEASED:
                 this.busyNodesNumber++;
         }
-        this.actualizeViews(parentToRefresh);
+        this.actualizeTreeView(parentToRefresh);
+        this.addTableItem(nodeEvent.getNodeSource(), nodeEvent.getHostName(), newNode.getState(), newNode
+                .getName());
+        this.actualizeStatsView();
     }
 
     public void removeNode(RMNodeEvent nodeEvent) {
@@ -107,7 +123,10 @@ public class RMModel {
             case TO_BE_RELEASED:
                 this.busyNodesNumber--;
         }
-        this.actualizeViews(parentToRefresh);
+
+        this.actualizeTreeView(parentToRefresh);
+        this.removeTableItem(nodeEvent.getNodeUrl());
+        this.actualizeStatsView();
     }
 
     public void changeNodeState(RMNodeEvent nodeEvent) {
@@ -143,7 +162,12 @@ public class RMModel {
             case TO_BE_RELEASED:
                 this.busyNodesNumber++;
         }
-        this.actualizeViews(node);
+
+        this.actualizeTreeView(node);
+        this.actualizeStatsView();
+        this.updateTableItem(nodeEvent.getNodeSource(), nodeEvent.getHostName(), node.getState(), node
+                .getName());
+
     }
 
     public void addNodeSource(RMNodeSourceEvent nodeSourceEvent) {
@@ -154,7 +178,10 @@ public class RMModel {
                 root.addChild(source);
             }
         }
-        actualizeViews(root);
+        actualizeTreeView(root);
+        //refresh node source removal command state
+        refreshNodeSourceRemovalHandler();
+
     }
 
     public void removeNodeSource(RMNodeSourceEvent nodeSourceEvent) {
@@ -166,7 +193,9 @@ public class RMModel {
                 }
             }
         }
-        actualizeViews(root);
+        actualizeTreeView(root);
+        //refresh node source removal command state
+        refreshNodeSourceRemovalHandler();
     }
 
     /****************************************************/
@@ -188,27 +217,49 @@ public class RMModel {
             }
     }
 
+    private void refreshNodeSourceRemovalHandler() {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                RemoveNodeSourceHandler.getInstance().isEnabled();
+            }
+        });
+    }
+
     /****************************************************/
     /* view update methods								*/
     /****************************************************/
-
-    /** 
-     * Actualize views
-     * 
-     * @param element
-     */
-    public void actualizeViews(TreeLeafElement element) {
-        //actualize table view if exists
-        if (ResourcesTabView.getTabViewer() != null) {
-            ResourcesTabView.getTabViewer().actualize(root);
-        }
+    private void actualizeTreeView(TreeLeafElement element) {
         //actualize tree view if exists
-        if (ResourceExplorerView.getTreeViewer() != null) {
+        if (updateViews && ResourceExplorerView.getTreeViewer() != null) {
             ResourceExplorerView.getTreeViewer().actualize(element);
         }
-        // actualize stats view if exists
-        if (StatisticsView.getStatsViewer() != null) {
+    }
+
+    private void actualizeStatsView() {
+        //actualize stats view if exists
+        if (updateViews && StatisticsView.getStatsViewer() != null) {
             StatisticsView.getStatsViewer().actualize();
+        }
+    }
+
+    private void updateTableItem(String nodeSource, String host, NodeState state, String nodeUrl) {
+        //actualize table view if exists
+        if (updateViews && ResourcesTabView.getTabViewer() != null) {
+            ResourcesTabView.getTabViewer().updateItem(nodeSource, host, state, nodeUrl);
+        }
+    }
+
+    private void removeTableItem(String nodeUrl) {
+        //actualize table view if exists
+        if (updateViews && ResourcesTabView.getTabViewer() != null) {
+            ResourcesTabView.getTabViewer().removeItem(nodeUrl);
+        }
+    }
+
+    private void addTableItem(String nodeSource, String host, NodeState state, String nodeUrl) {
+        //actualize table view if exists
+        if (updateViews && ResourcesTabView.getTabViewer() != null) {
+            ResourcesTabView.getTabViewer().addItem(nodeSource, host, state, nodeUrl);
         }
     }
 
@@ -239,29 +290,6 @@ public class RMModel {
         return tmp;
     }
 
-    public String[] getNodesNames() {
-        List<String> res = new ArrayList<String>();
-        // FIXME A synchronize more efficient may be done ?
-        synchronized (root) {
-            for (TreeLeafElement src : root.getChildren()) {
-                TreeParentElement source = (TreeParentElement) src;
-                for (TreeLeafElement hst : source.getChildren()) {
-                    TreeParentElement host = (TreeParentElement) hst;
-                    for (TreeLeafElement jvms : host.getChildren()) {
-                        TreeParentElement jvm = (TreeParentElement) jvms;
-                        for (TreeLeafElement node : jvm.getChildren()) {
-                            res.add(node.getName());
-                        }
-                    }
-                }
-            }
-        }
-        String[] tmp = new String[res.size()];
-        res.toArray(tmp);
-        Arrays.sort(tmp);
-        return tmp;
-    }
-
     public int getFreeNodesNumber() {
         return freeNodesNumber;
     }
@@ -272,5 +300,9 @@ public class RMModel {
 
     public int getDownNodesNumber() {
         return downNodesNumber;
+    }
+
+    public void setUpdateViews(boolean updateViews) {
+        this.updateViews = updateViews;
     }
 }

@@ -37,7 +37,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setShowMenuBar(true);
         configurer.setInitialSize(new Point(1000, 700));
         configurer.setShowCoolBar(true);
-        configurer.setShowStatusLine(false);
+        configurer.setShowStatusLine(true);
         configurer.setShowPerspectiveBar(false);
     }
 }
