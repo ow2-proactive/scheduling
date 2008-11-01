@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="doc_after_properties">
+<project>
 <property name="docs.published.coreclasses" 		value="${docs.tmp.dir}/publishedCoreClasses" />
 <property name="docs.published.extensionsclasses" 	value="${docs.tmp.dir}/publishedExtensionsClasses" />
 <property name="docs.published.extraclasses" 		value="${docs.tmp.dir}/publishedExtraClasses" />
