@@ -10,7 +10,10 @@
 		<section xml:id="Create_job_xml"><info><title>Job XML descriptor</title></info>
 			<para>
 			The  Job  XML descriptor is created 
-			following the <link href="http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd">descriptor XSD schema</link>:
+			following the 
+			<uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd">
+			descriptor XSD schema</uri>
+			
 			</para>
 			<para>
 				Several parameters can be set for a job :
@@ -768,11 +771,15 @@ job.setTask(aTask);
 							If the task has exception or error more than defined in this property, 2 possibilities :
 							<itemizedlist>
 								<listitem>
+									<para>
 									cancelJobOnError=true : then the job is canceled.
+									</para>
 								</listitem>
 								<listitem>
+									<para>
 									cancelJobOnError=false : then the task ends and the result is the representation of the error 
 									(Exception in Java, error code in native). The job continues in a normal way.
+									</para>
 								</listitem>
 							</itemizedlist>
 						</para>
