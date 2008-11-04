@@ -23,7 +23,7 @@ public class TreeSelectionListener implements ISelectionChangedListener {
             if (selection != null) {
                 list = (List<TreeLeafElement>) ((IStructuredSelection) selection).toList();
                 for (TreeLeafElement leaf : list) {
-                	getSubTreeNodesList(leaf, selectionList);
+                    getSubTreeNodesList(leaf, selectionList);
                 }
             }
         }
@@ -39,7 +39,7 @@ public class TreeSelectionListener implements ISelectionChangedListener {
                 selectList.add(leaf.getName());
         } else if (((TreeParentElement) leaf).hasChildren()) {
             for (TreeLeafElement element : ((TreeParentElement) leaf).getChildren()) {
-            	getSubTreeNodesList(element, selectList);
+                getSubTreeNodesList(element, selectList);
             }
         }
     }

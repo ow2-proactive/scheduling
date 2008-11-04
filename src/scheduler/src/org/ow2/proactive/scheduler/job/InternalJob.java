@@ -132,6 +132,14 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
+     * To get the type
+     *
+     * @return the type
+     */
+    @Override
+    public abstract JobType getType();
+
+    /**
      * Set the jobEvent contained in the TaskEvent to this job.
      *
      * @param event a taskEvent containing a job event.
@@ -565,14 +573,6 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     public void setTaskFinishedTimeModify(HashMap<TaskId, Long> taskFinishedTimeModify) {
         jobInfo.setTaskFinishedTimeModify(taskFinishedTimeModify);
     }
-
-    /**
-     * To get the type
-     *
-     * @return the type
-     */
-    @Override
-    public abstract JobType getType();
 
     /**
      * To get the precious results of this job

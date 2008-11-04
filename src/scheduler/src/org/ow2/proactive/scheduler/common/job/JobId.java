@@ -122,6 +122,18 @@ public final class JobId implements Comparable<JobId>, Serializable {
     }
 
     /**
+     * Get the value of the JobId.<br />
+     * As the internal implementation of this class can change, It is strongly recommended to use this method
+     * to get a literal value of the ID.<br />
+     * It is possible to re-make a new JobId with this value by using the {@link JobId.makeJobId(String)} method.
+     * 
+     * @return
+     */
+    public String value() {
+        return "" + this.id;
+    }
+
+    /**
      * Make a new JobId with the given arguments.
      * 
      * @param str the string on which to base the id.
@@ -154,6 +166,10 @@ public final class JobId implements Comparable<JobId>, Serializable {
     }
 
     /**
+     * <font color="red"><b>Do not use this method to get the value as an INTEGER.<br />
+     * It does not ensure that this integer value is the real Job ID Value.</b></font><br />
+     * Use the {@link JobId.value()} method instead.
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override

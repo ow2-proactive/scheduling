@@ -1012,7 +1012,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             }
 
-            //if this job is finished (every task are finished)
+            //if this job is finished (every task have finished)
             if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()) {
                 //terminating job
                 job.terminate();
@@ -1677,7 +1677,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         job.update(task.getTaskInfo());
                     }
 
-                    // restart classserver if needed
+                    // restart classServer if needed
                     if (job.getEnv().getJobClasspath() != null) {
                         try {
                             SchedulerCore.addTaskClassServer(job.getId(), job.getEnv()
@@ -1878,9 +1878,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @return /
      * @throws SchedulerException /
      */
-    public SchedulerInitialState<? extends Job> addSchedulerEventListener(
+    @SuppressWarnings("unused")
+    private SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
-        return null;
+        throw new RuntimeException("METHOD NOT USED IN THIS CLASS !");
     }
 
     /**
@@ -1888,7 +1889,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      *
      * @throws SchedulerException /
      */
-    public void disconnect() throws SchedulerException {
+    @SuppressWarnings("unused")
+    private void disconnect() throws SchedulerException {
+        throw new RuntimeException("METHOD NOT USED IN THIS CLASS !");
     }
 
     /**
@@ -1897,8 +1900,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @return /
      * @throws SchedulerException /
      */
-    public Stats getStats() throws SchedulerException {
-        return null;
+    @SuppressWarnings("unused")
+    private Stats getStats() throws SchedulerException {
+        throw new RuntimeException("METHOD NOT USED IN THIS CLASS !");
     }
 
     /**
@@ -1908,7 +1912,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @return /
      * @throws SchedulerException /
      */
-    public JobId submit(Job job) throws SchedulerException {
-        return null;
+    @SuppressWarnings("unused")
+    private JobId submit(Job job) throws SchedulerException {
+        throw new RuntimeException("METHOD NOT USED IN THIS CLASS !");
     }
 }

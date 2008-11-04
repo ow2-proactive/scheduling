@@ -35,7 +35,6 @@ public class Application implements IApplication {
         }
     }
 
-
     public void stop() {
         final IWorkbench workbench = PlatformUI.getWorkbench();
         if (workbench == null)
