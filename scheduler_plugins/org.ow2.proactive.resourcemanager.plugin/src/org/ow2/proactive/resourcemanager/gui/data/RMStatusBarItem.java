@@ -8,7 +8,7 @@ public class RMStatusBarItem extends StatusLineContributionItem {
     private static RMStatusBarItem instance;
 
     public RMStatusBarItem(String id) {
-        super(id);
+        super(id, true, 20);
     }
 
     public static RMStatusBarItem getInstance() {

@@ -151,7 +151,7 @@ public class RMStarter {
                 while ((typed = (char) System.in.read()) != 'e') {
                 }
                 try {
-                    RMFactory.getAdmin().shutdown(false);
+                    RMFactory.getAdmin().shutdown(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                     PALifeCycle.exitFailure();

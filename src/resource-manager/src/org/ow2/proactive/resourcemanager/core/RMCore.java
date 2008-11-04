@@ -1135,6 +1135,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             // finish the shutdown
             this.user.shutdown();
             this.monitoring.shutdown();
+            PAActiveObject.terminateActiveObject(admin, false);
             PAActiveObject.terminateActiveObject(true);
             try {
                 Thread.sleep(2000);

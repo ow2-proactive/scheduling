@@ -62,7 +62,6 @@ public class TreeLabelProvider extends ColumnLabelProvider {
     }
 
     public String getToolTipText(Object obj) {
-        System.out.println("TooltipLabelProvider.getToolTipText()");
         if (((TreeLeafElement) obj).getType() == TreeElementType.NODE) {
             switch (((Node) obj).getState()) {
                 case DOWN:
