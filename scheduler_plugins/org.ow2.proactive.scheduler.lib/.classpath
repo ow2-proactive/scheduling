@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="lib/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ajo.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-2.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/axis.jar"/>
@@ -20,7 +19,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/cog-ogce.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/colobus-0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/colt.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-cli-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-discovery.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
@@ -88,5 +86,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/xsdlib.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="lib/jsr173_1.0_api.jar"/>
+	<classpathentry kind="lib" path="lib/wstx-lgpl-3.9.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-cli-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

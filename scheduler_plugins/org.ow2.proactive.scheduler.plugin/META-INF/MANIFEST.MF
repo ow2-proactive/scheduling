@@ -40,5 +40,6 @@ Export-Package: .,
    org.eclipse.swt.graphics,
    org.eclipse.ui.part,
    org.objectweb.proactive.extra.scheduler.task,
-   org.eclipse.swt.widgets"
+   org.eclipse.swt.widgets",
+ org.ow2.proactive.scheduler.gui.wizards.flatJobWizard
 

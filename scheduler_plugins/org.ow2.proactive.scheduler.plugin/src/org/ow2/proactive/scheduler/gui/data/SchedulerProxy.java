@@ -202,13 +202,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.Job)
      */
-    public JobId submit(Job job) {
-        try {
-            return scheduler.submit(job);
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public JobId submit(Job job) throws SchedulerException {
+        return scheduler.submit(job);
     }
 
     /**

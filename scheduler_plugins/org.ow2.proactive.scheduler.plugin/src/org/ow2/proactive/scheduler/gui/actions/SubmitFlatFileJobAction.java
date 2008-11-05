@@ -30,53 +30,37 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.FileDialog;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
-import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
+import org.ow2.proactive.scheduler.gui.wizards.flatJobWizard.FlatFileJobWizard;
 
 
 /**
  * @author The ProActive Team
  */
-public class SubmitJobAction extends SchedulerGUIAction {
+public class SubmitFlatFileJobAction extends SchedulerGUIAction {
     private Composite parent = null;
 
-    public SubmitJobAction(Composite parent) {
+    public SubmitFlatFileJobAction(Composite parent) {
         this.parent = parent;
-        this.setText("Submit an XML job file");
-        this.setToolTipText("Submit job from an XML file containing a job description");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_submit.gif"));
+        this.setText("Submit a file containning commands");
+        this.setToolTipText("Submit a file containning commands");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/file_obj.gif"));
         this.setEnabled(false);
     }
 
     @Override
     public void run() {
-        FileDialog fileDialog = new FileDialog(parent.getShell(), SWT.OPEN);
-        fileDialog.setFilterExtensions(new String[] { "*.xml" });
-        String fileName = fileDialog.open();
+        // Instantiates and initializes the wizard
+        FlatFileJobWizard wizard = new FlatFileJobWizard();
+        //wizard.init(null, null);
 
-        if (fileName != null) {
-            try {
-                // CREATE JOB
-                Job job = JobFactory.getFactory().createJob(fileName);
-                // SUBMIT JOB
-                SchedulerProxy.getInstance().submit(job);
-            } catch (JobCreationException e) {
-                MessageDialog.openError(parent.getShell(), "Couldn't submit job",
-                        "Couldn't submit job due to : " + e.getCause());
-            } catch (SchedulerException e) {
-                MessageDialog.openError(parent.getShell(), "Couldn't submit job",
-                        "Couldn't submit job due to : " + e.getCause());
-            }
-        }
+        // Instantiates the wizard container with the wizard and opens it
+        WizardDialog dialog = new WizardDialog(parent.getShell(), wizard);
+        dialog.create();
+        dialog.open();
     }
 
     @Override

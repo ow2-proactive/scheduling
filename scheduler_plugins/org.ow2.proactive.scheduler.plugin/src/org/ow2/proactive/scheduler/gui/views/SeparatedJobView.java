@@ -64,6 +64,7 @@ import org.ow2.proactive.scheduler.gui.actions.PriorityJobAction;
 import org.ow2.proactive.scheduler.gui.actions.ResumeSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.ShutdownSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.StartStopSchedulerAction;
+import org.ow2.proactive.scheduler.gui.actions.SubmitFlatFileJobAction;
 import org.ow2.proactive.scheduler.gui.actions.SubmitJobAction;
 import org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite;
 import org.ow2.proactive.scheduler.gui.composite.FinishedJobComposite;
@@ -102,6 +103,7 @@ public class SeparatedJobView extends ViewPart {
 
     private static Action obtainJobOutputAction = null;
     private static Action submitJob = null;
+    private static Action submitFlatJob = null;
     private static Action pauseResumeJobAction = null;
     private static Action killJobAction = null;
     private static Action changePriorityJobAction = null;
@@ -118,6 +120,10 @@ public class SeparatedJobView extends ViewPart {
     private static Action shutdownSchedulerAction = null;
     private static Action killSchedulerAction = null;
     private static Composite parent = null;
+
+    private static IMenuManager subMenu = null;
+    private static IMenuManager subMenuJob = null;
+    private static IMenuManager subMenuPriority = null;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -152,7 +158,7 @@ public class SeparatedJobView extends ViewPart {
         // but I will remove some others calls to this method on others classes
         manager.add(connectSchedulerAction);
         manager.add(changeViewModeAction);
-        IMenuManager subMenu = new MenuManager("Maximize list") {
+        subMenu = new MenuManager("Maximize list") {
         };
         manager.add(subMenu);
         subMenu.add(maximizeNoneListAction);
@@ -161,25 +167,30 @@ public class SeparatedJobView extends ViewPart {
         subMenu.add(maximizeFinishedListAction);
 
         manager.add(new Separator());
-        manager.add(submitJob);
+
+        subMenuJob = new MenuManager("Submit job");
+        manager.add(subMenuJob);
+        subMenuJob.add(submitJob);
+        subMenuJob.add(submitFlatJob);
+
         manager.add(pauseResumeJobAction);
-        subMenu = new MenuManager("Change job priority") {
+        subMenuPriority = new MenuManager("Change job priority") {
         };
-        manager.add(subMenu);
+        manager.add(subMenuPriority);
         if (SchedulerProxy.getInstance() != null) {
             if (SchedulerProxy.getInstance().isAnAdmin()) {
-                subMenu.add(priorityIdleJobAction);
+                subMenuPriority.add(priorityIdleJobAction);
             }
         }
-        subMenu.add(priorityLowestJobAction);
-        subMenu.add(priorityLowJobAction);
-        subMenu.add(priorityNormalJobAction);
+        subMenuPriority.add(priorityLowestJobAction);
+        subMenuPriority.add(priorityLowJobAction);
+        subMenuPriority.add(priorityNormalJobAction);
         manager.add(obtainJobOutputAction);
         manager.add(killJobAction);
         if (SchedulerProxy.getInstance() != null) {
             if (SchedulerProxy.getInstance().isAnAdmin()) {
-                subMenu.add(priorityHighJobAction);
-                subMenu.add(priorityHighestJobAction);
+                subMenuPriority.add(priorityHighJobAction);
+                subMenuPriority.add(priorityHighestJobAction);
                 manager.add(new Separator());
                 manager.add(startStopSchedulerAction);
                 manager.add(freezeSchedulerAction);
@@ -205,6 +216,7 @@ public class SeparatedJobView extends ViewPart {
         manager.add(changeMaximizeListAction);
         manager.add(new Separator());
         manager.add(submitJob);
+        manager.add(submitFlatJob);
         manager.add(pauseResumeJobAction);
         manager.add(changePriorityJobAction);
         manager.add(obtainJobOutputAction);
@@ -236,6 +248,7 @@ public class SeparatedJobView extends ViewPart {
 
         obtainJobOutputAction = new ObtainJobOutputAction();
         submitJob = new SubmitJobAction(parent);
+        submitFlatJob = new SubmitFlatFileJobAction(parent);
         pauseResumeJobAction = new PauseResumeJobAction();
         killJobAction = new KillRemoveJobAction(shell);
 
