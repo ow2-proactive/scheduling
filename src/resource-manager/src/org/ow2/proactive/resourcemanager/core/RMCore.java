@@ -727,7 +727,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     public void createGCMNodesource(GCMApplication GCMApp, String sourceName) throws RMException {
         logger.info("Creating a GCM Node source : " + sourceName);
         if (this.nodeSources.containsKey(sourceName)) {
-            throw new RMException("Node Source name already existing");
+            throw new RMException("Node Source name " + sourceName + " is already existing");
         } else {
             try {
                 NodeSource gcmSource = (NodeSource) PAActiveObject.newActive(GCMNodeSource.class.getName(),
@@ -751,7 +751,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
 
         //check that a Node Source with a same name is not already existing
         if (this.nodeSources.containsKey(id)) {
-            throw new RMException("Node Source name already existing");
+            throw new RMException("Node Source name " + id + " is already existing");
         } else {
             //check that a P2P node source is not already existing
             //It's a drawback, but for the moment we are just able to start one peer to peer service per JVM
@@ -784,7 +784,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                 throw new RMException(e);
             }
         } else {
-            throw new RMException("unknown node source");
+            throw new RMException("unknown node source " + sourceName);
         }
     }
 
@@ -839,7 +839,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                 throw new RMException(e);
             }
         } else {
-            throw new RMException("unknown node source");
+            throw new RMException("unknown node source " + sourceName);
         }
     }
 

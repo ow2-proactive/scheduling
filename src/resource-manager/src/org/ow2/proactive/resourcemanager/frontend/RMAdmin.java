@@ -37,8 +37,9 @@ import java.util.Vector;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 
 
@@ -200,4 +201,17 @@ public interface RMAdmin extends Serializable {
      *
      */
     public void shutdown(boolean preempt) throws ProActiveException;
+
+    /**
+     * Get list of nodes handled by Resource Manager
+     * @return a list of RMNodeEvent objects representing the nodes 
+     */
+    public List<RMNodeEvent> getNodesList();
+
+    /**
+     * Get list of nodes sources on Resource Manager
+     * @return a list of RMNodeSourceEvent objects representing the nodes sources
+     */
+    public List<RMNodeSourceEvent> getNodeSourcesList();
+
 }

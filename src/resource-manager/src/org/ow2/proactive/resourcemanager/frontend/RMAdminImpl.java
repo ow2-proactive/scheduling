@@ -41,6 +41,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,6 +58,9 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -378,5 +383,28 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
         } catch (IOException e) {
             throw new RMException(e);
         }
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#getNodesList()
+     */
+    public List<RMNodeEvent> getNodesList() {
+
+        List<RMNodeEvent> nodesList = new ArrayList<RMNodeEvent>();
+
+        RMInitialState state = this.rmcore.getRMInitialState();
+        nodesList.addAll(state.getFreeNodes());
+        nodesList.addAll(state.getBusyNodes());
+        nodesList.addAll(state.getToReleaseNodes());
+        nodesList.addAll(state.getDownNodes());
+
+        return nodesList;
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#getNodeSourcesList()
+     */
+    public List<RMNodeSourceEvent> getNodeSourcesList() {
+        return rmcore.getRMInitialState().getNodeSource();
     }
 }
