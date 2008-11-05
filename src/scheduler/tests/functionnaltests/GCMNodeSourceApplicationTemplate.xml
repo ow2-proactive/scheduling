@@ -13,6 +13,7 @@
 		<applicationClasspath>
 				<pathElement base="proactive" relpath="/dist/lib/ProActive_resource-manager.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/ProActive_scheduler.jar"/>
+				<pathElement base="proactive" relpath="/dist/lib/commons-cli-1.1.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/clover.jar"/>
 				<pathElement base="proactive" relpath="/lib/common/script-api.jar"/>
 				<pathElement base="proactive" relpath="/lib/common/script-js.jar"/>
