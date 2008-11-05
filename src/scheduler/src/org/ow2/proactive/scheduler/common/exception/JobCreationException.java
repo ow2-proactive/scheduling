@@ -52,4 +52,12 @@ public class JobCreationException extends Exception {
     public JobCreationException(String msg, Exception cause) {
         super(msg, cause);
     }
+
+    /**
+     * Create a new instance of JobCreationException with the given message.
+     * @param msg message to attach.
+     */
+    public JobCreationException(String msg) {
+        super(msg);
+    }
 }

@@ -39,6 +39,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -46,6 +48,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
@@ -54,6 +57,9 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.job.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -84,20 +90,50 @@ public class JobLauncher {
 
         Options options = new Options();
 
-        Option help = new Option("h", "help", false, "to display this help");
-        help.setArgName("help");
-        help.setRequired(false);
-        options.addOption(help);
-
         Option username = new Option("l", "login", true, "the login");
         username.setArgName("login");
         username.setRequired(false);
         options.addOption(username);
 
-        Option job = new Option("j", "job", true, "the job file descriptor");
-        job.setArgName("job");
-        job.setRequired(true);
-        options.addOption(job);
+        OptionGroup jobGroup = new OptionGroup();
+
+        Option job = new Option("j", "job", true, "job xml file descriptor to schedule");
+        job.setArgName("jobXMLfile");
+        jobGroup.addOption(job);
+
+        Option jobCmd = new Option("cmd", "command", true, "a command line executable to schedule");
+        jobCmd.setArgName("command args...");
+        jobCmd.setArgs(Option.UNLIMITED_VALUES);
+        jobGroup.addOption(jobCmd);
+
+        Option jobCmdFile = new Option("cmdf", "commandfile", true,
+            "a text file containing command lines to schedule");
+        jobCmdFile.setArgName("commandfile");
+        jobGroup.addOption(jobCmdFile);
+
+        Option help = new Option("h", "help", false, "to display this help");
+        help.setArgName("help");
+        jobGroup.addOption(help);
+
+        jobGroup.setRequired(true);
+        options.addOptionGroup(jobGroup);
+
+        Option jobOutputFile = new Option("o", "output", true,
+            "path of standard output file (only used with -cmd|-cmdf)");
+        jobOutputFile.setArgName("outputPath");
+        jobOutputFile.setRequired(false);
+        options.addOption(jobOutputFile);
+
+        Option jobName = new Option("jn", "jobName", true, "job name (only used with -cmd|-cmdf)");
+        jobName.setArgName("job_name");
+        jobName.setRequired(false);
+        options.addOption(jobName);
+
+        Option selScript = new Option("s", "selScript", true,
+            "path to a selection script file (only used with -cmd|-cmdf)");
+        selScript.setArgName("name");
+        selScript.setRequired(false);
+        options.addOption(selScript);
 
         Option schedulerURL = new Option("u", "schedulerURL", true, "the scheduler URL (default " +
             SCHEDULER_DEFAULT_URL + ")");
@@ -147,11 +183,48 @@ public class JobLauncher {
                 if (cmd.hasOption("n"))
                     nbJob = new Integer(cmd.getOptionValue("n"));
 
-                jobUrl = cmd.getOptionValue("j");
+                Job j = null;
 
-                // CREATE JOB
-                Job j = JobFactory.getFactory().createJob(jobUrl);
-                System.out.println();
+                //TODO: todo check on these three options exist and create group options
+                if (cmd.hasOption("j")) {
+                    jobUrl = cmd.getOptionValue("j");
+                    // CREATE JOB from an Xml descriptor job
+                    j = JobFactory.getFactory().createJob(jobUrl);
+                } else if (cmd.hasOption("cmd") || cmd.hasOption("cmdf")) {
+
+                    String jobGivenName = null;
+                    String jobGivenOutput = null;
+                    String givenSelScript = null;
+                    if (cmd.hasOption("jn")) {
+                        jobGivenName = cmd.getOptionValue("jn");
+                    }
+                    if (cmd.hasOption("o")) {
+                        jobGivenOutput = cmd.getOptionValue("o");
+                    }
+                    if (cmd.hasOption("s")) {
+                        givenSelScript = cmd.getOptionValue("s");
+                    }
+
+                    if (cmd.hasOption("cmd")) {
+                        //create job from a command to launch specified in command line
+                        String cmdTab[] = cmd.getOptionValues("cmd");
+                        String jobCommand = "";
+
+                        //no check to null or empty tab for cmdTab[] because -cmd option is
+                        // defined with mandatory argument
+                        for (String s : cmdTab) {
+                            jobCommand += (s + " ");
+                        }
+                        jobCommand = jobCommand.trim();
+                        j = FlatJobFactory.getFactory().createNativeJobFromCommand(jobCommand, jobGivenName,
+                                givenSelScript, jobGivenOutput, cmd.getOptionValue("l"));
+                    } else {
+
+                        String commandFilePath = cmd.getOptionValue("cmdf");
+                        j = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath,
+                                jobGivenName, givenSelScript, jobGivenOutput, cmd.getOptionValue("l"));
+                    }
+                }
 
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
@@ -225,9 +298,19 @@ public class JobLauncher {
             displayHelp = true;
         } catch (ParseException e) {
             displayHelp = true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            System.exit(1);
+        } catch (JobCreationException e) {
+            System.out.println("Unable to create job : ");
+            System.out.println(e.getMessage());
+            if (e.getCause() != null) {
+                System.out.println(e.getCause().getMessage());
+            }
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        } catch (LoginException e) {
+            System.out.println("Unable to authenticate user : ");
+            System.out.println(e.getMessage());
         } finally {
             if (reader != null)
                 try {
@@ -243,10 +326,17 @@ public class JobLauncher {
 
         if (displayHelp) {
             System.out.println();
-            new HelpFormatter().printHelp("submit", options, true);
+            HelpFormatter hf = new HelpFormatter();
+            hf.setWidth(120);
+            hf.printHelp("submit", options, true);
+            System.out
+                    .println("\n Notice : -o, -n and -s options are only considered with -cmd|cmdf options.");
+            System.out
+                    .println(" If you submit job with xml file (-j), selection script, job name and STD output file are "
+                        + "specified in xml job descriptor.");
             System.exit(2);
         }
 
-        //        System.exit(0);
+        //System.exit(0);
     }
 }

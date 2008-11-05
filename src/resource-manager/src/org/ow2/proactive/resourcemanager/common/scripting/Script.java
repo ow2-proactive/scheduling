@@ -121,9 +121,8 @@ public abstract class Script<E> implements Serializable {
         try {
             storeScript(file);
         } catch (IOException e) {
-            throw new InvalidScriptException("Unable to read script : ", e);
+            throw new InvalidScriptException("Unable to read script : " + file.getAbsolutePath(), e);
         }
-
         this.id = file.getPath();
         this.parameters = parameters;
     }
@@ -147,7 +146,7 @@ public abstract class Script<E> implements Serializable {
         try {
             storeScript(url);
         } catch (IOException e) {
-            throw new InvalidScriptException("Unable to read script : ", e);
+            throw new InvalidScriptException("Unable to read script : " + url.getPath(), e);
         }
 
         this.id = url.toExternalForm();
@@ -261,7 +260,7 @@ public abstract class Script<E> implements Serializable {
                 }
 
         if (scriptEngine == null) {
-            throw new InvalidScriptException("No script engine corresponding");
+            throw new InvalidScriptException("No script engine corresponding for file : " + filepath);
         }
     }
 
