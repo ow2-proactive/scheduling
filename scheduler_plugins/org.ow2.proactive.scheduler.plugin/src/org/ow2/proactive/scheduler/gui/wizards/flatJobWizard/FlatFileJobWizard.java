@@ -54,7 +54,6 @@ public class FlatFileJobWizard extends Wizard implements IWorkbenchWizard {
         addPage(summaryPage);
     }
 
-    @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
     }
 

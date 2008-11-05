@@ -32,7 +32,6 @@ public class SummaryPage extends WizardPage {
         setDescription("Job Summary");
     }
 
-    @Override
     public void createControl(Composite parent) {
         // create the composite to hold the widgets
         composite = new Composite(parent, SWT.NULL);

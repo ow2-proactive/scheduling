@@ -151,7 +151,6 @@ public class MainPage extends WizardPage implements ModifyListener {
         setControl(composite);
     }
 
-    @Override
     public void modifyText(ModifyEvent e) {
         getWizard().getContainer().updateButtons();
     }
