@@ -46,7 +46,7 @@
     <target name="javadoc.published" depends="compile.all" description="Make published Javadoc">
         <mkdir dir="${docs.tmp.dir}" />
         <javadoc source="${source}"	classpathref="scheduler.libs">
-            <doclet name="doc.PublishedAPIDoclet" path="${proactive.utils.jar}">
+            <doclet name="doc.PublishedAPIDoclet" path="${docs.java.classes.dir}">
                 <param name="-file" value="${docs.published.coreclasses}" />
             </doclet>
             <packageset dir="${src.scheduler.dir}"/>
