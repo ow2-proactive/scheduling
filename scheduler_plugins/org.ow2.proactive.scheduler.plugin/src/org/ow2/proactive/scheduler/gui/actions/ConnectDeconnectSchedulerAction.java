@@ -32,7 +32,12 @@ package org.ow2.proactive.scheduler.gui.actions;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
@@ -49,6 +54,7 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
     private Composite parent = null;
     private boolean isConnected = false;
+    private Shell waitShell = null;
 
     public ConnectDeconnectSchedulerAction(Composite parent) {
         this.parent = parent;
@@ -66,6 +72,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
 
     private void connection() {
         SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(parent.getShell());
+
         if (dialogResult != null) {
             int res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
 
@@ -75,14 +82,32 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
 
                 // connection successful, so record "valid" url and login
                 SelectSchedulerDialog.saveInformations();
-
                 this.setText("Disconnect");
                 this.setToolTipText("Disconnect from the ProActive Scheduler");
                 this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
                         "icons/disconnect.gif"));
+                waitShell = new Shell(parent.getShell(), SWT.PRIMARY_MODAL);
+                FormLayout layout = new FormLayout();
+                layout.marginHeight = 20;
+                layout.marginWidth = 20;
+                waitShell.setLayout(layout);
+                Label jobNameLabel = new Label(waitShell, SWT.NONE);
+                jobNameLabel.setText("Download scheduler state, please wait...");
+                waitShell.pack();
+                Rectangle parentBounds = parent.getShell().getBounds();
+                int x = parentBounds.x + parentBounds.width / 2;
+                int y = parentBounds.y + parentBounds.height / 2;
+                waitShell.setLocation(x, y);
+                waitShell.pack();
+                waitShell.open();
 
-                // active reference
-                JobsController.getActiveView().init();
+                // wait result for synchronous call
+                boolean futurRes = JobsController.getActiveView().init();
+
+                //synchronous call ; wait futur 
+                if (futurRes) {
+                    waitShell.close();
+                }
 
                 // the call "JobsController.getActiveView().init();"
                 // must be terminated here, before starting other call.
