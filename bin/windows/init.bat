@@ -45,7 +45,8 @@ rem Jars needed by the scheduler not included in the ProActive.jar jarindex
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\rngpack-1.1a.jar.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\script-api.jar.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\script-js.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\xsdlib.jar		
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\xsdlib.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-cli-1.1.jar		
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
