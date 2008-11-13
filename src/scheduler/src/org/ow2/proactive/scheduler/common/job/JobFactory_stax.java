@@ -685,6 +685,8 @@ public class JobFactory_stax extends JobFactory {
                             } else {
                                 path = replace(cursorScript.getAttributeValue(0));
                             }
+                            while (cursorScript.next() != XMLEvent.START_ELEMENT)
+                                ;
                             if (url != null) {
                                 toReturn = new SimpleScript(new URL(url), getArguments(cursorScript));
                             } else {
@@ -820,20 +822,21 @@ public class JobFactory_stax extends JobFactory {
             //one step ahead to go to the command (static or dynamic)
             while (cursorExec.next() != XMLEvent.START_ELEMENT)
                 ;
+            ArrayList<String> command = new ArrayList<String>();
             if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_SCRIPT_STATICCOMMAND)) {
-                String command = replace(cursorExec.getAttributeValue(0));
+                command.add(replace(cursorExec.getAttributeValue(0)));
                 int eventType;
                 while (cursorExec.hasNext()) {
                     eventType = cursorExec.next();
                     switch (eventType) {
                         case XMLEvent.START_ELEMENT:
                             if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_SCRIPT_ARGUMENT)) {
-                                command = command + " " + replace(cursorExec.getAttributeValue(0));
+                                command.add(" " + replace(cursorExec.getAttributeValue(0)));
                             }
                             break;
                         case XMLEvent.END_ELEMENT:
                             if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_NATIVE_EXECUTABLE)) {
-                                nativeTask.setCommandLine(command);
+                                nativeTask.setCommandLine(command.toArray(new String[] {}));
                                 return;
                             }
                             break;
