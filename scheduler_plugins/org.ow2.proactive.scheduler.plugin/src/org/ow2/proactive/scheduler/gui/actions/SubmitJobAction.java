@@ -30,6 +30,9 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -59,23 +62,33 @@ public class SubmitJobAction extends SchedulerGUIAction {
 
     @Override
     public void run() {
-        FileDialog fileDialog = new FileDialog(parent.getShell(), SWT.OPEN);
+        FileDialog fileDialog = new FileDialog(parent.getShell(), SWT.OPEN | SWT.MULTI);
         fileDialog.setFilterExtensions(new String[] { "*.xml" });
-        String fileName = fileDialog.open();
+        fileDialog.open();
 
-        if (fileName != null) {
-            try {
-                // CREATE JOB
-                Job job = JobFactory.getFactory().createJob(fileName);
-                // SUBMIT JOB
-                SchedulerProxy.getInstance().submit(job);
-            } catch (JobCreationException e) {
-                MessageDialog.openError(parent.getShell(), "Couldn't submit job",
-                        "Couldn't submit job due to : " + e.getCause());
-            } catch (SchedulerException e) {
-                MessageDialog.openError(parent.getShell(), "Couldn't submit job",
-                        "Couldn't submit job due to : " + e.getCause());
+        String[] filesNames = fileDialog.getFileNames();
+        String directoryPath = fileDialog.getFilterPath();
+        ArrayList<Job> jobs = new ArrayList<Job>();
+        String filePath = null;
+        String jobName = null;
+
+        try {
+            //create jobs
+            for (String fileName : filesNames) {
+                filePath = directoryPath + File.separator + fileName;
+                jobs.add(JobFactory.getFactory().createJob(filePath));
             }
+            //submit jobs
+            for (Job job : jobs) {
+                jobName = job.getName();
+                SchedulerProxy.getInstance().submit(job);
+            }
+        } catch (JobCreationException e) {
+            MessageDialog.openError(parent.getShell(), "Job creation error",
+                    "Failed to create job from file " + filePath + " :\n\n" + e.getCause());
+        } catch (SchedulerException e) {
+            MessageDialog.openError(parent.getShell(), "Job submission error", "Couldn't submit job " +
+                jobName + " :\n\n" + e.getCause());
         }
     }
 
