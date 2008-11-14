@@ -85,10 +85,10 @@ public class SubmitJobAction extends SchedulerGUIAction {
             }
         } catch (JobCreationException e) {
             MessageDialog.openError(parent.getShell(), "Job creation error",
-                    "Failed to create job from file " + filePath + " :\n\n" + e.getCause());
+                    "Failed to create job from file " + filePath + " :\n\n" + e.getMessage());
         } catch (SchedulerException e) {
             MessageDialog.openError(parent.getShell(), "Job submission error", "Couldn't submit job " +
-                jobName + " :\n\n" + e.getCause());
+                jobName + " :\n\n" + e.getMessage());
         }
     }
 

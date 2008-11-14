@@ -188,7 +188,7 @@ public class JobFactory_stax extends JobFactory {
             displayJobInfo();
             return job;
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured during Job creation", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -236,7 +236,7 @@ public class JobFactory_stax extends JobFactory {
                 }
             }
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured during Job creation !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -325,7 +325,7 @@ public class JobFactory_stax extends JobFactory {
             job.setMaxNumberOfExecution(jtmp.getMaxNumberOfExecution());
             job.setGenericInformations(jtmp.getGenericInformations());
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured during Job properties creation !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -355,7 +355,7 @@ public class JobFactory_stax extends JobFactory {
                 }
             }
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while creating variables !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -390,7 +390,7 @@ public class JobFactory_stax extends JobFactory {
             }
             return infos;
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while creating generic information !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -422,7 +422,7 @@ public class JobFactory_stax extends JobFactory {
             }
             return pathEntries.toArray(new String[] {});
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while creating classpath entries !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -446,7 +446,7 @@ public class JobFactory_stax extends JobFactory {
                 ;
             return description;
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while reading description !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -488,7 +488,7 @@ public class JobFactory_stax extends JobFactory {
                 }
             }
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while filling job with task !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -605,7 +605,7 @@ public class JobFactory_stax extends JobFactory {
             }
             return toReturn;
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while filling task !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -641,7 +641,7 @@ public class JobFactory_stax extends JobFactory {
                 }
             }
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while filling task !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -685,8 +685,8 @@ public class JobFactory_stax extends JobFactory {
                             } else {
                                 path = replace(cursorScript.getAttributeValue(0));
                             }
-							while (cursorScript.next() != XMLEvent.START_ELEMENT)
-                            ;
+                            while (cursorScript.next() != XMLEvent.START_ELEMENT)
+                                ;
                             if (url != null) {
                                 toReturn = new SimpleScript(new URL(url), getArguments(cursorScript));
                             } else {
@@ -711,8 +711,7 @@ public class JobFactory_stax extends JobFactory {
             }
             return toReturn;
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while creating " + currentScriptTag +
-                " script !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -767,7 +766,7 @@ public class JobFactory_stax extends JobFactory {
                 }
                 return args.toArray(new String[] {});
             } catch (Exception e) {
-                throw new JobCreationException("Exception occured while reading script arguments !", e);
+                throw new JobCreationException(e.getMessage(), e);
             }
         } else {
             return null;
@@ -805,7 +804,7 @@ public class JobFactory_stax extends JobFactory {
                 }
             }
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while setting ProActive Executable !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -860,7 +859,7 @@ public class JobFactory_stax extends JobFactory {
                 throw new RuntimeException("Unknow command type : " + cursorExec.getLocalName());
             }
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while setting Native Executable !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
@@ -915,7 +914,7 @@ public class JobFactory_stax extends JobFactory {
                 }
             }
         } catch (Exception e) {
-            throw new JobCreationException("Exception occured while setting Java Executable !", e);
+            throw new JobCreationException(e.getMessage(), e);
         }
     }
 
