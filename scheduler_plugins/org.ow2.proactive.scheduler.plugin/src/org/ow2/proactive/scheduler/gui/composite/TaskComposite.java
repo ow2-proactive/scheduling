@@ -303,10 +303,16 @@ public class TaskComposite extends Composite {
                             try {
                                 JPanel graphPrev = tr.getGraphicalDescription();
                                 resultPreview.update(graphPrev);
-                            } catch (Throwable e) {
-                                // NoClassDefFound error if job classpath is not correct
-                                resultPreview.update(new SimpleTextPanel(
-                                    "Graphical preview cannot be displayed because " + e.getMessage()));
+                            } catch (NoClassDefFoundError e) {
+                                resultPreview
+                                        .update(new SimpleTextPanel(
+                                            "Graphical preview cannot be displayed because result previewer classes cannot be found : " +
+                                                e.getMessage() == null ? e : e.getMessage()));
+                            } catch (Throwable e2) {
+                                resultPreview
+                                        .update(new SimpleTextPanel(
+                                            "Graphical preview cannot be displayed because " +
+                                                e2.getMessage() == null ? e2 : e2.getMessage()));
                             }
                         } else {
                             try {
