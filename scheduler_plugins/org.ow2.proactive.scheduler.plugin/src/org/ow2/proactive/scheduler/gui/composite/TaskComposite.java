@@ -307,12 +307,12 @@ public class TaskComposite extends Composite {
                                 resultPreview
                                         .update(new SimpleTextPanel(
                                             "Graphical preview cannot be displayed because result previewer classes cannot be found : " +
-                                                e.getMessage() == null ? e : e.getMessage()));
+                                                (e.getMessage() == null ? e : e.getMessage())));
                             } catch (Throwable e2) {
                                 resultPreview
                                         .update(new SimpleTextPanel(
                                             "Graphical preview cannot be displayed because " +
-                                                e2.getMessage() == null ? e2 : e2.getMessage()));
+                                                (e2.getMessage() == null ? e2 : e2.getMessage())));
                             }
                         } else {
                             try {
