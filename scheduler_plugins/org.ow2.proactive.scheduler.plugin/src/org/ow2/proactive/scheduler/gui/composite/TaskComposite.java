@@ -343,13 +343,14 @@ public class TaskComposite extends Composite {
         try {
             previewPanel = result.getGraphicalDescription();
             resultPreview.update(previewPanel);
-        } catch (NoClassDefFoundError e) {
-            resultPreview.update(new SimpleTextPanel(
-                "Graphical preview cannot be displayed because result previewer classes cannot be found : " +
-                    (e.getMessage() == null ? e : e.getMessage())));
-        } catch (Throwable e2) {
-            resultPreview.update(new SimpleTextPanel("Graphical preview cannot be displayed because " +
-                (e2.getMessage() == null ? e2 : e2.getMessage())));
+        } catch (Throwable e) {
+            // root exception can be wrapped into ProActive level exception
+            // try to display also cause exception.
+            // TODO cdelbe : recursive display ?
+            String cause = e.getCause() != null ? System.getProperty("line.separator") + "caused by " +
+                e.getCause() : "";
+            resultPreview.update(new SimpleTextPanel("[ERROR] Cannot create graphical previewer: " +
+                System.getProperty("line.separator") + e + cause));
         }
     }
 
@@ -364,9 +365,12 @@ public class TaskComposite extends Composite {
             previewPanel = new SimpleTextPanel(result.getTextualDescription());
             resultPreview.update(previewPanel);
         } catch (Throwable e) {
-            // NoClassDefFound error if job classpath is not correct
-            resultPreview.update(new SimpleTextPanel("Textual preview cannot be displayed because " +
-                e.getMessage()));
+            // root exception can be wrapped into ProActive level exception
+            // try to display also cause exception.
+            String cause = e.getCause() != null ? System.getProperty("line.separator") + "caused by " +
+                e.getCause() : "";
+            resultPreview.update(new SimpleTextPanel("[ERROR] Cannot create textual previewer: " +
+                System.getProperty("line.separator") + e + cause));
         }
     }
 

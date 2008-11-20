@@ -132,7 +132,7 @@ public class ResultPreview extends ViewPart {
         container.setVisible(true);
         root.pack();
         parent.pack();
-        update(new SimpleTextPanel("No selected task"));
+        update(new SimpleTextPanel("No task selected"));
     }
 
     /**

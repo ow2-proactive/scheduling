@@ -220,7 +220,7 @@ public class TaskResultImpl implements TaskResult {
      */
     public void setPreviewerClassName(String descClass) {
         if (this.previewerClassName != null) {
-            throw new RuntimeException("Descriptor class cannot be changed");
+            throw new RuntimeException("Previewer class cannot be changed");
         } else {
             this.previewerClassName = descClass;
         }
@@ -238,17 +238,21 @@ public class TaskResultImpl implements TaskResult {
      */
     public JPanel getGraphicalDescription() {
         boolean instanciation = false;
-
         try {
             instanciation = this.instanciateDescriptor();
-        } catch (InstantiationException e) {
-            return new SimpleTextPanel("[SCHEDULER] Cannot create descriptor : " + e.getMessage());
-        } catch (IllegalAccessException e) {
-            return new SimpleTextPanel("[SCHEDULER] Cannot create descriptor : " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            return new SimpleTextPanel(
+                "[ERROR] Previewer classes cannot be found. Cannot create graphical previewer: " +
+                    System.getProperty("line.separator") + e);
+        } catch (Exception e) {
+            return new SimpleTextPanel("[ERROR] Cannot create graphical previewer: " +
+                System.getProperty("line.separator") + e);
         }
-
         if (instanciation) {
-            return this.descriptor.getGraphicalDescription(this);
+            JPanel ret = this.descriptor.getGraphicalDescription(this);
+            return ret != null ? ret : new SimpleTextPanel(
+                "[ERROR] Graphical preview returned by previewer " + this.descriptor.getClass().getName() +
+                    " is null");
         } else {
             return new SimpleTextPanel(this.getTextualDescription());
         }
@@ -259,17 +263,18 @@ public class TaskResultImpl implements TaskResult {
      */
     public String getTextualDescription() {
         boolean instanciation = false;
-
         try {
             instanciation = this.instanciateDescriptor();
-        } catch (InstantiationException e) {
-            return "[SCHEDULER] Cannot create descriptor : " + e.getMessage();
-        } catch (IllegalAccessException e) {
-            return "[SCHEDULER] Cannot create descriptor : " + e.getMessage();
+        } catch (ClassNotFoundException e) {
+            return "[ERROR] Previewer classes cannot be found. Cannot create textual previewer: " +
+                System.getProperty("line.separator") + e;
+        } catch (Exception e) {
+            return "[ERROR] Cannot create textual previewer: " + System.getProperty("line.separator") + e;
         }
-
         if (instanciation) {
-            return this.descriptor.getTextualDescription(this);
+            String ret = this.descriptor.getTextualDescription(this);
+            return ret != null ? ret : "[ERROR] Textual preview returned by previewer " +
+                this.descriptor.getClass().getName() + " is null";
         } else if (!this.hadException()) {
             return "[DEFAULT DESCRIPTION] " + value;
         } else {
@@ -284,37 +289,24 @@ public class TaskResultImpl implements TaskResult {
      * the job classpath.
      * @return true if the creation occurs, false otherwise
      */
-    private boolean instanciateDescriptor() throws InstantiationException, IllegalAccessException {
+    private boolean instanciateDescriptor() throws InstantiationException, IllegalAccessException,
+            IOException, ClassNotFoundException {
         if (this.descriptor == null) {
-            try {
-                ClassLoader cl = this.getTaskClassLoader();
-                boolean isInstanciated = false;
-                // if a specific previewer is defined, instanciate it
-                if (this.previewerClassName != null) {
-                    Class<?> previewClass = Class.forName(this.previewerClassName, true, cl);
-                    this.descriptor = (ResultPreview) (previewClass.newInstance());
-                    isInstanciated = true;
-                }
-                // in any case, instanciate value and exception
-                if (this.serializedException != null) {
-                    this.exception = this.instanciateException(cl);
-                } else {
-                    this.value = this.instanciateValue(cl);
-                }
-                return isInstanciated;
-            } catch (ClassNotFoundException e) {
-                System.err.println("Cannot create ResultPreview : " + e.getMessage());
-                e.printStackTrace();
-                return false;
-            } catch (MalformedURLException e) {
-                System.err.println("Cannot create ResultPreview : " + e.getMessage());
-                e.printStackTrace();
-                return false;
-            } catch (IOException e) {
-                System.err.println("Cannot create ResultPreview : " + e.getMessage());
-                e.printStackTrace();
-                return false;
+            ClassLoader cl = this.getTaskClassLoader();
+            boolean isInstanciated = false;
+            // if a specific previewer is defined, instanciate it
+            if (this.previewerClassName != null) {
+                Class<?> previewClass = Class.forName(this.previewerClassName, true, cl);
+                this.descriptor = (ResultPreview) (previewClass.newInstance());
+                isInstanciated = true;
             }
+            // in any case, instanciate value and exception
+            if (this.serializedException != null) {
+                this.exception = this.instanciateException(cl);
+            } else {
+                this.value = this.instanciateValue(cl);
+            }
+            return isInstanciated;
         } else {
             return true;
         }
