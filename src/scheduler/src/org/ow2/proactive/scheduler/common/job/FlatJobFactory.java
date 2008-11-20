@@ -19,11 +19,45 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
+/**
+ * This class implements static methods use to parse a text file containing commands, and from it build
+ * a ProActive Scheduler job made of native tasks. each task of the jobs corresponds to a line of the 
+ * parsed file. This is a way to avoid creation of XML job descriptor for creation of simple jobs.
+ * 
+ * Every line of the text file is taken and considered as a native command from which a native task is built, 
+ * except lines beginning with {@value FlatJobFactory#CMD_FILE_COMMENT_CHAR} and empty lines.
+ * dependencies between tasks cannot be set, task names are automatically set. A log file can be specified. 
+ * A selection script can be associated for all the tasks, but not specific selection script for each tasks.
+ * A Job name can be specified too.
+ * 
+ * This class does not intend to provide a job specification with all ProActive Scheduler jobs feature, but is 
+ * way to define quickly jobs made of native tasks to execute in parallel.
+ * If you need to define jobs with dependencies, jobs with java Tasks, specific selection script for each task,
+ * or generation scripts... you should rather use XML job descriptors and {@link JobFactory}.
+ * 
+ * 
+ * the class presents too a way to create a job made of one task from a String representing a native command to launch.
+ * 
+ * @author ProActive team
+ *
+ */
 public class FlatJobFactory {
 
+    /**
+     * Log4j logger name 
+     */
     public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
 
-    private static final String CMD_FILE_COMMENT_CHAR = "#";
+    /**
+     * comment character used to ignore line in text file containing
+     * native commands
+     */
+    public static final String CMD_FILE_COMMENT_CHAR = "#";
+
+    /**
+     * String prefix used to build default job name (if no job name is specified).
+     */
+    public static final String JOB_DEFAULT_NAME_PREFIX = "Job_";
 
     /**
      * Singleton Pattern
@@ -43,20 +77,27 @@ public class FlatJobFactory {
     }
 
     /**
+     * Create a job from a String representing file path, this text file contains native commands to launch
+     * Every line of the text file is taken and considered as a native command from which a native task is built, 
+     * except lines beginning with {@value FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} and empty lines.
+     * So job in result is made of several native tasks without dependencies.
      * 
-     * @param commandFilePath
-     * @param jobName
-     * @param selectionScriptPath
-     * @param outputFile
-     * @param userName
-     * @return
-     * @throws JobCreationException
+     * @param commandFilePath a string representing a text file containing native commands.
+     * @param jobName A String representing a name to give to the job. If null, default job name is made of 
+     * {@value FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} + userName parameter.
+     * @param selectionScriptPath a Path to a file containing a selection script, or null if 
+     * no script is needed.
+     * @param outputFile a path to file that will contain log of STDOUT and STDERR of job's tasks execution.
+     * @param userName name of connected user that asked job creation, null otherwise. This parameter
+     * is only used for default job's name creation.
+     * @return a job object representing created job and ready-to-schedule job.
+     * @throws JobCreationException with a relevant error message if an error occurs.
      */
     public Job createNativeJobFromCommandsFile(String commandFilePath, String jobName,
             String selectionScriptPath, String outputFile, String userName) throws JobCreationException {
 
         if (jobName == null) {
-            jobName = "Job_" + userName;
+            jobName = JOB_DEFAULT_NAME_PREFIX + userName;
         }
         Job nativeJob = new TaskFlowJob();
         nativeJob.setName(jobName);
@@ -115,14 +156,19 @@ public class FlatJobFactory {
     }
 
     /**
+     * Creates a job from a String representing a native command to launch. So job in result is made
+     * of one native task.
      * 
-     * @param command
-     * @param jobName
-     * @param selectionScriptPath
-     * @param outputFile
-     * @param userName
-     * @return
-     * @throws JobCreationException
+     * @param command a string representing an executable command to launch.
+     * @param jobName A String representing a name to give to the job, if null. default job name is made of 
+     * {@value FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} + userName parameter.
+     * @param selectionScriptPath A Path to a file containing a selection script, or null if 
+     * no script is needed.
+     * @param outputFile a path to file that will contain log of STDOUT and STDERR of the task's execution
+     * @param userName name of connected user that asked job creation, null otherwise. This parameter
+     * is just used for default job's name creation.
+     * @return a job object representing created job and ready-to-schedule job.
+     * @throws JobCreationException with a relevant error message if an error occurs.
      */
     public Job createNativeJobFromCommand(String command, String jobName, String selectionScriptPath,
             String outputFile, String userName) throws JobCreationException {
@@ -131,7 +177,7 @@ public class FlatJobFactory {
         }
 
         if (jobName == null) {
-            jobName = "Job_" + userName;
+            jobName = JOB_DEFAULT_NAME_PREFIX + userName;
         }
         Job nativeJob = new TaskFlowJob();
         nativeJob.setName(jobName);
@@ -155,11 +201,13 @@ public class FlatJobFactory {
     }
 
     /**
-     * @param command
-     * @param taskName
-     * @param selectionScriptPath
-     * @return
-     * @throws InvalidScriptException
+     * Creates a native task from a string representing a native command to execute.
+     * @param command a String representing a native command.
+     * @param taskName an eventual name for the task.
+     * @param selectionScriptPath path to an existing file containing a selection script code.
+     * @return a NativeTask object that can be put in a Job Object.
+     * @throws InvalidScriptException if an error occurs in definition of selection script
+     * from file path specified.
      */
     private NativeTask createNativeTaskFromCommandString(String command, String taskName,
             String selectionScriptPath) throws InvalidScriptException {

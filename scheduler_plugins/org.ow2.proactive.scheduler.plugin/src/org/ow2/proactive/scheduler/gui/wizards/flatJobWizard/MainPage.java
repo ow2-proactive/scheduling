@@ -111,7 +111,7 @@ public class MainPage extends WizardPage implements ModifyListener {
         FormData choosesScriptButtonFormData = new FormData();
         choosesScriptButtonFormData.top = new FormAttachment(sScriptPathLabel, 0, SWT.BOTTOM);
         choosesScriptButtonFormData.left = new FormAttachment(sScriptPathText, 5, SWT.RIGHT);
-        choosesScriptButton.setLayoutData(choosesScriptButtonFormData);        
+        choosesScriptButton.setLayoutData(choosesScriptButtonFormData);
 
         //output log file
         Label logOutputPathLabel = new Label(composite, SWT.NONE);
@@ -156,7 +156,7 @@ public class MainPage extends WizardPage implements ModifyListener {
     }
 
     public boolean canFlipToNextPage() {
-    	setErrorMessage(this.findMostSevere());
+        setErrorMessage(this.findMostSevere());
         if ("".equals(jobNameText.getText()) || "".equals(commandPathText.getText())) {
             return false;
         } else {
@@ -176,7 +176,7 @@ public class MainPage extends WizardPage implements ModifyListener {
         if (!"".equals(logOutputPathText.getText())) {
             logFilePath = logOutputPathText.getText();
         }
- 
+
         Job j;
         try {
             j = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath, jobName,
@@ -197,10 +197,11 @@ public class MainPage extends WizardPage implements ModifyListener {
     }
 
     public String findMostSevere() {
-    	if("".equals(jobNameText.getText())) {
-    		return "enter a job name";
-    	} else if("".equals(commandPathText.getText())) {
-    		return "choose a path to a commands file";
-    	} else return null;
+        if ("".equals(jobNameText.getText())) {
+            return "enter a job name";
+        } else if ("".equals(commandPathText.getText())) {
+            return "choose a path to a commands file";
+        } else
+            return null;
     }
 }

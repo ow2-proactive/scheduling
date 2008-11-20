@@ -47,15 +47,15 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.scheduler.Tools;
@@ -247,82 +247,77 @@ public class TaskComposite extends Composite {
         //        tc8.setMoveable(true);
         tc9.setMoveable(true);
 
+        table.addListener(SWT.Selection, new Listener() {
+
+            public void handleEvent(Event event) {
+                Widget widget = event.item;
+
+                if ((widget != null) && (!widget.isDisposed())) {
+                    TaskId id = (TaskId) widget.getData();
+                    updateResultPreview(id, false);
+                }
+            }
+        });
+
         table.addMouseListener(new MouseListener() {
-            private boolean doubleClick = false;
 
             public void mouseDoubleClick(MouseEvent e) {
-                doubleClick = true;
                 TableItem[] items = ((Table) e.getSource()).getSelection();
                 if (items.length > 0)
-                    onClick((TaskId) items[0].getData(), doubleClick);
+                    updateResultPreview((TaskId) items[0].getData(), true);
             }
 
             public void mouseDown(MouseEvent e) {
-                doubleClick = false;
             }
 
             public void mouseUp(MouseEvent e) {
-                if (!doubleClick) {
-                    TableItem[] items = ((Table) e.getSource()).getSelection();
-                    if (items.length > 0)
-                        onClick((TaskId) items[0].getData(), doubleClick);
-                }
             }
 
         });
-
         return table;
     }
 
-    private void onClick(TaskId taskId, boolean doubleClick) {
+    private void initResultPreviewDisplay() {
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ResultPreview.ID);
+        } catch (PartInitException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update Result Preview Panel by displaying a description of a task's result
+     * Create resultPreview SWT view if needed. 
+     * @param taskId Task identifier for which a result preview is asked
+     * @param grapchicalPreview try to display a Graphical description of the result if available (otherwise display textual description),
+     * otherwise display a textual description of task's result.
+     */
+    private void updateResultPreview(TaskId taskId, boolean grapchicalPreview) {
         ResultPreview resultPreview = ResultPreview.getInstance();
+        if (resultPreview == null) {
+            //force view creation
+            initResultPreviewDisplay();
+            resultPreview = ResultPreview.getInstance();
+        }
+
+        //check nevertheless whether creation of view has succeed
         if (resultPreview != null) {
             InternalJob job = JobsController.getLocalView().getJobById(taskId.getJobId());
 
             // test job owner
             if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
-
-                // set Focus on task result
-                IWorkbench iworkbench = PlatformUI.getWorkbench();
-                IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
-                IWorkbenchPage page = currentWindow.getActivePage();
-                try {
-                    IViewPart part = page.showView(ResultPreview.ID);
-                    part.setFocus();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
                 InternalTask task = job.getHMTasks().get(taskId);
-
                 // update its tasks informations if task is finished
                 if (task.getStatus() == TaskState.FINISHED || task.getStatus() == TaskState.FAULTY) {
                     TaskResult tr = getTaskResult(job.getId(), taskId);
                     if (tr != null) {
-                        if (doubleClick) {
-                            try {
-                                JPanel graphPrev = tr.getGraphicalDescription();
-                                resultPreview.update(graphPrev);
-                            } catch (NoClassDefFoundError e) {
-                                resultPreview
-                                        .update(new SimpleTextPanel(
-                                            "Graphical preview cannot be displayed because result previewer classes cannot be found : " +
-                                                (e.getMessage() == null ? e : e.getMessage())));
-                            } catch (Throwable e2) {
-                                resultPreview
-                                        .update(new SimpleTextPanel(
-                                            "Graphical preview cannot be displayed because " +
-                                                (e2.getMessage() == null ? e2 : e2.getMessage())));
-                            }
+                        if (grapchicalPreview) {
+                            displayGraphicalPreview(resultPreview, tr);
+                            resultPreview.putOnTop();
                         } else {
-                            try {
-                                String textPrev = tr.getTextualDescription();
-                                resultPreview.update(new SimpleTextPanel(textPrev));
-                            } catch (Throwable e) {
-                                // NoClassDefFound error if job classpath is not correct
-                                resultPreview.update(new SimpleTextPanel(
-                                    "Textual preview cannot be displayed because " + e.getMessage()));
-                            }
+                            displayTextualPreview(resultPreview, tr);
+                            resultPreview.putOnTop();
                         }
                     } else {
                         throw new RuntimeException("Task " + taskId + " is finished but result is null");
@@ -334,6 +329,44 @@ public class TaskComposite extends Composite {
             } else {
                 resultPreview.update(new SimpleTextPanel("You do not have sufficient rights !"));
             }
+        }
+    }
+
+    /**
+     * Display in Result Preview view graphical description of a task result if
+     * any graphical description is available for this task
+     * @param resultPreview Result preview SWT view object
+     * @param result TaskResult that has eventually a graphical description  
+     */
+    private void displayGraphicalPreview(ResultPreview resultPreview, TaskResult result) {
+        JPanel previewPanel;
+        try {
+            previewPanel = result.getGraphicalDescription();
+            resultPreview.update(previewPanel);
+        } catch (NoClassDefFoundError e) {
+            resultPreview.update(new SimpleTextPanel(
+                "Graphical preview cannot be displayed because result previewer classes cannot be found : " +
+                    (e.getMessage() == null ? e : e.getMessage())));
+        } catch (Throwable e2) {
+            resultPreview.update(new SimpleTextPanel("Graphical preview cannot be displayed because " +
+                (e2.getMessage() == null ? e2 : e2.getMessage())));
+        }
+    }
+
+    /**
+     * Display in Result Preview view textual description of a task result.
+     * @param resultPreview Result preview SWT view object
+     * @param result TaskResult for which a textual description is to display   
+     */
+    private void displayTextualPreview(ResultPreview resultPreview, TaskResult result) {
+        JPanel previewPanel;
+        try {
+            previewPanel = new SimpleTextPanel(result.getTextualDescription());
+            resultPreview.update(previewPanel);
+        } catch (Throwable e) {
+            // NoClassDefFound error if job classpath is not correct
+            resultPreview.update(new SimpleTextPanel("Textual preview cannot be displayed because " +
+                e.getMessage()));
         }
     }
 

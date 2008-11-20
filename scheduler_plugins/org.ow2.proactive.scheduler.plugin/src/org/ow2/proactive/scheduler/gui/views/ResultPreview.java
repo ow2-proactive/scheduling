@@ -38,6 +38,7 @@ import javax.swing.JScrollPane;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 
@@ -51,13 +52,12 @@ public class ResultPreview extends ViewPart {
     public static final String ID = "org.ow2.proactive.scheduler.gui.views.ResultPreview";
 
     // The shared instance
-    private static Composite parent = null;
+    private Composite parent = null;
     private static ResultPreview instance = null;
-    private static boolean isDisposed = true;
-    private static Composite root;
-    private static Frame container;
-    private static JPanel toBeDisplayed;
-    private static JScrollPane scrollableContainer;
+    private Composite root;
+    private Frame container;
+    private JPanel toBeDisplayed = null;
+    private JScrollPane scrollableContainer;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -67,6 +67,7 @@ public class ResultPreview extends ViewPart {
      *
      */
     public ResultPreview() {
+        super();
         instance = this;
     }
 
@@ -79,12 +80,13 @@ public class ResultPreview extends ViewPart {
      * @return the shared instance
      */
     public static ResultPreview getInstance() {
-        if (isDisposed) {
-            return null;
-        }
         return instance;
     }
 
+    /**
+     * Update Result preview with JPanel representing a result description to display.
+     * @param tbd JPanel object to be displayed.
+     */
     public void update(JPanel tbd) {
         if (tbd != toBeDisplayed) {
             toBeDisplayed = tbd;
@@ -100,6 +102,20 @@ public class ResultPreview extends ViewPart {
         root.getParent().layout();
     }
 
+    /**
+     * Ask to Perspective workbench to display this View, useful if this view is hidden
+     * by another one in one of the workbench areas organized in tabs.  
+     */
+    public void putOnTop() {
+        try {
+            this.getViewSite().getWorkbenchWindow().getActivePage().showView(this.ID);
+            //create view if not created
+        } catch (PartInitException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     // -------------------------------------------------------------------- //
     // ------------------------- extends viewPart ------------------------- //
     // -------------------------------------------------------------------- //
@@ -109,7 +125,6 @@ public class ResultPreview extends ViewPart {
     @Override
     public void createPartControl(Composite theParent) {
         parent = theParent;
-        isDisposed = false;
         root = new Composite(parent, SWT.EMBEDDED);
         root.setVisible(true);
         container = SWT_AWT.new_Frame(root);
@@ -117,7 +132,7 @@ public class ResultPreview extends ViewPart {
         container.setVisible(true);
         root.pack();
         parent.pack();
-        this.update(new SimpleTextPanel("No selected task"));
+        update(new SimpleTextPanel("No selected task"));
     }
 
     /**
@@ -132,7 +147,6 @@ public class ResultPreview extends ViewPart {
      */
     @Override
     public void dispose() {
-        isDisposed = true;
         super.dispose();
     }
 }

@@ -303,6 +303,7 @@ public class JobLauncher {
         } catch (JobCreationException e) {
             System.out.println("Unable to create job : ");
             System.out.println(e.getMessage());
+            e.printStackTrace();
         } catch (SchedulerException e) {
             System.out.println("Unable to submit job : ");
             System.out.println(e.getMessage());
