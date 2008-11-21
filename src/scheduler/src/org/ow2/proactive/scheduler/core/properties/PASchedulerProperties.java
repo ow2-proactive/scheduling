@@ -118,6 +118,9 @@ public enum PASchedulerProperties {
     /** Multiplicative factor for job id (taskId will be : this_factor*jobID+taskID) */
     JOB_FACTOR("pa.scheduler.job.factor", PAPropertiesType.INTEGER),
 
+    /** Remove job in dataBase when removing it from scheduler. */
+    JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PAPropertiesType.BOOLEAN),
+
     /* ***************************************************************** */
     /* ************************ TASKS PROPERTIES *********************** */
     /* ***************************************************************** */

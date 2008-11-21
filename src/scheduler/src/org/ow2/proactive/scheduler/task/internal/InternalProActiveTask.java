@@ -61,7 +61,7 @@ public class InternalProActiveTask extends InternalTask {
      * @param execContainer contains the task to execute
      */
     public InternalProActiveTask(JavaExecutableContainer execContainer) {
-        this.executableContainer = execContainer;
+        this.executableContainer = new ExecutableContainerDataBaseProxy(execContainer, this);
     }
 
     /**

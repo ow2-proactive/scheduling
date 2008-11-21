@@ -68,6 +68,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
+import org.ow2.proactive.scheduler.job.InternalJobWrapper;
 import org.ow2.proactive.scheduler.job.JobDescriptor;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.PolicyInterface;
@@ -110,6 +111,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
 
     /** Implementation of scheduler main structure */
     private transient SchedulerCore scheduler;
+
+    /** Direct link to the current job to submit. */
+    private InternalJobWrapper currentJobToSubmit = new InternalJobWrapper();
 
     /** Job identification management */
     private HashMap<JobId, IdentifiedJob> jobs;
@@ -154,6 +158,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public void initActivity(Body body) {
         try {
+            body.setImmediateService("getTaskResult");
+            body.setImmediateService("getJobResult");
             //scheduler URL
             String schedulerUrl = "//" + NodeFactory.getDefaultNode().getVMInformation().getHostName() + "/" +
                 SchedulerConnection.SCHEDULER_DEFAULT_NAME;
@@ -164,8 +170,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             SchedulerAuthentication schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(
                     SchedulerAuthentication.class.getName(), new Object[] { PAActiveObject.getStubOnThis() });
             //creating scheduler core
-            scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
-                    resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
+            SchedulerCore scheduler_local = new SchedulerCore(resourceManager,
+                (SchedulerFrontend) PAActiveObject.getStubOnThis(), policyFullName, currentJobToSubmit);
+            scheduler = (SchedulerCore) PAActiveObject.turnActive(scheduler_local);
+
+            //            scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
+            //                    resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
             logger.debug("Scheduler successfully created on " +
                 PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
             logger.info("Registering scheduler...");
@@ -253,10 +263,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         if (!scheduler.isSubmitPossible()) {
             throw new SchedulerException("Scheduler is stopped, cannot submit job !!");
         }
-
         //get the internal job.
         InternalJob job = InternalJobFactory.createJob(userJob);
-
         //setting job informations
         if (job.getTasks().size() == 0) {
             throw new SchedulerException(
@@ -270,7 +278,6 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                     job.getPriority());
             }
         }
-
         UserIdentificationImpl ident = identifications.get(id);
         //setting the job properties
         job.setId(JobId.nextId(job.getName()));
@@ -281,7 +288,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
         //make the job descriptor
         job.setJobDescriptor(new JobDescriptor(job));
-        scheduler.submit(job);
+        //scheduler.submit(job);
+        currentJobToSubmit.setJob(job);
+        scheduler.submit();
         //increase number of submit for this user
         ident.addSubmit();
         //send update user event only if the user is in the list of connected users.
@@ -291,6 +300,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //stats
         stats.increaseSubmittedJobCount(job.getType());
         stats.submitTime();
+        jobSubmittedEvent(job);
+        logger.info("New job submitted (" + job.getName() + ") containing " + job.getTotalNumberOfTasks() +
+            " tasks !");
         return job.getId();
     }
 
@@ -422,11 +434,11 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
 
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
-        if (!identifications.containsKey(id)) {
+        UserIdentificationImpl uIdent = identifications.get(id);
+
+        if (uIdent == null) {
             throw new SchedulerException(ACCESS_DENIED);
         }
-
-        UserIdentificationImpl uIdent = identifications.get(id);
 
         if (events.length > 0) {
             uIdent.setUserEvents(events);

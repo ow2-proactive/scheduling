@@ -230,7 +230,7 @@ public class InternalJobFactory implements Serializable {
                     .getArguments()));
         } else {
             throw new SchedulerException(
-                "You must specify your own executable task to be launched in every task !");
+                "You must specify your own executable task class to be launched (in every task) !");
         }
 
         javaTask.setFork(task.isFork());
@@ -248,7 +248,7 @@ public class InternalJobFactory implements Serializable {
      * @throws SchedulerException an exception if the factory cannot create the given task.
      */
     private static InternalTask createTask(Job userJob, NativeTask task) throws SchedulerException {
-        if (((task.getCommandLine() == null) || (task.getCommandLine() == "")) &&
+        if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0)) &&
             (task.getGenerationScript() == null)) {
             throw new SchedulerException("The command line is null or empty and not generated !!");
         }

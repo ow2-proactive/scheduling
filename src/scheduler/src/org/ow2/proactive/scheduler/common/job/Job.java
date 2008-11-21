@@ -148,7 +148,7 @@ public abstract class Job extends CommonAttribute implements GenericInformations
     }
 
     /**
-     * To set the priority of the job.
+     * To set the priority of the job. (Default is 'NORMAL')
      *
      * @param priority the priority to set.
      */

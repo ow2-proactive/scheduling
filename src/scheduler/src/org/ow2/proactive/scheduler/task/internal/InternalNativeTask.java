@@ -62,7 +62,7 @@ public class InternalNativeTask extends InternalTask {
      * @param execContainer the Native Executable Container
      */
     public InternalNativeTask(NativeExecutableContainer execContainer) {
-        this.executableContainer = execContainer;
+        this.executableContainer = new ExecutableContainerDataBaseProxy(execContainer, this);
     }
 
     /**

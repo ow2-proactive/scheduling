@@ -85,15 +85,23 @@ public class SummaryPage extends WizardPage {
         Collections.sort(list, new TaskComparator());
 
         for (Task t : list) {
-            String commandToDisplay = ((NativeTask) t).getCommandLine();
+            String[] commandToDisplay = ((NativeTask) t).getCommandLine();
             String taskName = ((NativeTask) t).getName();
             TableItem item = new TableItem(table, SWT.NONE);
-            item.setText(new String[] { taskName, commandToDisplay });
+            item.setText(new String[] { taskName, cmdArrayToString(commandToDisplay) });
 
         }
         taskColumn.pack();
         taskColumn.setWidth(taskColumn.getWidth() + 20);
         commandColumn.pack();
         table.setRedraw(true);
+    }
+
+    private String cmdArrayToString(String[] sArray) {
+        String toReturn = "";
+        for (String s : sArray) {
+            toReturn += (s + " ");
+        }
+        return toReturn;
     }
 }

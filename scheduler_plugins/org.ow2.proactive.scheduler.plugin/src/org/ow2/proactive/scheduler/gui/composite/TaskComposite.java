@@ -92,8 +92,8 @@ public class TaskComposite extends Composite {
     //    /** the unique id and the title for the column "Run time limit" */
     //    public static final String COLUMN_RUN_TIME_LIMIT_TITLE = "Run time limit";
 
-    /** the unique id and the title for the column "Re-runnable" */
-    public static final String COLUMN_RERUN_TITLE = "Re-run";
+    /** the unique id and the title for the column "Node failures" */
+    public static final String COLUMN_NODEFAILURE_TITLE = "Node failures";
 
     /** the unique id and the title for the column "Start time" */
     public static final String COLUMN_START_TIME_TITLE = "Start time";
@@ -223,7 +223,7 @@ public class TaskComposite extends Composite {
         tc4.setText(COLUMN_HOST_NAME_TITLE);
         tc5.setText(COLUMN_START_TIME_TITLE);
         tc6.setText(COLUMN_FINISHED_TIME_TITLE);
-        tc7.setText(COLUMN_RERUN_TITLE);
+        tc7.setText(COLUMN_NODEFAILURE_TITLE);
         //        tc8.setText(COLUMN_RUN_TIME_LIMIT_TITLE);
         tc9.setText(COLUMN_DESCRIPTION_TITLE);
         // setWidth
@@ -505,13 +505,13 @@ public class TaskComposite extends Composite {
                     switch (internalTask.getStatus()) {
                         case RUNNING:
                         case FINISHED:
+                        case FAULTY:
                             tmp = tmp +
                                 " (" +
                                 (internalTask.getMaxNumberOfExecution() -
                                     internalTask.getNumberOfExecutionLeft() + 1) + "/" +
                                 internalTask.getMaxNumberOfExecution() + ")";
                             break;
-                        case FAULTY:
                         case WAITING_ON_ERROR:
                             tmp = tmp +
                                 " (" +
@@ -530,10 +530,10 @@ public class TaskComposite extends Composite {
                     item.setText(i, Tools.getFormattedDate(internalTask.getStartTime()));
                 } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
                     item.setText(i, Tools.getFormattedDate(internalTask.getFinishedTime()));
-                } else if (title.equals(COLUMN_RERUN_TITLE)) {
-                    item.setText(i, (internalTask.getMaxNumberOfExecution() - internalTask
-                            .getNumberOfExecutionLeft()) +
-                        "/" + internalTask.getMaxNumberOfExecution());
+                } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
+                    item.setText(i, (internalTask.getMaxNumberOfExecutionOnFailure() - internalTask
+                            .getNumberOfExecutionOnFailureLeft()) +
+                        "/" + internalTask.getMaxNumberOfExecutionOnFailure());
                     //                } else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE)) {
                     //                    item.setText(i,
                     //                        Tools.getFormattedDate(internalTask.getRunTimeLimit()));

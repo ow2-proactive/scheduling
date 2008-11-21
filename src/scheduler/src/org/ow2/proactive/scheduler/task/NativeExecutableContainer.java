@@ -45,15 +45,16 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 public class NativeExecutableContainer implements ExecutableContainer {
 
     // actual executable data
-    private String command;
+    private String[] command;
     private GenerationScript generated;
 
     /**
      * Create a new container for a native executable.
+     * 
      * @param command the command to be executed.
      * @param generated the script that generates the command (can be null).
      */
-    public NativeExecutableContainer(String command, GenerationScript generated) {
+    public NativeExecutableContainer(String[] command, GenerationScript generated) {
         this.command = command;
         this.generated = generated;
     }

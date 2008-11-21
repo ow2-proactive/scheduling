@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.exception.DataBaseNotFoundException;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
 
 
 /**
@@ -130,14 +131,20 @@ public abstract class AbstractSchedulerDB {
     public abstract TaskResult getTaskResult(TaskId taskId);
 
     /**
-     * Disconnect the database.
+     * Return the executable containers of the task corresponding to the given taskId.
      *
+     * @param taskId the identification of the task on which you want the result.
+     * @return The executable containers of the corresponding task.
+     */
+    public abstract ExecutableContainer getExecutableContainer(TaskId taskId);
+
+    /**
+     * Disconnect the database.
      */
     public abstract void disconnect();
 
     /**
      * Delete the created database. If no database is linked to this object, nothing is performed.
-     *
      */
     public abstract void delete();
 

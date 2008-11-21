@@ -49,9 +49,9 @@ import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
+import org.ow2.proactive.scheduler.core.db.CreateDataBase;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
-import org.ow2.proactive.scheduler.util.CreateDataBase;
 
 import functionalTests.FunctionalTest;
 

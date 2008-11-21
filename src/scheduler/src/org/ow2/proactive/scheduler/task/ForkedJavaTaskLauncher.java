@@ -158,7 +158,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         try {
             init();
             //fake native executable used only to instanciate threadReader.
-            currentExecutable = new NativeExecutable("");//executableContainer; //??
+            currentExecutable = new NativeExecutable(null);//executableContainer; //??
             /* building command for executing java */
             StringBuffer command = new StringBuffer();
 

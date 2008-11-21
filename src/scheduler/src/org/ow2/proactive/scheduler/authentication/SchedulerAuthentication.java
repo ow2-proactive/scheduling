@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
-import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,9 +69,6 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
 
     /** Scheduler logger */
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
-
-    /** Jaas config file path used to determine authentication method*/
-    private String jaasConfigFilePath = "jaas.config";
 
     /** The scheduler front-end connected to this authentication interface */
     private SchedulerFrontend scheduler;
@@ -118,6 +114,11 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
      */
     public UserSchedulerInterface logAsUser(String user, String password) throws LoginException,
             SchedulerException {
+
+        if (user == null | user.equals("")) {
+            throw new LoginException("Bad user name (user is null or empty)");
+        }
+
         isStarted();
 
         try {
@@ -140,6 +141,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
 
             lc.login();
             logger.info("Logging successfull for user : " + user);
+
             // create user scheduler interface
             logger.debug("Connecting to the scheduler...");
 
@@ -166,7 +168,12 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
     public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException,
             SchedulerException {
 
+        if (user == null | user.equals("")) {
+            throw new LoginException("Bad user name (user is null or empty)");
+        }
+
         isStarted();
+
         try {
             // Verify that this user//password can connect to this existing scheduler
             logger.info(user + " is trying to connect as admin...");

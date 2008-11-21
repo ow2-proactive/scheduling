@@ -94,7 +94,6 @@ public class JavaExecutableContainer implements ExecutableContainer {
     public void init(InternalJob job, InternalTask task) {
         // get the classserver if any (can be null)
         this.classServer = SchedulerCore.getTaskClassServer(job.getId());
-
     }
 
 }

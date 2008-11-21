@@ -63,11 +63,11 @@ public enum TaskState implements java.io.Serializable {
     /**
      * The task is waiting for restart after an error. (ie:native code != 0 or exception)
      */
-    WAITING_ON_ERROR("Faulty"),
+    WAITING_ON_ERROR("Faulty..."),
     /**
      * The task is waiting for restart after a failure. (ie:node down)
      */
-    WAITING_ON_FAILURE("Failed"),
+    WAITING_ON_FAILURE("Failed..."),
     /**
      * The task is failed 
      * (only if max execution time has been reached and the node on which it was started is down).

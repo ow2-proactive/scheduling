@@ -75,7 +75,7 @@ public abstract class CommonAttribute implements Serializable {
     }
 
     /**
-     * Set to true if you want to cancel the job when an exception occurs in a task.
+     * Set to true if you want to cancel the job when an exception occurs in a task. (Default is false)
      *
      * @param cancelJobOnError the cancelJobOnError to set
      */
@@ -102,7 +102,7 @@ public abstract class CommonAttribute implements Serializable {
     }
 
     /**
-     * Sets the restartTaskOnError to the given restartOnError value.
+     * Sets the restartTaskOnError to the given restartOnError value. (Default is 'ANYWHERE')
      *
      * @param restartOnError the restartOnError to set.
      */
@@ -129,7 +129,7 @@ public abstract class CommonAttribute implements Serializable {
     }
 
     /**
-     * To set the number of execution for this task.
+     * To set the number of execution for this task. (Default is 1)
      *
      * @param the number of times this task can be executed.
      */

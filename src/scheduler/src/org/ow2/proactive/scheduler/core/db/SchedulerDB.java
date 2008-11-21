@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.DatabaseManager;
@@ -67,9 +68,10 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
- * SchedulerDB...
+ * SchedulerDB is an implementation of AbstractSchedulerDB using JavaDB.
  * 
  * @author The ProActive Team
+ * @since ProActive Scheduling 0.9.1
  */
 public class SchedulerDB extends AbstractSchedulerDB {
 
@@ -164,11 +166,15 @@ public class SchedulerDB extends AbstractSchedulerDB {
     // -------------------------------------------------------------------- //
     // ------------------- extends AbstractSchedulerDB -------------------- //
     // -------------------------------------------------------------------- //
+    /* The logger.debug(" "); instructions are just used to force a print by the
+     * logger that will display Class name and method name. */
+
     /**
      * @see org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB#disconnect()
      */
     @Override
     public void disconnect() {
+        logger.debug(" ");
         try {
             if (preparedStatement != null) {
                 preparedStatement.close();
@@ -186,7 +192,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
         }
 
         DatabaseManager.getInstance(configFile).disconnect();
-        logger.debug("done");
+        logger.debug("Disconnected");
     }
 
     /**
@@ -194,11 +200,12 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public void delete() {
+        logger.debug(" ");
         try {
             statement.execute("DROP TABLE " + AbstractSchedulerDB.TASK_TABLE_NAME);
             statement.execute("DROP TABLE " + AbstractSchedulerDB.JOB_TABLE_NAME);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -207,6 +214,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      */
     @Override
     public String getURL() {
+        logger.debug(" ");
         try {
             return connection.getMetaData().getURL();
         } catch (SQLException e) {
@@ -216,6 +224,8 @@ public class SchedulerDB extends AbstractSchedulerDB {
 
     /**
      * @see org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB#addJob(org.ow2.proactive.scheduler.job.InternalJob)
+     * 
+     * Warning, this method will clean the executableContainers.
      */
     @Override
     public boolean addJob(InternalJob job) {
@@ -224,6 +234,11 @@ public class SchedulerDB extends AbstractSchedulerDB {
         try {
             int jobid_hashcode = job.getId().hashCode();
 
+            HashMap<TaskId, ExecutableContainer> exContains = new HashMap<TaskId, ExecutableContainer>();
+            for (InternalTask it : job.getTasks()) {
+                exContains.put(it.getId(), it.getExecutableContainer());
+                it.getExecutableContainerProxy().clean();
+            }
             //Add job in table
             preparedStatement = connection
                     .prepareStatement("INSERT INTO JOB_AND_JOB_EVENTS(jobid_hashcode, job) VALUES (?,?)");
@@ -235,7 +250,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
 
             // Add all future taskResult with the precious property
             preparedStatement = connection
-                    .prepareStatement("INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(jobid_hashcode,taskid_hashcode,precious) VALUES(?,?,?)");
+                    .prepareStatement("INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(jobid_hashcode,taskid_hashcode,ExecContainer,precious) VALUES(?,?,?,?)");
 
             Map<TaskId, InternalTask> map = job.getHMTasks();
             Iterator<TaskId> iter = map.keySet().iterator();
@@ -248,7 +263,8 @@ public class SchedulerDB extends AbstractSchedulerDB {
 
                 preparedStatement.setInt(1, jobid_hashcode);
                 preparedStatement.setInt(2, task.getId().hashCode());
-                preparedStatement.setBoolean(3, task.isPreciousResult());
+                preparedStatement.setBlob(3, serialize(exContains.get(task.getId())));
+                preparedStatement.setBoolean(4, task.isPreciousResult());
                 count++;
                 nb += preparedStatement.executeUpdate();
             }
@@ -256,7 +272,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             if (count == nb)
                 return commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         rollback();
@@ -302,7 +318,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             if (preparedStatement.executeUpdate() == 1)
                 return commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
 
         rollback();
@@ -335,7 +351,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         } finally {
             if (rs != null) {
                 try {
@@ -344,16 +360,6 @@ public class SchedulerDB extends AbstractSchedulerDB {
                     // Nothing to do
                 }
             }
-
-            /* Blob.free() is not available in Java 5 */
-
-            //            if (blob != null) {
-            //                try {
-            //                    blob.free();
-            //                } catch (SQLException e) {
-            //                    // Nothing to do
-            //                }
-            //            }
         }
 
         return result;
@@ -430,7 +436,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
 
             return new RecoverableState(internalJobList, jobResultList, jobEventMap, taskEventMap);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         } finally {
             if (rs != null) {
                 try {
@@ -439,19 +445,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                     // Nothing to do
                 }
             }
-
-            /* Blob.free() is not available in Java 5 */
-
-            //            if (blob != null) {
-            //                try {
-            //                    blob.free();
-            //                } catch (SQLException e) {
-            //                    // Nothing to do
-            //                }
-            //            }
         }
-
-        return null;
     }
 
     /**
@@ -473,7 +467,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                     return (TaskResult) deserialize(blob);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         } finally {
             if (rs != null) {
                 try {
@@ -482,18 +476,39 @@ public class SchedulerDB extends AbstractSchedulerDB {
                     // Nothing to do
                 }
             }
-
-            /* Blob.free() is not available in Java 5 */
-
-            //            if (blob != null) {
-            //                try {
-            //                    blob.free();
-            //                } catch (SQLException e) {
-            //                    // Nothing to do
-            //                }
-            //            }
         }
+        return null;
+    }
 
+    /**
+     * @see org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB#getExecutableContainer(org.ow2.proactive.scheduler.common.task.TaskId)
+     */
+    @Override
+    public ExecutableContainer getExecutableContainer(TaskId taskId) {
+        logger.debug(" ");
+        ResultSet rs = null;
+        Blob blob = null;
+
+        try {
+            rs = statement
+                    .executeQuery("SELECT ExecContainer FROM TASK_EVENTS_AND_TASK_RESULTS WHERE taskid_hashcode=" +
+                        taskId.hashCode());
+            if (rs.next()) {
+                blob = rs.getBlob(1);
+                if (blob != null)
+                    return (ExecutableContainer) deserialize(blob);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    // Nothing to do
+                }
+            }
+        }
         return null;
     }
 
@@ -513,7 +528,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             if (preparedStatement.executeUpdate() == 1)
                 return commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
 
         rollback();
@@ -538,7 +553,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             if (preparedStatement.executeUpdate() == 1)
                 return commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
 
         rollback();
@@ -577,7 +592,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             if (count == nb)
                 return commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
 
         rollback();

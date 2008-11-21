@@ -73,7 +73,7 @@ public class InternalJavaTask extends InternalTask {
      * @param execContainer the Java Executable Container
      */
     public InternalJavaTask(JavaExecutableContainer execContainer) {
-        this.executableContainer = execContainer;
+        this.executableContainer = new ExecutableContainerDataBaseProxy(execContainer, this);
     }
 
     /**

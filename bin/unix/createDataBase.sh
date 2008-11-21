@@ -9,7 +9,7 @@ workingDir=`dirname $0`
 
 
 if [ -e "$1" ]; then
-	$JAVACMD org.ow2.proactive.scheduler.util.CreateDataBase $1
+	$JAVACMD org.ow2.proactive.scheduler.core.db.CreateDataBase $1
 else
 	echo "You must give a configuration file to create database ! Use scheduler_db.cfg as exemple."
 fi

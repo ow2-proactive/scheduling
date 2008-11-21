@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util;
+package org.ow2.proactive.scheduler.core.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -37,7 +37,8 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB;
+import org.ow2.proactive.scheduler.util.DatabaseManager;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -74,8 +75,9 @@ public class CreateDataBase {
                 AbstractSchedulerDB.JOB_TABLE_NAME + "_PK PRIMARY KEY(jobid_hashcode))");
 
             stmt.execute("create table " + AbstractSchedulerDB.TASK_TABLE_NAME + "(" +
-                "jobid_hashcode INTEGER, taskid_hashcode INTEGER, " + "taskevent BLOB, taskresult BLOB, " +
-                "precious SMALLINT, " + "CONSTRAINT " + AbstractSchedulerDB.TASK_TABLE_NAME +
+                "jobid_hashcode INTEGER, taskid_hashcode INTEGER, " +
+                "taskevent BLOB, taskresult BLOB, ExecContainer BLOB, " + "precious SMALLINT, " +
+                "CONSTRAINT " + AbstractSchedulerDB.TASK_TABLE_NAME +
                 "_PK PRIMARY KEY(jobid_hashcode, taskid_hashcode)," + "CONSTRAINT " +
                 AbstractSchedulerDB.TASK_TABLE_NAME + "_FK FOREIGN KEY (jobid_hashcode) REFERENCES " +
                 AbstractSchedulerDB.JOB_TABLE_NAME + ")");

@@ -426,8 +426,8 @@ aTask.setForkEnvironment(env);
 				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/native_task_simple.xml"/></textobject></programlisting>
 				<para>
 					The native Task is composed of one 'nativeExecutable' that specified the 'executable' process to use.
-					A set of parameters has also be defined to provide the executable some information. These parameters will be
-					append to the command line starting by your native executable.
+					A set of parameters has also be defined to provide the executable some arguments. These arguments will be
+					append (according to the Runtime.exec() method) to the command line starting by your native executable.
 					This example also shows the definition of two tasks with dependencies. We can easily see that 'task2_native' depends on
 					'task1_native'. So 'task2_native' will be executed when 'task1_native' has finished.
 					To put these two tasks inside your TaskFlow job, just put it between the 'taskFlow' tags.
@@ -451,9 +451,8 @@ aTask.setForkEnvironment(env);
 					To <emphasis>create a native task</emphasis> use the
 					<emphasis>NativeTask</emphasis> class.
 					In this type, you must specify the executable you want to start, by mentioning a
-					'command line'.
-					In addition, you can add arguments with which the task will be launched.
-					These launching arguments will be append to the 'command line'.
+					'command line' that is in fact a String array that contains the program name and the arguments
+					with which the task will be launched.
 					Just take a look at the example below to see how to use the task creation Java API
 					(see also Java DOCumentation of the ProActive Scheduler to learn more) :
 				</para>
@@ -470,7 +469,7 @@ aTask.setRerunnable(2);
 aTask.setRestartTaskOnError(RestartMode.ELSEWHERE);
 aTask.setResultPreview(UserDefinedResultPreview.class);
 //set the command line with the parameter append to the process name
-aTask.setCommandLine("/path/to/command/cmd param1 param2");
+aTask.setCommandLine(new String[]{"/path/to/command/cmd","param1","param2");
 
 //SCRIPTS EXAMPLE		
 //If the script to use is in a file or URL
@@ -529,7 +528,12 @@ aTask.setWallTime(10000);
 					<emphasis>native</emphasis> task: the execution of a generation
 					script must set the string variable <literal>command</literal>.
 					The value of this variable is the command line that will be executed by
-					the ProActive Scheduler as task execution.
+					the ProActive Scheduler as task execution. The returned string will be parsed
+					and transform as a String Array according to this example ( '!' is the escape character ): 
+					<itemizedlist>
+						<listitem>the string "/path/to/cmd arg1 arg 2 arg! 3 arg!!! 4 5</listitem>
+						<listitem>will generate : [/path/to/cmd,arg1,arg,2,arg 3,arg! 4,5]</listitem> where the first element is the command.
+					</itemizedlist>
 				</para>
 				<programlisting xml:lang="java">
 //create a new native task
@@ -857,7 +861,7 @@ job.setTask(aTask);
 						<para>
 							<emphasis>arguments</emphasis> (optional, only for native Task)
 							is a way to define arguments for your native process. Each arguments is define by a value
-							that will be append to the process name to create a command line.
+							that will be append to the process name to create a String array command line.
 						</para>
 					</listitem>
 					<listitem>

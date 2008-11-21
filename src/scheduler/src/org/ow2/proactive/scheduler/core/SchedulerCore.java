@@ -80,11 +80,8 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
-import org.ow2.proactive.scheduler.common.scheduler.Stats;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
@@ -101,6 +98,7 @@ import org.ow2.proactive.scheduler.exception.DataBaseNotFoundException;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.InternalJobWrapper;
 import org.ow2.proactive.scheduler.job.JobDescriptor;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.job.TaskDescriptor;
@@ -154,6 +152,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Scheduler front-end. */
     private SchedulerFrontend frontend;
 
+    /** Direct link to the current job to submit. */
+    private InternalJobWrapper currentJobToSubmit;
+
     /** Scheduler current policy */
     private PolicyInterface policy;
 
@@ -174,6 +175,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
     /** Thread that will ping the running nodes */
     private Thread pinger;
+
+    /** Timer used for remove result method (transient because Timer is not serializable)*/
+    private transient Timer timer = new Timer();
 
     /** Jobs that must be logged into the corresponding appenders */
     private Hashtable<JobId, AsyncAppender> jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
@@ -273,10 +277,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param frontend a reference to the frontend.
      * @param policyFullName the fully qualified name of the policy to be used.
      */
-    public SchedulerCore(ResourceManagerProxy imp, SchedulerFrontend frontend, String policyFullName) {
+    public SchedulerCore(ResourceManagerProxy imp, SchedulerFrontend frontend, String policyFullName,
+            InternalJobWrapper jobSubmitLink) {
         try {
             this.resourceManager = imp;
             this.frontend = frontend;
+            this.currentJobToSubmit = jobSubmitLink;
             //logger
             host = ProActiveInet.getInstance().getInetAddress().getHostName();
 
@@ -367,6 +373,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //used to read the enumerate schedulerState in order to know when submit is possible.
         //have to be immediate service
         body.setImmediateService("isSubmitPossible");
+        body.setImmediateService("getTaskResult");
+        body.setImmediateService("getJobResult");
 
         //set the filter for serveAll method (user action are privileged)
         RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenLog",
@@ -677,7 +685,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             } catch (Exception e1) {
                 e1.printStackTrace();
                 //if we are here, it is that something append while launching the current task.
-                logger.warn("Current node has failed due to node failure : " + node);
+                logger.warn("Current node (" + node + ") has failed : " + e1.getMessage());
                 //so get back the node to the resource manager
                 resourceManager.freeDownNode(internalTask.getExecuterInformations().getNodeName());
             }
@@ -700,15 +708,18 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     !PAActiveObject.pingActiveObject(td.getExecuterInformations().getLauncher())) {
                     logger.debug("Node failed on job " + job.getId() + ", task [ " + td.getId() + " ]");
 
-                    //free execution node even if it is dead
-                    resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
+                    try {
+                        //free execution node even if it is dead
+                        resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
+                    } catch (Exception e) {
+                        //just save the rest of the method execution
+                    }
 
                     td.decreaseNumberOfExecutionOnFailureLeft();
                     if (td.getNumberOfExecutionOnFailureLeft() > 0) {
                         td.setStatus(TaskState.WAITING_ON_FAILURE);
                         frontend.taskWaitingForRestart(td.getTaskInfo());
                         job.reStartTask(td);
-                        //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
                     } else {
                         endJob(
                                 job,
@@ -738,8 +749,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param job the job to be scheduled.
      * @throws SchedulerException
      */
-    public void submit(InternalJob job) throws SchedulerException {
-
+    public void submit() throws SchedulerException {
+        InternalJob job = currentJobToSubmit.getJob();
         // TODO cdelbe : create classserver only when job is running ?
         // create taskClassLoader for this job
         if (job.getEnv().getJobClasspath() != null) {
@@ -779,12 +790,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
         }
 
-        //sending event to client
-        frontend.jobSubmittedEvent(job);
         //and to data base
         AbstractSchedulerDB.getInstance().addJob(job);
-        logger.info("New job submitted (" + job.getName() + ") containing " + job.getTotalNumberOfTasks() +
-            " tasks !");
+
+        //unreference executable containers to prevent memory error
+        //        for (InternalTask it : job.getTasks()){
+        //        	//unreference it to prevent memory error
+        //        	it.getExecutableContainerProxy().clean();
+        //        }
     }
 
     /**
@@ -985,7 +998,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
                     new Timer().schedule(jtt, job.getNextWaitingTime());
 
-                    //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
                     return;
                 }
             }
@@ -1141,6 +1153,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     public JobResult getJobResult(JobId jobId) {
         JobResult result = null;
         final InternalJob job = jobs.get(jobId);
+        final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
 
         if (job != null) {
             result = AbstractSchedulerDB.getInstance().getJobResult(job.getId());
@@ -1152,10 +1165,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             TimerTask tt = new TimerTask() {
                 @Override
                 public void run() {
-                    remove(job.getId());
+                    schedulerStub.remove(job.getId());
+                    //TODO if the scheduler die when this thread is running, just remember to restart this thread
+                    //at scheduler Startup.
                 }
             };
-            new Timer().schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+            timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
             logger.debug("Job " + jobId + " will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) +
                 "sec");
         } catch (Exception e) {
@@ -1186,6 +1201,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             FileAppender jobFile = this.jobsToBeLoggedinAFile.remove(job.getId());
             if (jobFile != null) {
                 jobFile.close();
+            }
+            //remove from DataBase
+            if (PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean()) {
+                AbstractSchedulerDB.getInstance().removeJob(jobId);
             }
             logger.info("Job " + jobId + " removed !");
         }
@@ -1868,52 +1887,4 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
     }
 
-    //UNUSED OVERRIDED METHOD
-    //here to keep consistency in the architecture
-    /**
-     * UNUSED OVERRIDED METHOD
-     *
-     * @param sel /
-     * @param events /
-     * @return /
-     * @throws SchedulerException /
-     */
-    @SuppressWarnings("unused")
-    private SchedulerInitialState<? extends Job> addSchedulerEventListener(
-            SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
-        throw new RuntimeException("METHOD NOT USED IN THIS CLASS !");
-    }
-
-    /**
-     * UNUSED OVERRIDED METHOD
-     *
-     * @throws SchedulerException /
-     */
-    @SuppressWarnings("unused")
-    private void disconnect() throws SchedulerException {
-        throw new RuntimeException("METHOD NOT USED IN THIS CLASS !");
-    }
-
-    /**
-     * UNUSED OVERRIDED METHOD
-     *
-     * @return /
-     * @throws SchedulerException /
-     */
-    @SuppressWarnings("unused")
-    private Stats getStats() throws SchedulerException {
-        throw new RuntimeException("METHOD NOT USED IN THIS CLASS !");
-    }
-
-    /**
-     * UNUSED OVERRIDED METHOD
-     *
-     * @param job /
-     * @return /
-     * @throws SchedulerException /
-     */
-    @SuppressWarnings("unused")
-    private JobId submit(Job job) throws SchedulerException {
-        throw new RuntimeException("METHOD NOT USED IN THIS CLASS !");
-    }
 }

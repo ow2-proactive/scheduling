@@ -87,7 +87,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     private transient NodeSet nodeExclusion = null;
 
     /** Contains the user executable */
-    protected ExecutableContainer executableContainer = null;
+    protected ExecutableContainerDataBaseProxy executableContainer = null;
 
     /** Maximum number of execution for this task in case of failure (node down) */
     private int maxNumberOfExecutionOnFailure = PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
@@ -175,9 +175,23 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
 
     /**
      * Return a container for the user executable represented by this task descriptor.
+     * 
      * @return the user executable represented by this task descriptor.
      */
     public ExecutableContainer getExecutableContainer() {
+        if (this.executableContainer == null) {
+            return null;
+        } else {
+            return this.executableContainer.getValue();
+        }
+    }
+
+    /**
+     * Return the container proxy represented by this task descriptor.
+     * 
+     * @return the container proxy represented by this task descriptor.
+     */
+    public ExecutableContainerDataBaseProxy getExecutableContainerProxy() {
         return this.executableContainer;
     }
 
@@ -230,6 +244,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     public void setMaxNumberOfExecution(int numberOfExecution) {
         super.setMaxNumberOfExecution(numberOfExecution);
         this.taskInfo.setNumberOfExecutionLeft(numberOfExecution);
+        this.taskInfo.setNumberOfExecutionOnFailureLeft(maxNumberOfExecutionOnFailure);
     }
 
     /**

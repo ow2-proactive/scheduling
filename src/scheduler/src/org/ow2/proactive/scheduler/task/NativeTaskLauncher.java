@@ -44,6 +44,7 @@ import org.ow2.proactive.resourcemanager.common.scripting.ScriptHandler;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptLoader;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
 import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.scheduler.Tools;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -139,9 +140,8 @@ public class NativeTaskLauncher extends TaskLauncher {
                     throw new UserException(GENERATION_SCRIPT_ERR +
                         toBeLaunched.getGenerationScript().getId());
                 } else {
-
-                    //generation script has defined a command, spo set the command to launch
-                    toBeLaunched.setCommand(generationScriptDefinedCommand);
+                    //generation script has defined a command, so set the command to launch
+                    toBeLaunched.setCommand(Tools.parseCommandLine(generationScriptDefinedCommand));
                 }
             }
 

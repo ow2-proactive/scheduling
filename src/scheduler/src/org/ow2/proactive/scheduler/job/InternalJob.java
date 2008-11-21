@@ -300,7 +300,6 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
 
         if (getState() == JobState.PAUSED) {
             task.setStatus(TaskState.PAUSED);
-
             HashMap<TaskId, TaskState> hts = new HashMap<TaskId, TaskState>();
             hts.put(task.getId(), task.getStatus());
             jobDescriptor.update(hts);

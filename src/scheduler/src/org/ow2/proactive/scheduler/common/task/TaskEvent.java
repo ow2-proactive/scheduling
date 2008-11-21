@@ -262,9 +262,19 @@ public class TaskEvent implements Serializable {
     }
 
     /**
+     * Set the initial number of execution on failure left.
+     * 
+     * @param numberOfExecutionOnFailureLeft the new number of execution to be set.
+     */
+    public void setNumberOfExecutionOnFailureLeft(int numberOfExecutionOnFailureLeft) {
+        this.numberOfExecutionOnFailureLeft = numberOfExecutionOnFailureLeft;
+    }
+
+    /**
      * Decrease the number of execution on failure left.
      */
     public void decreaseNumberOfExecutionOnFailureLeft() {
         numberOfExecutionOnFailureLeft--;
     }
+
 }

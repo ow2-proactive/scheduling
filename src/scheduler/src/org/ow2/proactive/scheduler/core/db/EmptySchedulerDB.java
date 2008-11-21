@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
 
 
 /**
@@ -125,6 +126,14 @@ public class EmptySchedulerDB extends AbstractSchedulerDB {
     @Override
     public boolean setTaskEvent(TaskEvent taskEvent) {
         return true;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB#getExecutableContainer(org.ow2.proactive.scheduler.common.task.TaskId)
+     */
+    @Override
+    public ExecutableContainer getExecutableContainer(TaskId taskId) {
+        return null;
     }
 
     /**

@@ -31,12 +31,12 @@
  */
 package org.ow2.proactive.scheduler.common.scheduler;
 
-import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.StringTokenizer;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -165,5 +165,47 @@ public class Tools implements Serializable {
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+
+    /**
+     * Parse a command line in order to split it into a string array.
+     * This method provides the parsing as followed :<br />
+     *  - It is split according to the 'white space' character.<br />
+     *  - It is possible to escape white space character using the '!' character.<br />
+     *  - To write this '!' special char, just escape it ( '!!' ).<br />
+     * For example, the string "cmd arg1 arg! 2 arg!!! 3 arg4!! 5" will return the following string array :<br />
+     *   [cmd,arg1,arg 2,arg! 3,arg4!,5]<br />
+     * <br />This method can be mostlikely used for Runtime.exec(String[]) method.
+     *   
+     * @param cmdLine The command line to parse.
+     * @return a string array that represents the parsed command line.
+     */
+    public static String[] parseCommandLine(String cmdLine) {
+        final char specialToken = '!';
+        ArrayList<String> tokens = new ArrayList<String>();
+        int i = 0;
+        StringBuilder tmp = new StringBuilder();
+        char[] cs = cmdLine.toCharArray();
+        while (i < cs.length) {
+            switch (cs[i]) {
+                case specialToken:
+                    if (i + 1 < cs.length) {
+                        tmp.append(cs[i + 1]);
+                        i++;
+                    }
+                    break;
+                case ' ':
+                    tokens.add(tmp.toString());
+                    tmp = new StringBuilder();
+                    break;
+                default:
+                    tmp.append(cs[i]);
+            }
+            i++;
+        }
+        if (tmp.length() > 0) {
+            tokens.add(tmp.toString());
+        }
+        return tokens.toArray(new String[] {});
     }
 }

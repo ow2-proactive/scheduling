@@ -585,8 +585,9 @@ public class JobFactory_xpath extends JobFactory {
                 XPathConstants.NODE);
         NativeTask desc = new NativeTask();
         if (scNode != null) {
+            ArrayList<String> cmd = new ArrayList<String>();
             // static command
-            String cmd = (String) xpath.evaluate(SCRIPT_ATTRIBUTE_VALUE, scNode, XPathConstants.STRING);
+            cmd.add((String) xpath.evaluate(SCRIPT_ATTRIBUTE_VALUE, scNode, XPathConstants.STRING));
             NodeList args = (NodeList) xpath.evaluate(addPrefixes(SCRIPT_TAG_ARGUMENTS), scNode,
                     XPathConstants.NODESET);
             if (args != null) {
@@ -596,11 +597,11 @@ public class JobFactory_xpath extends JobFactory {
                             .evaluate(SCRIPT_ATTRIBUTE_VALUE, arg, XPathConstants.STRING);
 
                     if (value != null) {
-                        cmd += (" " + value);
+                        cmd.add(" " + value);
                     }
                 }
             }
-            desc.setCommandLine(cmd);
+            desc.setCommandLine(cmd.toArray(new String[] {}));
         } else {
             // dynamic command
             Node scriptNode = (Node) xpath.evaluate(
