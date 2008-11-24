@@ -35,6 +35,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -179,7 +181,7 @@ public class SchedulerAuthenticationGUIHelper {
         }
     }
 
-    static class AuthGraphicHelper extends JFrame implements ActionListener, WindowListener {
+    static class AuthGraphicHelper extends JFrame implements ActionListener, WindowListener, KeyListener {
 
         private JPanel jContentPane = null;
         private JButton jButton_OK = null;
@@ -207,6 +209,12 @@ public class SchedulerAuthenticationGUIHelper {
         }
 
         public void windowOpened(WindowEvent e) {
+        }
+
+        public void keyReleased(KeyEvent e) {
+        }
+
+        public void keyTyped(KeyEvent e) {
         }
 
         /**
@@ -277,6 +285,7 @@ public class SchedulerAuthenticationGUIHelper {
             if (jTextField_UserName == null) {
                 jTextField_UserName = new JTextField();
                 jTextField_UserName.setBounds(new Rectangle(130, 40, 170, 22));
+                jTextField_UserName.addKeyListener(this);
             }
             return jTextField_UserName;
         }
@@ -290,6 +299,7 @@ public class SchedulerAuthenticationGUIHelper {
             if (jPasswordField_Password == null) {
                 jPasswordField_Password = new JPasswordField();
                 jPasswordField_Password.setBounds(new Rectangle(130, 70, 170, 22));
+                jPasswordField_Password.addKeyListener(this);
             }
             return jPasswordField_Password;
         }
@@ -353,6 +363,15 @@ public class SchedulerAuthenticationGUIHelper {
         public void windowClosing(WindowEvent e) {
             this.cancel = true;
             terminate();
+        }
+
+        /**
+         * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+         */
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                terminate();
+            }
         }
 
     }
