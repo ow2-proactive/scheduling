@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+
+	<import file="../before_properties.xml"/>
+	
+	<!--  =============================================================== -->
+	<!--                   Doc directories paths                          -->
+	<!--  =============================================================== -->
+	<property name="docs.dir"      			value="${base.dir}/doc" />	
+	<property name="docs.src.dir"       	value="${docs.dir}/src" />
+	<property name="docs.tmp.dir"  			value="${docs.dir}/tmp" />
+	<property name="docs.toolchain.dir"		value="${docs.dir}/toolchain" />
+	<property name="docs.xsl.dir"			value="${docs.toolchain.dir}/xsl" />
+	<property name="docs.built.dir"			value="${docs.dir}/built" />
+	
+	<property name="docs.api.complete.dir"	value="${docs.built.dir}/api_complete" />
+	<property name="docs.api.published.dir"	value="${docs.built.dir}/api_published" />
+	<property name="docs.docbook.dir"		value="${docs.toolchain.dir}/docbook/" />
+	
+	<property name="docs.html.multiple.dir"	value="${docs.built.dir}/multiple_html/" />
+	<property name="docs.html.single.dir"	value="${docs.built.dir}/single_html/" />
+	<property name="docs.pdf.dir"			value="${docs.built.dir}/pdf/" />
+	
+	
+	<property name="docs.mainFile" 			value="main.xml" />
+	<property name="snippets.location"		value="${docs.tmp.dir}/automatic_snippets" />
+	
+	
+	
+	<!-- DocBook 
+	<property name="docbook.version" 		value="ns-1.74.0" /> -->
+	<property name="docbook.version" 		value="1.73.2" />	
+	<property name="docs.docbook.dir"		value="${docs.toolchain.dir}/docbook/" />
+	<property name="docs.docbook.lib.dir"	value="${docs.docbook.dir}/extensions/" />
+	<property name="docs.lib.dir"			value="${docs.toolchain.dir}/lib/" />
+
+	<property name="docs.java.dir"			value="${docs.toolchain.dir}/src/" />
+	<property name="docs.java.classes.dir"	value="${docs.toolchain.dir}/classes/" />
+	
+	<path id="docs.utils.classpath">
+		<pathelement location="${docs.java.classes.dir}" />
+		<fileset dir="${docs.lib.dir}">
+			<include name="log4j.jar"/>
+		</fileset>
+		
+	</path>
+	
+	<property name="docs.log4j.properties"	value="${docs.lib.dir}/log4j.properties" />
+	
+	<property name="extra.format.dir" 		value=""/>
+	<!-- ================================================================ -->
+	<!--                Documentation files:   XSL,XML,PDF,etc            -->
+	<!--  =============================================================== -->
+	<property name="docs.pdf.name"			value="${doc.name}Manual.pdf" />
+	
+
+	<property name="docs.xsl.profiling"		value="${docs.xsl.dir}/profiling.xsl" />
+	<property name="docs.xsl.pdf"			value="${docs.xsl.dir}/pdf.xsl" />
+	<property name="docs.xsl.html.chunked"	value="${docs.xsl.dir}/chunkedhtml.xsl" />
+	<property name="docs.xsl.html.one"		value="${docs.xsl.dir}/onehtml.xsl" />
+	<property name="docs.xsl.removenewlines" value="${docs.xsl.dir}/remove_newlines.xsl" />
+	
+	<property name="docs.html.multiple.zip"	value="${docs.built.dir}/${doc.name}ManualMultipleHtml.zip" />
+	<property name="docs.html.single.zip"	value="${docs.built.dir}/${doc.name}ManualSingleHtml.zip" />
+	<property name="docs.javadoc.published.zip"	value="${docs.built.dir}/${doc.name}JavadocPublished.zip" />
+	<property name="docs.javadoc.complete.zip"	value="${docs.built.dir}/${doc.name}JavadocComplete.zip" />
+	
+	
+	<property name="docs.html.multiple.output"	value="${docs.html.multiple.dir}/empty.html" />
+	<property name="docs.html.single.name"		value="${doc.name}Manual.html" />
+	<property name="docs.html.single.output"	value="${docs.html.single.dir}/${docs.html.single.name}" />
+	<property name="docs.pdf.output"			value="${docs.pdf.dir}/${docs.pdf.name}" />
+	
+	
+	<property name="docs.docbook.dtd.name"		value="docbook.dtd" />
+	<property name="docs.docbook.dtd"			value="${docs.docbook.dir}/${docs.docbook.dtd.name}" />
+	<!--//FIXME ? for html files this is defined in html.xsl -->
+	<property name="docs.html.css.name"			value="main.css" />
+	
+	<!-- ================================================================ -->
+	<!--                   Javadoc build properties                       -->
+	<!--  =============================================================== -->
+	
+	<property name="javadoc.title" 				value="${doc.name} "/>
+	<property name="javadoc.copyright" 			value="Copyright 1997-2008 INRIA All Rights Reserved."/>
+	<property name="docs.fractal.link"			value="http://fractal.objectweb.org/current/doc/javadoc/fractal/"/>
+	<property name="docs.java.api.link" 		value="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+	<property name="docs.javadoc.window.title" 	value="${doc.name}"/>
+
+	
+
+	<import file="../after_properties.xml"/>
+	
+</project>

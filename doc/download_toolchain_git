@@ -1,6 +1,0 @@
-#get a local copy
-git svn clone svn://scm.gforge.inria.fr/svn/proactive/documentation/tags/current_release toolchain
-cd toolchain
-#remove the .git folder and .project (eclipse file) -  git clone + rm -rf .git  =  svn export 
-rm -rf .git
-rm .project
