@@ -158,7 +158,6 @@ public class SchedulerDB extends AbstractSchedulerDB {
         try {
             connection.rollback();
         } catch (SQLException e) {
-            // TODO si il y a une exception la je suis mort donc que faire ?
             e.printStackTrace();
         }
     }
@@ -167,7 +166,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
     // ------------------- extends AbstractSchedulerDB -------------------- //
     // -------------------------------------------------------------------- //
     /* The logger.debug(" "); instructions are just used to force a print by the
-     * logger that will display Class name and method name. */
+     * debug log that will display Class name and method name. */
 
     /**
      * @see org.ow2.proactive.scheduler.core.db.AbstractSchedulerDB#disconnect()
