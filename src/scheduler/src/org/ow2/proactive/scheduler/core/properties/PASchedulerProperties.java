@@ -131,9 +131,6 @@ public enum PASchedulerProperties {
     /** Initial time to wait before the re-execution of a task. */
     REEXECUTION_INITIAL_WAITING_TIME("pa.scheduler.task.initialwaitingtime", PAPropertiesType.INTEGER),
 
-    /** Multiplicative factor for task re-execution time. Use to increase the time to wait before restarting a task. */
-    REEXECUTION_MULTIPLICATIVE_FACTOR("pa.scheduler.task.multiplicativefactor", PAPropertiesType.INTEGER),
-
     /** Maximum number of execution for a task in case of failure (node down) */
     NUMBER_OF_EXECUTION_ON_FAILURE("pa.scheduler.task.numberofexecutiononfailure", PAPropertiesType.INTEGER),
 

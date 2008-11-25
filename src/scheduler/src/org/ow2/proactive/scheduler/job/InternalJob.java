@@ -104,10 +104,6 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /** Initial waiting time for a task before restarting in millisecond */
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
 
-    /** Multiplicative factor for the task waiting time */
-    private int restartMultiplicativeFactor = PASchedulerProperties.REEXECUTION_MULTIPLICATIVE_FACTOR
-            .getValueAsInt();
-
     /**
      * ProActive empty constructor.
      */
@@ -822,14 +818,21 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
-     * Get the next restart waiting time.
+     * Get the next restart waiting time in millis.
      * 
-     * @return the next restart waiting time.
+     * @return the next restart waiting time in millis.
      */
-    public long getNextWaitingTime() {
-        long toReturn = restartWaitingTimer;
-        restartWaitingTimer = restartWaitingTimer * restartMultiplicativeFactor;
-        return toReturn;
+    public long getNextWaitingTime(int executionNumber) {
+        if (executionNumber <= 0) {
+            //execution number is 0 or less, restart with the minimal amount of time
+            return restartWaitingTimer;
+        } else if (executionNumber > 10) {
+            //execution timer exceed 10, restart after 60 seconds
+            return 60 * 1000;
+        } else {
+            //else restart according to this function
+            return (getNextWaitingTime(executionNumber - 1) + executionNumber * 1000);
+        }
     }
 
     /**

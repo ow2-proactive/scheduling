@@ -996,7 +996,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                     //the job is not restarted directly
                     RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
-                    new Timer().schedule(jtt, job.getNextWaitingTime());
+                    new Timer().schedule(jtt, job.getNextWaitingTime(descriptor.getMaxNumberOfExecution() -
+                        descriptor.getNumberOfExecutionLeft()));
 
                     return;
                 }
@@ -1694,6 +1695,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                     for (InternalTask task : tasksList) {
                         job.update(task.getTaskInfo());
+                        //if the task was in waiting for restart state, restart it
+                        if (task.getStatus() == TaskState.WAITING_ON_ERROR) {
+                            job.reStartTask(task);
+                        }
                     }
 
                     // restart classServer if needed
