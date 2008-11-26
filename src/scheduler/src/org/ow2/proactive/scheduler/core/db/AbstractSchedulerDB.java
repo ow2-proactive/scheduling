@@ -161,12 +161,12 @@ public abstract class AbstractSchedulerDB {
      * If database instance does not exist for this configuration file, it will throw a DataBaseNotFoundException.
      * 
      * @param configFile the file that contains the description of the database.
-     * @return the SchedulerDB instance.
+     * @return the SchedulerObjectDB instance.
      */
     public static AbstractSchedulerDB getInstance(String configFile) {
         if (instance == null) {
             try {
-                instance = new SchedulerDB(configFile);
+                instance = new SchedulerObjectDB(configFile);
             } catch (SQLException e) {
                 // The database doesn't exist
                 throw new DataBaseNotFoundException("Database has not been found for this config file");

@@ -68,12 +68,13 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
- * SchedulerDB is an implementation of AbstractSchedulerDB using JavaDB.
+ * SchedulerObjectDB is an implementation of AbstractSchedulerDB using JavaDB and blob object in DataBase.
+ * This version DO NOT support version updating due to the serialized Object.
  * 
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
-public class SchedulerDB extends AbstractSchedulerDB {
+public class SchedulerObjectDB extends AbstractSchedulerDB {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.DATABASE);
@@ -89,7 +90,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      * @param configFile the file that contains the description of the database.
      * @throws SQLException
      */
-    public SchedulerDB(String configFile) throws SQLException {
+    public SchedulerObjectDB(String configFile) throws SQLException {
         this.configFile = configFile;
         connection = DatabaseManager.getInstance(configFile).connect(false);
         connection.setAutoCommit(false);
