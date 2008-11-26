@@ -283,14 +283,17 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         td.setExecutionHostName(hostName);
     }
 
+    public void newWaitingTask() {
+        setNumberOfPendingTasks(getNumberOfPendingTask() + 1);
+        setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
+    }
+
     /**
      * Set this task in restart mode, it will set the task to pending state and change task count.
      *
      * @param task the task which has to be restarted.
      */
     public void reStartTask(InternalTask task) {
-        setNumberOfPendingTasks(getNumberOfPendingTask() + 1);
-        setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
 
         jobDescriptor.reStart(task.getId());
 
@@ -325,7 +328,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         //terminate this task
         jobDescriptor.terminate(taskId);
 
-        //creating list of status
+        //creating list of status for the jobDescriptor
         HashMap<TaskId, TaskState> hts = new HashMap<TaskId, TaskState>();
 
         for (InternalTask td : tasks.values()) {
@@ -833,6 +836,22 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             //else restart according to this function
             return (getNextWaitingTime(executionNumber - 1) + executionNumber * 1000);
         }
+    }
+
+    /**
+     * Get the toBeRemoved property.
+     *
+     * @return the toBeRemoved property.
+     */
+    public boolean isToBeRemoved() {
+        return jobInfo.isToBeRemoved();
+    }
+
+    /**
+     * Set this job to the state toBeRemoved.
+     */
+    public void setToBeRemoved() {
+        jobInfo.setToBeRemoved();
     }
 
     /**

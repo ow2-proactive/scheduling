@@ -333,10 +333,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * Create the list of taskEvent containing in the given job.
-     * Clear the task event modify status. It is used to change all status of all tasks
+     * - Create the list of taskEvent containing in the given job.
+     * - Clear the task event modify status. It is used to change all status of all tasks
      * with only one request. It has to be cleared after sending events.
-     * Send the change to the data base.
+     * - Send the change to the data base.
      *
      * @param currentJob the job where the task event are.
      */
@@ -345,7 +345,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         for (TaskId id : currentJob.getJobInfo().getTaskStatusModify().keySet()) {
             TaskEvent ev = currentJob.getHMTasks().get(id).getTaskInfo();
-
             if (ev.getStatus() != TaskState.RUNNING) {
                 events.add(ev);
             }
@@ -718,6 +717,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     td.decreaseNumberOfExecutionOnFailureLeft();
                     if (td.getNumberOfExecutionOnFailureLeft() > 0) {
                         td.setStatus(TaskState.WAITING_ON_FAILURE);
+                        job.newWaitingTask();
                         frontend.taskWaitingForRestart(td.getTaskInfo());
                         job.reStartTask(td);
                     } else {
@@ -928,6 +928,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     logger.debug("Node failed on job " + jobId + ", task [ " + taskId + " ]");
                     //change status and update GUI
                     descriptor.setStatus(TaskState.WAITING_ON_FAILURE);
+                    job.newWaitingTask();
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
                     job.reStartTask(descriptor);
                     //free execution node even if it is dead
@@ -951,6 +952,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //if res.value throws a RunningProcessException, user is not responsible
                     //change status and update GUI
                     descriptor.setStatus(TaskState.WAITING_ON_FAILURE);
+                    job.newWaitingTask();
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
                     job.reStartTask(descriptor);
                     //free execution node even if it is dead
@@ -992,6 +994,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             .getCleaningScript());
                     //change status and update GUI
                     descriptor.setStatus(TaskState.WAITING_ON_ERROR);
+                    job.newWaitingTask();
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
 
                     //the job is not restarted directly
@@ -1159,6 +1162,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         if (job != null) {
             result = AbstractSchedulerDB.getInstance().getJobResult(job.getId());
             logger.debug("GetJobResult of job[" + jobId + "]");
+            //remember that this job is to be removed
+            job.setToBeRemoved();
+            AbstractSchedulerDB.getInstance().setJobEvent(job.getJobInfo());
         }
 
         try {
@@ -1167,8 +1173,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 @Override
                 public void run() {
                     schedulerStub.remove(job.getId());
-                    //TODO if the scheduler die when this thread is running, just remember to restart this thread
-                    //at scheduler Startup.
                 }
             };
             timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
@@ -1176,7 +1180,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 "sec");
         } catch (Exception e) {
         }
-
         return result;
     }
 
@@ -1697,6 +1700,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         job.update(task.getTaskInfo());
                         //if the task was in waiting for restart state, restart it
                         if (task.getStatus() == TaskState.WAITING_ON_ERROR) {
+                            job.newWaitingTask();
                             job.reStartTask(task);
                         }
                     }
@@ -1815,16 +1819,33 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         //------------------------------------------------------------------------
         //---------    Removed non-managed jobs (result has been sent)   ---------
+        //----    Set remove waiting time to job where result has been sent   ----
         //------------------------------------------------------------------------
         Iterator<InternalJob> iterJob = jobs.values().iterator();
 
+        final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
         while (iterJob.hasNext()) {
-            InternalJob job = iterJob.next();
-
+            final InternalJob job = iterJob.next();
+            //remove job that don't have to be managed anymore by the scheduler
             if (job.getRemovedTime() > 0) {
-                //        		jobs.remove(job.getId());
                 iterJob.remove();
                 finishedJobs.remove(job);
+            }
+            //re-set job removed delay (if job result has been sent to user
+            if (job.isToBeRemoved()) {
+                try {
+                    //remove job after the given delay
+                    TimerTask tt = new TimerTask() {
+                        @Override
+                        public void run() {
+                            schedulerStub.remove(job.getId());
+                        }
+                    };
+                    timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+                    logger.debug("Job " + job.getId() + " will be removed in " +
+                        (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+                } catch (Exception e) {
+                }
             }
         }
 

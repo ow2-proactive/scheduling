@@ -85,6 +85,9 @@ public class JobEvent implements Serializable {
     /** state of the job */
     private JobState state = JobState.PENDING;
 
+    /** to know if the job has to be removed after the fixed admin delay or not */
+    private boolean toBeRemoved = false;
+
     /** If this status is not null, it means the tasks have to change their status */
     private HashMap<TaskId, TaskState> taskStatusModify = null;
 
@@ -324,4 +327,21 @@ public class JobEvent implements Serializable {
     public void setState(JobState state) {
         this.state = state;
     }
+
+    /**
+     * Get the toBeRemoved property.
+     *
+     * @return the toBeRemoved property.
+     */
+    public boolean isToBeRemoved() {
+        return toBeRemoved;
+    }
+
+    /**
+     * Set this job to the state toBeRemoved.
+     */
+    public void setToBeRemoved() {
+        this.toBeRemoved = true;
+    }
+
 }
