@@ -111,7 +111,7 @@
                     Before starting to use the Matlab interface, you
                     need to install the Matlab interface to Java. You'll
                     find all the instructions on
-                    PROACTIVE/scripts/unix/matlab/README. This interface
+                    SCHEDULER/extensions/matlab/README. This interface
                     will build the native libraries of the Java
                     Interface to Matlab. As this library is native, it
                     is important that you build it for each couple
@@ -595,8 +595,7 @@
                 running. Explanation on how to install and use the ProActive Scheduler and Resource Manager are detailed
                 in the Scheduler documentation. When a parallel script is executed, the toolkit wraps the scripts
                 inside a job definition and submits it to the running scheduler. Execution of the job can therefore be
-                monitored using the Scheduler SWT client interface described. The scheduler will run Matlab engines in
-                order to parallelize
+                monitored using the Scheduler GUI. The scheduler will run several Matlab engines in order to parallelize
                 scripts. In consequence, these engines will need a Matlab licence (up to 4 engines
                 running on the same computer will take only one licence though). Finally, the Scheduler will need to
                 have acces to the native Java interface to Matlab in order to launch the Matlab engines. It's already
@@ -612,6 +611,11 @@
                 <listitem>
                     <para>
                         Linux 64 bits / Matlab 7.5
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Windows 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5
                     </para>
                 </listitem>
             </itemizedlist>
