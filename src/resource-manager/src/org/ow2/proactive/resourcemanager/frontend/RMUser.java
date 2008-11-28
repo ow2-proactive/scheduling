@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
+import java.util.List;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -103,6 +105,19 @@ public interface RMUser {
      * @return an array list of nodes.
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion);
+
+    /**
+     * Provides nbNodes nodes verifying several selection scripts AND the exclusion nodes.
+     * If the Resource manager (RM) don't have enough free nodes
+     * it returns the maximum amount of valid free nodes
+     * @param nbNodes the number of nodes.
+     * @param selectionScriptsList : a list of scripts to be verified. Returned nodes
+     * verify ALL selection scripts of this list. 
+     * @param exclusion the exclusion nodes that cannot be returned
+     * @return an array list of nodes.
+     */
+    public NodeSet getAtMostNodes(IntWrapper nbNodes, List<SelectionScript> selectionScriptsList,
+            NodeSet exclusion);
 
     /**
      * Provides exactly nbNodes nodes verifying the selection script.

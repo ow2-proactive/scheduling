@@ -268,7 +268,7 @@ public class SelectionScript extends Script<Boolean> {
      */
     @Override
     public int hashCode() {
-        return getId().hashCode();
+        return new String(id).hashCode();
     }
 
     /** Compare two arrays of bytes

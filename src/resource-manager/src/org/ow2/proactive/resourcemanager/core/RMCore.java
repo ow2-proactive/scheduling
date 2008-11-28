@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -311,13 +313,12 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
 
             // set all dynamic script results to the state of
             // ALREADY_VERIFIED_SCRIPT
-            HashMap<SelectionScript, Integer> verifs = rmnode.getScriptStatus();
+            Map<SelectionScript, Integer> verifs = rmnode.getScriptStatus();
             for (Entry<SelectionScript, Integer> entry : verifs.entrySet()) {
                 if (entry.getKey().isDynamic() && (entry.getValue() == RMNode.VERIFIED_SCRIPT)) {
                     entry.setValue(RMNode.ALREADY_VERIFIED_SCRIPT);
                 }
             }
-
             // create the event
             this.monitoring.nodeFreeEvent(rmnode.getNodeEvent());
         } catch (NodeException e) {
@@ -479,14 +480,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * 
      * @see org.ow2.proactive.resourcemanager.rmnode.RMCoreInterface#getNodesByScript(org.objectweb.proactive.extensions.scheduler.common.scripting.VerifyingScript)
      */
-    private ArrayList<RMNode> internalGetFreeNodesSortedByScript(SelectionScript script) {
+    private ArrayList<RMNode> internalGetFreeNodes() {
         ArrayList<RMNode> result = new ArrayList<RMNode>();
-        for (RMNode rmnode : this.freeNodes) {
-            result.add(rmnode);
-        }
-        if ((script != null)) {
-            Collections.sort(result, new RMNodeComparator(script));
-        }
+        result.addAll(this.freeNodes);
         return result;
     }
 
@@ -504,113 +500,36 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      *            list of free nodes.
      * @return NodeSet of nodes verifying the SelectionScript.
      */
-    private NodeSet selectNodeWithStaticVerifScript(int nb, SelectionScript selectionScript,
-            ArrayList<RMNode> nodes) {
-        NodeSet result = new NodeSet();
-        int found = 0;
+    private ArrayList<RMNode> selectNodesWithStaticVerifScript(int nb, SelectionScript selectionScript,
+            ArrayList<RMNode> candidateNodes) {
 
         logger.debug("Searching for " + nb + " nodes  with static verif script on " +
             this.getSizeListFreeRMNodes() + " free nodes.");
-        // select nodes where the static script has already be launched and
-        // satisfied
-        Iterator<RMNode> it = nodes.iterator();
-        while (it.hasNext() && found < nb) {
+
+        ArrayList<RMNode> result = new ArrayList<RMNode>();
+        ArrayList<RMNode> nodesToTest = new ArrayList<RMNode>();
+        Collections.sort(candidateNodes, new RMNodeComparator(selectionScript));
+
+        // select nodes where the static script has already been launched and satisfied
+        Iterator<RMNode> it = candidateNodes.iterator();
+        while (it.hasNext() && result.size() < nb) {
             RMNode node = it.next();
-            if (node.getScriptStatus().containsKey(selectionScript) &&
-                node.getScriptStatus().get(selectionScript).equals(RMNode.VERIFIED_SCRIPT)) {
-                try {
-                    result.add(node.getNode());
-                    internalSetBusy(node);
-                    nodes.remove(node);
-                    it = nodes.iterator();
-                    found++;
-                } catch (NodeException e) {
-                    internalSetDown(node);
+            if (node.getScriptStatus().containsKey(selectionScript)) {
+                if (node.getScriptStatus().get(selectionScript).equals(RMNode.VERIFIED_SCRIPT)) {
+                    result.add(node);
+                } else if (node.getScriptStatus().get(selectionScript).equals(RMNode.NEVER_TESTED)) {
+                    nodesToTest.add(node);
                 }
             } else {
-                //Nodes are sorted by script results, if this one respond other than 'verified', the next 
-                //will respond the same or worst, so we can stop the checking here
-                break;
+                nodesToTest.add(node);
             }
         }
 
-        if (found == nb) {
-            return result;
-        } else {
-
-            Vector<ScriptResult<Boolean>> scriptResults = new Vector<ScriptResult<Boolean>>();
-            Vector<RMNode> nodeResults = new Vector<RMNode>();
-            int launched = found;
-
-            //other nodes needed, launching the script on nodes remaining
-            while (!nodes.isEmpty() && (launched++ < nb)) {
-                nodeResults.add(nodes.get(0));
-                ScriptResult<Boolean> sr = nodes.get(0).executeScript(selectionScript);
-
-                // if r is not a future, the script has not been executed
-                if (MOP.isReifiedObject(sr)) {
-                    scriptResults.add(sr);
-                } else {
-                    // script has not been executed on remote host
-                    // nothing to do, just let the node in the free list
-                    logger.info("Error occured executing verifying script : " +
-                        sr.getException().getMessage());
-                }
-                nodes.remove(0);
-            }
-
-            //get the results of the selection scripts
-            do {
-                try {
-                    if (!scriptResults.isEmpty()) {
-                        int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
-                        RMNode rmnode = nodeResults.remove(idx);
-                        ScriptResult<Boolean> res = scriptResults.remove(idx);
-                        if (res.errorOccured()) {
-                            // nothing to do, just let the node in the free list
-                            logger.info("Error occured executing selection script" +
-                                res.getException().getMessage());
-                        } else if (res.getResult()) {
-                            // Result OK
-                            try {
-                                result.add(rmnode.getNode());
-                                internalSetBusy(rmnode);
-                                rmnode.setVerifyingScript(selectionScript);
-                                found++;
-                            } catch (NodeException e) {
-                                internalSetDown(rmnode);
-                                // try on a new node if any
-                                if (!nodes.isEmpty()) {
-                                    nodeResults.add(nodes.get(0));
-                                    scriptResults.add(nodes.remove(0).executeScript(selectionScript));
-                                }
-                            }
-                        } else {
-                            // result is false
-                            rmnode.setNotVerifyingScript(selectionScript);
-                            // try on a new node if any
-                            if (!nodes.isEmpty()) {
-                                nodeResults.add(nodes.get(0));
-                                scriptResults.add(nodes.remove(0).executeScript(selectionScript));
-                            }
-                        }
-                    } else {
-                        if (!nodes.isEmpty()) {
-                            nodeResults.add(nodes.get(0));
-                            scriptResults.add(nodes.remove(0).executeScript(selectionScript));
-                        }
-                    }
-                } catch (ProActiveException e) {
-                    // TODO Auto-generated catch block
-                    // Wait For Any Timeout...
-                    // traitement special
-                    e.printStackTrace();
-                }
-            } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) && (found < nb));
-
-            return result;
+        if (result.size() < nb && nodesToTest.size() > 0) {
+            result.addAll(execSelectionScriptOnNodes(nb - result.size(), nodesToTest, selectionScript));
         }
 
+        return result;
     }
 
     /**
@@ -627,87 +546,97 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      *            list of free nodes.
      * @return NodeSet of nodes verifying the SelectionScript.
      */
-    private NodeSet selectNodeWithDynamicVerifScript(int nb, SelectionScript selectionScript,
-            ArrayList<RMNode> nodes) {
-        logger.debug("Searching for " + nb + " nodes  with dynamic verif script on " +
-            this.getSizeListFreeRMNodes() + " free nodes.");
+    private ArrayList<RMNode> selectNodesWithDynamicVerifScript(int nb, SelectionScript selectionScript,
+            ArrayList<RMNode> candidateNodes) {
 
-        StringBuffer order = new StringBuffer();
-        for (RMNode n : nodes) {
-            order.append(n.getHostName() + " ");
+        logger.debug("Searching for " + nb + " nodes  with dynamic verif script on " + candidateNodes.size() +
+            " free nodes.");
+
+        Collections.sort(candidateNodes, new RMNodeComparator(selectionScript));
+        return execSelectionScriptOnNodes(nb, candidateNodes, selectionScript);
+    }
+
+    /**
+     * Launches selection script verifications on a set of nodes, to check node. 
+     * Launches first a 'required' number of execution, if one of these execution
+     * fails or result is a non verifying script, then launches another execution
+     * on one node in target nodes list.  
+     * @param required number of 
+     * @param targetNodesList
+     * @param selectionScript
+     * @return
+     */
+    private ArrayList<RMNode> execSelectionScriptOnNodes(int required, List<RMNode> targetNodesList,
+            SelectionScript selectionScript) {
+
+        ArrayList<RMNode> returnNodes = new ArrayList<RMNode>();
+        ArrayList<RMNode> nodesInTest = new ArrayList<RMNode>();
+        ArrayList<ScriptResult<Boolean>> awaitedResults = new ArrayList<ScriptResult<Boolean>>();
+
+        //launch on a 'required' number of nodes script executions
+        while (nodesInTest.size() < required && !targetNodesList.isEmpty()) {
+            RMNode targetNode = targetNodesList.remove(0);
+            launchScriptExecution(selectionScript, targetNode, nodesInTest, awaitedResults);
         }
-        logger.debug("Available nodes are : " + order);
-        Vector<ScriptResult<Boolean>> scriptResults = new Vector<ScriptResult<Boolean>>();
-        Vector<RMNode> nodeResults = new Vector<RMNode>();
-        NodeSet result = new NodeSet();
-        int found = 0;
 
-        // launch verification on n(needed) first nodes
-        int launched = 0;
-        while (!nodes.isEmpty() && (launched++ < nb)) {
-            nodeResults.add(nodes.get(0));
-            ScriptResult<Boolean> r = nodes.get(0).executeScript(selectionScript);
+        while (returnNodes.size() < required && (targetNodesList.size() != 0 || nodesInTest.size() != 0)) {
 
-            // if r is not a future, the script has not been executed
-            if (MOP.isReifiedObject(r)) {
-                scriptResults.add(r);
-            } else {
-                // script has not been executed on remote host
-                // nothing to do, just let the node in the free list
-                logger.info("Error occured executing selection script" + r.getException().getMessage());
-            }
-            nodes.remove(0);
-        }
-        do {
-            try {
-                if (!scriptResults.isEmpty()) {
-                    int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
-                    // idx could be -1 if an error occured in wfa (or timeout
-                    // expires)
-                    RMNode rmnode = nodeResults.remove(idx);
-                    ScriptResult<Boolean> res = scriptResults.remove(idx);
-                    if (res.errorOccured()) {
-                        // nothing to do, just let the node in the free list
-                        logger.info("Error occured executing verifying script" +
-                            res.getException().getMessage());
-                    } else if (res.getResult()) {
-                        // Result OK
-                        try {
-                            result.add(rmnode.getNode());
-                            internalSetBusy(rmnode);
-                            rmnode.setVerifyingScript(selectionScript);
-                            found++;
-                        } catch (NodeException e) {
-                            internalSetDown(rmnode);
-                            // try on a new node if any
-                            if (!nodes.isEmpty()) {
-                                nodeResults.add(nodes.get(0));
-                                scriptResults.add(nodes.remove(0).executeScript(selectionScript));
-                            }
-                        }
+            //get result of one of the executions
+            if (nodesInTest.size() != 0) {
+                try {
+                    int index;
+                    index = PAFuture.waitForAny(awaitedResults, MAX_VERIF_TIMEOUT);
+                    ScriptResult<Boolean> result = awaitedResults.remove(index);
+                    RMNode testedNode = nodesInTest.remove(index);
+                    if (result.errorOccured()) {
+                        //TODO gsigety improve error handling on failed exceptions :
+                        // error due to script itself or Node  itself ?
+                        logger.info("Error occured executing selection script : " +
+                            result.getException().getMessage());
+                    } else if (!result.getResult()) {
+                        testedNode.setNotVerifyingScript(selectionScript);
                     } else {
-                        // result is false
-                        rmnode.setNotVerifyingScript(selectionScript);
-                        // try on a new node if any
-                        if (!nodes.isEmpty()) {
-                            nodeResults.add(nodes.get(0));
-                            scriptResults.add(nodes.remove(0).executeScript(selectionScript));
-                        }
+                        //result ok
+                        returnNodes.add(testedNode);
+                        testedNode.setVerifyingScript(selectionScript);
                     }
-                } else {
-                    if (!nodes.isEmpty()) {
-                        nodeResults.add(nodes.get(0));
-                        scriptResults.add(nodes.remove(0).executeScript(selectionScript));
-                    }
+                } catch (ProActiveException e) {
+                    logger.info("time out expired in waiting ends of script executiony on " +
+                        nodesInTest.size() + "nodes : " + e.getMessage());
+                    //these nodes are no suitable
+                    nodesInTest.clear();
+                    awaitedResults.clear();
                 }
-            } catch (ProActiveException e) {
-                // TODO Auto-generated catch block
-                // Wait For Any Timeout...
-                // traitement special
-                e.printStackTrace();
             }
-        } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) && (found < nb));
-        return result;
+
+            //launch another script executions if needed and if there are other nodes to test 
+            while (nodesInTest.size() + returnNodes.size() < required && !targetNodesList.isEmpty()) {
+                RMNode targetNode = targetNodesList.remove(0);
+                launchScriptExecution(selectionScript, targetNode, nodesInTest, awaitedResults);
+            }
+        }
+        return returnNodes;
+    }
+
+    private boolean launchScriptExecution(SelectionScript script, RMNode targetNode,
+            ArrayList<RMNode> alreadyLaunchedList, ArrayList<ScriptResult<Boolean>> resultList) {
+
+        ScriptResult<Boolean> scriptResult = targetNode.executeScript(script);
+
+        // if r is not a future, the script has not been executed
+        //TODO check if that code is always needed
+        // because exception in script handler creation/execution
+        // produce an exception in ScriptResult
+        if (MOP.isReifiedObject(scriptResult)) {
+            alreadyLaunchedList.add(targetNode);
+            resultList.add(scriptResult);
+            return true;
+        } else {
+            // script has not been executed on remote host
+            logger.info("Error occured executing verifying script : " +
+                scriptResult.getException().getMessage());
+            return false;
+        }
     }
 
     /**
@@ -988,44 +917,70 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript, org.ow2.proactive.resourcemanager.frontend.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion) {
+        ArrayList<SelectionScript> list = null;
+        if (selectionScript != null) {
+            list = new ArrayList<SelectionScript>();
+            list.add(selectionScript);
+        }
+        return getAtMostNodes(nb, list, exclusion);
+    }
 
-        // if RM is in shutdown state, don't provide nodes
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, java.util.List, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     */
+    public NodeSet getAtMostNodes(IntWrapper nb, List<SelectionScript> selectionScriptList, NodeSet exclusion) {
+
+        // if RM is in shutdown state, it doesn't give nodes
         if (this.toShutDown) {
             return new NodeSet();
         } else {
-            ArrayList<RMNode> nodes = internalGetFreeNodesSortedByScript(selectionScript);
+
+            ArrayList<RMNode> selectedNodes = new ArrayList<RMNode>();
+            ArrayList<RMNode> candidateNodes = internalGetFreeNodes();
+
             // delete nodes that are in exclusion list.
-            // TODO to be checked by cdelbe or gsigety
             if (exclusion != null && exclusion.size() > 0) {
-                Iterator<RMNode> it = nodes.iterator();
+                Iterator<RMNode> it = candidateNodes.iterator();
                 while (it.hasNext()) {
-                    if (contains(exclusion, it.next())) {
-                        it.remove();
+                    RMNode nodeToTest = it.next();
+                    if (contains(exclusion, nodeToTest)) {
+                        candidateNodes.remove(nodeToTest);
+                        it = candidateNodes.iterator();
                     }
                 }
             }
 
-            int found = 0;
             NodeSet result;
             // no verifying script
-            if (selectionScript == null) {
+            if (selectionScriptList == null || selectionScriptList.size() == 0) {
                 logger.debug("Searching for " + nb + " nodes on " + this.getSizeListFreeRMNodes() +
                     " free nodes.");
-                result = new NodeSet();
-                while (!nodes.isEmpty() && (found < nb.intValue())) {
-                    RMNode node = nodes.remove(0);
-                    try {
-                        result.add(node.getNode());
-                        internalSetBusy(node);
-                        found++;
-                    } catch (NodeException e) {
-                        internalSetDown(node);
-                    }
+                while (!candidateNodes.isEmpty() && (selectedNodes.size() < nb.intValue())) {
+                    RMNode node = candidateNodes.remove(0);
+                    selectedNodes.add(node);
                 }
-            } else if (selectionScript.isDynamic()) {
-                result = this.selectNodeWithDynamicVerifScript(nb.intValue(), selectionScript, nodes);
             } else {
-                result = this.selectNodeWithStaticVerifScript(nb.intValue(), selectionScript, nodes);
+                for (SelectionScript selectionScript : selectionScriptList) {
+                    if (selectionScript.isDynamic()) {
+                        selectedNodes = selectNodesWithDynamicVerifScript(nb.intValue(), selectionScript,
+                                candidateNodes);
+                    } else {
+                        selectedNodes = selectNodesWithStaticVerifScript(nb.intValue(), selectionScript,
+                                candidateNodes);
+                    }
+                    candidateNodes = selectedNodes;
+                }
+            }
+
+            result = new NodeSet();
+            //put nodes in busy state and build the nodeSet to return
+            for (RMNode rmnode : selectedNodes) {
+                try {
+                    internalSetBusy(rmnode);
+                    result.add(rmnode.getNode());
+                } catch (NodeException e) {
+                    internalSetDown(rmnode);
+                }
             }
             return result;
         }

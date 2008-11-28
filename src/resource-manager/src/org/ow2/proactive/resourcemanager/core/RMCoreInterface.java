@@ -170,19 +170,34 @@ public interface RMCoreInterface {
      * This method has three way to handle the request :<BR>
      *  - if there is no script, it returns at most the
      * first nb free nodes asked.<BR>
-     * - If the script is a dynamic script, the method will
-     * test the resources, until nb nodes verify the script or if there is no
-     * node left.<BR>
-     * - If the script is a static script, it will return in priority the
-     * nodes on which the given script has already been verified.<BR>
-     * - This will not returns node that are specified in the exclusion list.
+     * - Otherwise, it will return the nodes on which 
+     * the given script has been verified.<BR>
+     * 
+     * Exclusion list permits to eliminate a list of non wished nodes.
      *
      * @param nb number of node to provide
      * @param selectionScript that nodes must verify
-     * @param exclusion the exclusion nodes that cannot be returned
+     * @param exclusion a set of node that must not be returned
      * @return an array list of nodes.
      */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion);
+
+    /**
+     * Get a set of nodes that verify a list of selection scripts, with
+     * ability, to exclude a set of nodes 
+     *  - if scripts list is null or empty, it returns at most the
+     * first nb free nodes asked.<BR>
+     * - otherwise, Resource manager test selection scripts in the list,
+     * and return a set of node that satisfy ALL the selection scripts defined in the list
+     * 
+     * Exclusion list permits to eliminate a list of non wished nodes. 
+     * 
+     * @param nb number of node to provide
+     * @param selectionScriptList : a list of scripts to be verified.
+     * @param exclusion a set of node that must not be returned
+     * @return a set of node that must not be returned.
+     */
+    public NodeSet getAtMostNodes(IntWrapper nb, List<SelectionScript> selectionScriptList, NodeSet exclusion);
 
     /**
      * Returns an exactly number of nodes

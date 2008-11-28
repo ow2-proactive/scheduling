@@ -32,6 +32,7 @@
 package org.ow2.proactive.resourcemanager.frontend;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -146,6 +147,14 @@ public class RMUserImpl implements RMUser, InitActive {
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
         return rmcore.getAtMostNodes(nbNodes, selectionScript, exclusion);
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, java.util.List, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     */
+    public NodeSet getAtMostNodes(IntWrapper nbNodes, List<SelectionScript> selectionScriptsList,
+            NodeSet exclusion) {
+        return rmcore.getAtMostNodes(nbNodes, selectionScriptsList, exclusion);
     }
 
     /**
