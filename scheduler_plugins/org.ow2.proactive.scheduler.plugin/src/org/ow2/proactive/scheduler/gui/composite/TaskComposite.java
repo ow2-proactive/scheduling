@@ -506,11 +506,12 @@ public class TaskComposite extends Composite {
                         case RUNNING:
                         case FINISHED:
                         case FAULTY:
-                            tmp = tmp +
-                                " (" +
-                                (internalTask.getMaxNumberOfExecution() -
-                                    internalTask.getNumberOfExecutionLeft() + 1) + "/" +
-                                internalTask.getMaxNumberOfExecution() + ")";
+                        	int nb = (internalTask.getMaxNumberOfExecution() -
+                                    internalTask.getNumberOfExecutionLeft() + 1);
+                        	if (nb>internalTask.getMaxNumberOfExecution()){
+                        		nb = internalTask.getMaxNumberOfExecution();
+                        	}
+                            tmp = tmp + " (" + nb + "/" + internalTask.getMaxNumberOfExecution() + ")";
                             break;
                         case WAITING_ON_ERROR:
                             tmp = tmp +

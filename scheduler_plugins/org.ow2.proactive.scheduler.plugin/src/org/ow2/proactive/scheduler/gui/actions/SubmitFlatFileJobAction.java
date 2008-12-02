@@ -45,8 +45,8 @@ public class SubmitFlatFileJobAction extends SchedulerGUIAction {
 
     public SubmitFlatFileJobAction(Composite parent) {
         this.parent = parent;
-        this.setText("Submit a file containning commands");
-        this.setToolTipText("Submit a file containning commands");
+        this.setText("Submit a file containing commands");
+        this.setToolTipText("Submit a file containing commands");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/file_obj.gif"));
         this.setEnabled(false);
     }
