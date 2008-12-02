@@ -28,7 +28,6 @@ public class DisconnectHandler extends AbstractHandler implements IHandler {
         return RMStore.isConnected();
     }
 
-    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         if (MessageDialog.openConfirm(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell(),
                 "Confirm disconnection",

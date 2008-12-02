@@ -28,7 +28,6 @@ public class ShutdownHandler extends AbstractHandler implements IHandler {
         return RMStore.isConnected();
     }
 
-    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         ShutdownDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell());
         fireHandlerChanged(new HandlerEvent(this, true, false));

@@ -28,7 +28,6 @@ public class CreateNodeSourceHandler extends AbstractHandler implements IHandler
         return RMStore.isConnected();
     }
 
-    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         CreateSourceDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell());
         return null;

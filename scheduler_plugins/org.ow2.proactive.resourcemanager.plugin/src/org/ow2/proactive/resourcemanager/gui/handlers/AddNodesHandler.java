@@ -28,7 +28,6 @@ public class AddNodesHandler extends AbstractHandler implements IHandler {
         return RMStore.isConnected();
     }
 
-    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         AddNodeDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell(), null);
         return null;

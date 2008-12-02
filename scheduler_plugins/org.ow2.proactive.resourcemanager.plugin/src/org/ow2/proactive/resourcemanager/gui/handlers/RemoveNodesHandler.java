@@ -48,7 +48,6 @@ public class RemoveNodesHandler extends AbstractHandler implements IHandler {
         return enabled;
     }
 
-    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         RemoveNodeDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell(),
                 selectedNodes);

@@ -45,7 +45,6 @@ public class RemoveNodeSourceHandler extends AbstractHandler implements IHandler
         return state;
     }
 
-    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         RemoveSourceDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell());
         return null;
