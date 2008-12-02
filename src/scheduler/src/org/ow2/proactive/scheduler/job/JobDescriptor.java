@@ -35,6 +35,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Vector;
 import java.util.Map.Entry;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -282,12 +283,12 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     }
 
     /**
-     * To get the tasks
+     * To get the tasks.
      *
-     * @return the tasks
+     * @return the tasks.
      */
     public Collection<EligibleTaskDescriptor> getEligibleTasks() {
-        return eligibleTasks.values();
+        return new Vector<EligibleTaskDescriptor>(eligibleTasks.values());
     }
 
     /**
