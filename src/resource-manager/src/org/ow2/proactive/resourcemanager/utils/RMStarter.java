@@ -61,6 +61,9 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
  */
 public class RMStarter {
 
+    /**
+     * Log4j logger name.
+     */
     public static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
 
     /**
@@ -130,16 +133,11 @@ public class RMStarter {
                         admin.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile));
                     }
                 } else if (!cmd.hasOption("n")) {
-                    //select the appropriate deployment descriptor regarding to the OS
-                    if (System.getProperty("os.name").contains("Windows")) {
-                        File gcmDeployFile = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                            File.separator + "config/deployment/Local4JVMDeploymentWindows.xml");
-                        admin.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile));
-                    } else {
-                        File gcmDeployFile = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                            File.separator + "config/deployment/Local4JVMDeploymentUnix.xml");
-                        admin.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile));
-                    }
+                    RMFactory.setOsJavaProperty();
+                    File gcmDeployFile = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                        File.separator + "config/deployment/Local4JVMDeployment.xml");
+                    admin.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile));
+
                 }
 
                 //        Vector<String> v = new Vector<String>();

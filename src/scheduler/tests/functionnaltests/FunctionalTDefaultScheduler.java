@@ -99,6 +99,8 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }
+
+        RMFactory.setOsJavaProperty();
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(defaultDescriptor));
         admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
         ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +

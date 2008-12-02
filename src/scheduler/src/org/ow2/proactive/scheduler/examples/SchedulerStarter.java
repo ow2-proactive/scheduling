@@ -47,7 +47,6 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -168,18 +167,10 @@ public class SchedulerStarter {
                             e1.printStackTrace();
                         }
 
-                        //select the appropriate deployment descriptor regarding to the OS
-                        if (System.getProperty("os.name").contains("Windows")) {
-                            File GCMDeployFile = new File(PAResourceManagerProperties.RM_HOME
-                                    .getValueAsString() +
-                                File.separator + "config/deployment/Local4JVMDeploymentWindows.xml");
-                            admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
-                        } else {
-                            File GCMDeployFile = new File(PAResourceManagerProperties.RM_HOME
-                                    .getValueAsString() +
-                                File.separator + "config/deployment/Local4JVMDeploymentUnix.xml");
-                            admin.addNodes(FileToBytesConverter.convertFileToByteArray(GCMDeployFile));
-                        }
+                        RMFactory.setOsJavaProperty();
+                        File gcmDeployFile = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                            File.separator + "config/deployment/Local4JVMDeployment.xml");
+                        admin.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile));
 
                         Runtime.getRuntime().addShutdownHook(new Thread() {
                             public void run() {
@@ -194,7 +185,6 @@ public class SchedulerStarter {
                         logger.info("Resource Manager created on " +
                             PAActiveObject.getActiveObjectNodeUrl(imp));
                     }
-
                 }
 
                 AdminScheduler.createScheduler(imp, policyFullName);

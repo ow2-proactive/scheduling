@@ -64,6 +64,10 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @since ProActive Scheduling 0.9
  *
  */
+/**
+ * @author gsigety
+ *
+ */
 @PublicAPI
 public class RMFactory implements RMConstants {
 
@@ -157,6 +161,18 @@ public class RMFactory implements RMConstants {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Set Java Property "os" used by default GCM deployment file.
+     */
+    public static void setOsJavaProperty() {
+        //set appropriate os java property used in default GCM deployment descriptor.
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            System.setProperty("os", "windows");
+        } else {
+            System.setProperty("os", "unix");
         }
     }
 }

@@ -40,6 +40,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
@@ -80,6 +81,7 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
         System.out.println("------------------------------ Test 1");
 
         String nodeSourceName = "GCM_Node_source_test1";
+        RMFactory.setOsJavaProperty();
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
         admin.createGCMNodesource(GCMDeploymentData, nodeSourceName);
 

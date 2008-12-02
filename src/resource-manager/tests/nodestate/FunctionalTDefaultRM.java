@@ -99,7 +99,7 @@ public class FunctionalTDefaultRM extends FunctionalTest {
      * @throws Exception if the deployment fails.
      */
     public void deployDefault() throws Exception {
-
+        RMFactory.setOsJavaProperty();
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
         admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
     }

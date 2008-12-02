@@ -23,8 +23,19 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
 
+/**
+ * Class with a main provides a way to list nodes, nodes sources,
+ * add/remove nodes and nodes sources and shutdown Resource Manager.
+ * 
+ * 
+ * @author ProActive team
+ *
+ */
 public class RMController {
 
+    /**
+     * Log4j logger name.
+     */
     public static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
 
     /**
@@ -220,6 +231,10 @@ public class RMController {
         System.exit(0);
     }
 
+    /**
+     * Print on STDOUT a list of nodes 
+     * @param list a list of RMNodeEvent objects representing a set of nodes to display.
+     */
     public static void printNodesList(List<RMNodeEvent> list) {
 
         if (list.size() == 0) {
@@ -248,6 +263,10 @@ public class RMController {
 
     }
 
+    /**
+     * Print on STDOUT a list of node sources 
+     * @param list a list of RMNodesourceEvent representing a set of nodes sources to display.
+     */
     public static void printNodeSourcesList(List<RMNodeSourceEvent> list) {
         System.out.println("\n");
         for (RMNodeSourceEvent evt : list) {
