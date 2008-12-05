@@ -52,6 +52,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setShowCoolBar(true);
         configurer.setShowStatusLine(false);
         configurer.setShowPerspectiveBar(true);
+        configurer.setShowMenuBar(true);
     }
 
     public void postWindowCreate() {

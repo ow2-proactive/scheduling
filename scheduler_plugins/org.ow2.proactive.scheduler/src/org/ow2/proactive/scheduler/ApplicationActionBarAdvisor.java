@@ -59,6 +59,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IContributionItem perspectiveList;
     private IContributionItem viewList;
     private IWorkbenchWindow window;
+    private IWorkbenchAction preferenceAction;
 
     public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
@@ -86,6 +87,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         perspectiveList = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(window);
         viewList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+
+        preferenceAction = ActionFactory.PREFERENCES.create(window);
+        register(preferenceAction);
+
     }
 
     protected void fillMenuBar(IMenuManager menuBar) {
@@ -116,6 +121,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         windowMenu.add(perspectiveMenu);
         viewMenu.add(viewList);
         windowMenu.add(viewMenu);
+        windowMenu.add(preferenceAction);
 
         // Help
         helpMenu.add(aboutAction);
