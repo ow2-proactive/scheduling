@@ -30,6 +30,11 @@
  */
 package org.ow2.proactive.scheduler.gui.data;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Observer;
+
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -51,6 +56,7 @@ import org.ow2.proactive.scheduler.common.scheduler.Stats;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
+import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.PolicyInterface;
 
@@ -71,10 +77,13 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     private String userName = null;
     private Boolean logAsAdmin = false;
 
+    List<SchedulerConnectionListener> observers;
+
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
     public SchedulerProxy() {
+        observers = new LinkedList<SchedulerConnectionListener>();
     }
 
     // -------------------------------------------------------------------- //
@@ -107,6 +116,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             if (scheduler != null) {
                 scheduler.disconnect();
+                sendConnectionLostEvent();
+
             }
         } catch (SchedulerException e) {
             // Nothing to do
@@ -200,8 +211,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.Job)
-     */
+      * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.Job)
+      */
     public JobId submit(Job job) throws SchedulerException {
         return scheduler.submit(job);
     }
@@ -342,6 +353,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             } else {
                 scheduler = sai.logAsUser(userName, dialogResult.getPassword());
             }
+            sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
             return CONNECTED;
         } catch (SchedulerException e) {
             e.printStackTrace();
@@ -394,4 +406,29 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     public static void clearInstance() {
         instance = null;
     }
+
+    public void addConnectionListener(SchedulerConnectionListener obs) {
+        this.observers.add(obs);
+    }
+
+    public void removeObserver(Observer obs) {
+        this.observers.remove(obs);
+    }
+
+    public void sendConnectionCreatedEvent(String schedulerUrl, String user, String password) {
+        Iterator<SchedulerConnectionListener> it = this.observers.iterator();
+        while (it.hasNext()) {
+            SchedulerConnectionListener o = it.next();
+            o.connectionCreatedEvent(schedulerUrl, user, password);
+        }
+    }
+
+    public void sendConnectionLostEvent() {
+        Iterator<SchedulerConnectionListener> it = this.observers.iterator();
+        while (it.hasNext()) {
+            SchedulerConnectionListener o = it.next();
+            o.connectionLostEvent();
+        }
+    }
+
 }
