@@ -134,11 +134,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
     /** Scheduler node ping frequency in second. */
     private static final long SCHEDULER_NODE_PING_FREQUENCY = PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY
-            .getValueAsInt()*1000;
+            .getValueAsInt() * 1000;
 
     /** Delay to wait for between getting a job result and removing the job concerned */
     private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
-            .getValueAsInt()*1000;
+            .getValueAsInt() * 1000;
 
     /** Host name of the scheduler for logger system. */
     private String host = null;
