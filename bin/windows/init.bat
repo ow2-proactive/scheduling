@@ -51,7 +51,7 @@ rem Jars needed by the scheduler not included in the ProActive.jar jarindex
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%PA_SCHEDULER%\config\scheduler.java.policy" -Dlog4j.configuration="file:///%PA_SCHEDULER%/config/scheduler-log4j"
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%PA_SCHEDULER%\config\scheduler.java.policy" -Dlog4j.configuration="file:///%PA_SCHEDULER%/config/scheduler-log4j"
 
 rem Adding java tools to the path
 SET OK=1
