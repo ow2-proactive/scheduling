@@ -61,7 +61,7 @@ public class TaskEvent implements Serializable {
     /** task started time */
     private long startTime = -1;
 
-    /** task finished time : HAS TO BE SET TO -1 */
+    /** task finished time : DEFAULT HAS TO BE SET TO -1 */
     private long finishedTime = -1;
 
     /** Current taskState of the task */

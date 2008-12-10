@@ -57,6 +57,9 @@ public class ExecuterInformations implements Serializable {
     /** Reference to the node name of this task. */
     private String nodeName;
 
+    /** Reference to the node host of this task. */
+    private String hostName;
+
     /**
      * Create a new executer informations with the given info.
      *
@@ -68,6 +71,7 @@ public class ExecuterInformations implements Serializable {
         this.nodes = new NodeSet();
         this.nodes.add(node);
         this.nodeName = node.getNodeInformation().getName();
+        this.hostName = node.getNodeInformation().getVMInformation().getHostName();
     }
 
     /**
@@ -104,5 +108,14 @@ public class ExecuterInformations implements Serializable {
      */
     public String getNodeName() {
         return nodeName;
+    }
+
+    /**
+     * Returns the host name
+     *
+     * @return the host name.
+     */
+    public String getHostName() {
+        return hostName;
     }
 }

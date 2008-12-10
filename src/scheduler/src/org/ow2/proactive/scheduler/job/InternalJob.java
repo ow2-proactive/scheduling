@@ -267,9 +267,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * Start a new task will set some count and update dependencies if necessary.
      *
      * @param td the task which has just been started.
-     * @param hostName the computer host name on which the task has been started.
      */
-    public void startTask(InternalTask td, String hostName) {
+    public void startTask(InternalTask td) {
         setNumberOfPendingTasks(getNumberOfPendingTask() - 1);
         setNumberOfRunningTasks(getNumberOfRunningTask() + 1);
 
@@ -280,7 +279,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         jobDescriptor.start(td.getId());
         td.setStatus(TaskState.RUNNING);
         td.setStartTime(System.currentTimeMillis());
-        td.setExecutionHostName(hostName);
+        td.setExecutionHostName(td.getExecuterInformations().getHostName() + " (" +
+            td.getExecuterInformations().getNodeName() + ")");
     }
 
     public void newWaitingTask() {

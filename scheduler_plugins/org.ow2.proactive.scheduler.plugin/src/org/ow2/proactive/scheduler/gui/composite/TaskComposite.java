@@ -506,11 +506,11 @@ public class TaskComposite extends Composite {
                         case RUNNING:
                         case FINISHED:
                         case FAULTY:
-                        	int nb = (internalTask.getMaxNumberOfExecution() -
-                                    internalTask.getNumberOfExecutionLeft() + 1);
-                        	if (nb>internalTask.getMaxNumberOfExecution()){
-                        		nb = internalTask.getMaxNumberOfExecution();
-                        	}
+                            int nb = (internalTask.getMaxNumberOfExecution() -
+                                internalTask.getNumberOfExecutionLeft() + 1);
+                            if (nb > internalTask.getMaxNumberOfExecution()) {
+                                nb = internalTask.getMaxNumberOfExecution();
+                            }
                             tmp = tmp + " (" + nb + "/" + internalTask.getMaxNumberOfExecution() + ")";
                             break;
                         case WAITING_ON_ERROR:
@@ -532,12 +532,14 @@ public class TaskComposite extends Composite {
                 } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
                     item.setText(i, Tools.getFormattedDate(internalTask.getFinishedTime()));
                 } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
-                    item.setText(i, (internalTask.getMaxNumberOfExecutionOnFailure() - internalTask
-                            .getNumberOfExecutionOnFailureLeft()) +
-                        "/" + internalTask.getMaxNumberOfExecutionOnFailure());
-                    //                } else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE)) {
-                    //                    item.setText(i,
-                    //                        Tools.getFormattedDate(internalTask.getRunTimeLimit()));
+                    if (internalTask.getStatus() == TaskState.FAILED) {
+                        item.setText(i, internalTask.getMaxNumberOfExecutionOnFailure() + "/" +
+                            internalTask.getMaxNumberOfExecutionOnFailure());
+                    } else {
+                        item.setText(i, (internalTask.getMaxNumberOfExecutionOnFailure() - internalTask
+                                .getNumberOfExecutionOnFailureLeft()) +
+                            "/" + internalTask.getMaxNumberOfExecutionOnFailure());
+                    }
                 } else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
                     String hostName = internalTask.getExecutionHostName();
                     if (hostName == null) {

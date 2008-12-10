@@ -627,6 +627,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                             parentTask.getId());
                                 }
                             }
+                            //TODO if the next task is a native task, it's no need to pass params
                             currentJob.getJobResult().addTaskResult(
                                     internalTask.getName(),
                                     launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(),
@@ -661,8 +662,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         }
 
                         // set the different informations on task
-                        currentJob.startTask(internalTask, node.getNodeInformation().getVMInformation()
-                                .getHostName());
+                        currentJob.startTask(internalTask);
                         // send task event to front-end
                         frontend.taskPendingToRunningEvent(internalTask.getTaskInfo());
 
@@ -1501,6 +1501,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         InternalJob job = jobs.get(jobId);
         jobs.remove(jobId);
 
+        if (job != null) {
+            return new BooleanWrapper(false);
+        }
         for (InternalTask td : job.getTasks()) {
             if (td.getStatus() == TaskState.RUNNING) {
                 try {
@@ -1521,9 +1524,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
         }
 
-        if (runningJobs.remove(job) || pendingJobs.remove(job) || finishedJobs.remove(job)) {
-            ;
-        }
+        //this line will try to remove job from each list.
+        //once removed, it won't be removed from remaining list, but we ensure that the job is in only one of the list.
+        boolean unused = runningJobs.remove(job) || finishedJobs.remove(job) || pendingJobs.remove(job);
 
         // terminate loggers
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
