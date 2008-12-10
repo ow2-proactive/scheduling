@@ -529,10 +529,10 @@ aTask.setWallTime(10000);
 					script must set the string variable <literal>command</literal>.
 					The value of this variable is the command line that will be executed by
 					the ProActive Scheduler as task execution. The returned string will be parsed
-					and transform as a String Array according to this example ( '!' is the escape character ): 
+					and transform as a String Array according to this example ( '%' is the escape character ):
 					<itemizedlist>
-						<listitem>the string "/path/to/cmd arg1 arg 2 arg! 3 arg!!! 4 5</listitem>
-						<listitem>will generate : [/path/to/cmd,arg1,arg,2,arg 3,arg! 4,5]</listitem> where the first element is the command.
+						<listitem>the string "/path/to/cmd arg1 arg 2 arg% 3 arg%%% 4 5</listitem>
+						<listitem>will generate : [/path/to/cmd,arg1,arg,2,arg 3,arg% 4,5]</listitem> where the first element is the command.
 					</itemizedlist>
 				</para>
 				<programlisting xml:lang="java">

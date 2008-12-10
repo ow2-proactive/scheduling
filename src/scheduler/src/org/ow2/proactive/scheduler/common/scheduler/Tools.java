@@ -171,17 +171,17 @@ public class Tools implements Serializable {
      * Parse a command line in order to split it into a string array.
      * This method provides the parsing as followed :<br />
      *  - It is split according to the 'white space' character.<br />
-     *  - It is possible to escape white space character using the '!' character.<br />
-     *  - To write this '!' special char, just escape it ( '!!' ).<br />
-     * For example, the string "cmd arg1 arg! 2 arg!!! 3 arg4!! 5" will return the following string array :<br />
-     *   [cmd,arg1,arg 2,arg! 3,arg4!,5]<br />
+     *  - It is possible to escape white space character using the '%' character.<br />
+     *  - To write this '%' special char, just escape it ( '%%' ).<br />
+     * For example, the string "cmd arg1 arg% 2 arg%%% 3 arg4%% 5" will return the following string array :<br />
+     *   [cmd,arg1,arg 2,arg% 3,arg4%,5]<br />
      * <br />This method can be mostlikely used for Runtime.exec(String[]) method.
      *   
      * @param cmdLine The command line to parse.
      * @return a string array that represents the parsed command line.
      */
     public static String[] parseCommandLine(String cmdLine) {
-        final char specialToken = '!';
+        final char specialToken = '%';
         ArrayList<String> tokens = new ArrayList<String>();
         int i = 0;
         StringBuilder tmp = new StringBuilder();
