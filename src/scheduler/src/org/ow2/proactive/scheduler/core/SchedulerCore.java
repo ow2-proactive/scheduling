@@ -132,13 +132,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Scheduler main loop time out */
     private static final int SCHEDULER_TIME_OUT = PASchedulerProperties.SCHEDULER_TIME_OUT.getValueAsInt();
 
-    /** Scheduler node ping frequency in ms. */
-    private static final int SCHEDULER_NODE_PING_FREQUENCY = PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY
-            .getValueAsInt();
+    /** Scheduler node ping frequency in second. */
+    private static final long SCHEDULER_NODE_PING_FREQUENCY = PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY
+            .getValueAsInt()*1000;
 
     /** Delay to wait for between getting a job result and removing the job concerned */
-    private static final int SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
-            .getValueAsInt();
+    private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
+            .getValueAsInt()*1000;
 
     /** Host name of the scheduler for logger system. */
     private String host = null;
