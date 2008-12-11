@@ -1189,7 +1189,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     public void remove(JobId jobId) {
         InternalJob job = jobs.get(jobId);
 
-        if (job != null) {
+        if (job != null && finishedJobs.contains(job)) {
             jobs.remove(jobId);
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
