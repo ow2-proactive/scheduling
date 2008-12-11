@@ -111,12 +111,6 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
     // -------------------------------------------------------------------- //
     // ------------------- implements EventJobsListener ------------------- //
     // -------------------------------------------------------------------- //
-    /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#killedEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
-     */
-    public void killedEvent(JobId jobId) {
-        // Do nothing
-    }
 
     /**
      * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)

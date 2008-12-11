@@ -80,6 +80,12 @@ public enum TaskState implements java.io.Serializable {
      */
     NOT_STARTED("Could not start"),
     /**
+     * The task could not be restarted.<br>
+     * It means that the task could not be restarted after an error
+     * during the previous execution
+     */
+    NOT_RESTARTED("Could not restart"),
+    /**
      * The task has been canceled.
      */
     CANCELED("Canceled"),

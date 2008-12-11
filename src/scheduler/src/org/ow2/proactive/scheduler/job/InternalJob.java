@@ -279,10 +279,14 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         jobDescriptor.start(td.getId());
         td.setStatus(TaskState.RUNNING);
         td.setStartTime(System.currentTimeMillis());
+        td.setFinishedTime(-1);
         td.setExecutionHostName(td.getExecuterInformations().getHostName() + " (" +
             td.getExecuterInformations().getNodeName() + ")");
     }
 
+    /**
+     * Updates count for running to pending event.
+     */
     public void newWaitingTask() {
         setNumberOfPendingTasks(getNumberOfPendingTask() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
@@ -353,21 +357,24 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
-     * Failed this job due to the given task failure.
+     * Failed this job due to the given task failure or job has been killed
      *
-     * @param taskId the task that has been the cause to failure.
-     * @param jobState type of the failure on this job. (failed/canceled)
+     * @param taskId the task that has been the cause to failure. Can be null if the job has been killed
+     * @param jobState type of the failure on this job. (failed/canceled/killed)
      */
     public void failed(TaskId taskId, JobState jobState) {
-        InternalTask descriptor = tasks.get(taskId);
-        descriptor.setFinishedTime(System.currentTimeMillis());
+        if (jobState != JobState.KILLED) {
+            InternalTask descriptor = tasks.get(taskId);
+            descriptor.setFinishedTime(System.currentTimeMillis());
+            descriptor.setStatus((jobState == JobState.FAILED) ? TaskState.FAILED : TaskState.FAULTY);
+            //terminate this job descriptor
+            jobDescriptor.failed();
+        }
+        //set the new state of the job
         setFinishedTime(System.currentTimeMillis());
         setNumberOfPendingTasks(0);
         setNumberOfRunningTasks(0);
-        descriptor.setStatus((jobState == JobState.FAILED) ? TaskState.FAILED : TaskState.FAULTY);
         setState(jobState);
-        //terminate this job descriptor
-        jobDescriptor.failed();
 
         //creating list of status
         HashMap<TaskId, TaskState> hts = new HashMap<TaskId, TaskState>();
@@ -378,6 +385,9 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
                 if (td.getStatus() == TaskState.RUNNING) {
                     td.setStatus(TaskState.ABORTED);
                     td.setFinishedTime(System.currentTimeMillis());
+                } else if (td.getStatus() == TaskState.WAITING_ON_ERROR ||
+                    td.getStatus() == TaskState.WAITING_ON_FAILURE) {
+                    td.setStatus(TaskState.NOT_RESTARTED);
                 } else if (td.getStatus() != TaskState.FINISHED) {
                     td.setStatus(TaskState.NOT_STARTED);
                 }

@@ -51,8 +51,9 @@ public class ActionsManager {
                 if (jobs.size() > 0) {
                     InternalJob job = jobs.get(0);
                     jobSelected = true;
-                    jobInFinishQueue = (job.getState() == JobState.CANCELLED) ||
-                        (job.getState() == JobState.FAILED) || (job.getState() == JobState.FINISHED);
+                    jobInFinishQueue = (job.getState() == JobState.CANCELED) ||
+                        (job.getState() == JobState.FAILED) || (job.getState() == JobState.FINISHED) ||
+                        (job.getState() == JobState.KILLED);
                     owner = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
                     for (int i = 1; owner && (i < jobs.size()); i++) {
                         owner &= SchedulerProxy.getInstance().isItHisJob(jobs.get(i).getOwner());

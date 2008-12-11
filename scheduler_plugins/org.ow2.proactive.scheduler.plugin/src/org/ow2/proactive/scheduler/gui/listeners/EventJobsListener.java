@@ -31,7 +31,6 @@
 package org.ow2.proactive.scheduler.gui.listeners;
 
 import org.ow2.proactive.scheduler.common.job.JobEvent;
-import org.ow2.proactive.scheduler.common.job.JobId;
 
 
 /**
@@ -39,13 +38,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
  *
  */
 public interface EventJobsListener {
-
-    /**
-     * Invoked when a job has been killed on the scheduler.
-     *
-     * @param jobId the job to killed.
-     */
-    public void killedEvent(JobId jobId);
 
     /**
      * Invoked when a job has been paused on the scheduler.

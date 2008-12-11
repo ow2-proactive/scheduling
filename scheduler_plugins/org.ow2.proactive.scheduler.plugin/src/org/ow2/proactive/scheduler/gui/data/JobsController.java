@@ -43,6 +43,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
@@ -212,12 +213,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             listener.killedEvent();
     }
 
-    /** call "killedEvent" method on listeners */
-    private void jobKilledEventInternal(JobId jobId) {
-        for (EventJobsListener listener : eventJobsListeners)
-            listener.killedEvent(jobId);
-    }
-
     /** call "pausedEvent" method on listeners */
     private void jobPausedEventInternal(JobEvent event) {
         for (EventJobsListener listener : eventJobsListeners)
@@ -349,13 +344,24 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         boolean rememberIsOnly = TableManager.getInstance().isOnlyJobSelected(jobId);
         boolean rememberIsSelectedButNotOnly = TableManager.getInstance().isJobSelected(jobId);
 
-        // call method on listeners
-        removeRunningJobEventInternal(jobId);
+        if (event.getStartTime() == -1) {
+            // call method on listeners
+            removePendingJobEventInternal(jobId);
 
-        // remove job from the running jobs list
-        if (!runningJobsIds.remove(jobId)) {
-            throw new IllegalStateException("can't remove the job (id = " + jobId +
-                ") from the runningJobsIds list !");
+            // remove job from the pendinig jobs list
+            if (!pendingJobsIds.remove(jobId)) {
+                throw new IllegalStateException("can't remove the job (id = " + jobId +
+                    ") from the runningJobsIds list !");
+            }
+        } else {
+            // call method on listeners
+            removeRunningJobEventInternal(jobId);
+
+            // remove job from the running jobs list
+            if (!runningJobsIds.remove(jobId)) {
+                throw new IllegalStateException("can't remove the job (id = " + jobId +
+                    ") from the runningJobsIds list !");
+            }
         }
 
         // add job to finished jobs list
@@ -426,79 +432,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         // remove job's output
         JobsOutputController.getInstance().removeJobOutput(jobId);
-
-        if (rememberIsSelected) {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    // remove this job if it was selected
-                    TableManager.getInstance().removeJobSelection(jobId);
-
-                    // this job is not the only selected job
-                    List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
-                    List<InternalJob> jobs = getJobsByIds(jobsId);
-
-                    // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
-                    if (jobInfo != null) {
-                        if (jobsId.isEmpty())
-                            jobInfo.clear();
-                        else if (jobsId.size() == 1)
-                            jobInfo.updateInfos(jobs.get(0));
-                        else
-                            jobInfo.updateInfos(jobs);
-                    }
-
-                    TaskView taskView = TaskView.getInstance();
-                    if (taskView != null) {
-                        if (jobsId.isEmpty())
-                            taskView.clear();
-                        else if (jobsId.size() == 1)
-                            taskView.fullUpdate(jobs.get(0));
-                        else
-                            taskView.fullUpdate(jobs);
-                    }
-                }
-            });
-        }
-    }
-
-    /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobKilledEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobId)
-     */
-    public void jobKilledEvent(JobId aJobId) {
-        final JobId jobId = aJobId;
-        boolean rememberIsSelected = TableManager.getInstance().isJobSelected(jobId);
-
-        Vector<JobId> list = null;
-
-        if (pendingJobsIds.contains(jobId)) {
-            list = pendingJobsIds;
-            removePendingJobEventInternal(jobId);
-        } else if (runningJobsIds.contains(jobId)) {
-            list = runningJobsIds;
-            removeRunningJobEventInternal(jobId);
-        } else if (finishedJobsIds.contains(jobId)) {
-            list = finishedJobsIds;
-            removeFinishedJobEventInternal(jobId);
-        }
-
-        // remove job from the jobs map
-        if (jobs.remove(jobId) == null) {
-            throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs map !");
-        }
-
-        // remove job from the specified jobs list
-        if (!list.remove(jobId)) {
-            throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the list !");
-        }
-
-        // remove job's output
-        JobsOutputController.getInstance().removeJobOutput(jobId);
-
-        // call method on listeners
-        jobKilledEventInternal(jobId);
 
         if (rememberIsSelected) {
             Display.getDefault().asyncExec(new Runnable() {

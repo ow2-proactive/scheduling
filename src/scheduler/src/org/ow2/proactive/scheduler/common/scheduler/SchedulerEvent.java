@@ -63,46 +63,32 @@ public enum SchedulerEvent {
     STOPPED("schedulerStoppedEvent"),
     /** The scheduler has just been killed. */
     KILLED("schedulerKilledEvent"),
-    /** A job has just been killed. */
-    JOB_KILLED("jobKilledEvent"),
     /** A job has just been paused. It will finished the running task. */
     JOB_PAUSED("jobPausedEvent"),
-
     /** A job has just been scheduled. At least one of its task is running. */
     JOB_PENDING_TO_RUNNING("jobPendingToRunningEvent"),
-
     /** A job has just been resumed. */
     JOB_RESUMED("jobResumedEvent"),
     /** A job has just been submitted. */
     JOB_SUBMITTED("jobSubmittedEvent"),
-
     /** A job has just finished. All tasks are finished. */
     JOB_RUNNING_TO_FINISHED("jobRunningToFinishedEvent"),
-
     /** A job has just been removed from scheduler. */
     JOB_REMOVE_FINISHED("jobRemoveFinishedEvent"),
-
     /** A task has just been scheduled. It is now running. */
     TASK_PENDING_TO_RUNNING("taskPendingToRunningEvent"),
-
     /** A task has just finished. */
     TASK_RUNNING_TO_FINISHED("taskRunningToFinishedEvent"),
-
     /** A task has just had an error, it will wait for restart. */
     TASK_WAITING_FOR_RESTART("taskWaitingForRestart"),
-
     /** The priority of a job has just been change. */
     JOB_CHANGE_PRIORITY("jobChangePriorityEvent"),
-
     /** The scheduler has just been paused. Every running job will be finished. */
     PAUSED("schedulerPausedEvent"),
-
     /** The Resource Manager is no more available. */
     RM_DOWN("schedulerRMDownEvent"),
-
     /** The Resource Manager is re-available . */
     RM_UP("schedulerRMUpEvent"),
-
     /** A user has just connect the scheduler or submit a job. */
     USERS_UPDATE("usersUpdate");
 

@@ -68,12 +68,18 @@ public enum JobState implements java.io.Serializable {
      * This state runs when a user exception occurs in a task
      * and when the user has asked to cancel On exception.
      */
-    CANCELLED("Canceled"),
+    CANCELED("Canceled"),
     /**
      * The job has failed. One or more tasks have failed (due to resources failure).
      * There is no more executionOnFailure left for a task.
      */
-    FAILED("Failed");
+    FAILED("Failed"),
+    /**
+     * The job has been killed by a user..
+     * Nothing can be done anymore on this job expect read execution informations
+     * such as output, time, etc...
+     */
+    KILLED("Killed");
 
     /** The textual definition of the state */
     private String definition;

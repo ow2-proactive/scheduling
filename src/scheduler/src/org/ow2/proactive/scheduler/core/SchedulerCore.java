@@ -116,7 +116,7 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
 
 
 /**
- * <i><font size="-1" color="#FF0000">** Scheduler core ** </font></i>
+ * <i><font size="2" color="#FF0000">** Scheduler core ** </font></i>
  * This is the main active object of the scheduler implementation,
  * it communicates with the entity manager to acquire nodes and with a policy
  * to insert and get jobs from the queue.
@@ -262,6 +262,22 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
         }
         return (tcs != null);
+    }
+
+    /**
+     * Terminate some job handling at the end of a job
+     */
+    private void terminateJobHandling(JobId jid) {
+        //remove loggers
+        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jid);
+        l.removeAllAppenders();
+        this.jobsToBeLogged.remove(jid);
+        this.jobsToBeLoggedinAFile.remove(jid);
+        // remove current running tasks
+        // TODO cdelbe : When a job can be removed on failure ??
+        // Other tasks' logs should remain available...
+        this.currentlyRunningTasks.remove(jid);
+        removeTaskClassServer(jid);
     }
 
     /**
@@ -438,7 +454,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         while ((runningJobs.size() + pendingJobs.size()) > 0) {
             try {
-                service.serveAll("terminate");
+                service.serveAll(filter);
                 schedule();
                 //block the loop until a method is invoked and serve it
                 service.blockingServeOldest(SCHEDULER_TIME_OUT);
@@ -804,9 +820,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * End the given job due to the given task failure.
      *
      * @param job the job to end.
-     * @param td the task who has been the caused of failing.
+     * @param task the task who has been the caused of failing. **This argument can be null only if jobState is killed**
      * @param errorMsg the error message to send in the task result.
-     * @param jobState the type of the end for this job. (failed/canceled)
+     * @param jobState the type of the end for this job. (failed/canceled/killed)
      */
     private void endJob(InternalJob job, InternalTask task, String errorMsg, JobState jobState) {
         TaskResult taskResult = null;
@@ -819,63 +835,73 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 //try to terminate the task
                 try {
                     td.getExecuterInformations().getLauncher().terminate();
-                } catch (Exception e) { /* Tested (nothing to do) */
+                } catch (Exception e) { /* (nothing to do) */
                 }
 
-                //free every execution nodes
-                resourceManager.freeNodes(nodes, td.getCleaningScript());
-
-                //deleting tasks results except the one that causes the failure
-                if (!td.getId().equals(task.getId())) {
-                    job.getJobResult().removeResult(td.getName());
+                try {
+                    //free every execution nodes
+                    resourceManager.freeNodes(nodes, td.getCleaningScript());
+                } catch (Exception e) {
+                    try {
+                        // try to get the node back to the IM
+                        resourceManager.freeNodes(td.getExecuterInformations().getNodes());
+                    } catch (Exception e1) {
+                        resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
+                    }
                 }
-                //if canceled, get the result of the canceled task
-                if ((jobState == JobState.CANCELLED) && td.getId().equals(task.getId())) {
-                    taskResult = job.getJobResult().getAllResults().get(task.getName());
+
+                //If not killed
+                if (jobState != JobState.KILLED) {
+                    //deleting tasks results except the one that causes the error
+                    if (!td.getId().equals(task.getId())) {
+                        job.getJobResult().removeResult(td.getName());
+                    }
+                    //if canceled, get the result of the canceled task
+                    if ((jobState == JobState.CANCELED) && td.getId().equals(task.getId())) {
+                        taskResult = job.getJobResult().getAllResults().get(task.getName());
+                    }
                 }
             }
         }
 
-        taskResult = (TaskResult) PAFuture.getFutureValue(taskResult);
-        //failed the job
-        job.failed(task.getId(), jobState);
-
-        //store the exception into jobResult
-        if (jobState == JobState.FAILED) {
-            taskResult = new TaskResultImpl(task.getId(), new Throwable(errorMsg), new SimpleTaskLogs("",
-                errorMsg));
-            job.getJobResult().addTaskResult(task.getName(), taskResult, task.isPreciousResult());
+        //if job has been killed
+        if (jobState == JobState.KILLED) {
+            job.failed(null, jobState);
+            //the next line will try to remove job from each list.
+            //once removed, it won't be removed from remaining list, but we ensure that the job is in only one of the list.
+            if (runningJobs.remove(job) || pendingJobs.remove(job)) {
+                finishedJobs.add(job);
+            }
         } else {
-            job.getJobResult().addTaskResult(task.getName(), taskResult, task.isPreciousResult());
+            //failed the job
+            job.failed(task.getId(), jobState);
+
+            //store the exception into jobResult
+            if (jobState == JobState.FAILED) {
+                taskResult = new TaskResultImpl(task.getId(), new Throwable(errorMsg), new SimpleTaskLogs("",
+                    errorMsg));
+                job.getJobResult().addTaskResult(task.getName(), taskResult, task.isPreciousResult());
+            } else if (jobState == JobState.CANCELED) {
+                taskResult = (TaskResult) PAFuture.getFutureValue(taskResult);
+                job.getJobResult().addTaskResult(task.getName(), taskResult, task.isPreciousResult());
+            }
+
+            //add the result in database
+            AbstractSchedulerDB.getInstance().addTaskResult(taskResult);
+            //clean the result to improve memory usage
+            ((TaskResultImpl) taskResult).clean();
+            //move the job
+            runningJobs.remove(job);
+            finishedJobs.add(job);
         }
 
-        //add the result in database
-        AbstractSchedulerDB.getInstance().addTaskResult(taskResult);
-        //clean the result to improve memory usage
-        ((TaskResultImpl) taskResult).clean();
-        //move the job
-        runningJobs.remove(job);
-        finishedJobs.add(job);
-
-        // terminate loggers
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
-        l.removeAllAppenders();
-        this.jobsToBeLogged.remove(job.getId());
-        this.jobsToBeLoggedinAFile.remove(job.getId());
-
-        // remove current running tasks
-        // TODO cdelbe : When a job can be removed on failure ??
-        // Other tasks' logs should remain available...
-        this.currentlyRunningTasks.remove(job.getId());
-
-        // Remove taskClassServer
-        removeTaskClassServer(job.getId());
+        terminateJobHandling(job.getId());
 
         //send event to listeners.
         frontend.jobRunningToFinishedEvent(job.getJobInfo());
         //create tasks events list
         updateTaskEventsList(job);
-        logger.info("Terminated job " + job.getId() + " (failed/Canceled) ");
+        logger.info("Terminated job " + job.getId() + " (" + jobState + ")");
     }
 
     /**
@@ -982,7 +1008,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //if no rerun left, failed the job
                     endJob(job, descriptor,
                             "An error occurred in your task and the maximum number of executions has been reached. "
-                                + "You also ask to cancel the job in such a situation !", JobState.CANCELLED);
+                                + "You also ask to cancel the job in such a situation !", JobState.CANCELED);
                     return;
                 }
                 if (descriptor.getNumberOfExecutionLeft() > 0) {
@@ -1036,19 +1062,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 finishedJobs.add(job);
                 logger.info("Terminated job " + jobId);
 
-                // terminate loggers
-                Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
-                l.removeAllAppenders(); // appender are closed...
-                //send event to listeners.
-
-                this.jobsToBeLogged.remove(jobId);
-                this.jobsToBeLoggedinAFile.remove(job.getId());
-                // TODO cdelbe : race condition with GUI ? Logger are removed before
-                // job is removed from GUI ...
-                this.currentlyRunningTasks.remove(jobId);
-
-                // Remove taskClassServer
-                removeTaskClassServer(job.getId());
+                terminateJobHandling(job.getId());
 
                 frontend.jobRunningToFinishedEvent(job.getJobInfo());
                 //and to data base
@@ -1167,18 +1181,20 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             AbstractSchedulerDB.getInstance().setJobEvent(job.getJobInfo());
         }
 
-        try {
-            //remove job after the given delay
-            TimerTask tt = new TimerTask() {
-                @Override
-                public void run() {
-                    schedulerStub.remove(job.getId());
-                }
-            };
-            timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
-            logger.debug("Job " + jobId + " will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) +
-                "sec");
-        } catch (Exception e) {
+        if (SCHEDULER_REMOVED_JOB_DELAY > 0) {
+            try {
+                //remove job after the given delay
+                TimerTask tt = new TimerTask() {
+                    @Override
+                    public void run() {
+                        schedulerStub.remove(job.getId());
+                    }
+                };
+                timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+                logger.debug("Job " + jobId + " will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) +
+                    "sec");
+            } catch (Exception e) {
+            }
         }
         return result;
     }
@@ -1494,51 +1510,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             return new BooleanWrapper(false);
         }
 
-        if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
+        if (state == SchedulerState.KILLED) {
             return new BooleanWrapper(false);
         }
 
         InternalJob job = jobs.get(jobId);
-        jobs.remove(jobId);
 
-        if (job != null) {
+        if (job == null || job.getState() == JobState.KILLED) {
             return new BooleanWrapper(false);
         }
-        for (InternalTask td : job.getTasks()) {
-            if (td.getStatus() == TaskState.RUNNING) {
-                try {
-                    //get the nodes that are used for this descriptor
-                    NodeSet nodes = td.getExecuterInformations().getNodes();
 
-                    //try to terminate the task
-                    try {
-                        td.getExecuterInformations().getLauncher().terminate();
-                    } catch (Exception e) { /* Tested (nothing to do) */
-                    }
+        endJob(job, null, "", JobState.KILLED);
 
-                    //free every execution nodes
-                    resourceManager.freeNodes(nodes, td.getCleaningScript());
-                } catch (Exception e) {
-                    resourceManager.freeNodes(td.getExecuterInformations().getNodes());
-                }
-            }
-        }
-
-        //this line will try to remove job from each list.
-        //once removed, it won't be removed from remaining list, but we ensure that the job is in only one of the list.
-        boolean unused = runningJobs.remove(job) || finishedJobs.remove(job) || pendingJobs.remove(job);
-
-        // terminate loggers
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
-        l.removeAllAppenders();
-        this.jobsToBeLogged.remove(job.getId());
-        this.jobsToBeLoggedinAFile.remove(job.getId());
-        // remove current running tasks
-        this.currentlyRunningTasks.remove(job.getId());
-
-        logger.debug("Job " + jobId + " has just been killed !");
-        frontend.jobKilledEvent(jobId);
-        AbstractSchedulerDB.getInstance().removeJob(jobId);
+        terminateJobHandling(job.getId());
 
         return new BooleanWrapper(true);
     }
@@ -1721,8 +1705,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                     break;
                 case FINISHED:
-                case CANCELLED:
+                case CANCELED:
                 case FAILED:
+                case KILLED:
                     finishedJobs.add(job);
                     break;
                 case PAUSED:
@@ -1836,18 +1821,20 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
             //re-set job removed delay (if job result has been sent to user
             if (job.isToBeRemoved()) {
-                try {
-                    //remove job after the given delay
-                    TimerTask tt = new TimerTask() {
-                        @Override
-                        public void run() {
-                            schedulerStub.remove(job.getId());
-                        }
-                    };
-                    timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
-                    logger.debug("Job " + job.getId() + " will be removed in " +
-                        (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
-                } catch (Exception e) {
+                if (SCHEDULER_REMOVED_JOB_DELAY > 0) {
+                    try {
+                        //remove job after the given delay
+                        TimerTask tt = new TimerTask() {
+                            @Override
+                            public void run() {
+                                schedulerStub.remove(job.getId());
+                            }
+                        };
+                        timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+                        logger.debug("Job " + job.getId() + " will be removed in " +
+                            (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+                    } catch (Exception e) {
+                    }
                 }
             }
         }

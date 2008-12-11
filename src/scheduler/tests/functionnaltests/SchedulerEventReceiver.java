@@ -263,13 +263,6 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobKilledEvent(org.ow2.proactive.scheduler.common.job.JobId)
-     */
-    public void jobKilledEvent(JobId jobId) {
-        // TODO Auto-generated method stub
-    }
-
-    /**
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobPausedEvent(JobEvent event) {

@@ -96,13 +96,6 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     public void schedulerKilledEvent();
 
     /**
-     * Invoked when a job has been killed on the scheduler.
-     *
-     * @param jobId the job to killed.
-     */
-    public void jobKilledEvent(JobId jobId);
-
-    /**
      * Invoked when a job has been paused on the scheduler.
      *
      * @param event the informations on the paused job.

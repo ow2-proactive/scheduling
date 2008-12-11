@@ -60,10 +60,10 @@ public class StatusLabel implements EventSchedulerListener {
     public static final Color PAUSED_COLOR = Colors.BLACK;
     public static final String RESUMED_TEXT = "RESUMED";
     public static final Color RESUMED_COLOR = Colors.BLACK;
-    public static final String SHUTTING_DOWN_TEXT = "SHUTTING_DOWN";
+    public static final String SHUTTING_DOWN_TEXT = "SHUTTING DOWN";
     public static final Color SHUTTING_DOWN_COLOR = Colors.BLACK;
-    public static final String SHUTTED_DOWN_TEXT = "SHUTTED_DOWN";
-    public static final Color SHUTTED_DOWN_COLOR = Colors.BLACK;
+    public static final String SHUTDOWN_TEXT = "SHUTDOWN";
+    public static final Color SHUTDOWN_COLOR = Colors.BLACK;
     public static final String KILLED_TEXT = "KILLED";
     public static final Color KILLED_COLOR = Colors.BLACK;
     public static final String DISCONNECTED_TEXT = "DISCONNECTED";
@@ -105,7 +105,7 @@ public class StatusLabel implements EventSchedulerListener {
     }
 
     public void shutDownEvent() {
-        setText(SHUTTED_DOWN_TEXT, SHUTTED_DOWN_COLOR);
+        setText(SHUTDOWN_TEXT, SHUTDOWN_COLOR);
     }
 
     public void shuttingDownEvent() {

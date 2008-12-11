@@ -156,7 +156,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
         this.scheduler = auth.logAsUser(user, passwd);
 
-        this.scheduler.addSchedulerEventListener((AOMatlabEnvironment) stubOnThis, SchedulerEvent.JOB_KILLED,
+        this.scheduler.addSchedulerEventListener((AOMatlabEnvironment) stubOnThis,
                 SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN);
 
@@ -334,19 +334,6 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    public void jobKilledEvent(JobId jobId) {
-        if (debugCurrentJob) {
-            System.out.println("Received job killed event...");
-        }
-
-        // Filtering the right job
-        if ((currentJobId == null) || !jobId.equals(currentJobId)) {
-            return;
-        }
-        this.jobKilled = true;
-
-    }
-
     public void jobPausedEvent(JobEvent event) {
         // TODO Auto-generated method stub
 
@@ -368,92 +355,103 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     }
 
     public void jobRunningToFinishedEvent(JobEvent event) {
-        if (debugCurrentJob) {
-            System.out.println("Received job finished event...");
-        }
-
-        if (event == null) {
-            return;
-        }
-
-        // Filtering the right job
-        if (!event.getJobId().equals(currentJobId)) {
-            return;
-        }
-        // Getting the Job result from the Scheduler
-        JobResult jResult = null;
-
-        try {
-            jResult = scheduler.getJobResult(event.getJobId());
-        } catch (SchedulerException e) {
-            jobDidNotSucceed(event.getJobId(), e, true, null);
-            return;
-        }
-
-        if (debugCurrentJob) {
-            System.out
-                    .println("Updating results of job: " + jResult.getName() + "(" + event.getJobId() + ")");
-        }
-
-        // Geting the task results from the job result
-        Map<String, TaskResult> task_results = null;
-        if (jResult.hadException()) {
-            task_results = jResult.getExceptionResults();
-        } else {
-            // sorted results
-
-            task_results = jResult.getAllResults();
-        }
-        ArrayList<Integer> keys = new ArrayList<Integer>();
-        for (String key : task_results.keySet()) {
-            keys.add(Integer.parseInt(key));
-        }
-        Collections.sort(keys);
-        // Iterating over the task results
-        for (Integer key : keys) {
-            TaskResult res = task_results.get("" + key);
+        if (event.getState() == JobState.KILLED) {
             if (debugCurrentJob) {
-                System.out.println("Looking for result of task: " + key);
+                System.out.println("Received job killed event...");
             }
-            String logs = res.getOuput().getAllLogs(false);
 
-            // No result received
-            if (res == null) {
-                jobDidNotSucceed(event.getJobId(), new RuntimeException("Task id = " + key +
-                    " was not returned by the scheduler"), false, null);
+            // Filtering the right job
+            if ((currentJobId == null) || !event.getJobId().equals(currentJobId)) {
+                return;
+            }
+            this.jobKilled = true;
+        } else {
+            if (debugCurrentJob) {
+                System.out.println("Received job finished event...");
+            }
 
-            } else if (res.hadException()) {
+            if (event == null) {
+                return;
+            }
 
-                //Exception took place inside the framework
-                if (res.getException() instanceof ptolemy.kernel.util.IllegalActionException) {
-                    // We filter this specific exception which means that the "out" variable was not set by the function 
-                    // due to an error inside the script or a missing licence 
+            // Filtering the right job
+            if (!event.getJobId().equals(currentJobId)) {
+                return;
+            }
+            // Getting the Job result from the Scheduler
+            JobResult jResult = null;
 
-                    jobDidNotSucceed(event.getJobId(), new MatlabTaskException(logs), false, logs);
-                } else {
-                    // For other types of exception we forward it as it is.
-                    jobDidNotSucceed(event.getJobId(), res.getException(), true, logs);
-                }
+            try {
+                jResult = scheduler.getJobResult(event.getJobId());
+            } catch (SchedulerException e) {
+                jobDidNotSucceed(event.getJobId(), e, true, null);
+                return;
+            }
+
+            if (debugCurrentJob) {
+                System.out.println("Updating results of job: " + jResult.getName() + "(" + event.getJobId() +
+                    ")");
+            }
+
+            // Geting the task results from the job result
+            Map<String, TaskResult> task_results = null;
+            if (jResult.hadException()) {
+                task_results = jResult.getExceptionResults();
             } else {
-                // Normal success
-                Token computedResult = null;
-                try {
-                    computedResult = (Token) res.value();
-                    results.add(computedResult);
-                    // We print the logs of the job, if any
-                    if (logs.length() > 0) {
-                        System.out.println(logs);
+                // sorted results
+
+                task_results = jResult.getAllResults();
+            }
+            ArrayList<Integer> keys = new ArrayList<Integer>();
+            for (String key : task_results.keySet()) {
+                keys.add(Integer.parseInt(key));
+            }
+            Collections.sort(keys);
+            // Iterating over the task results
+            for (Integer key : keys) {
+                TaskResult res = task_results.get("" + key);
+                if (debugCurrentJob) {
+                    System.out.println("Looking for result of task: " + key);
+                }
+                String logs = res.getOuput().getAllLogs(false);
+
+                // No result received
+                if (res == null) {
+                    jobDidNotSucceed(event.getJobId(), new RuntimeException("Task id = " + key +
+                        " was not returned by the scheduler"), false, null);
+
+                } else if (res.hadException()) {
+
+                    //Exception took place inside the framework
+                    if (res.getException() instanceof ptolemy.kernel.util.IllegalActionException) {
+                        // We filter this specific exception which means that the "out" variable was not set by the function 
+                        // due to an error inside the script or a missing licence 
+
+                        jobDidNotSucceed(event.getJobId(), new MatlabTaskException(logs), false, logs);
+                    } else {
+                        // For other types of exception we forward it as it is.
+                        jobDidNotSucceed(event.getJobId(), res.getException(), true, logs);
                     }
-                } catch (ptolemy.kernel.util.IllegalActionException e1) {
-                    jobDidNotSucceed(event.getJobId(), new MatlabTaskException(logs), false, logs);
-                } catch (Throwable e2) {
-                    jobDidNotSucceed(event.getJobId(), e2, true, logs);
+                } else {
+                    // Normal success
+                    Token computedResult = null;
+                    try {
+                        computedResult = (Token) res.value();
+                        results.add(computedResult);
+                        // We print the logs of the job, if any
+                        if (logs.length() > 0) {
+                            System.out.println(logs);
+                        }
+                    } catch (ptolemy.kernel.util.IllegalActionException e1) {
+                        jobDidNotSucceed(event.getJobId(), new MatlabTaskException(logs), false, logs);
+                    } catch (Throwable e2) {
+                        jobDidNotSucceed(event.getJobId(), e2, true, logs);
+                    }
                 }
             }
+
+            isJobFinished = true;
         }
-
-        isJobFinished = true;
-
     }
 
     public void jobSubmittedEvent(Job job) {

@@ -65,6 +65,7 @@ import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
@@ -167,7 +168,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
         this.scheduler = auth.logAsUser(user, passwd);
 
-        this.scheduler.addSchedulerEventListener((AOScilabEnvironment) stubOnThis, SchedulerEvent.JOB_KILLED,
+        this.scheduler.addSchedulerEventListener((AOScilabEnvironment) stubOnThis,
                 SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN);
 
@@ -348,19 +349,6 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    public void jobKilledEvent(JobId jobId) {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received job killed event...");
-        }
-
-        // Filtering the right job
-        if ((currentJobId == null) || !jobId.equals(currentJobId)) {
-            return;
-        }
-        this.jobKilled = true;
-
-    }
-
     public void jobPausedEvent(JobEvent event) {
         // TODO Auto-generated method stub
 
@@ -401,86 +389,97 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
     }
 
     public void jobRunningToFinishedEvent(JobEvent event) {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received job finished event...");
-        }
-
-        if (event == null) {
-            return;
-        }
-
-        // Filtering the right job
-        if (!event.getJobId().equals(currentJobId)) {
-            return;
-        }
-        // Getting the Job result from the Scheduler
-        JobResult jResult = null;
-
-        try {
-            jResult = scheduler.getJobResult(event.getJobId());
-        } catch (SchedulerException e) {
-            jobDidNotSucceed(event.getJobId(), e, true, null);
-            return;
-        }
-
-        if (logger.isDebugEnabled()) {
-            System.out
-                    .println("Updating results of job: " + jResult.getName() + "(" + event.getJobId() + ")");
-        }
-
-        // Geting the task results from the job result
-        HashMap<String, TaskResult> task_results = null;
-        if (jResult.hadException()) {
-            task_results = jResult.getExceptionResults();
-        } else {
-            task_results = jResult.getAllResults();
-        }
-
-        // Iterating over the task results
-        for (Map.Entry<String, TaskResult> res : task_results.entrySet()) {
+        if (event.getState() == JobState.KILLED) {
             if (logger.isDebugEnabled()) {
-                logger.info("Looking for result of task: " + res.getKey());
+                logger.info("Received job killed event...");
             }
 
-            // No result received
-            if (res.getValue() == null) {
-                jobDidNotSucceed(event.getJobId(), new RuntimeException("Task id = " + res.getKey() +
-                    " was not returned by the scheduler"), false, null);
+            // Filtering the right job
+            if ((currentJobId == null) || !event.getJobId().equals(currentJobId)) {
+                return;
+            }
+            this.jobKilled = true;
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.info("Received job finished event...");
+            }
 
-            } else if (res.getValue().hadException()) {
-                //Exception took place inside the framework
-                if (res.getValue().getException() instanceof ptolemy.kernel.util.IllegalActionException) {
-                    // We filter this specific exception which means that the "out" variable was not set by the function 
-                    // due to an error inside the script
-                    String logs = res.getValue().getOuput().getAllLogs(false);
-                    jobDidNotSucceed(event.getJobId(), new SciLabTaskException(logs), false, logs);
-                } else {
-                    // For other types of exception we forward it as it is.
-                    jobDidNotSucceed(event.getJobId(), res.getValue().getException(), true, res.getValue()
-                            .getOuput().getAllLogs(false));
-                }
+            if (event == null) {
+                return;
+            }
+
+            // Filtering the right job
+            if (!event.getJobId().equals(currentJobId)) {
+                return;
+            }
+            // Getting the Job result from the Scheduler
+            JobResult jResult = null;
+
+            try {
+                jResult = scheduler.getJobResult(event.getJobId());
+            } catch (SchedulerException e) {
+                jobDidNotSucceed(event.getJobId(), e, true, null);
+                return;
+            }
+
+            if (logger.isDebugEnabled()) {
+                System.out.println("Updating results of job: " + jResult.getName() + "(" + event.getJobId() +
+                    ")");
+            }
+
+            // Geting the task results from the job result
+            HashMap<String, TaskResult> task_results = null;
+            if (jResult.hadException()) {
+                task_results = jResult.getExceptionResults();
             } else {
-                // Normal success
-                SciData computedResult = null;
-                String logs = null;
-                try {
-                    logs = res.getValue().getOuput().getAllLogs(false);
-                    computedResult = ((ArrayList<SciData>) res.getValue().value()).get(0);
-                    results.put(res.getKey(), computedResult);
-                    // We print the logs of the job, if any
-                    if (logs.length() > 0) {
-                        logger.info(logs);
+                task_results = jResult.getAllResults();
+            }
+
+            // Iterating over the task results
+            for (Map.Entry<String, TaskResult> res : task_results.entrySet()) {
+                if (logger.isDebugEnabled()) {
+                    logger.info("Looking for result of task: " + res.getKey());
+                }
+
+                // No result received
+                if (res.getValue() == null) {
+                    jobDidNotSucceed(event.getJobId(), new RuntimeException("Task id = " + res.getKey() +
+                        " was not returned by the scheduler"), false, null);
+
+                } else if (res.getValue().hadException()) {
+                    //Exception took place inside the framework
+                    if (res.getValue().getException() instanceof ptolemy.kernel.util.IllegalActionException) {
+                        // We filter this specific exception which means that the "out" variable was not set by the function 
+                        // due to an error inside the script
+                        String logs = res.getValue().getOuput().getAllLogs(false);
+                        jobDidNotSucceed(event.getJobId(), new SciLabTaskException(logs), false, logs);
+                    } else {
+                        // For other types of exception we forward it as it is.
+                        jobDidNotSucceed(event.getJobId(), res.getValue().getException(), true, res
+                                .getValue().getOuput().getAllLogs(false));
                     }
-                } catch (ptolemy.kernel.util.IllegalActionException e1) {
-                    jobDidNotSucceed(event.getJobId(), new SciLabTaskException(logs), false, logs);
-                } catch (Throwable e2) {
-                    jobDidNotSucceed(event.getJobId(), e2, true, logs);
+                } else {
+                    // Normal success
+                    SciData computedResult = null;
+                    String logs = null;
+                    try {
+                        logs = res.getValue().getOuput().getAllLogs(false);
+                        computedResult = ((ArrayList<SciData>) res.getValue().value()).get(0);
+                        results.put(res.getKey(), computedResult);
+                        // We print the logs of the job, if any
+                        if (logs.length() > 0) {
+                            logger.info(logs);
+                        }
+                    } catch (ptolemy.kernel.util.IllegalActionException e1) {
+                        jobDidNotSucceed(event.getJobId(), new SciLabTaskException(logs), false, logs);
+                    } catch (Throwable e2) {
+                        jobDidNotSucceed(event.getJobId(), e2, true, logs);
+                    }
                 }
             }
+
+            isJobFinished = true;
         }
-
-        isJobFinished = true;
-
     }
 
     public void jobSubmittedEvent(Job job) {

@@ -94,7 +94,7 @@ public class PauseResumeJobAction extends SchedulerGUIAction {
                     case PAUSED:
                         count++;
                         break;
-                    case CANCELLED:
+                    case CANCELED:
                     case FAILED:
                     case FINISHED:
                         enabled = false;

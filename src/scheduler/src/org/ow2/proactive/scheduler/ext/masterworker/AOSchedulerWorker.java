@@ -140,8 +140,8 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         // We register this active object as a listener
         try {
             this.scheduler.addSchedulerEventListener((AOSchedulerWorker) stubOnThis,
-                    SchedulerEvent.JOB_KILLED, SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED,
-                    SchedulerEvent.SHUTDOWN, SchedulerEvent.SHUTTING_DOWN);
+                    SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
+                    SchedulerEvent.SHUTTING_DOWN);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
@@ -233,15 +233,6 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
     }
 
-    public void jobKilledEvent(JobId jobId) {
-        if (!processing.containsKey(jobId)) {
-            return;
-        }
-
-        jobDidNotSucceed(jobId, new TaskException(new SchedulerException("Job id=" + jobId + " was killed")));
-
-    }
-
     public void jobPausedEvent(JobEvent event) {
         // TODO Auto-generated method stub
 
@@ -263,81 +254,89 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     }
 
     public void jobRunningToFinishedEvent(JobEvent event) {
-        if (debug) {
-            logger.debug(name + " receives job finished event...");
-        }
-
-        if (event == null) {
-            return;
-        }
-
-        if (!processing.containsKey(event.getJobId())) {
-            return;
-        }
-
-        JobResult jResult = null;
-
-        try {
-            jResult = scheduler.getJobResult(event.getJobId());
-        } catch (SchedulerException e) {
-            jobDidNotSucceed(event.getJobId(), new TaskException(e));
-            return;
-        }
-
-        if (debug) {
-            logger.debug(this.getName() + ": updating results of job: " + jResult.getName());
-        }
-
-        Collection<TaskIntern<Serializable>> tasksOld = processing.remove(event.getJobId());
-
-        ArrayList<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
-        HashMap<String, TaskResult> allTaskResults = jResult.getAllResults();
-
-        for (TaskIntern<Serializable> task : tasksOld) {
-            if (debug) {
-                logger.debug(this.getName() + ": looking for result of task: " + task.getId());
+        if (event.getState() == JobState.KILLED) {
+            if (!processing.containsKey(event.getJobId())) {
+                return;
             }
-            ResultIntern<Serializable> intres = new ResultInternImpl(task.getId());
-            TaskResult result = allTaskResults.get("" + task.getId());
 
-            if (result == null) {
-                intres.setException(new TaskException(new SchedulerException("Task id=" + task.getId() +
-                    " was not returned by the scheduler")));
+            jobDidNotSucceed(event.getJobId(), new TaskException(new SchedulerException("Job id=" +
+                event.getJobId() + " was killed")));
+        } else {
+
+            if (debug) {
+                logger.debug(name + " receives job finished event...");
+            }
+
+            if (event == null) {
+                return;
+            }
+
+            if (!processing.containsKey(event.getJobId())) {
+                return;
+            }
+
+            JobResult jResult = null;
+
+            try {
+                jResult = scheduler.getJobResult(event.getJobId());
+            } catch (SchedulerException e) {
+                jobDidNotSucceed(event.getJobId(), new TaskException(e));
+                return;
+            }
+
+            if (debug) {
+                logger.debug(this.getName() + ": updating results of job: " + jResult.getName());
+            }
+
+            Collection<TaskIntern<Serializable>> tasksOld = processing.remove(event.getJobId());
+
+            ArrayList<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
+            HashMap<String, TaskResult> allTaskResults = jResult.getAllResults();
+
+            for (TaskIntern<Serializable> task : tasksOld) {
                 if (debug) {
-                    logger
-                            .debug("Task result not found in job result: " +
-                                intres.getException().getMessage());
+                    logger.debug(this.getName() + ": looking for result of task: " + task.getId());
                 }
-            } else if (result.hadException()) { //Exception took place inside the framework
-                intres.setException(new TaskException(result.getException()));
-                if (debug) {
-                    logger.debug("Task result contains exception: " + intres.getException().getMessage());
-                }
-            } else {
-                try {
-                    Serializable computedResult = (Serializable) result.value();
+                ResultIntern<Serializable> intres = new ResultInternImpl(task.getId());
+                TaskResult result = allTaskResults.get("" + task.getId());
 
-                    intres.setResult(computedResult);
-
-                } catch (Throwable e) {
-                    intres.setException(new TaskException(e));
+                if (result == null) {
+                    intres.setException(new TaskException(new SchedulerException("Task id=" + task.getId() +
+                        " was not returned by the scheduler")));
                     if (debug) {
-                        logger.debug(intres.getException().getMessage());
+                        logger.debug("Task result not found in job result: " +
+                            intres.getException().getMessage());
+                    }
+                } else if (result.hadException()) { //Exception took place inside the framework
+                    intres.setException(new TaskException(result.getException()));
+                    if (debug) {
+                        logger.debug("Task result contains exception: " + intres.getException().getMessage());
+                    }
+                } else {
+                    try {
+                        Serializable computedResult = (Serializable) result.value();
+
+                        intres.setResult(computedResult);
+
+                    } catch (Throwable e) {
+                        intres.setException(new TaskException(e));
+                        if (debug) {
+                            logger.debug(intres.getException().getMessage());
+                        }
                     }
                 }
+
+                results.add(intres);
+
             }
 
-            results.add(intres);
+            Queue<TaskIntern<Serializable>> newTasks = provider.sendResultsAndGetTasks(results, name, true);
 
+            pendingTasksFutures.offer(newTasks);
+
+            // Schedule a new job
+            stubOnThis.scheduleTask();
         }
-
-        Queue<TaskIntern<Serializable>> newTasks = provider.sendResultsAndGetTasks(results, name, true);
-
-        pendingTasksFutures.offer(newTasks);
-
-        // Schedule a new job
-        stubOnThis.scheduleTask();
-
     }
 
     public void jobSubmittedEvent(Job job) {

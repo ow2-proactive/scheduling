@@ -196,7 +196,7 @@ public abstract class AbstractJobComposite extends Composite {
     private void fillBackgroundColor(TableItem item, JobState state, Color col) {
         boolean setFont = false;
         switch (state) {
-            case CANCELLED:
+            case CANCELED:
                 setFont = true;
                 item.setForeground(JOB_CANCELED_BACKGROUND_COLOR);
                 break;

@@ -217,7 +217,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
 
                 //if the job is finished set it
                 switch (e.getValue().getState()) {
-                    case CANCELLED:
+                    case CANCELED:
                     case FINISHED:
                     case FAILED:
                         ij.setFinished(true);
@@ -873,14 +873,6 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public void schedulerKilledEvent() {
         dispatch(SchedulerEvent.KILLED, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobKilledEvent(org.ow2.proactive.scheduler.common.job.JobId)
-     */
-    public void jobKilledEvent(JobId jobId) {
-        dispatch(SchedulerEvent.JOB_KILLED, new Class<?>[] { JobId.class }, jobId);
-        jobs.remove(jobId);
     }
 
     /**
