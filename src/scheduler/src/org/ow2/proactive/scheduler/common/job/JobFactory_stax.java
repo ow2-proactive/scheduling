@@ -685,8 +685,9 @@ public class JobFactory_stax extends JobFactory {
                             } else {
                                 path = replace(cursorScript.getAttributeValue(0));
                             }
-                            while (cursorScript.next() != XMLEvent.START_ELEMENT)
-                                ;
+
+                            while (cursorScript.next() != XMLEvent.END_ELEMENT);
+
                             if (url != null) {
                                 toReturn = new SimpleScript(new URL(url), getArguments(cursorScript));
                             } else {
@@ -1018,7 +1019,7 @@ public class JobFactory_stax extends JobFactory {
             logger.debug("cjoe : " + job.isCancelJobOnError());
             logger.debug("rtoe : " + job.getRestartTaskOnError());
             logger.debug("mnoe : " + job.getMaxNumberOfExecution());
-            System.out.print("cp   : ");
+            logger.debug("cp   : ");
             if (job.getEnv().getJobClasspath() != null) {
                 String cp = "cp   : ";
                 for (String s : job.getEnv().getJobClasspath()) {
