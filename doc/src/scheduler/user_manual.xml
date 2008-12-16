@@ -11,7 +11,7 @@
 			<para>
 			The  Job  XML descriptor is created 
 			following the 
-			<uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd">
+			<uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd">
 			descriptor XSD schema</uri>
 			
 			</para>
