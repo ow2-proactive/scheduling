@@ -72,7 +72,7 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class ResourceManagerProxy implements InitActive, RunActive, RMConstants {
+public class ResourceManagerProxy implements InitActive, RunActive {
     private static final long VERIF_TIMEOUT = 10000;
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.RMPROXY);
     private RMUser user;
@@ -108,7 +108,7 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
             if (!url.endsWith("/")) {
                 url += "/";
             }
-            RMUser user = RMConnection.connectAsUser(url + NAME_ACTIVE_OBJECT_RMUSER);
+            RMUser user = RMConnection.connectAsUser(url + RMConstants.NAME_ACTIVE_OBJECT_RMUSER);
             return (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class
                     .getCanonicalName(), new Object[] { user });
         } catch (RMException e) {

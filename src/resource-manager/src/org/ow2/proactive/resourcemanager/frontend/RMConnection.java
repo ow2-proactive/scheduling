@@ -54,7 +54,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
  *
  */
 @PublicAPI
-public class RMConnection implements RMConstants {
+public class RMConnection {
 
     /**
      * Gives the RM's Administrator interface.
@@ -64,7 +64,7 @@ public class RMConnection implements RMConstants {
      */
     public static RMAdmin connectAsAdmin(String url) throws RMException {
         if (url == null) {
-            url = "//localhost/" + NAME_ACTIVE_OBJECT_RMADMIN;
+            url = "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
         }
 
         try {
@@ -85,7 +85,7 @@ public class RMConnection implements RMConstants {
      */
     public static RMUser connectAsUser(String url) throws RMException {
         if (url == null) {
-            url = "//localhost/" + NAME_ACTIVE_OBJECT_RMUSER;
+            url = "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMUSER;
         }
         try {
             RMUser user = (RMUser) PAActiveObject.lookupActive(RMUser.class.getName(), url);
@@ -105,7 +105,7 @@ public class RMConnection implements RMConstants {
      */
     public static RMMonitoring connectAsMonitor(String url) throws RMException {
         if (url == null) {
-            url = "//localhost/" + NAME_ACTIVE_OBJECT_RMMONITORING;
+            url = "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING;
         }
         try {
             RMMonitoring mon = (RMMonitoring) PAActiveObject.lookupActive(RMMonitoring.class.getName(), url);

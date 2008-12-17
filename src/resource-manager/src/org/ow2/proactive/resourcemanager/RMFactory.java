@@ -69,7 +69,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  *
  */
 @PublicAPI
-public class RMFactory implements RMConstants {
+public class RMFactory {
 
     /** Logger of the RMFactory */
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.RMFACTORY);
