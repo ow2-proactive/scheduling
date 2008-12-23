@@ -31,22 +31,8 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar 
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
-	SET JARS=%PA_SCHEDULER%\dist\lib\ProActive.jar
-rem Jars needed by the scheduler not included in the ProActive.jar jarindex
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\derby.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\derbytools.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\isorelax.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\js.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\msv.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_resource-manager.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_scheduler.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_tests.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\relaxngDatatype.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\rngpack-1.1a.jar.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\script-api.jar.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\script-js.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\xsdlib.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-cli-1.1.jar		
+	rem Jars needed by the scheduler
+	FOR %%j IN ("%PA_SCHEDULER%\dist\lib\*.jar") DO SET JARS=!JARS!;%%j
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
