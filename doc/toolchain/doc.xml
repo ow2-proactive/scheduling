@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir=".">
-	<!-- <import file="ic2d_paths.xml" /> -->
 	<import file="doc_paths.xml" />
 	
 	
@@ -23,7 +22,7 @@
 			<!-- If a needed file doesn't exist, it will be fetched on the web -->
 
 			<classpath>
-				<pathelement location="${docs.docbook.dir}" />
+				<pathelement location="${docs.toolchain.dir}/${docbook.archive}" />
 			</classpath>
 
 			<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="${docs.docbook.dtd}" />
@@ -52,14 +51,8 @@
 			<param name="profile.os" expression="${docbook.profile}" />
 			<!--docbook.profile can be html, pdf or empty-->
 			<xmlcatalog refid="docbookcatalog" />
-			<classpath>
-				<fileset dir="${docs.docbook.lib.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-				<fileset dir="${docs.lib.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-			</classpath>
+			<classpath refid="docs.utils.classpath" />
+
 		</xslt>
 
 		<!-- Do the real conversion, docbook to pdf or html -->
@@ -72,62 +65,11 @@
 
 			<!-- Output dir for the chunked stylesheet-->
 			<param name="base.dir" expression="${docs.html.multiple.dir}"/>
+			<classpath refid="docs.utils.classpath" />
 
-			<classpath>
-				<fileset dir="${docs.lib.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-			</classpath>
 		</xslt>
 	</target>
 	
-	<!-- ==================================================================== -->
-	<!--                          Formats the XML files                       -->
-	<!--            for now it just removes whitespaces from programlisting   -->
-	<!--			(whitespaces are shown verbatim in the final doc)		  -->
-	<!--                         	SIDE EFFECTS:                             -->
-	<!--    due to the way XPath works it also removes DOCTYPEs and comments  --> 
-	<!--  		              that are note not under the root	node          -->
-	<!--         (ex: comments at the beginning or end of the file)           -->
-	<!-- ==================================================================== -->
-	<target name="formatXML">
-		<!-- delete everything in the temp dir since we will
-		run the xslt task and then copy everything back to 
-		docs source -->
-		<delete quiet="true">
-			<fileset dir="${docs.tmp.dir}"/>
-		</delete>
-		<!--TODO REMOVE/MAKE UNNECESARY UGLY EXCLUDE by organizing doc source directory or in some other way -->
-		<xslt basedir="${docs.src.dir}"
-		includes="**/*.xml"
-		extension=".xml"
-		destdir="${docs.tmp.dir}"
-		 style="${docs.xsl.removenewlines}"
-		 force="yes"
-		 excludes="**/helloworld-distributed.xml **/temporary_gcm.xml **/temporary_gcm_code.xml
-		 **/MPIRemote-descriptor.xml **/toadd.xml
-		 **/MPI-Jacobi-nina-nef.xml **/web.xml 
-		 **/deployment.xml **/PA_index.xml **/sample_p2p.xml **/application.xml" >
-			<xmlcatalog refid="docbookcatalog" />
-
-			<classpath>
-				<fileset dir="${docs.lib.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-			</classpath>
-		</xslt>
- 		<!-- copy the processed files back -->
-		<copy todir="${docs.src.dir}"
-		  verbose="true">
-		    <fileset dir="${docs.tmp.dir}">
-		      <include name="**/*.xml"/>
-		    </fileset>
-		  </copy>
-		 <!-- clean tmp folder --> 
-		 <delete quiet="true">
-			<fileset dir="${docs.tmp.dir}"/>
-		</delete>
-	</target>
 	
 	<!-- ==================================================================== -->
 	<!--          Generic task to transform docbook xml into pdf              -->
@@ -144,12 +86,8 @@
 
 		<!-- declare how to transform fo xml file in pdf through a new 'fop' task -->
 		<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
-			<classpath>
-				<fileset dir="${docs.lib.dir}">
-					<include name="*.jar" />
-				</fileset>
-				
-			</classpath>
+			<classpath refid="docs.utils.classpath" />
+
 		</taskdef>
 
 		<!-- Then use the newly defined fop task to translate fo into pdf -->
@@ -162,7 +100,7 @@
 	<!-- ==================================================================== -->
 	<!--          Create the snippets necessary for programlistings           -->
 	<!-- ==================================================================== -->
-	<target name="-snippetscreation" depends="compile.doc.utils">
+	<target name="-snippetscreation">
 		<delete quiet="true">
 			<fileset dir="${snippets.location}"/>
 		</delete>
@@ -181,7 +119,7 @@
 	<!-- ==================================================================== -->
 	<!--    Add some highlighting information to the docbook source code      -->
 	<!-- ==================================================================== -->
-	<target name="-docbookBeautify" depends="compile.doc.utils">
+	<target name="-docbookBeautify">
 		
 		<java classname="doc.DocBookize" fork="true">
 			<classpath refid="docs.utils.classpath"/>
@@ -202,11 +140,6 @@
 
 		<java classname="doc.Validate" fork="true">
 			<classpath refid="docs.utils.classpath" />
-			<classpath>
-				<fileset dir="${docs.docbook.lib.dir}">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
 			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
 		</java>
 
@@ -216,7 +149,7 @@
 	<!--    Checks if the XML is valid and if the manual can be built properly-->
 	<!--   this should catch if the XML is malformed  or files are missing    -->
 	<!-- ==================================================================== -->
-	<target name="-docbookBeautifyFailCheck" depends="compile.doc.utils">
+	<target name="-docbookBeautifyFailCheck" >
 		
 		<java classname="doc.DocBookize" fork="true" failonerror="true">
 			<classpath refid="docs.utils.classpath"/>
@@ -235,11 +168,7 @@
 
 		<java classname="doc.Validate" fork="true" failonerror="true">
 			<classpath refid="docs.utils.classpath" />
-			<classpath>
-				<fileset dir="${docs.docbook.lib.dir}">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
+
 			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
 		</java>
 
@@ -405,17 +334,5 @@
 		<!-- The generation of the files is done by the depends clause -->
 		<!-- Once the doc files have been generated, do some cleaning up -->
 		<delete dir="${docs.tmp.dir}" />
-	</target>
-	
-	<!-- ==================================================================== -->
-	<!--            Compile the documentation java utils                      -->
-	<!-- ==================================================================== -->
-	
-	<target name="compile.doc.utils" description="Compile Documentation Utils ">
-		<mkdir dir="${docs.java.classes.dir}" />
-		<copy  file="${docs.log4j.properties}" todir="${docs.java.classes.dir}"/>
-		<javac srcdir="${docs.java.dir}" destdir="${docs.java.classes.dir}" includes="**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="docs.utils.classpath" />
-		</javac>
 	</target>
 </project>

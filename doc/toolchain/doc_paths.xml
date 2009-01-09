@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
 
-	<import file="../before_properties.xml"/>
-	
 	<!--  =============================================================== -->
 	<!--                   Doc directories paths                          -->
 	<!--  =============================================================== -->
@@ -11,11 +9,10 @@
 	<property name="docs.tmp.dir"  			value="${docs.dir}/tmp" />
 	<property name="docs.toolchain.dir"		value="${docs.dir}/toolchain" />
 	<property name="docs.xsl.dir"			value="${docs.toolchain.dir}/xsl" />
-	<property name="docs.built.dir"			value="${docs.dir}/built" />
+	<property name="docs.built.dir"                 value="${docs.dir}/built/${doc.name}" />
 	
 	<property name="docs.api.complete.dir"	value="${docs.built.dir}/api_complete" />
 	<property name="docs.api.published.dir"	value="${docs.built.dir}/api_published" />
-	<property name="docs.docbook.dir"		value="${docs.toolchain.dir}/docbook/" />
 	
 	<property name="docs.html.multiple.dir"	value="${docs.built.dir}/multiple_html/" />
 	<property name="docs.html.single.dir"	value="${docs.built.dir}/single_html/" />
@@ -27,20 +24,14 @@
 	
 	
 	
-	<!-- DocBook 
-	<property name="docbook.version" 		value="ns-1.74.0" /> -->
-	<property name="docbook.version" 		value="1.73.2" />	
-	<property name="docs.docbook.dir"		value="${docs.toolchain.dir}/docbook/" />
-	<property name="docs.docbook.lib.dir"	value="${docs.docbook.dir}/extensions/" />
+	<!-- DocBook --> 
+	<property name="docbook.version" 		value="ns-1.74.0" />
+	<property name="docbook.archive"                value="docbook-xsl-${docbook.version}" />
 	<property name="docs.lib.dir"			value="${docs.toolchain.dir}/lib/" />
 
-	<property name="docs.java.dir"			value="${docs.toolchain.dir}/src/" />
-	<property name="docs.java.classes.dir"	value="${docs.toolchain.dir}/classes/" />
-	
 	<path id="docs.utils.classpath">
-		<pathelement location="${docs.java.classes.dir}" />
 		<fileset dir="${docs.lib.dir}">
-			<include name="log4j.jar"/>
+			<include name="**/*.jar"/>
 		</fileset>
 		
 	</path>
@@ -73,7 +64,7 @@
 	
 	
 	<property name="docs.docbook.dtd.name"		value="docbook.dtd" />
-	<property name="docs.docbook.dtd"			value="${docs.docbook.dir}/${docs.docbook.dtd.name}" />
+	<property name="docs.docbook.dtd"			value="${docs.src.dir}/${docs.docbook.dtd.name}" />
 	<!--//FIXME ? for html files this is defined in html.xsl -->
 	<property name="docs.html.css.name"			value="main.css" />
 	
@@ -89,6 +80,6 @@
 
 	
 
-	<import file="../after_properties.xml"/>
+	<import file="../after_properties.xml" optional="true"/>
 	
 </project>

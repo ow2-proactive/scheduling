@@ -15,5 +15,5 @@
     <property name="otherpath3.inclusion" value="./"/>
     <property name="otherpath4.inclusion" value="./"/>
     <property name="otherpath5.inclusion" value="./"/>
-    
+     <import file="toolchain/doc.xml"/>    
 </project>    
