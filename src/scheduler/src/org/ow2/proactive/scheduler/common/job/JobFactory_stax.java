@@ -686,7 +686,15 @@ public class JobFactory_stax extends JobFactory {
                                 path = replace(cursorScript.getAttributeValue(0));
                             }
 
-                            while (cursorScript.next() != XMLEvent.END_ELEMENT);
+                            //go to the next 'arguments' start element or the 'file' end element
+                            while (true) {
+                                int ev = cursorScript.next();
+                                if (((ev == XMLEvent.START_ELEMENT) && cursorScript.getLocalName().equals(
+                                        ELEMENT_SCRIPT_ARGUMENTS)) ||
+                                    (ev == XMLEvent.END_ELEMENT)) {
+                                    break;
+                                }
+                            }
 
                             if (url != null) {
                                 toReturn = new SimpleScript(new URL(url), getArguments(cursorScript));
