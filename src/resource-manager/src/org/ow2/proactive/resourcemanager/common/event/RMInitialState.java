@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 
 
 /**
@@ -58,17 +57,8 @@ import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 @PublicAPI
 public class RMInitialState implements Serializable {
 
-    /** Free Nodes */
-    private ArrayList<RMNodeEvent> freeNodes = new ArrayList<RMNodeEvent>();
-
-    /** busy Nodes */
-    private ArrayList<RMNodeEvent> busyNodes = new ArrayList<RMNodeEvent>();
-
-    /** toRelease Nodes */
-    private ArrayList<RMNodeEvent> toReleaseNodes = new ArrayList<RMNodeEvent>();
-
-    /** down Nodes */
-    private ArrayList<RMNodeEvent> downNodes = new ArrayList<RMNodeEvent>();
+    /** Nodes events */
+    private ArrayList<RMNodeEvent> nodesList = new ArrayList<RMNodeEvent>();
 
     /** Nodes sources AO living in RM */
     private ArrayList<RMNodeSourceEvent> nodeSources = new ArrayList<RMNodeSourceEvent>();
@@ -87,86 +77,17 @@ public class RMInitialState implements Serializable {
      * @param downNodesList RM's down nodes.
      * @param nodeSourcesList RM's node sources list.
      */
-    public RMInitialState(ArrayList<RMNodeEvent> freeNodesList, ArrayList<RMNodeEvent> busyNodesList,
-            ArrayList<RMNodeEvent> toReleaseNodesList, ArrayList<RMNodeEvent> downNodesList,
-            ArrayList<RMNodeSourceEvent> nodeSourcesList) {
-        this.freeNodes = freeNodesList;
-        this.busyNodes = busyNodesList;
-        this.toReleaseNodes = toReleaseNodesList;
-        this.downNodes = downNodesList;
+    public RMInitialState(ArrayList<RMNodeEvent> nodesList, ArrayList<RMNodeSourceEvent> nodeSourcesList) {
+        this.nodesList = nodesList;
         this.nodeSources = nodeSourcesList;
-    }
-
-    /**
-     * set the free nodes list.
-     * @param v the list of free nodes
-     */
-    public void setFreeNodes(ArrayList<RMNodeEvent> v) {
-        this.freeNodes = v;
-    }
-
-    /**
-     * set the busy nodes list.
-     * @param v the list of busy nodes
-     */
-    public void setBusyNodes(ArrayList<RMNodeEvent> v) {
-        this.busyNodes = v;
-    }
-
-    /**
-     * set the free nodes list.
-     * @param v the list of down nodes.
-     */
-    public void setDownNodes(ArrayList<RMNodeEvent> v) {
-        this.downNodes = v;
-    }
-
-    /**
-     * set the 'to be released' nodes list.
-     * @param v the list of free nodes.
-     */
-    public void setToReleaseNodes(ArrayList<RMNodeEvent> v) {
-        this.toReleaseNodes = v;
-    }
-
-    /**
-     * set the {@link NodeSource} objects list.
-     * @param v the list of free nodes.
-     */
-    public void setNodeSource(ArrayList<RMNodeSourceEvent> v) {
-        this.nodeSources = v;
-    }
-
-    /**
-     * Returns the free Nodes list.
-     * @return the free Nodes list.
-     */
-    public ArrayList<RMNodeEvent> getFreeNodes() {
-        return this.freeNodes;
-    }
-
-    /**
-     * Returns the busy Nodes list.
-     * @return the busy Nodes list.
-     */
-    public ArrayList<RMNodeEvent> getBusyNodes() {
-        return this.busyNodes;
-    }
-
-    /**
-     * Returns the down Nodes list.
-     * @return the down Nodes list.
-     */
-    public ArrayList<RMNodeEvent> getDownNodes() {
-        return this.downNodes;
     }
 
     /**
      * Returns the 'to release' Nodes list.
      * @return the 'to release' Nodes list.
      */
-    public ArrayList<RMNodeEvent> getToReleaseNodes() {
-        return this.toReleaseNodes;
+    public ArrayList<RMNodeEvent> getNodesEvents() {
+        return this.nodesList;
     }
 
     /**

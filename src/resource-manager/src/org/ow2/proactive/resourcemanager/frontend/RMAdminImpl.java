@@ -41,7 +41,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -389,16 +388,8 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#getNodesList()
      */
     public List<RMNodeEvent> getNodesList() {
-
-        List<RMNodeEvent> nodesList = new ArrayList<RMNodeEvent>();
-
         RMInitialState state = this.rmcore.getRMInitialState();
-        nodesList.addAll(state.getFreeNodes());
-        nodesList.addAll(state.getBusyNodes());
-        nodesList.addAll(state.getToReleaseNodes());
-        nodesList.addAll(state.getDownNodes());
-
-        return nodesList;
+        return state.getNodesEvents();
     }
 
     /**

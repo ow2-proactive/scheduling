@@ -66,35 +66,6 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 public interface RMNode extends Comparable<RMNode> {
 
     /**
-     * The script has been executed on this node, and the result was negative.
-     */
-    public static final int NOT_VERIFIED_SCRIPT = 0;
-
-    /**
-     * The script has already responded by the negative,
-     * but something has been executed on the node since.
-     */
-    public static final int NO_LONGER_VERIFIED_SCRIPT = 1;
-
-    /**
-     * The script has never been tested on this {@link RMNode}.
-     */
-    public static final int NEVER_TESTED = 2;
-
-    /**
-     * The script is verified on this node,
-     * but something has been executed since the time it has been tested.
-     */
-    public static final int ALREADY_VERIFIED_SCRIPT = 3;
-
-    /**
-     * The script is verified, and nothing
-     * has been executed since the verification.
-     */
-    public static final int VERIFIED_SCRIPT = 4;
-
-    // SCRIPTING
-    /**
      * Execute a {@link SelectionScript} on this {@link RMNode}
      * @param script a selection script to execute.
      * @return the {@link ScriptResult} corresponding to the script execution.
@@ -222,20 +193,6 @@ public interface RMNode extends Comparable<RMNode> {
      * @param nodeSource
      */
     public void setNodeSource(NodeSource nodeSource);
-
-    /**
-     * Memorize a result of a selection script,
-     * node verify conditions of the selection.
-     * @param script script tested.
-     */
-    public void setVerifyingScript(SelectionScript script);
-
-    /**
-     * Memorize a result of a selection script,
-     * node does not verify conditions of the selection.
-     * @param script script tested.
-     */
-    public void setNotVerifyingScript(SelectionScript script);
 
     /**
      *  Builds the RMNodeEvent object for the RMNode

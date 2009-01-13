@@ -83,4 +83,8 @@ public interface RMLoggers {
      */
     static final public String RMLAUNCHER = RESOURCEMANAGER + ".rmlauncher";
 
+    /**
+     * Selection manager logger's name. 
+     */
+    static final public String RMSELECTION = RESOURCEMANAGER + ".rmselection";
 }

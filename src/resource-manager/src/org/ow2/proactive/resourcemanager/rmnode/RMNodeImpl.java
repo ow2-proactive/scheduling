@@ -401,36 +401,6 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * memorize a result of a selection script,
-     * node verify conditions of the selection.
-     * @param script script tested.
-     */
-    public void setVerifyingScript(SelectionScript script) {
-        if (scriptStatus.containsKey(script)) {
-            scriptStatus.remove(script);
-        }
-        scriptStatus.put(script, RMNode.VERIFIED_SCRIPT);
-    }
-
-    /**
-     * memorize a result of a selection script,
-     * node does not verify conditions of the selection.
-     * @param script script tested.
-     */
-    public void setNotVerifyingScript(SelectionScript script) {
-        if (scriptStatus.containsKey(script)) {
-            int status = scriptStatus.remove(script);
-            if (status == RMNode.NOT_VERIFIED_SCRIPT) {
-                scriptStatus.put(script, RMNode.NOT_VERIFIED_SCRIPT);
-            } else {
-                scriptStatus.put(script, RMNode.NO_LONGER_VERIFIED_SCRIPT);
-            }
-        } else {
-            scriptStatus.put(script, RMNode.NOT_VERIFIED_SCRIPT);
-        }
-    }
-
-    /**
      *  build the RMNodeEvent object for the RMNode
      *  @return the RMNodeEvent object related to the RMNode.
      */

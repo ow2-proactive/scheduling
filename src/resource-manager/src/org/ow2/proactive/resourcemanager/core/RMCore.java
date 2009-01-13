@@ -34,11 +34,11 @@ package org.ow2.proactive.resourcemanager.core;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -48,7 +48,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -62,6 +62,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
+import org.ow2.proactive.resourcemanager.common.scripting.ScriptWithResult;
 import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
@@ -77,8 +78,9 @@ import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.p2p.P2PNodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeComparator;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
+import org.ow2.proactive.resourcemanager.selection.ProbablisticSelectionManager;
+import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -152,14 +154,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     /** list of all free nodes */
     private ArrayList<RMNode> freeNodes;
 
-    /** list of all busy nodes */
-    private ArrayList<RMNode> busyNodes;
-
-    /** list of all down nodes */
-    private ArrayList<RMNode> downNodes;
-
-    /** list of all 'to be released' nodes */
-    private ArrayList<RMNode> toBeReleased;
+    private SelectionManager selectionManager;
 
     /** Timeout for selection script result */
     private static final int MAX_VERIF_TIMEOUT = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT
@@ -192,11 +187,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
 
         nodeSources = new HashMap<String, NodeSource>();
         allNodes = new HashMap<String, RMNode>();
-
         freeNodes = new ArrayList<RMNode>();
-        busyNodes = new ArrayList<RMNode>();
-        downNodes = new ArrayList<RMNode>();
-        toBeReleased = new ArrayList<RMNode>();
+        selectionManager = new ProbablisticSelectionManager();
     }
 
     /**
@@ -260,28 +252,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Return true if ns contains the node rmn.
-     * 
-     * @param ns
-     *            a list of nodes
-     * @param rmn
-     *            a RM node
-     * @return true if ns contains the node rmn.
-     */
-    private boolean contains(NodeSet ns, RMNode rmn) {
-        for (Node n : ns) {
-            try {
-                if (n.getNodeInformation().getURL().equals(rmn.getNodeInformation().getURL())) {
-                    return true;
-                }
-            } catch (Exception e) {
-                continue;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Returns a node object to a corresponding URL.
      * 
      * @param url
@@ -304,21 +274,11 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     private void internalSetFree(RMNode rmnode) {
         // the node can only come from a busy state or down state
         assert rmnode.isBusy();
-        assert this.busyNodes.contains(rmnode);
         try {
             rmnode.clean(); // cleaning the node, kill all active objects
-            this.busyNodes.remove(rmnode);
             rmnode.setFree();
             this.freeNodes.add(rmnode);
 
-            // set all dynamic script results to the state of
-            // ALREADY_VERIFIED_SCRIPT
-            Map<SelectionScript, Integer> verifs = rmnode.getScriptStatus();
-            for (Entry<SelectionScript, Integer> entry : verifs.entrySet()) {
-                if (entry.getKey().isDynamic() && (entry.getValue() == RMNode.VERIFIED_SCRIPT)) {
-                    entry.setValue(RMNode.ALREADY_VERIFIED_SCRIPT);
-                }
-            }
             // create the event
             this.monitoring.nodeFreeEvent(rmnode.getNodeEvent());
         } catch (NodeException e) {
@@ -347,7 +307,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             e1.printStackTrace();
         }
         this.freeNodes.remove(rmnode);
-        busyNodes.add(rmnode);
         // create the event
         this.monitoring.nodeBusyEvent(rmnode.getNodeEvent());
     }
@@ -366,9 +325,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         }
         // the node can only come from a busy state
         assert rmnode.isBusy();
-        assert this.busyNodes.contains(rmnode);
-        this.busyNodes.remove(rmnode);
-        this.toBeReleased.add(rmnode);
         try {
             rmnode.setToRelease();
         } catch (NodeException e1) {
@@ -386,10 +342,11 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      */
     private void internalSetDown(RMNode rmnode) {
         logger.info("Down node : " + rmnode.getNodeURL() + ", from Source : " + rmnode.getNodeSourceId());
-        assert (this.busyNodes.contains(rmnode) || this.freeNodes.contains(rmnode) || this.toBeReleased
-                .contains(rmnode));
-        removeFromAllLists(rmnode);
-        this.downNodes.add(rmnode);
+        assert (!rmnode.isDown());
+
+        if (rmnode.isFree()) {
+            freeNodes.remove(rmnode);
+        }
         rmnode.setDown();
         // create the event
         this.monitoring.nodeDownEvent(rmnode.getNodeEvent());
@@ -421,7 +378,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      */
     private void internalRemoveNodeFromCore(RMNode rmnode) {
         // removing the node from the HM list
-        this.removeFromAllLists(rmnode);
+        if (rmnode.isFree()) {
+            freeNodes.remove(rmnode);
+        }
         this.allNodes.remove(rmnode.getNodeURL());
         // create the event
         this.monitoring.nodeRemovedEvent(rmnode.getNodeEvent());
@@ -451,191 +410,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         if (logger.isInfoEnabled()) {
             logger.info("New node added, node ID is : " + rmnode.getNodeURL() + ", node Source : " +
                 nodeSource.getSourceId());
-        }
-    }
-
-    /**
-     * Remove the RMNode object from all the lists it can appears.
-     * 
-     * @param rmnode
-     *            the node to be removed
-     * @return true if the node has been removed form one list, false otherwise
-     */
-    private boolean removeFromAllLists(RMNode rmnode) {
-        boolean free = this.freeNodes.remove(rmnode);
-        boolean busy = this.busyNodes.remove(rmnode);
-        boolean toBeReleased = this.toBeReleased.remove(rmnode);
-        boolean down = this.downNodes.remove(rmnode);
-        return free || busy || toBeReleased || down;
-    }
-
-    /**
-     * Returns free nodes sorted by a SelectionScript test result. Returns free
-     * nodes list in a specific order : - if there is no script to verify, just
-     * return the free nodes ; - if there is a script, tries to give the nodes
-     * in an efficient order : -> First the nodes that verified the script
-     * before ; -> Next, the nodes that haven't been tested ; -> Next, the nodes
-     * that have already verified the script, but no longer ; -> To finish, the
-     * nodes that don't verify the script.
-     * 
-     * @see org.ow2.proactive.resourcemanager.rmnode.RMCoreInterface#getNodesByScript(org.objectweb.proactive.extensions.scheduler.common.scripting.VerifyingScript)
-     */
-    private ArrayList<RMNode> internalGetFreeNodes() {
-        ArrayList<RMNode> result = new ArrayList<RMNode>();
-        result.addAll(this.freeNodes);
-        return result;
-    }
-
-    /**
-     * Selects nodes which verify a static Selection script test. Tries to give
-     * nodes that have already verified selection script. if these nodes are not
-     * enough, launch the Selection script on other free nodes, gather result,
-     * and return at most nb nodes which verify the script.
-     * 
-     * @param nb
-     *            number of of nodes asked
-     * @param selectionScript
-     *            selectionScript that must be verified by nodes
-     * @param nodes
-     *            list of free nodes.
-     * @return NodeSet of nodes verifying the SelectionScript.
-     */
-    private ArrayList<RMNode> selectNodesWithStaticVerifScript(int nb, SelectionScript selectionScript,
-            ArrayList<RMNode> candidateNodes) {
-
-        logger.debug("Searching for " + nb + " nodes  with static verif script on " +
-            this.getSizeListFreeRMNodes() + " free nodes.");
-
-        ArrayList<RMNode> result = new ArrayList<RMNode>();
-        ArrayList<RMNode> nodesToTest = new ArrayList<RMNode>();
-        Collections.sort(candidateNodes, new RMNodeComparator(selectionScript));
-
-        // select nodes where the static script has already been launched and satisfied
-        Iterator<RMNode> it = candidateNodes.iterator();
-        while (it.hasNext() && result.size() < nb) {
-            RMNode node = it.next();
-            if (node.getScriptStatus().containsKey(selectionScript)) {
-                if (node.getScriptStatus().get(selectionScript).equals(RMNode.VERIFIED_SCRIPT)) {
-                    result.add(node);
-                } else if (node.getScriptStatus().get(selectionScript).equals(RMNode.NEVER_TESTED)) {
-                    nodesToTest.add(node);
-                }
-            } else {
-                nodesToTest.add(node);
-            }
-        }
-
-        if (result.size() < nb && nodesToTest.size() > 0) {
-            result.addAll(execSelectionScriptOnNodes(nb - result.size(), nodesToTest, selectionScript));
-        }
-
-        return result;
-    }
-
-    /**
-     * Selects at most nb nodes which verify a dynamic selection script test.
-     * Tries to give nodes that have already verified selection script. if these
-     * nodes are not enough, launch the Selection script on other free nodes,
-     * gather result, and return at most nb nodes which verify the script.
-     * 
-     * @param nb
-     *            number of of nodes asked
-     * @param selectionScript
-     *            selectionScript that must be verified by nodes
-     * @param nodes
-     *            list of free nodes.
-     * @return NodeSet of nodes verifying the SelectionScript.
-     */
-    private ArrayList<RMNode> selectNodesWithDynamicVerifScript(int nb, SelectionScript selectionScript,
-            ArrayList<RMNode> candidateNodes) {
-
-        logger.debug("Searching for " + nb + " nodes  with dynamic verif script on " + candidateNodes.size() +
-            " free nodes.");
-
-        Collections.sort(candidateNodes, new RMNodeComparator(selectionScript));
-        return execSelectionScriptOnNodes(nb, candidateNodes, selectionScript);
-    }
-
-    /**
-     * Launches selection script verifications on a set of nodes, to check node. 
-     * Launches first a 'required' number of execution, if one of these execution
-     * fails or result is a non verifying script, then launches another execution
-     * on one node in target nodes list.  
-     * @param required number of 
-     * @param targetNodesList
-     * @param selectionScript
-     * @return
-     */
-    private ArrayList<RMNode> execSelectionScriptOnNodes(int required, List<RMNode> targetNodesList,
-            SelectionScript selectionScript) {
-
-        ArrayList<RMNode> returnNodes = new ArrayList<RMNode>();
-        ArrayList<RMNode> nodesInTest = new ArrayList<RMNode>();
-        ArrayList<ScriptResult<Boolean>> awaitedResults = new ArrayList<ScriptResult<Boolean>>();
-
-        //launch on a 'required' number of nodes script executions
-        while (nodesInTest.size() < required && !targetNodesList.isEmpty()) {
-            RMNode targetNode = targetNodesList.remove(0);
-            launchScriptExecution(selectionScript, targetNode, nodesInTest, awaitedResults);
-        }
-
-        while (returnNodes.size() < required && (targetNodesList.size() != 0 || nodesInTest.size() != 0)) {
-
-            //get result of one of the executions
-            if (nodesInTest.size() != 0) {
-                try {
-                    int index;
-                    index = PAFuture.waitForAny(awaitedResults, MAX_VERIF_TIMEOUT);
-                    ScriptResult<Boolean> result = awaitedResults.remove(index);
-                    RMNode testedNode = nodesInTest.remove(index);
-                    if (result.errorOccured()) {
-                        //TODO gsigety improve error handling on failed exceptions :
-                        // error due to script itself or Node  itself ?
-                        logger.info("Error occured executing selection script : " +
-                            result.getException().getMessage());
-                    } else if (!result.getResult()) {
-                        testedNode.setNotVerifyingScript(selectionScript);
-                    } else {
-                        //result ok
-                        returnNodes.add(testedNode);
-                        testedNode.setVerifyingScript(selectionScript);
-                    }
-                } catch (ProActiveException e) {
-                    logger.info("time out expired in waiting ends of script executiony on " +
-                        nodesInTest.size() + "nodes : " + e.getMessage());
-                    //these nodes are no suitable
-                    nodesInTest.clear();
-                    awaitedResults.clear();
-                }
-            }
-
-            //launch another script executions if needed and if there are other nodes to test 
-            while (nodesInTest.size() + returnNodes.size() < required && !targetNodesList.isEmpty()) {
-                RMNode targetNode = targetNodesList.remove(0);
-                launchScriptExecution(selectionScript, targetNode, nodesInTest, awaitedResults);
-            }
-        }
-        return returnNodes;
-    }
-
-    private boolean launchScriptExecution(SelectionScript script, RMNode targetNode,
-            ArrayList<RMNode> alreadyLaunchedList, ArrayList<ScriptResult<Boolean>> resultList) {
-
-        ScriptResult<Boolean> scriptResult = targetNode.executeScript(script);
-
-        // if r is not a future, the script has not been executed
-        //TODO check if that code is always needed
-        // because exception in script handler creation/execution
-        // produce an exception in ScriptResult
-        if (MOP.isReifiedObject(scriptResult)) {
-            alreadyLaunchedList.add(targetNode);
-            resultList.add(scriptResult);
-            return true;
-        } else {
-            // script has not been executed on remote host
-            logger.info("Error occured executing verifying script : " +
-                scriptResult.getException().getMessage());
-            return false;
         }
     }
 
@@ -784,21 +558,13 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             // Node sources have already removed the node because they have
             // detected the node down
             if (rmnode.isDown()) {
-                assert this.downNodes.contains(rmnode);
+                assert rmnode.isDown();
                 this.internalRemoveNodeFromCore(rmnode);
-            } else {
-                if (preempt) {
-                    this.allNodes.get(nodeUrl).getNodeSource().nodeRemovalCoreRequest(nodeUrl, true);
-                    internalRemoveNodeFromCore(rmnode);
-                } else {
-                    if (rmnode.isBusy()) {
-                        internalSetToRelease(rmnode);
-                    } else if (rmnode.isFree()) {
-                        // soft removal on a free node => node can be removed now
-                        internalRemoveNodeFromCore(rmnode);
-                        rmnode.getNodeSource().nodeRemovalCoreRequest(nodeUrl, false);
-                    }
-                }
+            } else if (preempt || rmnode.isFree()) {
+                internalRemoveNodeFromCore(rmnode);
+                rmnode.getNodeSource().nodeRemovalCoreRequest(nodeUrl, preempt);
+            } else if (rmnode.isBusy()) {
+                internalSetToRelease(rmnode);
             }
         }
     }
@@ -812,12 +578,13 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         } else if (nodeSources.containsKey(sourceName)) {
             //remove down nodes handled by the source
             //because node source doesn't know anymore its down nodes
-            Iterator<RMNode> it = downNodes.iterator();
+
+            Iterator<RMNode> it = allNodes.values().iterator();
             while (it.hasNext()) {
                 RMNode rmnode = it.next();
-                if (rmnode.getNodeSourceId().equals(sourceName)) {
+                if (rmnode.isDown() && rmnode.getNodeSourceId().equals(sourceName)) {
                     internalRemoveNodeFromCore(rmnode);
-                    it = downNodes.iterator();
+                    it = allNodes.values().iterator();
                 }
             }
             nodeSources.get(sourceName).shutdown(preempt);
@@ -832,15 +599,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     public void shutdown(boolean preempt) {
         this.toShutDown = true;
         this.monitoring.rmShuttingDownEvent(new RMEvent());
-
-        //remove down nodes
-        //because node sources doesn't know anymore down nodes
-        Iterator<RMNode> it = downNodes.iterator();
-        while (it.hasNext()) {
-            RMNode rmnode = it.next();
-            internalRemoveNodeFromCore(rmnode);
-            it = downNodes.iterator();
-        }
 
         for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
             entry.getValue().shutdown(preempt);
@@ -935,46 +693,134 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             return new NodeSet();
         } else {
 
-            ArrayList<RMNode> selectedNodes = new ArrayList<RMNode>();
-            ArrayList<RMNode> candidateNodes = internalGetFreeNodes();
+            logger.info("Number of requested nodes is " + nb.intValue());
+            NodeSet result = new NodeSet();
+            // getting sorted by probability candidates nodes from selection manager
+            Collection<RMNode> candidatesNodes = selectionManager.findAppropriateNodes(selectionScriptList,
+                    freeNodes, exclusion);
+            boolean scriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
 
-            // delete nodes that are in exclusion list.
-            if (exclusion != null && exclusion.size() > 0) {
-                Iterator<RMNode> it = candidateNodes.iterator();
-                while (it.hasNext()) {
-                    RMNode nodeToTest = it.next();
-                    if (contains(exclusion, nodeToTest)) {
-                        candidateNodes.remove(nodeToTest);
-                        it = candidateNodes.iterator();
+            // if no script specified no execution is required
+            // in this case selection manager just return a list of free nodes
+            if (!scriptSpecified) {
+                for (RMNode rmnode : candidatesNodes) {
+                    if (result.size() == nb.intValue()) {
+                        break;
+                    }
+                    try {
+                        internalSetBusy(rmnode);
+                        result.add(rmnode.getNode());
+                    } catch (NodeException e) {
+                        internalSetDown(rmnode);
                     }
                 }
+                return result;
             }
 
-            NodeSet result;
-            // no verifying script
-            if (selectionScriptList == null || selectionScriptList.size() == 0) {
-                logger.debug("Searching for " + nb + " nodes on " + this.getSizeListFreeRMNodes() +
-                    " free nodes.");
-                while (!candidateNodes.isEmpty() && (selectedNodes.size() < nb.intValue())) {
-                    RMNode node = candidateNodes.remove(0);
-                    selectedNodes.add(node);
-                }
+            // scripts were specified
+            // start execution on candidates set until we have enough
+            // candidates or test each node
+            Iterator<RMNode> nodesIterator = candidatesNodes.iterator();
+            HashMap<RMNode, List<ScriptWithResult>> scriptsExecutionResults;
+
+            while (nodesIterator.hasNext() && result.size() < nb.intValue()) {
+                scriptsExecutionResults = executeScripts(selectionScriptList, nodesIterator, nb.intValue() -
+                    result.size());
+                result.addAll(processScriptResults(scriptsExecutionResults));
+            }
+
+            logger.info("Number of found nodes is " + result.size());
+            return result;
+        }
+    }
+
+    /**
+     * Executes set of scripts on "number" nodes.
+     * Returns "future" script results for further analysis.
+     */
+    private HashMap<RMNode, List<ScriptWithResult>> executeScripts(List<SelectionScript> selectionScriptList,
+            Iterator<RMNode> nodesIterator, int number) {
+        HashMap<RMNode, List<ScriptWithResult>> scriptExecutionResults = new HashMap<RMNode, List<ScriptWithResult>>();
+        while (nodesIterator.hasNext() && scriptExecutionResults.keySet().size() < number) {
+            RMNode rmnode = nodesIterator.next();
+            scriptExecutionResults.put(rmnode, executeScripts(rmnode, selectionScriptList));
+        }
+        return scriptExecutionResults;
+    }
+
+    /**
+    * Executes set of scripts on a given node.
+    * Returns "future" script results for further analysis.
+    */
+    private List<ScriptWithResult> executeScripts(RMNode rmnode, List<SelectionScript> selectionScriptList) {
+        List<ScriptWithResult> scriptExecitionResults = new LinkedList<ScriptWithResult>();
+
+        for (SelectionScript script : selectionScriptList) {
+            if (selectionManager.scriptWillPassOnTheNode(script, rmnode)) {
+                // already executed static script
+                logger.info("Skipping script execution " + script.hashCode() + " on node " +
+                    rmnode.getNodeURL());
+                scriptExecitionResults.add(new ScriptWithResult(script, new ScriptResult<Boolean>(true)));
+                continue;
+            }
+
+            logger.info("Executing script " + script.hashCode() + " on node " + rmnode.getNodeURL());
+            ScriptResult<Boolean> scriptResult = rmnode.executeScript(script);
+
+            // if r is not a future, the script has not been executed
+            //TODO check if that code is always needed
+            // because exception in script handler creation/execution
+            // produce an exception in ScriptResult
+            if (MOP.isReifiedObject(scriptResult)) {
+                scriptExecitionResults.add(new ScriptWithResult(script, scriptResult));
             } else {
-                for (SelectionScript selectionScript : selectionScriptList) {
-                    if (selectionScript.isDynamic()) {
-                        selectedNodes = selectNodesWithDynamicVerifScript(nb.intValue(), selectionScript,
-                                candidateNodes);
-                    } else {
-                        selectedNodes = selectNodesWithStaticVerifScript(nb.intValue(), selectionScript,
-                                candidateNodes);
-                    }
-                    candidateNodes = selectedNodes;
+                scriptExecitionResults.add(new ScriptWithResult(script, null));
+                // script has not been executed on remote host
+                logger.info("Error occured executing verifying script : " +
+                    scriptResult.getException().getMessage());
+            }
+        }
+
+        return scriptExecitionResults;
+    }
+
+    /**
+     * Processes script execution results, updating selection manager knowledge base.
+     * Returns a set of selected nodes. 
+     */
+    private NodeSet processScriptResults(HashMap<RMNode, List<ScriptWithResult>> scriptsExecutionResults) {
+
+        // deadline for scripts execution
+        long deadline = System.currentTimeMillis() + MAX_VERIF_TIMEOUT;
+
+        NodeSet result = new NodeSet();
+        for (RMNode rmnode : scriptsExecutionResults.keySet()) {
+            assert (scriptsExecutionResults.containsKey(rmnode));
+
+            // checking whether all scripts are passed or not for the node
+            boolean scriptPassed = true;
+            for (ScriptWithResult swr : scriptsExecutionResults.get(rmnode)) {
+                ScriptResult<Boolean> scriptResult = swr.getScriptResult();
+                try {
+                    // calculating time to wait script result
+                    long timeToWait = deadline - System.currentTimeMillis();
+                    if (timeToWait <= 0)
+                        timeToWait = 1; //ms
+                    PAFuture.waitFor(scriptResult, timeToWait);
+                } catch (ProActiveTimeoutException e) {
+                    // no script result was obtained
+                    logger.info("Time out expired in waiting ends of script execution: " + e.getMessage());
+                    scriptResult = null;
+                }
+
+                // processing script result and updating knowledge base of 
+                // selection manager at the same time. Returns whether node is selected.
+                if (!selectionManager.processScriptResult(swr.getScript(), scriptResult, rmnode)) {
+                    scriptPassed = false;
                 }
             }
 
-            result = new NodeSet();
-            //put nodes in busy state and build the nodeSet to return
-            for (RMNode rmnode : selectedNodes) {
+            if (scriptPassed) {
                 try {
                     internalSetBusy(rmnode);
                     result.add(rmnode.getNode());
@@ -982,8 +828,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                     internalSetDown(rmnode);
                 }
             }
-            return result;
         }
+
+        return result;
     }
 
     /**
@@ -1007,24 +854,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState() {
-        ArrayList<RMNodeEvent> freeNodesList = new ArrayList<RMNodeEvent>();
-        for (RMNode rmnode : this.freeNodes) {
-            freeNodesList.add(rmnode.getNodeEvent());
-        }
-
-        ArrayList<RMNodeEvent> busyNodesList = new ArrayList<RMNodeEvent>();
-        for (RMNode rmnode : this.busyNodes) {
-            busyNodesList.add(rmnode.getNodeEvent());
-        }
-
-        ArrayList<RMNodeEvent> toReleaseNodesList = new ArrayList<RMNodeEvent>();
-        for (RMNode rmnode : this.toBeReleased) {
-            toReleaseNodesList.add(rmnode.getNodeEvent());
-        }
-
-        ArrayList<RMNodeEvent> downNodeslist = new ArrayList<RMNodeEvent>();
-        for (RMNode rmnode : this.downNodes) {
-            downNodeslist.add(rmnode.getNodeEvent());
+        ArrayList<RMNodeEvent> nodesList = new ArrayList<RMNodeEvent>();
+        for (RMNode rmnode : this.allNodes.values()) {
+            nodesList.add(rmnode.getNodeEvent());
         }
 
         ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<RMNodeSourceEvent>();
@@ -1032,8 +864,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             nodeSourcesList.add(s.getSourceEvent());
         }
 
-        return new RMInitialState(freeNodesList, busyNodesList, toReleaseNodesList, downNodeslist,
-            nodeSourcesList);
+        return new RMInitialState(nodesList, nodeSourcesList);
     }
 
     // ----------------------------------------------------------------------

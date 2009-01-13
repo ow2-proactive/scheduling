@@ -87,7 +87,7 @@ public enum PAResourceManagerProperties {
         if (System.getProperty("pa.rm.properties.filepath") != null) {
             propertiesPath = System.getProperty("pa.rm.properties.filepath");
         }
-        if (!new File(propertiesPath).isAbsolute()) {
+        if (!new File(propertiesPath).isAbsolute() && System.getProperty("pa.rm.home") != null) {
             propertiesPath = System.getProperty("pa.rm.home") + File.separator + propertiesPath;
         }
         DEFAULT_PROPERTIES_FILE = propertiesPath;

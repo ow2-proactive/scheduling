@@ -29,11 +29,12 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.rmnode;
+package org.ow2.proactive.resourcemanager.selection;
 
 import java.util.Comparator;
+import java.util.HashMap;
 
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 
 /**
@@ -42,42 +43,25 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
  * This comparator is used to sort a nodes collection according to results
  * of a {@link SelectionScript}.
  *
- * @author The ProActive Team
- * @since ProActive Scheduling 0.9
- *
  */
-public class RMNodeComparator implements Comparator<RMNode> {
-    private SelectionScript script;
+public class NodeProbabilityComparator implements Comparator<RMNode> {
 
-    /**
-     * Create a the comparator object
-     * @param script comparison criteria.
-     */
-    public RMNodeComparator(SelectionScript script) {
-        this.script = script;
+    HashMap<RMNode, Probability> nodes;
+
+    public NodeProbabilityComparator(HashMap<RMNode, Probability> nodes) {
+        this.nodes = nodes;
     }
 
-    /**
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-     * @param o1 an RMNode object
-     * @param o2 an RMNode object
-     * @return an integer, greater than 0 if o2 is more able to verify again the selection
-     * script, or an integer lesser than 0 if o1 is more able to verify again the selection
-     * than o1.
-     */
-    public int compare(RMNode o1, RMNode o2) {
-        int status1 = RMNode.NEVER_TESTED;
+    public int compare(RMNode n1, RMNode n2) {
+        // probabilities are always greater than zero, so diff approach can be used
+        // for numbers which can be negative it won't work
+        double diff = nodes.get(n2).value() - nodes.get(n1).value();
+        if (diff < 0)
+            return -1;
+        else if (diff > 0)
+            return 1;
 
-        if (o1.getScriptStatus().containsKey(script)) {
-            status1 = o1.getScriptStatus().get(script);
-        }
-
-        int status2 = RMNode.NEVER_TESTED;
-
-        if (o2.getScriptStatus().containsKey(script)) {
-            status2 = o2.getScriptStatus().get(script);
-        }
-
-        return status2 - status1;
+        return 0;
     }
+
 }
