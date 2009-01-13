@@ -90,7 +90,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.ADMIN);
 
-    private final static String PATTERNGCMDEPLOYMENT = PAResourceManagerProperties.RM_GCM_DEPLOYMENT_PATTERN_NAME
+    private final static String GCMD_PROPERTY_NAME = PAResourceManagerProperties.RM_GCMD_PATH_PROPERTY_NAME
             .getValueAsString();
 
     private String gcmApplicationFile = PAResourceManagerProperties.RM_GCM_TEMPLATE_APPLICATION_FILE
@@ -133,10 +133,10 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
                             .info("*********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
                                 gcmApplicationFile +
                                 ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
-                } else if (!checkPatternInGCMAppTemplate(gcmApplicationFile, PATTERNGCMDEPLOYMENT)) {
-                    logger.info("*********  ERROR ********** pattern " + PATTERNGCMDEPLOYMENT +
-                        " cannot be found in GCMApplication descriptor template " + gcmApplicationFile +
-                        ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
+                } else if (GCMD_PROPERTY_NAME == null || "".equals(GCMD_PROPERTY_NAME)) {
+                    logger.info("*********  ERROR ********** Java Property used by " + gcmApplicationFile +
+                        ", to specify GCMD deployment file is not defined," +
+                        " Resource Manager will be unable to deploy nodes by GCM Deployment descriptor.");
                 }
             } catch (NodeException e) {
                 e.printStackTrace();
@@ -260,21 +260,14 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
 
         GCMApplication appl = null;
         try {
+
             File gcmDeployment = File.createTempFile("gcmDeployment", "xml");
-
             FileToBytesConverter.convertByteArrayToFile(gcmDeploymentData, gcmDeployment);
+            System.setProperty(GCMD_PROPERTY_NAME, gcmDeployment.getAbsolutePath());
 
-            File gcmApp = File.createTempFile("gcmApplication", "xml");
-            copyFile(new File(gcmApplicationFile), gcmApp);
+            appl = PAGCMDeployment.loadApplicationDescriptor(new File(gcmApplicationFile));
 
-            if (!readReplace(gcmApp.getAbsolutePath(), PATTERNGCMDEPLOYMENT, "\"" +
-                gcmDeployment.getAbsolutePath() + "\"")) {
-                throw new RMException("GCM deployment error, cannot replace pattern " + PATTERNGCMDEPLOYMENT +
-                    "in GCM application Descriptor file used as template : " + gcmApplicationFile);
-            }
-            appl = PAGCMDeployment.loadApplicationDescriptor(gcmApp);
-            //delete the two GCMA and GCMD temp files 
-            gcmApp.delete();
+            //delete gcmd temp file
             gcmDeployment.delete();
 
         } catch (FileNotFoundException e) {
@@ -286,102 +279,6 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
         }
 
         return appl;
-    }
-
-    /**
-     * Check that a string is present in file. Used for create couple GCMA-GCMD
-     * from GCMApplication template used by RMAdmin 
-     * @param fileName string representing the path of file on which the pattern is searched
-     * @param pattern string representing the pattern to find.
-     * @return true if the pattern is present, false otherwise.
-     */
-    private boolean checkPatternInGCMAppTemplate(String fileName, String pattern) {
-        String line;
-        StringBuffer sb = new StringBuffer();
-        int nbLinesRead = 0;
-        try {
-            FileInputStream fis = new FileInputStream(fileName);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-            while ((line = reader.readLine()) != null) {
-                nbLinesRead++;
-                if (line.contains(pattern)) {
-                    return true;
-                }
-                sb.append(line + "\n");
-            }
-            reader.close();
-            BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
-            out.write(sb.toString());
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        return false;
-    }
-
-    /**
-     * replace a string by another into a file.
-     * @param fileName file in which the replacement is attempted
-     * @param oldPattern the string which has to be replaced
-     * @param replPattern the replacement string.
-     * @return true is the replacement succeeded, false otherwise.
-     */
-    private boolean readReplace(String fileName, String oldPattern, String replPattern) {
-        String line;
-        StringBuffer sb = new StringBuffer();
-        int nbLinesRead = 0;
-        try {
-            FileInputStream fis = new FileInputStream(fileName);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-            while ((line = reader.readLine()) != null) {
-                nbLinesRead++;
-                if (line.contains(oldPattern)) {
-                    //transform the replacement pattern with quote replacement
-                    //before performing the replacement
-                    //in order to avoid backslashes problems with windows paths
-                    String quotedReplacement = Matcher.quoteReplacement(replPattern);
-                    line = Pattern.compile(oldPattern).matcher(line).replaceFirst(quotedReplacement);
-                }
-                sb.append(line + "\n");
-            }
-            reader.close();
-            BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
-            out.write(sb.toString());
-            out.close();
-
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Copy a file to another.
-     * @param src source file.
-     * @param dest destination file.
-     * @throws RMException if the copy failed.
-     */
-    private void copyFile(File src, File dest) throws RMException {
-        int bytes_read = 0;
-        byte[] buffer = new byte[1024];
-
-        FileInputStream in;
-        FileOutputStream out;
-        try {
-            in = new FileInputStream(src);
-            out = new FileOutputStream(dest);
-
-            while ((bytes_read = in.read(buffer)) != -1)
-                out.write(buffer, 0, bytes_read);
-            in.close();
-            out.close();
-
-        } catch (FileNotFoundException e) {
-            throw new RMException(e);
-        } catch (IOException e) {
-            throw new RMException(e);
-        }
     }
 
     /**

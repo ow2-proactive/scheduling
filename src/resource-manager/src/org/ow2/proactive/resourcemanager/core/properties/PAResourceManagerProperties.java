@@ -72,7 +72,7 @@ public enum PAResourceManagerProperties {
     /** name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
      * as a place of a GCM deployment file. 
      */
-    RM_GCM_DEPLOYMENT_PATTERN_NAME("pa.rm.gcm.deployment.pattern.name", PAPropertiesType.STRING),
+    RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PAPropertiesType.STRING),
 
     /** Resource Manager home directory */
     RM_HOME("pa.rm.home", PAPropertiesType.STRING);

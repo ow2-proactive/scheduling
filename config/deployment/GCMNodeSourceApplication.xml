@@ -5,6 +5,8 @@
 	
 	<environment>
 		<javaPropertyVariable name="proactive.home" />
+		<!-- this variable will be replaced by a path of a GCMD to deploy, by RMAdmin -->
+		<javaPropertyVariable name="gcmd.file" /> 
 	</environment>
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
@@ -25,7 +27,7 @@
 
 	<resources>
 		<nodeProvider id="workers">
-			<file path="WORKERSDEPLOYMENT"/>
+			<file path="${gcmd.file}"/>
 		</nodeProvider>
 	</resources>
 </GCMApplication>
