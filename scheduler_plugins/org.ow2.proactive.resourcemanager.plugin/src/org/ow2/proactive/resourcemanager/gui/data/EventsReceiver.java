@@ -36,16 +36,8 @@ public class EventsReceiver implements InitActive, RMEventListener {
         for (RMNodeSourceEvent nodeSourceEvent : initialState.getNodeSource()) {
             model.addNodeSource(nodeSourceEvent);
         }
-        for (RMNodeEvent nodeEvent : initialState.getBusyNodes()) {
-            model.addNode(nodeEvent);
-        }
-        for (RMNodeEvent nodeEvent : initialState.getDownNodes()) {
-            model.addNode(nodeEvent);
-        }
-        for (RMNodeEvent nodeEvent : initialState.getFreeNodes()) {
-            model.addNode(nodeEvent);
-        }
-        for (RMNodeEvent nodeEvent : initialState.getToReleaseNodes()) {
+
+        for (RMNodeEvent nodeEvent : initialState.getNodesEvents()) {
             model.addNode(nodeEvent);
         }
 
