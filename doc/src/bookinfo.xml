@@ -6,11 +6,6 @@ and compile/build.xml as the date
 and version is passed as a parameter in the ant task 
 to -->
   
- <!--if you want to change the title in the html version on
- change the subtitle tag in the  xsl/html.xsl
- 
- changing here applies only to the pdf  -->
-  
 
   <author><personname><surname>The OASIS Research Team and ActiveEon Company</surname></personname></author>
 
