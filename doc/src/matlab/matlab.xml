@@ -642,8 +642,9 @@
                 </listitem>
                 <listitem>
                     <para>
-                        Add the scripts contained in PROACTIVE/dev/matlab/embedded to your Matlab path.
+                        Add the scripts contained in <emphasis>SCHEDULER/extensions/matlab/embedded</emphasis> to your Matlab path :
                     </para>
+                    <screen>&gt;&gt; addpath('/mypath-to-scheduler/extensions/matlab/embedded');</screen>
                 </listitem>
                 <listitem>
                     <para>
