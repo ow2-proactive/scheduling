@@ -908,7 +908,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobRunningToFinishedEvent(JobEvent event) {
-    	jobs.get(event.getJobId()).setFinished(true);
+        jobs.get(event.getJobId()).setFinished(true);
         dispatch(SchedulerEvent.JOB_RUNNING_TO_FINISHED, new Class<?>[] { JobEvent.class }, event);
         //stats
         stats.increaseFinishedJobCount(event.getNumberOfFinishedTasks());
@@ -918,8 +918,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobRemoveFinishedEvent(JobEvent event) {
-    	//removing jobs from the global list : this job is no more managed
-    	jobs.remove(event.getJobId());
+        //removing jobs from the global list : this job is no more managed
+        jobs.remove(event.getJobId());
         dispatch(SchedulerEvent.JOB_REMOVE_FINISHED, new Class<?>[] { JobEvent.class }, event);
     }
 

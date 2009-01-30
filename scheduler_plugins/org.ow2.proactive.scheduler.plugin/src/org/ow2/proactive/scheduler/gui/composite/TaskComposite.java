@@ -309,7 +309,8 @@ public class TaskComposite extends Composite {
             if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
                 InternalTask task = job.getHMTasks().get(taskId);
                 // update its tasks informations if task is finished
-                if (task.getStatus() == TaskState.FINISHED || task.getStatus() == TaskState.FAULTY) {
+                if (task.getStatus() == TaskState.FINISHED || task.getStatus() == TaskState.FAULTY ||
+                    task.getStatus() == TaskState.WAITING_ON_ERROR) {
                     TaskResult tr = getTaskResult(job.getId(), taskId);
                     if (tr != null) {
                         if (grapchicalPreview) {

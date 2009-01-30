@@ -1021,6 +1021,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //change status and update GUI
                     descriptor.setStatus(TaskState.WAITING_ON_ERROR);
                     job.newWaitingTask();
+
+                    //store this task result in the job result.
+                    job.getJobResult()
+                            .addTaskResult(descriptor.getName(), res, descriptor.isPreciousResult());
+                    //and to data base
+                    AbstractSchedulerDB.getInstance().addTaskResult(res);
+
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
 
                     //the job is not restarted directly

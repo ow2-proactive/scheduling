@@ -14,7 +14,6 @@ import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
-import org.unicore.resources.Application;
 
 
 public class EventsReceiver implements InitActive, RMEventListener {
