@@ -44,7 +44,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
@@ -75,6 +74,8 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
 
     private ArrayList<TaskEvent> taskRunningToFinishedEvents;
 
+    private ArrayList<TaskEvent> taskWaitingForRestartEvents;
+
     private Vector<String> methodCalls;
 
     private ArrayList<SchedulerEvent> miscEvents;
@@ -87,7 +88,7 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
         jobRunningToFinishedEvents = new ArrayList<JobEvent>();
         jobSubmittedEvents = new ArrayList<Job>();
         jobRemoveFinishedEvents = new ArrayList<JobEvent>();
-
+        taskWaitingForRestartEvents = new ArrayList<TaskEvent>();
         taskPendingToRunningEvents = new ArrayList<TaskEvent>();
         taskRunningToFinishedEvents = new ArrayList<TaskEvent>();
         miscEvents = new ArrayList<SchedulerEvent>();
@@ -201,6 +202,17 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     public ArrayList<JobEvent> cleanNgetjobRemoveFinishedEvents() {
         ArrayList<JobEvent> toReturn = (ArrayList<JobEvent>) this.jobRemoveFinishedEvents.clone();
         this.jobRemoveFinishedEvents.clear();
+        return toReturn;
+    }
+
+    /**
+     * Get and remove the eventual 'job submitted' events received by this monitor.
+     *
+     * @return the eventual 'job submitted' events received by this monitor.
+     */
+    public ArrayList<TaskEvent> cleanNgetTaskWaitingForRestartEvents() {
+        ArrayList<TaskEvent> toReturn = (ArrayList<TaskEvent>) this.taskWaitingForRestartEvents.clone();
+        this.taskWaitingForRestartEvents.clear();
         return toReturn;
     }
 
@@ -357,7 +369,6 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskEvent)
      */
     public void taskWaitingForRestart(TaskEvent event) {
-        // TODO Auto-generated method stub
-
+        taskWaitingForRestartEvents.add(event);
     }
 }

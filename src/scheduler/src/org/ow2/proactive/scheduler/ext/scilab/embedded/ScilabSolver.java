@@ -84,7 +84,7 @@ public class ScilabSolver {
             	Do this for all the results.
              */
 
-            for (Iterator iterator = results.iterator(); iterator.hasNext();) {
+            for (Iterator<SciData> iterator = results.iterator(); iterator.hasNext();) {
                 SciData res = (SciData) iterator.next();
 
                 if (res instanceof SciDoubleMatrix) {

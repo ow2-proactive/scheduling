@@ -32,8 +32,8 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
-import java.io.IOException;
-import java.rmi.AlreadyBoundException;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -43,14 +43,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PALifeCycle;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 
 
 /**
@@ -64,17 +59,11 @@ public class RMStarter {
     /**
      * Log4j logger name.
      */
-    public static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
+    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
 
-    /**
-     * main function
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) {
+    private static Options options = new Options();
 
-        Options options = new Options();
-
+    private static void initOptions() {
         Option help = new Option("h", "help", false, "to display this help");
         help.setArgName("help");
         help.setRequired(false);
@@ -91,92 +80,85 @@ public class RMStarter {
         noDeploy.setArgName("nodeploy");
         noDeploy.setRequired(false);
         options.addOption(noDeploy);
+    }
+
+    private static void displayHelp() {
+        System.out.println("\nLaunch ProActive Resource Manager.");
+        System.out.println("Without arguments, Resource Manager is launched with 4 "
+            + "computing nodes on local machine.\n");
+        new HelpFormatter().printHelp("scheduler", options, true);
+        System.exit(2);
+    }
+
+    /**
+     * main function
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String[] args) {
+
+        initOptions();
 
         Parser parser = new GnuParser();
         CommandLine cmd;
 
         String[] gcmdList = null;
-        boolean displayHelp = false;
-        boolean launchRM = true;
 
         try {
             cmd = parser.parse(options, args);
             if (cmd.hasOption("h")) {
-                displayHelp = true;
-                launchRM = false;
+                displayHelp();
             } else if (cmd.hasOption("d") && cmd.hasOption("n")) {
-                displayHelp = true;
-                launchRM = false;
                 System.out
                         .println("\nError, you cannot specify a deployment (-d|--deploy) and ask to deploy nothing (-n|--nodeply) !");
-            } else {
-                if (cmd.hasOption("d")) {
-                    gcmdList = cmd.getOptionValues("d");
-                    for (String gcmdPath : gcmdList) {
-                        if (!(new File(gcmdPath)).exists()) {
-                            System.out.println("Error, cannot find GCM deployment file " + gcmdPath);
-                            launchRM = false;
-                        }
+                displayHelp();
+            } else if (cmd.hasOption("d")) {
+                // checking that all specified files are exist 
+                gcmdList = cmd.getOptionValues("d");
+                for (String gcmdPath : gcmdList) {
+                    if (!(new File(gcmdPath)).exists()) {
+                        System.out.println("Error, cannot find GCM deployment file " + gcmdPath);
+                        System.exit(2);
                     }
                 }
             }
 
-            if (launchRM) {
-                logger.info("STARTING RESOURCE MANAGER: Press 'e' to shutdown.");
-                RMFactory.startLocal();
-                Thread.sleep(2000);
-                RMAdmin admin = RMFactory.getAdmin();
+            logger.info("STARTING RESOURCE MANAGER: Press 'e' to shutdown.");
 
+            if (cmd.hasOption("n")) {
+                // starting clean resource manager
+                RMFactory.startLocal();
+            } else {
+                Collection<String> deploymentDescriptors = new LinkedList<String>();
                 if (cmd.hasOption("d")) {
                     for (String desc : gcmdList) {
-                        File gcmDeployFile = new File(desc);
-                        admin.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile));
+                        deploymentDescriptors.add(desc);
                     }
-                } else if (!cmd.hasOption("n")) {
+                } else {
                     RMFactory.setOsJavaProperty();
-                    File gcmDeployFile = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                        File.separator + "config/deployment/Local4JVMDeployment.xml");
-                    admin.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile));
-
+                    String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                        File.separator + "config/deployment/Local4JVMDeployment.xml";
+                    deploymentDescriptors.add(gcmDeployFile);
                 }
-
-                //        Vector<String> v = new Vector<String>();
-                //        v.add("//localhost:6444");
-                //        admin.createDynamicNodeSource("P2P", 3, 10000, 50000, v);
-
-                @SuppressWarnings("unused")
-                char typed = 'x';
-                while ((typed = (char) System.in.read()) != 'e') {
-                }
-                try {
-                    RMFactory.getAdmin().shutdown(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    PALifeCycle.exitFailure();
-                }
+                // starting resource manager and deploy given infrastructure
+                RMFactory.startLocal(deploymentDescriptors);
             }
-        } catch (ParseException e1) {
-            displayHelp = true;
-        } catch (NodeException e) {
-            e.printStackTrace();
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (AlreadyBoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (RMException e) {
-            e.printStackTrace();
-        }
 
-        if (displayHelp) {
-            System.out.println("\nLaunch ProActive Resource Manager.");
-            System.out.println("Without arguments, Resource Manager is launched with 4 "
-                + "computing nodes on local machine.\n");
-            new HelpFormatter().printHelp("scheduler", options, true);
+            while (System.in.read() != 'e') {
+                logger.info("Press 'e' to shutdown.");
+            }
+
+            logger.info("Shuting down the resource manager");
+            // shutdown hook of rmcore should deal with node sources
+
+        } catch (ParseException e1) {
+            displayHelp();
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(2);
         }
+
+        System.exit(0);
     }
+
 }

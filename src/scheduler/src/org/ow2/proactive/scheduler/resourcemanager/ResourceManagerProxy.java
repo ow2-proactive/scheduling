@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -50,6 +52,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.scripting.Script;
@@ -61,59 +64,61 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
  * The Resource Manager Proxy provides an interface with the
- * Resource Manager. It connects to RMUser interface,
+ * Resource Manager for Scheduler only. It connects to RMUser interface,
  * and adds the Clean Scripting management.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 public class ResourceManagerProxy implements InitActive, RunActive {
+
     private static final long VERIF_TIMEOUT = 10000;
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.RMPROXY);
     private RMUser user;
     private HashMap<Node, ScriptResult<?>> nodes;
     private boolean running = true;
 
+    private RMAuthentication auth = null;
+
     /** ProActive no Args constructor **/
     public ResourceManagerProxy() {
-    } //proactive no arg constructor
+    }
 
     /** IMProxy constructor.
      *
      * @param user the User interface
+     * @throws LoginException
      */
-    public ResourceManagerProxy(RMUser user) {
-        this.user = user;
+    public ResourceManagerProxy(RMAuthentication auth) {
+        this.auth = auth;
     }
 
     /**
      * Get a IMProxy by its URI (example : "rmi://localhost:1099/" ).
+     * 
      *
-     *
-     * @param uriIM
-     * @return
-     * @throws ActiveObjectCreationException
-     * @throws IOException
-     * @throws NodeException
+     * @param uriIM The URI of the Resource Manager
+     * @return an instance of a Resource Manager proxy connected to the Resource Manager at the given URI
+     * @throws NodeException if the resource manager proxy cannot be created on this node
+     * @throws LoginException if the login or password are not correct
+     * @throws ActiveObjectCreationException if the resource manager proxy cannot be created
      */
-    public static ResourceManagerProxy getProxy(URI uriIM) throws ActiveObjectCreationException, IOException,
-            NodeException {
-        try {
-            String url = uriIM.toString();
-            if (!url.endsWith("/")) {
-                url += "/";
-            }
-            RMUser user = RMConnection.connectAsUser(url + RMConstants.NAME_ACTIVE_OBJECT_RMUSER);
-            return (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class
-                    .getCanonicalName(), new Object[] { user });
-        } catch (RMException e) {
-            throw new ActiveObjectCreationException(e);
+    public static ResourceManagerProxy getProxy(URI uriIM) throws RMException, IOException, NodeException,
+            LoginException, ActiveObjectCreationException {
+        String url = uriIM.toString();
+        if (!url.endsWith("/")) {
+            url += "/";
         }
+
+        RMAuthentication auth = RMConnection.join(url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
+        return (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class.getCanonicalName(),
+                new Object[] { auth });
     }
 
     public StringWrapper echo() {
@@ -126,7 +131,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * Simply free a Node
      * @see RMUser#freeNode(Node)
      *
-     * @param node
+     * @param node the node to free
      */
     public void freeNode(Node node) {
         if (logger.isDebugEnabled()) {
@@ -140,8 +145,8 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * Execute the CleaningScript on the node before freeing it.
      * @see RMUser#freeNode(Node)
      *
-     * @param node
-     * @param CleaningScript
+     * @param node the node to free
+     * @param CleaningScript the cleaning script to apply to this node when freeing
      */
     public void freeNode(Node node, Script<?> cleaningScript) {
         if (node != null) {
@@ -156,13 +161,13 @@ public class ResourceManagerProxy implements InitActive, RunActive {
                         logger.debug("Cleaning Script handled on node" + node.getNodeInformation().getURL());
                     }
                 } catch (ActiveObjectCreationException e) {
-                    // TODO Que faire si noeud mort ?
-                    // CHOIX 1 : on retourne le noeud sans rien faire
+                    // TODO what happen if node is down ?
+                    // CHOICE 1 : return node without doing anything
                     e.printStackTrace();
                     freeNode(node);
                 } catch (NodeException e) {
-                    // TODO Que faire si noeud mort ?
-                    // CHOIX 1 : on retourne le noeud sans rien faire
+                    // TODO what happen if node is down ?
+                    // CHOICE 1 : return node without doing anything
                     e.printStackTrace();
                     freeNode(node);
                 }
@@ -174,7 +179,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * Simply free a NodeSet
      * @see RMUser#freeNodes(NodeSet)
      *
-     * @param nodes
+     * @param nodes the node set to free
      */
     public void freeNodes(NodeSet nodes) {
         if (logger.isDebugEnabled()) {
@@ -188,8 +193,8 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * Execute the cleaningScript on the nodes before freeing them.
      * @see RMUser#freeNodes(NodeSet)
      *
-     * @param nodes
-     * @param cleaningScript
+     * @param nodes the nodeset to free
+     * @param cleaningScript the cleaning script to apply to the freed nodes.
      */
     public void freeNodes(NodeSet nodes, Script<?> cleaningScript) {
         if (cleaningScript == null) {
@@ -220,19 +225,46 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     }
 
     // GET NODES *********************************************
+    /**
+     * Return a number of nodes between 0 and nbNodes matching the given selection script.
+     * 
+     * @param nbNodes the max number of nodes to ask for
+     * @param selectionScript the script that must match the returned resources.
+     * @return A node set that contains between 0 and nbNodes nodes matching the given script.
+     */
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript) {
         return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScript);
     }
 
+    /**
+     * Return a number of nodes between 0 and nbNodes matching the given selection script.
+     * Nodes that are in the exclusion won't be returned.
+     * 
+     * @param nbNodes the max number of nodes to ask for
+     * @param selectionScript the script that must match the returned resources.
+     * @param exclusion the nodes that must not be returned
+     * @return A node set that contains between 0 and nbNodes nodes matching the given script.
+     */
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
         return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScript, exclusion);
     }
 
+    /**
+     * Return the exact number of nodes demanded matching the selection script or nothing (empty nodeset)
+     * if the exact number of nodes has not been found.
+     * 
+     * @param nbNodes the number of nodes to ask for.
+     * @param selectionScript the script that must match the returned resources.
+     * @return the exact number of nodes demanded matching the selection script
+     */
     public NodeSet getExactlyNodes(int nbNodes, SelectionScript selectionScript) {
         return user.getExactlyNodes(new IntWrapper(nbNodes), selectionScript);
     }
 
     // PROXY SPECIFIC METHODS ********************************
+    /**
+     * Shutdown this proxy by disconnecting user connection to the RM.
+     */
     public void shutdownProxy() {
         if (running) {
             NodeSet ns = new NodeSet();
@@ -243,10 +275,24 @@ public class ResourceManagerProxy implements InitActive, RunActive {
             if (logger.isInfoEnabled()) {
                 logger.info("Infrastructure Manager Proxy Stopped");
             }
+
+            user.disconnect();
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+     */
     public void initActivity(Body body) {
+        if (auth != null) {
+            try {
+                user = auth.logAsUser(PASchedulerProperties.RESOURCE_MANAGER_USER.getValueAsString(),
+                        PASchedulerProperties.RESOURCE_MANAGER_PASSWORD.getValueAsString());
+            } catch (LoginException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+
         if (logger.isInfoEnabled()) {
             logger.info("Infrastructure Manager Proxy started");
         }
@@ -254,6 +300,9 @@ public class ResourceManagerProxy implements InitActive, RunActive {
         nodes = new HashMap<Node, ScriptResult<?>>();
     }
 
+    /**
+     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
+     */
     public void runActivity(Body body) {
         Service service = new Service(body);
 
@@ -265,6 +314,9 @@ public class ResourceManagerProxy implements InitActive, RunActive {
         }
     }
 
+    /**
+     * Check the nodes to free and free the one that have to.
+     */
     private void verify() {
         Iterator<Entry<Node, ScriptResult<?>>> iterator = nodes.entrySet().iterator();
         NodeSet ns = new NodeSet();
@@ -288,6 +340,12 @@ public class ResourceManagerProxy implements InitActive, RunActive {
         }
     }
 
+    /**
+     * Free node considered as down.
+     * The given node must be its name as a string.
+     * 
+     * @param nodeName a string that represents the node name to free.
+     */
     public void freeDownNode(String nodeName) {
         //imcore.freeDownNode(nodeName);
     }

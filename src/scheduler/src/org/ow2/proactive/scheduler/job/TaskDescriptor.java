@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.job;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -63,7 +64,7 @@ public class TaskDescriptor implements Serializable {
     private int numberOfUsedNodes;
 
     /** Task user informations */
-    private HashMap<String, String> genericInformations;
+    private Map<String, String> genericInformations;
 
     /** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
     private Vector<TaskDescriptor> parents;
@@ -200,11 +201,11 @@ public class TaskDescriptor implements Serializable {
     }
 
     /**
-     * Return the generic informations has an HashMap.
+     * Return the generic informations has a Map.
      *
-     * @return the generic informations has an HashMap.
+     * @return the generic informations has a Map.
      */
-    public HashMap<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformations() {
         return genericInformations;
     }
 

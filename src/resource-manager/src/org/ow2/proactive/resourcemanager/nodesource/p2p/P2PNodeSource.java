@@ -387,8 +387,8 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive, P2PL
      *            shutting down
      */
     @Override
-    public void shutdown(boolean preempt) {
-        super.shutdown(preempt);
+    public Boolean shutdown(boolean preempt) {
+        return super.shutdown(preempt);
     }
 
     /**

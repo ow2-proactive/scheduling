@@ -41,7 +41,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 

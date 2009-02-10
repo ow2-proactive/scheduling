@@ -32,14 +32,30 @@
 package org.ow2.proactive.scheduler.common.task;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.ManyToAny;
+import org.hibernate.annotations.MetaValue;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.scripting.Script;
 import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
+import org.ow2.proactive.resourcemanager.common.scripting.SimpleScript;
 import org.ow2.proactive.scheduler.common.exception.DependenceFailedException;
-import org.ow2.proactive.scheduler.common.job.GenericInformationsProvider;
 
 
 /**
@@ -60,53 +76,75 @@ import org.ow2.proactive.scheduler.common.job.GenericInformationsProvider;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public abstract class Task extends CommonAttribute implements GenericInformationsProvider {
+@MappedSuperclass
+@Table(name = "TASK")
+@AccessType("field")
+@Proxy(lazy = false)
+public abstract class Task extends CommonAttribute {
 
     /** Number of nodes asked by the user. */
+    @Column(name = "NODES_NEEDED")
     protected int numberOfNodesNeeded = 1;
 
     /** Name of the task. */
+    @Column(name = "NAME")
     protected String name = TaskId.TASK_DEFAULT_NAME;
 
     /** Description of the task. */
+    @Column(name = "DESCRIPTION", columnDefinition = "CLOB")
     protected String description = null;
 
     /** Description of the result of the task */
+    @Column(name = "RESULTPREVIEW", columnDefinition = "CLOB")
     protected String resultPreview;
-
-    /** Task user informations */
-    protected HashMap<String, String> genericInformations = new HashMap<String, String>();
 
     /**
      * selection script : can be launched before getting a node in order to
      * verify some computer specificity.
      */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = SelectionScript.class)
     protected SelectionScript selectionScript;
 
     /**
      * PreScript : can be used to launch script just before the task
      * execution.
      */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
     protected Script<?> preScript;
 
     /**
      * PostScript : can be used to launch script just after the task
      */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
     protected Script<?> postScript;
 
     /**
      * CleaningScript : can be used to launch script just after the task or the postScript (if set)
      * Started even if a problem occurs.
      */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
     protected Script<?> cleaningScript;
 
     /** Tell whether this task has a precious result or not. */
+    @Column(name = "PRECIOUS_RESULT")
     protected boolean preciousResult;
 
     /** List of dependences if necessary. */
-    protected ArrayList<Task> dependences = null;
+    @ManyToAny(metaColumn = @Column(name = "TASK_TYPE", length = 5))
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+            @MetaValue(targetEntity = JavaTask.class, value = "IJT"),
+            @MetaValue(targetEntity = NativeTask.class, value = "INT") })
+    @JoinTable(joinColumns = @JoinColumn(name = "TASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @Cascade(CascadeType.ALL)
+    protected List<Task> dependences = null;
 
     /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
+    @Column(name = "WALLTIME")
     protected long wallTime = 0;
 
     /**
@@ -216,6 +254,10 @@ public abstract class Task extends CommonAttribute implements GenericInformation
      *            the name to set.
      */
     public void setName(String name) {
+        if (name != null && name.length() > 255) {
+            throw new IllegalArgumentException("The name is too long, it must have 255 chars length max : " +
+                name);
+        }
         this.name = name;
     }
 
@@ -306,7 +348,7 @@ public abstract class Task extends CommonAttribute implements GenericInformation
      *
      * @return the the list of dependences of the task.
      */
-    public ArrayList<Task> getDependencesList() {
+    public List<Task> getDependencesList() {
         return dependences;
     }
 
@@ -317,27 +359,6 @@ public abstract class Task extends CommonAttribute implements GenericInformation
      */
     public int getNumberOfNodesNeeded() {
         return numberOfNodesNeeded;
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
-     */
-    public HashMap<String, String> getGenericInformations() {
-        return genericInformations;
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#addGenericInformation(java.lang.String, java.lang.String)
-     */
-    public void addGenericInformation(String key, String genericInformation) {
-        this.genericInformations.put(key, genericInformation);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#setGenericInformations(java.util.HashMap)
-     */
-    public void setGenericInformations(HashMap<String, String> genericInformations) {
-        this.genericInformations = genericInformations;
     }
 
     /**

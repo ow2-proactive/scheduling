@@ -1,15 +1,19 @@
 package org.ow2.proactive.resourcemanager.gui.data;
 
+import javax.security.auth.login.LoginException;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
+import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
@@ -28,7 +32,9 @@ public class RMStore {
 
     /*    public static StatusLineContributionItem statusItem =
      new StatusLineContributionItem("LoggedInStatus");*/
-    private RMAdmin rmAdmin = null;
+    private RMUser loggerUser = null;
+    private boolean isAdmin = false;
+
     private RMMonitoring rmMonitoring = null;
     private EventsReceiver receiver = null;
     private RMModel model = null;
@@ -38,13 +44,36 @@ public class RMStore {
      statusItem.setText("diconnected");
      }*/
 
-    private RMStore(String url) throws RMException {
+    private RMStore(String url, String login, String password, Boolean isAdmin) throws RMException {
         try {
             baseURL = url;
-            if (!url.endsWith("/"))
+            this.isAdmin = isAdmin.booleanValue();
+
+            if (url != null && !url.endsWith("/"))
                 url += "/";
-            rmAdmin = RMConnection.connectAsAdmin(url + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
-            rmMonitoring = RMConnection.connectAsMonitor(url + RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
+
+            RMAuthentication auth = null;
+            try {
+                System.out.println("Joining resource manager on the following url " + url +
+                    RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
+                auth = RMConnection.join(url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
+            } catch (RMException e) {
+                e.printStackTrace();
+                throw new RMException("Resource manager does not exist on the following url: " + url);
+            }
+
+            try {
+                if (isAdmin) {
+                    loggerUser = auth.logAsAdmin(login, password);
+                } else {
+                    loggerUser = auth.logAsUser(login, password);
+                }
+            } catch (LoginException e) {
+                e.printStackTrace();
+                throw new RMException(e.getMessage());
+            }
+
+            rmMonitoring = auth.logAsMonitor();
             RMStore.instance = this;
             model = new RMModel();
             receiver = (EventsReceiver) PAActiveObject.newActive(EventsReceiver.class.getName(),
@@ -63,8 +92,9 @@ public class RMStore {
         }
     }
 
-    public static void newInstance(String url) throws RMException {
-        instance = new RMStore(url);
+    public static void newInstance(String url, String login, String password, Boolean logAsAdmin)
+            throws RMException {
+        instance = new RMStore(url, login, password, logAsAdmin);
     }
 
     public static RMStore getInstance() {
@@ -82,9 +112,22 @@ public class RMStore {
     /**
      * To get the rmAdmin
      * @return the rmAdmin
+     * @throws RMException
      */
-    public RMAdmin getRMAdmin() {
-        return rmAdmin;
+    public RMAdmin getRMAdmin() throws RMException {
+        if (isAdmin && loggerUser != null) {
+            return (RMAdmin) loggerUser;
+        } else {
+            throw new RMException("Only administrators can perform this action");
+        }
+    }
+
+    public RMUser getRMUser() throws RMException {
+        if (loggerUser != null) {
+            return loggerUser;
+        } else {
+            throw new RMException("You are not authenticated");
+        }
     }
 
     /**
@@ -129,7 +172,8 @@ public class RMStore {
         if (StatisticsView.getStatsViewer() != null) {
             StatisticsView.getStatsViewer().setInput(null);
         }
-        rmAdmin = null;
+        loggerUser.disconnect();
+        loggerUser = null;
         rmMonitoring = null;
         model = null;
         baseURL = null;

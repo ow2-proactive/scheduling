@@ -31,27 +31,23 @@
  */
 package functionnaltests;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Properties;
+import java.net.URL;
 
 import org.junit.After;
 import org.junit.Before;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.ow2.proactive.resourcemanager.RMFactory;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
-import org.ow2.proactive.scheduler.core.AdminScheduler;
-import org.ow2.proactive.scheduler.core.db.CreateDataBase;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 
 import functionalTests.FunctionalTest;
 
@@ -66,19 +62,34 @@ import functionalTests.FunctionalTest;
  */
 public class FunctionalTDefaultScheduler extends FunctionalTest {
 
-    protected UserSchedulerInterface schedUserInterface;
-    protected SchedulerAuthenticationInterface schedulerAuth;
+    protected static String defaultDescriptor = FunctionalTDefaultScheduler.class.getResource(
+            "config/GCMNodeSourceDeployment.xml").getPath();
 
-    private static String defaultDescriptor = FunctionalTDefaultScheduler.class.getResource(
-            "GCMNodeSourceDeployment.xml").getPath();
+    protected static URL startForkedSchedulerApplication = FunctionalTDefaultScheduler.class
+            .getResource("/functionnaltests/config/StartForkedSchedulerApplication.xml");
 
-    private static String functionalTestRMProperties = FunctionalTDefaultScheduler.class.getResource(
-            "functionalTRMProperties.ini").getPath();
+    protected static String functionalTestRMProperties = FunctionalTDefaultScheduler.class.getResource(
+            "config/functionalTRMProperties.ini").getPath();
+    protected static String functionalTestSchedulerProperties = FunctionalTDefaultScheduler.class
+            .getResource("config/functionalTSchedulerProperties.ini").getPath();
 
     protected static String schedulerDefaultURL = "//Localhost/" +
         PASchedulerProperties.SCHEDULER_DEFAULT_NAME;
 
-    private static String defaultDBConfigFile = null;
+    public static final String VAR_OS = "os";
+
+    public VariableContractImpl vContract;
+    public GCMApplication gcmad;
+
+    protected SchedulerAuthenticationInterface schedulerAuth;
+    protected UserSchedulerInterface schedUserInterface;
+
+    protected String username = "jl";
+    protected String password = "jl";
+
+    public FunctionalTDefaultScheduler() {
+
+    }
 
     /**
      * Performs all preparatory actions for  a test on ProActive Scheduler :
@@ -90,102 +101,69 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
      */
     @Before
     public void before() throws Exception {
-        PAResourceManagerProperties.updateProperties(functionalTestRMProperties);
-        //Starting a local RM
-        RMFactory.startLocal();
-        RMAdmin admin = RMFactory.getAdmin();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
-
-        RMFactory.setOsJavaProperty();
-        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(defaultDescriptor));
-        admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
-        ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
-            PAProperties.PA_RMI_PORT.getValue() + "/"));
-
-        defaultDBConfigFile = PASchedulerProperties
-                .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_DBCONFIG_FILE.getValueAsString());
-
-        removeDataBase(defaultDBConfigFile);
-        CreateDataBase.createDataBase(defaultDBConfigFile);
-
-        AdminScheduler.createScheduler(rmp, "org.ow2.proactive.scheduler.policy.PriorityPolicy");
-
-        System.out.println("Scheduler successfully created !");
-
-        Thread.sleep(3000);
+        createVContract();
+        startScheduler(false);
     }
 
     /**
-     * End the test.
+     * Start the scheduler using a forked JVM.
      *
-     * @throws Exception if an error occurred
+     * @param startWithDefaultConfiguration true if you want to start the scheduler with the default
+     * 			starting configuration (UPDATE) or false for the test configuration (CREATE-DROP).
+     * @throws Exception
      */
+    private void startScheduler(boolean startWithDefaultConfiguration) throws Exception {
+        GCMVirtualNode vn = gcmad.getVirtualNode("VN");
+        Node node = vn.getANode();
+
+        MyAO myAO = (MyAO) PAActiveObject.newActive(MyAO.class.getName(), null, node);
+        schedulerAuth = myAO.createAndJoinForkedScheduler(startWithDefaultConfiguration);
+
+        schedUserInterface = schedulerAuth.logAsUser(username, password);
+    }
+
+    /**
+     * Restart the scheduler using a forked JVM.
+     *
+     * @param startWithDefaultConfiguration true if you want to start the scheduler with the default
+     * 			starting configuration (UPDATE) or false for the test configuration (CREATE-DROP).
+     * @throws Exception
+     */
+    protected void restartScheduler(boolean startWithDefaultConfiguration) throws Exception {
+        schedulerAuth = null;
+        schedUserInterface = null;
+        createVContract();
+        startScheduler(startWithDefaultConfiguration);
+    }
+
+    private void createVContract() throws Exception {
+        vContract = new VariableContractImpl();
+        vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
+                VariableContractType.DescriptorDefaultVariable);
+        StringBuilder properties = new StringBuilder("-Djava.security.manager");
+        properties.append(" " + PAProperties.PA_HOME.getCmdLine() + PAProperties.PA_HOME.getValue());
+        properties.append(" " + PAProperties.JAVA_SECURITY_POLICY.getCmdLine() +
+            PAProperties.JAVA_SECURITY_POLICY.getValue());
+        properties.append(" " + PAProperties.LOG4J.getCmdLine() + PAProperties.LOG4J.getValue());
+        properties.append(" " + PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
+            PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
+        properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() +
+            PAResourceManagerProperties.RM_HOME.getValueAsString());
+        vContract.setVariableFromProgram("jvmargDefinedByTest", properties.toString(),
+                VariableContractType.DescriptorDefaultVariable);
+        gcmad = PAGCMDeployment.loadApplicationDescriptor(startForkedSchedulerApplication, vContract);
+        gcmad.startDeployment();
+    }
+
     @After
-    public void after() throws Exception {
-        if (defaultDBConfigFile != null) {
-            removeDataBase(defaultDBConfigFile);
+    public void after() {
+        if (gcmad != null) {
+            gcmad.kill();
         }
     }
 
-    /**
-     * Remove the linked database from file system.
-     *
-     * @param configFile the path of the configuration file.
-     */
-    public static void removeDataBase(String configFile) {
-        Properties props = new Properties();
-        BufferedInputStream bis = null;
-
-        try {
-            bis = new BufferedInputStream(new FileInputStream(configFile));
-            props.load(bis);
-            String databasePath = props.getProperty("db_path");
-            String databaseName = props.getProperty("db_name");
-            File dataBaseDir;
-
-            if (databasePath.equals("")) {
-                dataBaseDir = new File(databaseName);
-            } else {
-                dataBaseDir = new File(databasePath + File.separator + databaseName);
-            }
-
-            if (deleteDirectory(dataBaseDir)) {
-                System.out.println("Scheduler database removed");
-            } else {
-                System.out.println("Cannot remove dabase directory : " + dataBaseDir);
-            }
-
-        } catch (FileNotFoundException e) {
-            System.out.println("Cannot find config file : " + configFile + " for Database to remove");
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("Cannot read config file : " + configFile + " for Database to remove");
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Recursively remove the directory of the given path file.
-     *
-     * @param path the directory to remove.
-     * @return true if the directory has been successfully removed.
-     */
-    static public boolean deleteDirectory(File path) {
-        if (path.exists()) {
-            File[] files = path.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    deleteDirectory(files[i]);
-                } else {
-                    files[i].delete();
-                }
-            }
-        }
-        return (path.delete());
+    protected void log(String s) {
+        System.out.println("------------------------------ " + s);
     }
 
 }

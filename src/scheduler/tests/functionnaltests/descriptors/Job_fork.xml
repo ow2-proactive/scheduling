@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="job_fork" priority="normal" cancelJobOnError="false">
+	<variables>
+		<!-- Relative path is from Scheduler root directory for the tests -->
+		<variable name="WORK_DIR" value="jobs_descriptors/job_native_linux"/>
+	</variables>
+	<taskFlow>
+		<task name="Task1">
+			<nativeExecutable>
+				<staticCommand
+					value="${WORK_DIR}/nativTask">
+					<arguments>
+						<argument value="2"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+		<task name="Task2">
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo" fork="true">
+				<parameters>
+					<parameter name="steps" value="20"/>
+					<parameter name="iterations" value="100000000"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task name="Fork1" walltime="5" >
+			<nativeExecutable>
+				<staticCommand
+					value="${WORK_DIR}/nativTask">
+					<arguments>
+						<argument value="2"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+		<!-- walltime automatically fork -->
+		<task name="Fork2" walltime="5" >
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
+				<parameters>
+					<parameter name="steps" value="20"/>
+					<parameter name="iterations" value="100000000"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+	</taskFlow>
+</job>

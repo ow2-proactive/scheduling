@@ -152,4 +152,9 @@ public interface RMUser {
      * @return a state containing some informations about RM activity.
      */
     public RMState getRMState();
+
+    /**
+     * Disconnects from resource manager.
+     */
+    public void disconnect();
 }

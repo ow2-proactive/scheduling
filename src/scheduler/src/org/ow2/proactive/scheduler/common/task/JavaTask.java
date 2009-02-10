@@ -33,10 +33,10 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.task.ForkEnvironment;
 
 
 /**
@@ -54,7 +54,7 @@ public class JavaTask extends Task {
     private String executableClassName = null;
 
     /** Arguments of the task as a map */
-    private Map<String, String> args = new HashMap<String, String>();
+    private Map<String, String> arguments = new HashMap<String, String>();
 
     /** if the task will be executed in a separate JVM */
     private boolean fork;
@@ -84,6 +84,14 @@ public class JavaTask extends Task {
      * @param executableClassName the task Class to set.
      */
     public void setExecutableClassName(String executableClassName) {
+        if (executableClassName == null) {
+            throw new IllegalArgumentException("Executable class name must be set for JavaTask : " +
+                this.name);
+        }
+        if (executableClassName.length() > 255) {
+            throw new IllegalArgumentException(
+                "Class name is too long, it must have 255 chars length max : " + executableClassName);
+        }
         this.executableClassName = executableClassName;
     }
 
@@ -93,7 +101,7 @@ public class JavaTask extends Task {
      * @return the arguments list.
      */
     public Map<String, String> getArguments() {
-        return args;
+        return this.arguments;
     }
 
     /**
@@ -103,7 +111,10 @@ public class JavaTask extends Task {
      * @param value the associated value to add.
      */
     public void addArgument(String name, String value) {
-        args.put(name, value);
+        if (name != null && name.length() > 255) {
+            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + name);
+        }
+        this.arguments.put(name, value);
     }
 
     /**
@@ -137,4 +148,5 @@ public class JavaTask extends Task {
     public void setForkEnvironment(ForkEnvironment forkEnvironment) {
         this.forkEnvironment = forkEnvironment;
     }
+
 }

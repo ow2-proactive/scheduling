@@ -31,6 +31,19 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Proxy;
+import org.hibernate.annotations.Type;
 import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
@@ -42,11 +55,30 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * This class is a container for Native executable. The actual executable is instanciated on the worker node.
  * @author The ProActive Team
  */
+@Entity
+@Table(name = "NATIVE_EXECUTABLE_CONTAINER")
+@AccessType("field")
+@Proxy(lazy = false)
 public class NativeExecutableContainer implements ExecutableContainer {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     // actual executable data
+    @Column(name = "CLASSPATH", columnDefinition = "BLOB")
+    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
     private String[] command;
+
+    // actual generation script
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = GenerationScript.class)
     private GenerationScript generated;
+
+    /** Hibernate default constructor */
+    @SuppressWarnings("unused")
+    private NativeExecutableContainer() {
+    }
 
     /**
      * Create a new container for a native executable.

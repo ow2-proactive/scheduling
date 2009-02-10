@@ -79,12 +79,12 @@ import org.ow2.proactive.resourcemanager.common.scripting.SimpleScript;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.scheduler.Tools;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -381,7 +381,7 @@ public class JobFactory_xpath extends JobFactory {
 
         // JOB EXECUTION ENVIRONMENT
         if (classpathEntries != null && classpathEntries.length != 0) {
-            job.getEnv().setJobClasspath(classpathEntries);
+            job.getEnvironment().setJobClasspath(classpathEntries);
         }
         return createTasks(jobNode, job, xpath);
     }

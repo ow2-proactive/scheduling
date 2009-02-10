@@ -291,7 +291,7 @@ public abstract class TaskLauncher implements InitActive {
         if (res.errorOccured()) {
             System.err.println("Error on pre-script occured : ");
             res.getException().printStackTrace();
-            throw new UserException("PreTask script has failed on the current node");
+            throw new UserException("PreTask script has failed on the current node", res.getException());
         }
     }
 
@@ -310,7 +310,7 @@ public abstract class TaskLauncher implements InitActive {
         if (res.errorOccured()) {
             System.err.println("Error on post-script occured : ");
             res.getException().printStackTrace();
-            throw new UserException("PostTask script has failed on the current node");
+            throw new UserException("PostTask script has failed on the current node", res.getException());
         }
     }
 

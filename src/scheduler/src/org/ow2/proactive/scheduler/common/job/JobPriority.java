@@ -147,4 +147,5 @@ public enum JobPriority implements java.io.Serializable {
 
         return NORMAL;
     }
+
 }

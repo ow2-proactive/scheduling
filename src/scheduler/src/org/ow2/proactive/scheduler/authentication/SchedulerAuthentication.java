@@ -31,11 +31,6 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -43,6 +38,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
@@ -65,18 +61,11 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * @since ProActive Scheduling 0.9
  *
  */
-public class SchedulerAuthentication implements InitActive, SchedulerAuthenticationInterface {
-
-    /** Scheduler logger */
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
+public class SchedulerAuthentication extends AuthenticationImpl implements InitActive,
+        SchedulerAuthenticationInterface {
 
     /** The scheduler front-end connected to this authentication interface */
-    private SchedulerFrontend scheduler;
-
-    /** Active state of the authentication interface :
-     * If false, user can not access the scheduler,
-     * If true user can connect to the scheduler.*/
-    private boolean activated = false;
+    private SchedulerFrontend frontend;
 
     /**
      * ProActive empty constructor.
@@ -88,138 +77,61 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
      * Get a new instance of SchedulerAuthentication according to the given logins file.
      * This will also set java.security.auth.login.config property.
      *
-     * @param scheduler the scheduler front-end on which to connect the user after authentication success.
+     * @param frontend the scheduler front-end on which to connect the user after authentication success.
      */
-    public SchedulerAuthentication(SchedulerFrontend scheduler) {
-        URL jaasConfig = SchedulerAuthentication.class.getResource("jaas.config");
-
-        if (jaasConfig == null) {
-            throw new RuntimeException(
-                "The file 'jaas.config' has not been found and have to be at the following directory :\n"
-                    + "\tclasses/Extensions/org.objectweb.proactive.extensions.security.loginmodule/");
-        }
-        System.setProperty("java.security.auth.login.config", jaasConfig.toString());
-        this.scheduler = scheduler;
+    public SchedulerAuthentication(SchedulerFrontend frontend) {
+        this.frontend = frontend;
     }
 
     /**
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
-        scheduler.connect();
+        this.frontend.connect();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthentication#logAsUser(java.lang.String, java.lang.String)
      */
-    public UserSchedulerInterface logAsUser(String user, String password) throws LoginException,
-            SchedulerException {
+    public UserSchedulerInterface logAsUser(String user, String password) throws LoginException {
 
-        if (user == null | user.equals("")) {
-            throw new LoginException("Bad user name (user is null or empty)");
-        }
+        loginAs("user", new String[] { "user", "admin" }, user, password);
 
-        isStarted();
-
+        UserScheduler us = new UserScheduler();
+        us.schedulerFrontend = this.frontend;
+        //add this user to the scheduler front-end
+        UserIdentificationImpl ident = new UserIdentificationImpl(user);
+        ident.setHostName(getSenderHostName());
         try {
-            // Verify that this user//password can connect to this existing scheduler
-            logger.info(user + " is trying to connect...");
-
-            Map<String, Object> params = new HashMap<String, Object>(4);
-            //user name to check
-            params.put("username", user);
-            //password to check
-            params.put("pw", password);
-            //minimal group membership : user must belong to group user or a group above  
-            params.put("group", "user");
-            //group hierarchy defined for this authentication/permission ( from lowest, 
-            params.put("groupsHierarchy", new String[] { "user", "admin" });
-
-            //Load LoginContext according to login method defined in jaas.config
-            LoginContext lc = new LoginContext(PASchedulerProperties.SCHEDULER_LOGIN_METHOD
-                    .getValueAsString(), new NoCallbackHandler(params));
-
-            lc.login();
-            logger.info("Logging successfull for user : " + user);
-
-            // create user scheduler interface
-            logger.debug("Connecting to the scheduler...");
-
-            UserScheduler us = new UserScheduler();
-            us.schedulerFrontend = scheduler;
-            //add this user to the scheduler front-end
-            UserIdentificationImpl ident = new UserIdentificationImpl(user);
-            ident.setHostName(getSenderHostName());
-            scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
-
-            // return the created interface
-            return us;
-        } catch (LoginException e) {
-            logger.info(e.getMessage());
-            //Nature of exception is hidden for user, we don't want to inform
-            //user about the reason of non authentication
-            throw new LoginException("authentication Failed");
+            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
+        } catch (SchedulerException e) {
+            throw new LoginException(e.getMessage());
         }
+
+        // return the created interface
+        return us;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthentication#logAsAdmin(java.lang.String, java.lang.String)
      */
-    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException,
-            SchedulerException {
+    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException {
 
-        if (user == null | user.equals("")) {
-            throw new LoginException("Bad user name (user is null or empty)");
-        }
+        loginAs("admin", new String[] { "admin" }, user, password);
 
-        isStarted();
-
+        AdminScheduler as = new AdminScheduler();
+        as.schedulerFrontend = this.frontend;
+        //add this user to the scheduler front-end
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, true);
+        ident.setHostName(getSenderHostName());
         try {
-            // Verify that this user//password can connect to this existing scheduler
-            logger.info(user + " is trying to connect as admin...");
-            logger.debug("Checking user name and password...");
-
-            Map<String, Object> params = new HashMap<String, Object>(4);
-            //user name to check
-            params.put("username", user);
-            //password to check
-            params.put("pw", password);
-            //minimal group membership : user must belong to group user or a group above  
-            params.put("group", "admin");
-            //group hierarchy defined for this authentication/permission
-            params.put("groupsHierarchy", new String[] { "admin" });
-
-            //Load LoginContext according to login method defined in jaas.config
-            LoginContext lc = new LoginContext(PASchedulerProperties.SCHEDULER_LOGIN_METHOD
-                    .getValueAsString(), new NoCallbackHandler(params));
-
-            lc.login();
-            logger.info("Logging successfull for admin : " + user);
-            // create user scheduler interface
-            logger.debug("Connecting to the scheduler...");
-
-            AdminScheduler as = new AdminScheduler();
-            as.schedulerFrontend = scheduler;
-            //add this user to the scheduler front-end
-            UserIdentificationImpl ident = new UserIdentificationImpl(user, true);
-            ident.setHostName(getSenderHostName());
-            scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
-
-            // return the created interface
-            return as;
-
-        } catch (LoginException e) {
-            logger.info(e.getMessage());
-            //Nature of exception is hidden for user, we don't want to inform
-            //user about the reason of non authentication
-            throw new LoginException("authentication Failed");
+            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
+        } catch (SchedulerException e) {
+            throw new LoginException(e.getMessage());
         }
-    }
 
-    private void isStarted() throws SchedulerException {
-        if (!activated) {
-            throw new SchedulerException("Scheduler is starting, please try to connect it later !");
-        }
+        // return the created interface
+        return as;
     }
 
     //get the host name of the sender.
@@ -229,22 +141,11 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
         return senderURL;
     }
 
-    /**
-     * Active the scheduler authentication interface.
-     * This method allow user to access the scheduler.
-     */
-    public void activate() {
-        activated = true;
+    public Logger getLogger() {
+        return ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
     }
 
-    /**
-     * Terminate the SchedulerAuthentication active object.
-     * @return always true;
-     */
-    public boolean terminate() {
-        PAActiveObject.terminateActiveObject(false);
-        logger.info("Scheduler authentication is now shutdown !");
-
-        return true;
+    protected String getLoginMethod() {
+        return PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString();
     }
 }

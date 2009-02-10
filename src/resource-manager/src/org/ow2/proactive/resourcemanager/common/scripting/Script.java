@@ -40,12 +40,18 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.net.URL;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
+import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -59,21 +65,30 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @param <E> Template class's type of the result.
  */
 @PublicAPI
+@MappedSuperclass
+@Table(name = "SCRIPT")
+@AccessType("field")
+@Proxy(lazy = false)
 public abstract class Script<E> implements Serializable {
 
     /** Variable name for script arguments */
     public static final String ARGUMENTS_NAME = "args";
 
     /** Name of the script engine */
+    @Column(name = "SCRIPTENGINE")
     protected String scriptEngine = null;
 
     /** The script to evaluate */
+    @Column(name = "SCRIPT", columnDefinition = "CLOB")
     protected String script = null;
 
     /** Id of this script */
+    @Column(name = "SCRIPT_ID", columnDefinition = "CLOB")
     protected String id = null;
 
     /** The parameters of the script */
+    @Column(name = "PARAMETERS", columnDefinition = "BLOB")
+    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
     protected String[] parameters = null;
 
     /** ProActive needed constructor */
@@ -167,6 +182,24 @@ public abstract class Script<E> implements Serializable {
      */
     public Script(Script<?> script2) throws InvalidScriptException {
         this(script2.script, script2.scriptEngine, script2.parameters);
+    }
+
+    /**
+     * Get the script.
+     *
+     * @return the script.
+     */
+    public String getScript() {
+        return script;
+    }
+
+    /**
+     * Get the parameters.
+     *
+     * @return the parameters.
+     */
+    public String[] getParameters() {
+        return parameters;
     }
 
     /**
@@ -278,4 +311,5 @@ public abstract class Script<E> implements Serializable {
 
         return false;
     }
+
 }

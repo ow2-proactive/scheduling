@@ -87,6 +87,7 @@ public interface UserSchedulerInterface_ extends Serializable {
      * @param jobId the job in which the task result is.
      * @param taskName the name of the task in which the result is.
      * @return a job Result containing information about the result.
+     * 		If null is returned, this task is not yet terminated.
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException;

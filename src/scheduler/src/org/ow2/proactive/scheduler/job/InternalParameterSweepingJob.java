@@ -31,6 +31,13 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -43,7 +50,15 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@Entity
+@Table(name = "INTERNAL_PARAMETERSWEEPING_JOB")
+@AccessType("field")
+@Proxy(lazy = false)
 public class InternalParameterSweepingJob extends InternalJob {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /**
      * ProActive empty constructor.

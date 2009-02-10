@@ -32,7 +32,7 @@
 package org.ow2.proactive.scheduler.common.scheduler;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -53,5 +53,5 @@ public interface Stats extends Serializable {
      *
      * @return the properties as an hashMap.
      */
-    public HashMap<String, Object> getProperties();
+    public Map<String, Object> getProperties();
 }

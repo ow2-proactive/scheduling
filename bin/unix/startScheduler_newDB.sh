@@ -1,7 +1,7 @@
 #!/bin/sh
 
 rm -rf SCHEDULER_DB
-./createDataBase.sh ../../config/database/scheduler_db.cfg
+rm derby.log
 
 echo
 echo --- Scheduler----------------------------------------------

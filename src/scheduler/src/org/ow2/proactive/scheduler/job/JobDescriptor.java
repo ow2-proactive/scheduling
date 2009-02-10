@@ -35,6 +35,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -73,19 +75,19 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     protected String projectName = "";
 
     /** Job user informations */
-    private HashMap<String, String> genericInformations;
+    private Map<String, String> genericInformations;
 
     /** List that knows which task has children and which have not */
-    private HashSet<TaskId> hasChildren = new HashSet<TaskId>();
+    private Set<TaskId> hasChildren = new HashSet<TaskId>();
 
     /** Job tasks to be able to be schedule */
-    private HashMap<TaskId, EligibleTaskDescriptor> eligibleTasks = new HashMap<TaskId, EligibleTaskDescriptor>();
+    private Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new HashMap<TaskId, EligibleTaskDescriptor>();
 
     /** Job running tasks */
-    private HashMap<TaskId, TaskDescriptor> runningTasks = new HashMap<TaskId, TaskDescriptor>();
+    private Map<TaskId, TaskDescriptor> runningTasks = new HashMap<TaskId, TaskDescriptor>();
 
     /** Job paused tasks */
-    private HashMap<TaskId, TaskDescriptor> pausedTasks = new HashMap<TaskId, TaskDescriptor>();
+    private Map<TaskId, TaskDescriptor> pausedTasks = new HashMap<TaskId, TaskDescriptor>();
 
     /**
      * Create a new instance of job descriptor using an internal job.
@@ -122,7 +124,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
      * This list represents the ordered TaskDescriptor list of its parent tasks.
      */
     private void makeTree(InternalJob job) {
-        HashMap<InternalTask, TaskDescriptor> mem = new HashMap<InternalTask, TaskDescriptor>();
+        Map<InternalTask, TaskDescriptor> mem = new HashMap<InternalTask, TaskDescriptor>();
 
         //create task descriptor list
         for (InternalTask td : job.getTasks()) {
@@ -226,7 +228,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
      *
      * @param taskState the taskId with their current status.
      */
-    void update(HashMap<TaskId, TaskState> taskState) {
+    void update(Map<TaskId, TaskState> taskState) {
         for (Entry<TaskId, TaskState> tid : taskState.entrySet()) {
             if (tid.getValue() == TaskState.PAUSED) {
                 TaskDescriptor lt = eligibleTasks.get(tid.getKey());
@@ -310,11 +312,11 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     }
 
     /**
-     * Return the generic informations has an HashMap.
+     * Return the generic informations has a Map.
      *
-     * @return the generic informations has an HashMap.
+     * @return the generic informations has a Map.
      */
-    public HashMap<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformations() {
         return genericInformations;
     }
 

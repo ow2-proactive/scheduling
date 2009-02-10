@@ -1,7 +1,9 @@
 package org.ow2.proactive.resourcemanager.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -10,15 +12,14 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
@@ -50,6 +51,11 @@ public class RMController {
         urlOpt.setRequired(false);
         urlOpt.setArgs(1);
         options.addOption(urlOpt);
+
+        Option username = new Option("l", "login", true, "the login");
+        username.setArgName("login");
+        username.setRequired(false);
+        options.addOption(username);
 
         OptionGroup actionGroup = new OptionGroup();
         actionGroup.setRequired(true);
@@ -83,7 +89,7 @@ public class RMController {
         createNSOpt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(createNSOpt);
 
-        Option listNodesOpt = new Option("l", "listNodes", false,
+        Option listNodesOpt = new Option("ln", "listNodes", false,
             "list nodes handled by Resource Manager. Display is :\nNODESOURCE HOSTNAME STATE NODE_URL");
         listNodesOpt.setRequired(true);
         actionGroup.addOption(listNodesOpt);
@@ -122,8 +128,12 @@ public class RMController {
         Parser parser = new GnuParser();
         CommandLine cmd;
         String rmUrl = null;
+        String rmUser = null;
+        String rmPassword = null;
 
         try {
+
+            RMAuthentication auth = null;
 
             cmd = parser.parse(options, args);
             if (cmd.hasOption("h")) {
@@ -132,12 +142,34 @@ public class RMController {
                 new HelpFormatter().printHelp("adminRM", options, true);
                 System.exit(0);
             } else if (!cmd.hasOption("u")) {
-                System.out.println("\n Error, you must specify a Resource Manager URL");
-                System.exit(0);
+                auth = RMConnection.join(null);
+            } else {
+                rmUrl = cmd.getOptionValue("u") + "/";
+                auth = RMConnection.join(rmUrl + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
             }
 
-            rmUrl = cmd.getOptionValue("u") + "/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
-            RMAdmin admin = RMConnection.connectAsAdmin(rmUrl);
+            String pwdMsg = "";
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+            if (cmd.hasOption("l")) {
+                rmUser = cmd.getOptionValue("l");
+                pwdMsg = rmUser + "'s password: ";
+            } else {
+                System.out.print("login: ");
+                rmUser = reader.readLine();
+                pwdMsg = "password: ";
+            }
+
+            //ask password to User         
+            char password[] = null;
+            try {
+                password = PasswordField.getPassword(System.in, pwdMsg);
+                rmPassword = (password == null) ? "" : String.valueOf(password);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+
+            RMAdmin admin = auth.logAsAdmin(rmUser, rmPassword);
 
             if (cmd.hasOption("a")) {
                 String[] nodesURls = cmd.getOptionValues("a");
@@ -209,7 +241,7 @@ public class RMController {
                 boolean preempt = cmd.hasOption("f");
                 admin.shutdown(preempt);
                 logger.info("shutdown request sent to Resource Manager " + rmUrl);
-            } else if (cmd.hasOption("l")) {
+            } else if (cmd.hasOption("ln")) {
 
                 printNodesList(admin.getNodesList());
 
@@ -218,13 +250,7 @@ public class RMController {
                 printNodeSourcesList(admin.getNodeSourcesList());
 
             }
-        } catch (ParseException e) {
-            logger.error(e.getMessage());
-        } catch (RMException e) {
-            logger.error(e.getMessage());
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        } catch (ProActiveException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
 

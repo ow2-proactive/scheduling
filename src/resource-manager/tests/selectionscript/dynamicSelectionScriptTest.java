@@ -91,10 +91,10 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
     @org.junit.Test
     public void action() throws Exception {
 
-        System.out.println("------------------------------ Deployment");
+        log("Deployment");
 
         System.out.println(monitor.echo());
-        System.out.println(user.echo());
+        System.out.println(admin.echo());
 
         RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODE_REMOVED,
                 RMEventType.NODESOURCE_CREATED, RMEventType.NODE_BUSY, RMEventType.NODE_FREE, };
@@ -127,49 +127,49 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
         SelectionScript sScript = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
                 this.vmPropKey, this.vmPropValue }, true);
 
-        System.out.println("------------------------------ Test 1");
+        log("Test 1");
 
-        NodeSet nodes = user.getAtMostNodes(new IntWrapper(1), sScript);
+        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(1), sScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
         //wait for node busy event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == 1);
 
-        user.freeNode(nodes.get(0));
+        admin.freeNode(nodes.get(0));
 
         //wait for node free event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == 1);
 
-        System.out.println("------------------------------ Test 2");
+        log("Test 2");
 
-        nodes = user.getAtMostNodes(new IntWrapper(3), sScript);
+        nodes = admin.getAtMostNodes(new IntWrapper(3), sScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
         //wait for node busy event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == 1);
 
-        user.freeNode(nodes.get(0));
+        admin.freeNode(nodes.get(0));
 
         //wait for node free event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == 1);
 
-        System.out.println("------------------------------ Test 3");
+        log("Test 3");
 
         //add a second with JVM env var
 
@@ -182,25 +182,25 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
 
-        nodes = user.getAtMostNodes(new IntWrapper(3), sScript);
+        nodes = admin.getAtMostNodes(new IntWrapper(3), sScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 2);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         //wait for node busy event
         receiver.waitForNEvent(2);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == 2);
 
-        user.freeNodes(nodes);
+        admin.freeNodes(nodes);
 
         //wait for node free event
         receiver.waitForNEvent(2);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == 2);
 
-        System.out.println("------------------------------ Test 4");
+        log("Test 4");
 
         admin.removeNode(node1URL, true);
         admin.removeNode(node2URL, true);
@@ -209,38 +209,38 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
         receiver.waitForNEvent(2);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 2);
 
-        nodes = user.getAtMostNodes(new IntWrapper(3), sScript);
+        nodes = admin.getAtMostNodes(new IntWrapper(3), sScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 0);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
-        System.out.println("------------------------------ Test 5");
+        log("Test 5");
 
         //create the bad dynamic selection script object
         SelectionScript badScript = new SelectionScript(new File(badSelectionScriptpath), new String[] {},
             true);
 
-        nodes = user.getAtMostNodes(new IntWrapper(3), badScript);
+        nodes = admin.getAtMostNodes(new IntWrapper(3), badScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
         assertTrue(nodes.size() == 0);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
-        System.out.println("------------------------------ Test 6");
+        log("Test 6");
 
         //create the dynamic selection script object that doesn't define 'selected'
         SelectionScript noSelectedScript = new SelectionScript(new File(withoutSelectedSelectionScriptpath),
             new String[] {}, true);
 
-        nodes = user.getAtMostNodes(new IntWrapper(3), noSelectedScript);
+        nodes = admin.getAtMostNodes(new IntWrapper(3), noSelectedScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
         assertTrue(nodes.size() == 0);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
     }
 }

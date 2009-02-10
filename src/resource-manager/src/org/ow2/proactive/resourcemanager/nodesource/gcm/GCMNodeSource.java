@@ -196,12 +196,14 @@ public class GCMNodeSource extends NodeSource {
      * false node source wait end of tasks on its nodes before shutting down.
      */
     @Override
-    public void shutdown(boolean preempt) {
+    public Boolean shutdown(boolean preempt) {
         super.shutdown(preempt);
         if (this.nodes.size() > 0) {
             Iterator<Entry<String, Node>> it = this.nodes.entrySet().iterator();
+
             while (it.hasNext()) {
                 Entry<String, Node> entry = it.next();
+
                 this.rmCore.nodeRemovalNodeSourceRequest(entry.getKey(), preempt);
                 if (preempt) {
                     //preemptive shutdown, kill the node now
@@ -230,6 +232,8 @@ public class GCMNodeSource extends NodeSource {
             //so node source can be stopped and removed immediately
             terminateNodeSourceShutdown();
         }
+
+        return new Boolean(true);
     }
 
     /**

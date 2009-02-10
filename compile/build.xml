@@ -69,9 +69,29 @@
 		Compilation		
 	-->
 
-	<target name="compile.all" depends="compile.scheduler, compile.rm" description="Build all class files (Scheduler + Resource Manager)" />
+	<target name="compile.all" depends="compile.common, compile.scheduler, compile.rm" description="Build all class files (Scheduler + Resource Manager)" />
 
-	<target name="compile.rm" description="Compile all Resource Manager stuffs">
+	 <target name="compile.common" description="Compile commmon stuffs">
+                <mkdir dir="${cl.common}"/>
+	 	
+				<copy toDir="${cl.common}">
+						<fileset dir="${src.common}" excludes="**/*.java"/>
+				</copy>
+
+                <javac
+                        srcdir="${src.common}"
+                        destdir="${cl.common}"
+                        deprecation="on"
+                        source="${source}"
+                        debug="${debug}"  >
+
+                        <classpath refid="common.libs"/>
+                        <include name="**/*.java"/>
+                </javac>
+        </target>
+
+
+	<target name="compile.rm" depends="compile.common" description="Compile all Resource Manager stuffs">
 		<mkdir dir="${cl.rm.dir}"/>
 		<mkdir dir="${cl.rm.tests.dir}"/>
 	
@@ -136,16 +156,16 @@
 			<include name="**/*.java"/>
 		</javac>
 		<javac 
-				srcdir="${src.scheduler.tests.dir}" 
-				destdir="${cl.scheduler.tests.dir}" 
-				deprecation="on" 
-				source="${source}" 
-				debug="${debug}"  >
-			
-				<classpath refid="scheduler.libs"/>
-				<classpath path="${cl.rm.dir}"/>
-				<classpath path="${cl.scheduler.dir}"/>
-				<include name="**/*.java"/>
+			srcdir="${src.scheduler.tests.dir}"
+			destdir="${cl.scheduler.tests.dir}"
+			deprecation="on"
+			source="${source}"
+			debug="${debug}"  >
+
+			<classpath refid="scheduler.libs"/>
+			<classpath path="${cl.rm.dir}"/>
+			<classpath path="${cl.scheduler.dir}"/>
+			<include name="**/*.java"/>
 		</javac>
 		
 		<java classname="${stubgenerator.class}" fork="true">
@@ -174,11 +194,13 @@
 	
 	<target name="deploy.rm" depends="-deployCopy, compile.rm" description="Populate Resourcemanager dist/ with all needed files">
 		<jar destfile="${deploy.lib.dir}/ProActive_resource-manager.jar">
+			<fileset dir="${cl.common}" includes="**" />
 			<fileset dir="${cl.rm.dir}" includes="**" />
         </jar>
 	</target>
 	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler"  description="Populate Scheduler and Resource Manager dist/ with all needed files">
 		<jar destfile="${deploy.lib.dir}/ProActive_scheduler.jar">
+			<fileset dir="${cl.common}" includes="**" />
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
         </jar>
 	</target>
@@ -207,7 +229,7 @@
 				</classpath>
 
 				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
-				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
+				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j" />
 
 				<jvmargs />
 
@@ -346,6 +368,13 @@
 		<delete dir="${test.classes.dir}" />
 		<delete file="tests.log" />
 		<delete dir="${junit.dir}" />
+		<!-- Database generated classes -->
+		<delete file="${base.dir}/derby.log" />
+		<delete dir="${base.dir}/SCHEDULER_DB" />
+		<delete file="${base.dir}/bin/unix/derby.log" />
+		<delete dir="${base.dir}/bin/unix/SCHEDULER_DB" />
+		<delete file="${base.dir}/bin/windows/derby.log" />
+		<delete dir="${base.dir}/bin/windows/SCHEDULER_DB" />
 	</target>
 
 
@@ -374,7 +403,7 @@
 				<include name="org/**/*.xsd" />
 				<include name="org/**/*.png" />
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd" />
-				<include name="org/**/jaas.config" />
+				<include name="common/**/jaas.config" />
 			</fileset>
 		</copy>
 	</target>

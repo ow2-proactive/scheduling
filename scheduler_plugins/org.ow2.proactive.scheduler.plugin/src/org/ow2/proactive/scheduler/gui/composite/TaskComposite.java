@@ -321,7 +321,7 @@ public class TaskComposite extends Composite {
                             resultPreview.putOnTop();
                         }
                     } else {
-                        throw new RuntimeException("Task " + taskId + " is finished but result is null");
+                        throw new RuntimeException("Cannot get the result of Task " + taskId + ".");
                     }
                 } else { //Not available 
                     resultPreview.update(new SimpleTextPanel("No preview is available because the task is " +

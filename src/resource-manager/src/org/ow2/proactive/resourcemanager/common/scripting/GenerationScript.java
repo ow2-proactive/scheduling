@@ -36,10 +36,16 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -50,7 +56,15 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since 3.9
  */
 @PublicAPI
+@Entity
+@Table(name = "GENERATION_SCRIPT")
+@AccessType("field")
+@Proxy(lazy = false)
 public class GenerationScript extends Script<String> {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /**
      * The variable name which must be set after the evaluation

@@ -70,10 +70,10 @@ public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
     @org.junit.Test
     public void action() throws Exception {
 
-        System.out.println("------------------------------ Deployment");
+        log("Deployment");
 
         System.out.println(monitor.echo());
-        System.out.println(user.echo());
+        System.out.println(admin.echo());
 
         RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODESOURCE_CREATED,
                 RMEventType.NODE_BUSY, RMEventType.NODE_DOWN, RMEventType.NODE_FREE,
@@ -93,13 +93,13 @@ public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
         // Book all nodes deployed by descriptor (user action)
         // verify that there are no free nodes left,
         // and remove preemptively a node
-        System.out.println("------------------------------ Test 1");
+        log("Test 1");
 
-        NodeSet nodes = user.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), null);
+        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), null);
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == defaultDescriptorNodesNb);
-        assertTrue(user.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         receiver.waitForNEvent(defaultDescriptorNodesNb);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == defaultDescriptorNodesNb);
@@ -114,36 +114,36 @@ public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
 
         //try to give back removed node => no effect
-        user.freeNode(n1);
+        admin.freeNode(n1);
 
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == 0);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
 
-        user.freeNodes(nodes);
+        admin.freeNodes(nodes);
         receiver.waitForNEvent(defaultDescriptorNodesNb - 1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == defaultDescriptorNodesNb - 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
 
         //---------------------------------------------------------- 
         // and remove preemptively a free node
-        System.out.println("------------------------------ Test 2");
+        log("Test 2");
 
         admin.removeNode(n2.getNodeInformation().getURL(), true);
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 2);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 2);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 2);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 2);
 
         //---------------------------------------------------------- 
         // remove preemptively a toRelease node
-        System.out.println("------------------------------ Test 3");
+        log("Test 3");
 
-        nodes = user.getAtMostNodes(new IntWrapper(2), null);
+        nodes = admin.getAtMostNodes(new IntWrapper(2), null);
 
         PAFuture.waitFor(nodes);
         assertTrue(nodes.size() == 2);
@@ -161,22 +161,22 @@ public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesToReleaseEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 2);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 2);
 
         //finally remove preemptively the node
         admin.removeNode(n3.getNodeInformation().getURL(), true);
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 3);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 3);
 
-        user.freeNodes(nodes);
+        admin.freeNodes(nodes);
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == 1);
 
         //---------------------------------------------------------- 
         // remove preemptively a down node
-        System.out.println("------------------------------ Test 4");
+        log("Test 4");
 
         try {
             n4.getProActiveRuntime().killRT(false);
@@ -188,24 +188,24 @@ public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
         //check that node down event has been thrown
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesdownEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 3);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 3);
 
         admin.removeNode(n4.getNodeInformation().getURL(), true);
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 4);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 4);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 4);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 4);
 
         //---------------------------------------------------------- 
         // and remove preemptively a node not handled by RM
-        System.out.println("------------------------------ Test 5");
+        log("Test 5");
 
         admin.removeNode("rmi://unknown_node", true);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 4);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 4);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb - 4);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 4);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 0);
 
-        System.out.println("------------------------------ end of test");
+        log("end of test");
     }
 }

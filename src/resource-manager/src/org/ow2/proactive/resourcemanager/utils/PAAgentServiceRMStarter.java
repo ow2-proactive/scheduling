@@ -35,10 +35,13 @@ import java.rmi.AlreadyBoundException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.security.auth.login.LoginException;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
@@ -72,18 +75,24 @@ public class PAAgentServiceRMStarter {
      * @param args
      */
     public static void main(String args[]) {
-        if (args.length < 1) {
+        if (args.length < 3) {
             printUsage();
             return;
         }
         String rmHost = args[0];
+        String rmUser = args[1];
+        String rmPassword = args[2];
         PAAgentServiceRMStarter starter = new PAAgentServiceRMStarter();
-        starter.registerInRM(rmHost);
+        try {
+            starter.registerInRM(rmHost, rmUser, rmPassword);
+        } catch (LoginException e) {
+            e.printStackTrace();
+        }
     }
 
     // registers itself in ResourceManager at given URL in parameter
 
-    private void registerInRM(String rmHost) {
+    private void registerInRM(String rmHost, String rmUser, String rmPassword) throws LoginException {
         // create local node
         Node n = null;
         try {
@@ -106,7 +115,9 @@ public class PAAgentServiceRMStarter {
         RMAdmin admin = null;
         while ((!success) && (nbOfRetries <= NB_OF_CONNECT_RETRIES)) {
             try {
-                admin = RMConnection.connectAsAdmin(url);
+                // TODO rewrite it with RMConnection.joinAndWait
+                RMAuthentication auth = RMConnection.join(url);
+                admin = auth.logAsAdmin(rmUser, rmPassword);
                 admin.addNode(n.getNodeInformation().getURL());
                 success = true;
             } catch (RMException e) {
@@ -162,9 +173,7 @@ public class PAAgentServiceRMStarter {
     // prints help
 
     private static void printUsage() {
-        System.out.println("PAAgentServiceRMStarter help. Available parameters are: ");
-        System.out.println("[rm-url]");
-
+        System.out.println("Usage: java PAAgentServiceRMStarter url user password");
     }
 
     class RMPinger implements Runnable {

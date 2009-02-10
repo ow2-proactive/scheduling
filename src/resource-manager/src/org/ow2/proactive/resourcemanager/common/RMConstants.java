@@ -58,6 +58,8 @@ public interface RMConstants {
     /** name of RMMonitoring AO registered in RMI register */
     public static final String NAME_ACTIVE_OBJECT_RMMONITORING = "RMMONITORING";
 
+    public static final String NAME_ACTIVE_OBJECT_RMAUTHENTICATION = "RMAUTHENTICATION";
+
     /** constants for {@link org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource} source type name*/
     public static final String GCM_NODE_SOURCE_TYPE = "GCM_NODE_SOURCE";
 

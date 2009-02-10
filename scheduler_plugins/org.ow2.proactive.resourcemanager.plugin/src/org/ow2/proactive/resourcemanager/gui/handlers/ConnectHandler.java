@@ -34,10 +34,11 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                 .getActiveWorkbenchWindowChecked(event).getShell());
         if (dialogResult != null) {
             try {
-                RMStore.newInstance(dialogResult.getUrl());
+                RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
+                        .getPassword(), dialogResult.isLogAsAdmin());
             } catch (RMException e) {
-                MessageDialog.openError(Display.getDefault().getActiveShell(), "Couldn't connect",
-                        "Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
+                MessageDialog.openError(Display.getDefault().getActiveShell(),
+                        "Couldn't connect to resource manager", e.getMessage());
                 System.out.println(e.getMessage());
             }
         }

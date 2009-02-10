@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="classes/resource-managerTests" path="src/resource-manager/tests"/>
+	<classpathentry kind="src" output="classes/common" path="src/common"/>
 	<classpathentry kind="src" output="classes/resource-manager" path="src/resource-manager/src"/>
 	<classpathentry kind="src" output="classes/scheduler" path="src/scheduler/src"/>
 	<classpathentry kind="src" output="classes/schedulerTests" path="src/scheduler/tests"/>
@@ -99,5 +100,8 @@
 	<classpathentry kind="lib" path="lib/common/jsr173_1.0_api.jar"/>
 	<classpathentry kind="lib" path="lib/common/wstx-lgpl-3.9.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-cli-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/annotation/ejb3-persistence.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/annotation/hibernate-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/core/hibernate-core.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

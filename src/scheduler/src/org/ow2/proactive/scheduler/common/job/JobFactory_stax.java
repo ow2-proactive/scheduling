@@ -41,6 +41,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -58,12 +59,12 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.common.scripting.SimpleScript;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.scheduler.Tools;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -89,6 +90,8 @@ public class JobFactory_stax extends JobFactory {
     public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:dev";
     /** Job prefix. */
     public static final String JOB_PREFIX = "js";
+    /** Variables pattern definition */
+    private static final Pattern variablesPattern = Pattern.compile(".*\\$\\{[^\\}]+\\}.*", Pattern.DOTALL);
 
     //Are define only the needed tags. If more are needed, just create them.
     //JOBS
@@ -292,7 +295,7 @@ public class JobFactory_stax extends JobFactory {
                         } else if (current.equals(JobFactory_stax.ELEMENT_COMMON_GENERIC_INFORMATION)) {
                             jtmp.setGenericInformations(getGenericInformations(cursorJob));
                         } else if (current.equals(JobFactory_stax.ELEMENT_JOB_CLASSPATHES)) {
-                            jtmp.getEnv().setJobClasspath(getClasspath(cursorJob));
+                            jtmp.getEnvironment().setJobClasspath(getClasspath(cursorJob));
                         } else if (current.equals(JobFactory_stax.ELEMENT_COMMON_DESCRIPTION)) {
                             jtmp.setDescription(getDescription(cursorJob));
                         } else if (current.equals(JobFactory_stax.ELEMENT_TASKFLOW)) {
@@ -315,7 +318,7 @@ public class JobFactory_stax extends JobFactory {
             }
             //if this point is reached, fill the real job using the temporary one
             job.setDescription(jtmp.getDescription());
-            job.setEnv(jtmp.getEnv());
+            job.setEnvironment(jtmp.getEnvironment());
             job.setLogFile(jtmp.getLogFile());
             job.setName(jtmp.getName());
             job.setPriority(jtmp.getPriority());
@@ -832,14 +835,17 @@ public class JobFactory_stax extends JobFactory {
                 ;
             ArrayList<String> command = new ArrayList<String>();
             if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_SCRIPT_STATICCOMMAND)) {
-                command.add(replace(cursorExec.getAttributeValue(0)));
+                String[] parsedCommandLine = Tools.parseCommandLine(replace(cursorExec.getAttributeValue(0)));
+                for (String pce : parsedCommandLine) {
+                    command.add(pce);
+                }
                 int eventType;
                 while (cursorExec.hasNext()) {
                     eventType = cursorExec.next();
                     switch (eventType) {
                         case XMLEvent.START_ELEMENT:
                             if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_SCRIPT_ARGUMENT)) {
-                                command.add(" " + replace(cursorExec.getAttributeValue(0)));
+                                command.add(replace(cursorExec.getAttributeValue(0)));
                             }
                             break;
                         case XMLEvent.END_ELEMENT:
@@ -930,8 +936,10 @@ public class JobFactory_stax extends JobFactory {
 
     /**
      * Construct the dependences between tasks.
+     *
+     * @throws JobCreationException if a dependences name is unknown.
      */
-    private void makeDependences() {
+    private void makeDependences() throws JobCreationException {
         if (dependences != null && dependences.size() > 0) {
             if (job.getType() == JobType.TASKSFLOW) {
                 TaskFlowJob tfj = (TaskFlowJob) job;
@@ -939,7 +947,11 @@ public class JobFactory_stax extends JobFactory {
                     ArrayList<String> names = dependences.get(t.getName());
                     if (names != null) {
                         for (String name : names) {
-                            t.addDependence(tfj.getTask(name));
+                            if (tfj.getTask(name) == null) {
+                                throw new JobCreationException("Unknow dependence : " + name);
+                            } else {
+                                t.addDependence(tfj.getTask(name));
+                            }
                         }
                     }
                 }
@@ -956,11 +968,9 @@ public class JobFactory_stax extends JobFactory {
      * @return the string with variables replaced by values.
      */
     private String replace(String str) {
-        //TODO improve this (critical) method ? it is called many time during the parsing.
-        //    	Pattern pattern = Pattern.compile("\\$\\{[^\\}]+\\}",Pattern.CASE_INSENSITIVE);
-        //    	Matcher matcher = pattern.matcher(str);
-        if (!variables.isEmpty() && str.matches(".*\\$\\{[^\\}]+\\}.*")) {
-            for (Entry e : variables.entrySet()) {
+        str = str.trim();
+        if (!variables.isEmpty() && variablesPattern.matcher(str).matches()) {
+            for (Entry<String, String> e : variables.entrySet()) {
                 str = str.replaceAll("\\$\\{" + (String) e.getKey() + "\\}", (String) e.getValue());
             }
         }
@@ -1028,9 +1038,9 @@ public class JobFactory_stax extends JobFactory {
             logger.debug("rtoe : " + job.getRestartTaskOnError());
             logger.debug("mnoe : " + job.getMaxNumberOfExecution());
             logger.debug("cp   : ");
-            if (job.getEnv().getJobClasspath() != null) {
+            if (job.getEnvironment().getJobClasspath() != null) {
                 String cp = "cp   : ";
-                for (String s : job.getEnv().getJobClasspath()) {
+                for (String s : job.getEnvironment().getJobClasspath()) {
                     cp += (s + ":");
                 }
                 logger.debug(cp);

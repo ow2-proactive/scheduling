@@ -31,14 +31,10 @@
  */
 package org.ow2.proactive.scheduler.common.scheduler;
 
-import java.io.IOException;
-import java.io.Serializable;
-
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerLoggers;
@@ -53,46 +49,72 @@ import org.ow2.proactive.scheduler.util.SchedulerLoggers;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public class SchedulerConnection implements Serializable {
+public class SchedulerConnection extends Connection<SchedulerAuthenticationInterface> {
 
-    /** default scheduler node name */
     public static final String SCHEDULER_DEFAULT_NAME = PASchedulerProperties.SCHEDULER_DEFAULT_NAME
             .getValueAsString();
+    private static SchedulerConnection instance;
 
-    /** Scheduler logger */
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
+    private SchedulerConnection() {
+        super(SchedulerAuthenticationInterface.class);
+    }
+
+    public Logger getLogger() {
+        return ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
+    }
+
+    public static synchronized SchedulerConnection getInstance() {
+        if (instance == null) {
+            instance = new SchedulerConnection();
+        }
+        return instance;
+    }
 
     /**
-     * Return the {@link SchedulerAuthenticationInterface} from the specified URL.
-     *
-     * @param schedulerURL the URL of the scheduler to join.
+     * Returns the {@link SchedulerAuthenticationInterface} from the specified
+     * URL. If scheduler is not available or initializing throws an exception.
+     * 
+     * @param url the URL of the scheduler to join.
      * @return the scheduler authentication at the specified URL.
-     * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
+     * @throws SchedulerException
+     *             thrown if the connection to the scheduler cannot be
+     *             established.
      */
-    public static SchedulerAuthenticationInterface join(String schedulerURL) throws SchedulerException {
-        // Get the scheduler authentication at the specified URL
-        SchedulerAuthenticationInterface schedulerAuth = null;
-        logger.info("******************* TRYING TO JOIN EXISTING SCHEDULER *****************");
-
-        if (schedulerURL == null) {
-            logger.info("Scheduler URL was null...");
-            throw new SchedulerException(
-                "Scheduler URL was null, URL is mandatory to join an existing Scheduler\n"
-                    + "\tURL form is : //host:port/SCHEDULER_NAME");
-        }
-
-        logger.debug("Trying to join ProActive Scheduler at '" + schedulerURL + "'");
-
+    public static SchedulerAuthenticationInterface join(String url) throws SchedulerException {
         try {
-            schedulerAuth = (SchedulerAuthenticationInterface) (PAActiveObject.lookupActive(
-                    SchedulerAuthenticationInterface.class.getName(), schedulerURL));
-            return schedulerAuth;
-        } catch (ActiveObjectCreationException e) {
-            throw new SchedulerException("Error while getting scheduler interface !", e);
-        } catch (IOException e) {
-            throw new SchedulerException(
-                "Error while connecting the scheduler ! (Ensure that the Scheduler Name is appended to the URL)",
-                e);
+            return getInstance().connect(url);
+        } catch (Exception e) {
+            throw new SchedulerException(e);
         }
     }
+
+    /**
+     * Connects to the scheduler using given URL. The current thread will be block until
+     * connection established or an error occurs.
+     */
+    public static SchedulerAuthenticationInterface waitAndJoin(String url) throws SchedulerException {
+        return waitAndJoin(url, 0);
+    }
+
+    /**
+     * Connects to the scheduler with a specified timeout value. A timeout of
+     * zero is interpreted as an infinite timeout. The connection will then
+     * block until established or an error occurs.
+     */
+    public static SchedulerAuthenticationInterface waitAndJoin(String url, int timeout)
+            throws SchedulerException {
+        try {
+            return getInstance().waitAndConnect(url, timeout);
+        } catch (Exception e) {
+            throw new SchedulerException(e);
+        }
+    }
+
+    /**
+     * Returns default url of scheduler
+     */
+    public String getDefaultUrl() {
+        return "//localhost/" + SCHEDULER_DEFAULT_NAME;
+    }
+
 }

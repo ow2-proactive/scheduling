@@ -40,7 +40,7 @@
 						<para>
 							<emphasis role="bold">The Authentication interface</emphasis>
 							which is the first object that the user may have to contact. It is in charge of authenticate
-							the user and allowing him access (or not) to the Scheduler. The authentication security system
+							the user and allowing him to access (or not) to the Scheduler. The authentication security system
 							can interact with files or LDAP.
 						</para>
 					</listitem>
@@ -77,48 +77,40 @@
 			<para>
 				First of all, it's good to know that the ProActive Scheduler have to be started with
 				a database that will be used to save scheduling process in case of crash.
-				It allows the ProActive Scheduler to restart with a coherent state.
-				To create a new database, use the "createDataBase.[sh|bat]" script
-				in the "bin/[os]" directory :
+				It allows the ProActive Scheduler to restart with a consistent state.
+				The database is created automatically if it does not exist OR use the existing one if exist.
 				<itemizedlist>
 					<listitem>
 						<para>
-							createDataBase.[sh|bat] ../../config/database/scheduler_db.cfg : this will start the database using
-							the configuration file provide in the config/database directory. Here's an example of configuration file :
+							The database get its properties in the <emphasis>/database/hibernate/hibernate.cfg.xml</emphasis> configuration file.
+							Here's an example of configuration :
 						</para>
 						<programlisting>
-driver=org.apache.derby.jdbc.EmbeddedDriver
-protocol=jdbc:derby:
-db_path=
-db_name=SCHEDULER_DB
-user=scheduler
-password=
+&lt;property name="connection.driver_class"&gt;org.apache.derby.jdbc.EmbeddedDriver&lt;/property&gt;
+&lt;property name="connection.url"&gt;jdbc:derby:SCHEDULER_DB;create=true&lt;/property&gt;
+&lt;property name="connection.username"&gt;scheduler&lt;/property&gt;
+&lt;property name="connection.password"&gt;&lt;/property&gt;
+&lt;!-- SQL dialect  --&gt;
+&lt;property name="dialect"&gt;org.hibernate.dialect.DerbyDialect&lt;/property&gt;
 						</programlisting>
 						<itemizedlist>
 							<listitem><para>
 								The first property defines which driver to use for the current dataBase implementation.
-								The second one is the protocol used for this dataBase. The goal of this two properties is
+								The second one define the protocol, url and name used for this dataBase. The goal of this two properties is
 								to provide a way to change the implementation of the database and its directory. To start the Scheduler
 								with the provided implementation, just don't modify them.</para>
 							</listitem>
 							<listitem><para>
-								<emphasis>db_path</emphasis> is the directory where the database will be stored relative to the directory of
-								the script that will start the dataBase creation.</para>
+								<emphasis>username</emphasis> is the user name authorized to create and manage the database. (default is 'scheduler')</para>
 							</listitem>
 							<listitem><para>
-								<emphasis>db_name</emphasis> is the name of the database.
-								It will be concatenate to the <emphasis>db_path</emphasis> to complete the database URL.</para>
+								<emphasis>password</emphasis> is the password of the authorized user. (default is empty)</para>
 							</listitem>
 							<listitem><para>
-								<emphasis>user</emphasis> is the user name authorized to create and manage the database.</para>
-							</listitem>
-							<listitem><para>
-								<emphasis>password</emphasis> is the password of the authorized user.</para>
+								<emphasis>dialect</emphasis> If you intend to change the database implementation, don't forget to change the dialect
+								to match the given implementation.</para>
 							</listitem>
 						</itemizedlist>
-						<para>
-						For a quick start, just modify the <emphasis>db_path</emphasis> and <emphasis>db_name</emphasis>.
-						</para>
 					</listitem>
 				</itemizedlist>
 			</para>
@@ -176,7 +168,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 				</para>
 				<para>
 					For example, the following line will launch a scheduler on a Resource Manager started on "toto". It will also use 
-					the given scheduling policy :
+					the 'PriorityPolicy' scheduling policy :
 				</para>
 				<itemizedlist>
 					<listitem>
@@ -187,7 +179,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 				</itemizedlist>
 				<para>
 					By default, the "config/authentication/" directory has to contain the two authentication files. (group and login).
-					The "config/database" directory must contain the "scheduler_db.cfg" configuration file.
+					The "config/database/hibernate" directory must contain the "hibernate.cfg.xml" configuration file.
 				</para>
 				<para>
 					It is also possible to launch the ProActive Scheduler with only one of the options or no option. For more
@@ -370,6 +362,8 @@ JobId myJobId = scheduler.submit(job);
 							<para>
 								First of all, a user tries to join the authentication interface using the
 								<emphasis role="bold">SchedulerConnection.join(...)</emphasis> static method.
+								It is also possible to use the SchedulerConnection.waitAndJoin(...) that will join the scheduler and wait
+								for the connection to be established or an error to be raised.
 							</para>
 							<programlisting xml:lang="java">
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER");

@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.common.task.ProActiveTask;
  */
 @PublicAPI
 public class ProActiveJob extends Job {
+
     private ProActiveTask task = null;
 
     /** ProActive Empty Constructor */
@@ -79,6 +80,7 @@ public class ProActiveJob extends Job {
      * @param task the task to set
      */
     public void setTask(ProActiveTask task) {
+        task.setPreciousResult(true);
         this.task = task;
     }
 

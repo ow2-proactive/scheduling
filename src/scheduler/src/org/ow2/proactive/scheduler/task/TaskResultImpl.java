@@ -37,16 +37,36 @@ import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.swing.JPanel;
 
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Any;
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.MetaValue;
+import org.hibernate.annotations.Proxy;
+import org.hibernate.annotations.Type;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.ResultPreview;
+import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.ow2.proactive.scheduler.core.db.annotation.Unloadable;
 
 
 /**
@@ -58,27 +78,62 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleText
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@Entity
+@Table(name = "TASK_RESULT_IMPL")
+@AccessType("field")
+@Proxy(lazy = false)
 public class TaskResultImpl implements TaskResult {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /** The task identification of the result */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskId.class)
     private TaskId id = null;
 
     /** The value of the result if no exception occurred as a byte array */
+    @Unloadable
+    @Column(name = "SERIALIZED_VALUE", updatable = false, columnDefinition = "BLOB")
+    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
     public byte[] serializedValue = null;
     /** The value of the result if no exception occurred */
+    @Transient
     public transient Serializable value = null;
 
-    /** The exception thrown by the task */
+    /** The exception thrown by the task as a byte array */
+    @Unloadable
+    @Column(name = "SERIALIZED_EXCEPTION", updatable = false, columnDefinition = "BLOB")
+    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
     public byte[] serializedException = null;
+    /** The exception thrown by the task */
+    @Transient
     private transient Throwable exception = null;
 
     /** Task output */
+    @Unloadable
+    @Any(fetch = FetchType.EAGER, metaColumn = @Column(name = "OUTPUT_TYPE", updatable = false, length = 5))
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+            @MetaValue(targetEntity = Log4JTaskLogs.class, value = "LTL"),
+            @MetaValue(targetEntity = SimpleTaskLogs.class, value = "STL") })
+    @JoinColumn(name = "OUTPUT_ID", updatable = false)
+    @Cascade(CascadeType.ALL)
     public TaskLogs output = null;
 
     /** Description definition of this result */
+    @Unloadable
+    @Column(name = "PREVIEWER_CLASSNAME", updatable = false)
     private String previewerClassName = null;
+
+    /** An instance that describe how to display the result of this task. */
+    @Transient
     private transient ResultPreview descriptor = null;
+
     // this classpath is used on client side to instantiate the previewer (can be null)
+    @Unloadable
+    @Column(name = "JOB_CLASSPATH", updatable = false, columnDefinition = "BLOB")
+    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
     private String[] jobClasspath;
 
     /** ProActive empty constructor. */
@@ -121,28 +176,6 @@ public class TaskResultImpl implements TaskResult {
             e.printStackTrace();
         }
         this.output = output;
-    }
-
-    /**
-     * <font color='red'>** FOR INTERNAL USE ONLY **</font> - Must be called only by the scheduler to
-     * improve memory usage. This method will removed the value and output of this result.
-     */
-    public void clean() {
-        this.value = null;
-        this.exception = null;
-        this.output = null;
-        this.serializedException = null;
-        this.serializedValue = null;
-    }
-
-    /**
-     * Return true if the result has been stored in database, false if not.
-     * 
-     * @return true if the result has been stored in database, false if not.
-     */
-    public boolean isInDataBase() {
-        return value == null && exception == null && output == null && serializedValue == null &&
-            serializedException == null;
     }
 
     /**
@@ -361,6 +394,51 @@ public class TaskResultImpl implements TaskResult {
         } else {
             return this.getClass().getClassLoader();
         }
+    }
+
+    /**
+     * Get the serializedValue.
+     *
+     * @return the serializedValue.
+     */
+    public byte[] getSerializedValue() {
+        return serializedValue;
+    }
+
+    /**
+     * Get the serializedException.
+     *
+     * @return the serializedException.
+     */
+    public byte[] getSerializedException() {
+        return serializedException;
+    }
+
+    /**
+     * Get the output.
+     *
+     * @return the output.
+     */
+    public TaskLogs getOutput() {
+        return output;
+    }
+
+    /**
+     * Get the previewerClassName.
+     *
+     * @return the previewerClassName.
+     */
+    public String getPreviewerClassName() {
+        return previewerClassName;
+    }
+
+    /**
+     * Get the jobClasspath.
+     *
+     * @return the jobClasspath.
+     */
+    public String[] getJobClasspath() {
+        return jobClasspath;
     }
 
 }

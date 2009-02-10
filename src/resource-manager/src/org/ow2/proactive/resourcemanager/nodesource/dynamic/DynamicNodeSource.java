@@ -173,7 +173,7 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
      * false node source wait end of tasks on its nodes before shutting down
      */
     @Override
-    public void shutdown(boolean preempt) {
+    public Boolean shutdown(boolean preempt) {
         super.shutdown(preempt);
         this.niceTimes.clear();
 
@@ -206,6 +206,8 @@ public abstract class DynamicNodeSource extends NodeSource implements DynamicNod
             //(preemptive shutdown or not) 
             terminateNodeSourceShutdown();
         }
+
+        return new Boolean(true);
     }
 
     /**

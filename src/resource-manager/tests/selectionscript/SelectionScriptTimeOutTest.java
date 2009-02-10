@@ -48,10 +48,10 @@ public class SelectionScriptTimeOutTest extends FunctionalTDefaultRM {
     @org.junit.Test
     public void action() throws Exception {
 
-        System.out.println("------------------------------ Deployment");
+        log("Deployment");
 
         System.out.println(monitor.echo());
-        System.out.println(user.echo());
+        System.out.println(admin.echo());
 
         RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODE_REMOVED,
                 RMEventType.NODESOURCE_CREATED, RMEventType.NODE_BUSY, RMEventType.NODE_FREE, };
@@ -68,18 +68,18 @@ public class SelectionScriptTimeOutTest extends FunctionalTDefaultRM {
 
         int scriptSleepingTime = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt() * 2;
 
-        System.out.println("------------------------------ Test 1");
+        log("Test 1");
 
         //create the static selection script object
         SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath),
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
-        NodeSet nodes = user.getAtMostNodes(new IntWrapper(2), sScript);
+        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(2), sScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 0);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
     }
 }

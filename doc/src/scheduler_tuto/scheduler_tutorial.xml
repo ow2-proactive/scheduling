@@ -655,27 +655,6 @@ public class HelloTask extends JavaExecutable{
 		<literal>//localhost/RMCORE</literal>
 	</para>
 	</section>
-	<section xml:id="launch_database"><info><title>Launching the scheduler dataBase</title></info>
-	<para>
-		The scheduler has to be launched with its dataBase.
-	</para>
-	<para>
-	To start a new dataBase, type in the same directory (on another console):
-	</para>
-	<para>
-	<literal>$ ./createDataBase.sh ../../config/database/scheduler_db.cfg</literal>
-	</para>
-	<para>
-	This script will start a dataBase according to the specified configuration file
-	"scheduler_db.cfg". You will see on the standard output :
-	</para>
-	<para>
-	<literal>	Committed successfully
-				Connection closed
-				Connection closed
-				Database shut down normally</literal>
-	</para>
-	</section>
 	</section>
 	<section xml:id="laucnh_sched"><info><title>Launching the scheduler</title></info>
 		
@@ -693,9 +672,7 @@ public class HelloTask extends JavaExecutable{
 	The "-a auth_path" option specifies where to find the two authentication files "login.cfg" and "group.cfg" that
 	contain informations about who is able to connect the scheduler.
 	By default, it will scan the current directory.
-	The "-c db_config_file.cfg" option specifies the DataBase configuration file to be used by the scheduler.
-	This file must represent a started dataBase. By default it uses the file named "scheduler_db.cfg"
-	in the current directory.
+	
 	When started, you will see on the standard output the line :
 	</para>
 	<para>
@@ -708,7 +685,7 @@ public class HelloTask extends JavaExecutable{
 	Last we submit our hello World example :
 	</para>
 	<para>
-		<literal>$ submit.sh  -j [working_dir]/Job_native.xml -l user1</literal>
+		<literal>$ submit.sh -j [working_dir]/Job_native.xml -l user1</literal>
 	</para>
 	<para>
 		-j option specifies the xml file specififying the job. -l option specifies the username.

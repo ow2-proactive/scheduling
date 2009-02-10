@@ -38,10 +38,18 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
+import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -63,7 +71,15 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@Entity
+@Table(name = "SELECTION_SCRIPT")
+@AccessType("field")
+@Proxy(lazy = false)
 public class SelectionScript extends Script<Boolean> {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /**
      * The variable name which must be set after the evaluation
@@ -72,12 +88,15 @@ public class SelectionScript extends Script<Boolean> {
     public static final String RESULT_VARIABLE = "selected";
 
     /** If true, script result is not cached */
+    @Column(name = "DYNAMIC")
     private boolean dynamic = false;
 
     /**
      * Hash digest of the script
      */
-    protected byte[] id;
+    @Column(name = "S_SCRIPT_ID", columnDefinition = "BLOB")
+    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
+    protected byte[] id_;
 
     /** ProActive needed constructor */
     public SelectionScript() {
@@ -180,10 +199,10 @@ public class SelectionScript extends Script<Boolean> {
         }
 
         try {
-            this.id = MessageDigest.getInstance("SHA-1").digest(stringId.getBytes());
+            this.id_ = MessageDigest.getInstance("SHA-1").digest(stringId.getBytes());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            this.id = stringId.getBytes();
+            this.id_ = stringId.getBytes();
         }
     }
 
@@ -258,7 +277,7 @@ public class SelectionScript extends Script<Boolean> {
         }
 
         if (o instanceof SelectionScript) {
-            return compareByteArray(this.id, ((SelectionScript) o).id);
+            return compareByteArray(this.id_, ((SelectionScript) o).id_);
         }
         return false;
     }
@@ -268,7 +287,7 @@ public class SelectionScript extends Script<Boolean> {
      */
     @Override
     public int hashCode() {
-        return new String(id).hashCode();
+        return new String(id_).hashCode();
     }
 
     /** Compare two arrays of bytes

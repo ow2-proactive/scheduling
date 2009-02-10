@@ -3,7 +3,8 @@
 	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 	name="Job_with_verif" priority="normal">
 	<variables>
-		<variable name="HOME" value="/user/gsigety/home/scheduler_workspace/Scheduler/jobs_descriptors"/>
+		<!-- Path relative to the 'bin/unix' or 'bin/windows' -->
+		<variable name="HOME" value="../../jobs_descriptors"/>
 		<variable name="ECLUSION_STRING" value="paquit"/>
 	</variables>
 	<description>8 parallel tasks with variable durations.

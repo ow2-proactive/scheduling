@@ -34,7 +34,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task8" preciousResult="true" maxNumberOfExecution="4">
+		<task name="task8" preciousResult="true">
 			<!-- Task human description -->
 			<description>This task will sleep 20s</description>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">

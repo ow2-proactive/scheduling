@@ -75,7 +75,19 @@ public enum PAResourceManagerProperties {
     RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PAPropertiesType.STRING),
 
     /** Resource Manager home directory */
-    RM_HOME("pa.rm.home", PAPropertiesType.STRING);
+    RM_HOME("pa.rm.home", PAPropertiesType.STRING),
+
+    /** Resource Manager authentication method */
+    RM_LOGIN_METHOD("pa.rm.authentication.loginMethod", PAPropertiesType.STRING),
+
+    /** Resource Manager ldap configuration file */
+    RM_LDAP_CONFIG("pa.rm.ldap.config.path", PAPropertiesType.STRING),
+
+    /** Resource Manager login file name */
+    RM_LOGIN_FILE("pa.rm.defaultloginfilename", PAPropertiesType.STRING),
+
+    /** Resource Manager group file name */
+    RM_GROUP_FILE("pa.rm.defaultgroupfilename", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -87,8 +99,8 @@ public enum PAResourceManagerProperties {
         if (System.getProperty("pa.rm.properties.filepath") != null) {
             propertiesPath = System.getProperty("pa.rm.properties.filepath");
         }
-        if (!new File(propertiesPath).isAbsolute() && System.getProperty("pa.rm.home") != null) {
-            propertiesPath = System.getProperty("pa.rm.home") + File.separator + propertiesPath;
+        if (!new File(propertiesPath).isAbsolute()) {
+            propertiesPath = System.getProperty(RM_HOME.key) + File.separator + propertiesPath;
         }
         DEFAULT_PROPERTIES_FILE = propertiesPath;
     }
@@ -108,6 +120,25 @@ public enum PAResourceManagerProperties {
     PAResourceManagerProperties(String str, PAPropertiesType type) {
         this.key = str;
         this.type = type;
+    }
+
+    /**
+     * Get the key.
+     *
+     * @return the key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Set a the value of this property to the given one.
+     *
+     * @param value the new value to set.
+     */
+    public void updateProperty(String value) {
+        getProperties();
+        prop.setProperty(key, value);
     }
 
     /**
@@ -158,6 +189,17 @@ public enum PAResourceManagerProperties {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Returns the string to be passed on the command line
+     *
+     * The property surrounded by '-D' and '='
+     *
+     * @return the string to be passed on the command line
+     */
+    public String getCmdLine() {
+        return "-D" + key + '=';
     }
 
     /**

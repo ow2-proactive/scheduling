@@ -83,18 +83,17 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 
         //check arguments...
         if (rm == null) {
-            throw new AdminSchedulerException("The Entity manager must be set !");
+            throw new AdminSchedulerException("The Resource Manager must be set !");
         }
 
-        //check that the scheduler is an active object
+        //check that the RM is an active object
         try {
             PAActiveObject.getActiveObjectNodeUrl(rm);
         } catch (ProActiveRuntimeException e) {
             logger
-                    .warn("The infrastructure manager is not an active object, this will decrease the scheduler performance.");
+                    .warn("The Resource Manager is not an active object, this will decrease the scheduler performance.");
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new AdminSchedulerException("An error has occured trying to access the entity manager " +
+            throw new AdminSchedulerException("An error has occured trying to access the Resource Manager " +
                 e.getMessage());
         }
 
@@ -120,14 +119,15 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
     }
 
     /**
-     * Create a new scheduler at the specified URL plugged on the given resource manager.<br>
-     * This constructor also requires the username//password of the admin to connect.<br>
+     * Create a new scheduler on the local host plugged on the given resource manager.<br>
+     * This constructor also requires the username//password of the admin to connect.<br><br>
      * This will provide a connection interface to allow the access to a restricted number of user.
-     * It will return an admin scheduler able to managed the scheduler.<br>
+     * It will return an admin scheduler able to managed the scheduler.<br><br>
      * <font color="red">WARNING :</font> this method provides a way to connect to the scheduler after its creation,
      * BUT if the scheduler is restarting after failure, this method will create the scheduler
      * but will throw a SchedulerException due to the failure of admin connection.<br>
-     * In fact, while the scheduler is restarting after a crash, no one can connect it during the whole restore process.
+     * In fact, while the scheduler is restarting after a crash, no one can connect it during the whole restore process.<br><br>
+     * The method will block until connection is allowed or error occurred.
      *
      * @param login the admin login.
      * @param password the admin password.
@@ -143,22 +143,10 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             SchedulerException, LoginException {
         createScheduler(rm, policyFullClassName);
 
-        SchedulerAuthenticationInterface auth = SchedulerConnection.join("//localhost/" +
+        SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("//localhost/" +
             PASchedulerProperties.SCHEDULER_DEFAULT_NAME);
 
-        AdminSchedulerInterface adminI = null;
-
-        do {
-            try {
-                Thread.sleep(500);
-                adminI = auth.logAsAdmin(login, password);
-            } catch (LoginException le) {
-                throw le;
-            } catch (Exception e) {
-            }
-        } while (adminI == null);
-
-        return adminI;
+        return auth.logAsAdmin(login, password);
     }
 
     /**

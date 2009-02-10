@@ -34,14 +34,26 @@ package org.ow2.proactive.scheduler.task.internal;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ForkedJavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.task.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 
@@ -53,12 +65,23 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@Entity
+@Table(name = "INTERNAL_JAVA_TASK")
+@AccessType("field")
+@Proxy(lazy = false)
 public class InternalJavaTask extends InternalTask {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /** Whether user wants to execute a task in a separate JVM */
+    @Column(name = "FORK")
     private boolean fork = false;
 
     /** Environment of a new dedicated JVM */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = ForkEnvironment.class)
     private ForkEnvironment forkEnvironment = null;
 
     /**
@@ -73,7 +96,7 @@ public class InternalJavaTask extends InternalTask {
      * @param execContainer the Java Executable Container
      */
     public InternalJavaTask(JavaExecutableContainer execContainer) {
-        this.executableContainer = new ExecutableContainerDataBaseProxy(execContainer, this);
+        this.executableContainer = execContainer;
     }
 
     /**

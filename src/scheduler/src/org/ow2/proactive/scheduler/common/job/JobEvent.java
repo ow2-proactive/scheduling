@@ -32,11 +32,25 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.Map;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.core.db.annotation.Alterable;
 
 
 /**
@@ -50,49 +64,92 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@Entity
+@Table(name = "JOB_EVENT")
+@AccessType("field")
+@Proxy(lazy = false)
 public class JobEvent implements Serializable {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /** job id  : must be initialize to a value in order to create temp taskId */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobId.class)
     private JobId jobId = JobId.makeJobId("0");
 
     /** job submitted time */
+    @Alterable
+    @Column(name = "SUBMIT_TIME")
     private long submittedTime = -1;
 
-    /** job started time : IMPORTANT TO BE SET TO -1 */
+    /** job started time*/
+    //DEFAULT MUST BE -1
+    @Alterable
+    @Column(name = "START_TIME")
     private long startTime = -1;
 
-    /** job finished time : IMPORTANT TO BE SET TO -1 */
+    /** job finished time*/
+    //DEFAULT MUST BE -1
+    @Alterable
+    @Column(name = "FINISHED_TIME")
     private long finishedTime = -1;
 
-    /** job removed time (it means the user got back the result of the job) : IMPORTANT TO BE SET TO -1 */
+    /** job removed time (it means the user got back the result of the job)*/
+    //DEFAULT MUST BE -1
+    @Alterable
+    @Column(name = "REMOVED_TIME")
     private long removedTime = -1;
 
     /** total number of tasks */
+    @Column(name = "NB_TASKS")
+    @Alterable
     private int totalNumberOfTasks = 0;
 
     /** number of pending tasks */
+    @Column(name = "NB_PENDING_TASKS")
+    @Alterable
     private int numberOfPendingTasks = 0;
 
     /** number of running tasks */
+    @Column(name = "NB_RUNNING_TASKS")
+    @Alterable
     private int numberOfRunningTasks = 0;
 
     /** number of finished tasks */
+    @Column(name = "NB_FINISHED_TASKS")
+    @Alterable
     private int numberOfFinishedTasks = 0;
 
     /** job priority */
+    @Column(name = "PRIORITY")
+    @Alterable
     private JobPriority priority = JobPriority.NORMAL;
 
     /** state of the job */
+    @Column(name = "STATE")
+    @Alterable
     private JobState state = JobState.PENDING;
 
     /** to know if the job has to be removed after the fixed admin delay or not */
+    @Column(name = "TO_REMOVE")
+    @Alterable
     private boolean toBeRemoved = false;
 
     /** If this status is not null, it means the tasks have to change their status */
-    private HashMap<TaskId, TaskState> taskStatusModify = null;
+    //not Hibernate informations
+    @Transient
+    private Map<TaskId, TaskState> taskStatusModify = null;
 
     /** If this finished time is not null, it means the tasks have to change their finished time */
-    private HashMap<TaskId, Long> taskFinishedTimeModify = null;
+    //not Hibernate informations
+    @Transient
+    private Map<TaskId, Long> taskFinishedTimeModify = null;
+
+    /** Hibernate default constructor */
+    public JobEvent() {
+    }
 
     /**
      * To get the jobId
@@ -198,7 +255,7 @@ public class JobEvent implements Serializable {
      *
      * @param taskStatusModify the taskStatusModify to set
      */
-    public void setTaskStatusModify(HashMap<TaskId, TaskState> taskStatusModify) {
+    public void setTaskStatusModify(Map<TaskId, TaskState> taskStatusModify) {
         this.taskStatusModify = taskStatusModify;
     }
 
@@ -207,7 +264,7 @@ public class JobEvent implements Serializable {
      *
      * @return the taskStatusModify
      */
-    public HashMap<TaskId, TaskState> getTaskStatusModify() {
+    public Map<TaskId, TaskState> getTaskStatusModify() {
         return taskStatusModify;
     }
 
@@ -216,7 +273,7 @@ public class JobEvent implements Serializable {
      *
      * @param taskFinishedTimeModify the taskStatusModify to set
      */
-    public void setTaskFinishedTimeModify(HashMap<TaskId, Long> taskFinishedTimeModify) {
+    public void setTaskFinishedTimeModify(Map<TaskId, Long> taskFinishedTimeModify) {
         this.taskFinishedTimeModify = taskFinishedTimeModify;
     }
 
@@ -225,7 +282,7 @@ public class JobEvent implements Serializable {
      *
      * @return the taskFinishedTimeModify
      */
-    public HashMap<TaskId, Long> getTaskFinishedTimeModify() {
+    public Map<TaskId, Long> getTaskFinishedTimeModify() {
         return taskFinishedTimeModify;
     }
 

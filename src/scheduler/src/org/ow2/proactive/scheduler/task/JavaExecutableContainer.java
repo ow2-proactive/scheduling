@@ -31,11 +31,29 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -49,22 +67,45 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
  * @see TaskClassServer
  * @author The ProActive Team
  */
+@Entity
+@Table(name = "JAVA_EXECUTABLE_CONTAINER")
+@AccessType("field")
+@Proxy(lazy = false)
 public class JavaExecutableContainer implements ExecutableContainer {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
+    @Column(name = "EXECUTABLE_CLASS")
     private String userExecutableClassName;
-    private Map<String, String> args;
 
-    // lazy instanciated
+    /** Arguments of the task as a map */
+    @OneToMany(cascade = javax.persistence.CascadeType.ALL)
+    @Cascade(CascadeType.ALL)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @JoinTable(name = "JAVA_EXECCONTAINER_ARGUMENTS")
+    private Map<String, BigString> args = new HashMap<String, BigString>();
+
+    // instanciated on demand : not DB managed
+    @Transient
     private JavaExecutable userExecutable;
-    // can be null
+
+    // can be null : not DB managed
+    @Transient
     private TaskClassServer classServer;
+
+    /** Hibernate default constructor */
+    @SuppressWarnings("unused")
+    private JavaExecutableContainer() {
+    }
 
     /**
      * Create a new container for JavaExecutable
      * @param userExecutableClassName the classname of the user defined executable
      * @param args the arguments for Executable.init() method.
      */
-    public JavaExecutableContainer(String userExecutableClassName, Map<String, String> args) {
+    public JavaExecutableContainer(String userExecutableClassName, Map<String, BigString> args) {
         this.userExecutableClassName = userExecutableClassName;
         this.args = args;
     }
@@ -78,9 +119,13 @@ public class JavaExecutableContainer implements ExecutableContainer {
             try {
                 TaskClassLoader tcl = new TaskClassLoader(ClassLoader.getSystemClassLoader(),
                     this.classServer);
-                Class userExecutableClass = tcl.loadClass(this.userExecutableClassName);
+                Class<?> userExecutableClass = tcl.loadClass(this.userExecutableClassName);
                 userExecutable = (JavaExecutable) userExecutableClass.newInstance();
-                userExecutable.setArgs(this.args);
+                Map<String, String> tmp = new HashMap<String, String>();
+                for (Entry<String, BigString> e : this.args.entrySet()) {
+                    tmp.put(e.getKey(), e.getValue().getValue());
+                }
+                userExecutable.setArgs(tmp);
             } catch (Throwable e) {
                 throw new ExecutableCreationException("Unable to instanciate JavaExecutable : " + e);
             }

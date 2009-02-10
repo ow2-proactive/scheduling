@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -92,7 +93,7 @@ public class SchedulerTester {
     public static int currentNBjobs = 0;
     /** Used as a semaphore to synchronized action. */
     public final static Object synchro = new Object();
-    private HashMap<String, Job> alreadySubmitted = new HashMap<String, Job>();
+    private Map<String, Job> alreadySubmitted = new HashMap<String, Job>();
 
     /**
      * Start the scheduler tester.
@@ -164,7 +165,7 @@ public class SchedulerTester {
      *
      */
     public void randomizedTest() {
-        HashMap<String, String> logins = new HashMap<String, String>();
+        Map<String, String> logins = new HashMap<String, String>();
         Vector<String> jobs = null;
         FileReader l = null;
         BufferedReader br = null;

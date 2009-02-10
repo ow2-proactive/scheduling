@@ -90,10 +90,10 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTDefaultRM {
     @org.junit.Test
     public void action() throws Exception {
 
-        System.out.println("------------------------------ Deployment");
+        log("Deployment");
 
         System.out.println(monitor.echo());
-        System.out.println(user.echo());
+        System.out.println(admin.echo());
 
         RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODE_REMOVED,
                 RMEventType.NODESOURCE_CREATED, RMEventType.NODE_BUSY, RMEventType.NODE_FREE, };
@@ -165,14 +165,14 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTDefaultRM {
         SelectionScript sScript2 = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
                 this.vmPropKey2, this.vmPropValue2 }, false);
 
-        System.out.println("------------------------------ Test 1");
+        log("Test 1");
 
         ArrayList<SelectionScript> scriptsList = new ArrayList<SelectionScript>();
 
         scriptsList.add(sScript1);
         scriptsList.add(sScript2);
 
-        NodeSet nodes = user.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), scriptsList, null);
+        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), scriptsList, null);
 
         //wait node selection
         PAFuture.waitFor(nodes);
@@ -183,23 +183,23 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTDefaultRM {
         //wait for node busy event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
 
-        user.freeNodes(nodes);
+        admin.freeNodes(nodes);
         //wait for node free event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 3);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 3);
 
-        System.out.println("------------------------------ Test 2");
+        log("Test 2");
 
-        nodes = user.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), scriptsList, nodes);
+        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), scriptsList, nodes);
 
         //wait node selection
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 0);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 3);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 3);
 
     }
 }

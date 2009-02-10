@@ -34,7 +34,7 @@ package org.ow2.proactive.scheduler.examples;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.cli.AlreadySelectedException;
@@ -101,6 +101,7 @@ public class AdminShell {
 
     private static void error(String message, Exception e) {
         error(message);
+        System.err.println();
         if (displayException) {
             e.printStackTrace();
             System.out.println();
@@ -444,7 +445,7 @@ public class AdminShell {
 
     private static void statScreen() {
         try {
-            HashMap<String, Object> stat = scheduler.getStats().getProperties();
+            Map<String, Object> stat = scheduler.getStats().getProperties();
             String out = "";
 
             for (Entry<String, Object> e : stat.entrySet()) {

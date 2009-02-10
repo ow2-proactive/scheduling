@@ -33,7 +33,18 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.api.PAActiveObject;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
@@ -55,12 +66,29 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @author The ProActive Team
  *
  */
+@Entity
+@Table(name = "FORKED_JAVA_EXECUTABLE")
+@AccessType("field")
+@Proxy(lazy = false)
 public class ForkedJavaExecutable extends JavaExecutable implements ExecutableContainer {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JavaExecutableContainer.class)
     private JavaExecutableContainer executableContainer = null;
+
+    @Transient
     private TaskLauncher taskLauncher = null;
 
-    private final static int TIMEOUT = 1000;
+    private static final int TIMEOUT = 1000;
+
+    /** Hibernate default constructor */
+    @SuppressWarnings("unused")
+    private ForkedJavaExecutable() {
+    }
 
     /**
      * Constructor 

@@ -149,7 +149,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             toBeLaunched.setEnvp(this.buildNativeExecEnvVars());
 
             //set modelEnv Var for kill action
-            HashMap<String, String> modelEnvVar = new HashMap<String, String>();
+            Map<String, String> modelEnvVar = new HashMap<String, String>();
             modelEnvVar.put(COOKIE_ENV, cookie_value);
             toBeLaunched.setModelEnvVar(modelEnvVar);
 

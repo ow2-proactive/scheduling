@@ -31,17 +31,47 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Proxy;
+
+
 /**
  * A simple String based implementation of TaskLogs.
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@Entity
+@Table(name = "SIMPLE_TASK_LOGS")
+@AccessType("field")
+@Proxy(lazy = false)
 public class SimpleTaskLogs implements TaskLogs {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
+
     // logs on standard output
-    private final String standardLogs;
+    @Cascade(CascadeType.ALL)
+    @Column(name = "STANDARD_LOGS", columnDefinition = "CLOB")
+    private String standardLogs;
 
     // logs on error output
-    private final String errorlogs;
+    @Cascade(CascadeType.ALL)
+    @Column(name = "ERROR_LOGS", columnDefinition = "CLOB")
+    private String errorlogs;
+
+    /** Hibernate constructor */
+    @SuppressWarnings("unused")
+    private SimpleTaskLogs() {
+    }
 
     /**
      * Create a new SimpleTaskLogs.

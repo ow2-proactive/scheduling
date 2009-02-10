@@ -1,5 +1,6 @@
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -12,6 +13,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.ProActiveException;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
@@ -20,7 +22,7 @@ public class ShutdownDialog extends Dialog {
     private Button okButton;
     private Button cancelButton;
 
-    public ShutdownDialog(Shell parent) {
+    public ShutdownDialog(final Shell parent) {
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
         /* Init the display */
@@ -60,6 +62,8 @@ public class ShutdownDialog extends Dialog {
                 } catch (ProActiveException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
+                } catch (RMException e) {
+                    MessageDialog.openError(parent, "Access denied", e.getMessage());
                 }
                 shell.close();
             }

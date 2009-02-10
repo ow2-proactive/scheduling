@@ -32,11 +32,29 @@
 package org.ow2.proactive.scheduler.job;
 
 import java.util.HashMap;
+import java.util.Map;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
 /**
@@ -48,11 +66,45 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@Entity
+@Table(name = "JOB_RESULT_IMPL")
+@AccessType("field")
+@Proxy(lazy = false)
 public class JobResultImpl implements JobResult {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
+
+    /** Referenced JobId */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobId.class)
     private JobId id = null;
-    private HashMap<String, TaskResult> allResults = null;
-    private HashMap<String, TaskResult> preciousResults = null;
-    private HashMap<String, TaskResult> exceptionResults = null;
+
+    /** Temporary used to store proActive futur result. */
+    @Transient
+    private Map<String, TaskResult> futurResults = new HashMap<String, TaskResult>();
+
+    /** List of every result */
+    @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
+    @Cascade(CascadeType.ALL)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @JoinColumn(name = "ALL_RESULTS")
+    private Map<String, TaskResult> allResults = null;
+
+    /** List of precious result */
+    @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
+    @Cascade(CascadeType.ALL)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @JoinColumn(name = "PRECIOUS_RESULTS")
+    private Map<String, TaskResult> preciousResults = null;
+
+    /** List of result that ends with an exception */
+    @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
+    @Cascade(CascadeType.ALL)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @JoinColumn(name = "EXCEPTION_RESULTS")
+    private Map<String, TaskResult> exceptionResults = null;
 
     /**
      * ProActive empty constructor
@@ -68,9 +120,9 @@ public class JobResultImpl implements JobResult {
      */
     public JobResultImpl(JobId id) {
         this.id = id;
-        allResults = new HashMap<String, TaskResult>();
-        preciousResults = new HashMap<String, TaskResult>(1);
-        exceptionResults = new HashMap<String, TaskResult>(0);
+        this.allResults = new HashMap<String, TaskResult>();
+        this.preciousResults = new HashMap<String, TaskResult>();
+        this.exceptionResults = new HashMap<String, TaskResult>();
     }
 
     /**
@@ -92,9 +144,29 @@ public class JobResultImpl implements JobResult {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobResult#addTaskResult(java.lang.String, org.ow2.proactive.scheduler.common.task.TaskResult, boolean)
+     * Used to store the futur result.
+     * It must be temporary in a Hibernate transient map to avoid empty ID Object.
+     *
+     * @param taskName user define name (in XML) of the task.
+     * @param taskResult the corresponding result of the task.
+     */
+    public void storeFuturResult(String taskName, TaskResult taskResult) {
+        futurResults.put(taskName, taskResult);
+    }
+
+    /**
+     * <font color="red">-- For internal use only --</font>
+     * Add a new task result to this job result.<br>
+     * Used by the scheduler to fill your job result.
+     *
+     * @param taskName user define name (in XML) of the task.
+     * @param taskResult the corresponding result of the task.
+     * @param isFinal true if this taskResult is a final one.
      */
     public void addTaskResult(String taskName, TaskResult taskResult, boolean isPrecious) {
+        //remove futur Result
+        futurResults.remove(taskName);
+
         //allResults
         allResults.put(taskName, taskResult);
 
@@ -111,29 +183,59 @@ public class JobResultImpl implements JobResult {
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobResult#getAllResults()
      */
-    public HashMap<String, TaskResult> getAllResults() {
+    public Map<String, TaskResult> getAllResults() {
         return allResults;
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobResult#getExceptionResults()
      */
-    public HashMap<String, TaskResult> getExceptionResults() {
+    public Map<String, TaskResult> getExceptionResults() {
         return exceptionResults;
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobResult#getPreciousResults()
      */
-    public HashMap<String, TaskResult> getPreciousResults() {
+    public Map<String, TaskResult> getPreciousResults() {
         return preciousResults;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.JobResult#getResult(java.lang.String)
+     */
+    public TaskResult getResult(String taskName) {
+        TaskResult tr = futurResults.get(taskName);
+        if (tr == null) {
+            return allResults.get(taskName);
+        } else if (!PAFuture.isAwaited(tr)) {
+            return tr;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Return any result even if it is awaited futur.
+     * Null is returned only if the given taskName is unknown
+     *
+     * @param taskName the task name of the result to get.
+     * @return the result if it exists, null if not.
+     */
+    public TaskResult getAnyResult(String taskName) {
+        TaskResult tr = futurResults.get(taskName);
+        if (tr == null) {
+            return allResults.get(taskName);
+        } else {
+            return tr;
+        }
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobResult#hadException()
      */
     public boolean hadException() {
-        return exceptionResults.size() != 0;
+        return exceptionResults.size() > 0;
     }
 
     /**
@@ -166,4 +268,5 @@ public class JobResultImpl implements JobResult {
 
         return toReturn.toString();
     }
+
 }

@@ -32,7 +32,7 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -69,24 +69,13 @@ public interface JobResult extends Serializable {
     public String getName();
 
     /**
-     * <font color="red">-- For internal use only --</font>
-     * Add a new task result to this job result.<br>
-     * Used by the scheduler to fill your job result.
-     *
-     * @param taskName user define name (in XML) of the task.
-     * @param taskResult the corresponding result of the task.
-     * @param isFinal true if this taskResult is a final one.
-     */
-    public void addTaskResult(String taskName, TaskResult taskResult, boolean isFinal);
-
-    /**
      * Return every task results of this job as a mapping between
      * user task name (in XML job description) and its task result.<br>
      * User that wants to get a specific result may get this map and ask for a specific mapping.
      *
      * @return the task result as a map.
      */
-    public HashMap<String, TaskResult> getAllResults();
+    public Map<String, TaskResult> getAllResults();
 
     /**
      * Return only the precious results of this job as a mapping between
@@ -95,7 +84,7 @@ public interface JobResult extends Serializable {
      *
      * @return the precious results as a map.
      */
-    public HashMap<String, TaskResult> getPreciousResults();
+    public Map<String, TaskResult> getPreciousResults();
 
     /**
      * Return only the task results that have generated an exception.<br>
@@ -103,7 +92,17 @@ public interface JobResult extends Serializable {
      *
      * @return the precious results as a map.
      */
-    public HashMap<String, TaskResult> getExceptionResults();
+    public Map<String, TaskResult> getExceptionResults();
+
+    /**
+     * Return the task Result corresponding to the given name.
+     * A result is returned if the taskName exist and if the result is available.
+     * Null is returned if the task is not finished (has no result) or if the task name is unknown.
+     *
+     * @param taskName the task name of the result to get.
+     * @return the result corresponding to the given task name, null if not found or not finished.
+     */
+    public TaskResult getResult(String taskName);
 
     /**
      * Remove the result of the given task in this jobResult.

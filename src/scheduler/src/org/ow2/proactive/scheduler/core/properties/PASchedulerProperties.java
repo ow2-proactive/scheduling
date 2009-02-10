@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
 
@@ -73,9 +74,6 @@ public enum PASchedulerProperties {
 
     /** Delay to wait between getting a job result and removing the job concerned */
     SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PAPropertiesType.INTEGER),
-
-    /** Default database configuration file name */
-    SCHEDULER_DEFAULT_DBCONFIG_FILE("pa.scheduler.core.database.defaultconfigfile", PAPropertiesType.STRING),
 
     /* ***************************************************************** */
     /* ********************** AUTHENTICATION PROPERTIES **************** */
@@ -152,11 +150,19 @@ public enum PASchedulerProperties {
     UNIX_HOME_ENV_VAR("pa.scheduler.launcher.unixenv", PAPropertiesType.STRING),
 
     /** Scheduler home directory */
-    SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING);
+    SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING),
 
-    /* ------------------------------------
-     *  SCHEDULER EXTENSIONS
-     */
+    /** Scheduler user name for RM authentication */
+    RESOURCE_MANAGER_USER("pa.scheduler.resourcemanager.authentication.username", PAPropertiesType.STRING),
+
+    /** Scheduler password for RM authentication */
+    RESOURCE_MANAGER_PASSWORD("pa.scheduler.resourcemanager.authentication.password", PAPropertiesType.STRING),
+
+    /* ***************************************************************** */
+    /* ********************** HIBERNATE PROPERTIES ********************* */
+    /* ***************************************************************** */
+    /** Hibernate configuration file (relative to home directory) */
+    SCHEDULER_DB_HIBERNATE_CONFIG("pa.scheduler.db.hibernate.configuration", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -195,6 +201,25 @@ public enum PASchedulerProperties {
     }
 
     /**
+     * Get the key.
+     *
+     * @return the key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Set a the value of this property to the given one.
+     *
+     * @param value the new value to set.
+     */
+    public void updateProperty(String value) {
+        getProperties(DEFAULT_PROPERTIES_FILE);
+        prop.setProperty(key, value);
+    }
+
+    /**
      * Set the user java properties to the PASchedulerProperties.<br/>
      * User properties are defined using the -Dname=value in the java command.
      */
@@ -210,13 +235,14 @@ public enum PASchedulerProperties {
     /**
      * Get the properties map or load it if needed.
      * 
+     * @param filename the new file to be loaded.
      * @return the properties map corresponding to the default property file.
      */
     private static Properties getProperties(String filename) {
         if (prop == null) {
             prop = new Properties();
             try {
-                prop.load(new FileInputStream(DEFAULT_PROPERTIES_FILE));
+                prop.load(new FileInputStream(filename));
                 setUserJavaProperties();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -247,6 +273,17 @@ public enum PASchedulerProperties {
         } else {
             getProperties(filename);
         }
+    }
+
+    /**
+     * Returns the string to be passed on the command line
+     *
+     * The property surrounded by '-D' and '='
+     *
+     * @return the string to be passed on the command line
+     */
+    public String getCmdLine() {
+        return "-D" + key + '=';
     }
 
     /**

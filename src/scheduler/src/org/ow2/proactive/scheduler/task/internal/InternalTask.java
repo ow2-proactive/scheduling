@@ -32,7 +32,27 @@
 package org.ow2.proactive.scheduler.task.internal;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Any;
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.ManyToAny;
+import org.hibernate.annotations.MetaValue;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -43,8 +63,12 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.core.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
+import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 
 
@@ -56,6 +80,10 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@MappedSuperclass
+@Table(name = "INTERNAL_TASK")
+@AccessType("field")
+@Proxy(lazy = false)
 public abstract class InternalTask extends Task implements Comparable<InternalTask> {
 
     /** Sorting constant, this will allow the user to sort the descriptor. */
@@ -65,7 +93,6 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     public static final int SORT_BY_DESCRIPTION = 4;
     public static final int SORT_BY_EXECUTIONLEFT = 5;
     public static final int SORT_BY_EXECUTIONONFAILURELEFT = 6;
-    public static final int SORT_BY_SUBMITTED_TIME = 7;
     public static final int SORT_BY_STARTED_TIME = 8;
     public static final int SORT_BY_FINISHED_TIME = 9;
     public static final int SORT_BY_HOST_NAME = 10;
@@ -75,27 +102,47 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     private static int currentOrder = ASC_ORDER;
 
     /** Parents list : null if no dependences */
-    private ArrayList<InternalTask> dependences = null;
+    @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+            @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
+            @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
+            @MetaValue(targetEntity = InternalProActiveTask.class, value = "IPT") })
+    @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @Cascade(CascadeType.ALL)
+    private List<InternalTask> idependences = null;
 
     /** Informations about the launcher and node */
+    //These informations are not required during task process
+    @Transient
     private ExecuterInformations executerInformations;
 
     /** Task information : this is the informations that can change during process. */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskEvent.class)
     private TaskEvent taskInfo = new TaskEvent();
 
     /** Node exclusion for this task if desired */
+    @Transient
     private transient NodeSet nodeExclusion = null;
 
     /** Contains the user executable */
-    protected ExecutableContainerDataBaseProxy executableContainer = null;
+    @Unloadable
+    @Any(fetch = FetchType.EAGER, metaColumn = @Column(name = "EXEC_CONTAINER_TYPE", updatable = false, length = 5))
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+            @MetaValue(targetEntity = JavaExecutableContainer.class, value = "JEC"),
+            @MetaValue(targetEntity = NativeExecutableContainer.class, value = "NEC"),
+            @MetaValue(targetEntity = ForkedJavaExecutable.class, value = "FJE") })
+    @JoinColumn(name = "EXEC_CONTAINER_ID", updatable = false)
+    @Cascade(CascadeType.ALL)
+    protected ExecutableContainer executableContainer = null;
 
     /** Maximum number of execution for this task in case of failure (node down) */
+    @Column(name = "MAX_EXEC_ON_FAILURE")
     private int maxNumberOfExecutionOnFailure = PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
             .getValueAsInt();
 
-    /**
-     * ProActive Empty constructor
-     */
+    /** Hibernate default constructor */
     public InternalTask() {
     }
 
@@ -145,9 +192,6 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
             case SORT_BY_STATUS:
                 return (currentOrder == ASC_ORDER) ? (getStatus().compareTo(task.getStatus())) : (task
                         .getStatus().compareTo(getStatus()));
-            case SORT_BY_SUBMITTED_TIME:
-                return (currentOrder == ASC_ORDER) ? ((int) (getSubmitTime() - task.getSubmitTime()))
-                        : ((int) (task.getSubmitTime() - getSubmitTime()));
             case SORT_BY_STARTED_TIME:
                 return (currentOrder == ASC_ORDER) ? ((int) (getStartTime() - task.getStartTime()))
                         : ((int) (task.getStartTime() - getStartTime()));
@@ -179,19 +223,6 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      * @return the user executable represented by this task descriptor.
      */
     public ExecutableContainer getExecutableContainer() {
-        if (this.executableContainer == null) {
-            return null;
-        } else {
-            return this.executableContainer.getValue();
-        }
-    }
-
-    /**
-     * Return the container proxy represented by this task descriptor.
-     * 
-     * @return the container proxy represented by this task descriptor.
-     */
-    public ExecutableContainerDataBaseProxy getExecutableContainerProxy() {
         return this.executableContainer;
     }
 
@@ -202,11 +233,11 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      * @param task a super task of this task.
      */
     public void addDependence(InternalTask task) {
-        if (dependences == null) {
-            dependences = new ArrayList<InternalTask>();
+        if (idependences == null) {
+            idependences = new ArrayList<InternalTask>();
         }
 
-        dependences.add(task);
+        idependences.add(task);
     }
 
     /**
@@ -216,7 +247,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      * @return true if this task has dependencies, false otherwise.
      */
     public boolean hasDependences() {
-        return dependences != null;
+        return (idependences != null && idependences.size() > 0);
     }
 
     /**
@@ -302,24 +333,6 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * To get the submitTime
-     *
-     * @return the submitTime
-     */
-    public long getSubmitTime() {
-        return taskInfo.getSubmitTime();
-    }
-
-    /**
-     * To set the submitTime
-     *
-     * @param submitTime the submitTime to set
-     */
-    public void setSubmitTime(long submitTime) {
-        taskInfo.setSubmitTime(submitTime);
-    }
-
-    /**
      * To get the taskId
      *
      * @return the taskID
@@ -388,12 +401,17 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * To get the dependences
+     * To get the dependences of this task.
+     * Return null if this task has no dependence.
      *
      * @return the dependences
      */
-    public ArrayList<InternalTask> getDependences() {
-        return dependences;
+    public List<InternalTask> getDependences() {
+        //set to null if needed
+        if (idependences != null && idependences.size() == 0) {
+            idependences = null;
+        }
+        return idependences;
     }
 
     /**
@@ -508,7 +526,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      */
     @Override
     public String toString() {
-        return "TaskDescriptor(" + getId() + ")";
+        return getClass().getSimpleName() + "(" + getId() + ")";
     }
 
     protected void setKillTaskTimer(TaskLauncher launcher) {

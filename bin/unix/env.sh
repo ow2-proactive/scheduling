@@ -33,6 +33,7 @@ PA_SCHEDULER=$(cd $workingDir/../.././ || (echo "Broken Scheduler/Resource Manag
  # Check if classes exists and is not empty
 if [ -d $PA_SCHEDULER/classes/scheduler ]
 then
+    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/common
     CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/resource-manager
     CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/scheduler
     for i in $PA_SCHEDULER/lib/*.jar ; do
@@ -42,6 +43,13 @@ then
       CLASSPATH=$CLASSPATH:$i
     done
     for i in $PA_SCHEDULER/lib/common/*.jar ; do
+      CLASSPATH=$CLASSPATH:$i
+    done
+    #hibernate libs
+    for i in $PA_SCHEDULER/lib/hibernate/annotation/*.jar ; do
+      CLASSPATH=$CLASSPATH:$i
+    done
+    for i in $PA_SCHEDULER/lib/hibernate/core/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
 else 

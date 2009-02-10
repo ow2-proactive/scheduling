@@ -42,11 +42,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.ow2.proactive.resourcemanager.RMFactory;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 
 import functionalTests.FunctionalTest;
@@ -62,9 +62,11 @@ import functionalTests.FunctionalTest;
  */
 public class FunctionalTDefaultRM extends FunctionalTest {
 
-    protected RMUser user;
     protected RMAdmin admin;
     protected RMMonitoring monitor;
+
+    private String username = "jl";
+    private String password = "jl";
 
     private static String functionalTestRMProperties = FunctionalTDefaultRM.class.getResource(
             "/nodestate/functionalTRMProperties.ini").getPath();
@@ -84,14 +86,11 @@ public class FunctionalTDefaultRM extends FunctionalTest {
 
         PAResourceManagerProperties.updateProperties(functionalTestRMProperties);
         RMFactory.startLocal();
-        user = RMFactory.getUser();
-        admin = RMFactory.getAdmin();
+
+        RMAuthentication auth = RMConnection.waitAndJoin(null);
+        admin = auth.logAsAdmin(username, password);
+
         monitor = RMFactory.getMonitoring();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -187,6 +186,10 @@ public class FunctionalTDefaultRM extends FunctionalTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    protected void log(String s) {
+        System.out.println("------------------------------ " + s);
     }
 
 }

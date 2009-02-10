@@ -31,89 +31,88 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import java.io.IOException;
-
-import org.objectweb.proactive.ActiveObjectCreationException;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.Connection;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
- * Class that implements static methods to execute lookups on
- * Resource manager (RM) active objects.
- * This class provide a way to connect to an existing RM and get
- * stubs of front-end objects :<BR>
- * - user interface of the RM : {@link RMUser}.<BR>
- * - administrator interface of the RM : {@link RMAdmin}.<BR>
- * - Monitoring interface of the RM : {@link RMMonitoring}.<BR>
+ * This class provides means to connect to an existing RM.
+ * As a result of connection returns {@link RMAuthentication} for further authentication.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  *
  */
 @PublicAPI
-public class RMConnection {
+public class RMConnection extends Connection<RMAuthentication> {
+
+    private static RMConnection instance;
+
+    private RMConnection() {
+        super(RMAuthentication.class);
+    }
+
+    public Logger getLogger() {
+        return ProActiveLogger.getLogger(RMLoggers.CONNECTION);
+    }
+
+    public static synchronized RMConnection getInstance() {
+        if (instance == null) {
+            instance = new RMConnection();
+        }
+        return instance;
+    }
 
     /**
-     * Gives the RM's Administrator interface.
-     * @param url host name URL of the RM.
-     * @return RMAdmin Stub of RMAdmin active object.
-     * @throws RMException if the lookup fails.
+     * Returns the {@link RMAuthentication} from the specified
+     * URL. If resource manager is not available or initializing throws an exception.
+     * 
+     * @param url the URL of the resource manager to join.
+     * @return the resource manager authentication at the specified URL.
+     * @throws RMException
+     *             thrown if the connection to the resource manager cannot be
+     *             established.
      */
-    public static RMAdmin connectAsAdmin(String url) throws RMException {
-        if (url == null) {
-            url = "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
-        }
-
+    public static RMAuthentication join(String url) throws RMException {
         try {
-            RMAdmin admin = (RMAdmin) PAActiveObject.lookupActive(RMAdmin.class.getName(), url);
-            return admin;
-        } catch (ActiveObjectCreationException e) {
-            throw new RMException(e);
-        } catch (IOException e) {
+            return getInstance().connect(url);
+        } catch (Exception e) {
             throw new RMException(e);
         }
     }
 
     /**
-     * Gives the RM's user interface.
-     * @param url host name URL of the RM.
-     * @return User Stub of User active object.
-     * @throws RMException if the lookup fails.
+     * Connects to the resource manager using given URL. The current thread will be block until
+     * connection established or an error occurs.
      */
-    public static RMUser connectAsUser(String url) throws RMException {
-        if (url == null) {
-            url = "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMUSER;
-        }
+    public static RMAuthentication waitAndJoin(String url) throws RMException {
+        return waitAndJoin(url, 0);
+    }
+
+    /**
+     * Connects to the resource manager with a specified timeout value. A timeout of
+     * zero is interpreted as an infinite timeout. The connection will then
+     * block until established or an error occurs.
+     */
+    public static RMAuthentication waitAndJoin(String url, int timeout) throws RMException {
         try {
-            RMUser user = (RMUser) PAActiveObject.lookupActive(RMUser.class.getName(), url);
-            return user;
-        } catch (ActiveObjectCreationException e) {
-            throw new RMException(e);
-        } catch (IOException e) {
+            return getInstance().waitAndConnect(url, timeout);
+        } catch (Exception e) {
             throw new RMException(e);
         }
     }
 
     /**
-     * Gives the RM's  monitoring interface.
-     * @param url host name URL of the RM.
-     * @return RMMonitoring Stub of monitoring active object.
-     * @throws RMException if the lookup fails.
+     * Returns default url of resource manager
      */
-    public static RMMonitoring connectAsMonitor(String url) throws RMException {
-        if (url == null) {
-            url = "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING;
-        }
-        try {
-            RMMonitoring mon = (RMMonitoring) PAActiveObject.lookupActive(RMMonitoring.class.getName(), url);
-            return mon;
-        } catch (ActiveObjectCreationException e) {
-            throw new RMException(e);
-        } catch (IOException e) {
-            throw new RMException(e);
-        }
+    public String getDefaultUrl() {
+        return "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
     }
+
 }

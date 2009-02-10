@@ -50,12 +50,11 @@ import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
  */
 @PublicAPI
 public class ProActiveTask extends Task {
-
     /** Classname of the executable */
     private String executableClassName = null;
 
     /** Arguments of the task as a map */
-    private Map<String, String> args = new HashMap<String, String>();
+    private Map<String, String> arguments = new HashMap<String, String>();
 
     /**
      * Empty constructor.
@@ -90,8 +89,8 @@ public class ProActiveTask extends Task {
      * @param numberOfNodesNeeded the number Of Nodes Needed to set.
      */
     public void setNumberOfNodesNeeded(int numberOfNodesNeeded) {
-        if (numberOfNodesNeeded < 1) {
-            numberOfNodesNeeded = 1;
+        if (this.numberOfNodesNeeded < 1) {
+            this.numberOfNodesNeeded = 1;
         }
 
         this.numberOfNodesNeeded = numberOfNodesNeeded;
@@ -122,7 +121,7 @@ public class ProActiveTask extends Task {
      * @return the arguments list.
      */
     public Map<String, String> getArguments() {
-        return args;
+        return this.arguments;
     }
 
     /**
@@ -131,7 +130,7 @@ public class ProActiveTask extends Task {
      * @param args the arguments list to set
      */
     public void setArguments(Map<String, String> args) {
-        this.args = args;
+        this.arguments = args;
     }
 
     /**
@@ -141,6 +140,9 @@ public class ProActiveTask extends Task {
      * @param value the associated value to add.
      */
     public void addArgument(String name, String value) {
-        args.put(name, value);
+        if (name != null && name.length() > 255) {
+            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + name);
+        }
+        this.arguments.put(name, value);
     }
 }

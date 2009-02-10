@@ -58,15 +58,15 @@ public class TaskClassLoader extends ClassLoader {
     /* (non-Javadoc)
      * @see java.lang.ClassLoader#loadClass(java.lang.String)
      */
-    public Class loadClass(String className) throws ClassNotFoundException {
+    public Class<?> loadClass(String className) throws ClassNotFoundException {
         return this.findClass(className);
     }
 
     /* (non-Javadoc)
      * @see java.lang.ClassLoader#findClass(java.lang.String)
      */
-    public Class findClass(String className) throws ClassNotFoundException {
-        Class res = null;
+    public Class<?> findClass(String className) throws ClassNotFoundException {
+        Class<?> res = null;
         // try parent
         try {
             res = this.getParent().loadClass(className);

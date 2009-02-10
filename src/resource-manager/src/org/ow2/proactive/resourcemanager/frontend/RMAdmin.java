@@ -58,7 +58,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
  *
  */
 @PublicAPI
-public interface RMAdmin extends Serializable {
+public interface RMAdmin extends RMUser, Serializable {
 
     /**
      * Set the ping frequency to the default node source
@@ -213,5 +213,10 @@ public interface RMAdmin extends Serializable {
      * @return a list of RMNodeSourceEvent objects representing the nodes sources
      */
     public List<RMNodeSourceEvent> getNodeSourcesList();
+
+    /**
+     * Disconnects from resource manager.
+     */
+    public void disconnect();
 
 }

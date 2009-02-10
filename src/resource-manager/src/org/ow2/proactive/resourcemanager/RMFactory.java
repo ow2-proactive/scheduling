@@ -33,6 +33,7 @@ package org.ow2.proactive.resourcemanager;
 
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -47,9 +48,8 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -107,18 +107,31 @@ public class RMFactory {
     }
 
     /**
-     * Gives the active object IMADMIN on local host.
-     * @return IMAdmin active object.
-     * @throws RMException if the resource Manager hasn't been created before.
+     * Creates Resource manager on local host with the further deployment of infrastructure from given deployment descriptor.
+     * 
+     * @param localGCMDeploymentDescriptors list of local gcm deployment descriptors which will be processed during core startup
+     * 
+     * @throws NodeException If the RM's node can't be created
+     * @throws ActiveObjectCreationException If RMCore cannot be created
+     * @throws AlreadyBoundException if a node with the same RMNode's name is already exist. 
+     * @throws IOException If node and RMCore fails.
      */
-    public static RMAdmin getAdmin() throws RMException {
-        if (rmcore != null) {
+    public static void startLocal(Collection<String> localGCMDeploymentDescriptors) throws NodeException,
+            ActiveObjectCreationException, AlreadyBoundException, IOException {
+
+        String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
+        if (rmcore == null) {
+            Node nodeRM = NodeFactory.createNode(RM_NODE_NAME);
+            rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
+                    new Object[] { RMCoreName, nodeRM, localGCMDeploymentDescriptors }, nodeRM);
+
             if (logger.isInfoEnabled()) {
-                logger.info("RM CORE started !");
+                logger.info("New RM core localy started");
             }
-            return rmcore.getAdmin();
         } else {
-            throw new RMException("Resource Manager has not been created before");
+            if (logger.isInfoEnabled()) {
+                logger.info("RM Core already localy running");
+            }
         }
     }
 
@@ -127,22 +140,13 @@ public class RMFactory {
      * @throws RMException if the resource Manager hasn't been created before
      */
     public static RMMonitoring getMonitoring() throws RMException {
-        if (rmcore != null) {
-            return rmcore.getMonitoring();
-        } else {
-            throw new RMException("resource Manager has not been created before");
-        }
-    }
-
-    /**
-     * @return IMUser active object on local host.
-     * @throws RMException if the resource Manager hasn't been created before
-     */
-    public static RMUser getUser() throws RMException {
-        if (rmcore != null) {
-            return rmcore.getUser();
-        } else {
-            throw new RMException("resource Manager has not been created before");
+        try {
+            return (RMMonitoring) PAActiveObject.lookupActive(RMMonitoringImpl.class.getName(), "/" +
+                RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
+        } catch (ActiveObjectCreationException e) {
+            throw new RMException(e);
+        } catch (IOException e) {
+            throw new RMException(e);
         }
     }
 

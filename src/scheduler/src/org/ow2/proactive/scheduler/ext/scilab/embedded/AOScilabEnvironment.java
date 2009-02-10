@@ -427,8 +427,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                     ")");
             }
 
-            // Geting the task results from the job result
-            HashMap<String, TaskResult> task_results = null;
+            // Getting the task results from the job result
+            Map<String, TaskResult> task_results = null;
             if (jResult.hadException()) {
                 task_results = jResult.getExceptionResults();
             } else {

@@ -31,11 +31,10 @@
  */
 package org.ow2.proactive.scheduler.common.scheduler;
 
-import java.io.Serializable;
-
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.core.UserScheduler;
 
@@ -49,7 +48,7 @@ import org.ow2.proactive.scheduler.core.UserScheduler;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public interface SchedulerAuthenticationInterface extends Serializable {
+public interface SchedulerAuthenticationInterface extends Authentication {
 
     /**
      * Connect the user interface to a scheduler with the given scheduler URL.<br>
@@ -63,8 +62,7 @@ public interface SchedulerAuthenticationInterface extends Serializable {
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
-    public UserSchedulerInterface logAsUser(String user, String password) throws LoginException,
-            SchedulerException;
+    public UserSchedulerInterface logAsUser(String user, String password) throws LoginException;
 
     /**
      * Connect the administrator interface to a scheduler with the given scheduler URL.<br>
@@ -79,6 +77,6 @@ public interface SchedulerAuthenticationInterface extends Serializable {
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
-    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException,
-            SchedulerException;
+    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException;
+
 }

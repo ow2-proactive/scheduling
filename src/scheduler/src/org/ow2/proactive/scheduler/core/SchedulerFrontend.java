@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.core;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -95,7 +96,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     private static final String ACCESS_DENIED = "Access denied !";
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
-    private HashMap<UniqueID, UserIdentificationImpl> identifications = new HashMap<UniqueID, UserIdentificationImpl>();
+    private Map<UniqueID, UserIdentificationImpl> identifications = new HashMap<UniqueID, UserIdentificationImpl>();
 
     /** List of connected user */
     private SchedulerUsers connectedUsers = new SchedulerUsers();
@@ -104,7 +105,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     private transient ResourceManagerProxy resourceManager;
 
     /** Authentication Interface */
-    private SchedulerAuthentication authenticationInterface;
+    private SchedulerAuthentication authentication;
 
     /** Full name of the policy class */
     private String policyFullName;
@@ -116,10 +117,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     private InternalJobWrapper currentJobToSubmit = new InternalJobWrapper();
 
     /** Job identification management */
-    private HashMap<JobId, IdentifiedJob> jobs;
+    private Map<JobId, IdentifiedJob> jobs;
 
     /** scheduler listeners */
-    private HashMap<UniqueID, SchedulerEventListener<? extends Job>> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener<? extends Job>>();
+    private Map<UniqueID, SchedulerEventListener<? extends Job>> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener<? extends Job>>();
 
     /** Scheduler's statistics */
     private StatsImpl stats = new StatsImpl(SchedulerState.STARTED);
@@ -198,7 +199,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * Connect the scheduler front-end to the scheduler authentication.
      */
     public void connect() {
-        authenticationInterface = (SchedulerAuthentication) PAActiveObject.getContext().getStubOnCaller();
+        authentication = (SchedulerAuthentication) PAActiveObject.getContext().getStubOnCaller();
     }
 
     /**
@@ -208,7 +209,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * 
      * @param jobList the jobList that may appear in this front-end.
      */
-    public void recover(HashMap<JobId, InternalJob> jobList) {
+    public void recover(Map<JobId, InternalJob> jobList) {
         if (jobList != null) {
             for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
                 UserIdentificationImpl uIdent = new UserIdentificationImpl(e.getValue().getOwner());
@@ -225,9 +226,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                 }
             }
         }
-
         //once recovered, activate scheduler communication
-        authenticationInterface.activate();
+        authentication.setActivated(true);
     }
 
     /**
@@ -284,10 +284,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         job.setOwner(ident.getUsername());
         //prepare tasks in order to be send into the core
         job.prepareTasks();
+        //create job descriptor
+        job.setJobDescriptor(new JobDescriptor(job));
         //put the job inside the frontend management list
         jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
-        //make the job descriptor
-        job.setJobDescriptor(new JobDescriptor(job));
         //scheduler.submit(job);
         currentJobToSubmit.setJob(job);
         scheduler.submit();
@@ -762,8 +762,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * @return always true;
      */
     public boolean terminate() {
-        if (authenticationInterface != null) {
-            authenticationInterface.terminate();
+        if (authentication != null) {
+            authentication.terminate();
         }
 
         PAActiveObject.terminateActiveObject(false);

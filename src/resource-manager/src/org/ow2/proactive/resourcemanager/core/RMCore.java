@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -55,7 +56,10 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.ow2.proactive.authentication.RestrictedService;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
@@ -88,15 +92,17 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * The main active object of the Resource Manager (RM), the RMCore has to
  * provide nodes to a scheduler.
  * 
- * The RMCore functions are :<BR> - Create Resource Manager's active objects at
- * its initialization ; {@link RMAdmin}, {@link RMUser}, {@link RMMonitoring}.<BR> -
- * keep an up-to-date list of nodes able to perform scheduler's tasks.<BR> -
- * give nodes to the Scheduler asked by {@link RMUser} object, with a node
- * selection mechanism performed by {@link SelectionScript}.<BR> - dialog with
- * node sources which add and remove nodes to the Core. - perform creation and
- * removal of NodeSource objects. <BR> - treat removing nodes and adding nodes
- * request coming from {@link RMAdmin}. - create and launch RMEvents concerning
- * nodes and nodes Sources To RMMonitoring active object.<BR>
+ * The RMCore functions are :<BR>
+ * - Create Resource Manager's active objects at its initialization ;
+ * {@link RMAdmin}, {@link RMUser}, {@link RMMonitoring}.<BR>
+ * - keep an up-to-date list of nodes able to perform scheduler's tasks.<BR>
+ * - give nodes to the Scheduler asked by {@link RMUser} object, with a node
+ * selection mechanism performed by {@link SelectionScript}.<BR>
+ * - dialog with node sources which add and remove nodes to the Core. - perform
+ * creation and removal of NodeSource objects. <BR>
+ * - treat removing nodes and adding nodes request coming from {@link RMAdmin}.
+ * - create and launch RMEvents concerning nodes and nodes Sources To
+ * RMMonitoring active object.<BR>
  * <BR>
  * 
  * Nodes in Resource Manager are represented by {@link RMNode objects}. RMcore
@@ -112,9 +118,9 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * these points are performed by {@link NodeSource} objects.<BR>
  * <BR>
  * RMCore got at least one node Source created at its startup (named
- * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}), 
- * which is a Static node source ({@link GCMNodeSource}),
- * able to receive a {@link GCMApplication} objects and deploy them.<BR>
+ * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}), which is a Static node
+ * source ({@link GCMNodeSource}), able to receive a {@link GCMApplication}
+ * objects and deploy them.<BR>
  * <BR>
  * 
  * WARNING : you must instantiate this class as an Active Object !
@@ -125,7 +131,8 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterface, Serializable {
+public class RMCore extends RestrictedService implements RMCoreInterface, InitActive, RMCoreSourceInterface,
+        Serializable {
 
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
@@ -137,13 +144,16 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     private Node nodeRM;
 
     /** stub of RMAdmin active object of the RM */
-    private RMAdmin admin;
+    private RMAdminImpl admin;
 
     /** stub of RMMonitoring active object of the RM */
     private RMMonitoringImpl monitoring;
 
     /** stub of RMuser active object of the RM */
-    private RMUser user;
+    private RMUserImpl user;
+
+    /** authentication active object */
+    private RMAuthenticationImpl authentication;
 
     /** HashMap of NodeSource active objects */
     private HashMap<String, NodeSource> nodeSources;
@@ -166,6 +176,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     /** indicates that RMCore must shutdown */
     private boolean toShutDown = false;
 
+    /** nodes to deploy during startup of resource manager */
+    private Collection<String> localGCMDeploymentFiles = null;
+
     /**
      * ProActive Empty constructor
      */
@@ -175,11 +188,15 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     /**
      * Creates the RMCore object.
      * 
-     * @param id Name for RMCOre.
-     * @param nodeRM Name of the ProActive Node object containing RM active
+     * @param id
+     *            Name for RMCOre.
+     * @param nodeRM
+     *            Name of the ProActive Node object containing RM active
      *            objects.
-     * @throws ActiveObjectCreationException if creation of the active object failed.
-     * @throws NodeException if a problem occurs on the target node.
+     * @throws ActiveObjectCreationException
+     *             if creation of the active object failed.
+     * @throws NodeException
+     *             if a problem occurs on the target node.
      */
     public RMCore(String id, Node nodeRM) throws ActiveObjectCreationException, NodeException {
         this.id = id;
@@ -192,15 +209,42 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
+     * Creates the RMCore object with further deployment of given data.
+     * 
+     * @param id
+     *            Name for RMCOre.
+     * @param nodeRM
+     *            Name of the ProActive Node object containing RM active
+     *            objects.
+     * @param gcmDeploymentData
+     *            data to deploy.
+     * @throws ActiveObjectCreationException
+     *             if creation of the active object failed.
+     * @throws NodeException
+     *             if a problem occurs on the target node.
+     */
+    public RMCore(String id, Node nodeRM, Collection<String> localGCMDeploymentFiles)
+            throws ActiveObjectCreationException, NodeException {
+        this(id, nodeRM);
+        this.localGCMDeploymentFiles = localGCMDeploymentFiles;
+    }
+
+    /**
      * Initialization part of the RMCore active object. <BR>
-     * Create RM's active objects :<BR> -{@link RMAdmin},<BR> -{@link RMUser},<BR> -{@link RMMonitoring},<BR>
+     * Create RM's active objects :<BR>
+     * -{@link RMAdmin},<BR>
+     * -{@link RMUser},<BR>
+     * -{@link RMMonitoring},<BR>
      * and creates the default static Node Source named
-     * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}. Finally throws the RM started
-     * event.
-     * @param body the active object's body.
+     * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}. Finally throws the RM
+     * started event.
+     * 
+     * @param body
+     *            the active object's body.
      * 
      */
     public void initActivity(Body body) {
+
         if (logger.isDebugEnabled()) {
             logger.debug("RMCore start : initActivity");
         }
@@ -210,11 +254,25 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                 RMConstants.NAME_ACTIVE_OBJECT_RMCORE);
 
             if (logger.isDebugEnabled()) {
+                logger.debug("active object RMAuthentication");
+            }
+
+            authentication = (RMAuthenticationImpl) PAActiveObject.newActive(RMAuthenticationImpl.class
+                    .getName(), new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+
+            if (logger.isDebugEnabled()) {
                 logger.debug("active object RMAdmin");
             }
 
-            admin = (RMAdminImpl) PAActiveObject.newActive(RMAdminImpl.class.getName(),
-                    new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+            admin = (RMAdminImpl) PAActiveObject.newActive(RMAdminImpl.class.getName(), new Object[] {
+                    PAActiveObject.getStubOnThis(), authentication }, nodeRM);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("active object RMUser");
+            }
+
+            user = (RMUserImpl) PAActiveObject.newActive(RMUserImpl.class.getName(), new Object[] {
+                    PAActiveObject.getStubOnThis(), authentication }, nodeRM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("active object RMMonitoring");
@@ -222,12 +280,11 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             monitoring = (RMMonitoringImpl) PAActiveObject.newActive(RMMonitoringImpl.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("active object RMUser");
-            }
-
-            user = (RMUserImpl) PAActiveObject.newActive(RMUserImpl.class.getName(),
-                    new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+            // register objects which are allowed to call methods of RMCore
+            registerTrustedService(authentication);
+            registerTrustedService(admin);
+            registerTrustedService(user);
+            registerTrustedService(monitoring);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("instanciation RMNodeManager");
@@ -235,8 +292,50 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
 
             this.createGCMNodesource(null, DEFAULT_NODE_SOURCE_NAME);
 
+            // deployment of required nodes 
+            if (localGCMDeploymentFiles != null) {
+                String GCMD_PROPERTY_NAME = PAResourceManagerProperties.RM_GCMD_PATH_PROPERTY_NAME
+                        .getValueAsString();
+                String applicationDescriptor = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                    File.separator +
+                    PAResourceManagerProperties.RM_GCM_TEMPLATE_APPLICATION_FILE.getValueAsString();
+
+                for (String gcmDeploymentFile : localGCMDeploymentFiles) {
+                    GCMApplication appl;
+                    try {
+                        System.setProperty(GCMD_PROPERTY_NAME, gcmDeploymentFile);
+                        appl = PAGCMDeployment.loadApplicationDescriptor(new File(applicationDescriptor));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+                    addingNodesAdminRequest(appl, DEFAULT_NODE_SOURCE_NAME);
+                }
+                localGCMDeploymentFiles = null; // don't need it anymore
+
+                // adding shutdown hook
+                // the shutdown hook is needed only for more convenient way to
+                // shutdown the resource manages when it was started by "startRM.sh"
+                // script (so the owner does not have to provide login information)
+                // for other cases don't use the hook because it has 
+                // concurrency issues when it is used with other shutdown technics
+                // like gcmAllp.kill()
+                final RMCore rmcoreStub = (RMCore) PAActiveObject.getStubOnThis();
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    public void run() {
+                        RMCore.this.registerTrustedService(PAActiveObject.getBodyOnThis().getID());
+                        if (!RMCore.this.toShutDown) {
+                            PAFuture.waitFor(rmcoreStub.shutdown(true));
+                        }
+                    }
+                });
+            }
+
             // Creating RM started event
             this.monitoring.rmStartedEvent(new RMEvent());
+
+            authentication.setActivated(true);
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
@@ -336,9 +435,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * Set a node state to down, and move the node to the
-     * internal down nodes list. An event informing the node state's change is
-     * thrown to RMMonitoring
+     * Set a node state to down, and move the node to the internal down nodes
+     * list. An event informing the node state's change is thrown to
+     * RMMonitoring
      */
     private void internalSetDown(RMNode rmnode) {
         logger.info("Down node : " + rmnode.getNodeURL() + ", from Source : " + rmnode.getNodeSourceId());
@@ -357,7 +456,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
      * free or 'to be released' state. do the release, and confirm to NodeSource
      * the removal.
      * 
-     * @param rmnode the node to release
+     * @param rmnode
+     *            the node to release
      */
     private void internalDoRelease(RMNode rmnode) {
         if (logger.isInfoEnabled()) {
@@ -386,13 +486,19 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
         this.monitoring.nodeRemovedEvent(rmnode.getNodeEvent());
     }
 
-    /** Internal operation of registering a new node in the Core ;
-     * adding the node to the all nodes list
-     * Creating the RMNode object related to the node, and put the node in free state.
-     * @param node node object to add
-     * @param VNodeName name of the Virtual node if eventually the node has been deployed 
-     * by a GCM deployment descriptor.
-     * @param nodeSource Stub of Active object node source responsible of the management of this node.
+    /**
+     * Internal operation of registering a new node in the Core ; adding the
+     * node to the all nodes list Creating the RMNode object related to the
+     * node, and put the node in free state.
+     * 
+     * @param node
+     *            node object to add
+     * @param VNodeName
+     *            name of the Virtual node if eventually the node has been
+     *            deployed by a GCM deployment descriptor.
+     * @param nodeSource
+     *            Stub of Active object node source responsible of the
+     *            management of this node.
      */
     private void internalAddNodeToCore(Node node, String VNodeName, NodeSource nodeSource) {
         RMNode rmnode = new RMNodeImpl(node, VNodeName, nodeSource);
@@ -425,7 +531,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     // ----------------------------------------------------------------------
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#createGCMNodesource(org.objectweb.proactive.gcmdeployment.GCMApplication, java.lang.String)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#createGCMNodesource(org.objectweb.proactive.gcmdeployment.GCMApplication,
+     *      java.lang.String)
      */
     public void createGCMNodesource(GCMApplication GCMApp, String sourceName) throws RMException {
         logger.info("Creating a GCM Node source : " + sourceName);
@@ -436,6 +543,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
                 NodeSource gcmSource = (NodeSource) PAActiveObject.newActive(GCMNodeSource.class.getName(),
                         new Object[] { sourceName, (RMCoreSourceInterface) PAActiveObject.getStubOnThis() },
                         nodeRM);
+
+                nodeSourceRegister(gcmSource, sourceName);
+
                 if (GCMApp != null) {
                     ((GCMNodeSource) gcmSource).nodesAddingCoreRequest(GCMApp);
                 }
@@ -446,18 +556,20 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#createDynamicNodeSource(java.lang.String, int, int, int, java.util.Vector)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#createDynamicNodeSource(java.lang.String,
+     *      int, int, int, java.util.Vector)
      */
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
             throws RMException {
         logger.info("Creating a P2P source " + id);
 
-        //check that a Node Source with a same name is not already existing
+        // check that a Node Source with a same name is not already existing
         if (this.nodeSources.containsKey(id)) {
             throw new RMException("Node Source name " + id + " is already existing");
         } else {
-            //check that a P2P node source is not already existing
-            //It's a drawback, but for the moment we are just able to start one peer to peer service per JVM
+            // check that a P2P node source is not already existing
+            // It's a drawback, but for the moment we are just able to start one
+            // peer to peer service per JVM
             for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
                 if (entry.getValue().getSourceEvent().getSourceType()
                         .equals(RMConstants.P2P_NODE_SOURCE_TYPE)) {
@@ -477,7 +589,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#addingNodesAdminRequest(org.objectweb.proactive.gcmdeployment.GCMApplication, java.lang.String)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#addingNodesAdminRequest(org.objectweb.proactive.gcmdeployment.GCMApplication,
+     *      java.lang.String)
      */
     public void addingNodesAdminRequest(GCMApplication GCMApp, String sourceName) throws RMException {
         if (this.nodeSources.containsKey(sourceName)) {
@@ -510,7 +623,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#addingNodeAdminRequest(java.lang.String, java.lang.String)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#addingNodeAdminRequest(java.lang.String,
+     *      java.lang.String)
      */
     public void addingNodeAdminRequest(String nodeUrl, String sourceName) throws RMException {
         if (this.nodeSources.containsKey(sourceName)) {
@@ -547,7 +661,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#nodeRemovalAdminRequest(java.lang.String, boolean)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#nodeRemovalAdminRequest(java.lang.String,
+     *      boolean)
      */
     public void nodeRemovalAdminRequest(String nodeUrl, boolean preempt) {
         if (this.allNodes.containsKey(nodeUrl)) {
@@ -570,7 +685,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#nodeSourceRemovalAdminRequest(java.lang.String, boolean)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#nodeSourceRemovalAdminRequest(java.lang.String,
+     *      boolean)
      */
     public void nodeSourceRemovalAdminRequest(String sourceName, boolean preempt) throws RMException {
         if (sourceName.equals(DEFAULT_NODE_SOURCE_NAME)) {
@@ -596,13 +712,17 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#shutdown(boolean)
      */
-    public void shutdown(boolean preempt) {
-        this.toShutDown = true;
+    public Boolean shutdown(boolean preempt) {
         this.monitoring.rmShuttingDownEvent(new RMEvent());
+        this.toShutDown = true;
 
+        List<Boolean> shutdownStatus = new LinkedList<Boolean>();
         for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
-            entry.getValue().shutdown(preempt);
+            shutdownStatus.add(entry.getValue().shutdown(preempt));
         }
+
+        PAFuture.waitForAll(shutdownStatus);
+        return new Boolean(true);
     }
 
     // ----------------------------------------------------------------------
@@ -672,7 +792,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
+     *      org.ow2.proactive.resourcemanager.common.scripting.SelectionScript,
+     *      org.ow2.proactive.resourcemanager.frontend.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion) {
         ArrayList<SelectionScript> list = null;
@@ -684,7 +806,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, java.util.List, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
+     *      java.util.List, org.ow2.proactive.resourcemanager.frontend.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nb, List<SelectionScript> selectionScriptList, NodeSet exclusion) {
 
@@ -834,10 +957,11 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
+     *      org.ow2.proactive.resourcemanager.common.scripting.SelectionScript)
      */
     public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript) {
-        //not implemented
+        // not implemented
         return null;
     }
 
@@ -874,7 +998,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAdmin()
      */
-    public RMAdmin getAdmin() {
+    public RMAdminImpl getAdmin() {
         return this.admin;
     }
 
@@ -888,7 +1012,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getUser()
      */
-    public RMUser getUser() {
+    public RMUserImpl getUser() {
         return this.user;
     }
 
@@ -897,24 +1021,29 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     // ----------------------------------------------------------------------
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#nodeSourceRegister(org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource, java.lang.String)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#nodeSourceRegister(org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource,
+     *      java.lang.String)
      */
     public void nodeSourceRegister(NodeSource source, String sourceId) {
         this.nodeSources.put(sourceId, source);
         // create the event
         this.monitoring.nodeSourceAddedEvent(source.getSourceEvent());
+        registerTrustedService(source);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#nodeSourceUnregister(java.lang.String, org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#nodeSourceUnregister(java.lang.String,
+     *      org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public void nodeSourceUnregister(String sourceId, RMNodeSourceEvent evt) {
-        this.nodeSources.remove(sourceId);
+        NodeSource nodeSource = this.nodeSources.remove(sourceId);
+
         if (logger.isInfoEnabled()) {
             logger.info("Node Source removed : " + sourceId);
         }
         // create the event
         this.monitoring.nodeSourceRemovedEvent(evt);
+        unregisterTrustedService(nodeSource);
 
         if ((this.nodeSources.size() == 0) && this.toShutDown) {
             // all nodes sources has been removed and RMCore in shutdown state,
@@ -933,14 +1062,17 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#addingNodeNodeSourceRequest(org.objectweb.proactive.core.node.Node, java.lang.String, org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#addingNodeNodeSourceRequest(org.objectweb.proactive.core.node.Node,
+     *      java.lang.String,
+     *      org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource)
      */
     public void addingNodeNodeSourceRequest(Node node, String VNodeName, NodeSource nodeSource) {
         internalAddNodeToCore(node, VNodeName, nodeSource);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#nodeRemovalNodeSourceRequest(java.lang.String, boolean)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#nodeRemovalNodeSourceRequest(java.lang.String,
+     *      boolean)
      */
     public void nodeRemovalNodeSourceRequest(String nodeUrl, boolean preempt) {
         RMNode rmnode = getNodebyUrl(nodeUrl);
@@ -995,7 +1127,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#setPingFrequency(int, java.lang.String)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#setPingFrequency(int,
+     *      java.lang.String)
      */
     public void setPingFrequency(int frequency, String sourceName) throws RMException {
         if (this.nodeSources.containsKey(sourceName)) {
@@ -1004,4 +1137,12 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInterfac
             throw new RMException("unknown node source : " + sourceName);
         }
     }
+
+    /**
+     * Logger used in RestrictedService
+     */
+    public Logger getLogger() {
+        return logger;
+    }
+
 }

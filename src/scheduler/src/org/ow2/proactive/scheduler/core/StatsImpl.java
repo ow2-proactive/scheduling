@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
@@ -48,7 +49,7 @@ import org.ow2.proactive.scheduler.common.scheduler.Tools;
 public class StatsImpl implements Stats {
 
     /** Map of properties of the scheduler */
-    private HashMap<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * ProActive Empty constructor
@@ -189,7 +190,7 @@ public class StatsImpl implements Stats {
     /**
      * @see org.ow2.proactive.scheduler.common.scheduler.Stats#getProperties()
      */
-    public HashMap<String, Object> getProperties() {
+    public Map<String, Object> getProperties() {
         return properties;
     }
 }

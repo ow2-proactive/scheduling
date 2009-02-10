@@ -33,6 +33,14 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
@@ -44,7 +52,15 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@Entity
+@Table(name = "JOB_ID")
+@AccessType("field")
+@Proxy(lazy = false)
 public final class JobId implements Comparable<JobId>, Serializable {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /** Default job name */
     public static final String DEFAULT_JOB_NAME = PASchedulerProperties.JOB_DEFAULT_NAME.getValueAsString();
@@ -53,15 +69,15 @@ public final class JobId implements Comparable<JobId>, Serializable {
     private static int currentId = 0;
 
     /** current instance id */
+    @Column(name = "ID")
     private int id;
 
     /** Human readable name */
+    @Column(name = "READABLE_NAME")
     private String readableName = DEFAULT_JOB_NAME;
 
-    /**
-     * ProActive empty constructor
-     */
-    public JobId() {
+    /** Hibernate default constructor */
+    private JobId() {
     }
 
     /**
@@ -91,15 +107,6 @@ public final class JobId implements Comparable<JobId>, Serializable {
      */
     public static void setInitialValue(JobId jobId) {
         currentId = jobId.id;
-    }
-
-    /**
-     * Get the next id
-     *
-     * @return the next available id.
-     */
-    public static JobId nextId() {
-        return new JobId(++currentId);
     }
 
     /**

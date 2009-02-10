@@ -62,10 +62,10 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
     @org.junit.Test
     public void action() throws Exception {
 
-        System.out.println("------------------------------ Deployment");
+        log("Deployment");
 
         System.out.println(monitor.echo());
-        System.out.println(user.echo());
+        System.out.println(admin.echo());
 
         RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODE_REMOVED,
                 RMEventType.NODESOURCE_CREATED, RMEventType.NODE_BUSY, RMEventType.NODE_FREE, };
@@ -80,29 +80,29 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         receiver.waitForNEvent(defaultDescriptorNodesNb + 1);
         receiver.cleanEventLists();
 
-        System.out.println("------------------------------ Test 1");
+        log("Test 1");
 
-        NodeSet nodeSetWithNodeToExclude = user.getAtMostNodes(new IntWrapper(1), null);
+        NodeSet nodeSetWithNodeToExclude = admin.getAtMostNodes(new IntWrapper(1), null);
 
         //wait for node selection
         PAFuture.waitFor(nodeSetWithNodeToExclude);
 
         assertTrue(nodeSetWithNodeToExclude.size() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 1);
 
         //wait for node busy event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == 1);
 
-        user.freeNodes(nodeSetWithNodeToExclude);
+        admin.freeNodes(nodeSetWithNodeToExclude);
 
         //wait for node free event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         //get nodes with the previous node excluded
-        NodeSet nodes = user.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb),
+        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb),
                 new ArrayList<SelectionScript>(), nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -115,23 +115,23 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == defaultDescriptorNodesNb - 1);
         //excluded node stays in free state
-        assertTrue(user.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
-        user.freeNodes(nodes);
+        admin.freeNodes(nodes);
         //wait for nodes freed event
         receiver.waitForNEvent(defaultDescriptorNodesNb - 1);
 
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == defaultDescriptorNodesNb - 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
-        System.out.println("------------------------------ Test 2");
+        log("Test 2");
 
         //create the dynamic selection script object
         SelectionScript dummyDynamicScript = new SelectionScript(new File(dummySelectionScriptPath),
             new String[] {}, true);
 
         //get nodes with the previous node excluded
-        nodes = user.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), dummyDynamicScript,
+        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), dummyDynamicScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -144,22 +144,22 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == defaultDescriptorNodesNb - 1);
         //excluded node stays in free state
-        assertTrue(user.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
-        user.freeNodes(nodes);
+        admin.freeNodes(nodes);
         //wait for node free event
         receiver.waitForNEvent(defaultDescriptorNodesNb - 1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == defaultDescriptorNodesNb - 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
-        System.out.println("------------------------------ Test 3");
+        log("Test 3");
 
         //create the static selection script object
         SelectionScript dummyStaticScript = new SelectionScript(new File(dummySelectionScriptPath),
             new String[] {}, false);
 
         //get nodes with the previous node excluded
-        nodes = user.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), dummyStaticScript,
+        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), dummyStaticScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -172,15 +172,15 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == defaultDescriptorNodesNb - 1);
         //excluded node stays in free state
-        assertTrue(user.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
-        user.freeNodes(nodes);
+        admin.freeNodes(nodes);
         //wait for node free event
         receiver.waitForNEvent(defaultDescriptorNodesNb - 1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == defaultDescriptorNodesNb - 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
-        System.out.println("------------------------------ Test 4");
+        log("Test 4");
 
         //deploy two other nodes
 
@@ -201,7 +201,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         //wait for nodes added events
         receiver.waitForNEvent(2);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 2);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
 
         //create the dynamic selection script object
         SelectionScript checkPropDynamicSScript = new SelectionScript(new File(vmPropSelectionScriptpath),
@@ -212,7 +212,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         nodeSetWithNodeToExclude.add(node1ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = user.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), checkPropDynamicSScript,
+        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), checkPropDynamicSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -225,18 +225,18 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == 1);
         //excluded node stays in free state
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 1);
 
         //unique node got is node2
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node2URL));
 
-        user.freeNodes(nodes);
+        admin.freeNodes(nodes);
         //wait for node free event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
 
-        System.out.println("------------------------------ Test 5");
+        log("Test 5");
 
         //create the static selection script object
         SelectionScript checkPropStaticSScript = new SelectionScript(new File(vmPropSelectionScriptpath),
@@ -248,7 +248,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         nodeSetWithNodeToExclude.add(node2ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = user.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), checkPropStaticSScript,
+        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), checkPropStaticSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -261,28 +261,28 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == 1);
         //excluded node stays in free state
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 1);
 
         //unique node got is node2
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
-        user.freeNodes(nodes);
+        admin.freeNodes(nodes);
         //wait for node free event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesFreeEvents().size() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
 
-        System.out.println("------------------------------ Test 6");
+        log("Test 6");
 
         nodeSetWithNodeToExclude.add(node1ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = user.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), checkPropStaticSScript,
+        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), checkPropStaticSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb + 2);
     }
 }

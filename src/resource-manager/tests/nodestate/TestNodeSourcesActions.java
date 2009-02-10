@@ -78,7 +78,7 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
 
         receiver.cleanEventLists();
 
-        System.out.println("------------------------------ Test 1");
+        log("Test 1");
 
         String nodeSourceName = "GCM_Node_source_test1";
         RMFactory.setOsJavaProperty();
@@ -92,16 +92,16 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
         receiver.waitForNEvent(defaultDescriptorNodesNb + 1);
         assertTrue(receiver.cleanNgetNodeSourcesCreatedEvents().size() == 1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == defaultDescriptorNodesNb);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         //book 3 nodes
-        NodeSet nodes = user.getAtMostNodes(new IntWrapper(3), null);
+        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(3), null);
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 3);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 3);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 3);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         receiver.waitForNEvent(3);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == 3);
@@ -136,12 +136,12 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
         //wait for the event of the node source removal 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodeSourcesRemovedEvents().size() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 0);
-        assertTrue(user.getTotalNodesNumber().intValue() == 0);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 0);
 
         //test the non preemptive node source removal 
 
-        System.out.println("------------------------------ Test 2");
+        log("Test 2");
 
         String nodeSourceName2 = "GCM_Node_source_test2";
         admin.createGCMNodesource(GCMDeploymentData, nodeSourceName2);
@@ -152,16 +152,16 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
         receiver.waitForNEvent(defaultDescriptorNodesNb + 1);
         assertTrue(receiver.cleanNgetNodeSourcesCreatedEvents().size() == 1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == defaultDescriptorNodesNb);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         //book 3 nodes
-        nodes = user.getAtMostNodes(new IntWrapper(3), null);
+        nodes = admin.getAtMostNodes(new IntWrapper(3), null);
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 3);
-        assertTrue(user.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 3);
-        assertTrue(user.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb);
+        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb - 3);
+        assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         receiver.waitForNEvent(3);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == 3);
@@ -205,16 +205,16 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
         //the 'to release' node keeps the same state
         assertTrue(receiver.cleanNgetNodesToReleaseEvents().size() == 1);
 
-        assertTrue(user.getFreeNodesNumber().intValue() == 0);
-        assertTrue(user.getTotalNodesNumber().intValue() == 2);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 2);
 
         //give back the two nodes in 'to release' state, they are directly removed
-        user.freeNode(n1);
-        user.freeNode(n3);
+        admin.freeNode(n1);
+        admin.freeNode(n3);
         receiver.waitForNEvent(2);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 2);
-        assertTrue(user.getFreeNodesNumber().intValue() == 0);
-        assertTrue(user.getTotalNodesNumber().intValue() == 0);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 0);
 
         //no more nodes handled by the node source, 
         //so the node source can be removed

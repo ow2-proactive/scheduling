@@ -51,17 +51,17 @@ public class IOTools {
 
         final InputStream is = process.getInputStream();
         final InputStream es = process.getErrorStream();
-        final ArrayList<String> out_lines = new ArrayList();
-        final ArrayList<String> err_lines = new ArrayList();
+        final ArrayList<String> out_lines = new ArrayList<String>();
+        final ArrayList<String> err_lines = new ArrayList<String>();
         Thread t1 = new Thread(new Runnable() {
             public void run() {
-                ArrayList linesTemp = getContentAsList(is);
+                ArrayList<String> linesTemp = getContentAsList(is);
                 out_lines.addAll(linesTemp);
             }
         });
         Thread t2 = new Thread(new Runnable() {
             public void run() {
-                ArrayList linesTemp = getContentAsList(es);
+                ArrayList<String> linesTemp = getContentAsList(es);
                 err_lines.addAll(linesTemp);
             }
         });

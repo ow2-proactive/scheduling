@@ -34,18 +34,17 @@ package org.ow2.proactive.resourcemanager.core;
 import java.util.List;
 import java.util.Vector;
 
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 
 
 /**
@@ -153,8 +152,11 @@ public interface RMCoreInterface {
      * Stops {@link RMAdmin}, {@link RMUser}, {@link RMMonitoring} active objects.
      * @param preempt if set to true, Resource manager wait its RM User give back all the busy
      * nodes before performing the shutdown 
+     *
+     * @return true if shutdown is successful. Make possible to perform synchronous call.
+     *
      */
-    public void shutdown(boolean preempt);
+    public Boolean shutdown(boolean preempt);
 
     /**
      * Stops and removes a NodeSource active object with their nodes from the Resource Manager

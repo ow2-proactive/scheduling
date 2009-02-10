@@ -34,7 +34,7 @@ package functionnaltests;
 import static junit.framework.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +44,6 @@ import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -73,10 +72,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
 
     private static String jobDescriptor = TestJobProActiveSubmission.class.getResource(
-            "/functionnaltests/Job_ProActive.xml").getPath();
-
-    private String username = "jl";
-    private String password = "jl";
+            "/functionnaltests/descriptors/Job_ProActive.xml").getPath();
 
     private SchedulerEventReceiver receiver = null;
 
@@ -87,11 +83,6 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
      */
     @Before
     public void preRun() throws Exception {
-        System.out.println("------------------------------ Starting and linking new scheduler !...");
-        //join the scheduler
-        schedulerAuth = SchedulerConnection.join(schedulerDefaultURL);
-        //Log as user
-        schedUserInterface = schedulerAuth.logAsUser(username, password);
         //Create an Event receiver AO in order to observe jobs and tasks states changes
         receiver = (SchedulerEventReceiver) PAActiveObject.newActive(SchedulerEventReceiver.class.getName(),
                 new Object[] {});
@@ -109,13 +100,13 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        System.out.println("------------------------------ Test 1 : Submitting job...");
+        log("Test 1 : Submitting job...");
         //job creation
         Job submittedJob = JobFactory.getFactory().createJob(jobDescriptor);
         //job submission
         JobId id = schedUserInterface.submit(submittedJob);
 
-        System.out.println("------------------------------ Test 2 : Verifying submission...");
+        log("Test 2 : Verifying submission...");
         // wait for event : job submitted
         receiver.waitForNEvent(1);
         ArrayList<Job> jobsList = receiver.cleanNgetJobSubmittedEvents();
@@ -123,7 +114,7 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
         Job job = jobsList.get(0);
         assertTrue(job.getId().equals(id));
 
-        System.out.println("------------------------------ Test 3 : Verifying start of job execution...");
+        log("Test 3 : Verifying start of job execution...");
         //wait for event : job pending to running
         receiver.waitForNEvent(1);
         ArrayList<JobEvent> eventsList = receiver.cleanNgetJobPendingToRunningEvents();
@@ -131,7 +122,7 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
         JobEvent jEvent = eventsList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
 
-        System.out.println("------------------------------ Test 4 : Verifying start of each tasks...");
+        log("Test 4 : Verifying start of each tasks...");
         //wait whole tasks execution : two events per task, task pending to running, and task running to finished  
         receiver.waitForNEvent(jEvent.getTotalNumberOfTasks() * 2);
         ArrayList<TaskEvent> tEventList = receiver.cleanNgetTaskPendingToRunningEvents();
@@ -139,7 +130,7 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
         tEventList = receiver.cleanNgetTaskRunningToFinishedEvents();
         assertTrue(tEventList.size() == jEvent.getTotalNumberOfTasks());
 
-        System.out.println("------------------------------ Test 5 : Verifying job termination...");
+        log("Test 5 : Verifying job termination...");
         //wait for event : job Running to finished
         receiver.waitForNEvent(1);
         eventsList = receiver.cleanNgetjobRunningToFinishedEvents();
@@ -147,7 +138,7 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
         jEvent = eventsList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
 
-        System.out.println("------------------------------ Test 6 : Getting job result...");
+        log("Test 6 : Getting job result...");
         JobResult res = schedUserInterface.getJobResult(id);
         schedUserInterface.remove(id);
         //check that there is no exception in results
@@ -158,7 +149,7 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
         assertTrue(eventsList.size() == 1);
         jEvent = eventsList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
-        HashMap<String, TaskResult> results = res.getAllResults();
+        Map<String, TaskResult> results = res.getAllResults();
         //check that number of results correspond to number of tasks       
         assertTrue(jEvent.getNumberOfFinishedTasks() == results.size());
         //check that all tasks results are defined
@@ -174,7 +165,7 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
      */
     @After
     public void afterTestJobSubmission() throws Exception {
-        System.out.println("------------------------------ Disconnecting from scheduler...");
+        log("Disconnecting from scheduler...");
         schedUserInterface.disconnect();
     }
 

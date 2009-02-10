@@ -34,6 +34,16 @@ package org.ow2.proactive.scheduler.common.job;
 import java.io.IOException;
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
+import org.hibernate.annotations.Type;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.util.classloading.JarUtils;
 
 
@@ -42,18 +52,35 @@ import org.ow2.proactive.scheduler.util.classloading.JarUtils;
  * contained in a job, as the classpath for Java executables.
  * @author The ProActive team
  */
+@PublicAPI
+@Entity
+@Table(name = "JOB_ENVIRONMENT")
+@AccessType("field")
+@Proxy(lazy = false)
 public class JobEnvironment implements Serializable {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     // job classpath
     // used for resolving classes only on user side !
+    @Column(name = "CLASSPATH", columnDefinition = "BLOB")
+    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
     private String[] jobClasspath;
+
     // jar file containing the job classpath
+    @Column(name = "CLASSPATH_CONTENT", columnDefinition = "BLOB")
+    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
     private byte[] jobClasspathContent;
+
     // true if the classpath contains jar files
+    @Column(name = "CONTAINS_JAR")
     private boolean containsJarFile;
 
     /**
      * return the byte[] representation of the jar file containing the job classpath.
+     *
      * @return the byte[] representation of the jar file containing the job classpath.
      */
     public byte[] getJobClasspathContent() {

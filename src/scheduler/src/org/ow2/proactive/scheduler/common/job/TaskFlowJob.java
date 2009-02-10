@@ -34,10 +34,10 @@ package org.ow2.proactive.scheduler.common.job;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 
 
@@ -56,7 +56,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 public class TaskFlowJob extends Job {
 
     /** List of task for the task flow job */
-    private HashMap<String, Task> tasks = new HashMap<String, Task>();
+    private Map<String, Task> tasks = new HashMap<String, Task>();
 
     /** ProActive Empty Constructor */
     public TaskFlowJob() {

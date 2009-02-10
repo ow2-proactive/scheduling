@@ -291,7 +291,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             Collection<TaskIntern<Serializable>> tasksOld = processing.remove(event.getJobId());
 
             ArrayList<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
-            HashMap<String, TaskResult> allTaskResults = jResult.getAllResults();
+            Map<String, TaskResult> allTaskResults = jResult.getAllResults();
 
             for (TaskIntern<Serializable> task : tasksOld) {
                 if (debug) {

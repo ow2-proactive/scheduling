@@ -33,9 +33,22 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.core.db.annotation.Alterable;
 
 
 /**
@@ -47,34 +60,59 @@ import org.ow2.proactive.scheduler.common.job.JobId;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@Entity
+@Table(name = "TASK_EVENT")
+@AccessType("field")
+@Proxy(lazy = false)
 public class TaskEvent implements Serializable {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /** id of the task */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskId.class)
     private TaskId taskId = null;
 
     /** informations about the job */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobEvent.class)
     private JobEvent jobEvent = null;
 
-    /** task submitted time */
-    private long submitTime = -1;
-
     /** task started time */
+    @Alterable
+    @Column(name = "START_TIME")
     private long startTime = -1;
 
     /** task finished time : DEFAULT HAS TO BE SET TO -1 */
+    @Alterable
+    @Column(name = "FINISHED_TIME")
     private long finishedTime = -1;
 
     /** Current taskState of the task */
+    @Alterable
+    @Column(name = "TASK_STATE")
     private TaskState taskState = TaskState.SUBMITTED;
 
     /** name of the host where the task is executed */
+    @Alterable
+    @Column(name = "EXEC_HOSTNAME")
     private String executionHostName;
 
     /** Number of executions left */
+    @Alterable
+    @Column(name = "NB_EXEC_LEFT")
     private int numberOfExecutionLeft = 1;
 
     /** Number of execution left for this task in case of failure (node down) */
+    @Alterable
+    @Column(name = "NB_EXEC_ON_FAILURE_LEFT")
     private int numberOfExecutionOnFailureLeft = 1;
+
+    /** Hibernate default constructor */
+    public TaskEvent() {
+    }
 
     /**
      * To get the jobEvent
@@ -171,24 +209,6 @@ public class TaskEvent implements Serializable {
      */
     public void setTaskId(TaskId taskId) {
         this.taskId = taskId;
-    }
-
-    /**
-     * To get the submitTime
-     *
-     * @return the submitTime
-     */
-    public long getSubmitTime() {
-        return submitTime;
-    }
-
-    /**
-     * To set the submitTime
-     *
-     * @param submitTime the submitTime to set
-     */
-    public void setSubmitTime(long submitTime) {
-        this.submitTime = submitTime;
     }
 
     /**

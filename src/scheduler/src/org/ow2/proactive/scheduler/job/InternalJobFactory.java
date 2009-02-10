@@ -35,6 +35,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -46,6 +47,7 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
@@ -115,7 +117,7 @@ public class InternalJobFactory implements Serializable {
 
         if (userTask.getExecutableClassName() != null) {
             job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(), userTask
-                    .getExecutableClassName(), userTask.getArguments());
+                    .getExecutableClassName(), toBigStringMap(userTask.getArguments()));
         } else {
             throw new SchedulerException(
                 "You must specify your own executable ProActive task to be launched (in the application task) !");
@@ -178,7 +180,7 @@ public class InternalJobFactory implements Serializable {
         }
 
         InternalJob job = new InternalTaskFlowJob();
-        HashMap<Task, InternalTask> tasksList = new HashMap<Task, InternalTask>();
+        Map<Task, InternalTask> tasksList = new HashMap<Task, InternalTask>();
         boolean hasPreciousResult = false;
 
         for (Task t : userJob.getTasks()) {
@@ -226,8 +228,8 @@ public class InternalJobFactory implements Serializable {
         InternalJavaTask javaTask;
 
         if (task.getExecutableClassName() != null) {
-            javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(), task
-                    .getArguments()));
+            javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
+                toBigStringMap(task.getArguments())));
         } else {
             throw new SchedulerException(
                 "You must specify your own executable task class to be launched (in every task) !");
@@ -274,7 +276,7 @@ public class InternalJobFactory implements Serializable {
         jobToSet.setDescription(job.getDescription());
         jobToSet.setLogFile(job.getLogFile());
         jobToSet.setProjectName(job.getProjectName());
-        jobToSet.setEnv(job.getEnv());
+        jobToSet.setEnvironment(job.getEnvironment());
         jobToSet.setGenericInformations(job.getGenericInformations());
     }
 
@@ -312,5 +314,22 @@ public class InternalJobFactory implements Serializable {
         }
         //Generic informations
         taskToSet.setGenericInformations(task.getGenericInformations());
+    }
+
+    /**
+     * Transform a String map into a BigString map to prepare Hibernate storage.
+     *
+     * @param arguments the String map to transform.
+     * @return The same map but with big string type
+     */
+    private static Map<String, BigString> toBigStringMap(Map<String, String> arguments) {
+        if (arguments == null) {
+            return null;
+        }
+        Map<String, BigString> tmp = new HashMap<String, BigString>();
+        for (Entry<String, String> e : arguments.entrySet()) {
+            tmp.put(e.getKey(), new BigString(e.getValue()));
+        }
+        return tmp;
     }
 }

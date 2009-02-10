@@ -34,8 +34,27 @@ package org.ow2.proactive.scheduler.job;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.Map;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.ManyToAny;
+import org.hibernate.annotations.MapKeyManyToMany;
+import org.hibernate.annotations.MetaValue;
+import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -46,7 +65,11 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.core.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
+import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
+import org.ow2.proactive.scheduler.task.internal.InternalProActiveTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
@@ -59,6 +82,10 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@MappedSuperclass
+@Table(name = "INTERNAL_JOB")
+@AccessType("field")
+@Proxy(lazy = false)
 public abstract class InternalJob extends Job implements Comparable<InternalJob> {
     /** Used to sort by id */
     public static final int SORT_BY_ID = 1;
@@ -84,29 +111,42 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     private static int currentOrder = ASC_ORDER;
 
     /** Owner of the job */
+    @Column(name = "OWNER")
     private String owner = "";
 
     /** List of every tasks in this job. */
-    protected HashMap<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
-
-    /** Instances of the precious task results, important to know which results the user wants */
-    protected Vector<InternalTask> preciousResults = new Vector<InternalTask>();
+    @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+            @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
+            @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
+            @MetaValue(targetEntity = InternalProActiveTask.class, value = "IPT") })
+    @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @Cascade(CascadeType.ALL)
+    @MapKeyManyToMany(targetEntity = TaskId.class)
+    protected Map<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
     /** Informations (that can be modified) about job execution */
+    @Alterable
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobEvent.class)
     protected JobEvent jobInfo = new JobEvent();
 
     /** Job descriptor for dependences management */
+    @Transient
+    //Not DB managed, created once needed.
     private JobDescriptor jobDescriptor;
 
     /** Job result */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobResultImpl.class)
     private JobResult jobResult;
 
     /** Initial waiting time for a task before restarting in millisecond */
+    @Column(name = "RESTART_TIMER")
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
 
-    /**
-     * ProActive empty constructor.
-     */
+    /** Hibernate default constructor */
     public InternalJob() {
     }
 
@@ -248,10 +288,6 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     public boolean addTask(InternalTask task) {
         task.setJobId(getId());
 
-        if (task.isPreciousResult()) {
-            preciousResults.add(task);
-        }
-
         task.setId(TaskId.nextId(getId(), task.getName()));
 
         boolean result = (tasks.put(task.getId(), task) == null);
@@ -276,7 +312,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             setState(JobState.RUNNING);
         }
 
-        jobDescriptor.start(td.getId());
+        getJobDescriptor().start(td.getId());
         td.setStatus(TaskState.RUNNING);
         td.setStartTime(System.currentTimeMillis());
         td.setFinishedTime(-1);
@@ -299,13 +335,13 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     public void reStartTask(InternalTask task) {
 
-        jobDescriptor.reStart(task.getId());
+        getJobDescriptor().reStart(task.getId());
 
         if (getState() == JobState.PAUSED) {
             task.setStatus(TaskState.PAUSED);
             HashMap<TaskId, TaskState> hts = new HashMap<TaskId, TaskState>();
             hts.put(task.getId(), task.getStatus());
-            jobDescriptor.update(hts);
+            getJobDescriptor().update(hts);
         } else {
             task.setStatus(TaskState.PENDING);
         }
@@ -330,7 +366,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         }
 
         //terminate this task
-        jobDescriptor.terminate(taskId);
+        getJobDescriptor().terminate(taskId);
 
         //creating list of status for the jobDescriptor
         HashMap<TaskId, TaskState> hts = new HashMap<TaskId, TaskState>();
@@ -340,7 +376,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         }
 
         //updating job descriptor for eligible task
-        jobDescriptor.update(hts);
+        getJobDescriptor().update(hts);
 
         return descriptor;
     }
@@ -352,8 +388,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param id the id of the task to start and terminate.
      */
     public void simulateStartAndTerminate(TaskId id) {
-        jobDescriptor.start(id);
-        jobDescriptor.terminate(id);
+        getJobDescriptor().start(id);
+        getJobDescriptor().terminate(id);
     }
 
     /**
@@ -368,12 +404,13 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             descriptor.setFinishedTime(System.currentTimeMillis());
             descriptor.setStatus((jobState == JobState.FAILED) ? TaskState.FAILED : TaskState.FAULTY);
             //terminate this job descriptor
-            jobDescriptor.failed();
+            getJobDescriptor().failed();
         }
         //set the new state of the job
         setFinishedTime(System.currentTimeMillis());
         setNumberOfPendingTasks(0);
         setNumberOfRunningTasks(0);
+        setNumberOfFinishedTasks(getNumberOfFinishedTask() + 1);
         setState(jobState);
 
         //creating list of status
@@ -408,13 +445,13 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @return the task descriptor associated to this id, or null if not running.
      */
     public TaskDescriptor getRunningTaskDescriptor(TaskId id) {
-        return jobDescriptor.GetRunningTaskDescriptor(id);
+        return getJobDescriptor().GetRunningTaskDescriptor(id);
     }
 
     /**
      * Set all properties following a job submitting.
      */
-    public void submit() {
+    public void submitAction() {
         setSubmittedTime(System.currentTimeMillis());
         setState(JobState.PENDING);
     }
@@ -472,7 +509,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             hts.put(td.getId(), td.getStatus());
         }
 
-        jobDescriptor.update(hts);
+        getJobDescriptor().update(hts);
         setTaskStatusModify(hts);
 
         return true;
@@ -512,7 +549,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             hts.put(td.getId(), td.getStatus());
         }
 
-        jobDescriptor.update(hts);
+        getJobDescriptor().update(hts);
         setTaskStatusModify(hts);
 
         return true;
@@ -540,10 +577,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     @Override
     public void setPriority(JobPriority priority) {
         jobInfo.setPriority(priority);
-
-        if (jobDescriptor != null) {
-            jobDescriptor.setPriority(priority);
-        }
+        getJobDescriptor().setPriority(priority);
     }
 
     /**
@@ -560,7 +594,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @return the tasks
      */
-    public HashMap<TaskId, InternalTask> getHMTasks() {
+    public Map<TaskId, InternalTask> getHMTasks() {
         return tasks;
     }
 
@@ -569,7 +603,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @param taskStatusModify the taskStatusModify to set
      */
-    public void setTaskStatusModify(HashMap<TaskId, TaskState> taskStatusModify) {
+    public void setTaskStatusModify(Map<TaskId, TaskState> taskStatusModify) {
         jobInfo.setTaskStatusModify(taskStatusModify);
     }
 
@@ -578,17 +612,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @param taskFinishedTimeModify the taskFinishedTimeModify to set
      */
-    public void setTaskFinishedTimeModify(HashMap<TaskId, Long> taskFinishedTimeModify) {
+    public void setTaskFinishedTimeModify(Map<TaskId, Long> taskFinishedTimeModify) {
         jobInfo.setTaskFinishedTimeModify(taskFinishedTimeModify);
-    }
-
-    /**
-     * To get the precious results of this job
-     *
-     * @return the precious results of this job
-     */
-    public Vector<InternalTask> getPreciousResults() {
-        return preciousResults;
     }
 
     /**
@@ -766,16 +791,19 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @return the jobDescriptor
      */
     public JobDescriptor getJobDescriptor() {
+        if (jobDescriptor == null) {
+            jobDescriptor = new JobDescriptor(this);
+        }
         return jobDescriptor;
     }
 
     /**
-     * To set the jobDescriptor
+     * Set the job Descriptor
      *
-     * @param jobDescriptor the jobDescriptor to set
+     * @param jobD the JobDescriptor to set.
      */
-    public void setJobDescriptor(JobDescriptor jobDescriptor) {
-        this.jobDescriptor = jobDescriptor;
+    public void setJobDescriptor(JobDescriptor jobD) {
+        this.jobDescriptor = jobD;
     }
 
     /**

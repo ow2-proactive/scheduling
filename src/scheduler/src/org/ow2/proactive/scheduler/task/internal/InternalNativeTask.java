@@ -31,6 +31,13 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
@@ -48,7 +55,15 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@Entity
+@Table(name = "INTERNAL_NATIVE_TASK")
+@AccessType("field")
+@Proxy(lazy = false)
 public class InternalNativeTask extends InternalTask {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /**
      * ProActive empty constructor.
@@ -62,7 +77,7 @@ public class InternalNativeTask extends InternalTask {
      * @param execContainer the Native Executable Container
      */
     public InternalNativeTask(NativeExecutableContainer execContainer) {
-        this.executableContainer = new ExecutableContainerDataBaseProxy(execContainer, this);
+        this.executableContainer = execContainer;
     }
 
     /**

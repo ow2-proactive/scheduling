@@ -31,31 +31,25 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -82,15 +76,17 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @since ProActive Scheduling 0.9
  *
  */
-public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
+public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, InitActive {
 
     /** RMCore active object of the RM */
     private RMCoreInterface rmcore;
 
+    private RMAuthentication authentication;
+
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.ADMIN);
 
-    private final static String GCMD_PROPERTY_NAME = PAResourceManagerProperties.RM_GCMD_PATH_PROPERTY_NAME
+    private final String GCMD_PROPERTY_NAME = PAResourceManagerProperties.RM_GCMD_PATH_PROPERTY_NAME
             .getValueAsString();
 
     private String gcmApplicationFile = PAResourceManagerProperties.RM_GCM_TEMPLATE_APPLICATION_FILE
@@ -106,8 +102,10 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * Creates the RMAdmin object
      * @param rmcore Stub of the {@link RMCore} active object of the RM.
      */
-    public RMAdminImpl(RMCoreInterface rmcore) {
+    public RMAdminImpl(RMCoreInterface rmcore, RMAuthentication authentication) {
+        super(rmcore, authentication);
         this.rmcore = rmcore;
+        this.authentication = authentication;
     }
 
     /**
@@ -138,6 +136,10 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
                         ", to specify GCMD deployment file is not defined," +
                         " Resource Manager will be unable to deploy nodes by GCM Deployment descriptor.");
                 }
+
+                registerTrustedService(authentication);
+                registerTrustedService(rmcore);
+
             } catch (NodeException e) {
                 e.printStackTrace();
             }
@@ -295,4 +297,13 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     public List<RMNodeSourceEvent> getNodeSourcesList() {
         return rmcore.getRMInitialState().getNodeSource();
     }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public boolean connect(UniqueID id) {
+        return registerTrustedService(id);
+    }
+
 }

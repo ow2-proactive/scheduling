@@ -33,10 +33,20 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.util.LinkedList;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Proxy;
 
 
 /**
@@ -44,7 +54,15 @@ import org.apache.log4j.spi.LoggingEvent;
  * @author The ProActive Team
  * @since 2.2
  */
+@Entity
+@Table(name = "LOG4J_TASK_LOGS")
+@AccessType("field")
+@Proxy(lazy = false)
 public class Log4JTaskLogs implements TaskLogs {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /** Prefix for job logger */
     public static final String JOB_LOGGER_PREFIX = "logger.scheduler.";
@@ -67,10 +85,17 @@ public class Log4JTaskLogs implements TaskLogs {
     public static final Level STDERR_LEVEL = Level.ERROR;
 
     /** The logs buffer */
+    @Cascade(CascadeType.ALL)
+    @Column(name = "ALL_EVENTS", columnDefinition = "BLOB")
     private LinkedList<LoggingEvent> allEvents;
 
     /** New line **/
     private static final String nl = System.getProperty("line.separator");
+
+    /** Hibernate constructor */
+    @SuppressWarnings("unused")
+    private Log4JTaskLogs() {
+    }
 
     /**
      * Create a new Log4JTaskLogs log.
@@ -142,4 +167,5 @@ public class Log4JTaskLogs implements TaskLogs {
     public LinkedList<LoggingEvent> getAllEvents() {
         return (LinkedList<LoggingEvent>) allEvents.clone();
     }
+
 }

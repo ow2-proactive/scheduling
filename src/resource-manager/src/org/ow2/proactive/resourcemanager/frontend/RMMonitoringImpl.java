@@ -256,4 +256,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         rmShutDownEvent(new RMEvent());
         PAActiveObject.terminateActiveObject(false);
     }
+
+    public Logger getLogger() {
+        return logger;
+    }
 }

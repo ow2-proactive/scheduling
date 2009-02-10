@@ -33,20 +33,65 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Any;
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.MetaValue;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Proxy;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
+import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
+
 
 /**
  * UpdatableProperties allow to know if a specified value has been modified or not.<br />
- * Useful to know if the default value has been kept.
+ * Useful to know if the default value has been kept.<br/> <br/>
+ * Managed parameter entities are RestartMode, BooleanWrapper, IntegerWrapper.
+ * If you want to add more entities, just add it in the @anyMetaDef annotation.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
+@Entity
+@Table(name = "UPDATABLE_PROPERTIES")
+@AccessType("field")
+@Proxy(lazy = false)
+@PublicAPI
 public class UpdatableProperties<T> implements Serializable {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /** The value of this property. */
+    @Any(metaColumn = @Column(name = "VALUE_TYPE", length = 5))
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+            @MetaValue(targetEntity = RestartMode.class, value = "RM"),
+            @MetaValue(targetEntity = BooleanWrapper.class, value = "BW"),
+            @MetaValue(targetEntity = IntegerWrapper.class, value = "IW") })
+    @JoinColumn(name = "VALUE_ID")
+    @Cascade(CascadeType.ALL)
     private T value = null;
+
     /** If the property has been set. */
+    @Column(name = "SET_")
     private boolean set = false;
+
+    /** HIBERNATE default constructor */
+    @SuppressWarnings("unused")
+    private UpdatableProperties() {
+    }
 
     /**
      * Create a new instance of UpdatableProperties using a specified value.<br />

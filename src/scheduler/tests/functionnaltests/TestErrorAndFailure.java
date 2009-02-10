@@ -34,19 +34,18 @@ package functionnaltests;
 import static junit.framework.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
-import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
@@ -56,27 +55,17 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * Register a monitor to Scheduler in order to receive events concerning
  * job submission.
  * 
- * Submit a job (test 1). 
- * After the job submission, the test monitor all jobs states changes, in order
- * to observe its execution :
- * job submitted (test 2),
- * job pending to running (test 3),
- * all task pending to running, and all tasks running to finished (test 4),
- * job running to finished (test 5).
- * After it retrieves job's result and check that all 
- * tasks results are available (test 6).
+ * This test will try many kind of possible errors.
+ * The goal for this test is to terminate. If the Test timeout is reached, it is considered as failed.
+ * Possible problems may come from many error count. If this job finish in a
+ * reasonable time, it is considered that it passed the test.
+ * Every events coming from the scheduler are also checked.
  * 
  * @author The ProActive Team
  * @date 2 jun 08
  * @since ProActive 4.0
  */
 public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
-
-    private static String jobDescriptor = TestErrorAndFailure.class.getResource(
-            "/functionnaltests/Job_PI.xml").getPath();
-
-    private String username = "jl";
-    private String password = "jl";
 
     private SchedulerEventReceiver receiver = null;
 
@@ -87,11 +76,6 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
      */
     @Before
     public void preRun() throws Exception {
-        System.out.println("------------------------------ Starting and linking new scheduler !...");
-        //join the scheduler
-        schedulerAuth = SchedulerConnection.join(schedulerDefaultURL);
-        //Log as user
-        schedUserInterface = schedulerAuth.logAsUser(username, password);
         //Create an Event receiver AO in order to observe jobs and tasks states changes
         receiver = (SchedulerEventReceiver) PAActiveObject.newActive(SchedulerEventReceiver.class.getName(),
                 new Object[] {});
@@ -109,7 +93,67 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        log("Test 1 : Creating job...");
+        //creating job
+        TaskFlowJob submittedJob = new TaskFlowJob();
+        submittedJob.setName("Test 12 tasks");
+        submittedJob
+                .setDescription("12 tasks job testing the behavior of error code and normal task ending.");
+        submittedJob.setMaxNumberOfExecution(10);
+        NativeTask finalTask = new NativeTask();
+        finalTask.setName("TestMerge");
+        finalTask.setCommandLine(new String[] { "java", "-cp", "classes/scheduler/",
+                "org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault", "final" });
+        for (int i = 1; i < 12; i++) {
+            NativeTask task = new NativeTask();
+            task.setName("Test" + i);
+            task.setCommandLine(new String[] { "java", "-cp", "classes/scheduler/",
+                    "org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault", "0" });
+            finalTask.addDependence(task);
+            submittedJob.addTask(task);
+        }
+        submittedJob.addTask(finalTask);
 
+        log("Test 2 : Submitting job...");
+        //job submission
+        JobId id = schedUserInterface.submit(submittedJob);
+
+        log("Test 3 : Verifying submission...");
+        // wait for event : job submitted
+        receiver.waitForNEvent(1);
+        ArrayList<Job> jobsList = receiver.cleanNgetJobSubmittedEvents();
+        assertTrue(jobsList.size() == 1);
+        Job job = jobsList.get(0);
+        assertTrue(job.getId().equals(id));
+
+        log("Test 4 : Verifying start of job execution...");
+        //wait for event : job pending to running
+        receiver.waitForNEvent(1);
+        ArrayList<JobEvent> eventsList = receiver.cleanNgetJobPendingToRunningEvents();
+        assertTrue(eventsList.size() == 1);
+        JobEvent jEvent = eventsList.get(0);
+        assertTrue(jEvent.getJobId().equals(id));
+
+        log("Test 5 : Verifying job termination...");
+        //wait for event : job Running to finished
+        while (true) {
+            receiver.waitForNEvent(1);
+            eventsList = receiver.cleanNgetjobRunningToFinishedEvents();
+            if (eventsList.size() == 1) {
+                break;
+            }
+        }
+        jEvent = eventsList.get(0);
+        assertTrue(jEvent.getJobId().equals(id));
+        assertTrue(receiver.cleanNgetTaskRunningToFinishedEvents().size() == 12);
+
+        log("Test 6 : Getting job result...");
+        JobResult res = schedUserInterface.getJobResult(id);
+        schedUserInterface.remove(id);
+        //Check the results
+        Map<String, TaskResult> results = res.getAllResults();
+        //check that number of results correspond to number of tasks
+        assertTrue(jEvent.getNumberOfFinishedTasks() == results.size());
     }
 
     /**
@@ -119,7 +163,7 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
      */
     @After
     public void afterTestJobSubmission() throws Exception {
-        System.out.println("------------------------------ Disconnecting from scheduler...");
+        log("Disconnecting from scheduler...");
         schedUserInterface.disconnect();
     }
 

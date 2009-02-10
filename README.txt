@@ -25,10 +25,9 @@ Quick start :
 
 * Start a command shell and go into the bin/[os] directory
 into your installed scheduler home path. Then launch :
-createDataBase.[sh|bat] ../../config/database/scheduler_db.cfg 
-script to create the database. This database will be used to store ProActive Scheduler
-activities and to offer fault tolerance. The file given as parameter -
-scheduler_db.cfg - is the configuration file for the database.
+A database is used to store ProActive Scheduler
+activities and to offer fault tolerance. The database is configured in the top of 
+the 'hibernate.cfg.xml' file in the 'config/database/hibernate' directory.
 
 * Next, we start the scheduler by launching the startScheduler.[sh|bat]
 script. If run without an argument, it will first start a Resources Manager on
@@ -39,7 +38,7 @@ when the line :
 
 is displayed. At this point, ProActive Scheduler is started with 4 nodes available.
 
-* You now submit a job. To do so, just start the
+* You can now submit a job. To do so, just start the
 submit.[sh|bat] script with proper parameters. You can try using :
 submit.[sh|bat] -j ../../jobs_descriptors/Job_8_tasks.xml -n 1, this will
 request for login and password, and then submit this job to the scheduler. If

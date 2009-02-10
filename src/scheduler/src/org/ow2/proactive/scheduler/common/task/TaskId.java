@@ -33,6 +33,18 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -46,7 +58,15 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@Entity
+@Table(name = "TASK_ID")
+@AccessType("field")
+@Proxy(lazy = false)
 public final class TaskId implements Comparable<TaskId>, Serializable {
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long hibernateId;
 
     /** Default task name */
     public static final String TASK_DEFAULT_NAME = PASchedulerProperties.TASK_DEFAULT_NAME.getValueAsString();
@@ -61,13 +81,21 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
     private static int currentId = 0;
 
     /** task id */
+    @Column(name = "ID")
     private long id;
 
     /** Human readable name */
+    @Column(name = "READABLE_NAME")
     private String readableName = TASK_DEFAULT_NAME;
 
     /** Job id */
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobId.class)
     private JobId jobId = null;
+
+    /** Hibernate default constructor */
+    private TaskId() {
+    }
 
     /**
      * Default constructor. Just set the id of the task.

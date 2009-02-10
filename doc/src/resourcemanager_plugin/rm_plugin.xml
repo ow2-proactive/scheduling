@@ -75,9 +75,11 @@
 				</mediaobject>
 		</figure>
 		<para>
-			Enter the URL of your already launched Resource Manager.
+			Enter the URL of existing Resource Manager and login information.
 			The URL is composed of the protocol, the host name on which the RM is started and the port on
-			which it is listening.
+			which it is listening. Ticking "log as admin" check box allows to perform administrator actions later
+			such as management of nodes and node sources, shutdown of resource manager and others. Regular users
+			can only get information about resources and their states.
 		</para>
 		<para>
 			You are now connected and ready to perform administrative actions on the remote Resource Manager.

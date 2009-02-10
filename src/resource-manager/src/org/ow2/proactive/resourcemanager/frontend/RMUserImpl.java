@@ -38,11 +38,14 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.ow2.proactive.authentication.RestrictedService;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
@@ -73,13 +76,15 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @since ProActive Scheduling 0.9
  *
  */
-public class RMUserImpl implements RMUser, InitActive {
+public class RMUserImpl extends RestrictedService implements RMUser, InitActive {
 
     /** Log4J logger name for RMUser */
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.USER);
 
     /** RMcore active object Stub of the RM */
     private RMCoreInterface rmcore;
+
+    private RMAuthentication authentication;
 
     /**
      * ProActive empty constructor
@@ -91,12 +96,13 @@ public class RMUserImpl implements RMUser, InitActive {
      * Creates the RM user object
      * @param rmcore stub of the RMCore active object
      */
-    public RMUserImpl(RMCoreInterface rmcore) {
+    public RMUserImpl(RMCoreInterface rmcore, RMAuthentication authentication) {
         if (logger.isDebugEnabled()) {
             logger.debug("RMUser constructor");
         }
 
         this.rmcore = rmcore;
+        this.authentication = authentication;
     }
 
     /**
@@ -107,6 +113,9 @@ public class RMUserImpl implements RMUser, InitActive {
             PAActiveObject.register(PAActiveObject.getStubOnThis(), "//" +
                 PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
                 RMConstants.NAME_ACTIVE_OBJECT_RMUSER);
+
+            registerTrustedService(authentication);
+            registerTrustedService(rmcore);
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -212,4 +221,18 @@ public class RMUserImpl implements RMUser, InitActive {
         state.setNumberOfAllResources(getTotalNodesNumber());
         return state;
     }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public boolean connect(UniqueID id) {
+        return registerTrustedService(id);
+    }
+
+    public void disconnect() {
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        unregisterTrustedService(id);
+    }
+
 }

@@ -31,8 +31,16 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.util.HashMap;
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
@@ -56,36 +64,42 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public abstract class Job extends CommonAttribute implements GenericInformationsProvider {
-
+@MappedSuperclass
+@Table(name = "JOB")
+@AccessType("field")
+@Proxy(lazy = false)
+public abstract class Job extends CommonAttribute {
     // TODO cdelbe, jlscheef
     // all setters are needed only for InternalJob creation. (JL) (also for (user API) job creation (?))
     // Is there a more elegant way...? (JL) Constructors ?
 
     /** Name of the job */
+    @Column(name = "NAME")
     protected String name = JobId.DEFAULT_JOB_NAME;
 
     /** Execution environment for this job */
-    protected JobEnvironment env = new JobEnvironment();
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobEnvironment.class)
+    protected JobEnvironment environment = new JobEnvironment();
 
     /** logs are written in logFile if not null */
+    @Column(name = "LOG_FILE")
     protected String logFile = null;
 
     /** Short description of this job */
+    @Column(name = "DESCRIPTION", columnDefinition = "CLOB")
     protected String description = "No description";
 
     /** Project name for this job */
+    @Column(name = "PROJECT_NAME")
     protected String projectName = "Not Assigned";
 
     /** Job priority */
+    @Column(name = "PRIORITY", columnDefinition = "integer")
     protected JobPriority priority = JobPriority.NORMAL;
-
-    /** Job user informations */
-    protected HashMap<String, String> genericInformations = new HashMap<String, String>();
 
     /** ProActive Empty Constructor */
     public Job() {
-
     }
 
     /**
@@ -162,6 +176,10 @@ public abstract class Job extends CommonAttribute implements GenericInformations
      * @param filePath the path of the log file.
      */
     public void setLogFile(String filePath) {
+        if (filePath != null && filePath.length() > 255) {
+            throw new IllegalArgumentException("File path is too long, it must have 255 chars length max : " +
+                filePath);
+        }
         this.logFile = filePath;
     }
 
@@ -172,27 +190,6 @@ public abstract class Job extends CommonAttribute implements GenericInformations
      */
     public String getLogFile() {
         return this.logFile;
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#getGenericInformations()
-     */
-    public HashMap<String, String> getGenericInformations() {
-        return genericInformations;
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#addGenericInformation(java.lang.String, java.lang.String)
-     */
-    public void addGenericInformation(String key, String genericInformation) {
-        this.genericInformations.put(key, genericInformation);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.job.GenericInformationsProvider#setGenericInformations(java.util.HashMap)
-     */
-    public void setGenericInformations(HashMap<String, String> genericInformations) {
-        this.genericInformations = genericInformations;
     }
 
     /**
@@ -215,18 +212,19 @@ public abstract class Job extends CommonAttribute implements GenericInformations
 
     /**
      * Return the environment for this job
+     *
      * @see JobEnvironment
      * @return the environment for this job
      */
-    public JobEnvironment getEnv() {
-        return env;
+    public JobEnvironment getEnvironment() {
+        return environment;
     }
 
     /**
      * Set the environment for this job.
      * @param env the environment to set
      */
-    public void setEnv(JobEnvironment env) {
-        this.env = env;
+    public void setEnvironment(JobEnvironment environment) {
+        this.environment = environment;
     }
 }

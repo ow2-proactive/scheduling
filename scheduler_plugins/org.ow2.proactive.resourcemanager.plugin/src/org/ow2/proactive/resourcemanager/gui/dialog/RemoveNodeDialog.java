@@ -29,6 +29,7 @@ package org.ow2.proactive.resourcemanager.gui.dialog;
 
 import java.util.ArrayList;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -40,6 +41,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
@@ -53,7 +55,7 @@ public class RemoveNodeDialog extends Dialog {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
-    private RemoveNodeDialog(Shell parent, ArrayList<String> nodesUrls) {
+    private RemoveNodeDialog(final Shell parent, ArrayList<String> nodesUrls) {
 
         // Pass the default styles here
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -100,8 +102,12 @@ public class RemoveNodeDialog extends Dialog {
         okButton.setText("OK");
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
-                for (String url : urls) {
-                    RMStore.getInstance().getRMAdmin().removeNode(url, !preemptCheck.getSelection());
+                try {
+                    for (String url : urls) {
+                        RMStore.getInstance().getRMAdmin().removeNode(url, !preemptCheck.getSelection());
+                    }
+                } catch (RMException e) {
+                    MessageDialog.openError(parent, "Access denied", e.getMessage());
                 }
                 shell.close();
             }

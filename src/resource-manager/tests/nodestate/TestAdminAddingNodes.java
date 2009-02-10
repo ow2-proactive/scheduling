@@ -86,7 +86,7 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         int pingFrequency = 5000;
         admin.setDefaultNodeSourcePingFrequency(pingFrequency);
 
-        System.out.println("------------------------------ Test 1");
+        log("Test 1");
 
         String node1URL = "rmi://" + hostName + "/node1";
         createNode(node1URL);
@@ -95,20 +95,20 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
-        System.out.println("------------------------------ Test 2");
+        log("Test 2");
 
         //preemptive removal is useless for this case, because node is free 
         admin.removeNode(node1URL, false);
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 0);
-        assertTrue(user.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 0);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
-        System.out.println("------------------------------ Test 3");
+        log("Test 3");
 
         String node2URL = "rmi://" + hostName + "/node2";
         createNode(node2URL);
@@ -118,8 +118,8 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         //wait the node added event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
         //kill the node
         Node node2 = NodeFactory.getNode(node2URL);
@@ -132,8 +132,8 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         //wait the node down event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesdownEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         //create another node with the same URL, and add it to Resource manager
         createNode(node2URL);
@@ -146,10 +146,10 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         //wait the node added event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
-        System.out.println("------------------------------ Test 4");
+        log("Test 4");
 
         //put a large ping frequency in order to avoid down nodes detection
         admin.setDefaultNodeSourcePingFrequency(10000);
@@ -176,20 +176,20 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         //wait the node added event, node added is free
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
-        System.out.println("------------------------------ Test 5");
+        log("Test 5");
 
         //put the the node to busy state
-        NodeSet nodes = user.getAtMostNodes(new IntWrapper(1), null);
+        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(1), null);
         PAFuture.waitFor(nodes);
 
         //wait the node busy event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         //node2 is busy, kill the node 
         node2 = NodeFactory.getNode(node2URL);
@@ -210,20 +210,20 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         //wait the node added event, node added is free
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
-        System.out.println("------------------------------ Test 6");
+        log("Test 6");
 
         //put the the node to busy state
-        nodes = user.getAtMostNodes(new IntWrapper(1), null);
+        nodes = admin.getAtMostNodes(new IntWrapper(1), null);
         PAFuture.waitFor(nodes);
 
         //wait the node busy event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesBusyEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         //put the node in to Release state
         admin.removeNode(node2URL, false);
@@ -231,8 +231,8 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         //wait the node to release event
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesToReleaseEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         //node2 is to release, kill the node 
         node2 = NodeFactory.getNode(node2URL);
@@ -253,8 +253,8 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         //wait the node added event, node added is free
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
-        assertTrue(user.getTotalNodesNumber().intValue() == 1);
-        assertTrue(user.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
     }
 }

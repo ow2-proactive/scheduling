@@ -32,8 +32,26 @@
 package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import javax.persistence.FetchType;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.task.util.BigString;
+import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
+import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 
 
 /**
@@ -43,19 +61,27 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9.1
  */
 @PublicAPI
+@MappedSuperclass
+@Table(name = "COMMON_ATTRIBUTE")
+@AccessType("field")
+@Proxy(lazy = false)
 public abstract class CommonAttribute implements Serializable {
-
     /** 
      * Do the job has to cancel when an exception occurs in a task. (default is false) <br />
      * You can override this property inside each task.
      */
-    private UpdatableProperties<Boolean> cancelJobOnError = new UpdatableProperties<Boolean>(false);
+    @OneToOne(fetch = FetchType.EAGER)
+    @Cascade(CascadeType.ALL)
+    private UpdatableProperties<BooleanWrapper> cancelJobOnError = new UpdatableProperties<BooleanWrapper>(
+        new BooleanWrapper(false));
 
     /** 
      * Where will a task be restarted if an error occurred. (default is ANYWHERE)<br />
      * It will be restarted according to the number of execution remaining.<br />
      * You can override this property inside each task.
      */
+    @OneToOne(fetch = FetchType.EAGER)
+    @Cascade(CascadeType.ALL)
     private UpdatableProperties<RestartMode> restartTaskOnError = new UpdatableProperties<RestartMode>(
         RestartMode.ANYWHERE);
 
@@ -63,7 +89,16 @@ public abstract class CommonAttribute implements Serializable {
      * The maximum number of execution for a task (default 1). <br />
      * You can override this property inside each task.
      */
-    private UpdatableProperties<Integer> maxNumberOfExecution = new UpdatableProperties<Integer>(1);
+    @OneToOne(fetch = FetchType.EAGER)
+    @Cascade(CascadeType.ALL)
+    private UpdatableProperties<IntegerWrapper> maxNumberOfExecution = new UpdatableProperties<IntegerWrapper>(
+        new IntegerWrapper(1));
+
+    /** Common user informations */
+    @OneToMany(cascade = javax.persistence.CascadeType.ALL)
+    @Cascade(CascadeType.ALL)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    private Map<String, BigString> genericInformations = new HashMap<String, BigString>();
 
     /**
      * To get the cancelOnError
@@ -71,7 +106,7 @@ public abstract class CommonAttribute implements Serializable {
      * @return the cancelOnError
      */
     public boolean isCancelJobOnError() {
-        return cancelJobOnError.getValue();
+        return cancelJobOnError.getValue().booleanValue();
     }
 
     /**
@@ -80,7 +115,7 @@ public abstract class CommonAttribute implements Serializable {
      * @param cancelJobOnError the cancelJobOnError to set
      */
     public void setCancelJobOnError(boolean cancelJobOnError) {
-        this.cancelJobOnError.setValue(cancelJobOnError);
+        this.cancelJobOnError.setValue(new BooleanWrapper(cancelJobOnError));
     }
 
     /**
@@ -88,7 +123,7 @@ public abstract class CommonAttribute implements Serializable {
      * 
      * @return the cancelJobOnError updatable property.
      */
-    public UpdatableProperties<Boolean> getCancelJobOnErrorProperty() {
+    public UpdatableProperties<BooleanWrapper> getCancelJobOnErrorProperty() {
         return cancelJobOnError;
     }
 
@@ -125,7 +160,7 @@ public abstract class CommonAttribute implements Serializable {
      * @return the number of execution allowed for this task.
      */
     public int getMaxNumberOfExecution() {
-        return maxNumberOfExecution.getValue();
+        return maxNumberOfExecution.getValue().integerValue();
     }
 
     /**
@@ -138,7 +173,7 @@ public abstract class CommonAttribute implements Serializable {
             throw new IllegalArgumentException(
                 "The number of execution must be a non negative integer (>0) !");
         }
-        this.maxNumberOfExecution.setValue(numberOfExecution);
+        this.maxNumberOfExecution.setValue(new IntegerWrapper(numberOfExecution));
     }
 
     /**
@@ -146,8 +181,50 @@ public abstract class CommonAttribute implements Serializable {
      * 
      * @return the maximum number Of Execution updatable property.
      */
-    public UpdatableProperties<Integer> getMaxNumberOfExecutionProperty() {
+    public UpdatableProperties<IntegerWrapper> getMaxNumberOfExecutionProperty() {
         return maxNumberOfExecution;
+    }
+
+    /**
+     * Returns the genericInformations.<br>
+     * These informations are transmitted to the policy that can use it for the scheduling.
+     *
+     * @return the genericInformations.
+     */
+    public Map<String, String> getGenericInformations() {
+        Map<String, String> tmp = new HashMap<String, String>();
+        for (Entry<String, BigString> e : this.genericInformations.entrySet()) {
+            tmp.put(e.getKey(), e.getValue().getValue());
+        }
+        return tmp;
+    }
+
+    /**
+     * Add an information to the generic field informations field.
+     * This information will be given to the scheduling policy.
+     *
+     * @param key the key in which to store the informations.
+     * @param genericInformation the information to store.
+     */
+    public void addGenericInformation(String key, String genericInformation) {
+        if (key != null && key.length() > 255) {
+            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + key);
+        }
+        this.genericInformations.put(key, new BigString(genericInformation));
+    }
+
+    /**
+     * Set the generic information as a hash map.
+     *
+     * @param genericInformations the generic information to set.
+     */
+    public void setGenericInformations(Map<String, String> genericInformations) {
+        this.genericInformations = new HashMap<String, BigString>();
+        if (genericInformations != null) {
+            for (Entry<String, String> e : genericInformations.entrySet()) {
+                addGenericInformation(e.getKey(), e.getValue());
+            }
+        }
     }
 
 }

@@ -82,7 +82,7 @@ public class ProbablisticSelectionManager implements SelectionManager {
             final Collection<RMNode> freeNodes, NodeSet exclusionNodes) {
 
         long startTime = System.currentTimeMillis();
-        logger.info("Looking for appropriate nodes");
+        logger.debug("Looking for appropriate nodes");
 
         Collection<RMNode> filteredList = new ArrayList<RMNode>();
         if (exclusionNodes != null && exclusionNodes.size() > 0) {
@@ -99,11 +99,11 @@ public class ProbablisticSelectionManager implements SelectionManager {
 
         // if no scripts are specified return filtered free nodes 
         if (!scriptSpecified) {
-            logger.info("Selection script was not specified");
+            logger.debug("Selection script was not specified");
             return filteredList;
         }
 
-        logger.info("Selection scripts count is " + selectionScriptList.size());
+        logger.debug("Selection scripts count is " + selectionScriptList.size());
 
         // finding intersection
         HashMap<RMNode, Probability> intersectionMap = new HashMap<RMNode, Probability>();
@@ -134,15 +134,15 @@ public class ProbablisticSelectionManager implements SelectionManager {
         res.addAll(intersectionMap.keySet());
         Collections.sort(res, new NodeProbabilityComparator(intersectionMap));
 
-        logger.info("The following nodes are selected for scripts execution (time is " +
+        logger.debug("The following nodes are selected for scripts execution (time is " +
             (System.currentTimeMillis() - startTime) + " ms) :");
         if (res.size() > 0) {
             for (RMNode rmnode : res) {
-                logger.info("Node url: " + rmnode.getNodeURL() + ", probability: " +
+                logger.debug("Node url: " + rmnode.getNodeURL() + ", probability: " +
                     intersectionMap.get(rmnode));
             }
         } else {
-            logger.info("None");
+            logger.debug("None");
         }
 
         return res;
@@ -159,10 +159,10 @@ public class ProbablisticSelectionManager implements SelectionManager {
     public boolean scriptWillPassOnTheNode(SelectionScript script, RMNode rmnode) {
         if (probabilities.containsKey(script) && probabilities.get(script).containsKey(rmnode)) {
             Probability p = probabilities.get(script).get(rmnode);
-            logger.info("Known static script " + script.hashCode() + " for node " + rmnode.getNodeURL());
+            logger.debug("Known static script " + script.hashCode() + " for node " + rmnode.getNodeURL());
             return p.value() == 1;
         }
-        logger.info("Unknown script " + script.hashCode() + " for node " + rmnode.getNodeURL());
+        logger.debug("Unknown script " + script.hashCode() + " for node " + rmnode.getNodeURL());
         return false;
     }
 
@@ -209,7 +209,7 @@ public class ProbablisticSelectionManager implements SelectionManager {
             probabilities.put(script, new HashMap<RMNode, Probability>());
         }
 
-        logger.info("Adding data to knowledge base - script: " + script.hashCode() + ", node: " +
+        logger.debug("Adding data to knowledge base - script: " + script.hashCode() + ", node: " +
             rmnode.getNodeURL() + ", probability: " + probability);
         probabilities.get(script).put(rmnode, probability);
         return result;
