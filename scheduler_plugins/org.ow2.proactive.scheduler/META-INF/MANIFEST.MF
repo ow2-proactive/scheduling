@@ -7,7 +7,9 @@ Bundle-Activator: org.ow2.proactive.scheduler.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.update.ui
+ org.eclipse.update.ui,
+ org.eclipse.core.runtime.compatibility;bundle-version="3.2.0",
+ org.eclipse.core.runtime.compatibility.auth;bundle-version="3.2.100"
 Eclipse-LazyStart: true
 Bundle-Vendor: ProActive
 Bundle-ClassPath: classes/,

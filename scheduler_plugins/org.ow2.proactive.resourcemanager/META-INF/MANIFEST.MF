@@ -12,3 +12,5 @@ Require-Bundle: org.eclipse.ui,
  org.ow2.proactive.resourcemanager.gui
 Eclipse-LazyStart: true
 Export-Package: org.ow2.proactive.resourcemanager
+Bundle-ClassPath: bin/,
+ .
