@@ -93,6 +93,7 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        String URLbegin = System.getProperty("pa.scheduler.home") + "/";
         log("Test 1 : Creating job...");
         //creating job
         TaskFlowJob submittedJob = new TaskFlowJob();
@@ -102,12 +103,12 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
         submittedJob.setMaxNumberOfExecution(10);
         NativeTask finalTask = new NativeTask();
         finalTask.setName("TestMerge");
-        finalTask.setCommandLine(new String[] { "java", "-cp", "classes/scheduler/",
+        finalTask.setCommandLine(new String[] { "java", "-cp", URLbegin + "classes/scheduler/",
                 "org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault", "final" });
         for (int i = 1; i < 12; i++) {
             NativeTask task = new NativeTask();
             task.setName("Test" + i);
-            task.setCommandLine(new String[] { "java", "-cp", "classes/scheduler/",
+            task.setCommandLine(new String[] { "java", "-cp", URLbegin + "classes/scheduler/",
                     "org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault", "0" });
             finalTask.addDependence(task);
             submittedJob.addTask(task);

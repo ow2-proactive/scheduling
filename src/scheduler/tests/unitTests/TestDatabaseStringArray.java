@@ -68,6 +68,7 @@ public class TestDatabaseStringArray {
 
     @Test
     public void run() throws Throwable {
+        String URLbegin = System.getProperty("pa.scheduler.home") + "/";
         String[] sa = new String[3];
         for (int k = 0; k < sa.length; k++) {
             StringBuilder sb = new StringBuilder("");
@@ -76,12 +77,12 @@ public class TestDatabaseStringArray {
             }
             sa[k] = sb.toString();
         }
-        SimpleScript ss = new SimpleScript(new File("jobs_descriptors/set.js"), sa);
+        SimpleScript ss = new SimpleScript(new File(URLbegin + "jobs_descriptors/set.js"), sa);
         DatabaseManager.register(ss);
         JobEnvironment je = new JobEnvironment();
         je.setJobClasspath(sa);
         DatabaseManager.register(je);
-        GenerationScript gs = new GenerationScript("jobs_descriptors/set.js", "js");
+        GenerationScript gs = new GenerationScript(URLbegin + "jobs_descriptors/set.js", "js");
         NativeExecutableContainer nec = new NativeExecutableContainer(sa, gs);
         DatabaseManager.register(nec);
         TaskResultImpl tri = new TaskResultImpl();
