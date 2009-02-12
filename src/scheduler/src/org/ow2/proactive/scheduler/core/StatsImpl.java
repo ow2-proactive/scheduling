@@ -37,7 +37,7 @@ import java.util.Map;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 import org.ow2.proactive.scheduler.common.scheduler.Stats;
-import org.ow2.proactive.scheduler.common.scheduler.Tools;
+import org.ow2.proactive.scheduler.common.scheduler.util.Tools;
 
 
 /**

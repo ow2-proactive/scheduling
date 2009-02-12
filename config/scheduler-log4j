@@ -70,13 +70,13 @@ log4j.appender.schedulerAppenderINFO=org.apache.log4j.ConsoleAppender
 #Layout definition
 log4j.appender.schedulerAppenderINFO.layout=org.apache.log4j.PatternLayout
 #Pattern display
-log4j.appender.schedulerAppenderINFO.layout.ConversionPattern=[SCHEDULER.%C{1}] %m%n
+log4j.appender.schedulerAppenderINFO.layout.ConversionPattern=[%-5p] [SCHEDULER.%C{1}] %m%n
 
 log4j.appender.schedulerAppenderDEBUG=org.apache.log4j.ConsoleAppender
 #Layout definition
 log4j.appender.schedulerAppenderDEBUG.layout=org.apache.log4j.PatternLayout
 #Pattern display
-log4j.appender.schedulerAppenderDEBUG.layout.ConversionPattern=[SCHEDULER.%C{1}.%M] %m%n
+log4j.appender.schedulerAppenderDEBUG.layout.ConversionPattern=[%-5p] [SCHEDULER.%C{1}.%M] %m%n
 
 
 #SCHEDULER Appender configuration
@@ -84,11 +84,11 @@ log4j.appender.resourceManagerAppender=org.apache.log4j.ConsoleAppender
 #Layout definition
 log4j.appender.resourceManagerAppender.layout=org.apache.log4j.PatternLayout
 #Pattern display
-log4j.appender.resourceManagerAppender.layout.ConversionPattern=[RESOURCE_MANAGER.%C{1}] %m%n
+log4j.appender.resourceManagerAppender.layout.ConversionPattern=[%-5p] [RESOURCE_MANAGER.%C{1}] %m%n
 
 
 ### HIBERNATE Appender configuration : direct log messages to stdout ###
 log4j.appender.hibernate=org.apache.log4j.ConsoleAppender
 log4j.appender.hibernate.Target=System.out
 log4j.appender.hibernate.layout=org.apache.log4j.PatternLayout
-log4j.appender.hibernate.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
+log4j.appender.hibernate.layout.ConversionPattern=[%-5p] %d{ABSOLUTE} %c{1}:%L - %m%n

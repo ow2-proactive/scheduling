@@ -31,7 +31,10 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -44,8 +47,12 @@ import org.ow2.proactive.scheduler.common.exception.JobCreationException;
  *
  */
 public abstract class JobFactory {
-
-    private static final String CURRENT_IMPL = "org.ow2.proactive.scheduler.common.job.JobFactory_stax";
+	
+	public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
+	
+    private static final String[] CURRENT_IMPL = new String[]{
+    	"org.ow2.proactive.scheduler.common.job.JobFactory_stax",
+    	"org.ow2.proactive.scheduler.common.job.JobFactory_xpath"};
 
     /**
      * Singleton Pattern
@@ -53,17 +60,48 @@ public abstract class JobFactory {
     private static JobFactory factory = null;
 
     /**
-     * Return the instance of the jobFactory.
+     * Try to instantiate the known factories.
+     * Return the created instance of the jobFactory.
+     * If no factory is found or created, a runtime exception is raised.
      *
      * @return the instance of the jobFactory.
      */
     public static JobFactory getFactory() {
         if (factory == null) {
-            try {
-                factory = (JobFactory) Class.forName(CURRENT_IMPL).newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException("Cannot instanciate this factory : " + CURRENT_IMPL, e);
-            }
+        	for (String factoryInstance : CURRENT_IMPL){
+	            try {
+	                factory = (JobFactory) Class.forName(factoryInstance).newInstance();
+	                break;
+	            } catch (ClassNotFoundException e) {
+	            	logger.warn("Cannot instanciate this factory : " + CURRENT_IMPL,e);
+	            } catch (Exception e){
+	            	logger.warn("Error while instanciating this factory : " + CURRENT_IMPL, e);
+	            }
+        	}
+        	if (factory == null){
+        		throw new RuntimeException("Cannot instanciate any factories ! (see warning to know why)");
+        	}
+        }
+        return factory;
+    }
+    
+    /**
+     * Try to instantiate the given factory.
+     * Return the created instance of the jobFactory.
+     * If the factory is not found or not created, a runtime exception is raised.
+     *
+     * @return the instance of the required factory.
+     */
+    public static JobFactory getFactory(String impl) {
+    	if (impl == null){
+    		return getFactory();
+    	}
+        try {
+            factory = (JobFactory) Class.forName(impl).newInstance();
+        } catch (ClassNotFoundException e) {
+        	throw new RuntimeException("Cannot instanciate this factory : " + CURRENT_IMPL,e);
+        } catch (Exception e){
+        	throw new RuntimeException("Error while instanciating this factory : " + CURRENT_IMPL, e);
         }
         return factory;
     }

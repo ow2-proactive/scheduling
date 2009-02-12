@@ -44,7 +44,7 @@ import org.ow2.proactive.resourcemanager.common.scripting.ScriptHandler;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptLoader;
 import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.scheduler.Tools;
+import org.ow2.proactive.scheduler.common.scheduler.util.Tools;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;

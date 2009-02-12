@@ -29,12 +29,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.scheduler;
+package org.ow2.proactive.scheduler.common.scheduler.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.StringTokenizer;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 

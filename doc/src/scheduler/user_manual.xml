@@ -87,6 +87,9 @@
 							is a way to define variables which can be reused throughout the descriptor file.
 							Inside this tag, each variable can be reused (even in another following variable definition)
 							by using the syntax ${name_of_variable}.
+							Note that you can also reference variables defined in the JVM properties. The JVM that starts the Job parser (JobFactory)
+							can be start with -Dtoto=helloWorld. The variable ${toto} in the XML descriptor file will have 'helloWorld' as value.
+							This method is not commonly used but can be very useful to manage your relative path.
 						</para>
 					</listitem>
 					<listitem>
@@ -95,7 +98,7 @@
 							is a way to define some information inside your job.
 							These information could be read by the policy of the Scheduler. This information can be used
 							to modify the scheduling behavior. As an example, the administrator can set the policy
-							to be influenced by this information. 
+							to be influenced by this information.
 						</para>
 					</listitem>
 					<listitem>
