@@ -253,9 +253,9 @@ public class JobFactory_stax extends JobFactory {
     private void createAndFillJob(XMLStreamReader cursorJob) throws JobCreationException {
         //create a job that will just temporary store the common properties of the job
         Job jtmp = new Job() {
-			private static final long serialVersionUID = -1860047809844693058L;
+            private static final long serialVersionUID = -1860047809844693058L;
 
-			public JobId getId() {
+            public JobId getId() {
                 throw new RuntimeException("Not Available !");
             }
 
@@ -520,7 +520,7 @@ public class JobFactory_stax extends JobFactory {
         try {
             Task toReturn = null;
             Task tmpTask = (taskToFill != null) ? taskToFill : new Task() {
-				private static final long serialVersionUID = -1584736279517084273L;
+                private static final long serialVersionUID = -1584736279517084273L;
             };
             //parse job attributes and fill the temporary one
             int attrLen = cursorTask.getAttributeCount();
@@ -974,33 +974,34 @@ public class JobFactory_stax extends JobFactory {
     private String replace(String str) throws JobCreationException {
         str = str.trim();
         //impl1 - do not search in System properties
-//        if (!variables.isEmpty() && variablesPattern.matcher(str).matches()) {
-//            for (Entry<String, String> e : variables.entrySet()) {
-//                str = str.replaceAll("\\$\\{" + (String) e.getKey() + "\\}", (String) e.getValue());
-//            }
-//        }
-//        return str;
+        //        if (!variables.isEmpty() && variablesPattern.matcher(str).matches()) {
+        //            for (Entry<String, String> e : variables.entrySet()) {
+        //                str = str.replaceAll("\\$\\{" + (String) e.getKey() + "\\}", (String) e.getValue());
+        //            }
+        //        }
+        //        return str;
         //impl2 - also search in System properties
-    	String[] strs = RegexpMatcher.matches(variablesPattern, str);
-    	String replacement;
-    	if (strs.length != 0) {
-    		//for each entry
-    		for (String s : strs){
-    			//remove ${ and }
-    			s = s.substring(2, s.length()-1);
-    			//search the key (first in variables)
-    			replacement = variables.get(s);
-    			if (replacement == null){
-    				//if not found in System properties
-    				replacement = System.getProperty(s);
-    			}
-    			if (replacement == null){
-    				throw new JobCreationException("Variable '"+s+"' not found in the definition (${"+s+"})");
-    			}
-    			str = str.replaceFirst("\\$\\{" + s + "\\}", replacement);
-    		}
-    	}
-    	return str;
+        String[] strs = RegexpMatcher.matches(variablesPattern, str);
+        String replacement;
+        if (strs.length != 0) {
+            //for each entry
+            for (String s : strs) {
+                //remove ${ and }
+                s = s.substring(2, s.length() - 1);
+                //search the key (first in variables)
+                replacement = variables.get(s);
+                if (replacement == null) {
+                    //if not found in System properties
+                    replacement = System.getProperty(s);
+                }
+                if (replacement == null) {
+                    throw new JobCreationException("Variable '" + s + "' not found in the definition (${" +
+                        s + "})");
+                }
+                str = str.replaceFirst("\\$\\{" + s + "\\}", replacement);
+            }
+        }
+        return str;
     }
 
     /**

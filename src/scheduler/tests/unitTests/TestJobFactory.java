@@ -60,17 +60,17 @@ public class TestJobFactory {
 
     @Test
     public void run() throws Throwable {
-    	log("TEST jobFactory STAX");
-    	//test default behavior as well (null is STAX)
-    	run1(null);
-    	log("TEST jobFactory XPATH");
-    	//test XPATH factory
-    	//run1("org.ow2.proactive.scheduler.common.job.JobFactory_xpath");
+        log("TEST jobFactory STAX");
+        //test default behavior as well (null is STAX)
+        run1(null);
+        log("TEST jobFactory XPATH");
+        //test XPATH factory
+        //run1("org.ow2.proactive.scheduler.common.job.JobFactory_xpath");
     }
-    
+
     private void run1(String impl) throws Throwable {
-    	String URLbegin = System.getProperty("pa.scheduler.home")+"/";
-    	log("Test Job TASKFLOW");
+        String URLbegin = System.getProperty("pa.scheduler.home") + "/";
+        log("Test Job TASKFLOW");
         TaskFlowJob tfJob = (TaskFlowJob) JobFactory.getFactory(impl).createJob(jobTaskFlowDescriptor);
         //Check job properties
         Assert.assertEquals(tfJob.getDescription(), "No paquit in its HostName.");
@@ -96,7 +96,7 @@ public class TestJobFactory {
         Assert.assertTrue(tfJob.getTask("task1").getPreScript().getScript().contains(
                 "Beginning of Pre-Script"));
         Assert.assertTrue(tfJob.getTask("task1").getPostScript().getScript().contains(
-        		"Content is equals to "+URLbegin+"jobs_descriptors/unset.js"));
+                "Content is equals to " + URLbegin + "jobs_descriptors/unset.js"));
         Assert.assertEquals(tfJob.getTask("task1").getPostScript().getParameters(), null);
         Assert.assertTrue(tfJob.getTask("task1").getCleaningScript().getScript().contains(
                 "Beginning of clean script"));
@@ -177,8 +177,8 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task3").isWallTime(), true);
         Assert.assertEquals(tfJob.getTask("task3").getGenericInformations().size(), 0);
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine().length, 5);
-        Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[0],
-        		URLbegin+"jobs_descriptors/job_native_linux/nativTask");
+        Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[0], URLbegin +
+            "jobs_descriptors/job_native_linux/nativTask");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[1], "1");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[2], "2 2");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[3], "3");
@@ -205,10 +205,10 @@ public class TestJobFactory {
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getScript(),
                 "command=args[0]+\" 12\";\n");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getParameters()[0],
-        		URLbegin+"jobs_descriptors/job_native_linux/nativTask");
+                URLbegin + "jobs_descriptors/job_native_linux/nativTask");
         Assert.assertEquals(
-                ((NativeTask) tfJob.getTask("task4")).getGenerationScript().execute().getResult(),
-                URLbegin+"jobs_descriptors/job_native_linux/nativTask 12");
+                ((NativeTask) tfJob.getTask("task4")).getGenerationScript().execute().getResult(), URLbegin +
+                    "jobs_descriptors/job_native_linux/nativTask 12");
 
         log("Test Job PROACTIVE");
         ProActiveJob paJob = (ProActiveJob) JobFactory.getFactory().createJob(jobProActiveDescriptor);
