@@ -74,6 +74,7 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
      *  This method will join a new scheduler and connect it as user.<br/>
      *  Then, it will register an event receiver to check the dispatched event.
      */
+    @SuppressWarnings("unchecked")
     @Before
     public void preRun() throws Exception {
         //Create an Event receiver AO in order to observe jobs and tasks states changes
@@ -94,6 +95,7 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
     @org.junit.Test
     public void run() throws Throwable {
         String URLbegin = System.getProperty("pa.scheduler.home") + "/";
+        String javaCmd = System.getProperty("java.home") + "/bin/java";
         log("Test 1 : Creating job...");
         //creating job
         TaskFlowJob submittedJob = new TaskFlowJob();
@@ -103,12 +105,12 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
         submittedJob.setMaxNumberOfExecution(10);
         NativeTask finalTask = new NativeTask();
         finalTask.setName("TestMerge");
-        finalTask.setCommandLine(new String[] { "java", "-cp", URLbegin + "classes/scheduler/",
+        finalTask.setCommandLine(new String[] { javaCmd, "-cp", URLbegin + "classes/scheduler/",
                 "org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault", "final" });
         for (int i = 1; i < 12; i++) {
             NativeTask task = new NativeTask();
             task.setName("Test" + i);
-            task.setCommandLine(new String[] { "java", "-cp", URLbegin + "classes/scheduler/",
+            task.setCommandLine(new String[] { javaCmd, "-cp", URLbegin + "classes/scheduler/",
                     "org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault", "0" });
             finalTask.addDependence(task);
             submittedJob.addTask(task);

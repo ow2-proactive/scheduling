@@ -65,7 +65,7 @@ public class TestJobFactory {
         run1(null);
         log("TEST jobFactory XPATH");
         //test XPATH factory
-        //run1("org.ow2.proactive.scheduler.common.job.JobFactory_xpath");
+        run1(org.ow2.proactive.scheduler.common.job.JobFactory_xpath.class.getCanonicalName());
     }
 
     private void run1(String impl) throws Throwable {
@@ -213,9 +213,7 @@ public class TestJobFactory {
         log("Test Job PROACTIVE");
         ProActiveJob paJob = (ProActiveJob) JobFactory.getFactory().createJob(jobProActiveDescriptor);
         //Check job properties
-        Assert
-                .assertEquals(paJob.getDescription(),
-                        "A ProActive job that will find out the Nth first prime number where N is given as argument.");
+        Assert.assertEquals(paJob.getDescription(), "No description");
         Assert.assertEquals(paJob.getName(), "job_proActive");
         Assert.assertEquals(paJob.getPriority(), JobPriority.LOW);
         Assert.assertEquals(paJob.getLogFile(), "one/file/to/log");

@@ -78,6 +78,7 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.common.scripting.SimpleScript;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.scheduler.util.RegexpMatcher;
 import org.ow2.proactive.scheduler.common.scheduler.util.Tools;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -113,6 +114,7 @@ public class JobFactory_xpath extends JobFactory {
     public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:dev";
     /** Job prefix. */
     public static final String JOB_PREFIX = "js";
+    private static final String variablesPattern = "\\$\\{[^\\}]+\\}";
 
     //JOBS
     private static final String JOB_TAG = "job";
@@ -121,6 +123,9 @@ public class JobFactory_xpath extends JobFactory {
     private static final String JOB_ATTRIBUTE_PRIORITY = "@priority";
     private static final String JOB_ATTRIBUTE_PROJECTNAME = "@projectName";
     private static final String JOB_ATTRIBUTE_LOGFILE = "@logFile";
+    private static final String JOB_VARIABLES = "variables";
+    private static final String JOB_VARIABLE = "variable";
+    private static final String VARIABLE_VALUE = "value";
     //COMMON
     private static final String ATTRIBUTE_CANCELJOBONERROR = "@cancelJobOnError";
     private static final String ATTRIBUTE_RESTARTTASKONERROR = "@restartTaskOnError";
@@ -232,9 +237,10 @@ public class JobFactory_xpath extends JobFactory {
      * 
      * @param input
      * @return
+     * @throws JobCreationException 
      */
     private Node transformVariablesAndGetDOM(InputStream input) throws ParserConfigurationException,
-            SAXException, IOException {
+            SAXException, IOException, JobCreationException {
         // create a new parser
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -256,15 +262,55 @@ public class JobFactory_xpath extends JobFactory {
         }
         DOMResult result = new DOMResult();
 
+        NodeList nList = domSource.getNode().getFirstChild().getChildNodes();
+        for (int i = 0; i < nList.getLength(); i++) {
+            Node node = nList.item(i);
+            if (JOB_VARIABLES.equals(node.getLocalName())) {
+                nList = node.getChildNodes();
+                for (int j = 0; j < nList.getLength(); j++) {
+                    node = nList.item(j);
+                    if (JOB_VARIABLE.equals(node.getLocalName())) {
+                        node = node.getAttributes().getNamedItem(VARIABLE_VALUE);
+                        node.setNodeValue(replace(node.getNodeValue()));
+                    }
+                }
+                break;
+            }
+        }
+
         try {
             transformer.transform(domSource, result);
         } catch (TransformerException e1) {
-            e1.printStackTrace();
+            throw new JobCreationException(
+                "A variable in the Variables definition cannot be found neither in JVM arguments nor in local variable definition.");
         }
         return result.getNode();
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Replace variable from JVM property in the given string.
+     * 
+     * @param str the string in which to do the replacement.
+     * @return the string where variables from JVM has been replaced.
+     */
+    private String replace(String str) {
+        str = str.trim();
+        String[] strs = RegexpMatcher.matches(variablesPattern, str);
+        String replacement;
+        if (strs.length != 0) {
+            //for each entry
+            for (String s : strs) {
+                //remove ${ and }
+                s = s.substring(2, s.length() - 1);
+                replacement = System.getProperty(s);
+                if (replacement != null) {
+                    str = str.replaceFirst("\\$\\{" + s + "\\}", replacement);
+                }
+            }
+        }
+        return str;
+    }
+
     private Job createJob(Node rootNode) throws XPathExpressionException, InvalidScriptException,
             SAXException, ClassNotFoundException, IOException, UserException {
         Job job = null;
@@ -341,10 +387,10 @@ public class JobFactory_xpath extends JobFactory {
         }
 
         // JOB DESCRIPTION
-        Object description = xpath.evaluate(addPrefixes(JOB_TAG + "/" + TAG_DESCRIPTION), rootNode,
+        String description = (String) xpath.evaluate(addPrefixes(JOB_TAG + "/" + TAG_DESCRIPTION), rootNode,
                 XPathConstants.STRING);
-        if (description != null) {
-            job.setDescription((String) description);
+        if (description.length() > 0) {
+            job.setDescription(((String) description).trim());
             logger.debug(JOB_TAG + "/" + TAG_DESCRIPTION + " = " + description);
         }
 
@@ -474,7 +520,6 @@ public class JobFactory_xpath extends JobFactory {
         return job;
     }
 
-    @SuppressWarnings("unchecked")
     private Task createTask(Node taskNode, Task task) throws XPathExpressionException,
             ClassNotFoundException, InvalidScriptException, MalformedURLException {
         // TASK NAME
@@ -482,8 +527,10 @@ public class JobFactory_xpath extends JobFactory {
         logger.debug(ATTRIBUTE_ID + " = " + task.getName());
 
         // TASK DESCRIPTION
-        task.setDescription((String) xpath.evaluate(addPrefixes(TAG_DESCRIPTION), taskNode,
-                XPathConstants.STRING));
+        String desc = (String) xpath.evaluate(addPrefixes(TAG_DESCRIPTION), taskNode, XPathConstants.STRING);
+        if (desc.length() > 0) {
+            task.setDescription(desc);
+        }
         logger.debug(TAG_DESCRIPTION + " = " + task.getDescription());
 
         // TASK GENERIC INFORMATION
@@ -587,7 +634,12 @@ public class JobFactory_xpath extends JobFactory {
         if (scNode != null) {
             ArrayList<String> cmd = new ArrayList<String>();
             // static command
-            cmd.add((String) xpath.evaluate(SCRIPT_ATTRIBUTE_VALUE, scNode, XPathConstants.STRING));
+            String[] cmds = Tools.parseCommandLine((String) xpath.evaluate(SCRIPT_ATTRIBUTE_VALUE, scNode,
+                    XPathConstants.STRING));
+            for (String s : cmds) {
+                cmd.add(s);
+            }
+
             NodeList args = (NodeList) xpath.evaluate(addPrefixes(SCRIPT_TAG_ARGUMENTS), scNode,
                     XPathConstants.NODESET);
             if (args != null) {
@@ -597,7 +649,7 @@ public class JobFactory_xpath extends JobFactory {
                             .evaluate(SCRIPT_ATTRIBUTE_VALUE, arg, XPathConstants.STRING);
 
                     if (value != null) {
-                        cmd.add(" " + value);
+                        cmd.add(value);
                     }
                 }
             }
@@ -614,7 +666,6 @@ public class JobFactory_xpath extends JobFactory {
         return desc;
     }
 
-    @SuppressWarnings("unchecked")
     private JavaTask createJavaTask(Node process) throws XPathExpressionException, ClassNotFoundException,
             IOException {
         JavaTask desc = new JavaTask();
@@ -633,7 +684,6 @@ public class JobFactory_xpath extends JobFactory {
         ForkEnvironment forkEnv = new ForkEnvironment();
         String javaHome = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
             FORK_ATTRIBUTE_JAVAHOME), process, XPathConstants.STRING);
-        logger.debug(process.getLocalName());
         if (javaHome != null) {
             forkEnv.setJavaHome(javaHome);
             logger.debug(FORK_TAG_ENVIRONMENT + "/" + FORK_ATTRIBUTE_JAVAHOME + " = " + javaHome);
@@ -645,7 +695,9 @@ public class JobFactory_xpath extends JobFactory {
             forkEnv.setJVMParameters(jvmParameters);
             logger.debug(FORK_TAG_ENVIRONMENT + "/" + FORK_ATTRIBUTE_JVMPARAMETERS + " = " + jvmParameters);
         }
-        desc.setForkEnvironment(forkEnv);
+        if (javaHome.length() > 0 || jvmParameters.length() > 0) {
+            desc.setForkEnvironment(forkEnv);
+        }
 
         //EXECUTABLE PARAMETERS
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
@@ -670,7 +722,6 @@ public class JobFactory_xpath extends JobFactory {
         return desc;
     }
 
-    @SuppressWarnings("unchecked")
     private ProActiveTask createProActiveTask(Node process) throws XPathExpressionException,
             ClassNotFoundException, IOException {
         ProActiveTask desc = new ProActiveTask();
@@ -713,9 +764,8 @@ public class JobFactory_xpath extends JobFactory {
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(SCRIPT_TAG_ARGUMENTS), node,
                 XPathConstants.NODESET);
 
-        if (args != null) {
+        if (args != null && args.getLength() > 0) {
             parameters = new String[args.getLength()];
-
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
                 String value = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, arg,
@@ -895,4 +945,5 @@ public class JobFactory_xpath extends JobFactory {
             throw new UnsupportedOperationException();
         }
     }
+
 }

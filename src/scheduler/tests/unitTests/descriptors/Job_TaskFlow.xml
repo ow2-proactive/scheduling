@@ -18,9 +18,9 @@
 			<selection>
 				<script type="static">
 					<file path="${WORK_DIR}/host_selection.js">
-					<arguments>
-						<argument value="${EXCLUSION_STRING}"/>
-					</arguments>
+						<arguments>
+							<argument value="${EXCLUSION_STRING}"/>
+						</arguments>
 					</file>
 				</script>
 			</selection>
