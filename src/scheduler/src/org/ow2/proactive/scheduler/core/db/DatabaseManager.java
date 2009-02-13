@@ -269,7 +269,7 @@ public class DatabaseManager {
     /**
      * This method is specially design to recover all jobs that have to be recovered.
      * It is also a way to get them without taking care of conditions.
-     * This method also ensure that every returned job have their @unloadable field unloaded.
+     * This method also ensure that every returned jobs have their @unloadable fields unloaded.
      *
      * @return The list of unloaded job entities.
      */
@@ -296,6 +296,7 @@ public class DatabaseManager {
                     " c WHERE c.jobInfo.jobId=:C0");
                 query.setParameter("C0", jid);
                 InternalJob job = (InternalJob) query.uniqueResult();
+
                 try {
                     Collection<TaskResult> results = job.getJobResult().getAllResults().values();
                     //unload taskResult

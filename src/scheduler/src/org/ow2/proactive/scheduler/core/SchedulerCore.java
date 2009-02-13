@@ -809,6 +809,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
         }
 
+        //unload job environment that potentially contains classpath as byte[]
+        DatabaseManager.unload(job.getEnvironment());
         //unload heavy object
         for (InternalTask it : job.getTasks()) {
             DatabaseManager.unload(it);
@@ -1773,6 +1775,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         }
                     }
             }
+            //unload job environment once handled
+            DatabaseManager.unload(job.getEnvironment());
         }
 
         //------------------------------------------------------------------------

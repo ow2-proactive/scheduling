@@ -44,6 +44,7 @@ import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.core.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.util.classloading.JarUtils;
 
 
@@ -70,6 +71,7 @@ public class JobEnvironment implements Serializable {
     private String[] jobClasspath;
 
     // jar file containing the job classpath
+    @Unloadable
     @Column(name = "CLASSPATH_CONTENT", columnDefinition = "BLOB")
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
     private byte[] jobClasspathContent;
@@ -89,6 +91,7 @@ public class JobEnvironment implements Serializable {
 
     /**
      * return the job classpath.
+     * 
      * @return the job classpath.
      */
     public String[] getJobClasspath() {
