@@ -81,7 +81,7 @@ public class RMConnection extends Connection<RMAuthentication> {
      */
     public static RMAuthentication join(String url) throws RMException {
         try {
-            return getInstance().connect(url);
+            return getInstance().connect(normalize(url));
         } catch (Exception e) {
             throw new RMException(e);
         }
@@ -102,17 +102,25 @@ public class RMConnection extends Connection<RMAuthentication> {
      */
     public static RMAuthentication waitAndJoin(String url, int timeout) throws RMException {
         try {
-            return getInstance().waitAndConnect(url, timeout);
+            return getInstance().waitAndConnect(normalize(url), timeout);
         } catch (Exception e) {
             throw new RMException(e);
         }
     }
 
     /**
-     * Returns default url of resource manager
+     * Creates the default url if null is passed as a parameter or adds NAME_ACTIVE_OBJECT_RMAUTHENTICATION
+     * to the url if it's missing
      */
-    public String getDefaultUrl() {
-        return "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
+    private static String normalize(String url) {
+        if (url == null) {
+            return "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
+        } else if (!url.endsWith(RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION)) {
+            if (!url.endsWith("/"))
+                url += "/";
+            return url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
+        }
+        return url;
     }
 
 }

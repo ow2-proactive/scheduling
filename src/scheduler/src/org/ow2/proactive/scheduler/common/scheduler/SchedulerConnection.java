@@ -82,7 +82,7 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      */
     public static SchedulerAuthenticationInterface join(String url) throws SchedulerException {
         try {
-            return getInstance().connect(url);
+            return getInstance().connect(normalize(url));
         } catch (Exception e) {
             throw new SchedulerException(e);
         }
@@ -104,17 +104,24 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
     public static SchedulerAuthenticationInterface waitAndJoin(String url, int timeout)
             throws SchedulerException {
         try {
-            return getInstance().waitAndConnect(url, timeout);
+            return getInstance().waitAndConnect(normalize(url), timeout);
         } catch (Exception e) {
             throw new SchedulerException(e);
         }
     }
 
     /**
-     * Returns default url of scheduler
+     * Creates the default url if null is passed as a parameter or adds SCHEDULER_DEFAULT_NAME
+     * to the url if it's missing
      */
-    public String getDefaultUrl() {
-        return "//localhost/" + SCHEDULER_DEFAULT_NAME;
+    private static String normalize(String url) {
+        if (url == null) {
+            return "//localhost/" + SCHEDULER_DEFAULT_NAME;
+        } else if (!url.endsWith(SCHEDULER_DEFAULT_NAME)) {
+            if (!url.endsWith("/"))
+                url += "/";
+            return url + SCHEDULER_DEFAULT_NAME;
+        }
+        return url;
     }
-
 }

@@ -61,10 +61,6 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
 	 */
 	private T lookupAuthentication(String url) throws Exception {
 
-		if (url == null) {
-			url = getDefaultUrl();
-		}
-
 		logger.debug("Looking up authentication interface '" + url + "'");
 
 		return (T) (PAActiveObject.lookupActive(clazz.getName(), url));
@@ -152,6 +148,4 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
 		// TODO two cycles has the same pattern => the code can be unified
 		return authentication;
 	}
-
-	public abstract String getDefaultUrl();
 }
