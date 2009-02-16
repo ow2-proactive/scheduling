@@ -98,53 +98,48 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
 
 		T authentication = null;
 		long leftTime = timeout == 0 ? Long.MAX_VALUE : timeout;
-
-		// obtaining authentication active object
-		while (leftTime > 0) {
-			long startTime = System.currentTimeMillis();
-			try {
-				authentication = lookupAuthentication(url);
-				if (authentication == null) {
-					// strange situation : should not be here
-					// simulating an exception during lookup
-					throw new Exception(ERROR_CANNOT_LOOKUP_AUTH);
-				}
-				// success
-				break;
-			} catch (Exception e) {
-
-				leftTime -= (System.currentTimeMillis() - startTime);
-				if (leftTime < 0) {
-					throw e;
+		try {
+			// obtaining authentication active object
+			while (leftTime > 0) {
+				long startTime = System.currentTimeMillis();
+				try {
+					authentication = lookupAuthentication(url);
+					if (authentication == null) {
+						// strange situation : should not be here
+						// simulating an exception during lookup
+						throw new Exception(ERROR_CANNOT_LOOKUP_AUTH);
+					}
+					// success
+					break;
+				} catch (Exception e) {
+					Thread.sleep(Math.min(PERIOD, leftTime));
+					leftTime -= (System.currentTimeMillis() - startTime);
+					if (leftTime <= 0) {
+						throw e;
+					}
 				}
 			}
-			try {
-				Thread.sleep(Math.min(PERIOD, leftTime));
-			} catch (InterruptedException e) {
-				throw new Exception(ERROR_CONNECTION_INTERRUPTED);
+
+			// waiting until scheduling is initialized
+			while (leftTime > 0) {
+				long startTime = System.currentTimeMillis();
+
+				if (authentication.isActivated()) {
+					// success
+					break;
+				} else {
+					Thread.sleep(Math.min(PERIOD, leftTime));
+					leftTime -= (System.currentTimeMillis() - startTime);
+					if (leftTime <= 0) {
+						throw new Exception(ERROR_NOT_ACTIVATED);
+					}
+				}
 			}
+
+		} catch (InterruptedException e) {
+			throw new Exception(ERROR_CONNECTION_INTERRUPTED);
 		}
 
-		// waiting until scheduling is initialized
-		while (leftTime > 0) {
-			long startTime = System.currentTimeMillis();
-
-			if (authentication.isActivated()) {
-				// success
-				break;
-			} else {
-
-				leftTime -= (System.currentTimeMillis() - startTime);
-				if (leftTime < 0) {
-					throw new Exception(ERROR_NOT_ACTIVATED);
-				}
-			}
-			try {
-				Thread.sleep(Math.min(PERIOD, leftTime));
-			} catch (InterruptedException e) {
-				throw new Exception(ERROR_CONNECTION_INTERRUPTED);
-			}
-		}
 		// TODO two cycles has the same pattern => the code can be unified
 		return authentication;
 	}
