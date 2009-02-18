@@ -426,7 +426,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
                 if (debugCurrentJob) {
                     System.out.println("Looking for result of task: " + key);
                 }
-                String logs = res.getOuput().getAllLogs(false);
+                String logs = res.getOutput().getAllLogs(false);
 
                 // No result received
                 if (res == null) {

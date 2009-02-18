@@ -451,19 +451,19 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                     if (res.getValue().getException() instanceof ptolemy.kernel.util.IllegalActionException) {
                         // We filter this specific exception which means that the "out" variable was not set by the function 
                         // due to an error inside the script
-                        String logs = res.getValue().getOuput().getAllLogs(false);
+                        String logs = res.getValue().getOutput().getAllLogs(false);
                         jobDidNotSucceed(event.getJobId(), new SciLabTaskException(logs), false, logs);
                     } else {
                         // For other types of exception we forward it as it is.
                         jobDidNotSucceed(event.getJobId(), res.getValue().getException(), true, res
-                                .getValue().getOuput().getAllLogs(false));
+                                .getValue().getOutput().getAllLogs(false));
                     }
                 } else {
                     // Normal success
                     SciData computedResult = null;
                     String logs = null;
                     try {
-                        logs = res.getValue().getOuput().getAllLogs(false);
+                        logs = res.getValue().getOutput().getAllLogs(false);
                         computedResult = ((ArrayList<SciData>) res.getValue().value()).get(0);
                         results.put(res.getKey(), computedResult);
                         // We print the logs of the job, if any

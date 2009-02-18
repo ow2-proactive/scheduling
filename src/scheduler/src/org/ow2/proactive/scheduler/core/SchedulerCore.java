@@ -650,7 +650,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                 //set the task result in the arguments array.
                                 params[i] = currentJob.getJobResult().getResult(parentTask.getName());
                                 //if this result has been unloaded, (extremely rare but possible)
-                                if (params[i].getOuput() == null) {
+                                if (params[i].getOutput() == null) {
                                     //get the result and load the content from database
                                     DatabaseManager.load(params[i]);
                                 }
@@ -1197,14 +1197,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 // try to look in the DB
                 DatabaseManager.load(tr);
 
-                logs = tr.getOuput();
+                logs = tr.getOutput();
 
                 // avoid race condition if any...
                 if (logs == null) {
                     // the logs has been deleted and stored in the DB during the previous getOutput
                     // should not be null now !
                     DatabaseManager.load(tr);
-                    logs = tr.getOuput();
+                    logs = tr.getOutput();
                 }
 
                 // TODO cdelbe : ok, cmathieu, I know it's ugly. I'll fix it asap. Need more genericity for logging mechanism.

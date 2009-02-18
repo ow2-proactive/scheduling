@@ -84,7 +84,7 @@ public interface TaskResult extends Serializable {
      *
      * @return the output of the execution, including stdout and stderr.
      */
-    public TaskLogs getOuput();
+    public TaskLogs getOutput();
 
     /**
      * Set the class that is able to describe this result. See ResultPreview.

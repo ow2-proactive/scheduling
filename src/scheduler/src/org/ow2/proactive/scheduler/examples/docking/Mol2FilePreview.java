@@ -54,7 +54,7 @@ public class Mol2FilePreview extends ResultPreview {
     @Override
     public JPanel getGraphicalDescription(TaskResult r) {
         try {
-            String pathToResult = this.getPathToFile(r.getOuput().getStdoutLogs(false));
+            String pathToResult = this.getPathToFile(r.getOutput().getStdoutLogs(false));
             String molEditor = System.getenv("MOL_EDITOR");
             if (molEditor == null) {
                 // mercury is default (supposed to be in the path)
@@ -77,7 +77,7 @@ public class Mol2FilePreview extends ResultPreview {
      */
     @Override
     public String getTextualDescription(TaskResult r) {
-        return "Ouput file : " + this.getPathToFile(r.getOuput().getStdoutLogs(false));
+        return "Output file : " + this.getPathToFile(r.getOutput().getStdoutLogs(false));
     }
 
     private String getPathToFile(String output) {

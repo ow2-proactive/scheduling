@@ -145,7 +145,7 @@ public class TaskResultImpl implements TaskResult {
      *
      * @param id the identification of the task that send this result.
      * @param value the result of the task.
-     * @param output the ouput of the task.
+     * @param output the output of the task.
      */
     public TaskResultImpl(TaskId id, Serializable value, TaskLogs output) {
         this.id = id;
@@ -164,7 +164,7 @@ public class TaskResultImpl implements TaskResult {
      *
      * @param id the identification of the task that send this result.
      * @param exception the exception that occurred in the task.
-     * @param output the ouput of the task.
+     * @param output the output of the task.
      */
     public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output) {
         this.id = id;
@@ -238,13 +238,6 @@ public class TaskResultImpl implements TaskResult {
         } else {
             return null;
         }
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskResult#getOuput()
-     */
-    public TaskLogs getOuput() {
-        return this.output;
     }
 
     /**
@@ -415,12 +408,10 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * Get the output.
-     *
-     * @return the output.
+     * @see org.ow2.proactive.scheduler.common.task.TaskResult#getOutput()
      */
     public TaskLogs getOutput() {
-        return output;
+        return this.output;
     }
 
     /**

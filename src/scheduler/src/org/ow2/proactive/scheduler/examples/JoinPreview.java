@@ -56,7 +56,7 @@ public class JoinPreview extends ResultPreview {
      */
     @Override
     public JPanel getGraphicalDescription(TaskResult r) {
-        String pathToResult = this.getPathToImage(r.getOuput().getStdoutLogs(false));
+        String pathToResult = this.getPathToImage(r.getOutput().getStdoutLogs(false));
         String jpgEditor = System.getenv("JPG_EDITOR");
         if (jpgEditor != null) {
             String command = jpgEditor + " " + pathToResult;
@@ -76,7 +76,7 @@ public class JoinPreview extends ResultPreview {
      */
     @Override
     public String getTextualDescription(TaskResult r) {
-        return this.getPathToImage(r.getOuput().getStdoutLogs(false));
+        return this.getPathToImage(r.getOutput().getStdoutLogs(false));
     }
 
     private String getPathToImage(String output) {

@@ -51,7 +51,7 @@ public class DenoisePreview extends ResultPreview {
      */
     @Override
     public JPanel getGraphicalDescription(TaskResult r) {
-        String path = this.getPathToImage(r.getOuput().getStderrLogs(false));
+        String path = this.getPathToImage(r.getOutput().getStderrLogs(false));
         System.out.println("[RESULT_DESCRIPTOR] Displaying " + path);
         return new SimpleImagePanel(path);
     }
@@ -61,7 +61,7 @@ public class DenoisePreview extends ResultPreview {
      */
     @Override
     public String getTextualDescription(TaskResult r) {
-        return this.getPathToImage(r.getOuput().getStderrLogs(false));
+        return this.getPathToImage(r.getOutput().getStderrLogs(false));
     }
 
     private String getPathToImage(String output) {
