@@ -31,178 +31,145 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.rmi.AlreadyBoundException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import javax.security.auth.login.LoginException;
-
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
 
 /**
  * This class is responsible for implementing actions that are started in
- * ProActiveAgent: registration in ProActive Resource Manager 
- * 
- * The created process from this class should be monitored by ProActiveAgent
- * component and restarted automatically on any failures.
+ * ProActiveAgent: registration in ProActive Resource Manager
  * 
  * @author ProActive team
- *
  */
-public class PAAgentServiceRMStarter {
-
-    //the starter will try to connect to the RM NB_OF_CONNECT_RETRIES times before killing itself
-    //that means that it will try to connect during NB_OF_CONNECT_RETRIES x RM_FREQ milliseconds
-    private static final int NB_OF_CONNECT_RETRIES = 10;
-    private static final long RM_FREQ = 6000;
-    private static final long PING_FREQ = 30000;
-    private static final String PAAGENT_NODE_NAME = "PA-AGENT_NODE";
-    private static Executor tpe = Executors.newFixedThreadPool(1);
-
-    // command dispatch
+public final class PAAgentServiceRMStarter {
 
     /**
-     * main function
+     * The starter will try to connect to the Resource Manager
+     * before killing itself
+     * that means that it will try to connect during
+     * RM_WAIT_ON_JOIN_TIMEOUT_IN_MS milliseconds */
+    private static final int RM_WAIT_ON_JOIN_TIMEOUT_IN_MS = 60000;
+    /** The ping delay used in RMPinger that pings the RM and exists if the Resource Manager is down */
+    private static final long PING_DELAY = 30000;
+    /** The default name of the node */
+    private static final String PAAGENT_DEFAULT_NODE_NAME = "PA-AGENT_NODE";
+
+    /**
+     * Creates a new instance of this class and calls registersInRm method. The
+     * arguments must be as follows: arg[0] = username, arg[1] = password,
+     * arg[2] = rmUrl, arg[3] = nodeName (optional)
+     * 
      * @param args
+     *            The arguments needed to join the Resource Manager
      */
-    public static void main(String args[]) {
-        if (args.length < 3) {
-            printUsage();
+    public static void main(final String args[]) {
+        if (args.length < 3 || args.length > 4) {
+            System.out.println("Usage: java PAAgentServiceRMStarter username password rmUrl nodename");
             return;
         }
-        String rmHost = args[0];
-        String rmUser = args[1];
-        String rmPassword = args[2];
-        PAAgentServiceRMStarter starter = new PAAgentServiceRMStarter();
-        try {
-            starter.registerInRM(rmHost, rmUser, rmPassword);
-        } catch (LoginException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // registers itself in ResourceManager at given URL in parameter
-
-    private void registerInRM(String rmHost, String rmUser, String rmPassword) throws LoginException {
-        // create local node
-        Node n = null;
-        try {
-            n = NodeFactory.createNode("//localhost/" + PAAGENT_NODE_NAME);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-            return;
-        } catch (AlreadyBoundException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        if (n == null) {
-            System.out.println("Could not create the node.");
-            return;
-        }
-        String url = rmHost + "/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
-        int nbOfRetries = 1;
-        boolean success = false;
-        RMAdmin admin = null;
-        while ((!success) && (nbOfRetries <= NB_OF_CONNECT_RETRIES)) {
-            try {
-                // TODO rewrite it with RMConnection.joinAndWait
-                RMAuthentication auth = RMConnection.join(url);
-                admin = auth.logAsAdmin(rmUser, rmPassword);
-                admin.addNode(n.getNodeInformation().getURL());
-                success = true;
-            } catch (RMException e) {
-                System.out.println("The attemt number " + nbOfRetries +
-                    " to connect to the Resource Manager failed. " + e.getMessage());
-                nbOfRetries++;
-                waitInterval(RM_FREQ);
-            }
-        }
-        if (success) {
-            System.out.println("Connected to the Resource Manager at " + url + "\n");
+        final String username = args[0];
+        final String password = args[1];
+        final String rmUrl = args[2];
+        // If the nodename was specified use it
+        final String nodename = (args.length == 4 ? args[3] : PAAGENT_DEFAULT_NODE_NAME);
+        // Use given args
+        final PAAgentServiceRMStarter starter = new PAAgentServiceRMStarter();
+        if (starter.registerInRM(username, password, rmUrl, nodename)) {
+            System.out.println("Connected to the Resource Manager at " + rmUrl + "\n");
         } else {
-            //it means we already tried to connect NB_OF_CONNECT_RETRIES times
-            System.out.println("The Resource Manager at " + url + " is not reachable (after " +
-                NB_OF_CONNECT_RETRIES + " attempts). The application will exit.");
+            System.out.println("The Resource Manager at " + rmUrl +
+                " is unreachable ! The application will exit.");
             System.exit(1);
         }
-        //     boolean connected = true;   
-        //     //ping the rm to see if we are still connected
-        //    //if not connected just exit
-        //        while (connected)
-        //        {
-        //        	if (!PAActiveObject.pingActiveObject(admin))
-        //        	{
-        //        		connected=false;
-        //        	}
-        //        	waitInterval(PING_FREQ);
-        //        }//while connected
-        //        
-        //      //if we are here it means we lost the connection. just exit.. 
-        //        System.out.println("The connection to the Resource Manager has been lost. The application will exit. ");
-        //        System.exit(1);
-
-        RMPinger rp = new RMPinger(admin);
-        tpe.execute(rp);
-
     }
 
-    // waits specified amount of time
-
-    private static void waitInterval(long rmFreq) {
-        long endTime = System.currentTimeMillis() + rmFreq;
-        long curTime = System.currentTimeMillis();
-        while (curTime < endTime) {
-            try {
-                Thread.sleep(endTime - curTime);
-            } catch (InterruptedException e) {
+    /**
+     * Registers a in ResourceManager at given URL in parameter and handles all
+     * errors/exceptions. Tries to joins the Resource Manager with a specified
+     * timeout then logs as admin with the provided username and password and
+     * adds the created node to the Resource Manager
+     */
+    private boolean registerInRM(final String username, final String password, final String rmUrl,
+            final String nodename) {
+        // 1 - Create a node on localhost
+        Node n = null;
+        try {
+            n = NodeFactory.createNode("//localhost/" + nodename);
+            if (n == null) {
+                throw new RuntimeException("The node returned by the NodeFactory is null");
             }
-            curTime = System.currentTimeMillis();
+        } catch (Throwable t) {
+            System.out.println("Could not create the local node " + nodename);
+            t.printStackTrace();
+            return false;
         }
+        // Create the full url to contact the Resource Manager
+        final String fullUrl = rmUrl.endsWith("/") ? rmUrl + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION
+                : rmUrl + "/" + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
+        // 2 - Try to join the Resource Manager with a specified timeout
+        RMAuthentication auth = null;
+        try {
+            auth = RMConnection.waitAndJoin(fullUrl, RM_WAIT_ON_JOIN_TIMEOUT_IN_MS);
+            if (auth == null) {
+                throw new RuntimeException("The RMAuthentication instance is null");
+            }
+        } catch (Throwable t) {
+            System.out.println("Could not join the Resource Manager at " + rmUrl);
+            t.printStackTrace();
+            return false;
+        }
+        // 3 - Log as admin with the provided username and password
+        RMAdmin admin = null;
+        try {
+            admin = auth.logAsAdmin(username, password);
+            if (admin == null) {
+                throw new RuntimeException("The RMAdmin instance is null");
+            }
+        } catch (Throwable t) {
+            System.out.println("Could not log as admin into the Resource Manager at " + rmUrl);
+            t.printStackTrace();
+            return false;
+        }
+        // 4 - Add the created node to the Resource Manager
+        try {
+            admin.addNode(n.getNodeInformation().getURL());
+        } catch (Throwable t) {
+            System.out.println("Could not add the local node the Resource Manager at " + rmUrl);
+            t.printStackTrace();
+            return false;
+        }
+        // 5 - Start a new pinger thread
+        final RMPinger rp = new RMPinger(admin);
+        new Thread(rp).start();
+        return true;
     }
 
-    // prints help
+    private final class RMPinger implements Runnable {
+        /** The reference to ping */
+        private final RMAdmin admin;
 
-    private static void printUsage() {
-        System.out.println("Usage: java PAAgentServiceRMStarter url user password");
-    }
-
-    class RMPinger implements Runnable {
-
-        private RMAdmin admin;
-
-        public RMPinger(RMAdmin admin) {
+        public RMPinger(final RMAdmin admin) {
             this.admin = admin;
         }
 
         public void run() {
-
-            boolean connected = true;
-            //ping the rm to see if we are still connected
-            //if not connected just exit
-            while (connected) {
-                if (!PAActiveObject.pingActiveObject(admin)) {
-                    connected = false;
+            // ping the rm to see if we are still connected
+            // if not connected just exit
+            while (PAActiveObject.pingActiveObject(admin)) {
+                try {
+                    Thread.sleep(PING_DELAY);
+                } catch (InterruptedException e) {
                 }
-                waitInterval(PING_FREQ);
-            }//while connected
-
-            //if we are here it means we lost the connection. just exit.. 
+            }// while connected
+            // if we are here it means we lost the connection. just exit..
             System.out
                     .println("The connection to the Resource Manager has been lost. The application will exit. ");
             System.exit(1);
-
         }
-
     }
-
 }
