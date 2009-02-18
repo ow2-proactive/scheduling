@@ -52,7 +52,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
-import org.ow2.proactive.resourcemanager.common.scripting.Script;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
@@ -61,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
+import org.ow2.proactive.scripting.Script;
 
 
 /**

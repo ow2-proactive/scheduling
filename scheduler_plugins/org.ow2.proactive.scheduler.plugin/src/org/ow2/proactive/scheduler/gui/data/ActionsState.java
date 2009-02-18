@@ -1,7 +1,7 @@
 package org.ow2.proactive.scheduler.gui.data;
 
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 
 
 /**

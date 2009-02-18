@@ -38,13 +38,13 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**

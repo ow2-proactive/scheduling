@@ -41,6 +41,7 @@ import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -48,6 +49,7 @@ import org.hibernate.annotations.Proxy;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@PublicAPI
 @Entity
 @Table(name = "SIMPLE_TASK_LOGS")
 @AccessType("field")

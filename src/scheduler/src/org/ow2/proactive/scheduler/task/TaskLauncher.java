@@ -47,10 +47,6 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.resourcemanager.common.scripting.Script;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptHandler;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptLoader;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
@@ -60,6 +56,10 @@ import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
 import org.ow2.proactive.scheduler.util.logforwarder.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.util.logforwarder.LoggingOutputStream;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
 
 
 /**

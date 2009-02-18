@@ -50,8 +50,11 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.resourcemanager.common.scripting.InvalidScriptException;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -62,16 +65,13 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabTaskException;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.SelectionScript;
 
 import ptolemy.data.Token;
 
@@ -672,6 +672,11 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     }
 
     public void taskWaitingForRestart(TaskEvent event) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void schedulerPolicyChangedEvent(String newPolicyName) {
         // TODO Auto-generated method stub
 
     }

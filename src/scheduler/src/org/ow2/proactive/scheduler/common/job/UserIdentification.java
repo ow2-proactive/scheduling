@@ -33,6 +33,8 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * SchedulerUser is an internal representation of a user.<br>
@@ -42,6 +44,7 @@ import java.io.Serializable;
  * @date 20 mars 08
  *
  */
+@PublicAPI
 public abstract class UserIdentification implements Serializable, Comparable<UserIdentification> {
 
     /** Value for  */

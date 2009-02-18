@@ -34,10 +34,10 @@ package org.ow2.proactive.resourcemanager.selection;
 import java.util.Collection;
 import java.util.List;
 
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**

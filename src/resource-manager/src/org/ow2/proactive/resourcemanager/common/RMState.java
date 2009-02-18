@@ -32,6 +32,8 @@
 package org.ow2.proactive.resourcemanager.common;
 
 import java.io.Serializable;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
@@ -43,6 +45,7 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
  * @date 12 mars 08
  *
  */
+@PublicAPI
 public class RMState implements Serializable {
 
     private IntWrapper numberOfAllResources;

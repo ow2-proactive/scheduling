@@ -58,8 +58,8 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**

@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.job.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.Job;
 
 

@@ -42,12 +42,12 @@ import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptHandler;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptLoader;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**

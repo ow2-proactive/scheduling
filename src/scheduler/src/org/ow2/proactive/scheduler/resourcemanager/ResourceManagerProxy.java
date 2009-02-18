@@ -51,21 +51,20 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.common.scripting.Script;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptHandler;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptLoader;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -121,9 +120,8 @@ public class ResourceManagerProxy implements InitActive, RunActive {
                 new Object[] { auth });
     }
 
-    public StringWrapper echo() {
-        return new StringWrapper("User Interface says " + user.echo());
-
+    public boolean isAlive() {
+        return user.isAlive();
     }
 
     // FREE NODES *********************************************

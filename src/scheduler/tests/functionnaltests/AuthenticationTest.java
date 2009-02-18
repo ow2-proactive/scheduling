@@ -33,10 +33,10 @@ package functionnaltests;
 
 import static junit.framework.Assert.assertTrue;
 
-import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 
 
 public class AuthenticationTest extends FunctionalTDefaultScheduler {

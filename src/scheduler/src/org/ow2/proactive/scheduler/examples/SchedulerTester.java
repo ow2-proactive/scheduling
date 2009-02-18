@@ -46,15 +46,15 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 /**
@@ -71,7 +71,7 @@ public class SchedulerTester {
     public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     // scheduler connection
-    private static final String DEFAULT_URL = "//localhost/" + PASchedulerProperties.SCHEDULER_DEFAULT_NAME;
+    private static final String DEFAULT_URL = "//localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
     private SchedulerAuthenticationInterface authentication;
 
     // users

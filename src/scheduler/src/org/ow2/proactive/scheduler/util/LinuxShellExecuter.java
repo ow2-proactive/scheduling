@@ -42,6 +42,7 @@ import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 public class LinuxShellExecuter {

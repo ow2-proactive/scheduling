@@ -35,10 +35,10 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidParameterException;
 import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import ptolemy.data.Token;
 
 import java.io.Serializable;

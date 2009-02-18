@@ -34,10 +34,10 @@ package org.ow2.proactive.scheduler.core;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
-import org.ow2.proactive.scheduler.common.scheduler.Stats;
-import org.ow2.proactive.scheduler.common.scheduler.util.Tools;
+import org.ow2.proactive.scheduler.common.util.Tools;
 
 
 /**
@@ -188,7 +188,7 @@ public class StatsImpl implements Stats {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.Stats#getProperties()
+     * @see org.ow2.proactive.scheduler.common.Stats#getProperties()
      */
     public Map<String, Object> getProperties() {
         return properties;

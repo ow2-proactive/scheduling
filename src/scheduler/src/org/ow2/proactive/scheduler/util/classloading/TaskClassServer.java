@@ -44,9 +44,10 @@ import java.util.jar.JarFile;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 
-import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**

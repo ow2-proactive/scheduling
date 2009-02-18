@@ -38,19 +38,19 @@ import java.net.UnknownHostException;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
 
 
@@ -78,7 +78,7 @@ public class SimpleHelloWorld {
             //get authentication interface from existing scheduler based on scheduler host URL
             //(localhost) followed by the scheduler name (here the default one)
             SchedulerAuthenticationInterface auth = SchedulerConnection.join("//localhost/" +
-                PASchedulerProperties.SCHEDULER_DEFAULT_NAME);
+                SchedulerConstants.SCHEDULER_DEFAULT_NAME);
 
             //Now you are connected you must log on with a couple of username/password matching an entry in login and group files.
             //(groups.cfg, login.cfg in the same directory)

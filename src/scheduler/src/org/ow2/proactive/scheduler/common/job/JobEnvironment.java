@@ -44,8 +44,8 @@ import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.core.db.annotation.Unloadable;
-import org.ow2.proactive.scheduler.util.classloading.JarUtils;
+import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
+import org.ow2.proactive.scheduler.common.util.JarUtils;
 
 
 /**
@@ -81,7 +81,7 @@ public class JobEnvironment implements Serializable {
     private boolean containsJarFile;
 
     /**
-     * return the byte[] representation of the jar file containing the job classpath.
+     * Return the byte[] representation of the jar file containing the job classpath.
      *
      * @return the byte[] representation of the jar file containing the job classpath.
      */
@@ -90,15 +90,18 @@ public class JobEnvironment implements Serializable {
     }
 
     /**
-     * return the job classpath.
+     * Return the job classPath.
      * 
-     * @return the job classpath.
+     * @return the job classPath.
      */
     public String[] getJobClasspath() {
         return jobClasspath;
     }
 
     /**
+     * Add the classPath of your task to the job. Every needed classes used in your executable must
+     * be in this classPath.
+     *
      * @param jobClasspath the jobClasspath to set
      * @throws IOException if the classpath cannot be built
      */

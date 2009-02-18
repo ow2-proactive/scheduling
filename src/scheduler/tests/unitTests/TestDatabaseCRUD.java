@@ -40,14 +40,13 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
-import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
@@ -63,13 +62,17 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
-import org.ow2.proactive.scheduler.job.JobDescriptor;
+import org.ow2.proactive.scheduler.job.JobDescriptorImpl;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.TaskEventImpl;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scripting.GenerationScript;
 
 import functionnaltests.FunctionalTDefaultScheduler;
 
@@ -105,15 +108,15 @@ public class TestDatabaseCRUD {
         String URLbegin = System.getProperty("pa.scheduler.home") + "/";
         log("Test CREATE");
         itfJob = (InternalTaskFlowJob) InternalJobFactory.createJob(tfJob);
-        itfJob.setId(JobId.nextId(itfJob.getName()));
+        itfJob.setId(JobIdImpl.nextId(itfJob.getName()));
         itfJob.setOwner("toto");
         //prepare tasks in order to be send into the core
         itfJob.prepareTasks();
         //create job descriptor
-        itfJob.setJobDescriptor(new JobDescriptor(itfJob));
+        itfJob.setJobDescriptor(new JobDescriptorImpl(itfJob));
         //add a taskResult
         itfJob.setJobResult(new JobResultImpl(itfJob.getId()));
-        ((JobResultImpl) itfJob.getJobResult()).addTaskResult("task2", new TaskResultImpl(TaskId
+        ((JobResultImpl) itfJob.getJobResult()).addTaskResult("task2", new TaskResultImpl(TaskIdImpl
                 .nextId(itfJob.getJobInfo().getJobId()), "salut", null), true);
         //register the job
         DatabaseManager.register(itfJob);
@@ -344,7 +347,7 @@ public class TestDatabaseCRUD {
             }
         }
         //update (1 task is enough)
-        TaskEvent infoMem = itfJob.getTasks().get(0).getTaskInfo();
+        TaskEventImpl infoMem = (TaskEventImpl) itfJob.getTasks().get(0).getTaskInfo();
         TaskId id = infoMem.getTaskId();
         new Condition("taskId", ConditionComparator.EQUALS_TO, id);
         //check MEM vs DB instance
@@ -362,7 +365,7 @@ public class TestDatabaseCRUD {
         infoMem.setExecutionHostName("toto");
         infoMem.setStartTime(1142564);
         infoMem.setStatus(TaskState.RUNNING);
-        infoMem.setTaskId(TaskId.nextId(id.getJobId()));
+        infoMem.setTaskId(TaskIdImpl.nextId(id.getJobId()));
         //synchronize update with database
         DatabaseManager.synchronize(infoMem);
         //re-check MEM vs DB instance

@@ -38,19 +38,19 @@ import java.util.Map;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
-import org.ow2.proactive.resourcemanager.common.scripting.Script;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptHandler;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptLoader;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.scheduler.util.Tools;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
+import org.ow2.proactive.scripting.GenerationScript;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
 
 
 /**

@@ -63,9 +63,6 @@ public enum PASchedulerProperties {
     /** Forked java task default policy path */
     SCHEDULER_DEFAULT_FJT_SECURITY_POLICY("pa.scheduler.forkedtask.security.policy", PAPropertiesType.STRING),
 
-    /** Default scheduler node name */
-    SCHEDULER_DEFAULT_NAME("pa.scheduler.core.defaultname", PAPropertiesType.STRING),
-
     /** Scheduler main loop time out */
     SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PAPropertiesType.INTEGER),
 
@@ -110,9 +107,6 @@ public enum PASchedulerProperties {
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
 
-    /** Default job name */
-    JOB_DEFAULT_NAME("pa.scheduler.job.defaultname", PAPropertiesType.STRING),
-
     /** Multiplicative factor for job id (taskId will be : this_factor*jobID+taskID) */
     JOB_FACTOR("pa.scheduler.job.factor", PAPropertiesType.INTEGER),
 
@@ -122,9 +116,6 @@ public enum PASchedulerProperties {
     /* ***************************************************************** */
     /* ************************ TASKS PROPERTIES *********************** */
     /* ***************************************************************** */
-
-    /** Default task name */
-    TASK_DEFAULT_NAME("pa.scheduler.task.defaultname", PAPropertiesType.STRING),
 
     /** Initial time to wait before the re-execution of a task. */
     REEXECUTION_INITIAL_WAITING_TIME("pa.scheduler.task.initialwaitingtime", PAPropertiesType.INTEGER),
@@ -143,14 +134,12 @@ public enum PASchedulerProperties {
     /* ************************ OTHER PROPERTIES *********************** */
     /* ***************************************************************** */
 
-    /** Name of the environment variable for windows home directory on the common file system. */
-    WINDOWS_HOME_ENV_VAR("pa.scheduler.launcher.windowsenv", PAPropertiesType.STRING),
-
-    /** Name of the environment variable for unix home directory on the common file system. */
-    UNIX_HOME_ENV_VAR("pa.scheduler.launcher.unixenv", PAPropertiesType.STRING),
-
     /** Scheduler home directory */
     SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING),
+
+    /* ***************************************************************** */
+    /* ************************** RM PROPERTIES ************************ */
+    /* ***************************************************************** */
 
     /** Scheduler user name for RM authentication */
     RESOURCE_MANAGER_USER("pa.scheduler.resourcemanager.authentication.username", PAPropertiesType.STRING),

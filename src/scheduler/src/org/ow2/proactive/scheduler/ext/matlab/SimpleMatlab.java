@@ -44,12 +44,12 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools.LoggingThread;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
 import org.ow2.proactive.scheduler.ext.matlab.util.MatlabFinder;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 import java.io.FileInputStream;
 import java.io.IOException;

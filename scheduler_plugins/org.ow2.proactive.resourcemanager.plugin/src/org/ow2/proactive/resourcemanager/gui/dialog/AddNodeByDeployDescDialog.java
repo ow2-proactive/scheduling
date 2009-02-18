@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**

@@ -3,27 +3,17 @@ package selectionscript;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import nodestate.FunctionalTDefaultRM;
 import nodestate.RMEventReceiver;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
-import org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource;
-import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -50,8 +40,8 @@ public class SelectionScriptTimeOutTest extends FunctionalTDefaultRM {
 
         log("Deployment");
 
-        System.out.println(monitor.echo());
-        System.out.println(admin.echo());
+        System.out.println(monitor.isAlive());
+        System.out.println(admin.isAlive());
 
         RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODE_REMOVED,
                 RMEventType.NODESOURCE_CREATED, RMEventType.NODE_BUSY, RMEventType.NODE_FREE, };

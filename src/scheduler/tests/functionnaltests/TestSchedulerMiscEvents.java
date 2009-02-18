@@ -36,8 +36,8 @@ import static junit.framework.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 
 
 /**

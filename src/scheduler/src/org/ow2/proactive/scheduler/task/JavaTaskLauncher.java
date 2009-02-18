@@ -33,12 +33,12 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
 
-import org.ow2.proactive.resourcemanager.common.scripting.Script;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
+import org.ow2.proactive.scripting.Script;
 
 
 /**

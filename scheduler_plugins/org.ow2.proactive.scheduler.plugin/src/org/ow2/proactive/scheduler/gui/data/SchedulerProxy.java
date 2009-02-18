@@ -41,24 +41,24 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerInitialState;
+import org.ow2.proactive.scheduler.common.Stats;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
-import org.ow2.proactive.scheduler.common.scheduler.Stats;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.policy.PolicyInterface;
 
 
 /**
@@ -103,7 +103,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#removeSchedulerEventListener()
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeSchedulerEventListener()
      */
     public void removeSchedulerEventListener() throws SchedulerException {
         //not used for the GUI
@@ -324,8 +324,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         }
     }
 
-    public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
-            throws SchedulerException {
+    public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -429,6 +428,16 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             SchedulerConnectionListener o = it.next();
             o.connectionLostEvent();
         }
+    }
+
+    public JobResult getJobResult(String arg0) throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public TaskResult getTaskResult(String arg0, String arg1) throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

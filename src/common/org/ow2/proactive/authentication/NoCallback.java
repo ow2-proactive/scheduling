@@ -42,6 +42,7 @@ import javax.security.auth.callback.Callback;
  * <code>NoCallbackHandler</code>.
  *
  * @author The ProActive Team
+ * @since ProActive Scheduling 0.9.1
  *
  */
 public class NoCallback implements Callback, Serializable {

@@ -48,14 +48,13 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -68,7 +67,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 public class GetJobResult {
 
     private static final String SCHEDULER_DEFAULT_URL = "//localhost/" +
-        PASchedulerProperties.SCHEDULER_DEFAULT_NAME;
+        SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     /**
      * Start the jobResult receiver.
@@ -157,7 +156,7 @@ public class GetJobResult {
 
                     for (int i = begin; i <= end; i++) {
                         try {
-                            JobResult result = scheduler.getJobResult(JobId.makeJobId(i + ""));
+                            JobResult result = scheduler.getJobResult(i + "");
 
                             if (result != null) {
                                 System.out.println("Job " + i + " Result => ");

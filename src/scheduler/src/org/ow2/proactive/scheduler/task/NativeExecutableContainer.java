@@ -44,11 +44,11 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
-import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scripting.GenerationScript;
 
 
 /**

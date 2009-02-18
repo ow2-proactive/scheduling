@@ -33,8 +33,8 @@ package org.ow2.proactive.scheduler.job;
 
 import java.util.HashSet;
 
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 
 
 /**

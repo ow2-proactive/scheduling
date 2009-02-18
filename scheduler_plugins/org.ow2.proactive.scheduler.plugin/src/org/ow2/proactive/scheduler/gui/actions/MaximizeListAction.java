@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Control;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 

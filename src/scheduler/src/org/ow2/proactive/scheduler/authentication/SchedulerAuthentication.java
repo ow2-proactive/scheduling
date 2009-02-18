@@ -39,16 +39,16 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.UserScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -91,7 +91,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthentication#logAsUser(java.lang.String, java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
      */
     public UserSchedulerInterface logAsUser(String user, String password) throws LoginException {
 
@@ -113,7 +113,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthentication#logAsAdmin(java.lang.String, java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
      */
     public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException {
 

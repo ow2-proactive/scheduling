@@ -69,18 +69,18 @@
 		Compilation		
 	-->
 
-	<target name="compile.all" depends="compile.common, compile.scheduler, compile.rm" description="Build all class files (Scheduler + Resource Manager)" />
+	<target name="compile.all" depends="compile.common, compile.rm, compile.scheduler" description="Build all class files (Scheduler + Resource Manager)" />
 
 	 <target name="compile.common" description="Compile commmon stuffs">
-                <mkdir dir="${cl.common}"/>
+                <mkdir dir="${cl.common.dir}"/>
 	 	
-				<copy toDir="${cl.common}">
+				<copy toDir="${cl.common.dir}">
 						<fileset dir="${src.common}" excludes="**/*.java"/>
 				</copy>
 
                 <javac
                         srcdir="${src.common}"
-                        destdir="${cl.common}"
+                        destdir="${cl.common.dir}"
                         deprecation="on"
                         source="${source}"
                         debug="${debug}"  >
@@ -155,6 +155,7 @@
 			<classpath path="${cl.rm.dir}"/>
 			<include name="**/*.java"/>
 		</javac>
+
 		<javac 
 			srcdir="${src.scheduler.tests.dir}"
 			destdir="${cl.scheduler.tests.dir}"
@@ -189,23 +190,35 @@
         </copy>
         <copy todir="${deploy.dir}/scripts">
 		   <fileset dir="${scripts.dir}"/>
-		 </copy>
+		</copy>
     </target>
 	
+	<target name="deploy.common" depends="-deployCopy, compile.common" description="Populate Common dist/ with all needed files">
+		<jar destfile="${deploy.lib.dir}/ProActive_SRM-common.jar">
+			<fileset dir="${cl.common.dir}" includes="**" />
+        </jar>
+	</target>
+
 	<target name="deploy.rm" depends="-deployCopy, compile.rm" description="Populate Resourcemanager dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/ProActive_resource-manager.jar">
-			<fileset dir="${cl.common}" includes="**" />
+		<jar destfile="${deploy.lib.dir}/ProActive_ResourceManager.jar">
 			<fileset dir="${cl.rm.dir}" includes="**" />
         </jar>
 	</target>
+
 	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler"  description="Populate Scheduler and Resource Manager dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/ProActive_scheduler.jar">
-			<fileset dir="${cl.common}" includes="**" />
+		<jar destfile="${deploy.lib.dir}/ProActive_Scheduler-core.jar">
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
         </jar>
 	</target>
 
-	<target name="deploy.all" depends="deploy.scheduler, deploy.rm" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
+	<target name="deploy.scheduler.client" depends="deploy.scheduler" description="Generate a client side Scheduler library">
+			<jar destfile="${deploy.lib.dir}/ProActive_Scheduler-client.jar">
+				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
+				<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
+	        </jar>
+	</target>
+
+	<target name="deploy.all" depends="deploy.common, deploy.scheduler, deploy.rm, deploy.scheduler.client" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
 
 	
 	<!-- ************
@@ -371,10 +384,6 @@
 		<!-- Database generated classes -->
 		<delete file="${base.dir}/derby.log" />
 		<delete dir="${base.dir}/SCHEDULER_DB" />
-		<delete file="${base.dir}/bin/unix/derby.log" />
-		<delete dir="${base.dir}/bin/unix/SCHEDULER_DB" />
-		<delete file="${base.dir}/bin/windows/derby.log" />
-		<delete dir="${base.dir}/bin/windows/SCHEDULER_DB" />
 	</target>
 
 
@@ -408,6 +417,16 @@
 		</copy>
 	</target>
 
+	<target name="scheduler.libClean" description="Clean all required libraries for scheduler/rm plugins">
+		<delete dir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" />
+	</target>
+
+	<target name="scheduler.libCopy" depends="deploy.all" description="Copy all required libraries to scheduler/rm plugins">
+		<copy todir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" includeemptydirs="no">
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/>
+		</copy>
+	</target>
+
 	<!-- ================================================================ -->
 	<!--  Scheduler Specific - Convert Schemas from Relax NG to XMLSchema -->
 	<!-- ================================================================ -->
@@ -419,31 +438,24 @@
 				</fileset>
 			</classpath>
 		</taskdef>
+
+		<property name="schemas.dir" value="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev" />
+		<property name="export.schema.name" value="schedulerjob" />
+
 		<!-- Convert Relax NG schema from compact syntax to xml syntax -->
-		<trang failonerror="true" input="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.rnc" output="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng" />
+		<trang failonerror="true" input="${schemas.dir}/${export.schema.name}.rnc" output="${schemas.dir}/${export.schema.name}.rng" />
 
 		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
-		<trang failonerror="true" input="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.rnc" output="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd" />
-		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd" out="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/temp.xsd" />
+		<trang failonerror="true" input="${schemas.dir}/${export.schema.name}.rnc" output="${schemas.dir}/${export.schema.name}.xsd" />
+		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${schemas.dir}/${export.schema.name}.xsd" out="${schemas.dir}/temp.xsd" />
 		<delete>
-			<fileset dir="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/">
+			<fileset dir="${schemas.dir}/">
 				<include name="xsi.xsd" />
-				<include name="schedulerjob.xsd" />
+				<include name="${export.schema.name}.xsd" />
 			</fileset>
 		</delete>
-		<move file="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/temp.xsd" tofile="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd" />
+		<move file="${schemas.dir}/temp.xsd" tofile="${schemas.dir}/${export.schema.name}.xsd" />
 	</target>
-	
-	<target name="scheduler.libClean" description="Clean all required libraries for scheduler/rm plugins">
-		<delete dir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" />
-	</target>
-
-	<target name="scheduler.libCopy" depends="deploy.all" description="Copy all required libraries to scheduler/rm plugins">
-		<copy todir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.dir}/lib" excludes="ProActive_tests.jar"/>
-		</copy>		
-	</target>		
-	
 	
 	<import file="../doc/toolchain/doc.xml" optional="true"/>
 	

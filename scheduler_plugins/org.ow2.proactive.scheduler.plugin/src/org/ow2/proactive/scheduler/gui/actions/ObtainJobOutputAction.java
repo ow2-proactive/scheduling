@@ -33,8 +33,8 @@ package org.ow2.proactive.scheduler.gui.actions;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 import org.ow2.proactive.scheduler.gui.data.JobsOutputController;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
 

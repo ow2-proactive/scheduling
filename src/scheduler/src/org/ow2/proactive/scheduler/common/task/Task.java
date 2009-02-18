@@ -52,10 +52,11 @@ import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.MetaValue;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.resourcemanager.common.scripting.Script;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
-import org.ow2.proactive.resourcemanager.common.scripting.SimpleScript;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.DependenceFailedException;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SimpleScript;
 
 
 /**
@@ -88,7 +89,7 @@ public abstract class Task extends CommonAttribute {
 
     /** Name of the task. */
     @Column(name = "NAME")
-    protected String name = TaskId.TASK_DEFAULT_NAME;
+    protected String name = SchedulerConstants.TASK_DEFAULT_NAME;
 
     /** Description of the task. */
     @Column(name = "DESCRIPTION", columnDefinition = "CLOB")

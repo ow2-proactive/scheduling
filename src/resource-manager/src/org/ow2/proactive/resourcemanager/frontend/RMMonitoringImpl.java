@@ -43,7 +43,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -152,10 +151,10 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMMonitoring#echo()
+     * @see org.ow2.proactive.resourcemanager.frontend.RMMonitoring#isAlive()
      */
-    public StringWrapper echo() {
-        return new StringWrapper("I'm the RMonitoring");
+    public boolean isAlive() {
+        return true;
     }
 
     /** inherited from RMEventListener methods

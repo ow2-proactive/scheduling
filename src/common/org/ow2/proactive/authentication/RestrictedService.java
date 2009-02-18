@@ -29,7 +29,6 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-
 package org.ow2.proactive.authentication;
 
 import java.util.HashMap;
@@ -47,10 +46,11 @@ import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 
 /**
- * 
  * Class represents an active object with restricted access. It accepts and serves requests only from
  * objects which had been registered as trusted services.
  * 
+ * @author The ProActive Team
+ * @since ProActive Scheduling 0.9.1
  */
 public abstract class RestrictedService implements Loggable, RunActive {
 

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ajo.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-2.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/axis.jar"/>
@@ -55,8 +59,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/oscar.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/osgi.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ow_deployment_scheduling.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive_resource-manager.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive_scheduler.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ptolemy.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/puretls.jar"/>
@@ -85,8 +87,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/xsdlib.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="lib/jsr173_1.0_api.jar"/>
-	<classpathentry kind="lib" path="lib/wstx-lgpl-3.9.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-cli-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsr173_1.0_api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/wstx-lgpl-3.9.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-cli-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ejb3-persistence.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-commons-annotations.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

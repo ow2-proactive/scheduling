@@ -78,7 +78,7 @@ public class JobResultImpl implements JobResult {
 
     /** Referenced JobId */
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobId.class)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobIdImpl.class)
     private JobId id = null;
 
     /** Temporary used to store proActive futur result. */

@@ -46,10 +46,10 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalProActiveTask;
@@ -192,7 +192,7 @@ public class InternalJobFactory implements Serializable {
         }
 
         //reinit taskId count
-        TaskId.initialize();
+        TaskIdImpl.initialize();
 
         for (Entry<Task, InternalTask> entry : tasksList.entrySet()) {
             if (entry.getKey().getDependencesList() != null) {

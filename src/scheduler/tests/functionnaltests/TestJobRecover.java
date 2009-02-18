@@ -36,11 +36,11 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 
 
 /**
@@ -140,19 +140,21 @@ public class TestJobRecover extends FunctionalTDefaultScheduler {
                 break;
             }
         }
-        //check result
+        //check result job 1
         JobResult result = schedUserInterface.getJobResult(idJ1);
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
             Assert.assertNotNull(result.getAllResults().get("Computation" + i).value());
             Assert.assertNull(result.getAllResults().get("Computation" + i).getException());
         }
+        //check result job 2
         result = schedUserInterface.getJobResult(idJ2);
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
             Assert.assertNotNull(result.getAllResults().get("Computation" + i).value());
             Assert.assertNull(result.getAllResults().get("Computation" + i).getException());
         }
+        //check result job 3
         result = schedUserInterface.getJobResult(idJ3);
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {

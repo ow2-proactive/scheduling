@@ -12,8 +12,9 @@
 			
 			<configuration>
 				<applicationClasspath>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_resource-manager.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_scheduler.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-core.jar"/>
 				</applicationClasspath>
 			</configuration>			
 			

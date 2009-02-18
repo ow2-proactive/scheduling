@@ -1508,7 +1508,7 @@ public class Patch {
 		 " org.ow2.proactive.scheduler.authentication,\n"+
 		 " org.ow2.proactive.scheduler.common.exception,\n"+
 		 " org.ow2.proactive.scheduler.common.job,\n"+
-		 " org.ow2.proactive.scheduler.common.scheduler,\n"+
+		 " org.ow2.proactive.scheduler.common,\n"+
 		 " org.ow2.proactive.scheduler.common.task,\n"+
 		 " org.ow2.proactive.scheduler.common.task.executable,\n"+
 		 " org.ow2.proactive.scheduler.common.task.util,\n"+

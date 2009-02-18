@@ -33,7 +33,7 @@ package org.ow2.proactive.scheduler.gui.actions;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Composite;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.gui.wizards.flatJobWizard.FlatFileJobWizard;
 
 

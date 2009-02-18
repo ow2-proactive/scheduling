@@ -34,9 +34,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
 

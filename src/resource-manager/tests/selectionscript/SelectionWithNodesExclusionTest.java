@@ -16,8 +16,8 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -64,8 +64,8 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
 
         log("Deployment");
 
-        System.out.println(monitor.echo());
-        System.out.println(admin.echo());
+        System.out.println(monitor.isAlive());
+        System.out.println(admin.isAlive());
 
         RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODE_REMOVED,
                 RMEventType.NODESOURCE_CREATED, RMEventType.NODE_BUSY, RMEventType.NODE_FREE, };

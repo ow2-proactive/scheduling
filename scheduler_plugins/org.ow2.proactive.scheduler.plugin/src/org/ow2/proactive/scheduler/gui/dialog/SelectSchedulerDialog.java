@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 
 
 /**
@@ -236,8 +237,10 @@ public class SelectSchedulerDialog extends Dialog {
             initialHostValue = "localhost";
             port = "1099";
         }
-        urlCombo.add("rmi://" + initialHostValue + ":" + port + "/SCHEDULER");
-        urlCombo.setText("rmi://" + initialHostValue + ":" + port + "/SCHEDULER");
+        urlCombo.add("rmi://" + initialHostValue + ":" + port + "/" +
+            SchedulerConstants.SCHEDULER_DEFAULT_NAME);
+        urlCombo.setText("rmi://" + initialHostValue + ":" + port + "/" +
+            SchedulerConstants.SCHEDULER_DEFAULT_NAME);
     }
 
     private static void setInitialLogin() {

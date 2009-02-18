@@ -41,14 +41,13 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerInitialState;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -1057,5 +1056,9 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     public static void clearInstances() {
         localView = null;
         activeView = null;
+    }
+
+    public void schedulerPolicyChangedEvent(String arg0) {
+        // TODO Auto-generated method stub
     }
 }

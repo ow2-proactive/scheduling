@@ -55,11 +55,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**

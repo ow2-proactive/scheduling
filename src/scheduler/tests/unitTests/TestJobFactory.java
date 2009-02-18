@@ -34,11 +34,11 @@ package unitTests;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.ProActiveJob;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
@@ -65,7 +65,7 @@ public class TestJobFactory {
         run1(null);
         log("TEST jobFactory XPATH");
         //test XPATH factory
-        run1(org.ow2.proactive.scheduler.common.job.JobFactory_xpath.class.getCanonicalName());
+        run1(org.ow2.proactive.scheduler.common.job.factories.JobFactory_xpath.class.getCanonicalName());
     }
 
     private void run1(String impl) throws Throwable {

@@ -43,7 +43,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 /**
  *
  * An active object responsible for authentication.
- *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 0.9.1
  */
 public abstract class AuthenticationImpl implements Authentication {
 

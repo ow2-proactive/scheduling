@@ -48,8 +48,8 @@ import javax.swing.border.EtchedBorder;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 /**
@@ -66,14 +66,13 @@ public class ResultPreviewTool {
      * Name of the environment variable for windows home directory
      * on the common file system.
      */
-    public static final String WINDOWS_HOME_ENV_VAR = PASchedulerProperties.WINDOWS_HOME_ENV_VAR
-            .getValueAsString();
+    public static final String WINDOWS_HOME_ENV_VAR = SchedulerConstants.WINDOWS_HOME_ENV_VAR;
 
     /**
      * Name of the environment variable for unix home directory
      * on the common file system.
      */
-    public static final String UNIX_HOME_ENV_VAR = PASchedulerProperties.UNIX_HOME_ENV_VAR.getValueAsString();
+    public static final String UNIX_HOME_ENV_VAR = SchedulerConstants.UNIX_HOME_ENV_VAR;
 
     /**
      * Convert path parameter into system compliant path on a common file system

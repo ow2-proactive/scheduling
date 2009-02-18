@@ -49,6 +49,15 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
+import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerInitialState;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerUsers;
+import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
@@ -56,25 +65,18 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerUsers;
-import org.ow2.proactive.scheduler.common.scheduler.Stats;
+import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
-import org.ow2.proactive.scheduler.job.JobDescriptor;
+import org.ow2.proactive.scheduler.job.JobDescriptorImpl;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
-import org.ow2.proactive.scheduler.policy.PolicyInterface;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -163,7 +165,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
             body.setImmediateService("getJobResult");
             //scheduler URL
             String schedulerUrl = "//" + NodeFactory.getDefaultNode().getVMInformation().getHostName() + "/" +
-                SchedulerConnection.SCHEDULER_DEFAULT_NAME;
+                SchedulerConstants.SCHEDULER_DEFAULT_NAME;
             //creating scheduler authentication
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
@@ -250,7 +252,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#submit(org.ow2.proactive.scheduler.common.job.Job)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#submit(org.ow2.proactive.scheduler.common.job.Job)
      */
     public JobId submit(Job userJob) throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
@@ -280,12 +282,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         }
         UserIdentificationImpl ident = identifications.get(id);
         //setting the job properties
-        job.setId(JobId.nextId(job.getName()));
+        job.setId(JobIdImpl.nextId(job.getName()));
         job.setOwner(ident.getUsername());
         //prepare tasks in order to be send into the core
         job.prepareTasks();
         //create job descriptor
-        job.setJobDescriptor(new JobDescriptor(job));
+        job.setJobDescriptor(new JobDescriptorImpl(job));
         //put the job inside the frontend management list
         jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
         //scheduler.submit(job);
@@ -307,7 +309,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public JobResult getJobResult(JobId jobId) throws SchedulerException {
         //checking permissions
@@ -334,15 +336,52 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //asking the scheduler for the result
         JobResult result = scheduler.getJobResult(jobId);
 
-        if (result == null) {
-            throw new SchedulerException("The result of this job is no longer available !");
+        return result;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobResult(java.lang.String)
+     */
+    public JobResult getJobResult(String jobId) throws SchedulerException {
+        return this.getJobResult(JobIdImpl.makeJobId(jobId));
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
+     */
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException {
+        //checking permissions
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+
+        if (!identifications.containsKey(id)) {
+            throw new SchedulerException(ACCESS_DENIED);
         }
+
+        IdentifiedJob ij = jobs.get(jobId);
+
+        if (ij == null) {
+            throw new SchedulerException("The job represented by this ID is unknow !");
+        }
+
+        if (!ij.hasRight(identifications.get(id))) {
+            throw new SchedulerException("You do not have permission to access this job !");
+        }
+
+        //asking the scheduler for the result
+        TaskResult result = scheduler.getTaskResult(jobId, taskName);
 
         return result;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#remove(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getTaskResult(java.lang.String, java.lang.String)
+     */
+    public TaskResult getTaskResult(String jobId, String taskName) throws SchedulerException {
+        return this.getTaskResult(JobIdImpl.makeJobId(jobId), taskName);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#remove(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public void remove(JobId jobId) throws SchedulerException {
         //checking permissions
@@ -367,39 +406,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
-     */
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException {
-        //checking permissions
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-
-        if (!identifications.containsKey(id)) {
-            throw new SchedulerException(ACCESS_DENIED);
-        }
-
-        IdentifiedJob ij = jobs.get(jobId);
-
-        if (ij == null) {
-            throw new SchedulerException("The job represented by this ID is unknow !");
-        }
-
-        if (!ij.hasRight(identifications.get(id))) {
-            throw new SchedulerException("You do not have permission to access this job !");
-        }
-
-        //asking the scheduler for the result
-        TaskResult result = scheduler.getTaskResult(jobId, taskName);
-
-        if (result == null) {
-            throw new SchedulerException(
-                "Error while getting the result of this task !\nProblems may be :\n\t The task name you try to join is incorrect,\n\t the task you want to join is not finished.");
-        }
-
-        return result;
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
@@ -422,7 +429,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener, org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent[])
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, org.ow2.proactive.scheduler.common.SchedulerEvent[])
      */
     public SchedulerInitialState<? extends Job> addSchedulerEventListener(
             SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
@@ -457,7 +464,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#removeSchedulerEventListener()
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeSchedulerEventListener()
      */
     public void removeSchedulerEventListener() throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
@@ -468,7 +475,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#getStats()
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStats()
      */
     public Stats getStats() throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
@@ -511,7 +518,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#start()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#start()
      */
     public BooleanWrapper start() throws SchedulerException {
         if (!ssprsc("You do not have permission to start the scheduler !")) {
@@ -528,7 +535,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#stop()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#stop()
      */
     public BooleanWrapper stop() throws SchedulerException {
         if (!ssprsc("You do not have permission to stop the scheduler !")) {
@@ -545,7 +552,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#pause()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#pause()
      */
     public BooleanWrapper pause() throws SchedulerException {
         if (!ssprsc("You do not have permission to pause the scheduler !")) {
@@ -562,7 +569,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#freeze()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#freeze()
      */
     public BooleanWrapper freeze() throws SchedulerException {
         if (!ssprsc("You do not have permission to pause the scheduler !")) {
@@ -579,7 +586,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#resume()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#resume()
      */
     public BooleanWrapper resume() throws SchedulerException {
         if (!ssprsc("You do not have permission to resume the scheduler !")) {
@@ -595,7 +602,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#shutdown()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#shutdown()
      */
     public BooleanWrapper shutdown() throws SchedulerException {
         if (!ssprsc("You do not have permission to shutdown the scheduler !")) {
@@ -611,7 +618,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#kill()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#kill()
      */
     public BooleanWrapper kill() throws SchedulerException {
         if (!ssprsc("You do not have permission to kill the scheduler !")) {
@@ -627,7 +634,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#disconnect()
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#disconnect()
      */
     public void disconnect() throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
@@ -647,7 +654,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#isConnected()
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#isConnected()
      */
     public BooleanWrapper isConnected() {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
@@ -680,7 +687,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface#pause(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#pause(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper pause(JobId jobId) throws SchedulerException {
         prkcp(jobId, "You do not have permission to pause this job !");
@@ -689,7 +696,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper resume(JobId jobId) throws SchedulerException {
         prkcp(jobId, "You do not have permission to resume this job !");
@@ -698,7 +705,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper kill(JobId jobId) throws SchedulerException {
         prkcp(jobId, "You do not have permission to kill this job !");
@@ -707,7 +714,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
      */
     public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
         prkcp(jobId, "You do not have permission to change the priority of this job !");
@@ -729,10 +736,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#changePolicy(java.lang.Class)
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#changePolicy(java.lang.Class)
      */
-    public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
-            throws SchedulerException {
+    public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
         UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
                 .getSourceBodyID());
 
@@ -744,7 +750,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#linkResourceManager(java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#linkResourceManager(java.lang.String)
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
         UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
@@ -795,9 +801,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
 
             while (iter.hasNext()) {
                 UniqueID id = iter.next();
-
+                UserIdentificationImpl userId = null;
                 try {
-                    UserIdentificationImpl userId = identifications.get(id);
+                    userId = identifications.get(id);
 
                     if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(methodName)) {
                         method.invoke(schedulerListeners.get(id), params);
@@ -809,7 +815,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                     ident.setToRemove();
                     connectedUsers.update(ident);
                     usersUpdate(ident);
-                    logger.error("!! Scheduler has detected that a listener is not connected anymore !!");
+                    logger.warn(userId.getUsername() + "@" + userId.getHostName() +
+                        " has been disconnected from events listener!");
                 }
             }
         } catch (SecurityException e) {
@@ -820,77 +827,77 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerFrozenEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerFrozenEvent()
      */
     public void schedulerFrozenEvent() {
         dispatch(SchedulerEvent.FROZEN, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerPausedEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPausedEvent()
      */
     public void schedulerPausedEvent() {
         dispatch(SchedulerEvent.PAUSED, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerResumedEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerResumedEvent()
      */
     public void schedulerResumedEvent() {
         dispatch(SchedulerEvent.RESUMED, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerShutDownEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShutDownEvent()
      */
     public void schedulerShutDownEvent() {
         dispatch(SchedulerEvent.SHUTDOWN, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerShuttingDownEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShuttingDownEvent()
      */
     public void schedulerShuttingDownEvent() {
         dispatch(SchedulerEvent.SHUTTING_DOWN, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerStartedEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStartedEvent()
      */
     public void schedulerStartedEvent() {
         dispatch(SchedulerEvent.STARTED, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerStoppedEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStoppedEvent()
      */
     public void schedulerStoppedEvent() {
         dispatch(SchedulerEvent.STOPPED, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerKilledEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerKilledEvent()
      */
     public void schedulerKilledEvent() {
         dispatch(SchedulerEvent.KILLED, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobPausedEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_PAUSED, new Class<?>[] { JobEvent.class }, event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobResumedEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_RESUMED, new Class<?>[] { JobEvent.class }, event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.Job)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.Job)
      * @param job The job that have just be submitted.
      */
     public void jobSubmittedEvent(InternalJob job) {
@@ -898,14 +905,14 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobPendingToRunningEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_PENDING_TO_RUNNING, new Class<?>[] { JobEvent.class }, event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobRunningToFinishedEvent(JobEvent event) {
         jobs.get(event.getJobId()).setFinished(true);
@@ -915,7 +922,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobRemoveFinishedEvent(JobEvent event) {
         //removing jobs from the global list : this job is no more managed
@@ -924,52 +931,59 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
      */
     public void taskPendingToRunningEvent(TaskEvent event) {
         dispatch(SchedulerEvent.TASK_PENDING_TO_RUNNING, new Class<?>[] { TaskEvent.class }, event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
      */
     public void taskRunningToFinishedEvent(TaskEvent event) {
         dispatch(SchedulerEvent.TASK_RUNNING_TO_FINISHED, new Class<?>[] { TaskEvent.class }, event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskEvent)
      */
     public void taskWaitingForRestart(TaskEvent event) {
         dispatch(SchedulerEvent.TASK_WAITING_FOR_RESTART, new Class<?>[] { TaskEvent.class }, event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobChangePriorityEvent(JobEvent event) {
         dispatch(SchedulerEvent.JOB_CHANGE_PRIORITY, new Class<?>[] { JobEvent.class }, event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerRMDownEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMDownEvent()
      */
     public void schedulerRMDownEvent() {
         dispatch(SchedulerEvent.RM_DOWN, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerRMUpEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMUpEvent()
      */
     public void schedulerRMUpEvent() {
         dispatch(SchedulerEvent.RM_UP, null);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#usersUpdate(org.ow2.proactive.scheduler.common.job.UserIdentification)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdate(org.ow2.proactive.scheduler.common.job.UserIdentification)
      */
     public void usersUpdate(UserIdentification userIdentification) {
         dispatch(SchedulerEvent.USERS_UPDATE, new Class<?>[] { UserIdentification.class }, userIdentification);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPolicyChangedEvent(java.lang.String)
+     */
+    public void schedulerPolicyChangedEvent(String newPolicyName) {
+        dispatch(SchedulerEvent.POLICY_CHANGED, new Class<?>[] { String.class }, newPolicyName);
     }
 
 }

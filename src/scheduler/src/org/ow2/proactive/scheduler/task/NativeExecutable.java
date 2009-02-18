@@ -36,13 +36,13 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
+import org.ow2.proactive.scripting.GenerationScript;
 
 
 /**

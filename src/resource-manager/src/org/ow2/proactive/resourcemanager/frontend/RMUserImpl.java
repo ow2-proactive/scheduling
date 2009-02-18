@@ -43,14 +43,13 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.authentication.RestrictedService;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -70,7 +69,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * If the node match criteria, it is selected, otherwise RM tries the selection script
  * on other nodes
  *
- *  @see org.ow2.proactive.resourcemanager.common.scripting.SelectionScript
+ *  @see org.ow2.proactive.scripting.SelectionScript
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -124,10 +123,10 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#echo()
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#isAlive()
      */
-    public StringWrapper echo() {
-        return new StringWrapper("I am RMUser");
+    public boolean isAlive() {
+        return true;
     }
 
     /**
@@ -145,14 +144,14 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.scripting.SelectionScript)
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
         return rmcore.getAtMostNodes(nbNodes, selectionScript, null);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.scripting.SelectionScript, org.ow2.proactive.resourcemanager.frontend.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
         return rmcore.getAtMostNodes(nbNodes, selectionScript, exclusion);
@@ -167,7 +166,7 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.resourcemanager.common.scripting.SelectionScript)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.scripting.SelectionScript)
      */
     public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
         if (logger.isInfoEnabled()) {

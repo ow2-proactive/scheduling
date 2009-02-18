@@ -70,8 +70,8 @@ public class TestNodesStates extends FunctionalTDefaultRM {
 
         log("Deployment");
 
-        System.out.println(monitor.echo());
-        System.out.println(admin.echo());
+        System.out.println(monitor.isAlive());
+        System.out.println(admin.isAlive());
 
         RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODESOURCE_CREATED,
                 RMEventType.NODE_BUSY, RMEventType.NODE_DOWN, RMEventType.NODE_FREE,

@@ -41,14 +41,14 @@ import org.objectweb.proactive.extensions.masterworker.core.ResultInternImpl;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -445,6 +445,11 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     }
 
     public void taskWaitingForRestart(TaskEvent event) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void schedulerPolicyChangedEvent(String newPolicyName) {
         // TODO Auto-generated method stub
 
     }

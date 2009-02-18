@@ -3,9 +3,9 @@ package org.ow2.proactive.scheduler.gui.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
 import org.ow2.proactive.scheduler.job.InternalJob;
 

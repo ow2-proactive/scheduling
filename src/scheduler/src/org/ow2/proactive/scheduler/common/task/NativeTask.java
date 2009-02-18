@@ -32,9 +32,8 @@
 package org.ow2.proactive.scheduler.common.task;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.task.NativeExecutable;
+import org.ow2.proactive.scripting.GenerationScript;
 
 
 /**

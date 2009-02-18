@@ -58,6 +58,7 @@ import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
+import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.ResultPreview;
@@ -66,7 +67,6 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
-import org.ow2.proactive.scheduler.core.db.annotation.Unloadable;
 
 
 /**
@@ -90,7 +90,7 @@ public class TaskResultImpl implements TaskResult {
 
     /** The task identification of the result */
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskId.class)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskIdImpl.class)
     private TaskId id = null;
 
     /** The value of the result if no exception occurred as a byte array */

@@ -55,18 +55,22 @@ import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.MapKeyManyToMany;
 import org.hibernate.annotations.MetaValue;
 import org.hibernate.annotations.Proxy;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.core.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalProActiveTask;
@@ -123,14 +127,14 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
-    @MapKeyManyToMany(targetEntity = TaskId.class)
+    @MapKeyManyToMany(targetEntity = TaskIdImpl.class)
     protected Map<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
     /** Informations (that can be modified) about job execution */
     @Alterable
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobEvent.class)
-    protected JobEvent jobInfo = new JobEvent();
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobEventImpl.class)
+    protected JobEventImpl jobInfo = new JobEventImpl();
 
     /** Job descriptor for dependences management */
     @Transient
@@ -181,7 +185,9 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param event a taskEvent containing a job event.
      */
     public synchronized void update(TaskEvent event) {
-        jobInfo = event.getJobEvent();
+        //ensure that is a JobEventImpl
+        //if not, we are in client side and client brings its own JobEvent Implementation
+        jobInfo = (JobEventImpl) event.getJobEvent();
         tasks.get(event.getTaskId()).update(event);
     }
 
@@ -191,19 +197,19 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param jobInfo the jobInfo to set
      */
     public synchronized void update(JobEvent jobInfo) {
-        this.jobInfo = jobInfo;
+        this.jobInfo = (JobEventImpl) jobInfo;
 
-        if (jobInfo.getTaskStatusModify() != null) {
+        if (this.jobInfo.getTaskStatusModify() != null) {
             for (TaskId id : tasks.keySet()) {
-                tasks.get(id).setStatus(jobInfo.getTaskStatusModify().get(id));
+                tasks.get(id).setStatus(this.jobInfo.getTaskStatusModify().get(id));
             }
         }
 
-        if (jobInfo.getTaskFinishedTimeModify() != null) {
+        if (this.jobInfo.getTaskFinishedTimeModify() != null) {
             for (TaskId id : tasks.keySet()) {
-                if (jobInfo.getTaskFinishedTimeModify().containsKey(id)) {
+                if (this.jobInfo.getTaskFinishedTimeModify().containsKey(id)) {
                     //a null send to a long setter throws a NullPointerException so, here is the fix
-                    tasks.get(id).setFinishedTime(jobInfo.getTaskFinishedTimeModify().get(id));
+                    tasks.get(id).setFinishedTime(this.jobInfo.getTaskFinishedTimeModify().get(id));
                 }
             }
         }
@@ -288,7 +294,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     public boolean addTask(InternalTask task) {
         task.setJobId(getId());
 
-        task.setId(TaskId.nextId(getId(), task.getName()));
+        task.setId(TaskIdImpl.nextId(getId(), task.getName()));
 
         boolean result = (tasks.put(task.getId(), task) == null);
 
@@ -708,12 +714,12 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         //get tasks
         ArrayList<InternalTask> sorted = getTasks();
         //re-init taskId count
-        TaskId.initialize();
+        TaskIdImpl.initialize();
         //sort task according to the ID
         Collections.sort(sorted);
         tasks.clear();
         for (InternalTask td : sorted) {
-            TaskId newId = TaskId.nextId(getId(), td.getName());
+            TaskId newId = TaskIdImpl.nextId(getId(), td.getName());
             td.setId(newId);
             td.setJobInfo(getJobInfo());
             tasks.put(newId, td);
@@ -790,11 +796,11 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @return the jobDescriptor
      */
-    public JobDescriptor getJobDescriptor() {
+    public JobDescriptorImpl getJobDescriptor() {
         if (jobDescriptor == null) {
-            jobDescriptor = new JobDescriptor(this);
+            jobDescriptor = new JobDescriptorImpl(this);
         }
-        return jobDescriptor;
+        return (JobDescriptorImpl) jobDescriptor;
     }
 
     /**
@@ -897,7 +903,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     @Override
     public String getName() {
-        if (getId() == null || getId().getReadableName().equals(JobId.DEFAULT_JOB_NAME)) {
+        if (getId() == null || getId().getReadableName().equals(SchedulerConstants.JOB_DEFAULT_NAME)) {
             return super.getName();
         } else {
             return getId().getReadableName();

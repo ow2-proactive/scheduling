@@ -43,27 +43,27 @@
         <!-- JOB -->
         <mapping class="org.ow2.proactive.scheduler.common.job.JobEnvironment"/>
         <mapping class="org.ow2.proactive.scheduler.common.job.Job"/>
-        <mapping class="org.ow2.proactive.scheduler.common.job.JobEvent"/>
-        <mapping class="org.ow2.proactive.scheduler.common.job.JobId"/>
+        <mapping class="org.ow2.proactive.scheduler.job.JobEventImpl"/>
+        <mapping class="org.ow2.proactive.scheduler.job.JobIdImpl"/>
         <!-- TASK -->
         <mapping class="org.ow2.proactive.scheduler.common.task.UpdatableProperties"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.CommonAttribute"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.RestartMode"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.Task"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.ForkEnvironment"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.TaskEvent"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.TaskId"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.Log4JTaskLogs"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.SimpleTaskLogs"/>
+        <mapping class="org.ow2.proactive.scheduler.task.TaskEventImpl"/>
+        <mapping class="org.ow2.proactive.scheduler.task.TaskIdImpl"/>
         <!-- UTIL -->
         <mapping class="org.ow2.proactive.scheduler.common.task.util.BooleanWrapper"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.util.IntegerWrapper"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.util.BigString"/>
         <!-- SCRIPTING -->
-        <mapping class="org.ow2.proactive.resourcemanager.common.scripting.Script"/>
-        <mapping class="org.ow2.proactive.resourcemanager.common.scripting.GenerationScript"/>
-        <mapping class="org.ow2.proactive.resourcemanager.common.scripting.SelectionScript"/>
-        <mapping class="org.ow2.proactive.resourcemanager.common.scripting.SimpleScript"/>
+        <mapping class="org.ow2.proactive.scripting.Script"/>
+        <mapping class="org.ow2.proactive.scripting.GenerationScript"/>
+        <mapping class="org.ow2.proactive.scripting.SelectionScript"/>
+        <mapping class="org.ow2.proactive.scripting.SimpleScript"/>
         <!-- INTERNAL TASK -->
         <mapping class="org.ow2.proactive.scheduler.task.internal.InternalTask"/>
         <mapping class="org.ow2.proactive.scheduler.task.internal.InternalJavaTask"/>

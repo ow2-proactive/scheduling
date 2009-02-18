@@ -34,9 +34,10 @@ package org.ow2.proactive.authentication;
 import org.apache.log4j.Logger;
 
 /**
- * 
  * This interface is used to acquire a Logger object defined in its children
  *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 0.9.1
  */
 public interface Loggable {
 	public Logger getLogger();

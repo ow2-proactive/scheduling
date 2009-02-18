@@ -38,7 +38,7 @@
 	<!--                   		Class  paths                              -->
 	<!--  =============================================================== -->
 
-	<property name="cl.common"    value="${classes.dir}/common" />
+	<property name="cl.common.dir"    value="${classes.dir}/common" />
 	<property name="cl.scheduler.dir"    value="${classes.dir}/scheduler" />
 	<property name="cl.scheduler.tests.dir"    value="${classes.dir}/schedulerTests" />
 	<property name="cl.rm.dir"           value="${classes.dir}/resource-manager" />
@@ -76,45 +76,45 @@
 	<!--  =============================================================== -->
 
     <path id="common.libs">
-            <fileset dir="${lib.dir}">
-                    <include name="ProActive/**/*.jar"/>
-                    <include name="common/**/*.jar"/>
-            </fileset>
+        <fileset dir="${lib.dir}">
+                <include name="ProActive/**/*.jar"/>
+                <include name="common/**/*.jar"/>
+                <include name="hibernate/**/*.jar"/>
+        </fileset>
     </path>
 
 	<path id="rm.libs">
 		<fileset dir="${lib.dir}">
 			<include name="ProActive/**/*.jar"/>		
-			<include name="common/**/*.jar"/>		
-			<include name="resource-manager/**/*.jar"/>	
-			<!-- Hibernate libs (to compile scripting package) -->
+			<include name="common/**/*.jar"/>
+			<include name="resource-manager/**/*.jar"/>
+			<!-- Hibernate libs -->
 			<include name="hibernate/**/*.jar"/>
-		</fileset>		
+		</fileset>
+		<pathelement location="${cl.common.dir}" />
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
-		<pathelement location="${cl.common}" />
 	</path>
 
 	<path id="scheduler.libs">
 		<fileset dir="${lib.dir}">
-			<include name="ProActive/**/*.jar"/>		
+			<include name="ProActive/**/*.jar"/>
 			<include name="common/**/*.jar"/>
 			<!-- Hibernate libs -->
 			<include name="hibernate/**/*.jar"/>
 		</fileset>
 		
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
-		<pathelement location="${cl.common}" />
+		<pathelement location="${cl.common.dir}" />
 	</path>
 	
 	<path id="project.classpath">
 		<fileset dir="${lib.dir}">
 			<include name="ProActive/**/*.jar"/>
-			<include name="common/**/*.jar"/>		
-			<include name="resource-manager/**/*.jar"/>	
-			<!-- Hibernate libs -->
+			<include name="common/**/*.jar"/>
+			<include name="resource-manager/**/*.jar"/>
 			<include name="hibernate/**/*.jar"/>
 		</fileset>		
-		<pathelement location="${cl.common}" />
+		<pathelement location="${cl.common.dir}" />
 		<pathelement location="${cl.scheduler.dir}" />
 		<pathelement location="${cl.scheduler.tests.dir}" />
 		<pathelement location="${cl.rm.dir}" />
@@ -126,10 +126,9 @@
 			<include name="ProActive/**/*.jar"/>
 			<include name="common/**/*.jar"/>
 			<include name="resource-manager/**/*.jar"/>
-			<!-- Hibernate libs -->
 			<include name="hibernate/**/*.jar"/>
 		</fileset>
-		<pathelement path="${cl.common}"/>
+		<pathelement path="${cl.common.dir}"/>
 		<pathelement path="${cl.rm.dir}"/>
 		<pathelement path="${cl.scheduler.dir}"/>
 		<pathelement path="${cl.rm.tests.dir}"/>

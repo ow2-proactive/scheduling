@@ -37,6 +37,8 @@ import java.io.Serializable;
  * 
  * Authentication interface.
  *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 0.9.1
  */
 public interface Authentication extends Loggable, Serializable {
     

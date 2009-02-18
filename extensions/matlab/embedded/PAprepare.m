@@ -84,7 +84,8 @@ else
     % Dist libs
     dist_lib_dir = [scheduling_dir filesep 'dist' filesep 'lib'];
     javaaddpath(strcat(dist_lib_dir,filesep,'ProActive.jar'));
-    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_scheduler.jar'));
-    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_resource-manager.jar'));
+    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_Scheduler-core.jar'));
+    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_ResourceManager.jar'));
+    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_SRM-common.jar'));
 end
 

@@ -40,15 +40,15 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
+import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.common.policy.Policy;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
-import org.ow2.proactive.scheduler.policy.PolicyInterface;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 
 
 /**
@@ -144,7 +144,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
         createScheduler(rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("//localhost/" +
-            PASchedulerProperties.SCHEDULER_DEFAULT_NAME);
+            SchedulerConstants.SCHEDULER_DEFAULT_NAME);
 
         return auth.logAsAdmin(login, password);
     }
@@ -155,7 +155,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      */
     public static void destroyLocalScheduler() {
         try {
-            String schedulerUrl = "//localhost/" + SchedulerConnection.SCHEDULER_DEFAULT_NAME;
+            String schedulerUrl = "//localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
             Object schedulerAuth = PAActiveObject.lookupActive(SchedulerAuthentication.class.getName(),
                     schedulerUrl);
             PAActiveObject.getActiveObjectNode(schedulerAuth).getProActiveRuntime().killRT(true);
@@ -165,64 +165,63 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#changePolicy(java.lang.Class)
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#changePolicy(java.lang.Class)
      */
-    public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
-            throws SchedulerException {
+    public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
         return schedulerFrontend.changePolicy(newPolicyFile);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#start()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#start()
      */
     public BooleanWrapper start() throws SchedulerException {
         return schedulerFrontend.start();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#stop()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#stop()
      */
     public BooleanWrapper stop() throws SchedulerException {
         return schedulerFrontend.stop();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#pause()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#pause()
      */
     public BooleanWrapper pause() throws SchedulerException {
         return schedulerFrontend.pause();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#freeze()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#freeze()
      */
     public BooleanWrapper freeze() throws SchedulerException {
         return schedulerFrontend.freeze();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#resume()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#resume()
      */
     public BooleanWrapper resume() throws SchedulerException {
         return schedulerFrontend.resume();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#shutdown()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#shutdown()
      */
     public BooleanWrapper shutdown() throws SchedulerException {
         return schedulerFrontend.shutdown();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminSchedulerInterface#kill()
+     * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#kill()
      */
     public BooleanWrapper kill() throws SchedulerException {
         return schedulerFrontend.kill();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#linkResourceManager(java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#linkResourceManager(java.lang.String)
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
         return schedulerFrontend.linkResourceManager(rmURL);

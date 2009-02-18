@@ -42,11 +42,11 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.MutableInteger;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 
 
@@ -226,149 +226,154 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobPendingToRunningEvent(JobEvent event) {
         jobPendingToRunningEvents.add(event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobRemoveFinishedEvent(JobEvent event) {
         jobRemoveFinishedEvents.add(event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobRunningToFinishedEvent(JobEvent event) {
         jobRunningToFinishedEvents.add(event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.Job)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.Job)
      */
     public void jobSubmittedEvent(Job job) {
         jobSubmittedEvents.add(job);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
      */
     public void taskPendingToRunningEvent(TaskEvent event) {
         taskPendingToRunningEvents.add(event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
      */
     public void taskRunningToFinishedEvent(TaskEvent event) {
         taskRunningToFinishedEvents.add(event);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobChangePriorityEvent(JobEvent event) {
         // TODO Auto-generated method stub	
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobPausedEvent(JobEvent event) {
         // TODO Auto-generated method stub
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
      */
     public void jobResumedEvent(JobEvent event) {
         // TODO Auto-generated method stub
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerFrozenEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerFrozenEvent()
      */
     public void schedulerFrozenEvent() {
         miscEvents.add(SchedulerEvent.FROZEN);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerKilledEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerKilledEvent()
      */
     public void schedulerKilledEvent() {
         miscEvents.add(SchedulerEvent.KILLED);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerPausedEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPausedEvent()
      */
     public void schedulerPausedEvent() {
         miscEvents.add(SchedulerEvent.PAUSED);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerRMDownEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMDownEvent()
      */
     public void schedulerRMDownEvent() {
         // TODO Auto-generated method stub	
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerRMUpEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMUpEvent()
      */
     public void schedulerRMUpEvent() {
         // TODO Auto-generated method stub
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerResumedEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerResumedEvent()
      */
     public void schedulerResumedEvent() {
         miscEvents.add(SchedulerEvent.RESUMED);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerShutDownEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShutDownEvent()
      */
     public void schedulerShutDownEvent() {
         miscEvents.add(SchedulerEvent.SHUTDOWN);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerShuttingDownEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShuttingDownEvent()
      */
     public void schedulerShuttingDownEvent() {
         miscEvents.add(SchedulerEvent.SHUTTING_DOWN);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerStartedEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStartedEvent()
      */
     public void schedulerStartedEvent() {
         miscEvents.add(SchedulerEvent.STARTED);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerStoppedEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStoppedEvent()
      */
     public void schedulerStoppedEvent() {
         miscEvents.add(SchedulerEvent.STOPPED);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#usersUpdate(org.ow2.proactive.scheduler.common.job.UserIdentification)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdate(org.ow2.proactive.scheduler.common.job.UserIdentification)
      */
     public void usersUpdate(UserIdentification userIdentification) {
         // TODO Auto-generated method stub	
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskEvent)
      */
     public void taskWaitingForRestart(TaskEvent event) {
         taskWaitingForRestartEvents.add(event);
+    }
+
+    public void schedulerPolicyChangedEvent(String newPolicyName) {
+        // TODO Auto-generated method stub
+
     }
 }

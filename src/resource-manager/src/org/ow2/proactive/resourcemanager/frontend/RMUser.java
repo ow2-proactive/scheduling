@@ -36,9 +36,8 @@ import java.util.List;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -58,7 +57,7 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
  * If the node match criteria, it is selected, otherwise RM tries the selection script
  * on other nodes.
  *
- *  @see org.ow2.proactive.resourcemanager.common.scripting.SelectionScript
+ *  @see org.ow2.proactive.scripting.SelectionScript
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -67,11 +66,12 @@ import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 @PublicAPI
 public interface RMUser {
 
-    /** echo function */
     /**
-     * @return ID of RMUser Active object
+     * Ping the RM
+     *
+     * @return true if RM is still alive
      */
-    public StringWrapper echo();
+    public boolean isAlive();
 
     /**
      * Return number of free nodes available for scheduling

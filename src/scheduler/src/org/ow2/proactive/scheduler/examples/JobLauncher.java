@@ -57,17 +57,17 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.job.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
 
 
@@ -79,7 +79,7 @@ import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
 public class JobLauncher {
 
     private static final String SCHEDULER_DEFAULT_URL = "//localhost/" +
-        PASchedulerProperties.SCHEDULER_DEFAULT_NAME;
+        SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     /**
      * Start the job launcher process.

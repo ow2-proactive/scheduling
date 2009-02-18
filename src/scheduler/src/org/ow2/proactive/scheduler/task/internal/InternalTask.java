@@ -57,18 +57,20 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskEvent;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.core.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.TaskEventImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 
 
@@ -119,8 +121,8 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
 
     /** Task information : this is the informations that can change during process. */
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskEvent.class)
-    private TaskEvent taskInfo = new TaskEvent();
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskEventImpl.class)
+    private TaskEventImpl taskInfo = new TaskEventImpl();
 
     /** Node exclusion for this task if desired */
     @Transient
@@ -265,7 +267,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      * @param taskInfo the taskInfo to set
      */
     public void update(TaskEvent taskInfo) {
-        this.taskInfo = taskInfo;
+        this.taskInfo = (TaskEventImpl) taskInfo;
     }
 
     /**
@@ -514,7 +516,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      */
     @Override
     public String getName() {
-        if (getId() == null || getId().getReadableName().equals(TaskId.TASK_DEFAULT_NAME)) {
+        if (getId() == null || getId().getReadableName().equals(SchedulerConstants.TASK_DEFAULT_NAME)) {
             return super.getName();
         } else {
             return getId().getReadableName();

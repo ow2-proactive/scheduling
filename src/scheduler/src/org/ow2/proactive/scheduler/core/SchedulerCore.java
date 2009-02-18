@@ -72,27 +72,31 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.frontend.NodeSet;
+import org.ow2.proactive.scheduler.common.AdminMethodsInterface;
+import org.ow2.proactive.scheduler.common.SchedulerInitialState;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface_;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerInitialState;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerState;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_;
+import org.ow2.proactive.scheduler.common.policy.Policy;
+import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
+import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.db.Condition;
 import org.ow2.proactive.scheduler.core.db.ConditionComparator;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
@@ -101,20 +105,20 @@ import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
-import org.ow2.proactive.scheduler.job.JobDescriptor;
+import org.ow2.proactive.scheduler.job.JobEventImpl;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
-import org.ow2.proactive.scheduler.job.TaskDescriptor;
-import org.ow2.proactive.scheduler.policy.PolicyInterface;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.ProActiveTaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -158,7 +162,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private InternalJobWrapper currentJobToSubmit;
 
     /** Scheduler current policy */
-    private PolicyInterface policy;
+    private Policy policy;
 
     /** list of all jobs managed by the scheduler */
     private Map<JobId, InternalJob> jobs = new HashMap<JobId, InternalJob>();
@@ -313,7 +317,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 throw new RuntimeException(e);
             }
 
-            this.policy = (PolicyInterface) Class.forName(policyFullName).newInstance();
+            this.policy = (Policy) Class.forName(policyFullName).newInstance();
             logger.info("Scheduler Core ready !");
         } catch (InstantiationException e) {
             logger.error("The policy class cannot be found : " + e.getMessage());
@@ -359,7 +363,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param currentJob the job where the task event are.
      */
     private void updateTaskEventsList(InternalJob currentJob) {
-        for (Entry<TaskId, TaskState> e : currentJob.getJobInfo().getTaskStatusModify().entrySet()) {
+        Map<TaskId, TaskState> tsm = ((JobEventImpl) currentJob.getJobInfo()).getTaskStatusModify();
+        for (Entry<TaskId, TaskState> e : tsm.entrySet()) {
             if (e.getValue() != TaskState.RUNNING) {
                 DatabaseManager.synchronize(currentJob.getHMTasks().get(e.getKey()).getTaskInfo());
             }
@@ -405,18 +410,20 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                 while ((state == SchedulerState.STARTED) || (state == SchedulerState.PAUSED)) {
                     try {
-                        service.serveAll(filter);
-                        schedule();
                         //block the loop until a method is invoked and serve it
                         service.blockingServeOldest(SCHEDULER_TIME_OUT);
+                        //serve all important methods
+                        service.serveAll(filter);
+                        //schedule
+                        schedule();
                     } catch (Exception e) {
                         //this point is reached in case of big problem, sometimes unknown
                         logger
-                                .warn("\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
+                                .fatal("\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
                         e.printStackTrace();
                         //trying to check if RM is dead
                         try {
-                            resourceManager.echo().stringValue();
+                            resourceManager.isAlive();
                         } catch (Exception rme) {
                             resourceManager.shutdownProxy();
                             //if failed
@@ -424,7 +431,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             //scheduler functionality are reduced until now
                             state = SchedulerState.UNLINKED;
                             logger
-                                    .warn("******************************\n"
+                                    .fatal("******************************\n"
                                         + "Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
                                         + "Scheduler is in critical state and its functionality are reduced : \n"
                                         + "\t-> use the linkResourceManager methode to reconnect a new one.\n"
@@ -442,9 +449,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     job.setUnPause();
 
                     JobEvent event = job.getJobInfo();
+                    updateTaskEventsList(job);
                     //send event to front_end
                     frontend.jobResumedEvent(event);
-                    updateTaskEventsList(job);
                 }
             }
 
@@ -508,7 +515,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         //ask the policy all the tasks to be schedule according to the jobs list.
-        Vector<? extends TaskDescriptor> taskRetrivedFromPolicy = policy.getOrderedTasks(jobDescriptorList);
+        Vector<EligibleTaskDescriptor> taskRetrivedFromPolicy = policy.getOrderedTasks(jobDescriptorList);
+
+        if (taskRetrivedFromPolicy == null) {
+            return;
+        }
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
             int nbNodesToAskFor = 0;
@@ -667,11 +678,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             currentJob.start();
                             pendingJobs.remove(currentJob);
                             runningJobs.add(currentJob);
-                            // send job event to front-end
-                            frontend.jobPendingToRunningEvent(currentJob.getJobInfo());
                             //create tasks events list
                             updateTaskEventsList(currentJob);
                             logger.info("Starting job " + currentJob.getId());
+                            // send job event to front-end
+                            frontend.jobPendingToRunningEvent(currentJob.getJobInfo());
                         }
 
                         // set the different informations on task
@@ -733,8 +744,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     if (td.getNumberOfExecutionOnFailureLeft() > 0) {
                         td.setStatus(TaskState.WAITING_ON_FAILURE);
                         job.newWaitingTask();
-                        frontend.taskWaitingForRestart(td.getTaskInfo());
                         job.reStartTask(td);
+                        frontend.taskWaitingForRestart(td.getTaskInfo());
                     } else {
                         endJob(
                                 job,
@@ -877,9 +888,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //failed the job
             job.failed(task.getId(), jobState);
 
-            //send task event
-            frontend.taskRunningToFinishedEvent(task.getTaskInfo());
-
             //store the exception into jobResult
             if (jobState == JobState.FAILED) {
                 taskResult = new TaskResultImpl(task.getId(), new Throwable(errorMsg), new SimpleTaskLogs("",
@@ -899,15 +907,20 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //move the job
             runningJobs.remove(job);
             finishedJobs.add(job);
+
+            //send task event
+            frontend.taskRunningToFinishedEvent(task.getTaskInfo());
         }
 
         terminateJobHandling(job.getId());
 
-        //send event to listeners.
-        frontend.jobRunningToFinishedEvent(job.getJobInfo());
         //create tasks events list
         updateTaskEventsList(job);
+
         logger.info("Terminated job " + job.getId() + " (" + jobState + ")");
+
+        //send event to listeners.
+        frontend.jobRunningToFinishedEvent(job.getJobInfo());
     }
 
     /**
@@ -1064,8 +1077,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //to be done before terminating the task, once terminated it is not running anymore..
             TaskDescriptor currentTD = job.getRunningTaskDescriptor(taskId);
             descriptor = job.terminateTask(errorOccurred, taskId);
-            //send event
-            frontend.taskRunningToFinishedEvent(descriptor.getTaskInfo());
             //store this task result in the job result.
             ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), res, descriptor
                     .isPreciousResult());
@@ -1083,6 +1094,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     DatabaseManager.unload(job.getJobResult().getResult(td.getId().getReadableName()));
                 }
             }
+            //send event
+            frontend.taskRunningToFinishedEvent(descriptor.getTaskInfo());
 
             //if this job is finished (every task have finished)
             if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()) {
@@ -1094,13 +1107,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                 terminateJobHandling(job.getId());
 
-                frontend.jobRunningToFinishedEvent(job.getJobInfo());
                 //and to data base
                 DatabaseManager.synchronize(job.getJobInfo());
                 //clean every task result
                 for (TaskResult tr : job.getJobResult().getAllResults().values()) {
                     DatabaseManager.unload(tr);
                 }
+                //send event to client
+                frontend.jobRunningToFinishedEvent(job.getJobInfo());
             }
 
             //free every execution nodes
@@ -1123,7 +1137,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private void updateJobIdReference(JobResult jobResult, TaskResult res) {
         try {
             //find the jobId field
-            for (Field f : TaskId.class.getDeclaredFields()) {
+            for (Field f : TaskIdImpl.class.getDeclaredFields()) {
                 if (f.getType().equals(JobId.class)) {
                     f.setAccessible(true);
                     //set to the existing reference
@@ -1151,7 +1165,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int logPort) {
         logger.debug("listen logs of job[" + jobId + "]");
@@ -1215,38 +1229,40 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
      */
-    public JobResult getJobResult(JobId jobId) {
-        JobResult result = null;
+    public JobResult getJobResult(JobId jobId) throws SchedulerException {
         final InternalJob job = jobs.get(jobId);
         final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
 
-        if (job != null) {
-            result = DatabaseManager.recover(job.getJobResult().getClass(),
-                    new Condition("id", ConditionComparator.EQUALS_TO, job.getJobResult().getId())).get(0);
-            logger.debug("GetJobResult of job[" + jobId + "]");
+        if (job == null) {
+            throw new SchedulerException("The job does not exist !");
+        }
 
-            if (!job.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
+        logger.debug("Trying to get JobResult of job[" + jobId + "]");
+        //result = null if not in DB (ie: not yet available)
+        JobResult result = DatabaseManager.recover(job.getJobResult().getClass(),
+                new Condition("id", ConditionComparator.EQUALS_TO, job.getJobResult().getId())).get(0);
 
-                //remember that this job is to be removed
-                job.setToBeRemoved();
-                DatabaseManager.synchronize(job.getJobInfo());
+        if (!job.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
 
-                try {
-                    //remove job after the given delay
-                    TimerTask tt = new TimerTask() {
-                        @Override
-                        public void run() {
-                            schedulerStub.remove(job.getId());
-                        }
-                    };
-                    timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
-                    logger.debug("Job " + jobId + " will be removed in " +
-                        (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            //remember that this job is to be removed
+            job.setToBeRemoved();
+            DatabaseManager.synchronize(job.getJobInfo());
+
+            try {
+                //remove job after the given delay
+                TimerTask tt = new TimerTask() {
+                    @Override
+                    public void run() {
+                        schedulerStub.remove(job.getId());
+                    }
+                };
+                timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+                logger.debug("Job " + jobId + " will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) +
+                    "sec");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -1254,37 +1270,42 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName) {
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException {
         logger.debug("trying to getTaskResult of task [" + taskName + "] for job[" + jobId + "]");
-        TaskResult result = null;
         InternalJob job = jobs.get(jobId);
 
-        if (job != null) {
-            //extract taskResult reference from memory (weak instance)
-            //useful to get the task result with the task name
-            result = ((JobResultImpl) job.getJobResult()).getResult(taskName);
-            if (result == null || PAFuture.isAwaited(result)) {
-                //the result is not yet available
-                return null;
-            }
-            //extract full taskResult from DB
-            //use the previous result to get the task Id matching the given name.
-            //extract full copy from DB to avoid load, unload operation
-            result = DatabaseManager.recover(result.getClass(),
-                    new Condition("id", ConditionComparator.EQUALS_TO, result.getTaskId())).get(0);
+        if (job == null) {
+            throw new SchedulerException("The job does not exist !");
+        }
 
-            if ((result != null)) {
-                logger.debug("Get '" + taskName + "' task result for job " + jobId);
-            }
+        //extract taskResult reference from memory (weak instance)
+        //useful to get the task result with the task name
+        TaskResult result = ((JobResultImpl) job.getJobResult()).getResult(taskName);
+        if (result == null) {
+            //the task is unknown
+            throw new SchedulerException("The task does not exist !");
+        }
+        if (PAFuture.isAwaited(result)) {
+            //the result is not yet available
+            return null;
+        }
+        //extract full taskResult from DB
+        //use the previous result to get the task Id matching the given name.
+        //extract full copy from DB to avoid load, unload operation
+        result = DatabaseManager.recover(result.getClass(),
+                new Condition("id", ConditionComparator.EQUALS_TO, result.getTaskId())).get(0);
+
+        if ((result != null)) {
+            logger.debug("Get '" + taskName + "' task result for job " + jobId);
         }
 
         return result;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#remove(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#remove(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public void remove(JobId jobId) {
         InternalJob job = jobs.get(jobId);
@@ -1293,8 +1314,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             jobs.remove(jobId);
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
-            //send event to front-end
-            frontend.jobRemoveFinishedEvent(job.getJobInfo());
             //and to data base
             DatabaseManager.synchronize(job.getJobInfo());
             // close log buffer
@@ -1311,11 +1330,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 DatabaseManager.delete(job);
             }
             logger.info("Job " + jobId + " removed !");
+            //send event to front-end
+            frontend.jobRemoveFinishedEvent(job.getJobInfo());
         }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#start()
+     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#start()
      */
     public BooleanWrapper start() {
         if (state == SchedulerState.UNLINKED) {
@@ -1334,7 +1355,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#stop()
+     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#stop()
      */
     public BooleanWrapper stop() {
         if (state == SchedulerState.UNLINKED) {
@@ -1354,7 +1375,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#pause()
+     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#pause()
      */
     public BooleanWrapper pause() {
         if (state == SchedulerState.UNLINKED) {
@@ -1377,7 +1398,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#freeze()
+     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#freeze()
      */
     public BooleanWrapper freeze() {
         if (state == SchedulerState.UNLINKED) {
@@ -1400,7 +1421,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#resume()
+     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#resume()
      */
     public BooleanWrapper resume() {
         if (state == SchedulerState.UNLINKED) {
@@ -1423,7 +1444,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#shutdown()
+     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#shutdown()
      */
     public BooleanWrapper shutdown() {
         if (state == SchedulerState.UNLINKED) {
@@ -1442,7 +1463,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#kill()
+     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#kill()
      */
     public synchronized BooleanWrapper kill() {
         if (state == SchedulerState.KILLED) {
@@ -1495,7 +1516,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#pause(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#pause(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper pause(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1519,15 +1540,16 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             logger.debug("Job " + jobId + " has just been paused !");
         }
 
-        frontend.jobPausedEvent(event);
         //create tasks events list
         updateTaskEventsList(job);
+        //send event to user
+        frontend.jobPausedEvent(event);
 
         return new BooleanWrapper(change);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper resume(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1551,15 +1573,16 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             logger.debug("Job " + jobId + " has just been resumed !");
         }
 
-        frontend.jobResumedEvent(event);
         //create tasks events list
         updateTaskEventsList(job);
+        //send event to user
+        frontend.jobResumedEvent(event);
 
         return new BooleanWrapper(change);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public synchronized BooleanWrapper kill(JobId jobId) {
         if (state == SchedulerState.UNLINKED) {
@@ -1584,7 +1607,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface_#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
      */
     public void changePriority(JobId jobId, JobPriority priority) {
         InternalJob job = jobs.get(jobId);
@@ -1601,10 +1624,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @return true if the policy has been correctly change, false if not.
      * @throws SchedulerException (can be due to insufficient permission)
      */
-    public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
-            throws SchedulerException {
+    public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
         try {
             policy = newPolicyFile.newInstance();
+            frontend.schedulerPolicyChangedEvent(newPolicyFile.getName());
         } catch (InstantiationException e) {
             throw new SchedulerException("Exception occurs while instanciating the policy !");
         } catch (IllegalAccessException e) {
@@ -1615,7 +1638,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.AdminMethodsInterface#linkResourceManager(java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#linkResourceManager(java.lang.String)
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
         //only if unlink
@@ -1673,7 +1696,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //------------------------------------------------------------------------
         logger.info("Re-build jobs lists");
 
-        JobId maxId = JobId.makeJobId("0");
+        JobId maxId = JobIdImpl.makeJobId("0");
 
         for (InternalJob job : recovering) {
             jobs.put(job.getId(), job);
@@ -1688,7 +1711,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //--------------------    Initialize jobId count   ----------------------
         //------------------------------------------------------------------------
         logger.debug("Initialize jobId count");
-        JobId.setInitialValue(maxId);
+        JobIdImpl.setInitialValue((JobIdImpl) maxId);
 
         //------------------------------------------------------------------------
         //-----------    Re-build pending/running/finished lists  ----------------

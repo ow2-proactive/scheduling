@@ -39,7 +39,10 @@ import org.objectweb.proactive.api.PAActiveObject;
 /**
  * Class implements connection to the service with authentication. It attempts lookup authentication 
  * active object and checks that system is up and running (in another words authentication object is activated).
- * Provides an ability to connect in blocking and non blocking manner. 
+ * Provides an ability to connect in blocking and non blocking manner.
+ *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 0.9.1
  */
 public abstract class Connection<T extends Authentication> implements Loggable, Serializable {
 

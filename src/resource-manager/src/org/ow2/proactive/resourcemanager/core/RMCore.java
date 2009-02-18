@@ -65,9 +65,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptResult;
-import org.ow2.proactive.resourcemanager.common.scripting.ScriptWithResult;
-import org.ow2.proactive.resourcemanager.common.scripting.SelectionScript;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -86,6 +83,9 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.ScriptWithResult;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -793,7 +793,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      org.ow2.proactive.resourcemanager.common.scripting.SelectionScript,
+     *      org.ow2.proactive.scripting.SelectionScript,
      *      org.ow2.proactive.resourcemanager.frontend.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion) {
@@ -958,7 +958,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      org.ow2.proactive.resourcemanager.common.scripting.SelectionScript)
+     *      org.ow2.proactive.scripting.SelectionScript)
      */
     public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript) {
         // not implemented

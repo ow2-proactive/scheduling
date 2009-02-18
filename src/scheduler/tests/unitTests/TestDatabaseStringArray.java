@@ -36,13 +36,13 @@ import java.io.File;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.proactive.resourcemanager.common.scripting.GenerationScript;
-import org.ow2.proactive.resourcemanager.common.scripting.SimpleScript;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scripting.GenerationScript;
+import org.ow2.proactive.scripting.SimpleScript;
 
 import functionnaltests.FunctionalTDefaultScheduler;
 

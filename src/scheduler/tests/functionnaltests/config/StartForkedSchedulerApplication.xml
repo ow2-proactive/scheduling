@@ -18,13 +18,14 @@
 				<jvmarg value="-Dproactive.test=true" />
 				<jvmarg value="${jvmargDefinedByTest}" />
 				<applicationClasspath>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_resource-manager.jar" />
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar" />
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_tests.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_scheduler.jar" />
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-core.jar" />
 					<pathElement base="proactive" relpath="/dist/lib/clover.jar" />
 					<pathElement base="proactive" relpath="/dist/lib/" />
-					<pathElement base="proactive" relpath="/lib/common/script-api.jar" />
-					<pathElement base="proactive" relpath="/lib/common/script-js.jar" />
+					<pathElement base="proactive" relpath="/dist/lib/script-api.jar" />
+					<pathElement base="proactive" relpath="/dist/lib/script-js.jar" />
 					<pathElement base="proactive" relpath="/dist/lib/js.jar" />
 					<pathElement base="proactive" relpath="/classes/schedulerTests/"/>
 					<pathElement base="proactive" relpath="/classes/resource-managerTests/"/>

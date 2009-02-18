@@ -47,7 +47,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 import functionalTests.FunctionalTest;
 

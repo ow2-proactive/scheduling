@@ -32,7 +32,6 @@
 package org.ow2.proactive.resourcemanager.frontend;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 
@@ -50,11 +49,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 @PublicAPI
 public interface RMMonitoring {
 
-    /** Echo function */
     /**
-     * @return a String representing the RMmonitoring ID
+     * ping the RM
+     *
+     * @return true if the RM is still alive
      */
-    public StringWrapper echo();
+    public boolean isAlive();
 
     /** Register a new Resource manager listener.
      * Way to a monitor object to ask at RMMonitoring to throw

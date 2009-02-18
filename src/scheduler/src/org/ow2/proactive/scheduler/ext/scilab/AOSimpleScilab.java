@@ -46,8 +46,8 @@ import javasci.SciData;
 import javasci.Scilab;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidParameterException;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

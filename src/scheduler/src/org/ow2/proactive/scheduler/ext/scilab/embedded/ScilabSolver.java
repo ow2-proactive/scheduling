@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
 public class ScilabSolver {

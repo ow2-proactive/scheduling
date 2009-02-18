@@ -34,7 +34,7 @@ script. If run without an argument, it will first start a Resources Manager on
 the local host and deploy 4 nodes. Then the scheduler will be started and
 connected to this resource Manager. Scheduler is starting sequence, that  is finished
 when the line :
-	 [SCHEDULER] Scheduler has just been started !
+	 [...] Scheduler has just been started !
 
 is displayed. At this point, ProActive Scheduler is started with 4 nodes available.
 
