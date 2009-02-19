@@ -194,12 +194,12 @@
     </target>
 	
 	<target name="deploy.common" depends="-deployCopy, compile.common" description="Populate Common dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/ProActive_SRM-common.jar">
+		<jar destfile="${deploy.lib.dir}/sProActive_SRM-common.jar">
 			<fileset dir="${cl.common.dir}" includes="**" />
         </jar>
 	</target>
 
-	<target name="deploy.rm" depends="-deployCopy, compile.rm" description="Populate Resourcemanager dist/ with all needed files">
+	<target name="deploy.rm" depends="-deployCopy, compile.rm, deploy.common" description="Populate Resourcemanager dist/ with all needed files">
 		<jar destfile="${deploy.lib.dir}/ProActive_ResourceManager.jar">
 			<fileset dir="${cl.rm.dir}" includes="**" />
         </jar>
