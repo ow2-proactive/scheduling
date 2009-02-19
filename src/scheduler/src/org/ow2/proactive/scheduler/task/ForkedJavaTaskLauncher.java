@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
@@ -152,9 +153,9 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
     /**
      * Method responsible for creating a a dedicated JVM, execution of the task on this JVM and collecting result
-     * @see org.ow2.proactive.scheduler.task.JavaTaskLauncher#doTask(org.ow2.proactive.scheduler.core.SchedulerCore, org.ow2.proactive.scheduler.task.ExecutableContainer, org.ow2.proactive.scheduler.common.task.TaskResult[])
+     * @see org.ow2.proactive.scheduler.task.JavaTaskLauncher#doTask(org.ow2.proactive.scheduler.common.TaskTerminateNotification, org.ow2.proactive.scheduler.task.ExecutableContainer, org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
-    public TaskResult doTask(SchedulerCore core, ExecutableContainer executableContainer,
+    public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
         try {
             init();

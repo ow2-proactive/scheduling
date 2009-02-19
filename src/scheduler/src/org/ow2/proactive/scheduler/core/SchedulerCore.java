@@ -72,8 +72,8 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.scheduler.common.AdminMethodsInterface;
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface_;
@@ -119,6 +119,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -130,7 +131,8 @@ import org.ow2.proactive.scripting.SelectionScript;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInterface, RunActive {
+public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInterface,
+        TaskTerminateNotification, RunActive {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);

@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**

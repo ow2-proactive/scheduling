@@ -47,19 +47,19 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.resourcemanager.frontend.NodeSet;
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.core.SchedulerCore;
 import org.ow2.proactive.scheduler.util.logforwarder.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.util.logforwarder.LoggingOutputStream;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -171,7 +171,7 @@ public abstract class TaskLauncher implements InitActive {
      * Common final behavior for any type of task launcher.
      * @param core reference to the scheduler.
      */
-    protected void finalizeTask(SchedulerCore core) {
+    protected void finalizeTask(TaskTerminateNotification core) {
         // unset env
         this.unsetEnv();
         // reset stdout/err
@@ -201,7 +201,7 @@ public abstract class TaskLauncher implements InitActive {
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public abstract TaskResult doTask(SchedulerCore core, ExecutableContainer execContainer,
+    public abstract TaskResult doTask(TaskTerminateNotification core, ExecutableContainer execContainer,
             TaskResult... results);
 
     /**
@@ -252,7 +252,7 @@ public abstract class TaskLauncher implements InitActive {
      * Activate the logs on this host and port.
      *
      * @param host the host on which to activate the log.
-     * @param port the host on which to activate the log.
+     * @param port the port on which to activate the log.
      */
     public void activateLogs(String host, int port) {
         // should reset taskId because calling thread is not active thread (immediate service)

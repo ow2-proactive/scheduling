@@ -56,7 +56,6 @@ import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
@@ -72,6 +71,7 @@ import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskEventImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**

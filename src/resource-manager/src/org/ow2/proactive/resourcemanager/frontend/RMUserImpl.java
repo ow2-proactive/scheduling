@@ -50,6 +50,7 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -151,14 +152,14 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.scripting.SelectionScript, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, org.ow2.proactive.scripting.SelectionScript, org.ow2.proactive.utils.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
         return rmcore.getAtMostNodes(nbNodes, selectionScript, exclusion);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, java.util.List, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper, java.util.List, org.ow2.proactive.utils.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes, List<SelectionScript> selectionScriptsList,
             NodeSet exclusion) {
@@ -188,7 +189,7 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#freeNodes(org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#freeNodes(org.ow2.proactive.utils.NodeSet)
      */
     public void freeNodes(NodeSet nodes) {
         if (logger.isDebugEnabled()) {

@@ -37,14 +37,14 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.resourcemanager.frontend.NodeSet;
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
-import org.ow2.proactive.scheduler.core.SchedulerCore;
 import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -99,7 +99,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * This method should have NEVER been called in an ProActive task launcher.
      */
     @Override
-    public TaskResult doTask(SchedulerCore core, ExecutableContainer executableContainer,
+    public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
         throw new RuntimeException("This method should have NEVER been called in this context !!");
     }
@@ -114,7 +114,8 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, JavaExecutableContainer executableContainer, NodeSet nodes) {
+    public TaskResult doTask(TaskTerminateNotification core, JavaExecutableContainer executableContainer,
+            NodeSet nodes) {
         nodesList = nodes;
 
         try {

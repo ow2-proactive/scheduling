@@ -68,7 +68,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.NodeSet;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMAdminImpl;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -86,6 +85,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.ScriptWithResult;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -784,7 +784,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#freeNodes(org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#freeNodes(org.ow2.proactive.utils.NodeSet)
      */
     public void freeNodes(NodeSet nodes) {
         for (Node node : nodes)
@@ -794,7 +794,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
      *      org.ow2.proactive.scripting.SelectionScript,
-     *      org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     *      org.ow2.proactive.utils.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion) {
         ArrayList<SelectionScript> list = null;
@@ -807,7 +807,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      java.util.List, org.ow2.proactive.resourcemanager.frontend.NodeSet)
+     *      java.util.List, org.ow2.proactive.utils.NodeSet)
      */
     public NodeSet getAtMostNodes(IntWrapper nb, List<SelectionScript> selectionScriptList, NodeSet exclusion) {
 

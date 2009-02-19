@@ -33,11 +33,11 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
 
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.core.SchedulerCore;
 import org.ow2.proactive.scripting.Script;
 
 
@@ -87,7 +87,7 @@ public class JavaTaskLauncher extends TaskLauncher {
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, ExecutableContainer executableContainer,
+    public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
         try {
             //launch pre script
