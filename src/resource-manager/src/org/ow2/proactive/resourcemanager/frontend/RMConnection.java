@@ -109,16 +109,24 @@ public class RMConnection extends Connection<RMAuthentication> {
     }
 
     /**
-     * Creates the default url if null is passed as a parameter or adds NAME_ACTIVE_OBJECT_RMAUTHENTICATION
-     * to the url if it's missing
+     * Normalize the URL of the RESOURCE MANAGER.<br>
+     *
+     * @param url, the URL to normalize.
+     * @return 	//localhost/RM_NAME if the given url is null.<br>
+     * 			the given URL if it terminates by the RM_NAME<br>
+     * 			the given URL with /RM_NAME appended if URL does not end with /<br>
+     * 			the given URL with RM_NAME appended if URL does end with /<br>
+     * 			the given URL with RM_NAME appended if URL does not end with RM_NAME
      */
     private static String normalize(String url) {
+        String NAME_ACTIVE_OBJECT_RMAUTHENTICATION = RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
         if (url == null) {
-            return "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
-        } else if (!url.endsWith(RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION)) {
+            url = "//localhost/";
+        }
+        if (!url.endsWith(NAME_ACTIVE_OBJECT_RMAUTHENTICATION)) {
             if (!url.endsWith("/"))
                 url += "/";
-            return url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
+            url += NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
         }
         return url;
     }

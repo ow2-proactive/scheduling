@@ -40,7 +40,6 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -77,8 +76,7 @@ public class SimpleHelloWorld {
             //*********************** GET SCHEDULER *************************
             //get authentication interface from existing scheduler based on scheduler host URL
             //(localhost) followed by the scheduler name (here the default one)
-            SchedulerAuthenticationInterface auth = SchedulerConnection.join("//localhost/" +
-                SchedulerConstants.SCHEDULER_DEFAULT_NAME);
+            SchedulerAuthenticationInterface auth = SchedulerConnection.join("//localhost/");
 
             //Now you are connected you must log on with a couple of username/password matching an entry in login and group files.
             //(groups.cfg, login.cfg in the same directory)

@@ -50,7 +50,6 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -66,8 +65,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  */
 public class GetJobResult {
 
-    private static final String SCHEDULER_DEFAULT_URL = "//localhost/" +
-        SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+    private static final String SCHEDULER_DEFAULT_URL = "//localhost/";
 
     /**
      * Start the jobResult receiver.

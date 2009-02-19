@@ -1039,7 +1039,7 @@ job.setTask(aTask);
 				<para>
 					For example :
 					<emphasis>
-						submit.[sh|bat] -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/SCHEDULER
+						submit.[sh|bat] -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
 					</emphasis>
 					will submit 12 times the <literal>Job_with_dep</literal> job to a local
 					ProActive Scheduler and only your password will be requested.
@@ -1055,7 +1055,7 @@ job.setTask(aTask);
 				</para>
 				<programlisting xml:lang="java">
 //join an existing ProActive Scheduler retrieving an authentication interface.
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 //connect and log to the Scheduler. Valid username and password are define by the administrator.
 UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 // submitting a new job and get the associated id

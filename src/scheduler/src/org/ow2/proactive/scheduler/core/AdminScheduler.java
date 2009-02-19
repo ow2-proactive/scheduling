@@ -143,8 +143,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             SchedulerException, LoginException {
         createScheduler(rm, policyFullClassName);
 
-        SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("//localhost/" +
-            SchedulerConstants.SCHEDULER_DEFAULT_NAME);
+        SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("//localhost/");
 
         return auth.logAsAdmin(login, password);
     }

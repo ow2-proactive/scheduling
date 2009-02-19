@@ -52,7 +52,6 @@ import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -69,8 +68,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
  */
 public class AdminShell {
 
-    private static final String SCHEDULER_DEFAULT_URL = "//localhost/" +
-        SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+    private static final String SCHEDULER_DEFAULT_URL = "//localhost/";
 
     private static AdminSchedulerInterface scheduler;
     private static final String STAT_CMD = "stat";

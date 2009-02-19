@@ -46,7 +46,6 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
@@ -74,7 +73,7 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
     protected static String functionalTestSchedulerProperties = FunctionalTDefaultScheduler.class
             .getResource("config/functionalTSchedulerProperties.ini").getPath();
 
-    protected static String schedulerDefaultURL = "//Localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+    protected static String schedulerDefaultURL = "//Localhost/";
 
     public static final String VAR_OS = "os";
 

@@ -106,8 +106,7 @@
 			<emphasis role="bold">Enter required informations</emphasis> about the remote scheduler,
 			and click <emphasis role="bold">OK</emphasis>.
 			Url is made of protocol, host name on which the Scheduler is started and port on
-			which it is listening, and finally binding name of scheduler. By default binding name is 'SCHEDULER' (this
-			name can be changed by your scheduler's administrator). 
+			which it is listening.
 			Then enter your user/admin name and password.
 		</para>
 		<para>

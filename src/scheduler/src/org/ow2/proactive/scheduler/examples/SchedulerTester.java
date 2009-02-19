@@ -48,7 +48,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -71,7 +70,7 @@ public class SchedulerTester {
     public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     // scheduler connection
-    private static final String DEFAULT_URL = "//localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+    private static final String DEFAULT_URL = "//localhost/";
     private SchedulerAuthenticationInterface authentication;
 
     // users

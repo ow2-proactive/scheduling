@@ -264,8 +264,7 @@ AdminScheduler.createScheduler(
 							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it :
 							<programlisting xml:lang="java">
 // connecting to the scheduler
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER");
-//"SCHEDULER" is the default name for the Scheduler Object. This value can be changed in the PASchedulerProperties.
+SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 // checking username and password
 UserSchedulerInterface
 scheduler = auth.logAsUser("username","password");
@@ -366,7 +365,7 @@ JobId myJobId = scheduler.submit(job);
 								for the connection to be established or an error to be raised.
 							</para>
 							<programlisting xml:lang="java">
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER");
+SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 							</programlisting>
 							<para>
 								Then, with the <emphasis role="bold">SchedulerAuthenticationInterface</emphasis>,
@@ -412,7 +411,7 @@ UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 					to get more details and features. Let remind how to connect the Scheduler as Administrator :
 				</para>
 				<programlisting xml:lang="java">
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER");
+SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 AdminSchedulerInterface scheduler = auth.logAsAdmin("admin_username", "admin_password");
 				</programlisting>
 				<para>

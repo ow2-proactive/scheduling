@@ -114,25 +114,26 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
     }
 
     /**
-     * Creates the default url if null is passed as a parameter or adds SCHEDULER_DEFAULT_NAME
-     * to the url if it's missing
+     * Normalize the URL of the SCHEDULER.<br>
+     *
+     * @param url, the URL to normalize.
+     * @return 	//localhost/SCHEDULER_NAME if the given url is null.<br>
+     * 			the given URL if it terminates by the SCHEDULER_NAME<br>
+     * 			the given URL with /SCHEDULER_NAME appended if URL does not end with /<br>
+     * 			the given URL with SCHEDULER_NAME appended if URL does end with /<br>
+     * 			the given URL with SCHEDULER_NAME appended if URL does not end with SCHEDULER_NAME
      */
     private static String normalize(String url) {
         String SCHEDULER_DEFAULT_NAME = SchedulerConstants.SCHEDULER_DEFAULT_NAME;
         if (url == null) {
-            return "//localhost/" + SCHEDULER_DEFAULT_NAME;
-        } else if (!url.endsWith(SCHEDULER_DEFAULT_NAME)) {
+            url = "//localhost/";
+        }
+        if (!url.endsWith(SCHEDULER_DEFAULT_NAME)) {
             if (!url.endsWith("/"))
                 url += "/";
-            return url + SCHEDULER_DEFAULT_NAME;
+            url += SCHEDULER_DEFAULT_NAME;
         }
         return url;
     }
 
-    /**
-     * @see org.ow2.proactive.authentication.Connection#getDefaultUrl()
-     */
-    public String getDefaultUrl() {
-        return "//localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
-    }
 }
