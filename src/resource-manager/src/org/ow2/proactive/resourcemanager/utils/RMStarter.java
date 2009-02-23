@@ -124,6 +124,7 @@ public class RMStarter {
             }
 
             logger.info("STARTING RESOURCE MANAGER: Press 'e' to shutdown.");
+            RMFactory.setOsJavaProperty();
 
             if (cmd.hasOption("n")) {
                 // starting clean resource manager
@@ -135,7 +136,6 @@ public class RMStarter {
                         deploymentDescriptors.add(desc);
                     }
                 } else {
-                    RMFactory.setOsJavaProperty();
                     String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
                         File.separator + "config/deployment/Local4JVMDeployment.xml";
                     deploymentDescriptors.add(gcmDeployFile);
