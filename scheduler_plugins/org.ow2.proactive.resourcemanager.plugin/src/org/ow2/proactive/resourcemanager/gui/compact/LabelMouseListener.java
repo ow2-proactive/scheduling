@@ -75,6 +75,7 @@ public class LabelMouseListener implements MouseListener {
                 ResourcesCompactView.getInstance().putTreeViewOnTop();
 
                 if (ResourceExplorerView.getTreeViewer() != null) {
+                    ResourceExplorerView.getTreeViewer().expandAll();
                     ResourceExplorerView.getTreeViewer().select(view.getElement());
                 }
             }
