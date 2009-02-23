@@ -38,6 +38,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
 import functionalTests.FunctionalTest;
 
+
 public class ConnectionTest2 extends FunctionalTest {
 
     @org.junit.Test
@@ -46,46 +47,46 @@ public class ConnectionTest2 extends FunctionalTest {
         log("Test 1");
         log("Connecting to non existing resource manager with join");
         try {
-        	RMConnection.join(null);
+            RMConnection.join(null);
             log("Failed: exception should be thrown");
-        	assertTrue(false);
-        } catch (Exception e) {        	
+            assertTrue(false);
+        } catch (Exception e) {
             log("Passed");
-        }        
-        
+        }
+
         log("Test 2");
         log("Connecting to non existing resource manager with waitAndJoin and timeout");
         try {
-        	RMConnection.waitAndJoin(null, 1000);
+            RMConnection.waitAndJoin(null, 1000);
             log("Failed: exception should be thrown");
-        	assertTrue(false);
-        } catch (Exception e) {        	
+            assertTrue(false);
+        } catch (Exception e) {
             log("Passed");
         }
 
         log("Test 3");
         log("Connecting to initializing resource manager with waitAndJoin and timeout");
         try {
-        	
-        	Thread t = new Thread() {
-        		public void run() {
-        			try {
-						Thread.sleep(1000);
-						log("Running resource manager");
-						RMFactory.startLocal();
-					} catch (Exception e) {
-						assertTrue(false);
-						log("Failed: unexpected error " + e.getMessage());
-					}
-        		}
-        	};
-        	t.start();
 
-        	RMConnection.waitAndJoin(null, 60000);
+            Thread t = new Thread() {
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                        log("Running resource manager");
+                        RMFactory.startLocal();
+                    } catch (Exception e) {
+                        assertTrue(false);
+                        log("Failed: unexpected error " + e.getMessage());
+                    }
+                }
+            };
+            t.start();
+
+            RMConnection.waitAndJoin(null, 60000);
             log("Passed");
-        } catch (Exception e) {        	
+        } catch (Exception e) {
             log("Failed: unexpected error " + e.getMessage());
-        	assertTrue(false);
+            assertTrue(false);
         }
     }
 

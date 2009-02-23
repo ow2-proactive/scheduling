@@ -48,14 +48,14 @@ public class ConnectionTest extends FunctionalTDefaultRM {
         log("Test 1");
         log("Connecting to existing resource manager");
         try {
-	        RMConnection.join(null);
-	        RMConnection.waitAndJoin(null);
-	        RMConnection.waitAndJoin(null, 10);
+            RMConnection.join(null);
+            RMConnection.waitAndJoin(null);
+            RMConnection.waitAndJoin(null, 10);
 
             log("Passed");
         } catch (Exception e) {
             log("Failed: unexpected error " + e.getMessage());
-        	assertTrue(false);
+            assertTrue(false);
         }
     }
 
