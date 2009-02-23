@@ -17,6 +17,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
@@ -167,6 +168,9 @@ public class RMStore {
         if (ResourceExplorerView.getTreeViewer() != null) {
             ResourceExplorerView.getTreeViewer().setInput(null);
             //ResourceExplorerView.init();	
+        }
+        if (ResourcesCompactView.getCompactViewer() != null) {
+            ResourcesCompactView.getCompactViewer().clear();
         }
         //clear stats view if stats panel is displayed
         if (StatisticsView.getStatsViewer() != null) {

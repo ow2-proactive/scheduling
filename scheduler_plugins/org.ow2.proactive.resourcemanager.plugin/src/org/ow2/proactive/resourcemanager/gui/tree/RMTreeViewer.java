@@ -1,5 +1,7 @@
 package org.ow2.proactive.resourcemanager.gui.tree;
 
+import java.util.Collections;
+
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -7,6 +9,7 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
@@ -40,4 +43,10 @@ public class RMTreeViewer extends TreeViewer {
         fireSelectionChanged(new SelectionChangedEvent(this, this.getSelection()));
     }
 
+    public void select(TreeLeafElement item) {
+        Widget w = findItem(item);
+        if (w != null) {
+            setSelection(Collections.singletonList(w));
+        }
+    }
 }

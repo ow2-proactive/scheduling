@@ -12,6 +12,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
@@ -52,6 +53,10 @@ public class EventsReceiver implements InitActive, RMEventListener {
                 if (ResourceExplorerView.getTreeViewer() != null) {
                     ResourceExplorerView.init();
                     ResourceExplorerView.getTreeViewer().expandAll();
+                }
+                //init Tree view if tree panel is displayed
+                if (ResourcesCompactView.getCompactViewer() != null) {
+                    ResourcesCompactView.getCompactViewer().loadMatrix();
                 }
                 //init stats view if stats panel is displayed
                 if (StatisticsView.getStatsViewer() != null) {

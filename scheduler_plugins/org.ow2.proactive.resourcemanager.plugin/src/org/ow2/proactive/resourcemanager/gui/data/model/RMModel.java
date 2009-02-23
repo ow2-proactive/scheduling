@@ -9,8 +9,8 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodeSourceHandler;
-import org.ow2.proactive.resourcemanager.gui.table.TableLabelProvider;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
@@ -47,6 +47,7 @@ public class RMModel {
     /****************************************************/
     public void addNode(RMNodeEvent nodeEvent) {
         TreeParentElement parentToRefresh = null;
+        TreeLeafElement nodeToAdd = null;
 
         Node newNode;
         synchronized (root) {
@@ -57,22 +58,28 @@ public class RMModel {
             if (host == null) { // if the host is null, then add it
                 host = new Host(nodeEvent.getHostName());
                 source.addChild(host);
-                if (parentToRefresh == null)
+                if (parentToRefresh == null) {
                     parentToRefresh = source;
+                    nodeToAdd = host;
+                }
             }
             TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
             if (vm == null) { // if the vm is null, then add it
                 vm = new VirtualMachine(nodeEvent.getVMName());
                 host.addChild(vm);
-                if (parentToRefresh == null)
+                if (parentToRefresh == null) {
                     parentToRefresh = host;
+                    nodeToAdd = vm;
+                }
             }
 
             newNode = new Node(nodeEvent.getNodeUrl(), nodeEvent.getState());
             vm.addChild(newNode);
 
-            if (parentToRefresh == null)
+            if (parentToRefresh == null) {
                 parentToRefresh = vm;
+                nodeToAdd = newNode;
+            }
         }
 
         switch (nodeEvent.getState()) {
@@ -87,27 +94,30 @@ public class RMModel {
                 this.busyNodesNumber++;
         }
         this.actualizeTreeView(parentToRefresh);
-        this.addTableItem(nodeEvent.getNodeSource(), nodeEvent.getHostName(), newNode.getState(), newNode
-                .getName());
+        this.addToCompactView(nodeToAdd);
+        this.addTableItem(nodeEvent.getNodeSource(), nodeEvent.getHostName(), newNode.getName(), newNode
+                .getState());
         this.actualizeStatsView();
     }
 
     public void removeNode(RMNodeEvent nodeEvent) {
         TreeParentElement parentToRefresh = null;
+        TreeLeafElement nodeToRemove = null;
+
         synchronized (root) {
             TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
             TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
             TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
 
-            remove(vm, nodeEvent.getNodeUrl());
+            nodeToRemove = remove(vm, nodeEvent.getNodeUrl());
             parentToRefresh = vm;
 
             if (vm.getChildren().length == 0) {
-                remove(host, nodeEvent.getVMName());
+                nodeToRemove = remove(host, nodeEvent.getVMName());
                 parentToRefresh = host;
 
                 if (host.getChildren().length == 0) {
-                    remove(source, nodeEvent.getHostName());
+                    nodeToRemove = remove(source, nodeEvent.getHostName());
                     parentToRefresh = source;
                 }
             }
@@ -126,6 +136,7 @@ public class RMModel {
 
         this.actualizeTreeView(parentToRefresh);
         this.removeTableItem(nodeEvent.getNodeUrl());
+        this.removeFromCompactView(nodeToRemove);
         this.actualizeStatsView();
     }
 
@@ -164,36 +175,42 @@ public class RMModel {
         }
 
         this.actualizeTreeView(node);
+        this.updateCompactView(node);
         this.actualizeStatsView();
-        this.updateTableItem(nodeEvent.getNodeSource(), nodeEvent.getHostName(), node.getState(), node
-                .getName());
+        this.updateTableItem(nodeEvent.getNodeSource(), nodeEvent.getHostName(), node.getName(), node
+                .getState());
 
     }
 
     public void addNodeSource(RMNodeSourceEvent nodeSourceEvent) {
+        TreeParentElement source = null;
         synchronized (root) {
-            TreeParentElement source = (TreeParentElement) find(root, nodeSourceEvent.getSourceName());
+            source = (TreeParentElement) find(root, nodeSourceEvent.getSourceName());
             if (source == null) {
                 source = new Source(nodeSourceEvent.getSourceName(), nodeSourceEvent.getSourceType());
                 root.addChild(source);
             }
         }
         actualizeTreeView(root);
+        addToCompactView(source);
         //refresh node source removal command state
         refreshNodeSourceRemovalHandler();
 
     }
 
     public void removeNodeSource(RMNodeSourceEvent nodeSourceEvent) {
+        TreeLeafElement source = null;
         synchronized (root) {
             for (TreeLeafElement n : root.getChildren()) {
                 if (n.getName().equals(nodeSourceEvent.getSourceName())) {
+                    source = n;
                     root.removeChild(n);
                     break;
                 }
             }
         }
         actualizeTreeView(root);
+        removeFromCompactView(source);
         //refresh node source removal command state
         refreshNodeSourceRemovalHandler();
     }
@@ -209,12 +226,14 @@ public class RMModel {
         return null;
     }
 
-    private void remove(TreeParentElement parent, String name) {
-        for (TreeLeafElement child : parent.getChildren())
+    private TreeLeafElement remove(TreeParentElement parent, String name) {
+        for (TreeLeafElement child : parent.getChildren()) {
             if (child.getName().equals(name)) {
                 parent.removeChild(child);
-                break;
+                return child;
             }
+        }
+        return null;
     }
 
     private void refreshNodeSourceRemovalHandler() {
@@ -235,6 +254,24 @@ public class RMModel {
         }
     }
 
+    private void addToCompactView(TreeLeafElement element) {
+        if (updateViews && ResourcesCompactView.getCompactViewer() != null) {
+            ResourcesCompactView.getCompactViewer().addView(element);
+        }
+    }
+
+    private void removeFromCompactView(TreeLeafElement element) {
+        if (updateViews && ResourcesCompactView.getCompactViewer() != null) {
+            ResourcesCompactView.getCompactViewer().removeView(element);
+        }
+    }
+
+    private void updateCompactView(TreeLeafElement element) {
+        if (updateViews && ResourcesCompactView.getCompactViewer() != null) {
+            ResourcesCompactView.getCompactViewer().updateView(element);
+        }
+    }
+
     private void actualizeStatsView() {
         //actualize stats view if exists
         if (updateViews && StatisticsView.getStatsViewer() != null) {
@@ -242,7 +279,7 @@ public class RMModel {
         }
     }
 
-    private void updateTableItem(String nodeSource, String host, NodeState state, String nodeUrl) {
+    private void updateTableItem(String nodeSource, String host, String nodeUrl, NodeState state) {
         //actualize table view if exists
         if (updateViews && ResourcesTabView.getTabViewer() != null) {
             ResourcesTabView.getTabViewer().updateItem(nodeSource, host, state, nodeUrl);
@@ -256,7 +293,7 @@ public class RMModel {
         }
     }
 
-    private void addTableItem(String nodeSource, String host, NodeState state, String nodeUrl) {
+    private void addTableItem(String nodeSource, String host, String nodeUrl, NodeState state) {
         //actualize table view if exists
         if (updateViews && ResourcesTabView.getTabViewer() != null) {
             ResourcesTabView.getTabViewer().addItem(nodeSource, host, state, nodeUrl);

@@ -48,6 +48,14 @@
             id="org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView"
             name="Tab Explorer">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.ow2.proactive.resourcemanager.gui.views.category"
+            class="org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView"
+            icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
+            id="org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView"
+            name="Compact View">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
