@@ -104,7 +104,7 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      * Note that you can use the provided {@link SchedulerAuthenticationGUIHelper} class to display a
      * graphical interface that will ask the URL, login and password.
      */
-    public static SchedulerAuthenticationInterface waitAndJoin(String url, int timeout)
+    public static SchedulerAuthenticationInterface waitAndJoin(String url, long timeout)
             throws SchedulerException {
         try {
             return getInstance().waitAndConnect(normalize(url), timeout);

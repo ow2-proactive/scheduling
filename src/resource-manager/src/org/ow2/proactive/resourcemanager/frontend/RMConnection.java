@@ -100,7 +100,7 @@ public class RMConnection extends Connection<RMAuthentication> {
      * zero is interpreted as an infinite timeout. The connection will then
      * block until established or an error occurs.
      */
-    public static RMAuthentication waitAndJoin(String url, int timeout) throws RMException {
+    public static RMAuthentication waitAndJoin(String url, long timeout) throws RMException {
         try {
             return getInstance().waitAndConnect(normalize(url), timeout);
         } catch (Exception e) {
