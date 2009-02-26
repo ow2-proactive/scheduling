@@ -219,7 +219,8 @@ public abstract class TaskLauncher implements InitActive {
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
         l.removeAllAppenders();
         // create an async appender for multiplexing (storage plus redirect through socketAppender)
-        this.logAppender = new AsyncAppenderWithStorage();
+        int logMaxSize = PASchedulerProperties.LOGS_MAX_SIZE.getValueAsInt();
+        this.logAppender = new AsyncAppenderWithStorage(logMaxSize);
         l.addAppender(this.logAppender);
         // redirect stdout and err
         this.redirectedStdout = new PrintStream(new LoggingOutputStream(l, Level.INFO), true);
