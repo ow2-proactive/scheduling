@@ -122,7 +122,7 @@
 				It is not necessary to specify every properties inside your own file.
 				Here's a way to override default PAScheduler properties file by the code :
 			</para>
-			<programlisting xml:lang="java">
+			<programlisting language="java">
 PASchedulerProperties.updateProperties("your_property_file");
 			</programlisting>
 			<para>
@@ -196,7 +196,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 					(see Resource Manager documentation <xref linkend="Resource_Manager"/> to create a resource Manager Proxy),
 					this can be done as following :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 AdminScheduler.createScheduler(
 	resourceManagerProxy,
 	"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
@@ -230,7 +230,7 @@ AdminScheduler.createScheduler(
 				<para>
 					Another way is to start the ProActive Scheduler AND connect an administrator at the same time :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 AdminScheduler.createScheduler(
 	"login",
 	"password",
@@ -262,7 +262,7 @@ AdminScheduler.createScheduler(
 						<para>
 							First, the user submits a Job using his <emphasis role="bold">UserSchedulerInterface</emphasis>
 							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it :
-							<programlisting xml:lang="java">
+							<programlisting language="java">
 // connecting to the scheduler
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 // checking username and password
@@ -364,7 +364,7 @@ JobId myJobId = scheduler.submit(job);
 								It is also possible to use the SchedulerConnection.waitAndJoin(...) that will join the scheduler and wait
 								for the connection to be established or an error to be raised.
 							</para>
-							<programlisting xml:lang="java">
+							<programlisting language="java">
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 							</programlisting>
 							<para>
@@ -372,7 +372,7 @@ SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 								users can be connected as user or administrator roles using the
 								<emphasis role="bold">logAsUser</emphasis> or <emphasis role="bold">logAsAdmin</emphasis> methods.
 							</para>
-							<programlisting xml:lang="java">
+							<programlisting language="java">
 UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 // OR AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");
 							</programlisting>
@@ -410,7 +410,7 @@ UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 					<emphasis role="bold">AdminSchedulerInterface</emphasis> to manage it. Just have a look to the JavaDocumentation 
 					to get more details and features. Let remind how to connect the Scheduler as Administrator :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 AdminSchedulerInterface scheduler = auth.logAsAdmin("admin_username", "admin_password");
 				</programlisting>
@@ -420,7 +420,7 @@ AdminSchedulerInterface scheduler = auth.logAsAdmin("admin_username", "admin_pas
 					scheduling order. Refer to the <xref linkend="Extend_scheduler_policy"/> to make your own policy and change it as
 					shown below :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //scheduler is the AdminSchedulerInterface returned in the previous sections
 scheduler.changePolicy(org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy.class);
 				</programlisting>
@@ -440,7 +440,7 @@ scheduler.changePolicy(org.objectweb.proactive.extensions.scheduler.policy.Prior
 					Here's the interface which must be implemented. The default implementation is <emphasis>PriorityPolicy</emphasis>
 					in the same package :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 public interface PolicyInterface extends Serializable {
 	//Resource Manager state field.
 	public RMState RMState = null;
@@ -462,7 +462,7 @@ public interface PolicyInterface extends Serializable {
 					and <emphasis>put them in a vector</emphasis>. Let's see the default implementation of the ProActive
 					Scheduler policy to illustrate it:
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 public class PriorityPolicy implements PolicyInterface {
 	/**
 	 * This method return the tasks using FIFO policy according to the jobs priorities.
@@ -513,7 +513,7 @@ public class PriorityPolicy implements PolicyInterface {
 			This storage of users accounts can be managed in two ways, by files, or by LDAP. A Scheduler property (PASchedulerProperties.ini)
 			specifies which kind of authentication will be used :
 			</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 	#Property that define the method that have to be used for logging users to the Scheduler
 	#It can be one of the following values :
 	#	- "SchedulerFileLoginMethod" to use file login and group management
@@ -532,7 +532,7 @@ public class PriorityPolicy implements PolicyInterface {
 			 	<listitem><para><emphasis>config/authentication/login.cfg</emphasis>, stores users and passwords accounts.
 			 	Each line must be like <emphasis>user:passwd</emphasis>.  
 			 	Default login.cfg is like this :</para>
-			 	<programlisting xml:lang="java">
+			 	<programlisting language="java">
 admin:admin
 user1:pwd1
 user2:pwd2
@@ -544,7 +544,7 @@ jl:jl
 			 	Each line must be like <emphasis>user:group</emphasis>. Group must be <emphasis>user</emphasis> to have user
 			 	rights, or <emphasis>admin</emphasis>, to have administrator rights.  
 			 	Default group.cfg is like this :</para>
-			 	<programlisting xml:lang="java">
+			 	<programlisting language="java">
 admin:admin
 jl:admin
 user1:user

@@ -192,7 +192,7 @@
                         <emphasis>taskFlow</emphasis>
                         job (a job containing several tasks).
                     </para>
-                    <programlisting xml:lang="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_SIMPLE_JOB_DEFINITION.snip"/></textobject></programlisting>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_SIMPLE_JOB_DEFINITION.snip"/></textobject></programlisting>
                 </section>
                 <section xml:id="Scheduler_Matlab_Task_Definition">
                     <info>
@@ -236,7 +236,7 @@
                             http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js
                         </uri>
                     </para>
-                    <programlisting xml:lang="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_SIMPLE_TASK_DEFINITION.snip"/></textobject></programlisting>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_SIMPLE_TASK_DEFINITION.snip"/></textobject></programlisting>
                 </section>
                 <section xml:id="Scheduler_Matlab_Script_Definition">
                     <info>
@@ -251,7 +251,7 @@
                         java program that will connect to the Matlab
                         engine and launch the given script inside it.
                     </para>
-                    <programlisting xml:lang="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_SIMPLE_EXECUTABLE.snip"/></textobject></programlisting>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_SIMPLE_EXECUTABLE.snip"/></textobject></programlisting>
                     <para>
                         The javaExecutable tag contains an attribute
                         <emphasis>class</emphasis>
@@ -326,7 +326,7 @@
                         <para/>
                     </example>
 
-                        <programlisting xml:lang="xml"><textobject><textdata fileref="matlab/jobs_descriptors/Job_matlab.xml"/></textobject></programlisting></section>
+                        <programlisting language="xml"><textobject><textdata fileref="matlab/jobs_descriptors/Job_matlab.xml"/></textobject></programlisting></section>
             </section>
         </section>
         <section xml:id="Scheduler_Matlab_More_Complex">
@@ -388,7 +388,7 @@
                 </info>
                 <para/>
             </example>
-                <programlisting xml:lang="xml"><textobject><textdata fileref="matlab/jobs_descriptors/Job_matlab.xml"/></textobject></programlisting>
+                <programlisting language="xml"><textobject><textdata fileref="matlab/jobs_descriptors/Job_matlab.xml"/></textobject></programlisting>
 
             <section xml:id="Scheduler_Matlab_Descriptor_Variables">
                 <info>
@@ -406,7 +406,7 @@
                     the variables declaration in the preceding
                     descriptor:
                 </para>
-                <programlisting xml:lang="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE.snip"/></textobject></programlisting>
+                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE.snip"/></textobject></programlisting>
                 <para>
                     the
                     <emphasis>variables</emphasis>
@@ -433,8 +433,8 @@
                     </title>
                 </info>
 
-                <programlisting xml:lang="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_SPLITTER.snip"/></textobject></programlisting>
-                <programlisting xml:lang="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_COLLECTOR.snip"/></textobject></programlisting>
+                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_SPLITTER.snip"/></textobject></programlisting>
+                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_COLLECTOR.snip"/></textobject></programlisting>
                 <para>
                     Two new tasks appear in this descriptor : the
                     <emphasis>MatlabSplitter</emphasis>
@@ -462,7 +462,7 @@
                     In order to do complex task flows, it is necessary
                     to add the concept of dependencies between tasks.
                 </para>
-                <programlisting xml:lang="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_DEPENDENCIES.snip"/></textobject></programlisting>
+                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_DEPENDENCIES.snip"/></textobject></programlisting>
                 <para>
                     The
                     <emphasis>depends</emphasis>
@@ -490,7 +490,7 @@
                     </title>
                 </info>
 
-                <programlisting xml:lang="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_INDEX.snip"/></textobject></programlisting>
+                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_INDEX.snip"/></textobject></programlisting>
                 <para>
                     A new parameter appears in this descriptor for the
                     SimpleMatlab task : the

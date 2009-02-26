@@ -457,6 +457,6 @@
 		<move file="${schemas.dir}/temp.xsd" tofile="${schemas.dir}/${export.schema.name}.xsd" />
 	</target>
 	
-	<import file="../doc/toolchain/doc.xml" optional="true"/>
+	<import file="../doc/scheduler.xml" optional="true"/>
 	
 </project>

@@ -6,8 +6,15 @@
 	exclude-result-prefixes="date" version="1.0">
 
 	<xsl:import
-		href="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" />
+			href="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" />
+<!-- 		href="http://docbook.sourceforge.net/release/xsl-ns/1.74.0/fo/docbook.xsl"  -->
+
 	<xsl:import href="common.xsl" />
+
+   <!-- Import profiled highlighting color -->
+   <xsl:import href="../highlighting/xsl/fo-hl.xsl" />
+
+
 	<!-- ignore the scaling values the someone might put in the XML files 
 		<xsl:param name="ignore.image.scaling" select="0">1</xsl:param>-->
 
@@ -50,15 +57,6 @@
 
 	<!--  Changing font sizes -->
 	<xsl:param name="monospace.font.family">Helvetica</xsl:param>
-
-	<xsl:param name="use.extensions" select="'1'" />
-	<xsl:param name="linenumbering.extension" select="'1'" />
-	<xsl:param name="tablecolumns.extension" select="'1'" />
-	<xsl:param name="textinsert.extension" select="'1'" />
-	<xsl:param name="highlight.source" select="1"/>
-	<xsl:param name="linenumbering.everyNth" select="'1'"/>
-	<xsl:param name="linenumbering.separator" select="':'"/>
-
 
 
 
@@ -360,11 +358,10 @@
 							<fo:block>
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-         <xsl:call-template name="fo-external-image">
-          <xsl:with-param name="filename"
-												select="$header.image.filename" />
-         </xsl:call-template>
-        </xsl:attribute>
+									  <xsl:call-template name="fo-external-image">
+									    <xsl:with-param name="filename" select="$header.image.filename" />
+									  </xsl:call-template>
+									</xsl:attribute>
 									<xsl:attribute
 										name="content-height">14pt</xsl:attribute>
 									<xsl:attribute

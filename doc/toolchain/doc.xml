@@ -1,338 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir=".">
-	<import file="doc_paths.xml" />
+<!-- change the project name to the name of the manual -->
+<project>
 	
-	
-	
-		<!-- ================================================================ -->
-		<!--            Create docs, which is the javadoc + manual            -->
-		<!--  =============================================================== -->
-		<target name="docs" depends="javadoc.all, manual, doc.zips" description="Construct the javadoc, the manual, and the zip archives" />
+	<import file="doc_macros.xml" />
 	
 	<!-- ================================================================ -->
 	<!--            Create docs, which is the javadoc + manual            -->
 	<!--  =============================================================== -->
-	<target name="doc.zips" depends="manualSingleHtmlZip, manualHtmlZip, javadoc.publishedZip, javadoc.completeZip" description="Construct the javadoc and manual zip archives" />
-	
-	<!-- ==================================================================== -->
-	<!--      The following docbook* are sub-tasks to build the Manual        -->
-	<!-- ==================================================================== -->
-	<!-- If a needed file doesn't exist, it will be fetched on the web -->	
-	<xmlcatalog id="docbookcatalog">
-			<!-- If a needed file doesn't exist, it will be fetched on the web -->
-
-			<classpath>
-				<pathelement location="${docs.toolchain.dir}/${docbook.archive}" />
-			</classpath>
-
-			<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="${docs.docbook.dtd}" />
-			<dtd publicId="http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd"  location="${docs.docbook.dtd}"/>
-
-			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/profiling/profile.xsl" location="profiling/profile.xsl" />
-			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/html/chunk.xsl" location="html/chunk.xsl" />
-			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/html/docbook.xsl" location="html/docbook.xsl" />
-			<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/fo/docbook.xsl" location="fo/docbook.xsl" />
-		</xmlcatalog>
-
+	<target name="docs" depends="manual, doc.zips" description="Construct the manual and the zip archives" />
 	
 	<!-- ================================================================ -->
-	<!--                     Create javadoc                               -->
-	<!-- ================================================================ -->
-	
-	<target name="javadoc.all" depends="javadoc.published,javadoc.complete"/>
-	
-
-	<!-- ==================================================================== -->
-	<!--      Converts docbook xml into ??? - uses the trax processor         -->
-	<!-- ==================================================================== -->
-	<target name="-docbookTransform"	>
-		<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
-		<xslt basedir="${docs.src.dir}"  in="${docs.tmp.dir}/${docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${docs.xsl.profiling}" force="yes">
-			<param name="profile.os" expression="${docbook.profile}" />
-			<!--docbook.profile can be html, pdf or empty-->
-			<xmlcatalog refid="docbookcatalog" />
-			<classpath refid="docs.utils.classpath" />
-
-		</xslt>
-
-		<!-- Do the real conversion, docbook to pdf or html -->
-		<xslt basedir="${docs.src.dir}" in="${docs.tmp.dir}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
-			<xmlcatalog refid="docbookcatalog" />
-			<param name="TODAY" expression="${TODAY}" />
-			<!-- the date for the first page -->
-			<param name="VERSION" expression="${version}" />
-			<!-- the version number, for the first page -->
-
-			<!-- Output dir for the chunked stylesheet-->
-			<param name="base.dir" expression="${docs.html.multiple.dir}"/>
-			<classpath refid="docs.utils.classpath" />
-
-		</xslt>
-	</target>
-	
-	
-	<!-- ==================================================================== -->
-	<!--          Generic task to transform docbook xml into pdf              -->
-	<!-- ==================================================================== -->
-	<target name="-docbookToPdf">
-		<property name="fo.output" value="${pdfOutputFile}.fo" />
-
-		<!--   First translate into intermediate fo format -->
-		<antcall target="-docbookTransform">
-			<param name="docbookOutputFile" value="${fo.output}" />
-			<param name="docbookStyle" value="${docs.xsl.pdf}" />
-			<param name="docbook.profile" value="pdf" />
-		</antcall>
-
-		<!-- declare how to transform fo xml file in pdf through a new 'fop' task -->
-		<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
-			<classpath refid="docs.utils.classpath" />
-
-		</taskdef>
-
-		<!-- Then use the newly defined fop task to translate fo into pdf -->
-		<fop format="application/pdf" fofile="${fo.output}" outfile="${pdfOutputFile}" basedir="${docs.src.dir}" />
-
-		<delete file="${fo.output}" />
-	</target>
-
-
-	<!-- ==================================================================== -->
-	<!--          Create the snippets necessary for programlistings           -->
-	<!-- ==================================================================== -->
-	<target name="-snippetscreation">
-		<delete quiet="true">
-			<fileset dir="${snippets.location}"/>
-		</delete>
-		<mkdir dir="${snippets.location}"/>
-		<java classname="doc.snippets.Snippetizer" fork="true">
-			<classpath refid="docs.utils.classpath"/>
-			<!-- The root for parser start, it will check all the files in the dir and subdirs-->
-			<arg value="${base.dir}" />
-			<!-- The output path for snippets  -->
-			<arg value="${snippets.location}" />
-		</java>
-	</target>
+	<!--            Create docs, which is the javadoc + manual            -->
+	<!--  =============================================================== -->
+	<target name="doc.zips" depends="manualSingleHtmlZip, manualHtmlZip" description="Construct the manual zip archives" />
 	
 	
 	
-	<!-- ==================================================================== -->
-	<!--    Add some highlighting information to the docbook source code      -->
-	<!-- ==================================================================== -->
-	<target name="-docbookBeautify">
-		
-		<java classname="doc.DocBookize" fork="true">
-			<classpath refid="docs.utils.classpath"/>
-			<!-- The xml file to parse -->
-			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
-			
-			<!-- take from after or before properties
-			 - included through doc_paths.xml--> 
-			<arg value="${java.inclusion}" />
-			<arg value="${xml.inclusion}" />
-			<arg value="${otherpath1.inclusion}" />
-			<arg value="${otherpath2.inclusion}" />
-			<arg value="${otherpath3.inclusion}" />
-			<arg value="${otherpath4.inclusion}" />
-			<arg value="${otherpath5.inclusion}" />
-			
-		</java>
-
-		<java classname="doc.Validate" fork="true">
-			<classpath refid="docs.utils.classpath" />
-			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
-		</java>
-
-	</target>
-
-	<!-- ==================================================================== -->
-	<!--    Checks if the XML is valid and if the manual can be built properly-->
-	<!--   this should catch if the XML is malformed  or files are missing    -->
-	<!-- ==================================================================== -->
-	<target name="-docbookBeautifyFailCheck" >
-		
-		<java classname="doc.DocBookize" fork="true" failonerror="true">
-			<classpath refid="docs.utils.classpath"/>
-			<!-- The xml file to parse -->
-			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
-
-			<!-- take from after or before properties
-				- included through doc_paths.xml--> 
-			<arg value="${java.inclusion}" />
-			<arg value="${xml.inclusion}" />
-			<arg value="${otherpath1.inclusion}" />
-			<arg value="${otherpath2.inclusion}" />
-			<arg value="${otherpath3.inclusion}" />
-			
-		</java>
-
-		<java classname="doc.Validate" fork="true" failonerror="true">
-			<classpath refid="docs.utils.classpath" />
-
-			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
-		</java>
-
-	</target>
-
-
-	<!-- ==================================================================== -->
-	<!--       XML Check by running everything up to the XSLT processor       -->
-	<!-- ==================================================================== -->
-	<target name="checkXML">
-
-		<!-- Call the code for generating the snippets -->
-		<antcall target="-snippetscreation"/>
-
-		<!-- as this file gets edited, make sure it's a fresh copy-->
-		<delete file="${docs.tmp.dir}/${docs.mainFile}" />
-
-		<!-- Copy the files needed for the html files (pics and maybe others) -->
-		<copy toDir="${docs.html.multiple.dir}">
-			<fileset dir="${docs.src.dir}">
-				<include name="**/*.png" />
-				<include name="**/*.jpg" />
-				<include name="**/*.svg" />
-				<include name="**/*.gif" />
-				<include name="${docs.html.css.name}" />
-			</fileset>
-		</copy>
-
-		<!-- Copying xml files so they can be edited (beautify programlistings) -->
-		<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
-			<fileset dir="${docs.src.dir}">
-				<include name="**/*" />
-				<exclude name="**/.svn" />
-				<exclude name="xsl" />
-			</fileset>
-		</copy>
-
-		<!-- Decorate the code a bit (code examples in programlistings) -->
-		<antcall target="-docbookBeautifyFailCheck">
-			<param name="docbookInputFile" value="${docs.mainFile}" />
-		</antcall>
-
-	</target>
-
-	<!-- ==================================================================== -->
-	<!-- preprocessing for the manual: copy files and add tags to source code -->
-	<!-- ==================================================================== -->
-	<target name="-docbookPreProcess">
-
-		<!-- Call the code for generating the snippets -->
-		<antcall target="-snippetscreation"/>
-
-		<!-- as this file gets edited, make sure it's a fresh copy-->
-		<delete file="${docs.tmp.dir}/${docs.mainFile}" />
-
-		<!-- Copy the files needed for the html files (pics and maybe others) -->
-		<copy toDir="${output.docs.dir}" includeemptydirs="no" >
-			<fileset dir="${docs.src.dir}">
-				<include name="**/*.png" />
-				<include name="**/*.jpg" />
-				<include name="**/*.svg" />
-				<include name="**/*.gif" />
-				<include name="${docs.html.css.name}" />
-			</fileset>
-		</copy>
-
-		<!-- Copying xml files so they can be edited (beautify programlistings) -->
-		<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
-			<fileset dir="${docs.src.dir}">
-				<include name="**/*" />
-				<exclude name="**/.svn" />
-				<exclude name="xsl" />
-			</fileset>
-		</copy>
-
-		<!-- Decorate the code a bit (code examples in programlistings) -->
-		<antcall target="-docbookBeautify">
-			<param name="docbookInputFile" value="${docs.mainFile}" />
-		</antcall>
-
-	</target>
-
-
 	<!-- ==================================================================== -->
 	<!--          Make just the html files for the manual                     -->
 	<!-- ==================================================================== -->
 	<target name="manualHtml" description="Make only the html files in the manual">
-		<antcall target="-docbookPreProcess">
-				<param name="output.docs.dir"  value="${docs.html.multiple.dir}" />
-		</antcall>
-		<antcall target="-docbookTransform">
-			<param name="docbookInputFile" value="${docs.mainFile}" />
-			<param name="docbookOutputFile" value="${docs.html.multiple.output}" />
-			<param name="docbookStyle" value="${docs.xsl.html.chunked}" />
-			<param name="docbook.profile" value="html" />
-		</antcall>
+		<manualHtml/>
 	</target>
 	<!-- ==================================================================== -->
 	<!--   Make an archive from the files for the multiple html manual        -->
 	<!-- ==================================================================== -->
 	<target name="manualHtmlZip" description="Create a zip of the html filed in the manual" depends="manualHtml">
-		<zip destfile="${docs.html.multiple.zip}" basedir="${docs.html.multiple.dir}" excludes="${docs.html.single.name}"/>
+		<manualHtmlZip/>
 	</target>
 
 	<!-- ==================================================================== -->
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
 	<target name="manualPdf" description="Make only the pdf files in the manual">
-		<antcall target="-docbookPreProcess">
-			<param name="output.docs.dir"  value="${docs.pdf.dir}" />
-		</antcall>
-		<antcall target="-docbookToPdf">
-			<param name="docbookInputFile" value="${docs.mainFile}" />
-			<param name="pdfOutputFile" value="${docs.pdf.output}" />
-		</antcall>
-		<!-- remove all files except the PDF -->
-		<!--  needed because docbookPreProcess copies all the files -->
-		<delete includeemptydirs="true">
-			<fileset dir="${docs.pdf.dir}" defaultexcludes="false"
-			 	includes="**/*"  excludes="${docs.pdf.name}" />
-		</delete>
+		<manualPdf/>
 	</target>
 	<!-- ==================================================================== -->
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<target name="manualSingleHtml" description="Make only the big html file in the manual">
-		<antcall target="-docbookPreProcess">
-			<param name="output.docs.dir"  value="${docs.html.single.dir}" />
-		</antcall>
-		<antcall target="-docbookTransform">
-			<param name="docbookInputFile" value="${docs.mainFile}" />
-			<param name="docbookOutputFile" value="${docs.html.single.output}" />
-			<param name="docbookStyle" value="${docs.xsl.html.one}" />
-			<param name="docbook.profile" value="html" />
-		</antcall>
+		<manualSingleHtml/>
 	</target>
+	
 	<!-- ==================================================================== -->
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
 	<target name="manualSingleHtmlZip" description="Create a zip of the big html file in the manual" depends="manualSingleHtml">
-		<zip destfile="${docs.html.single.zip}" basedir="${docs.html.single.dir}" includes="${docs.html.css.name} ${docs.html.single.name} **/*.gif **/*.png **/*.jpg"/>
+		<manualSingleHtmlZip  include.files="${docs.html.css.name} ${docs.html.single.name} **/*.gif **/*.png **/*.jpg" />
 	</target>
 
+
+	<!-- ==================================================================== -->
+	<!-- Construct the manual from the XML files in {docs.src}                -->
+	<!-- ==================================================================== -->
+	<target name="manual" description="Build all the different manual version: html, pdf... " depends="manualSingleHtml,manualHtml,manualPdf" >
+	</target>
+	
 	<!-- ==================================================================== -->
 	<!--      Make an archive from the published javadoc       -->
 	<!-- ==================================================================== -->
-	<target name="javadoc.publishedZip" description="Create a zip from the published javadoc" depends="javadoc.published">
-		<zip destfile="${docs.javadoc.published.zip}" basedir="${docs.api.published.dir}" />
+	<target name="javadoc.publishedZip">
+		<javadoc.publishedZip /> 
 	</target>
 	
 	<!-- ==================================================================== -->
 	<!--      Make an archive from the complete javadoc       -->
 	<!-- ==================================================================== -->
-	<target name="javadoc.completeZip" description="Create a zip from the complete javadoc" depends="javadoc.complete">
-		<zip destfile="${docs.javadoc.complete.zip}" basedir="${docs.api.complete.dir}" />
+	<target name="javadoc.completeZip"> 
+		<javadoc.completeZip /> 
 	</target>
-	
 
-	<!-- ==================================================================== -->
-	<!-- Construct the manual from the XML files in {docs.src}                -->
-	<!-- ==================================================================== -->
-	<target name="manual" description="Build all the different manual version: html, pdf... " depends="manualSingleHtml,manualHtml,manualPdf">
-		<!-- The generation of the files is done by the depends clause -->
-		<!-- Once the doc files have been generated, do some cleaning up -->
-		<delete dir="${docs.tmp.dir}" />
-	</target>
 </project>

@@ -1,0 +1,203 @@
+<project>
+	<import file="doc_paths.xml" />
+	<!-- If a needed file doesn't exist, it will be fetched on the web -->	
+	<xmlcatalog id="docbookcatalog">
+		<!-- If a needed file doesn't exist, it will be fetched on the web -->
+		
+		<classpath>
+			<pathelement location="${docs.toolchain.dir}/${docbook.archive}" />
+		</classpath>
+		
+		<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="${docs.docbook.dtd}" />
+		<dtd publicId="http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd"  location="${docs.docbook.dtd}"/>
+		
+		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/profiling/profile.xsl" location="docbook-xsl-ns-${docbook.version}/profiling/profile.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/html/chunk.xsl" location="docbook-xsl-ns-${docbook.version}/html/chunk.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/html/docbook.xsl" location="docbook-xsl-ns-${docbook.version}/html/docbook.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/fo/docbook.xsl" location="docbook-xsl-ns-${docbook.version}/fo/docbook.xsl" />
+	</xmlcatalog>
+	
+	
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the files for the single html manual       -->
+	<!-- ==================================================================== -->
+	<macrodef name="manualSingleHtmlZip" description="Create a zip of the big html file in the manual" >
+		<attribute name="include.files" />
+		<sequential>
+			<zip destfile="${docs.html.single.zip}" basedir="${docs.html.single.dir}" includes="@{include.files}"/>
+		</sequential>
+	</macrodef>
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the published javadoc       -->
+	<!-- ==================================================================== -->
+	<macrodef name="javadoc.publishedZip" description="Create a zip from the published javadoc">
+		<sequential>
+			<zip destfile="${docs.javadoc.published.zip}" basedir="${docs.api.published.dir}" />
+		</sequential>
+	</macrodef>
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the complete javadoc                       -->
+	<!-- ==================================================================== -->
+	<macrodef name="javadoc.completeZip" description="Create a zip from the complete javadoc">
+		<sequential>
+			<zip destfile="${docs.javadoc.complete.zip}" basedir="${docs.api.complete.dir}" />
+		</sequential>
+	</macrodef>
+
+	
+	<!-- ==================================================================== -->
+	<!--   Make an archive from the files for the multiple html manual        -->
+	<!-- ==================================================================== -->
+	<macrodef name="manualHtmlZip" description="Create a zip of the html filed in the manual" >
+		<sequential>
+			<zip destfile="${docs.html.multiple.zip}" basedir="${docs.html.multiple.dir}"/>
+		</sequential>
+	</macrodef>
+	<!-- ==================================================================== -->
+	<!--          Create the snippets necessary for programlistings           -->
+	<!-- ==================================================================== -->
+	<macrodef name="snippetscreation">
+		<sequential>
+			<delete quiet="true">
+				<fileset dir="${snippets.location}"/>
+			</delete>
+			<mkdir dir="${snippets.location}"/>
+			<java classname="doc.snippets.Snippetizer" fork="true">
+				<classpath refid="docs.utils.classpath"/>
+				<!-- The root for parser start, it will check all the files in the dir and subdirs-->
+				<arg value="${snippets.start}" />
+				<!-- The output path for snippets  -->
+				<arg value="${snippets.location}" />
+			</java>
+		</sequential>
+	</macrodef>
+	
+	
+	
+	
+	<!-- ==================================================================== -->
+	<!--      Converts docbook xml into ??? - uses the trax processor         -->
+	<!-- ==================================================================== -->
+	<macrodef name="docbookTransform">
+		<attribute name="docbookInputFile"/>
+		<attribute name="docbookOutputFile"/>
+		<attribute name="docbookStyle" />
+		<attribute name="docbook.profile" />
+		<attribute name="docbookOutputDir"/>
+
+		<sequential>
+			<taskdef name="xml_validate" classname="org.apache.tools.ant.taskdefs.optional.XMLValidateTask" description="XML Validation">
+				<classpath refid="docs.utils.classpath" />
+			</taskdef>
+			<xml_validate file="${docs.src.dir}/${docs.mainFile}"  warn="true" />
+			<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
+			<xslt basedir="${docs.src.dir}"  in="${docs.tmp.dir}/@{docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${docs.xsl.profiling}" force="yes">
+				<param name="profile.os" expression="@{docbook.profile}" />
+				<param name="tmp.dir" expression="${docs.tmp.dir}/" />
+				<!-- the date for the first page --> 
+				<!--docbook.profile can be html, pdf or empty-->
+				<xmlcatalog refid="docbookcatalog" />
+				<classpath refid="docs.utils.classpath" />
+			</xslt>
+
+			<java classname="com.icl.saxon.StyleSheet" fork="true" dir="@{docbookOutputDir}">
+				<classpath refid="docs.utils.classpath" />
+				<jvmarg value="-Dxslthl.config=file://${docs.highlighting.dir}/xml/xslthl-config.xml"/>
+				<arg line="-o @{docbookOutputFile} ${docs.tmp.dir}/profiled.xml @{docbookStyle}"/>
+				<arg value="TODAY=${TODAY}" />
+				<arg value="VERSION=${version}" />
+			</java>
+		</sequential>
+	</macrodef>
+
+	<!-- ==================================================================== -->
+	<!-- preprocessing for the manual: copy files and add tags to source code -->
+	<!-- ==================================================================== -->
+	<macrodef name="docbookPreProcess">
+		<attribute name="output.docs.dir"/>
+		<sequential>
+			<!-- Call the code for generating the snippets -->
+			<snippetscreation/>
+			
+			<!-- as this file gets edited, make sure it's a fresh copy-->
+			<delete file="${docs.tmp.dir}/${docs.mainFile}" />
+			
+			<!-- Copy the files needed for the html files (pics and maybe others) -->
+			<copy toDir="@{output.docs.dir}" includeemptydirs="no" >
+				<fileset dir="${docs.src.dir}">
+					<include name="**/*.png" />
+					<include name="**/*.jpg" />
+					<include name="**/*.svg" />
+					<include name="**/*.gif" />
+					<include name="${docs.html.css.name}" />
+				</fileset>
+			</copy>
+			<!-- Copying xml files so they can be edited (beautify programlistings) -->
+			<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
+				<fileset dir="${docs.src.dir}">
+					<include name="**/*" />
+					<exclude name="**/.svn" />
+					<exclude name="xsl" />
+				</fileset>
+			</copy>
+		</sequential>
+	</macrodef>
+	
+	<!-- ==================================================================== -->
+	<!--           Make only one huge html-file from the doc                  -->
+	<!-- ==================================================================== -->
+	<macrodef name="manualSingleHtml" description="Make only the big html file in the manual">
+		<sequential>
+		  <docbookPreProcess output.docs.dir="${docs.html.single.dir}" />
+		  <docbookTransform docbookInputFile="${docs.mainFile}" 
+			  docbookOutputFile="${docs.html.single.output}" 
+			  docbookStyle="${docs.xsl.html.one}" 
+			  docbook.profile="html" 
+			  docbookOutputDir="${docs.html.single.dir}"/>
+		</sequential>
+	</macrodef> 
+	
+	<!-- ==================================================================== -->
+	<!--               Make just the pdf files for the manual                 -->
+	<!-- ==================================================================== -->
+	<macrodef name="manualPdf" description="Make only the pdf files in the manual">
+		<sequential>
+			<docbookPreProcess output.docs.dir="${docs.pdf.dir}" />
+			<!--   First translate into intermediate fo format -->
+			<docbookTransform docbookInputFile="${docs.mainFile}"
+					  docbookOutputFile="${docs.pdf.output}.fo" 
+					  docbookStyle="${docs.xsl.pdf}" 
+					 docbook.profile="pdf"
+					 docbookOutputDir="${docs.pdf.dir}"/>
+			<!-- declare how to transform fo xml file in pdf through a new 'fop' task -->
+			<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
+				<classpath refid="docs.utils.classpath" />
+			</taskdef>
+			<!-- Then use the newly defined fop task to translate fo into pdf -->
+			<fop format="application/pdf" fofile="${docs.pdf.output}.fo" outfile="${docs.pdf.output}" basedir="${docs.src.dir}" />
+			
+			<delete file="${fo.output}" />
+			<!-- remove all files except the PDF -->
+
+<!--  needed because docbookPreProcess copies all the files -->
+			<delete includeemptydirs="true">
+				<fileset dir="${docs.pdf.dir}" defaultexcludes="false"
+					includes="**/*"  excludes="${docs.pdf.name}" />
+			</delete>
+		</sequential>
+	</macrodef>
+
+	<!-- ==================================================================== -->
+	<!--          Make just the html files for the manual                     -->
+	<!-- ==================================================================== -->
+	<macrodef name="manualHtml" description="Make only the html files in the manual">
+		<sequential>
+			<docbookPreProcess output.docs.dir="${docs.html.multiple.dir}" />
+			<docbookTransform docbookInputFile="${docs.mainFile}" 
+					docbookOutputFile="${docs.html.multiple.output}" 
+					docbookStyle="${docs.xsl.html.chunked}" 
+					docbook.profile="html" 
+					docbookOutputDir="${docs.html.multiple.dir}"/>
+		</sequential>
+	</macrodef>
+</project>

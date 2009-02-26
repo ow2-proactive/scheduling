@@ -3,6 +3,21 @@
  version="1.0">
 
 
+
+ <!--Import xsl file for highlightting-->
+ <xsl:import href="../highlighting/xsl/common.xsl"/>
+ 
+
+ 	<xsl:param name="use.extensions" select="'1'" />
+	<xsl:param name="linenumbering.extension" select="'1'" />
+	<xsl:param name="tablecolumns.extension" select="'1'" />
+	 <!-- Active highlighting-->
+	<xsl:param name="highlight.source" select="1"/>
+	<xsl:param name="linenumbering.everyNth" select="'1'"/>
+	<xsl:param name="linenumbering.separator" select="':'"/>
+	<xsl:param name="textinsert.extension" select="'1'" />
+
+
  <!-- Where should the titles of formal objects be placed? -->
  <xsl:param name="formal.title.placement">
   figure after 

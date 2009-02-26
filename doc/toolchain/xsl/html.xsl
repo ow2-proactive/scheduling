@@ -5,6 +5,9 @@
 
  <xsl:import href="common.xsl" />
 
+ <!-- Import profiled highlighting color -->
+ <xsl:import href="../highlighting/xsl/html-hl.xsl" />
+
  <!-- Configure the html stylesheet to use -->
  <xsl:param name="html.stylesheet" select="'main.css'" />
  <!-- Just use the image size for the html output. Width=... has no effect. -->
@@ -20,7 +23,7 @@
 <!--- - - - - - - - - - - - - - - - - - - - - - - - - - -->
  <xsl:template name="user.footer.content">
   <P class="copyright" align="right">
-   © 1997-2008
+   © 1997-2009
    <A href="http://www-sop.inria.fr/">
     INRIA Sophia Antipolis
    </A>

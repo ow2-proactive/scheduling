@@ -97,7 +97,7 @@
 				<para/>
 				</example>
 					
-					<programlisting xml:lang="xml"><textobject><textdata fileref="scilab/jobs_descriptors/Job_scilab.xml"/></textobject></programlisting>
+					<programlisting language="xml"><textobject><textdata fileref="scilab/jobs_descriptors/Job_scilab.xml"/></textobject></programlisting>
 				<para>
 					Here is the Scilab script that calculates individual
 					integrals
@@ -155,7 +155,7 @@
 					</title></info>
 					
 					<para>For example in the following task :</para>
-					<programlisting xml:lang="xml">&lt;javaExecutable
+					<programlisting language="xml">&lt;javaExecutable
  class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab"&gt;
     &lt;parameters&gt;
         &lt;parameter name="scriptFile"

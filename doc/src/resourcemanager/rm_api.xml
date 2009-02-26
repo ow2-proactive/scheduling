@@ -16,13 +16,13 @@
 		<para>
 			Resource Manager can be started locally using a static method of RMFactory class :
 		</para>
-		<programlisting xml:lang="java">
+		<programlisting language="java">
 RMFactory.startLocal(); //creates an empty Resource Manager	</programlisting>
 		<para>
 		In order to perform any operations with the Resource Manager you have to authorize and
 		acquire either RMAdmin or RMUser interface. This action is made by using RMConnection class :
 		</para>
-		<programlisting xml:lang="java">
+		<programlisting language="java">
 RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
 RMAdmin admin = auth.logAsAdmin(username, password);</programlisting>
 		<para>
@@ -30,7 +30,7 @@ RMAdmin admin = auth.logAsAdmin(username, password);</programlisting>
 		interface which can be used to track resources and their states.
 		Once you have a reference to RMAdmin active object you can perform all administrator actions such as shutdown of the Resource Manager
 		</para>
-		<programlisting xml:lang="java">
+		<programlisting language="java">
 admin.shutdown(true); //perform preemptive shutdown	</programlisting>
 		<para>
 		This method terminates all RM's active objects and stop JVM where RMCore is running. The boolean parameter that it takes
@@ -46,7 +46,7 @@ admin.shutdown(true); //perform preemptive shutdown	</programlisting>
 		RMFactory provides a way to specify a list of deployment descriptors which will be deployed once Resource Manager is started.
 		Here are an example of starting the Resource Manager with 4 nodes
 		</para>
-		<programlisting xml:lang="java">
+		<programlisting language="java">
 String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config/deployment/Local4JVMDeployment.xml";
 RMFactory.startLocal(Collections.singleton(gcmDeployFile));
 		</programlisting>
@@ -54,7 +54,7 @@ RMFactory.startLocal(Collections.singleton(gcmDeployFile));
 		In order to deploy nodes to existing Resource Manager RMAdmin interface should be acquired
 		as in example above and then deployment can be performed
 		</para>
-		<programlisting xml:lang="java">
+		<programlisting language="java">
 //create File object
 File GCMDFile = new File("GCMDeployment.xml");
        
@@ -74,7 +74,7 @@ admin.addNodes(GCMDContent);	</programlisting>
 	RMAdmin provides a way to add ProActive nodes that are already deployed, node is added with
 	its node's URL.
 	</para>
-	<programlisting xml:lang="java">
+	<programlisting language="java">
 admin.addNode("rmi://host_1/comptingNode"); //add a node identified with an URL 
 	</programlisting>
 	</section>
@@ -82,7 +82,7 @@ admin.addNode("rmi://host_1/comptingNode"); //add a node identified with an URL
 	<para>
 	You can remove a node from Resource Manager, with the code :
 	</para>
-	<programlisting xml:lang="java">
+	<programlisting language="java">
 admin.removeNode("rmi://nodeToRemove", true); 
 	</programlisting>
 	<para>
@@ -103,7 +103,7 @@ admin.removeNode("rmi://nodeToRemove", true);
 		Resource Manager provides a specific dynamic Node Source That performs acquisition/release of ProsActive
 		nodes from a peer to peer infrastructure. RMAdmin presents a way to Launch the peer to peer Node Source :
 		</para>
-		<programlisting xml:lang="java">
+		<programlisting language="java">
 Vector&lt;String&gt; v = new Vector&lt;String&gt;();
 v.add("//remotePeers");
 
@@ -127,7 +127,7 @@ admin.createDynamicNodeSource("P2P", 20, 10000, 50000, v);
 		You can obviously use Resource Manager as a node provider for your distributed application. RMUser active object 
 		provides a way to get and give back computing nodes :
 		</para>
-		<programlisting xml:lang="java">
+		<programlisting language="java">
 RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
 RMUser user = auth.logAsUser(username, password);
 

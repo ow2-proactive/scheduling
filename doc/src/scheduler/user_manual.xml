@@ -112,7 +112,7 @@
 					</listitem>
 				</itemizedlist>
 			</para>
-			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/job.xml"/></textobject></programlisting>
+			<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/job.xml"/></textobject></programlisting>
 			
 			<para>This example descriptor does not contain the job type definition. We detail the job type definition in the next sections.</para>
 		</section>
@@ -122,7 +122,7 @@
 				To specify that the job is a ProActive Job, we add the 'proActive' tag.
 				We use the previous job descriptor and add the tag :
 			</para>
-			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job.xml" /></textobject></programlisting>
+			<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job.xml" /></textobject></programlisting>
 			<para>
 				To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
 			</para>
@@ -134,7 +134,7 @@
 				To specify that the job is a Task Flow Job, we add the 'taskFlow' tag.
 				We use the previous job descriptor and add the tag :
 			</para>
-			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job.xml" /></textobject></programlisting>
+			<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job.xml" /></textobject></programlisting>
 			<para>
 				To create and add tasks to your Job, just go to <xref linkend="Create_add_task" />.
 			</para>
@@ -146,7 +146,7 @@
 				To make a new instance of a TaskFlow job we simply create a new 
 				object of <code>TaskFlowJob</code>  type:
 			</para>
-			<programlisting xml:lang="java"> <textobject><textdata fileref="automatic_snippets/task_flow_job_creation.snip" /></textobject></programlisting>
+			<programlisting language="java"> <textobject><textdata fileref="automatic_snippets/task_flow_job_creation.snip" /></textobject></programlisting>
 		</section>
 	
 
@@ -155,7 +155,7 @@
 				To make a new instance of a ProActive job we simply create a new 
 				object of <code>ProActiveJob</code>  type:
 			</para>
-			<programlisting xml:lang="java"><textobject><textdata>ProActiveJob job = new ProActiveJob();</textdata></textobject></programlisting>
+			<programlisting language="java"><![CDATA[ ProActiveJob job = new ProActiveJob();]]></programlisting>
   		</section>
 		
 		<section xml:id="Parameters_job_java"><info><title>Setting the job parameters using the Java API</title></info>
@@ -164,8 +164,8 @@
 				XML files <xref linkend="Create_job_xml"/>.
 				The example below creates a job using the Java Scheduler API and sets some parameters for the job:
 			</para>
-			<programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/taskflow_params.snip"/></textobject></programlisting>
-			<programlisting xml:lang="java">
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/taskflow_params.snip"/></textobject></programlisting>
+			<programlisting language="java">
 //job has already been created under the 'job' variable
 job.setLogFile("path/to/a/log/file.log");
 job.setDescription("Job description");
@@ -202,7 +202,7 @@ job.setEnv(je);
 					What is called 'executable' is in fact, the executed process (that is a Java class in this case).
 					Here's an example to create your own Java executable :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 public class WaitAndPrint extends JavaExecutable {
 
 	@Override
@@ -245,7 +245,7 @@ public class WaitAndPrint extends JavaExecutable {
 					overriding the init method on a Java executable. How to give arguments to the task will be explain
 					further.
 					We get back the foo, bar and test arguments to illustrate the task creation example below :
-					<programlisting xml:lang="java">
+					<programlisting language="java">
 private boolean foo;
 private int bar;
 private String test;
@@ -268,7 +268,7 @@ public void init(Map&lt;String, Object&gt; args) {
 					will be an array of two results (TaskResult 2 and 3) in this order
 					if the dependences of Task 5 is Task 2 and Task 3 in this order.
 					Therefore you can use them to perform Task 5 process.
-					<programlisting xml:lang="java">
+					<programlisting language="java">
 @Override
 public Serializable execute(TaskResult... results) throws Throwable {
 	//TaskResult
@@ -294,7 +294,7 @@ public Serializable execute(TaskResult... results) throws Throwable {
 				<para>
 					Just take a look at the example below to understand the syntax of a task :
 				</para>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/java_task_simple.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/java_task_simple.xml"/></textobject></programlisting>
 				<para>
 					The Java Task is composed of one 'javaExecutable' that specified the 'executable' Java class to use.
 					A set of parameters has also be defined to provide the executable some information. These parameters will be
@@ -304,14 +304,14 @@ public Serializable execute(TaskResult... results) throws Throwable {
 					To put these two tasks inside your TaskFlow job, just put it between the 'taskFlow' tags.
 					Here's how a complete ready-to-be-scheduled TaskFlow Job seems like :
 				</para>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job_complete.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job_complete.xml"/></textobject></programlisting>
 				<para>
 					It is obviously possible to mix Java and Native task inside a taskFlow Job.
 					Some other stuffs and options can be set onto a Java task, here's two examples of what can be done with
 					task XML descriptors :
 				</para>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/java_task_script.xml"/></textobject></programlisting>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/java_task_fork.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/java_task_script.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/java_task_fork.xml"/></textobject></programlisting>
 				<para>
 					To have an exhaustive list of which options are available and what they are suppose to do, just go to
 					the task explanation section at <xref linkend="Create_task_explanation"/>.
@@ -329,7 +329,7 @@ public Serializable execute(TaskResult... results) throws Throwable {
 					Just take a look at the example below to see how to use the task creation Java API
 					(see also Java DOCumentation of the Scheduler to learn more) :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //create a Java Task with the default constructor that we'll call 'aTask'
 JavaTask aTask = new JavaTask();
 //then, set the desired options : (for example)
@@ -375,14 +375,14 @@ aTask.setSelectionScript(selScript);
 				<para>
 					To complete your job by adding the task inside the job, just add it as followed :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //add the task to the job
 job.addTask(aTask);
 				</programlisting>
 				<para>
 					Here's some other features than can be performed on tasks such as dependencies or wallTime :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //admitting task 2 and task 3 has been create just before
 //we have to create task 5.
 //create a new task
@@ -394,7 +394,7 @@ task5.addDependence(task3);
 //or use the addDependences(list&lt;Task&gt;) method as shown
 //task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
 			</programlisting>
-			<programlisting xml:lang="java">
+			<programlisting language="java">
 //set this task as forked
 aTask.setFork(true);
 //or set a walltime
@@ -426,7 +426,7 @@ aTask.setForkEnvironment(env);
 				<para>
 					Just take a look at the example below to understand the syntax of a native task :
 				</para>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/native_task_simple.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/native_task_simple.xml"/></textobject></programlisting>
 				<para>
 					The native Task is composed of one 'nativeExecutable' that specified the 'executable' process to use.
 					A set of parameters has also be defined to provide the executable some arguments. These arguments will be
@@ -436,14 +436,14 @@ aTask.setForkEnvironment(env);
 					To put these two tasks inside your TaskFlow job, just put it between the 'taskFlow' tags.
 					Here's how a complete ready-to-be-scheduled TaskFlow Job seems like :
 				</para>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job_complete_with_native.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job_complete_with_native.xml"/></textobject></programlisting>
 				<para>
 					It is obviously possible to mix Java and Native task inside a taskFlow Job.
 					Some other stuffs and options can be set onto a native task, here's two examples of what can be done with
 					task XML descriptors :
 				</para>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/native_task_script.xml"/></textobject></programlisting>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/native_task_walltime.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/native_task_script.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/native_task_walltime.xml"/></textobject></programlisting>
 				<para>
 					To have an exhaustive list of which options are available and what they are suppose to do, just go to
 					the task explanation section at <xref linkend="Create_task_explanation"/>.
@@ -459,7 +459,7 @@ aTask.setForkEnvironment(env);
 					Just take a look at the example below to see how to use the task creation Java API
 					(see also Java DOCumentation of the ProActive Scheduler to learn more) :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //create a native task with the default constructor that we'll call 'aTask'
 NativeTask aTask = new NativeTask();
 //then, set the desired options : (for example)
@@ -501,14 +501,14 @@ aTask.setSelectionScript(selScript);
 				<para>
 					To complete your job by adding the task inside the job, just add it as followed :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 					//add the task to the job
 					job.addTask(aTask);
 				</programlisting>
 				<para>
 					Here's some other features than can be performed on tasks such as dependencies or wallTime :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //admitting task 2 and task 3 has been create just before
 //we have to create task 5.
 //create a new task
@@ -520,7 +520,7 @@ task5.addDependence(task3);
 //or use the addDependences(list&lt;Task&gt;) method as shown
 //task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
 				</programlisting>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //set a walltime to stop the process after the given time even it is not finish
 aTask.setWallTime(10000);
 				</programlisting>
@@ -539,7 +539,7 @@ aTask.setWallTime(10000);
  					</itemizedlist>
                                         where the first element is the command.
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //create a new native task
 NativeTask task2 = new NativeTask();
 //create a generation script with a script as shown above
@@ -570,7 +570,7 @@ task2.setGenerationScript(gscript);
 					What is called 'executable' is in fact, the executed process (that is a Java class in this case).
 					Here's an example to create your own ProActive executable application :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 public class ProActiveExample extends ProActiveExecutable {
 
 	private int numberToFind = 5003;
@@ -608,7 +608,7 @@ public class ProActiveExample extends ProActiveExecutable {
 					overriding the init method on a ProActive executable. How to give arguments to the task will be explain
 					further.
 					We get back the foo, bar and test arguments to illustrate the task creation example below :
-					<programlisting xml:lang="java">
+					<programlisting language="java">
 private boolean foo;
 private int bar;
 private String test;
@@ -634,7 +634,7 @@ public void init(Map&lt;String, Object&gt; args) {
 				<para>
 					Just take a look at the example below to understand the syntax of the ProActive task :
 				</para>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_simple.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_simple.xml"/></textobject></programlisting>
 				<para>
 					The ProActive Task is composed of one 'proActiveExecutable' that specified the 'ProActiveExecutable' Java class to use.
 					A set of parameters has also be defined to provide this executable some information. These parameters will be
@@ -644,12 +644,12 @@ public void init(Map&lt;String, Object&gt; args) {
 					Instead of deploying resources as it must be done in ProActive Suite, the resources are provides by the ProActive Scheduler.
 					Here's how a complete ready-to-be-scheduled ProActive Job seems like :
 				</para>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job_complete.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job_complete.xml"/></textobject></programlisting>
 				<para>
 					Some other stuffs and options can be set onto a ProActive task, here's a new example of what can be done with
 					task XML descriptors :
 				</para>
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_script.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_script.xml"/></textobject></programlisting>
 				<para>
 					To have an exhaustive list of which options are available and what they are suppose to do, just go to
 					the task explanation section at <xref linkend="Create_task_explanation"/>.
@@ -667,7 +667,7 @@ public void init(Map&lt;String, Object&gt; args) {
 					Just take a look at the example below to see how to use the task creation Java API
 					(see also Java DOCumentation of the Scheduler to learn more) :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //create a ProActive Task using the default constructor that we'll call 'aTask'
 ProActiveTask aTask = new ProActiveTask();
 //then, set the desired options : (for example)
@@ -713,7 +713,7 @@ aTask.setSelectionScript(selScript);
 					To complete your job by adding the task inside the job, just add it as followed :
 					(note that you can only add ONE ProActive task in a ProActive Job)
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //add the task to the job
 job.setTask(aTask);
 				</programlisting>
@@ -1053,7 +1053,7 @@ job.setTask(aTask);
 				<para>
 					To connect the ProActive Scheduler and submit a Job using Java API, just proceed as following :
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 //join an existing ProActive Scheduler retrieving an authentication interface.
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 //connect and log to the Scheduler. Valid username and password are define by the administrator.
@@ -1144,7 +1144,7 @@ JobId myJobId = scheduler.submit(job);
 					scheduler to be notified of some events. This
 					will be explain in the next section.
 				</para>
-				<programlisting xml:lang="java">
+				<programlisting language="java">
 // get the user interface
 UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 // get the result of the job
@@ -1163,7 +1163,7 @@ JobResult myResult = scheduler.getJobResult(myJobId);
 				then receive the scheduler initial state containing some information about the current
 				scheduling state. See the ProActive Scheduler JAVADOC for more details.
 			</para>
-			<programlisting xml:lang="java">
+			<programlisting language="java">
 //make your listener
 SchedulerEventListener mySchedulerEventListener = new chedulerEventListener () {
 	public void jobRunningToFinishedEvent(JobEvent event){

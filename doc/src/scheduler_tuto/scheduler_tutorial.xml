@@ -545,7 +545,7 @@ public class HelloTask extends JavaExecutable{
 		<para>
 		<emphasis role="bold">file : </emphasis>job_native.xml
 		</para>
-		<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/native_job.xml"/></textobject></programlisting>
+		<programlisting language="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/native_job.xml"/></textobject></programlisting>
 		<para>		
 		<emphasis role="bold">Job tag :</emphasis>
 		</para>
@@ -818,7 +818,7 @@ public class HelloTask extends JavaExecutable{
 		<para>			 
 		<emphasis role="bold">file : </emphasis>job_native.xml
 		</para>		
-		<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/job_native_with_s_script.xml"/></textobject></programlisting>
+		<programlisting language="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/job_native_with_s_script.xml"/></textobject></programlisting>
 		<para>
 		We can see in the two tasks definitions, after the task's description, 
 		there is a new “selection” tag which contains a path to a Javascript file.
@@ -838,7 +838,7 @@ public class HelloTask extends JavaExecutable{
 		<para>			 
 		<emphasis role="bold">file : </emphasis>check_unix_os.js
 		</para>						
-			<programlisting xml:lang="java">			
+			<programlisting language="java">			
 importPackage(java.lang);
 
 if(System.getProperty("os.name").contains("Windows"))
@@ -878,7 +878,7 @@ else
 		<para>			 
 		<emphasis role="bold">file : </emphasis>job_native.xml
 		</para>		
-				<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/pre_post_script.xml"/></textobject></programlisting>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/pre_post_script.xml"/></textobject></programlisting>
 		</section>
 		<section xml:id="java_script_code"><info><title>code of the removing files Javascript</title></info>
 		
@@ -891,7 +891,7 @@ else
 		<para>			 
 		<emphasis role="bold">file : </emphasis>remove_files.js
 		</para>						
-			<programlisting xml:lang="java">			
+			<programlisting language="java">			
 importPackage(java.io);
 print("clean working directory \n");
 for(i=0; i&lt;args.length;i++)
@@ -937,7 +937,7 @@ for(i=0; i&lt;args.length;i++)
 		<para>			 
 		<emphasis role="bold">file : </emphasis>job_native.xml
 		</para>	
-			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/command_generator.xml"/></textobject></programlisting>
+			<programlisting language="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/command_generator.xml"/></textobject></programlisting>
 		</section>
 		<section xml:id="cmd_generator_code_script"><info><title>Code of the command generator script</title></info>
 		
@@ -950,7 +950,7 @@ for(i=0; i&lt;args.length;i++)
 		<para>			 
 		<emphasis role="bold">file : </emphasis>commandGenerator.js
 		</para>				
-			<programlisting xml:lang="java">
+			<programlisting language="java">
 importPackage(java.lang);
 
 if(System.getProperty("os.name").contains("Windows"))
@@ -1012,7 +1012,7 @@ command="[working_dir]/nativTask"
 		<para>			 
 		<emphasis role="bold">file : </emphasis>job_file_output.xml
 		</para>	
-			<programlisting xml:lang="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/job_file_output.xml"/></textobject></programlisting>
+			<programlisting language="xml"><textobject><textdata fileref="scheduler_tuto/job_descriptors/job_file_output.xml"/></textobject></programlisting>
 	</section>
 	<section xml:id="native_c_code_exec"><info><title>Native C code of the executable which produces an output file</title></info>
 		
