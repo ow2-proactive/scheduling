@@ -54,7 +54,6 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.logforwarder.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.util.logforwarder.LoggingOutputStream;
 import org.ow2.proactive.scripting.Script;
@@ -219,8 +218,8 @@ public abstract class TaskLauncher implements InitActive {
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
         l.removeAllAppenders();
         // create an async appender for multiplexing (storage plus redirect through socketAppender)
-        int logMaxSize = PASchedulerProperties.LOGS_MAX_SIZE.getValueAsInt();
-        this.logAppender = new AsyncAppenderWithStorage(logMaxSize);
+        // int logMaxSize = PASchedulerProperties.LOGS_MAX_SIZE.getValueAsInt();
+        this.logAppender = new AsyncAppenderWithStorage();//logMaxSize);
         l.addAppender(this.logAppender);
         // redirect stdout and err
         this.redirectedStdout = new PrintStream(new LoggingOutputStream(l, Level.INFO), true);
