@@ -48,9 +48,12 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.resourcemanager.frontend.NodeSet;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.util.logforwarder.AsyncAppenderWithStorage;
@@ -59,7 +62,6 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -267,13 +269,30 @@ public abstract class TaskLauncher implements InitActive {
      */
     protected void finalizeLoggers() {
         //Unhandle loggers
-        this.redirectedStdout.flush();
-        this.redirectedStderr.flush();
+        this.flushStreams();
         this.logAppender.close();
         //FIXME : want to close only the task logger !
         //LogManager.shutdown();
         System.setOut(System.out);
         System.setErr(System.err);
+    }
+
+    /**
+     * Flush out and err streams.
+     */
+    protected void flushStreams() {
+        this.redirectedStdout.flush();
+        this.redirectedStderr.flush();
+    }
+
+    /**
+     * Return a TaskLogs object that contains the logs produced by the executed tasks
+     * @return a TaskLogs object that contains the logs produced by the executed tasks
+     */
+    protected TaskLogs getLogs() {
+        this.flushStreams();
+        TaskLogs logs = new Log4JTaskLogs(this.logAppender.getStorage());
+        return logs;
     }
 
     /**
@@ -293,6 +312,8 @@ public abstract class TaskLauncher implements InitActive {
             res.getException().printStackTrace();
             throw new UserException("PreTask script has failed on the current node", res.getException());
         }
+        // flush prescript output
+        this.flushStreams();
     }
 
     /**
@@ -312,6 +333,8 @@ public abstract class TaskLauncher implements InitActive {
             res.getException().printStackTrace();
             throw new UserException("PostTask script has failed on the current node", res.getException());
         }
+        // flush postscript output
+        this.flushStreams();
     }
 
     /**

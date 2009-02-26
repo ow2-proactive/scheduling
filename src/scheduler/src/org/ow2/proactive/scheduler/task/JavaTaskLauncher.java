@@ -110,14 +110,11 @@ public class JavaTaskLauncher extends TaskLauncher {
                 this.executePostScript(getNodes().get(0));
             }
 
-            //logBuffer is filled up
-            TaskLogs taskLogs = new Log4JTaskLogs(this.logAppender.getStorage());
-
             //return result
-            return new TaskResultImpl(taskId, userResult, taskLogs);
+            return new TaskResultImpl(taskId, userResult, this.getLogs());
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logAppender.getStorage()));
+            return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
             if (isWallTime())
                 cancelTimer();

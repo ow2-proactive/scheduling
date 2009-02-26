@@ -48,6 +48,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public abstract class ResultPreview implements Serializable {
 
     /**
+     * The textual preview of the result, evaluated on computing node side
+     * after the task completion.
+     */
+    private String textualPreview = null;
+
+    /**
      * Create a textual representation of the result.
      *
      * @param result the result to be described.
