@@ -2,9 +2,9 @@
 echo.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
-call init.bat
+call init.bat cli
 
-%JAVA_CMD% org.ow2.proactive.scheduler.examples.JobLauncher %*
+%JAVA_CMD% org.ow2.proactive.scheduler.common.util.JobLauncher %*
 ENDLOCAL
 
 :end

@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.examples;
+package org.ow2.proactive.scheduler.common.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,6 +47,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -59,12 +61,13 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 /**
  * GetJobResult help you to get the result of your job.<br>
  * Your job is represented by its ID.
- * 
+ *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 public class GetJobResult {
 
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
     private static final String SCHEDULER_DEFAULT_URL = "//localhost/";
 
     /**
@@ -107,14 +110,20 @@ public class GetJobResult {
             Parser parser = new GnuParser();
             CommandLine cmd = parser.parse(options, args);
 
-            if (cmd.hasOption("h"))
+            if (cmd.hasOption("h")) {
                 displayHelp = true;
-            else {
-                if (cmd.hasOption("u"))
-                    auth = SchedulerConnection.join(cmd.getOptionValue("u"));
-                else
-                    auth = SchedulerConnection.join(SCHEDULER_DEFAULT_URL);
+            } else {
+                String url;
+                if (cmd.hasOption("u")) {
+                    url = cmd.getOptionValue("u");
+                } else {
+                    url = SCHEDULER_DEFAULT_URL;
+                }
+                logger.info("Trying to connect Scheduler on " + url);
+                auth = SchedulerConnection.join(url);
+                logger.info("\t-> Connection established on " + url);
 
+                logger.info("\nConnecting user to the Scheduler");
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
                     pwdMsg = user + "'s password: ";
@@ -124,20 +133,22 @@ public class GetJobResult {
                     pwdMsg = "password: ";
                 }
 
-                //ask password to User 
+                //ask password to User
                 char password[] = null;
                 try {
                     password = PasswordField.getPassword(System.in, pwdMsg);
                     pwd = String.valueOf(password);
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                    logger.error(ioe);
                 }
 
                 //log as user
                 scheduler = auth.logAsUser(user, pwd);
+                logger.info("\t-> User '" + user + "' successfully connected");
 
                 String jID;
-                System.out.print("\nPlease enter the job id to get its result or 'exit' to exit :  ");
+                final String prompt = "\nPlease enter the job id to get its result or 'exit' to exit : ";
+                System.out.print(prompt);
 
                 while (!(jID = buf.readLine()).equals("exit")) {
                     int begin = 0;
@@ -157,46 +168,45 @@ public class GetJobResult {
                             JobResult result = scheduler.getJobResult(i + "");
 
                             if (result != null) {
-                                System.out.println("Job " + i + " Result => ");
+                                logger.info("Job " + i + " Result => ");
 
                                 for (Entry<String, TaskResult> e : result.getAllResults().entrySet()) {
                                     TaskResult tRes = e.getValue();
 
                                     try {
-                                        System.out.println("\t " + e.getKey() + " : " + tRes.value());
+                                        logger.info("\t " + e.getKey() + " : " + tRes.value());
                                     } catch (Throwable e1) {
-                                        System.out.println("\t ERROR during execution of " + e.getKey() +
-                                            "... ");
-                                        tRes.getException().printStackTrace();
+                                        logger.error("\t ERROR during execution of " + e.getKey() + "... ");
+                                        logger.error(tRes.getException());
                                     }
                                 }
                             } else {
-                                System.out.println("Job " + i + " is not finished !");
+                                logger.info("Job " + i + " is not finished !");
                             }
                         } catch (SchedulerException e) {
-                            System.out.println("Error job " + i + " : " + e.getMessage());
+                            logger.info("Error job " + i + " : " + e.getMessage());
                         }
                     }
 
-                    System.out.print("\nPlease enter the job id to get its result or 'exit' to exit :  ");
+                    System.out.print("prompt");
                 }
             }
         } catch (MissingArgumentException e) {
-            System.out.println(e.getLocalizedMessage());
+            logger.error(e);
             displayHelp = true;
         } catch (MissingOptionException e) {
-            System.out.println("Missing option: " + e.getLocalizedMessage());
+            logger.error("Missing option: " + e.getLocalizedMessage());
             displayHelp = true;
         } catch (UnrecognizedOptionException e) {
-            System.out.println(e.getLocalizedMessage());
+            logger.error(e.getLocalizedMessage());
             displayHelp = true;
         } catch (AlreadySelectedException e) {
-            System.out.println(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
+            logger.error(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
             displayHelp = true;
         } catch (ParseException e) {
             displayHelp = true;
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            logger.error(e);
             System.exit(1);
         } finally {
             if (reader != null)
@@ -212,9 +222,11 @@ public class GetJobResult {
         }
 
         if (displayHelp) {
-            System.out.println();
-            new HelpFormatter().printHelp("result", options, true);
-            System.exit(2);
+            logger.info("");
+            HelpFormatter hf = new HelpFormatter();
+            hf.setWidth(120);
+            hf.printHelp("result" + Tools.shellExtension(), options, true);
+            System.exit(1);
         }
 
         System.exit(0);

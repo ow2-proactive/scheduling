@@ -219,4 +219,17 @@ public class Tools implements Serializable {
         }
         return tokens.toArray(new String[] {});
     }
+
+    /**
+     * Return the extension of shell script depending the current OS
+     *
+     * @return the extension of shell script depending the current OS
+     */
+    public static String shellExtension() {
+        if (System.getProperty("os.name").contains("Windows")) {
+            return ".bat";
+        } else {
+            return ".sh";
+        }
+    }
 }

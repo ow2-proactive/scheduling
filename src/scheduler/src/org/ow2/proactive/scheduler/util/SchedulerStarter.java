@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.examples;
+package org.ow2.proactive.scheduler.util;
 
 import java.io.File;
 import java.net.URI;
@@ -59,7 +59,6 @@ import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -230,7 +229,9 @@ public class SchedulerStarter {
 
         if (displayHelp) {
             logger.info("");
-            new HelpFormatter().printHelp("scheduler", options, true);
+            HelpFormatter hf = new HelpFormatter();
+            hf.setWidth(120);
+            hf.printHelp("startScheduler" + Tools.shellExtension(), options, true);
             System.exit(10);
         }
 

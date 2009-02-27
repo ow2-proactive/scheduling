@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
@@ -28,12 +27,12 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 /**
  * Class with a main provides a way to list nodes, nodes sources,
  * add/remove nodes and nodes sources and shutdown Resource Manager.
- * 
- * 
+ *
+ *
  * @author ProActive team
  *
  */
-public class RMController {
+public class AdminRM {
 
     /**
      * Log4j logger name.
@@ -136,22 +135,27 @@ public class RMController {
 
             RMAuthentication auth = null;
 
+            String url = null;
             cmd = parser.parse(options, args);
             if (cmd.hasOption("h")) {
-                System.out
-                        .println("\n Add and removes nodes, create and removes nodes source, shutdown a Resource Manager.\n");
+                logger
+                        .info("\n Add and removes nodes, create and removes nodes source, shutdown a Resource Manager.\n");
                 new HelpFormatter().printHelp("adminRM", options, true);
-                System.exit(0);
-            } else if (!cmd.hasOption("u")) {
-                auth = RMConnection.join(null);
+                System.exit(1);
+            } else if (cmd.hasOption("u")) {
+                url = cmd.getOptionValue("u");
             } else {
-                rmUrl = cmd.getOptionValue("u") + "/";
-                auth = RMConnection.join(rmUrl + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
+                url = cmd.getOptionValue("//localhost/");
             }
+
+            logger.info("Trying to connect RM on " + url);
+            auth = RMConnection.join(url);
+            logger.info("\t-> Connection established on " + url);
 
             String pwdMsg = "";
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
+            logger.info("\nConnecting admin to the RM");
             if (cmd.hasOption("l")) {
                 rmUser = cmd.getOptionValue("l");
                 pwdMsg = rmUser + "'s password: ";
@@ -161,16 +165,17 @@ public class RMController {
                 pwdMsg = "password: ";
             }
 
-            //ask password to User         
+            //ask password to User
             char password[] = null;
             try {
                 password = PasswordField.getPassword(System.in, pwdMsg);
                 rmPassword = (password == null) ? "" : String.valueOf(password);
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                logger.error(ioe);
             }
 
             RMAdmin admin = auth.logAsAdmin(rmUser, rmPassword);
+            logger.info("\t-> Admin '" + rmUser + "' successfully connected\n");
 
             if (cmd.hasOption("a")) {
                 String[] nodesURls = cmd.getOptionValues("a");
@@ -185,7 +190,7 @@ public class RMController {
                         admin.addNode(nUrl);
                     }
                 }
-                logger.info("Addning nodes request sent to Resource Manager " + rmUrl);
+                logger.info("Adding nodes request sent to Resource Manager " + rmUrl);
 
             } else if (cmd.hasOption("gcmd")) {
                 String[] gcmdTab = cmd.getOptionValues("gcmd");
@@ -252,22 +257,22 @@ public class RMController {
 
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e);
         }
 
         System.exit(0);
     }
 
     /**
-     * Print on STDOUT a list of nodes 
+     * Print on STDOUT a list of nodes
      * @param list a list of RMNodeEvent objects representing a set of nodes to display.
      */
     public static void printNodesList(List<RMNodeEvent> list) {
 
         if (list.size() == 0) {
-            System.out.println("No nodes handled by Resource Manager");
+            logger.info("No nodes handled by Resource Manager");
         } else {
-            System.out.println("\n");
+            logger.info("\n");
             for (RMNodeEvent evt : list) {
                 String state = null;
                 switch (evt.getState()) {
@@ -283,7 +288,7 @@ public class RMController {
                     case TO_BE_RELEASED:
                         state = "TO_BE_RELEASED";
                 }
-                System.out.println(evt.getNodeSource() + "\t" + evt.getHostName() + "\t" + state + "\t" +
+                logger.info(evt.getNodeSource() + "\t" + evt.getHostName() + "\t" + state + "\t" +
                     evt.getNodeUrl());
             }
         }
@@ -291,13 +296,13 @@ public class RMController {
     }
 
     /**
-     * Print on STDOUT a list of node sources 
+     * Print on STDOUT a list of node sources
      * @param list a list of RMNodesourceEvent representing a set of nodes sources to display.
      */
     public static void printNodeSourcesList(List<RMNodeSourceEvent> list) {
-        System.out.println("\n");
+        logger.info("\n");
         for (RMNodeSourceEvent evt : list) {
-            System.out.println(evt.getSourceName() + "\t" + evt.getSourceType());
+            logger.info(evt.getSourceName() + "\t" + evt.getSourceType());
         }
     }
 }

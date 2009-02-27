@@ -10,7 +10,7 @@ call init.bat
 
 echo. 
 
-%JAVA_CMD% org.ow2.proactive.scheduler.examples.SchedulerStarter  %*
+%JAVA_CMD% org.ow2.proactive.scheduler.util.SchedulerStarter  %*
 ENDLOCAL
 
 :end

@@ -40,7 +40,14 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%PA_SCHEDULER%\config\scheduler.java.policy" -Dlog4j.configuration="file:%PA_SCHEDULER%/config/scheduler-log4j"
+rem log4j file
+IF "%1"=="cli" (
+	set LOG4J_FILE=file:%PA_SCHEDULER%/config/scheduler-log4j-client
+) ELSE (
+	set LOG4J_FILE=file:%PA_SCHEDULER%/config/scheduler-log4j
+)
+
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%PA_SCHEDULER%\config\scheduler.java.policy" -Dlog4j.configuration="%LOG4J_FILE%"
 
 rem Adding java tools to the path
 SET OK=1

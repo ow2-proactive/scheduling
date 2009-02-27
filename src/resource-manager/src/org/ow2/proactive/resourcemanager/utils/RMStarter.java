@@ -83,11 +83,13 @@ public class RMStarter {
     }
 
     private static void displayHelp() {
-        System.out.println("\nLaunch ProActive Resource Manager.");
-        System.out.println("Without arguments, Resource Manager is launched with 4 "
-            + "computing nodes on local machine.\n");
-        new HelpFormatter().printHelp("scheduler", options, true);
-        System.exit(2);
+        logger.info("");
+        HelpFormatter hf = new HelpFormatter();
+        hf.setWidth(120);
+        hf.printHelp("startRM", options, true);
+        logger
+                .info("\n Notice : Without argument, Resource Manager is launched with 4 computing nodes on local machine.");
+        System.exit(1);
     }
 
     /**
@@ -109,21 +111,21 @@ public class RMStarter {
             if (cmd.hasOption("h")) {
                 displayHelp();
             } else if (cmd.hasOption("d") && cmd.hasOption("n")) {
-                System.out
-                        .println("\nError, you cannot specify a deployment (-d|--deploy) and ask to deploy nothing (-n|--nodeply) !");
+                logger
+                        .warn("\nYou cannot specify a deployment (-d|--deploy) and ask to deploy nothing (-n|--nodeply) !\n");
                 displayHelp();
             } else if (cmd.hasOption("d")) {
                 // checking that all specified files are exist 
                 gcmdList = cmd.getOptionValues("d");
                 for (String gcmdPath : gcmdList) {
                     if (!(new File(gcmdPath)).exists()) {
-                        System.out.println("Error, cannot find GCM deployment file " + gcmdPath);
+                        logger.error("Cannot find GCM deployment file " + gcmdPath);
                         System.exit(2);
                     }
                 }
             }
 
-            logger.info("STARTING RESOURCE MANAGER: Press 'e' to shutdown.");
+            logger.info("Starting Resource Manager: Press 'e' to shutdown.");
             RMFactory.setOsJavaProperty();
 
             if (cmd.hasOption("n")) {
@@ -148,14 +150,13 @@ public class RMStarter {
                 logger.info("Press 'e' to shutdown.");
             }
 
-            logger.info("Shuting down the resource manager");
-            // shutdown hook of rmcore should deal with node sources
+            logger.info("Shutting down the resource manager");
 
         } catch (ParseException e1) {
             displayHelp();
         } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(2);
+            logger.error(e);
+            System.exit(3);
         }
 
         System.exit(0);

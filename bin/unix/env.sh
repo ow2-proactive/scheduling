@@ -6,11 +6,7 @@
 
 CLASSPATH=.
 
-
-
 # ----------------------------------------------------------------------------
-
-
 
 JAVA_HOME=${JAVA_HOME-NULL};
 if [ "$JAVA_HOME" = "NULL" ]
@@ -60,7 +56,15 @@ fi
 
 export CLASSPATH
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Dproactive.configuration=$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml -Djava.security.policy=$PA_SCHEDULER/config/scheduler.java.policy -Dlog4j.configuration=file:${PA_SCHEDULER}/config/scheduler-log4j -Dproactive.home=$PA_SCHEDULER -Dpa.scheduler.home=$PA_SCHEDULER -Dpa.rm.home=$PA_SCHEDULER"
+#log4j file
+if [ $# -ne 0 ]
+then
+	LOG4J_FILE=file:${PA_SCHEDULER}/config/scheduler-log4j-client
+else
+	LOG4J_FILE=file:${PA_SCHEDULER}/config/scheduler-log4j
+fi
+
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Dproactive.configuration=$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml -Djava.security.policy=$PA_SCHEDULER/config/scheduler.java.policy -Dlog4j.configuration=$LOG4J_FILE -Dproactive.home=$PA_SCHEDULER -Dpa.scheduler.home=$PA_SCHEDULER -Dpa.rm.home=$PA_SCHEDULER"
 
 #echo $JAVACMD
 

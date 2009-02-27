@@ -7,7 +7,7 @@ workingDir=`dirname $0`
 yjp=-agentlib:yjpagent
 opt="-Xms128m -Xmx2048m"
 
-$JAVACMD $opt org.ow2.proactive.scheduler.examples.SchedulerStarter $@
+$JAVACMD $opt org.ow2.proactive.scheduler.util.SchedulerStarter $@
 
 echo
 

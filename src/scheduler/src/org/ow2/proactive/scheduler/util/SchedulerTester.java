@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.examples;
+package org.ow2.proactive.scheduler.util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,7 +59,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 /**
  * Stress test for the scheduler. Creates several virtual users which randomly
  * submit jobs and retrieve results.
- * 
+ *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
@@ -67,7 +67,7 @@ public class SchedulerTester {
     /** directory containing jobs to be submitted */
     public static String JOBS_HOME;
     /** Scheduler loggers. */
-    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
+    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
 
     // scheduler connection
     private static final String DEFAULT_URL = "//localhost/";
@@ -96,20 +96,20 @@ public class SchedulerTester {
 
     /**
      * Start the scheduler tester.
-     * 
+     *
      * args[0] = [schedulerURL]
      * args[1] = [jobs directory]
      * args[2] = [submission period]
      * args[3] = [nb jobs]
      * args[4] = [nb total jobs]
-     * @param args the arguments that can be passed to this process.
+     * @param args the arguments that have to be passed to this process.
      */
     public static void main(String[] args) {
-        System.out.println();
-        System.out.println("***********************************************");
-        System.out.println("****** Press ENTER to stop submit orders ******");
-        System.out.println("***********************************************");
-        System.out.println();
+        logger.info("");
+        logger.info("***********************************************");
+        logger.info("****** Press ENTER to stop submit orders ******");
+        logger.info("***********************************************");
+        logger.info("");
         BufferedReader bu = null;
         try {
             // almost optional arguments...
@@ -129,21 +129,24 @@ public class SchedulerTester {
                 try {
                     tmp = bu.readLine();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
-                if ("".equals(tmp))
-                    for (User u : users)
+                if ("".equals(tmp)) {
+                    for (User u : users) {
                         u.stopSubmit();
+                    }
+                }
             }
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            logger.error(e);
         } finally {
-            if (bu != null)
+            if (bu != null) {
                 try {
                     bu.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
+            }
         }
     }
 
@@ -181,15 +184,15 @@ public class SchedulerTester {
             br.close();
             l.close();
 
-            System.out.print("[SCHEDULER TEST] Used logins are : ");
+            String msg = "[SCHEDULER TEST] Used logins are : ";
             for (String s : logins.keySet()) {
-                System.out.print(s + ", ");
+                msg += (s + ", ");
             }
-            System.out.println();
+            logger.info(msg);
 
             // read jobs
             File d = new File(JOBS_HOME);
-            System.out.println("===> " + JOBS_HOME);
+            logger.info("===> " + JOBS_HOME);
             String[] jobsTmp = d.list();
             // remove non *xml
             jobs = new Vector<String>();
@@ -200,16 +203,16 @@ public class SchedulerTester {
                 }
             }
 
-            System.out.print("[SCHEDULER TEST] Used jobs are : ");
+            msg = "Used jobs are : ";
             for (String s : jobs) {
-                System.out.print(s + ", ");
+                msg += (s + ", ");
                 //preparing the jobs
-                System.out.println("\n[SCHEDULER TEST] Preparing " + s);
+                logger.info("\tPreparing " + s);
                 //Create job
                 Job j = JobFactory.getFactory().createJob(JOBS_HOME + s);
                 alreadySubmitted.put(s, j);
             }
-            System.out.println();
+            logger.info(msg);
 
             for (String s : logins.keySet()) {
                 User user = new User(s, logins.get(s), jobs, authentication);
@@ -217,20 +220,22 @@ public class SchedulerTester {
                 new Thread(user).start();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e);
         } finally {
-            if (br != null)
+            if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
-            if (l != null)
+            }
+            if (l != null) {
                 try {
                     l.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
+            }
         }
     }
 
@@ -277,7 +282,7 @@ public class SchedulerTester {
             try {
                 this.scheduler = authentication.logAsUser(login, pswd);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
             }
 
             while (isActive) {
@@ -298,8 +303,8 @@ public class SchedulerTester {
                                     currentNBjobs++;
                                 } else {
                                     this.submit = false;
-                                    System.out
-                                            .println(login +
+                                    logger
+                                            .info(login +
                                                 " can't submit anymore, the total job count has been reached, but he is already trying to get his job's result");
                                 }
                             }
@@ -309,7 +314,7 @@ public class SchedulerTester {
                                 break;
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error(e);
                     }
                 }
 
@@ -317,7 +322,7 @@ public class SchedulerTester {
                 try {
                     Thread.sleep(generator.nextInt(maxSubmissionPeriod));
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
 
                 if (results.size() == 0)
@@ -331,7 +336,7 @@ public class SchedulerTester {
                                 this.results.remove(id);
                             }
                         } catch (SchedulerException e) {
-                            e.printStackTrace();
+                            logger.error(e);
                         }
                     }
                 }
@@ -340,8 +345,9 @@ public class SchedulerTester {
             synchronized (synchro) {
                 users.remove(this);
                 logger.info(login + " has shutdown");
-                if (users.size() == 0)
+                if (users.size() == 0) {
                     System.exit(0);
+                }
             }
         }
 

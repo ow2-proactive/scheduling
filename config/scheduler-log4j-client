@@ -9,7 +9,7 @@ log4j.rootLogger=INFO,NULL
 # avoid displaying additivity of the inherit loggers
 log4j.additivity.proactive.scheduler=false
 log4j.additivity.proactive.scheduler.dev=false
-log4j.additivity.proactive.scheduler.dev.admin=true
+log4j.additivity.proactive.scheduler.dev.admin=false
 # define SCHEDULER loggers
 log4j.logger.proactive.scheduler.dev=INFO,NULL
 log4j.logger.proactive.scheduler.dev.admin=INFO,NULL
@@ -19,6 +19,7 @@ log4j.logger.proactive.scheduler.dev.admin.consol=INFO,CONSOLE
 log4j.additivity.proactive.resourceManager=false
 # define RESOURCE MANAGER loggers
 log4j.logger.proactive.resourceManager=INFO,NULL
+log4j.logger.proactive.resourceManager.rmlauncher=INFO,CONSOLE
 
 # Hibernate logger
 log4j.additivity.org.hibernate=false
@@ -28,3 +29,6 @@ log4j.logger.org.hibernate=INFO,NULL
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 log4j.appender.CONSOLE.layout.ConversionPattern=%m%n
+
+# NULL appender
+log4j.appender.NULL=org.apache.log4j.varia.NullAppender

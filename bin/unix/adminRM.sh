@@ -2,10 +2,10 @@
 
 CLASSPATH=.
 workingDir=`dirname $0`
-. $workingDir/env.sh
+. $workingDir/env.sh cli
 
 opt="-Xms128m -Xmx2048m"
 
-$JAVACMD $opt org.ow2.proactive.resourcemanager.utils.RMController $@
+$JAVACMD org.ow2.proactive.resourcemanager.utils.AdminRM $@
 
 echo

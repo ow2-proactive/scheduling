@@ -15,7 +15,7 @@ CLASSPATH=.
 yjp=-agentlib:yjpagent
 opt="-Xms128m -Xmx512m"
 
-$JAVACMD $opt org.ow2.proactive.scheduler.examples.SchedulerStarter $@
+$JAVACMD $opt org.ow2.proactive.scheduler.util.SchedulerStarter $@
 
 echo
 

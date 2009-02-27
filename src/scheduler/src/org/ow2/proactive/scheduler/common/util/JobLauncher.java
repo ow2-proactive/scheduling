@@ -29,15 +29,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.examples;
+package org.ow2.proactive.scheduler.common.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.UnknownHostException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.security.auth.login.LoginException;
 
@@ -53,9 +49,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -66,16 +61,16 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
-import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
 
 
 /**
  * This class provides a way for submit jobs to a scheduler.
- * 
+ *
  * @author The ProActive Team
  */
 public class JobLauncher {
+
+    public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
 
     private static final String SCHEDULER_DEFAULT_URL = "//localhost/";
 
@@ -155,8 +150,8 @@ public class JobLauncher {
 
         InputStreamReader reader = new InputStreamReader(System.in);
         BufferedReader buf = new BufferedReader(reader);
+        String user = null;
         try {
-            String user = null;
             String pwd = null;
             String jobUrl = null;
             String pwdMsg = null;
@@ -167,19 +162,25 @@ public class JobLauncher {
             Parser parser = new GnuParser();
             CommandLine cmd = parser.parse(options, args);
 
-            if (cmd.hasOption("h"))
+            if (cmd.hasOption("h")) {
                 displayHelp = true;
-            else {
-                if (cmd.hasOption("u"))
-                    auth = SchedulerConnection.join(cmd.getOptionValue("u"));
-                else
-                    auth = SchedulerConnection.join(SCHEDULER_DEFAULT_URL);
+            } else {
+                String url;
+                if (cmd.hasOption("u")) {
+                    url = cmd.getOptionValue("u");
+                } else {
+                    url = SCHEDULER_DEFAULT_URL;
+                }
+                logger.info("Trying to connect Scheduler on " + url);
+                auth = SchedulerConnection.join(url);
+                logger.info("\t-> Connection established on " + url);
 
                 // if (cmd.hasOption("r"))
                 // logIt = true;
 
-                if (cmd.hasOption("n"))
+                if (cmd.hasOption("n")) {
                     nbJob = new Integer(cmd.getOptionValue("n"));
+                }
 
                 Job j = null;
 
@@ -188,7 +189,10 @@ public class JobLauncher {
                     jobUrl = cmd.getOptionValue("j");
                     // CREATE JOB from an Xml descriptor job
                     j = JobFactory.getFactory().createJob(jobUrl);
+                    logger.info("\t-> Job '" + j.getName() + "' (" + j.getClass().getSimpleName() +
+                        ") successfully created !");
                 } else if (cmd.hasOption("cmd") || cmd.hasOption("cmdf")) {
+                    logger.info("Switching to command line job creation mode");
 
                     String jobGivenName = null;
                     String jobGivenOutput = null;
@@ -216,14 +220,18 @@ public class JobLauncher {
                         jobCommand = jobCommand.trim();
                         j = FlatJobFactory.getFactory().createNativeJobFromCommand(jobCommand, jobGivenName,
                                 givenSelScript, jobGivenOutput, cmd.getOptionValue("l"));
+                        logger.info("\t-> Job '" + j.getName() + "' (" + j.getClass().getSimpleName() +
+                            ") successfully created using given arguments !");
                     } else {
-
                         String commandFilePath = cmd.getOptionValue("cmdf");
                         j = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath,
                                 jobGivenName, givenSelScript, jobGivenOutput, cmd.getOptionValue("l"));
+                        logger.info("\t-> Job '" + j.getName() + "' (" + j.getClass().getSimpleName() +
+                            ") successfully created using given command file !");
                     }
                 }
 
+                logger.info("\nConnecting user to the Scheduler");
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
                     pwdMsg = user + "'s password: ";
@@ -233,107 +241,114 @@ public class JobLauncher {
                     pwdMsg = "password: ";
                 }
 
-                //ask password to User         
+                //ask password to User
                 char password[] = null;
                 try {
                     password = PasswordField.getPassword(System.in, pwdMsg);
                     pwd = (password == null) ? "" : String.valueOf(password);
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                    logger.error(ioe);
                 }
 
                 // Log as user
                 UserSchedulerInterface scheduler = auth.logAsUser(user, pwd);
+                logger.info("\t-> User '" + user + "' successfully connected");
 
                 // ******************** GET JOB OUTPUT ***********************
-                SimpleLoggerServer simpleLoggerServer = null;
+                //FIXME WARNING SimpleLoggerServer cannot be in this class because it is user package
+                //                SimpleLoggerServer simpleLoggerServer = null;
+                //
+                //                if (logIt) {
+                //                    try {
+                //                        // it will launch a listener that will listen connection on any free port
+                //                        simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
+                //                    } catch (UnknownHostException e1) {
+                //                        logger.error(e1);
+                //                    } catch (IOException e) {
+                //                    	logger.error(e);
+                //                    }
+                //                }
 
-                if (logIt) {
-                    try {
-                        // it will launch a listener that will listen connection
-                        // on
-                        // any free port
-                        simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
-                    } catch (UnknownHostException e1) {
-                        e1.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                logger.info("\nJob to submit : name='" + j.getName() + "'  type='" +
+                    j.getClass().getSimpleName() + "'");
+                logger.info("Number to submit : " + nbJob);
+                System.out.println("Press 'Enter' to confirm");
+                System.in.read();
                 for (int i = 0; i < nbJob; i++) {
                     // SUBMIT JOB
                     JobId id = scheduler.submit(j);
 
-                    if (logIt) {
-                        // next, this method will forward task output on the
-                        // previous loggerServer
-                        scheduler.listenLog(id, ProActiveInet.getInstance().getInetAddress().getHostName(),
-                                simpleLoggerServer.getPort());
+                    //                    if (logIt) {
+                    //                        // next, this method will forward task output on the
+                    //                        // previous loggerServer
+                    //                        scheduler.listenLog(id, ProActiveInet.getInstance().getInetAddress().getHostName(),
+                    //                                simpleLoggerServer.getPort());
+                    //
+                    //                        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id);
+                    //
+                    //                        DateFormat dateFormat = new SimpleDateFormat("hh'h'mm'm'_dd-MM-yy");
+                    //                        FileAppender fa = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), "./logs/job[" +
+                    //                            j.getName() + "," + id + "]_" + dateFormat.format(new Date()) + ".log", true);
+                    //                        l.addAppender(fa);
+                    //                    }
 
-                        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id);
-
-                        DateFormat dateFormat = new SimpleDateFormat("hh'h'mm'm'_dd-MM-yy");
-                        FileAppender fa = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), "./logs/job[" +
-                            j.getName() + "," + id + "]_" + dateFormat.format(new Date()) + ".log", true);
-                        l.addAppender(fa);
-                    }
-
-                    System.out.println("Here is your job id : " + id.value());
+                    logger.info((i + 1) + ") Job submitted, here is the job id : " + id.value());
                 }
             }
         } catch (MissingArgumentException e) {
-            System.out.println(e.getLocalizedMessage());
+            logger.error(e.getMessage());
             displayHelp = true;
         } catch (MissingOptionException e) {
-            System.out.println("Missing option: " + e.getLocalizedMessage());
+            logger.error(e.getMessage());
             displayHelp = true;
         } catch (UnrecognizedOptionException e) {
-            System.out.println(e.getLocalizedMessage());
+            logger.error(e.getMessage());
             displayHelp = true;
         } catch (AlreadySelectedException e) {
-            System.out.println(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
+            logger.error(e.getMessage());
             displayHelp = true;
         } catch (ParseException e) {
+            logger.error(e.getMessage());
             displayHelp = true;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         } catch (JobCreationException e) {
-            System.out.println("Unable to create job : ");
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+            logger.error("Unable to create job !");
+            logger.error(e.getMessage());
+            //logger.error(e);
         } catch (SchedulerException e) {
-            System.out.println("Unable to submit job : ");
-            System.out.println(e.getMessage());
+            logger.error("Unable to submit job !");
+            logger.error(e.getMessage());
         } catch (LoginException e) {
-            System.out.println("Unable to authenticate user : ");
-            System.out.println(e.getMessage());
+            logger.error("Unable to authenticate user '" + user + "' !");
+            logger.error(e.getMessage());
         } finally {
-            if (reader != null)
+            if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException e1) {
+                } catch (IOException e) {
                 }
-            if (buf != null)
+            }
+            if (buf != null) {
                 try {
                     buf.close();
                 } catch (IOException e) {
                 }
+            }
         }
 
         if (displayHelp) {
-            System.out.println();
+            logger.info("");
             HelpFormatter hf = new HelpFormatter();
             hf.setWidth(120);
-            hf.printHelp("submit", options, true);
-            System.out
-                    .println("\n Notice : -o, -n and -s options are only considered with -cmd|cmdf options.");
-            System.out
-                    .println(" If you submit job with xml file (-j), selection script, job name and STD output file are "
+            hf.printHelp("submit" + Tools.shellExtension(), options, true);
+            logger.info("\n Notice : -o, -n and -s options are only considered with -cmd|cmdf options.");
+            logger
+                    .info(" If you submit job with xml file (-j), selection script, job name and STD output file are "
                         + "specified in xml job descriptor.");
-            System.exit(2);
+            System.exit(1);
         }
 
-        //System.exit(0);
+        System.exit(0);
     }
 }

@@ -298,14 +298,14 @@ JobId myJobId = scheduler.submit(job);
 				<para>
 					The admin shell is an interface that allow a user to administer the ProActive Scheduler without the
 					java API. It is also possible to see exceptions coming from the scheduler to know what happen.
-					To start a admin shell, run the <emphasis>adminShell.[sh|bat]</emphasis>
+					To start a admin shell, run the <emphasis>adminScheduler.[sh|bat]</emphasis>
 					script in 'unix/[os]/' directory. Without arguments, the admin shell will try to connect a
 					scheduler on the local host, exceptions from the ProActive Scheduler won't be displayed and
 					your login and password will be requested. Note that the admin shell uses administrator rights to allow
 					the connection to the scheduler.
 				</para>
 				<para>
-					<emphasis>adminShell.[sh|bat]</emphasis> can be started with 3 optional arguments :
+					<emphasis>adminScheduler.[sh|bat]</emphasis> can be started with 3 optional arguments :
 				</para>
 				<itemizedlist>
 					<listitem>
@@ -340,7 +340,7 @@ JobId myJobId = scheduler.submit(job);
 				</figure>
 				<para>
 					It is also possible to launch the admin shell with only one of the options or no option. For more
-					informations, use -h (or --help) option (i.e. "adminShell.[sh|bat] -h")
+					informations, use -h (or --help) option (i.e. "adminScheduler.[sh|bat] -h")
 				</para>
 			</section>
 			<section xml:id="Administer_scheduler_java"><info><title>Administer the Scheduler using Java API</title></info>

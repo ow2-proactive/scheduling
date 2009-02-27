@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.examples;
+package org.ow2.proactive.scheduler.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,6 +48,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -57,17 +59,20 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 
 
 /**
- * AdminShell will help you to manage the scheduler.
+ * AdminScheduler will help you to manage the scheduler.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class AdminShell {
+public class AdminScheduler {
 
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
     private static final String SCHEDULER_DEFAULT_URL = "//localhost/";
 
     private static AdminSchedulerInterface scheduler;
@@ -89,20 +94,10 @@ public class AdminShell {
     private static boolean stopCommunicator;
     private static boolean displayException = false;
 
-    private static void output(String message) {
-        System.out.print(message);
-    }
-
-    private static void error(String message) {
-        System.err.print(message);
-    }
-
     private static void error(String message, Exception e) {
-        error(message);
-        System.err.println();
+        logger.error(message);
         if (displayException) {
-            e.printStackTrace();
-            System.out.println();
+            logger.error(e);
         }
     }
 
@@ -153,14 +148,20 @@ public class AdminShell {
             if (cmd.hasOption("h"))
                 displayHelp = true;
             else {
-                if (cmd.hasOption("u"))
-                    auth = SchedulerConnection.join(cmd.getOptionValue("u"));
-                else
-                    auth = SchedulerConnection.join(SCHEDULER_DEFAULT_URL);
+                String url;
+                if (cmd.hasOption("u")) {
+                    url = cmd.getOptionValue("u");
+                } else {
+                    url = SCHEDULER_DEFAULT_URL;
+                }
+                logger.info("Trying to connect Scheduler on " + url);
+                auth = SchedulerConnection.join(url);
+                logger.info("\t-> Connection established on " + url);
 
                 if (cmd.hasOption("e"))
                     displayException = true;
 
+                logger.info("\nConnecting admin to the Scheduler");
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
                     pwdMsg = user + "'s password: ";
@@ -170,37 +171,39 @@ public class AdminShell {
                     pwdMsg = "password: ";
                 }
 
-                //ask password to User 
+                //ask password to User
                 char password[] = null;
                 try {
                     password = PasswordField.getPassword(System.in, pwdMsg);
                     pwd = String.valueOf(password);
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                    logger.error(ioe);
                 }
 
                 scheduler = auth.logAsAdmin(user, pwd);
+
+                logger.info("\t-> Admin '" + user + "' successfully connected\n");
 
                 stopCommunicator = false;
                 startCommandListener();
             }
         } catch (MissingArgumentException e) {
-            System.out.println(e.getLocalizedMessage());
+            logger.error(e.getLocalizedMessage());
             displayHelp = true;
         } catch (MissingOptionException e) {
-            System.out.println("Missing option: " + e.getLocalizedMessage());
+            logger.error("Missing option: " + e.getLocalizedMessage());
             displayHelp = true;
         } catch (UnrecognizedOptionException e) {
-            System.out.println(e.getLocalizedMessage());
+            logger.error(e.getLocalizedMessage());
             displayHelp = true;
         } catch (AlreadySelectedException e) {
-            System.out.println(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
+            logger.error(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
             displayHelp = true;
         } catch (ParseException e) {
             displayHelp = true;
         } catch (Exception e) {
-            error("A fatal error has occured : " + e.getMessage() + "\n Shutdown the shell.\n");
-            e.printStackTrace();
+            logger.error("A fatal error has occured : " + e.getMessage() + "\n Shutdown the shell.\n");
+            logger.error(e);
             System.exit(1);
         } finally {
             if (reader != null)
@@ -216,8 +219,10 @@ public class AdminShell {
         }
 
         if (displayHelp) {
-            System.out.println();
-            new HelpFormatter().printHelp("adminShell", options, true);
+            logger.info("");
+            HelpFormatter hf = new HelpFormatter();
+            hf.setWidth(120);
+            hf.printHelp("adminScheduler" + Tools.shellExtension(), options, true);
             System.exit(2);
         }
 
@@ -228,7 +233,7 @@ public class AdminShell {
     private static void handleCommand(String command) {
         if (command.equals("")) {
         } else if (command.equals(EXIT_CMD)) {
-            output("Shell will exit.\n");
+            logger.info("Shell will exit.");
             stopCommunicator = true;
         } else if (command.equals("?") || command.equals("help")) {
             helpScreen();
@@ -239,9 +244,9 @@ public class AdminShell {
                 boolean success = scheduler.start().booleanValue();
 
                 if (success) {
-                    output("Scheduler started.\n");
+                    logger.info("Scheduler started.");
                 } else {
-                    output("Start is impossible!!\n");
+                    logger.warn("Start is impossible!!");
                 }
             } catch (SchedulerException e) {
                 error("Start is impossible !!", e);
@@ -251,9 +256,9 @@ public class AdminShell {
                 boolean success = scheduler.stop().booleanValue();
 
                 if (success) {
-                    output("Scheduler stopped.\n");
+                    logger.info("Scheduler stopped.");
                 } else {
-                    output("Stop is impossible !!\n");
+                    logger.warn("Stop is impossible !!");
                 }
             } catch (SchedulerException e) {
                 error("Stop is impossible !!", e);
@@ -263,9 +268,9 @@ public class AdminShell {
                 boolean success = scheduler.pause().booleanValue();
 
                 if (success) {
-                    output("Scheduler paused.\n");
+                    logger.info("Scheduler paused.");
                 } else {
-                    output("Pause is impossible !!\n");
+                    logger.warn("Pause is impossible !!");
                 }
             } catch (SchedulerException e) {
                 error("Pause is impossible !!", e);
@@ -275,9 +280,9 @@ public class AdminShell {
                 boolean success = scheduler.freeze().booleanValue();
 
                 if (success) {
-                    output("Scheduler frozen.\n");
+                    logger.info("Scheduler frozen.");
                 } else {
-                    output("Freeze is impossible !!\n");
+                    logger.warn("Freeze is impossible !!");
                 }
             } catch (SchedulerException e) {
                 error("Freeze is impossible !!", e);
@@ -287,9 +292,9 @@ public class AdminShell {
                 boolean success = scheduler.resume().booleanValue();
 
                 if (success) {
-                    output("Scheduler resumed.\n");
+                    logger.info("Scheduler resumed.");
                 } else {
-                    output("Resume is impossible !!\n");
+                    logger.warn("Resume is impossible !!");
                 }
             } catch (SchedulerException e) {
                 error("Resume is impossible !!", e);
@@ -297,10 +302,11 @@ public class AdminShell {
         } else if (command.equals(SHUTDOWN_CMD)) {
             try {
                 if (scheduler.shutdown().booleanValue()) {
-                    output("Shutdown sequence initialized, it might take a while to finish all executions, shell will exit.\n");
+                    logger
+                            .info("Shutdown sequence initialized, it might take a while to finish all executions, shell will exit.");
                     stopCommunicator = true;
                 } else {
-                    output("Shutdown the scheduler is impossible for the moment.\n");
+                    logger.warn("Shutdown the scheduler is impossible for the moment.");
                 }
             } catch (SchedulerException e) {
                 error("Shutdown is impossible.", e);
@@ -308,10 +314,10 @@ public class AdminShell {
         } else if (command.equals(KILL_CMD)) {
             try {
                 if (scheduler.kill().booleanValue()) {
-                    output("Sheduler has just been killed, shell will exit.\n");
+                    logger.info("Sheduler has just been killed, shell will exit.");
                     stopCommunicator = true;
                 } else {
-                    output("killed the scheduler is impossible for the moment.\n");
+                    logger.warn("killed the scheduler is impossible for the moment.");
                 }
             } catch (SchedulerException e) {
                 error("kill is impossible !!", e);
@@ -321,9 +327,9 @@ public class AdminShell {
                 boolean success = scheduler.pause(JobIdImpl.makeJobId(command.split(" ")[1])).booleanValue();
 
                 if (success) {
-                    output("Job paused.\n");
+                    logger.info("Job paused.");
                 } else {
-                    output("Paused job is impossible !!\n");
+                    logger.warn("Paused job is impossible !!");
                 }
             } catch (SchedulerException e) {
                 error("Error while pausing this job !!", e);
@@ -333,9 +339,9 @@ public class AdminShell {
                 boolean success = scheduler.resume(JobIdImpl.makeJobId(command.split(" ")[1])).booleanValue();
 
                 if (success) {
-                    output("Job resumed.\n");
+                    logger.info("Job resumed.");
                 } else {
-                    output("Resume job is impossible !!\n");
+                    logger.warn("Resume job is impossible !!");
                 }
             } catch (SchedulerException e) {
                 error("Error while resuming this job !!", e);
@@ -345,9 +351,9 @@ public class AdminShell {
                 boolean success = scheduler.kill(JobIdImpl.makeJobId(command.split(" ")[1])).booleanValue();
 
                 if (success) {
-                    output("Job killed.\n");
+                    logger.info("Job killed.");
                 } else {
-                    output("Kill job is impossible !!\n");
+                    logger.warn("Kill job is impossible !!");
                 }
             } catch (SchedulerException e) {
                 error("Error while killing this job !!", e);
@@ -374,24 +380,22 @@ public class AdminShell {
                         JobResult result = scheduler.getJobResult(i + "");
 
                         if (result != null) {
-                            System.out.println("Job " + i + " Result => ");
+                            logger.info("Job " + i + " Result => ");
 
                             for (Entry<String, TaskResult> e : result.getAllResults().entrySet()) {
                                 TaskResult tRes = e.getValue();
 
                                 try {
-                                    System.out.println("\t " + e.getKey() + " : " + tRes.value());
+                                    logger.info("\t " + e.getKey() + " : " + tRes.value());
                                 } catch (Throwable e1) {
-                                    System.out.print("\t " + e.getKey() + " : ERROR - " +
-                                        tRes.getException().getMessage() + "\n");
-                                    tRes.getException().printStackTrace();
+                                    logger.error(tRes.getException());
                                 }
                             }
                         } else {
-                            System.out.println("Job " + i + " is not finished or unknown !");
+                            logger.info("Job " + i + " is not finished or unknown !");
                         }
                     } catch (SchedulerException e) {
-                        System.out.println("Error on job " + i + " : " + e.getMessage());
+                        logger.error("Error on job " + i + " : " + e.getMessage());
                     }
                 }
             } catch (Exception e) {
@@ -402,41 +406,45 @@ public class AdminShell {
             try {
                 Job job = JobFactory.getFactory().createJob(url);
                 scheduler.submit(job);
-                output("Job successfully submitted !\n");
+                logger.info("Job successfully submitted !");
             } catch (Exception e) {
-                output("Error on job Submission (url=" + url + ")" + " : " + e.getMessage() + "\n");
+                logger.error("Error on job Submission (url=" + url + ")" + " : " + e.getMessage());
             }
         } else if (command.startsWith(RECONNECT_RM_CMD)) {
             try {
                 String rmurl = command.replaceFirst(RECONNECT_RM_CMD, "");
                 boolean success = scheduler.linkResourceManager(rmurl.trim()).booleanValue();
                 if (success) {
-                    output("The new Resource Manager has been rebind to the scheduler at " + rmurl + ".\n");
+                    logger
+                            .info("The new Resource Manager has been rebind to the scheduler at " + rmurl +
+                                ".");
                 } else {
-                    output("Reconnect a Resource Manager is possible only when RM is dead !\n");
+                    logger.error("Reconnect a Resource Manager is only possible when RM is dead !");
                 }
             } catch (Exception e) {
                 error("Cannot join the new RM !", e);
             }
         } else {
-            error("UNKNOWN COMMAND : Please type '?' or 'help' to see the list of commands\n");
+            logger.warn("UNKNOWN COMMAND : Please type '?' or 'help' to see the list of commands");
         }
     }
 
     private static void startCommandListener() throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
+        System.out.print("type command here (type '?' or 'help' to see the list of commands)");
+
         while (!stopCommunicator) {
-            output(" > ");
+            System.out.print(" > ");
 
             String line = reader.readLine();
 
             try {
                 handleCommand(line);
             } catch (NumberFormatException e) {
-                error("Id error !!\n", e);
+                error("Id error !!", e);
             } catch (Exception e) {
-                error("Command error ! plz check your last command !\n");
+                logger.error("Command error ! plz check your last command !");
             }
         }
     }
@@ -450,7 +458,7 @@ public class AdminShell {
                 out += (e.getKey() + " : " + e.getValue() + "\n");
             }
 
-            output(out + "\n");
+            logger.info(out);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
@@ -482,6 +490,6 @@ public class AdminShell {
                 RECONNECT_RM_CMD));
         out.append(String.format(" %1$-18s\t Exits Shell\n", EXIT_CMD));
 
-        output(out.toString());
+        logger.info(out.toString());
     }
 }
