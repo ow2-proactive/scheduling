@@ -109,8 +109,8 @@ public class UserScheduler implements UserSchedulerInterface {
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, org.ow2.proactive.scheduler.common.SchedulerEvent[])
      */
-    public SchedulerInitialState<? extends Job> addSchedulerEventListener(
-            SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
+    public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener sel,
+            SchedulerEvent... events) throws SchedulerException {
         return schedulerFrontend.addSchedulerEventListener(sel, events);
     }
 

@@ -281,4 +281,12 @@ public class TaskEventImpl implements TaskEvent {
         numberOfExecutionOnFailureLeft--;
     }
 
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + taskId + "]";
+    }
+
 }

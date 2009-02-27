@@ -49,7 +49,7 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
  * @param <E> The job is used in the event that can either be an {@link InternalJob} for administrator or {@link Job} for a user.
  */
 @PublicAPI
-public interface SchedulerEventListener<E extends Job> extends Serializable {
+public interface SchedulerEventListener extends Serializable {
 
     /**
      * Invoked when the scheduler has just been started.
@@ -113,7 +113,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      *
      * @param job the new job to schedule.
      */
-    public void jobSubmittedEvent(E job);
+    public void jobSubmittedEvent(Job job);
 
     /**
      * Invoked when the scheduling of a job has just started.<br>

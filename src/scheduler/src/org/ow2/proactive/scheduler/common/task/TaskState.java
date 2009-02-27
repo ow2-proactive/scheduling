@@ -86,11 +86,8 @@ public enum TaskState implements java.io.Serializable {
      */
     NOT_RESTARTED("Could not restart"),
     /**
-     * The task has been canceled.
-     */
-    CANCELED("Canceled"),
-    /**
-     * The task has been aborted by an exception on an other task. (job is cancelOnError)
+     * The task has been aborted by an exception on an other task. (job is cancelOnError=true)
+     * Can be also in this state if the job is killed while the concerned task was running.
      */
     ABORTED("Aborted"),
     /**

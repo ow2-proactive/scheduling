@@ -105,7 +105,7 @@ public class TaskComposite extends Composite {
     public static final String COLUMN_HOST_NAME_TITLE = "Host name";
 
     /** the canceled tasks background color */
-    public static final Color TASKS_CANCELED_BACKGROUND_COLOR = Colors.ORANGE;
+    public static final Color TASKS_FAULTY_BACKGROUND_COLOR = Colors.ORANGE;
 
     /** the failed tasks background color */
     public static final Color TASKS_FAILED_BACKGROUND_COLOR = Colors.RED;
@@ -462,15 +462,16 @@ public class TaskComposite extends Composite {
                     setFont = true;
                     item.setForeground(TASKS_ABORTED_BACKGROUND_COLOR);
                     break;
-                case CANCELED:
+                case FAULTY:
                     setFont = true;
-                    item.setForeground(TASKS_CANCELED_BACKGROUND_COLOR);
+                    item.setForeground(TASKS_FAULTY_BACKGROUND_COLOR);
                     break;
                 case FAILED:
                     setFont = true;
                     item.setForeground(TASKS_FAILED_BACKGROUND_COLOR);
                     break;
                 case NOT_STARTED:
+                case NOT_RESTARTED:
                     setFont = true;
                     item.setForeground(TASKS_NOT_STARTED_BACKGROUND_COLOR);
                     break;

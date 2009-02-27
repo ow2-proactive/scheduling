@@ -264,19 +264,17 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @return true if a taskClassServer has been removed, false otherwise.
      */
     private static boolean removeTaskClassServer(JobId jid) {
-        logger_dev.info("Removing taskClassServer for Job '" + jid + "'");
+        logger_dev.info("Removing TaskClassServer for Job '" + jid + "'");
         // desactivate tcs
         TaskClassServer tcs = classServers.remove(jid);
         if (tcs != null) {
-            logger_dev.info("Desactivate taskClassServer for Job '" + jid + "'");
             tcs.desactivate();
         }
         // unexport remote object
-        logger_dev.info("Removing remote ClassServer for Job '" + jid + "'");
         RemoteObjectExposer<TaskClassServer> roe = remoteClassServers.remove(jid);
         if (roe != null) {
             try {
-                logger_dev.info("Unregister all (related to Job '" + jid + "'");
+                logger_dev.info("Unregister remote TaskClassServer for Job '" + jid + "'");
                 roe.unregisterAll();
             } catch (ProActiveException e) {
                 logger.error("Unable to unregister remote taskClassServer because : " + e);
@@ -326,7 +324,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             host = ProActiveInet.getInstance().getInetAddress().getHostName();
 
             try {
-                logger_dev.info("Create Simple logger server");
+                logger_dev.info("Create logger server on port " + this.port);
                 // redirect event only into JobLogs
                 SimpleLoggerServer slf = SimpleLoggerServer.createLoggerServer();
                 this.port = slf.getPort();
@@ -358,7 +356,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * Create the pinger thread to detect unActivity on nodes.
      */
     private void createPingThread() {
-        logger_dev.debug("Creating thread that will ping down node");
+        logger_dev.debug("Creating nodes pinging thread");
         pinger = new Thread() {
             @Override
             public void run() {
@@ -376,7 +374,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             }
         };
-        logger_dev.info("Starting thread that will ping down node (ping frequency is : " +
+        logger_dev.info("Starting nodes pinging thread (ping frequency is : " +
             SCHEDULER_NODE_PING_FREQUENCY + "ms )");
         pinger.start();
     }
@@ -558,8 +556,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //ask the policy all the tasks to be schedule according to the jobs list.
         Vector<EligibleTaskDescriptor> taskRetrivedFromPolicy = policy.getOrderedTasks(jobDescriptorList);
 
-        if (taskRetrivedFromPolicy == null) {
-            logger_dev.info("No task to schedule");
+        if (taskRetrivedFromPolicy == null || taskRetrivedFromPolicy.size() == 0) {
             return;
         }
 
@@ -903,8 +900,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private void endJob(InternalJob job, InternalTask task, String errorMsg, JobState jobState) {
         TaskResult taskResult = null;
 
-        logger_dev.info("Job ending request for job '" + job.getId() + "' - cause by task '" + task.getId() +
-            "' - state : " + jobState);
+        if (task != null) {
+            logger_dev.info("Job ending request for job '" + job.getId() + "' - cause by task '" +
+                task.getId() + "' - state : " + jobState);
+        } else {
+            logger_dev.info("Job ending request for job '" + job.getId() + "' - state : " + jobState);
+        }
 
         for (InternalTask td : job.getTasks()) {
             if (td.getStatus() == TaskState.RUNNING) {
@@ -1235,13 +1236,21 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      *
      * @return the scheduler current state with the pending, running, finished jobs list.
      */
-    public SchedulerInitialState<? extends Job> getSchedulerInitialState() {
-        SchedulerInitialState<InternalJob> sState = new SchedulerInitialState<InternalJob>();
-        sState.setPendingJobs(pendingJobs);
-        sState.setRunningJobs(runningJobs);
-        sState.setFinishedJobs(finishedJobs);
+    public SchedulerInitialState getSchedulerInitialState() {
+        SchedulerInitialStateImpl sState = new SchedulerInitialStateImpl();
+        sState.setPendingJobs(convert(pendingJobs));
+        sState.setRunningJobs(convert(runningJobs));
+        sState.setFinishedJobs(convert(finishedJobs));
         sState.setState(state);
         return sState;
+    }
+
+    private Vector<Job> convert(Vector<InternalJob> jobs) {
+        Vector<Job> jobs2 = new Vector<Job>();
+        for (Job j : jobs) {
+            jobs2.add(j);
+        }
+        return jobs2;
     }
 
     /**
@@ -1996,7 +2005,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             if (onlyFinished) {
                 switch (task.getStatus()) {
                     case ABORTED:
-                    case CANCELED:
                     case FAILED:
                     case FINISHED:
                     case FAULTY:

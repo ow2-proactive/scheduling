@@ -39,120 +39,48 @@ import org.ow2.proactive.scheduler.common.job.Job;
 
 
 /**
- * This class is a representation of the whole scheduler initial jobs list state.<br>
+ * This interface is a representation of the whole scheduler initial jobs list state.<br>
  * It is basically represented by 3 lists of jobs, and its scheduling state.
  *
  * @author The ProActive Team
- * @param <E> The way a job can be viewed inside the initial state. Can be every type overriding {@link Job}.
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public final class SchedulerInitialState<E extends Job> implements Serializable {
-
-    /** Pending jobs */
-    private Vector<E> pendingJobs = new Vector<E>();
-
-    /** Running jobs */
-    private Vector<E> runningJobs = new Vector<E>();
-
-    /** Finished jobs */
-    private Vector<E> finishedJobs = new Vector<E>();
-
-    /** Scheduler state */
-    private SchedulerState state = SchedulerState.STOPPED;
-
-    /** List of connected user. */
-    private SchedulerUsers sUsers;
+public interface SchedulerInitialState extends Serializable {
 
     /**
-     * ProActive Empty constructor.
-     */
-    public SchedulerInitialState() {
-    }
-
-    /**
-     * To get the finishedJobs
+     * Get the finished Jobs list
      *
-     * @return the finishedJobs
+     * @return the finished Jobs list
      */
-    public Vector<E> getFinishedJobs() {
-        return finishedJobs;
-    }
+    public Vector<Job> getFinishedJobs();
 
     /**
-     * To set the finishedJobs
+     * Get the pending Jobs list
      *
-     * @param finishedJobs the finishedJobs to set
+     * @return the pending Jobs list
      */
-    public void setFinishedJobs(Vector<E> finishedJobs) {
-        this.finishedJobs = finishedJobs;
-    }
+    public Vector<Job> getPendingJobs();
 
     /**
-     * To get the pendingJobs
+     * Get the running Jobs list
      *
-     * @return the pendingJobs
+     * @return the running Jobs list
      */
-    public Vector<E> getPendingJobs() {
-        return pendingJobs;
-    }
+    public Vector<Job> getRunningJobs();
 
     /**
-     * To set the pendingJobs
+     * Get the state of the scheduler
      *
-     * @param pendingJobs the pendingJobs to set
+     * @return the state of the scheduler
      */
-    public void setPendingJobs(Vector<E> pendingJobs) {
-        this.pendingJobs = pendingJobs;
-    }
-
-    /**
-     * To get the runningJobs
-     *
-     * @return the runningJobs
-     */
-    public Vector<E> getRunningJobs() {
-        return runningJobs;
-    }
-
-    /**
-     * To set the runningJobs
-     *
-     * @param runningJobs the runningJobs to set
-     */
-    public void setRunningJobs(Vector<E> runningJobs) {
-        this.runningJobs = runningJobs;
-    }
-
-    /**
-     * @return the state
-     */
-    public SchedulerState getState() {
-        return state;
-    }
-
-    /**
-     * @param state the state to set
-     */
-    public void setState(SchedulerState state) {
-        this.state = state;
-    }
+    public SchedulerState getState();
 
     /**
      * Returns the list of connected users.
      *
      * @return the list of connected users.
      */
-    public SchedulerUsers getUsers() {
-        return sUsers;
-    }
+    public SchedulerUsers getUsers();
 
-    /**
-     * Sets the list of connected users to the given users value.
-     *
-     * @param users the list of connected users to set.
-     */
-    public void setUsers(SchedulerUsers users) {
-        sUsers = users;
-    }
 }

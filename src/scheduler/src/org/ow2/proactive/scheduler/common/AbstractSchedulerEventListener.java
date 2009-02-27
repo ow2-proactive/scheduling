@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
  * @since ProActive Scheduling 0.9.1
  */
 @PublicAPI
-public class AbstractSchedulerEventListener implements SchedulerEventListener<Job> {
+public class AbstractSchedulerEventListener implements SchedulerEventListener {
 
     public void jobChangePriorityEvent(JobEvent event) {
     }

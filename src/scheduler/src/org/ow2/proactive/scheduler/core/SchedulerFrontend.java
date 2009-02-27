@@ -89,8 +89,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerFrontend implements InitActive, SchedulerEventListener<InternalJob>,
-        AdminSchedulerInterface {
+public class SchedulerFrontend implements InitActive, SchedulerEventListener, AdminSchedulerInterface {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
@@ -124,7 +123,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     private Map<JobId, IdentifiedJob> jobs;
 
     /** scheduler listeners */
-    private Map<UniqueID, SchedulerEventListener<? extends Job>> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener<? extends Job>>();
+    private Map<UniqueID, SchedulerEventListener> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener>();
 
     /** Scheduler's statistics */
     private StatsImpl stats = new StatsImpl(SchedulerState.STARTED);
@@ -314,7 +313,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         stats.submitTime();
         jobSubmittedEvent(job);
         logger.info("New job submitted '" + job.getId() + "' containing " + job.getTotalNumberOfTasks() +
-            " tasks");
+            " tasks (owner is '" + job.getOwner() + "')");
         return job.getId();
     }
 
@@ -462,8 +461,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, org.ow2.proactive.scheduler.common.SchedulerEvent[])
      */
-    public SchedulerInitialState<? extends Job> addSchedulerEventListener(
-            SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
+    public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener sel,
+            SchedulerEvent... events) throws SchedulerException {
 
         // first check if the listener is a reified remote object
         if (!MOP.isReifiedObject(sel)) {
@@ -490,7 +489,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         //add the listener to the list of listener for this user.
         schedulerListeners.put(id, sel);
         //get the initialState
-        SchedulerInitialState<? extends Job> initState = scheduler.getSchedulerInitialState();
+        SchedulerInitialStateImpl initState = (SchedulerInitialStateImpl) scheduler
+                .getSchedulerInitialState();
         //and update the connected users list.
         initState.setUsers(connectedUsers);
         //return to the user
@@ -839,7 +839,11 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     private void dispatch(SchedulerEvent methodName, Class<?>[] types, Object... params) {
         try {
-            logger_dev.info("Dispatch event '" + methodName + "'");
+            if (logger_dev.isDebugEnabled()) {
+                if (params != null && params.length > 0) {
+                    logger_dev.debug("Dispatch event '" + methodName + "' - parameter : " + params[0]);
+                }
+            }
 
             Method method = SchedulerEventListener.class.getMethod(methodName.toString(), types);
             Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
@@ -945,7 +949,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.Job)
      * @param job The job that have just be submitted.
      */
-    public void jobSubmittedEvent(InternalJob job) {
+    public void jobSubmittedEvent(Job job) {
         dispatch(SchedulerEvent.JOB_SUBMITTED, new Class<?>[] { Job.class }, job);
     }
 

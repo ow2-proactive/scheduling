@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -73,7 +74,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class JobsController implements SchedulerEventListener<InternalJob> {
+public class JobsController implements SchedulerEventListener {
     // The shared instance view as a direct reference
     private static JobsController localView = null;
 
@@ -249,13 +250,13 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#newPendingJobEvent
      * (org.objectweb.proactive.extra.scheduler.job.Job)
      */
-    public void jobSubmittedEvent(InternalJob job) {
+    public void jobSubmittedEvent(Job job) {
         // add job to the global jobs map
-        jobs.put(job.getId(), job);
+        jobs.put(job.getId(), (InternalJob) job);
 
         // add job to the pending jobs list
         if (!pendingJobsIds.add(job.getId())) {
-            throw new IllegalStateException("can't add the job (id = " + job.getJobInfo() +
+            throw new IllegalStateException("can't add the job (id = " + ((InternalJob) job).getJobInfo() +
                 ") from the pendingJobsIds list !");
         }
 
@@ -966,7 +967,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @return true only if no error caught, for synchronous call.
      */
     public boolean init() {
-        SchedulerInitialState<InternalJob> state = null;
+        SchedulerInitialState state = null;
         state = SchedulerProxy.getInstance().addSchedulerEventListener(
                 ((SchedulerEventListener) PAActiveObject.getStubOnThis()));
 
@@ -1002,19 +1003,19 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         runningJobsIds = new Vector<JobId>();
         finishedJobsIds = new Vector<JobId>();
 
-        Vector<InternalJob> tmp = state.getPendingJobs();
+        Vector<InternalJob> tmp = convert(state.getPendingJobs());
         for (InternalJob job : tmp) {
             jobs.put(job.getId(), job);
             pendingJobsIds.add(job.getId());
         }
 
-        tmp = state.getRunningJobs();
+        tmp = convert(state.getRunningJobs());
         for (InternalJob job : tmp) {
             jobs.put(job.getId(), job);
             runningJobsIds.add(job.getId());
         }
 
-        tmp = state.getFinishedJobs();
+        tmp = convert(state.getFinishedJobs());
         for (InternalJob job : tmp) {
             jobs.put(job.getId(), job);
             finishedJobsIds.add(job.getId());
@@ -1025,6 +1026,14 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         // for synchronous call
         return true;
+    }
+
+    private Vector<InternalJob> convert(Vector<Job> jobs) {
+        Vector<InternalJob> jobs2 = new Vector<InternalJob>();
+        for (Job j : jobs) {
+            jobs2.add((InternalJob) j);
+        }
+        return jobs2;
     }
 
     public static JobsController getLocalView() {

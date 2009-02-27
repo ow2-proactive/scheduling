@@ -31,15 +31,23 @@
  */
 package org.ow2.proactive.scheduler.util.classloading;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+
+
 /**
- * This classloader is used on nodes provided by the resource manager to instanciate
+ * This classLoader is used on nodes provided by the resource manager to instantiate
  * the executable. If a class is not found locally, then this class is asked to the
  * taskClassCerver associated to this TaskClassLoader.
+ *
  * @see TaskClassServer 
  * @author The ProActive team 
  *
  */
 public class TaskClassLoader extends ClassLoader {
+
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /** The associated classserver on the scheduler core side */
     // Can be null if no classpath has been set for the job
@@ -66,21 +74,27 @@ public class TaskClassLoader extends ClassLoader {
      * @see java.lang.ClassLoader#findClass(java.lang.String)
      */
     public Class<?> findClass(String className) throws ClassNotFoundException {
+        logger_dev.debug("Looking for class " + className);
         Class<?> res = null;
         // try parent
         try {
             res = this.getParent().loadClass(className);
+            logger_dev.debug("Found class " + className + " locally");
         } catch (ClassNotFoundException e) {
             if (remoteServer != null) {
                 // tries remote TaskClassServer...
+                logger_dev.debug("Ask for class " + className + " to the remote TaskClassServer");
                 byte[] classBytes = this.remoteServer.getClassBytes(className);
                 if (classBytes == null || classBytes.length == 0) {
+                    logger_dev.debug("Did not find " + className);
                     throw new ClassNotFoundException(className);
                 } else {
+                    logger_dev.debug("Found " + className);
                     res = this.defineClass(className, classBytes, 0, classBytes.length);
                 }
             } else {
                 // no remote classserver available...
+                logger_dev.debug("No TaskClassServer found when looking for " + className);
                 throw e;
             }
         }

@@ -378,4 +378,12 @@ public class JobEventImpl implements JobEvent {
         this.toBeRemoved = true;
     }
 
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + jobId + "]";
+    }
+
 }

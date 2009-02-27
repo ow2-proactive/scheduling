@@ -1,0 +1,30 @@
+# This file represents the log4j config file for Scheduler and Resource Manager (user side).
+# It is given as property in the env.sh or init.bat script
+
+# The default logging level is INFO
+# The root logger logs in NULL
+
+log4j.rootLogger=INFO,NULL
+
+# avoid displaying additivity of the inherit loggers
+log4j.additivity.proactive.scheduler=false
+log4j.additivity.proactive.scheduler.dev=false
+log4j.additivity.proactive.scheduler.dev.admin=true
+# define SCHEDULER loggers
+log4j.logger.proactive.scheduler.dev=INFO,NULL
+log4j.logger.proactive.scheduler.dev.admin=INFO,NULL
+log4j.logger.proactive.scheduler.dev.admin.consol=INFO,CONSOLE
+
+# avoid displaying additivity of the inherit loggers
+log4j.additivity.proactive.resourceManager=false
+# define RESOURCE MANAGER loggers
+log4j.logger.proactive.resourceManager=INFO,NULL
+
+# Hibernate logger
+log4j.additivity.org.hibernate=false
+log4j.logger.org.hibernate=INFO,NULL
+
+# CONSOLE uses PatternLayout
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=%m%n

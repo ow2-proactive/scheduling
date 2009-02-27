@@ -207,7 +207,7 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public String toString() {
         String a = admin ? "(admin)" : "";
-        return username + a;
+        return getClass().getName() + "[" + username + a + "]";
     }
 
 }

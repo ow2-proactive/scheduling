@@ -219,7 +219,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             throw new FailedLoginException("Groups hierarchy not found");
         }
 
-        logger.info("authentication succeeded");
+        logger.info("authentication succeeded for user '"+username+"' in group '"+group+"'");
         succeeded = true;
         return true;
     }

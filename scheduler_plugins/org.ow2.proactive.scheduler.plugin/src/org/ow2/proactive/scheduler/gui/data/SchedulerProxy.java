@@ -58,7 +58,6 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -92,10 +91,10 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
      */
-    public SchedulerInitialState<InternalJob> addSchedulerEventListener(
-            SchedulerEventListener<? extends Job> listener, SchedulerEvent... events) {
+    public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener listener,
+            SchedulerEvent... events) {
         try {
-            return (SchedulerInitialState<InternalJob>) scheduler.addSchedulerEventListener(listener, events);
+            return (SchedulerInitialState) scheduler.addSchedulerEventListener(listener, events);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
