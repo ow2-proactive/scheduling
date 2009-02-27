@@ -42,6 +42,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
@@ -489,8 +490,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         //add the listener to the list of listener for this user.
         schedulerListeners.put(id, sel);
         //get the initialState
-        SchedulerInitialStateImpl initState = (SchedulerInitialStateImpl) scheduler
-                .getSchedulerInitialState();
+        SchedulerInitialStateImpl initState = (SchedulerInitialStateImpl) (PAFuture.getFutureValue(scheduler
+                .getSchedulerInitialState()));
         //and update the connected users list.
         initState.setUsers(connectedUsers);
         //return to the user
