@@ -41,8 +41,8 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.api.PAActiveObject;
 
 /**
- *
  * An active object responsible for authentication.
+ *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
@@ -76,7 +76,7 @@ public abstract class AuthenticationImpl implements Authentication {
     protected void loginAs(String role, String[] groups, String username, String password) throws LoginException {
 
 		if (activated == false) {
-	            throw new LoginException("Authentication active object is not activated.");
+	        throw new LoginException("Authentication active object is not activated.");
 		}
 
         if (username == null | username.equals("")) {
@@ -131,7 +131,6 @@ public abstract class AuthenticationImpl implements Authentication {
     public boolean terminate() {
         PAActiveObject.terminateActiveObject(false);
         getLogger().info("Authentication service is now shutdown!");
-
         return true;
     }
 }

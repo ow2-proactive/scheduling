@@ -33,16 +33,19 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -54,6 +57,8 @@ import org.ow2.proactive.utils.NodeSet;
  * @since ProActive Scheduling 0.9
  */
 public class ProActiveTaskLauncher extends TaskLauncher {
+
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
     /** execution nodes list */
     private NodeSet nodesList;
@@ -113,7 +118,6 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * @param nodes the nodes that the user needs to run his ProActive task.
      * @return a task result representing the result of this task execution.
      */
-    @SuppressWarnings("unchecked")
     public TaskResult doTask(TaskTerminateNotification core, JavaExecutableContainer executableContainer,
             NodeSet nodes) {
         nodesList = nodes;
@@ -121,6 +125,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
         try {
             nodesList.add(super.getNodes().get(0));
         } catch (NodeException e) {
+            logger_dev.error(e);
         }
 
         try {
@@ -134,10 +139,12 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             }
 
             //init task
+            logger_dev.info("Initialize executable");
             currentExecutable.init();
 
-            if (isWallTime())
+            if (isWallTime()) {
                 scheduleTimer();
+            }
 
             //launch task
             Serializable userResult = ((ProActiveExecutable) currentExecutable).execute(nodes);
@@ -151,6 +158,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             //return result
             return new TaskResultImpl(taskId, userResult, this.getLogs());
         } catch (Throwable ex) {
+            logger_dev.info(ex);
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
@@ -162,8 +170,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             } catch (RuntimeException e) {
                 // exception should not be thrown to the scheduler core
                 // the result has been computed and must be returned !
-                // TODO : logger.warn
-                System.err.println("WARNING : Loggers are not shut down !");
+                logger_dev.warn("Loggers are not shut down !", e);
             }
 
             //terminate the task

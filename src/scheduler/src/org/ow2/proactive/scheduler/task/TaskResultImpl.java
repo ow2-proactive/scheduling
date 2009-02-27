@@ -48,6 +48,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.swing.JPanel;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
@@ -58,6 +59,7 @@ import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
@@ -67,6 +69,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -83,6 +86,8 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleText
 @AccessType("field")
 @Proxy(lazy = false)
 public class TaskResultImpl implements TaskResult {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -153,8 +158,7 @@ public class TaskResultImpl implements TaskResult {
         try {
             this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
         } catch (IOException e) {
-            // TODO cdelbe : exception ?
-            e.printStackTrace();
+            logger_dev.error(e);
         }
         this.output = output;
     }
@@ -172,8 +176,7 @@ public class TaskResultImpl implements TaskResult {
         try {
             this.serializedException = ObjectToByteConverter.ObjectStream.convert(exception);
         } catch (IOException e) {
-            // TODO cdelbe : exception ?
-            e.printStackTrace();
+            logger_dev.error(e);
         }
         this.output = output;
     }
@@ -210,11 +213,11 @@ public class TaskResultImpl implements TaskResult {
             try {
                 return this.instanciateValue(this.getTaskClassLoader());
             } catch (IOException e) {
-                e.printStackTrace();
+                logger_dev.error(e);
                 throw new SchedulerException("Cannot instanciate result of the task " + this.id + " : " +
                     e.getMessage());
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                logger_dev.error(e);
                 throw new SchedulerException("Cannot instanciate result of the task " + this.id + " : " +
                     e.getMessage());
             }

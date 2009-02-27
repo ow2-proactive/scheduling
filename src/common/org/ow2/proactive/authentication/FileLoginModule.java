@@ -139,10 +139,10 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             params.clear();
             ((NoCallback) callbacks[0]).clear();
         } catch (java.io.IOException ioe) {
-            ioe.printStackTrace();
+            logger.error(ioe);
             throw new LoginException(ioe.toString());
         } catch (UnsupportedCallbackException uce) {
-            uce.printStackTrace();
+		logger.error(uce);
             throw new LoginException("Error: " + uce.getCallback().toString() +
                 " not available to garner authentication information from the user");
 
@@ -215,7 +215,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                 throw new FailedLoginException("User group not matching");
             }
         } catch (GroupException e) {
-            e.printStackTrace();
+		logger.error(e);
             throw new FailedLoginException("Groups hierarchy not found");
         }
 

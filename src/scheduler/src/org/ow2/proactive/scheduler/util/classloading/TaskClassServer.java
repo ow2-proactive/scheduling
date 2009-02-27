@@ -33,7 +33,6 @@ package org.ow2.proactive.scheduler.util.classloading;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -44,9 +43,12 @@ import java.util.jar.JarFile;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -58,6 +60,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * @since ProActive Scheduling 0.9
  */
 public class TaskClassServer {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     // temp directory for unjaring classpath : if not defined, java.io.tmpdir is used.
     private static final String tmpTmpJarFilesDir = PASchedulerProperties.SCHEDULER_CLASSSERVER_TMPDIR
@@ -141,6 +144,7 @@ public class TaskClassServer {
                     reuseExistingFiles = false;
                 }
             } catch (Exception e) {
+                logger_dev.warn(e);
                 // if any exception occurs, cancel 
                 reuseExistingFiles = false;
             }
@@ -215,6 +219,7 @@ public class TaskClassServer {
                     this.cachedClasses.put(classname, cb);
                 }
             } catch (IOException e) {
+                logger_dev.error(e);
                 throw new ClassNotFoundException("Class " + classname + " has not be found in " +
                     classpath.getAbsolutePath() + ". Caused by " + e);
             }
@@ -302,6 +307,7 @@ public class TaskClassServer {
     /**
      * Convert the path to a class into a qualified classname.
      */
+    @SuppressWarnings("unused")
     private String convertPathToName(String path) {
         return path.replace('/', '.').substring(0, path.length() - ".class".length());
     }

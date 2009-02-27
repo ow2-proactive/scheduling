@@ -77,6 +77,7 @@ import org.ow2.proactive.scheduler.job.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -93,6 +94,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
@@ -150,9 +152,10 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName)
             throws ActiveObjectCreationException, NodeException {
-        logger.debug("Creating scheduler core...");
+        logger_dev.info("Creating scheduler Front-end...");
         resourceManager = imp;
         policyFullName = policyFullClassName;
+        logger_dev.debug("Policy used is " + policyFullClassName);
         jobs = new HashMap<JobId, IdentifiedJob>();
     }
 
@@ -163,30 +166,27 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         try {
             body.setImmediateService("getTaskResult");
             body.setImmediateService("getJobResult");
+            logger_dev.debug("Front-end immediate services : getTaskResult,getJobResult");
             //scheduler URL
             String schedulerUrl = "//" + NodeFactory.getDefaultNode().getVMInformation().getHostName() + "/" +
                 SchedulerConstants.SCHEDULER_DEFAULT_NAME;
             //creating scheduler authentication
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
-            logger.info("Creating scheduler authentication interface...");
+            logger_dev.info("Creating scheduler authentication interface...");
             SchedulerAuthentication schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(
                     SchedulerAuthentication.class.getName(), new Object[] { PAActiveObject.getStubOnThis() });
             //creating scheduler core
+            logger_dev.info("Creating scheduler core...");
             SchedulerCore scheduler_local = new SchedulerCore(resourceManager,
                 (SchedulerFrontend) PAActiveObject.getStubOnThis(), policyFullName, currentJobToSubmit);
             scheduler = (SchedulerCore) PAActiveObject.turnActive(scheduler_local);
 
-            //            scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
-            //                    resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
-            logger.debug("Scheduler successfully created on " +
-                PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
-            logger.info("Registering scheduler...");
+            logger_dev.info("Registering scheduler...");
             PAActiveObject.register(schedulerAuth, schedulerUrl);
-            // run forest run !!
-            logger.info("Scheduler Created on " + schedulerUrl);
+            // run !!
         } catch (Exception e) {
-            e.printStackTrace();
+            logger_dev.error(e);
             System.exit(1);
         }
     }
@@ -201,6 +201,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * Connect the scheduler front-end to the scheduler authentication.
      */
     public void connect() {
+        logger_dev.info(" ");//just trace method name
         authentication = (SchedulerAuthentication) PAActiveObject.getContext().getStubOnCaller();
     }
 
@@ -212,6 +213,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      * @param jobList the jobList that may appear in this front-end.
      */
     public void recover(Map<JobId, InternalJob> jobList) {
+        logger_dev.info("job list : " + jobList);
         if (jobList != null) {
             for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
                 UserIdentificationImpl uIdent = new UserIdentificationImpl(e.getValue().getOwner());
@@ -243,10 +245,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification)
             throws SchedulerException {
         if (identifications.containsKey(sourceBodyID)) {
-            logger.warn("Active object already connected !");
+            logger.warn("Active object already connected for this user :" + identification.getUsername());
             throw new SchedulerException("This active object is already connected to the scheduler !");
         }
-
         logger.info(identification.getUsername() + " successfully connected !");
         identifications.put(sourceBodyID, identification);
     }
@@ -257,29 +258,38 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     public JobId submit(Job userJob) throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
+        logger_dev.info("New job submission requested : " + userJob.getName());
+
         if (!identifications.containsKey(id)) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
 
         //check if the scheduler is stopped
         if (!scheduler.isSubmitPossible()) {
-            throw new SchedulerException("Scheduler is stopped, cannot submit job !!");
+            String msg = "Scheduler is stopped, cannot submit job";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
         //get the internal job.
         InternalJob job = InternalJobFactory.createJob(userJob);
         //setting job informations
         if (job.getTasks().size() == 0) {
-            throw new SchedulerException(
-                "This job does not contain Tasks !! Insert tasks before submitting job.");
+            String msg = "This job does not contain Tasks !! Insert tasks before submitting job";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         //verifying that the user has right to set the given priority to his job. 
         if (!identifications.get(id).isAdmin()) {
             if ((job.getPriority().getPriority() > 3) || (job.getPriority() == JobPriority.IDLE)) {
-                throw new SchedulerException("Only the administrator can submit a job with such priority : " +
-                    job.getPriority());
+                String msg = "Only the administrator can submit a job with such priority : " +
+                    job.getPriority();
+                logger_dev.info(msg);
+                throw new SchedulerException(msg);
             }
         }
+        logger_dev.info("Preparing and settings job submission");
         UserIdentificationImpl ident = identifications.get(id);
         //setting the job properties
         job.setId(JobIdImpl.nextId(job.getName()));
@@ -290,7 +300,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         job.setJobDescriptor(new JobDescriptorImpl(job));
         //put the job inside the frontend management list
         jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
-        //scheduler.submit(job);
+        //statically reference the job to submit
         currentJobToSubmit.setJob(job);
         scheduler.submit();
         //increase number of submit for this user
@@ -303,8 +313,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         stats.increaseSubmittedJobCount(job.getType());
         stats.submitTime();
         jobSubmittedEvent(job);
-        logger.info("New job submitted (" + job.getName() + ") containing " + job.getTotalNumberOfTasks() +
-            " tasks !");
+        logger.info("New job submitted '" + job.getId() + "' containing " + job.getTotalNumberOfTasks() +
+            " tasks");
         return job.getId();
     }
 
@@ -316,20 +326,26 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
 
         IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            throw new SchedulerException("The job represented by this ID is unknow !");
+            String msg = "The job represented by this ID is unknow !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         if (!ij.hasRight(identifications.get(id))) {
-            throw new SchedulerException("You do not have permission to access this job !");
+            String msg = "You do not have permission to access this job !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         if (!ij.isFinished()) {
+            logger_dev.info("Job '" + jobId + "' is not finished");
             return null;
         }
 
@@ -354,17 +370,22 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
 
         IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            throw new SchedulerException("The job represented by this ID is unknow !");
+            String msg = "The job represented by this ID is unknow !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         if (!ij.hasRight(identifications.get(id))) {
-            throw new SchedulerException("You do not have permission to access this job !");
+            String msg = "You do not have permission to access this job !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         //asking the scheduler for the result
@@ -388,17 +409,22 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
 
         IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            throw new SchedulerException("The job represented by this ID is unknow !");
+            String msg = "The job represented by this ID is unknow !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         if (!ij.hasRight(identifications.get(id))) {
-            throw new SchedulerException("You do not have permission to remove this job !");
+            String msg = "You do not have permission to remove this job !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         //asking the scheduler for the result
@@ -412,17 +438,22 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
 
         IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            throw new SchedulerException("The job represented by this ID is unknow !");
+            String msg = "The job represented by this ID is unknow !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         if (!ij.hasRight(identifications.get(id))) {
-            throw new SchedulerException("You do not have permission to listen the log of this job !");
+            String msg = "You do not have permission to listen the log of this job !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         scheduler.listenLog(jobId, hostname, port);
@@ -436,7 +467,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
 
         // first check if the listener is a reified remote object
         if (!MOP.isReifiedObject(sel)) {
-            throw new SchedulerException("Scheduler listener must be a remote object !");
+            String msg = "Scheduler listener must be a remote object !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
@@ -444,6 +477,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         UserIdentificationImpl uIdent = identifications.get(id);
 
         if (uIdent == null) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
 
@@ -469,6 +503,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
     public void removeSchedulerEventListener() throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
         if (!identifications.containsKey(id)) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
         schedulerListeners.remove(id);
@@ -481,6 +516,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
 
@@ -503,14 +539,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
-            logger.warn(ACCESS_DENIED);
-
+            logger_dev.info(ACCESS_DENIED);
             return false;
         }
 
         if (!identifications.get(id).isAdmin()) {
-            logger.warn(permissionMsg);
-
+            logger_dev.warn(permissionMsg);
             return false;
         }
 
@@ -640,6 +674,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
 
@@ -650,7 +685,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         ident.setToRemove();
         connectedUsers.update(ident);
         usersUpdate(ident);
-        logger.debug("User " + user + " has left the scheduler !");
+        logger_dev.info("User '" + user + "' has left the scheduler !");
     }
 
     /**
@@ -672,16 +707,20 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
+            logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
 
         IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            throw new SchedulerException("The job represented by this ID is unknow !");
+            String msg = "The job represented by this ID is unknow !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         if (!ij.hasRight(identifications.get(id))) {
+            logger_dev.info(permissionMsg);
             throw new SchedulerException(permissionMsg);
         }
     }
@@ -723,12 +762,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                 .getSourceBodyID());
 
         if (!ui.isAdmin()) {
-            if (priority == JobPriority.HIGHEST) {
-                throw new SchedulerException("Only an administrator can change the priority to HIGHEST");
-            } else if (priority == JobPriority.HIGH) {
-                throw new SchedulerException("Only an administrator can change the priority to HIGH");
-            } else if (priority == JobPriority.IDLE) {
-                throw new SchedulerException("Only an administrator can change the priority to IDLE");
+            if (priority == JobPriority.HIGHEST || priority == JobPriority.HIGH ||
+                priority == JobPriority.IDLE) {
+                String msg = "Only an administrator can change the priority to " +
+                    priority.toString().toUpperCase();
+                logger_dev.info(msg);
+                throw new SchedulerException(msg);
             }
         }
 
@@ -743,7 +782,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                 .getSourceBodyID());
 
         if (!ui.isAdmin()) {
-            throw new SchedulerException("You do not have permission to change the policy of the scheduler !");
+            String msg = "You do not have permission to change the policy of the scheduler !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
         policyFullName = newPolicyFile.getClass().getName();
         return scheduler.changePolicy(newPolicyFile);
@@ -757,7 +798,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                 .getSourceBodyID());
 
         if (!ui.isAdmin()) {
-            throw new SchedulerException("You do not have permission to reconnect a RM to the scheduler !");
+            String msg = "You do not have permission to reconnect a RM to the scheduler !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
         return scheduler.linkResourceManager(rmURL);
     }
@@ -796,6 +839,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
      */
     private void dispatch(SchedulerEvent methodName, Class<?>[] types, Object... params) {
         try {
+            logger_dev.info("Dispatch event '" + methodName + "'");
+
             Method method = SchedulerEventListener.class.getMethod(methodName.toString(), types);
             Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 
@@ -820,9 +865,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener<Int
                 }
             }
         } catch (SecurityException e) {
-            e.printStackTrace();
+            logger_dev.error(e);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger_dev.error(e);
         }
     }
 

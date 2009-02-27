@@ -45,6 +45,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.AnyMetaDef;
 import org.hibernate.annotations.Cascade;
@@ -55,6 +56,7 @@ import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.MapKeyManyToMany;
 import org.hibernate.annotations.MetaValue;
 import org.hibernate.annotations.Proxy;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -75,6 +77,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalProActiveTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -91,6 +94,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @AccessType("field")
 @Proxy(lazy = false)
 public abstract class InternalJob extends Job implements Comparable<InternalJob> {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+
     /** Used to sort by id */
     public static final int SORT_BY_ID = 1;
     /** Used to sort by name */
@@ -311,6 +316,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param td the task which has just been started.
      */
     public void startTask(InternalTask td) {
+        logger_dev.debug(" ");
         setNumberOfPendingTasks(getNumberOfPendingTask() - 1);
         setNumberOfRunningTasks(getNumberOfRunningTask() + 1);
 
@@ -330,6 +336,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * Updates count for running to pending event.
      */
     public void newWaitingTask() {
+        logger_dev.debug(" ");
         setNumberOfPendingTasks(getNumberOfPendingTask() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
     }
@@ -340,7 +347,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param task the task which has to be restarted.
      */
     public void reStartTask(InternalTask task) {
-
+        logger_dev.debug(" ");
         getJobDescriptor().reStart(task.getId());
 
         if (getState() == JobState.PAUSED) {
@@ -361,6 +368,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @return the taskDescriptor that has just been terminated.
      */
     public InternalTask terminateTask(boolean errorOccurred, TaskId taskId) {
+        logger_dev.debug(" ");
         InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskState.FAULTY : TaskState.FINISHED);
@@ -394,6 +402,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param id the id of the task to start and terminate.
      */
     public void simulateStartAndTerminate(TaskId id) {
+        logger_dev.debug(" ");
         getJobDescriptor().start(id);
         getJobDescriptor().terminate(id);
     }
@@ -405,6 +414,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param jobState type of the failure on this job. (failed/canceled/killed)
      */
     public void failed(TaskId taskId, JobState jobState) {
+        logger_dev.debug(" ");
         if (jobState != JobState.KILLED) {
             InternalTask descriptor = tasks.get(taskId);
             descriptor.setFinishedTime(System.currentTimeMillis());
@@ -458,6 +468,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * Set all properties following a job submitting.
      */
     public void submitAction() {
+        logger_dev.debug(" ");
         setSubmittedTime(System.currentTimeMillis());
         setState(JobState.PENDING);
     }
@@ -468,6 +479,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * set the taskStatusModify to "null" : setTaskStatusModify(null);
      */
     public void start() {
+        logger_dev.debug(" ");
         setStartTime(System.currentTimeMillis());
         setNumberOfPendingTasks(getTotalNumberOfTasks());
         setNumberOfRunningTasks(0);
@@ -487,6 +499,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * Set all properties in order to terminate the job.
      */
     public void terminate() {
+        logger_dev.debug(" ");
         setState(JobState.FINISHED);
         setFinishedTime(System.currentTimeMillis());
     }
@@ -499,6 +512,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @return true if the job has correctly been paused, false if not.
      */
     public boolean setPaused() {
+        logger_dev.debug(" ");
         if (jobInfo.getState() == JobState.PAUSED) {
             return false;
         }
@@ -529,6 +543,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @return true if the job has correctly been unpaused, false if not.
      */
     public boolean setUnPause() {
+        logger_dev.debug(" ");
         if (jobInfo.getState() != JobState.PAUSED) {
             return false;
         }
@@ -711,6 +726,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * The task may have a consistent id and job event.
      */
     public synchronized void prepareTasks() {
+        logger_dev.debug(" ");
         //get tasks
         ArrayList<InternalTask> sorted = getTasks();
         //re-init taskId count

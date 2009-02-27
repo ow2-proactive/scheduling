@@ -35,8 +35,6 @@ import java.io.File;
 import java.net.URI;
 import java.rmi.AlreadyBoundException;
 
-import javax.security.auth.login.LoginException;
-
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -56,30 +54,41 @@ import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
- * SchedulerStarter can start a new scheduler.
+ * SchedulerStarter will start a new Scheduler on the local host connected to the given Resource Manager.<br>
+ * If no Resource Manager is specified, it will try first to connect a local one. If not succeed, it will create one on
+ * the localHost started with 4 local nodes.<br>
+ * The scheduling policy can be specified at startup. If not given, it will use the default one.<br>
+ * Start with -h option for more help.<br>
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 public class SchedulerStarter {
     //shows how to run the scheduler
+    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
+    private static Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULER);
 
     public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
             .getValueAsString();
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
+    public static final String deploymentFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+        File.separator + "config/deployment/Local4JVMDeployment.xml";
 
     public static void cleanNode() {
         try {
+            logger_dev.info("Trying to destroy local Scheduler");
             AdminScheduler.destroyLocalScheduler();
+            logger_dev.info("Local Scheduler destroyed !");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger_dev.warn(e);
         }
     }
 
@@ -126,74 +135,72 @@ public class SchedulerStarter {
             if (cmd.hasOption("h"))
                 displayHelp = true;
             else {
-                if (cmd.hasOption("p"))
+                if (cmd.hasOption("p")) {
                     policyFullName = cmd.getOptionValue("p");
+                    logger_dev.info("Used policy : " + policyFullName);
+                }
 
-                if (cmd.hasOption("u"))
+                if (cmd.hasOption("u")) {
                     rm = cmd.getOptionValue("u");
+                    logger_dev.info("RM URL : " + rm);
+                }
 
-                logger.info("STARTING SCHEDULER : Press 'e' to shutdown.");
+                logger.info("Starting Scheduler, Please wait...");
 
                 if (rm != null) {
                     try {
+                        logger_dev.info("Trying to connect to Resource Manager on " + rm);
                         imp = ResourceManagerProxy.getProxy(new URI(rm));
-                        logger.info("Connect to Resource Manager on " + rm);
-                    } catch (LoginException e) {
-                        logger.info("Unable to authenticate user to Resource Manager (" + rm + ")", e);
-                        System.exit(1);
                     } catch (Exception e) {
-                        logger.info(e);
+                        logger.error("Error while connecting the RM on " + rm, e);
                         System.exit(2);
                     }
                 } else {
                     URI uri = new URI("rmi://localhost/");
                     //trying to connect to a started local RM
-                    logger.info("Trying to connect to a started local Resource Manager...");
+                    logger_dev.info("Trying to connect to a started Resource Manager on " + uri);
                     try {
                         imp = ResourceManagerProxy.getProxy(uri);
-                        logger.info("Connected to the local Resource Manager");
-                    } catch (LoginException e) {
-                        logger.info("Unable to authenticate user to Resource Manager (" + rm + ")", e);
-                        System.exit(1);
+                        logger
+                                .info("Resource Manager URL was not specified, connection made to the local Resource Manager at " +
+                                    uri);
                     } catch (Exception e) {
-                        logger.info("Resource Manager doesn't exist on localhost");
+                        logger_dev.info("Resource Manager doesn't exist on " + uri);
                         try {
                             //Starting a local RM using default deployment descriptor
                             RMFactory.setOsJavaProperty();
-                            String deploymentDescriptor = PAResourceManagerProperties.RM_HOME
-                                    .getValueAsString() +
-                                File.separator + "config/deployment/Local4JVMDeployment.xml";
-                            RMFactory.startLocal(java.util.Collections.singletonList(deploymentDescriptor));
+                            logger_dev.info("Trying to start a local Resource Manager");
+                            RMFactory.startLocal(java.util.Collections.singletonList(deploymentFile));
 
+                            logger_dev.info("Trying to join the local Resource Manager");
                             //wait for the RM to be created
                             RMConnection.waitAndJoin(null);
 
+                            logger_dev
+                                    .info("Trying to connect the local Resource Manager using Scheduler identity");
                             //get the proxy on the Resource Manager
                             imp = ResourceManagerProxy.getProxy(uri);
 
-                            logger.info("Resource Manager created on " +
-                                PAActiveObject.getActiveObjectNodeUrl(imp));
-                        } catch (LoginException le) {
-                            logger.info("Unable to authenticate user to local Resource Manager", le);
-                            System.exit(1);
+                            logger.warn("Resource Manager created on " +
+                                Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(imp)) +
+                                " as it does not exist locally");
                         } catch (AlreadyBoundException abe) {
-                            logger.info("Resource Manager already exists on local host", abe);
+                            logger.error("Resource Manager already exists on local host", abe);
                             System.exit(4);
                         } catch (ActiveObjectCreationException aoce) {
-                            logger.info("Unable to create local Resource Manager", aoce);
+                            logger.error("Unable to create local Resource Manager", aoce);
                             System.exit(5);
                         }
                     }
                 }
 
                 try {
+                    logger_dev.info("Creating scheduler...");
                     AdminScheduler.createScheduler(imp, policyFullName);
                 } catch (AdminSchedulerException e) {
-                    logger.info(e);
+                    logger.warn(e);
                 }
 
-                @SuppressWarnings("unused")
-                char typed;
                 while (System.in.read() != 'e')
                     ;
                 //shutdown scheduler if 'e' is pressed
@@ -202,28 +209,29 @@ public class SchedulerStarter {
                 System.exit(0);
             }
         } catch (MissingArgumentException e) {
-            System.out.println(e.getLocalizedMessage());
+            logger_dev.error(e.getLocalizedMessage());
             displayHelp = true;
         } catch (MissingOptionException e) {
-            System.out.println("Missing option: " + e.getLocalizedMessage());
+            logger_dev.error(e.getLocalizedMessage());
             displayHelp = true;
         } catch (UnrecognizedOptionException e) {
-            System.out.println(e.getLocalizedMessage());
+            logger_dev.error(e.getLocalizedMessage());
             displayHelp = true;
         } catch (AlreadySelectedException e) {
-            System.out.println(e.getClass().getSimpleName() + " : " + e.getLocalizedMessage());
+            logger_dev.error(e.getLocalizedMessage());
             displayHelp = true;
         } catch (ParseException e) {
+            logger_dev.error(e.getLocalizedMessage());
             displayHelp = true;
         } catch (Exception e) {
-            logger.info(e);
+            logger.error(e);
             System.exit(6);
         }
 
         if (displayHelp) {
-            System.out.println();
+            logger.info("");
             new HelpFormatter().printHelp("scheduler", options, true);
-            System.exit(2);
+            System.exit(10);
         }
 
     }

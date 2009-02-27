@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 import javax.management.Notification;
 import javax.management.NotificationListener;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -51,6 +52,7 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -60,6 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.Script;
 
@@ -72,6 +75,8 @@ import org.ow2.proactive.scripting.Script;
  * @author The ProActive Team
  */
 public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
+
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
     /**
      * When creating a ProActive node on a dedicated JVM, assign a default name of VN
@@ -160,8 +165,9 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         try {
             init();
             //fake native executable used only to instanciate threadReader.
-            currentExecutable = new NativeExecutable(null);//executableContainer; //??
+            currentExecutable = new NativeExecutable(null);
             /* building command for executing java */
+            logger_dev.info("Preparing new java command");
             StringBuffer command = new StringBuffer();
 
             setJavaCommand(command);
@@ -171,11 +177,13 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
             createRegistrationListener();
 
+            logger_dev.info("Create JVM process with command : " + command);
             createJVMProcess(command, currentExecutable);
 
             waitForRegistration();
 
-            /* JavaTaskLauncher is will be an active object created on a newly created ProActive node */
+            /* JavaTaskLauncher will be an active object created on a newly created ProActive node */
+            logger_dev.info("Create remote task launcher");
             JavaTaskLauncher newLauncher = createRemoteTaskLauncher();
 
             forkedJavaExecutable = new ForkedJavaExecutable((JavaExecutableContainer) executableContainer,
@@ -190,6 +198,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             return result;
 
         } catch (Throwable ex) {
+            logger_dev.info(ex);
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
             if (isWallTime())
@@ -320,6 +329,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      */
     protected void clean() {
         try {
+            logger_dev.info("cleaning task launcher");
             //close fake executable to free its stream
             this.currentExecutable.kill();
             //if tmp file has been set, destroy it.
@@ -344,7 +354,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
                 process = null;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger_dev.error(e);
         }
     }
 

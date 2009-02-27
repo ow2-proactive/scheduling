@@ -44,9 +44,12 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.utils.SchedulerLoggers;
 
 
 /**
@@ -62,6 +65,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @AccessType("field")
 @Proxy(lazy = false)
 public class GenerationScript extends Script<String> {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -154,11 +159,14 @@ public class GenerationScript extends Script<String> {
             if (result instanceof String) {
                 return new ScriptResult<String>((String) result);
             } else {
-                return new ScriptResult<String>(new Exception("Bad result format : awaited String, found " +
-                    result.getClass().getName()));
+		String msg = "Bad result format : awaited String, found " + result.getClass().getName();
+		logger_dev.warn(msg);
+                return new ScriptResult<String>(new Exception(msg));
             }
         } else {
-            return new ScriptResult<String>(new Exception("No binding for key " + RESULT_VARIABLE));
+		String msg = "No binding for key " + RESULT_VARIABLE;
+		logger_dev.warn(msg);
+            return new ScriptResult<String>(new Exception(msg));
         }
     }
 

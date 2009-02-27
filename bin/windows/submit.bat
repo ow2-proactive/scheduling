@@ -1,6 +1,5 @@
 @echo off
-echo. 
-echo --- Job Launcher -------------------------------------
+echo.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat
@@ -9,5 +8,4 @@ call init.bat
 ENDLOCAL
 
 :end
-echo. 
-echo ---------------------------------------------------------
+echo.

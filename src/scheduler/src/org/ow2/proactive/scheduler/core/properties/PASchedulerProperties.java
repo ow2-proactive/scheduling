@@ -66,7 +66,7 @@ public enum PASchedulerProperties {
     /** Scheduler main loop time out */
     SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PAPropertiesType.INTEGER),
 
-    /** Scheduler node ping frequency in ms. */
+    /** Scheduler node ping frequency in s. */
     SCHEDULER_NODE_PING_FREQUENCY("pa.scheduler.core.nodepingfrequency", PAPropertiesType.INTEGER),
 
     /** Delay to wait between getting a job result and removing the job concerned */

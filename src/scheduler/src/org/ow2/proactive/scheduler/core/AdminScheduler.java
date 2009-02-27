@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -67,6 +68,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
 
     /** Logger to be used for all messages related to the scheduler */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /**
      * Create a new scheduler at the specified URL plugged on the given resource manager.<br>
@@ -79,11 +81,13 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      */
     public static void createScheduler(ResourceManagerProxy rm, String policyFullClassName)
             throws AdminSchedulerException {
-        logger.info("********************* STARTING NEW SCHEDULER *******************");
+        logger.info("Starting new Scheduler");
 
         //check arguments...
         if (rm == null) {
-            throw new AdminSchedulerException("The Resource Manager must be set !");
+            String msg = "The Resource Manager must be set !";
+            logger_dev.error(msg);
+            throw new AdminSchedulerException(msg);
         }
 
         //check that the RM is an active object
@@ -93,6 +97,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             logger
                     .warn("The Resource Manager is not an active object, this will decrease the scheduler performance.");
         } catch (Exception e) {
+            logger_dev.error(e);
             throw new AdminSchedulerException("An error has occured trying to access the Resource Manager " +
                 e.getMessage());
         }
@@ -113,7 +118,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             //ready
             logger.info("Scheduler is now ready to be started !");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger_dev.error(e);
             throw new AdminSchedulerException(e.getMessage());
         }
     }
@@ -159,7 +164,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
                     schedulerUrl);
             PAActiveObject.getActiveObjectNode(schedulerAuth).getProActiveRuntime().killRT(true);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger_dev.error(e);
         }
     }
 

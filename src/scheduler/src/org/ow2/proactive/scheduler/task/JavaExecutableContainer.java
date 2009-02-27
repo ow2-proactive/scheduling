@@ -72,6 +72,7 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 @AccessType("field")
 @Proxy(lazy = false)
 public class JavaExecutableContainer implements ExecutableContainer {
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

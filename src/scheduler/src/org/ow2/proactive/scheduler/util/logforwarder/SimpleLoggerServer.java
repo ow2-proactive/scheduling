@@ -42,9 +42,13 @@ import java.util.Vector;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 public class SimpleLoggerServer implements Runnable {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+
     // socket port
     private int port;
     private boolean terminate = false;
@@ -160,7 +164,7 @@ public class SimpleLoggerServer implements Runnable {
                 this.connections.add(ch);
                 new Thread(ch).start();
             } catch (IOException e1) {
-                e1.printStackTrace();
+                logger_dev.error(e1);
             }
         }
 
@@ -168,7 +172,7 @@ public class SimpleLoggerServer implements Runnable {
         try {
             this.serverSocket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger_dev.error(e);
         }
     }
 
@@ -192,7 +196,7 @@ public class SimpleLoggerServer implements Runnable {
                 this.input = input;
                 this.inputStream = new ObjectInputStream(new BufferedInputStream(input.getInputStream()));
             } catch (IOException e) {
-                e.printStackTrace();
+                logger_dev.error(e);
             }
         }
 
@@ -229,16 +233,16 @@ public class SimpleLoggerServer implements Runnable {
             } catch (EOFException e) {
                 // normal case ...
             } catch (IOException e) {
-                e.printStackTrace();
+                logger_dev.error(e);
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                logger_dev.error(e);
             }
 
             // close stream
             try {
                 this.inputStream.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger_dev.error(e);
             }
             // remove connexion from server
             SimpleLoggerServer.this.removeConnection(this);

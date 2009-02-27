@@ -73,7 +73,7 @@ public class ThreadReader implements Runnable {
                     stop[0] = true;
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    //nothing to do, socket is dead
                 }
             }
         }.start();

@@ -39,6 +39,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -49,6 +51,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.task.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -60,6 +63,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @since ProActive Scheduling 0.9.1
  */
 public class JobDescriptorImpl implements JobDescriptor {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+
     /** Job id */
     private JobId id;
 
@@ -99,6 +104,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param job the internal job to be lighted.
      */
     public JobDescriptorImpl(InternalJob job) {
+        logger_dev.debug("job = " + job.getId());
         id = job.getId();
         priority = job.getPriority();
         type = job.getType();
@@ -125,6 +131,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * This list represents the ordered TaskDescriptor list of its parent tasks.
      */
     private void makeTree(InternalJob job) {
+        logger_dev.debug("job = " + job.getId());
         Map<InternalTask, TaskDescriptor> mem = new HashMap<InternalTask, TaskDescriptor>();
 
         //create task descriptor list
@@ -194,6 +201,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param taskId the task to remove from running task.
      */
     public void terminate(TaskId taskId) {
+        logger_dev.debug("task = " + taskId);
         if (type == JobType.TASKSFLOW) {
             TaskDescriptor lt = runningTasks.get(taskId);
 
@@ -231,6 +239,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param taskState the taskId with their current status.
      */
     public void update(Map<TaskId, TaskState> taskState) {
+        logger_dev.debug(" ");
         for (Entry<TaskId, TaskState> tid : taskState.entrySet()) {
             if (tid.getValue() == TaskState.PAUSED) {
                 TaskDescriptor lt = eligibleTasks.get(tid.getKey());

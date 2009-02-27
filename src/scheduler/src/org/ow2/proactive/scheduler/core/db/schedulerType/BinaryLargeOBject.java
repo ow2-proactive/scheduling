@@ -42,9 +42,12 @@ import java.sql.Types;
 
 import javax.sql.rowset.serial.SerialBlob;
 
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -56,6 +59,8 @@ import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
  * @since ProActive Scheduling 0.9.1
  */
 public class BinaryLargeOBject implements UserType {
+
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /**
      * @see org.hibernate.usertype.UserType#sqlTypes()
@@ -152,7 +157,7 @@ public class BinaryLargeOBject implements UserType {
         try {
             return new SerialBlob(ObjectToByteConverter.ObjectStream.convert(o));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger_dev.error(e);
             return null;
         }
     }
@@ -164,7 +169,7 @@ public class BinaryLargeOBject implements UserType {
             Object o = ois.readObject();
             return o;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger_dev.error(e);
             return null;
         } finally {
             if (ois != null) {

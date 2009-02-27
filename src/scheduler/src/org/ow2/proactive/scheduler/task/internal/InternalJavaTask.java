@@ -42,6 +42,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -50,12 +51,14 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ForkedJavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -70,6 +73,8 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 @AccessType("field")
 @Proxy(lazy = false)
 public class InternalJavaTask extends InternalTask {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -111,6 +116,7 @@ public class InternalJavaTask extends InternalTask {
         JavaTaskLauncher launcher = null;
         if (fork || isWallTime()) {
             String forkedPolicycontent = getJavaPolicy();
+            logger_dev.info("Create forked java task launcher");
             if (getPreScript() == null && getPostScript() == null) {
                 launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
                         .getName(), new Object[] { getId(), forkedPolicycontent }, node);
@@ -121,6 +127,7 @@ public class InternalJavaTask extends InternalTask {
             }
             ((ForkedJavaTaskLauncher) launcher).setForkEnvironment(forkEnvironment);
         } else {
+            logger_dev.info("Create java task launcher");
             if (getPreScript() == null && getPostScript() == null) {
                 launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
                         new Object[] { getId() }, node);
@@ -153,7 +160,7 @@ public class InternalJavaTask extends InternalTask {
                 content.append(line + "\n");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger_dev.error(e);
             content = new StringBuilder("grant {\npermission java.security.AllPermission;\n};\n");
         }
         return content.toString();

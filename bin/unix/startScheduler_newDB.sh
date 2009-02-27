@@ -1,10 +1,10 @@
 #!/bin/sh
 
+if [ -d SCHEDULER_DB ]
+then
 rm -rf SCHEDULER_DB
 rm derby.log
-
-echo
-echo --- Scheduler----------------------------------------------
+fi
 
 
 workingDir=`pwd`
@@ -14,7 +14,6 @@ CLASSPATH=.
 
 yjp=-agentlib:yjpagent
 opt="-Xms128m -Xmx512m"
-
 
 $JAVACMD $opt org.ow2.proactive.scheduler.examples.SchedulerStarter $@
 

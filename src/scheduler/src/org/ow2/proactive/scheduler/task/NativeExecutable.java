@@ -36,10 +36,13 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.GenerationScript;
@@ -54,6 +57,7 @@ import org.ow2.proactive.scripting.GenerationScript;
  * @since ProActive Scheduling 0.9
  */
 public class NativeExecutable extends Executable {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /** Process that start the native task */
     private transient Process process;
@@ -154,7 +158,8 @@ public class NativeExecutable extends Executable {
         } catch (Exception e) {
             //in this case, the error is certainly due to the user (ie : command not found)
             //we have to inform him about the cause.
-            System.err.println(e.getMessage());
+            logger_dev.info(e);
+            System.err.println(e);
             throw new StartProcessException(e.getMessage());
         }
 
@@ -175,6 +180,7 @@ public class NativeExecutable extends Executable {
             //killTreeProcess(process);
             return process.exitValue();
         } catch (Exception e) {
+            logger_dev.error(e);
             //exception during process
             //means that for most cases, user is not responsible
             throw new RunningProcessException(e.getMessage());
@@ -199,7 +205,7 @@ public class NativeExecutable extends Executable {
         super.kill();
         if (process != null) {
             ProcessTreeKiller.get().kill(process, modelEnvVar);
-            //TODO jlscheef destroy() may be useless but it's not working yet without it.
+            //WARN jlscheef destroy() may be useless but it's not working yet without it.
             //processTreeKiller seems not to kill current process...
             process.destroy();
         }

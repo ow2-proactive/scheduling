@@ -47,6 +47,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
@@ -54,6 +55,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.logforwarder.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.util.logforwarder.LoggingOutputStream;
 import org.ow2.proactive.scripting.Script;
@@ -74,6 +76,8 @@ import org.ow2.proactive.utils.NodeSet;
  * @since ProActive Scheduling 0.9
  */
 public abstract class TaskLauncher implements InitActive {
+
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
     /**
      * Scheduler related java properties. Thoses properties are automatically 
@@ -166,6 +170,7 @@ public abstract class TaskLauncher implements InitActive {
         PAActiveObject.setImmediateService("getNodes");
         PAActiveObject.setImmediateService("activateLogs");
         PAActiveObject.setImmediateService("terminate");
+        logger_dev.info("Immediate services : getNodes, activateLogs, terminate");
     }
 
     /**
@@ -181,8 +186,7 @@ public abstract class TaskLauncher implements InitActive {
         } catch (RuntimeException e) {
             // exception should not be thrown to the scheduler core
             // the result has been computed and must be returned !
-            // TODO : logger.warn
-            System.err.println("WARNING : Loggers are not shut down !");
+            logger_dev.warn("Loggers are not shutdown !", e);
         }
 
         //terminate the task
@@ -201,7 +205,6 @@ public abstract class TaskLauncher implements InitActive {
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
      */
-    @SuppressWarnings("unchecked")
     public abstract TaskResult doTask(TaskTerminateNotification core, ExecutableContainer execContainer,
             TaskResult... results);
 
@@ -210,6 +213,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     @SuppressWarnings("unchecked")
     protected void initLoggers() {
+        logger_dev.debug("Init loggers");
         // error about log should not be logged
         LogLog.setQuietMode(true);
         // create logger
@@ -256,7 +260,9 @@ public abstract class TaskLauncher implements InitActive {
      * @param host the host on which to activate the log.
      * @param port the port on which to activate the log.
      */
+    @SuppressWarnings("unchecked")
     public void activateLogs(String host, int port) {
+        logger_dev.debug("activate logs");
         // should reset taskId because calling thread is not active thread (immediate service)
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
         Appender out = new SocketAppender(host, port);
@@ -302,15 +308,16 @@ public abstract class TaskLauncher implements InitActive {
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occurred during the execution of the script
      */
+    @SuppressWarnings("unchecked")
     protected void executePreScript(Node n) throws ActiveObjectCreationException, NodeException,
             UserException {
+        logger_dev.info("Executing pre-script");
         ScriptHandler handler = ScriptLoader.createHandler(n);
         ScriptResult<String> res = handler.handle(pre);
 
         if (res.errorOccured()) {
-            System.err.println("Error on pre-script occured : ");
-            res.getException().printStackTrace();
-            throw new UserException("PreTask script has failed on the current node", res.getException());
+            logger_dev.error("Error on pre-script occured : ", res.getException());
+            throw new UserException("Pre-script has failed on the current node", res.getException());
         }
         // flush prescript output
         this.flushStreams();
@@ -323,15 +330,16 @@ public abstract class TaskLauncher implements InitActive {
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occurred during the execution of the script
      */
+    @SuppressWarnings("unchecked")
     protected void executePostScript(Node n) throws ActiveObjectCreationException, NodeException,
             UserException {
+        logger_dev.info("Executing post-script");
         ScriptHandler handler = ScriptLoader.createHandler(n);
         ScriptResult<String> res = handler.handle(post);
 
         if (res.errorOccured()) {
-            System.err.println("Error on post-script occured : ");
-            res.getException().printStackTrace();
-            throw new UserException("PostTask script has failed on the current node", res.getException());
+            logger_dev.error("Error on post-script occured : ", res.getException());
+            throw new UserException("Post-script has failed on the current node", res.getException());
         }
         // flush postscript output
         this.flushStreams();
@@ -371,8 +379,7 @@ public abstract class TaskLauncher implements InitActive {
         } catch (RuntimeException e) {
             // exception should not be thrown to the scheduler core
             // the result has been computed and must be returned !
-            // TODO : logger.warn
-            System.err.println("WARNING : Loggers are not shut down !");
+            logger_dev.warn("Loggers are not shut down !", e);
         }
         PAActiveObject.terminateActiveObject(true);
     }
@@ -390,15 +397,16 @@ public abstract class TaskLauncher implements InitActive {
 
     /**
      * If user specified walltime for the particular task, the timer will be scheduled to kill the task
-     * if it does not finish before the walltime. If it does finish before the walltine then the timer will be cancelled 
+     * if it does not finish before the walltime. If it does finish before the walltime then the timer will be canceled
      */
     protected void scheduleTimer() {
+        logger_dev.info("Execute timer because task is walltimed");
         scheduleTimer(currentExecutable);
     }
 
     /**
      * If user specified walltime for the particular task, the timer will be scheduled to kill the task
-     * if it does not finish before the walltime. If it does finish before the walltine then the timer will be cancelled
+     * if it does not finish before the walltime. If it does finish before the walltine then the timer will be canceled
      */
     protected void scheduleTimer(Executable executable) {
         if (isWallTime()) {

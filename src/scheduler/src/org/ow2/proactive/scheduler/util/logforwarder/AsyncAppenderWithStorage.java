@@ -144,6 +144,7 @@ public class AsyncAppenderWithStorage extends AsyncAppender {
      * Return a clone of the current logging event storage.
      * @return a cloned linked list containing all logged events.
      */
+    @SuppressWarnings("unchecked")
     public synchronized LinkedList<LoggingEvent> getStorage() {
         return (LinkedList<LoggingEvent>) this.storage.clone();
     }

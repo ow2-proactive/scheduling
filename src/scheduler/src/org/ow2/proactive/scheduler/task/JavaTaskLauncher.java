@@ -33,11 +33,14 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.Script;
 
 
@@ -49,6 +52,8 @@ import org.ow2.proactive.scripting.Script;
  *
  */
 public class JavaTaskLauncher extends TaskLauncher {
+
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
     /**
      * ProActive Empty Constructor
@@ -86,7 +91,6 @@ public class JavaTaskLauncher extends TaskLauncher {
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
      */
-    @SuppressWarnings("unchecked")
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
         try {
@@ -113,6 +117,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             //return result
             return new TaskResultImpl(taskId, userResult, this.getLogs());
         } catch (Throwable ex) {
+            logger_dev.info(ex);
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {

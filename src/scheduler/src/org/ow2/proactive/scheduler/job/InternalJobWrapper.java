@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 
 /**
- * Internal job Wrapper.
+ * Internal job Wrapper is used to pass the newly submitted job from the front-end to the core without space copy.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1

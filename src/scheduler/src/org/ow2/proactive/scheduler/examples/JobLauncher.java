@@ -279,7 +279,7 @@ public class JobLauncher {
                         l.addAppender(fa);
                     }
 
-                    System.out.println("Here is your job id : " + id);
+                    System.out.println("Here is your job id : " + id.value());
                 }
             }
         } catch (MissingArgumentException e) {

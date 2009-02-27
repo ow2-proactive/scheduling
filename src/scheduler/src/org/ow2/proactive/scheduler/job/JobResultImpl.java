@@ -130,7 +130,7 @@ public class JobResultImpl implements JobResult {
      *
      * @return the id
      */
-    public JobId getId() {
+    public JobId getJobId() {
         return id;
     }
 
@@ -140,7 +140,7 @@ public class JobResultImpl implements JobResult {
      * @return the name
      */
     public String getName() {
-        return getId().getReadableName();
+        return getJobId().getReadableName();
     }
 
     /**

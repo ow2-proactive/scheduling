@@ -38,6 +38,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.ProActiveJob;
@@ -54,6 +56,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalProActiveTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -66,6 +69,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  */
 public class InternalJobFactory implements Serializable {
 
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FACTORY);
+
     /**
      * Create a new internal job with the given job (user).
      *
@@ -76,8 +81,11 @@ public class InternalJobFactory implements Serializable {
     public static InternalJob createJob(Job job) throws SchedulerException {
         InternalJob iJob = null;
 
+        logger_dev.info("Create job '" + job.getName() + "' - " + job.getClass().getName());
+
         switch (job.getType()) {
             case PARAMETER_SWEEPING:
+                logger_dev.error("The type of the given job is not yet implemented !");
                 throw new SchedulerException("The type of the given job is not yet implemented !");
             case PROACTIVE:
                 iJob = createJob((ProActiveJob) job);
@@ -86,6 +94,7 @@ public class InternalJobFactory implements Serializable {
                 iJob = createJob((TaskFlowJob) job);
                 break;
             default:
+                logger_dev.error("The type of the given job is unknown !");
                 throw new SchedulerException("The type of the given job is unknown !");
         }
 
@@ -94,6 +103,7 @@ public class InternalJobFactory implements Serializable {
             setJobCommonProperties(job, iJob);
             return iJob;
         } catch (Exception e) {
+            logger_dev.error(e);
             throw new SchedulerException("Error while creating the internalJob !", e);
         }
     }
@@ -137,6 +147,8 @@ public class InternalJobFactory implements Serializable {
      * @return true if every tasks can be accessed, false if not.
      */
     private static boolean isConsistency(TaskFlowJob userJob) {
+        logger_dev.info("Check if job '" + userJob.getName() +
+            "' is consistency : ie Every task can be accessed");
         HashSet<Task> tasks = new HashSet<Task>();
         HashSet<Task> reached = new HashSet<Task>();
         for (Task t : userJob.getTasks()) {
@@ -171,12 +183,15 @@ public class InternalJobFactory implements Serializable {
      */
     private static InternalJob createJob(TaskFlowJob userJob) throws SchedulerException {
         if (userJob.getTasks().size() == 0) {
+            logger_dev.info("Job '" + userJob.getName() + "' must contain tasks !");
             throw new SchedulerException("This job must contains tasks !");
         }
 
         //check tasks flow
         if (!isConsistency(userJob)) {
-            throw new SchedulerException("One or more tasks in this job cannot be reached !");
+            String msg = "One or more tasks in this job cannot be reached !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         InternalJob job = new InternalTaskFlowJob();
@@ -213,7 +228,9 @@ public class InternalJobFactory implements Serializable {
         } else if (task instanceof JavaTask) {
             return createTask(userJob, (JavaTask) task);
         } else {
-            throw new SchedulerException("The task you intend to add is unknown !");
+            String msg = "The task you intend to add is unknown ! (type : " + task.getClass().getName() + ")";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
     }
 
@@ -231,8 +248,9 @@ public class InternalJobFactory implements Serializable {
             javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
                 toBigStringMap(task.getArguments())));
         } else {
-            throw new SchedulerException(
-                "You must specify your own executable task class to be launched (in every task) !");
+            String msg = "You must specify your own executable task class to be launched (in every task) !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
 
         javaTask.setFork(task.isFork());
@@ -252,7 +270,9 @@ public class InternalJobFactory implements Serializable {
     private static InternalTask createTask(Job userJob, NativeTask task) throws SchedulerException {
         if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0)) &&
             (task.getGenerationScript() == null)) {
-            throw new SchedulerException("The command line is null or empty and not generated !!");
+            String msg = "The command line is null or empty and not generated !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
         }
         InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
                 .getCommandLine(), task.getGenerationScript()));
@@ -268,6 +288,7 @@ public class InternalJobFactory implements Serializable {
      * @param jobToSet the internal job to set.
      */
     private static void setJobCommonProperties(Job job, InternalJob jobToSet) {
+        logger_dev.info("Setting job common properties");
         jobToSet.setName(job.getName());
         jobToSet.setPriority(job.getPriority());
         jobToSet.setCancelJobOnError(job.isCancelJobOnError());
@@ -287,6 +308,7 @@ public class InternalJobFactory implements Serializable {
      * @param taskToSet the internal task to set.
      */
     private static void setTaskCommonProperties(Job userJob, Task task, InternalTask taskToSet) {
+        logger_dev.info("Setting task common properties");
         taskToSet.setDescription(task.getDescription());
         taskToSet.setPreciousResult(task.isPreciousResult());
         taskToSet.setName(task.getName());

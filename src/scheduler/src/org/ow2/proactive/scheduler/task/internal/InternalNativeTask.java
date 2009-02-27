@@ -36,15 +36,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeTaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -60,6 +63,8 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 @AccessType("field")
 @Proxy(lazy = false)
 public class InternalNativeTask extends InternalTask {
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -87,9 +92,11 @@ public class InternalNativeTask extends InternalTask {
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         NativeTaskLauncher launcher;
         if (getPreScript() == null && getPostScript() == null) {
+            logger_dev.info("Create native task launcher without script");
             launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
                     new Object[] { getId() }, node);
         } else {
+            logger_dev.info("Create native task launcher with scripts");
             launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
                     new Object[] { getId(), getPreScript(), getPostScript() }, node);
         }

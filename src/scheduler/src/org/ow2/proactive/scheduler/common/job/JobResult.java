@@ -59,7 +59,7 @@ public interface JobResult extends Serializable {
      *
      * @return the id of the job corresponding to this result.
      */
-    public JobId getId();
+    public JobId getJobId();
 
     /**
      * To get the name of the job that has generate this result.

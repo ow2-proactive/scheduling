@@ -190,7 +190,7 @@ public class Patch {
 			return new Result(false,"An error occured while reading files on hard drive !");
 		}
 	}
-	//Reading file into jars is not so simple so here's the manifest content.
+	//manifest content.
 	private static String MANIFEST_CONTENT = 
 		 "Manifest-Version: 1.0\n"+
 		 "Bundle-ManifestVersion: 2\n"+

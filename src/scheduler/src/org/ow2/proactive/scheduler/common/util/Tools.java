@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.common.util;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -164,6 +165,17 @@ public class Tools implements Serializable {
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+
+    /**
+     * Normalize the given URL into an URL that only contains protocol://host:port/
+     *
+     * @param url the url to transform
+     * @return an URL that only contains protocol://host:port/
+     */
+    public static String getHostURL(String url) {
+        URI uri = URI.create(url);
+        return uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + "/";
     }
 
     /**

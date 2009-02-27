@@ -36,8 +36,10 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
@@ -45,6 +47,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.Tools;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
@@ -60,6 +63,8 @@ import org.ow2.proactive.scripting.ScriptResult;
  * @since ProActive Scheduling 0.9
  */
 public class NativeTaskLauncher extends TaskLauncher {
+
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
     /**
      * Environment variable exported to the the process
@@ -114,7 +119,6 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
      */
-    @SuppressWarnings("unchecked")
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
         try {
@@ -135,7 +139,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 if ((generationScriptDefinedCommand == null) ||
                     generationScriptDefinedCommand.equals(GenerationScript.DEFAULT_COMMAND_VALUE)) {
 
-                    System.err.println(GENERATION_SCRIPT_ERR + toBeLaunched.getGenerationScript().getId());
+                    logger_dev.error(GENERATION_SCRIPT_ERR + toBeLaunched.getGenerationScript().getId());
 
                     throw new UserException(GENERATION_SCRIPT_ERR +
                         toBeLaunched.getGenerationScript().getId());
@@ -153,8 +157,9 @@ public class NativeTaskLauncher extends TaskLauncher {
             modelEnvVar.put(COOKIE_ENV, cookie_value);
             toBeLaunched.setModelEnvVar(modelEnvVar);
 
-            if (isWallTime())
+            if (isWallTime()) {
                 scheduleTimer();
+            }
 
             //launch task
             Serializable userResult = toBeLaunched.execute(results);
@@ -170,6 +175,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             //return result
             return result;
         } catch (Throwable ex) {
+            logger_dev.info(ex);
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
@@ -186,14 +192,14 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @throws UserException if an error occurred during the execution of the script
      * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
      */
+    @SuppressWarnings("unchecked")
     protected String executeGenerationScript(GenerationScript script) throws ActiveObjectCreationException,
             NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(getNodes().get(0));
         ScriptResult<String> res = handler.handle(script);
 
         if (res.errorOccured()) {
-            System.err.println("Error on command generation Script occured : ");
-            res.getException().printStackTrace();
+            logger_dev.error(res.getException());
             throw new UserException("Command generation script execution has failed on the current node");
         }
 

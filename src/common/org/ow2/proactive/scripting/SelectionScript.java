@@ -47,10 +47,13 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.utils.SchedulerLoggers;
 
 
 /**
@@ -76,6 +79,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @AccessType("field")
 @Proxy(lazy = false)
 public class SelectionScript extends Script<Boolean> {
+	public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -201,7 +206,7 @@ public class SelectionScript extends Script<Boolean> {
         try {
             this.id_ = MessageDigest.getInstance("SHA-1").digest(stringId.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+		logger_dev.error(e);
             this.id_ = stringId.getBytes();
         }
     }
@@ -247,9 +252,11 @@ public class SelectionScript extends Script<Boolean> {
                         result.getClass().getName()));
             }
         } else {
-            return new ScriptResult<Boolean>(new Exception("No binding for key : " + RESULT_VARIABLE +
-                "\na Selection script must define a variable named '" + RESULT_VARIABLE +
-                "' set to true or false"));
+		String msg = "No binding for key : " + RESULT_VARIABLE +
+		"\na Selection script must define a variable named '" + RESULT_VARIABLE +
+		"' set to true or false";
+		logger_dev.error(msg);
+            return new ScriptResult<Boolean>(new Exception(msg));
         }
     }
 

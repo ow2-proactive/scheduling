@@ -29,38 +29,17 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.scheduler.common.util;
+package org.ow2.proactive.utils;
 
 /**
- * SchedulerLoggers is used for administrator and user loggers only.
- * See SchedulerDevLoggers developer loggers.
+ * SchedulerLoggers is used for user loggers only.
  *
  * @author The ProActive Team
  */
 public interface SchedulerLoggers {
 
-    static final public String PREFIX = "proactive.scheduler.dev";
+	static final public String PREFIX = "proactive.scheduler.dev";
 
-    static final public String SCHEDULER = PREFIX + ".admin";
-
-    static final public String CONSOLE = SCHEDULER + ".consol";
-
-    static final public String CORE = SCHEDULER + ".core";
-
-    static final public String DATABASE = SCHEDULER + ".database";
-
-    static final public String FRONTEND = SCHEDULER + ".frontend";
-
-    static final public String CONNECTION = SCHEDULER + ".connection";
-
-    static final public String FACTORY = SCHEDULER + ".factory";
-
-    static final public String MATLAB = SCHEDULER + ".matlab";
-
-    static final public String SCILAB = SCHEDULER + ".scilab";
-
-    static final public String UTIL = SCHEDULER + ".util";
-
-    static final public String RMPROXY = SCHEDULER + ".RMproxy";
+	static final public String SCRIPT = PREFIX+".script";
 
 }

@@ -49,10 +49,13 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.utils.SchedulerLoggers;
 
 
 /**
@@ -70,6 +73,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @AccessType("field")
 @Proxy(lazy = false)
 public abstract class Script<E> implements Serializable {
+
+	public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
 
     /** Variable name for script arguments */
     public static final String ARGUMENTS_NAME = "args";
@@ -220,7 +225,7 @@ public abstract class Script<E> implements Serializable {
 
             return getResult(bindings);
         } catch (Throwable e) {
-            e.printStackTrace();
+		logger_dev.error(e);
             return new ScriptResult<E>(new Exception("An exception occured while executing the script ", e));
 
         }

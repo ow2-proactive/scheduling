@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.UserScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -63,6 +64,9 @@ import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
  */
 public class SchedulerAuthentication extends AuthenticationImpl implements InitActive,
         SchedulerAuthenticationInterface {
+
+    /** Scheduler logger */
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CONNECTION);
 
     /** The scheduler front-end connected to this authentication interface */
     private SchedulerFrontend frontend;
@@ -94,6 +98,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
      * @see org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
      */
     public UserSchedulerInterface logAsUser(String user, String password) throws LoginException {
+        logger_dev.info("user : " + user);
 
         loginAs("user", new String[] { "user", "admin" }, user, password);
 
@@ -105,6 +110,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         try {
             this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
         } catch (SchedulerException e) {
+            logger_dev.error(e);
             throw new LoginException(e.getMessage());
         }
 
@@ -116,6 +122,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
      * @see org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
      */
     public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException {
+        logger_dev.info("admin : " + user);
 
         loginAs("admin", new String[] { "admin" }, user, password);
 
@@ -127,6 +134,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         try {
             this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
         } catch (SchedulerException e) {
+            logger_dev.error(e);
             throw new LoginException(e.getMessage());
         }
 

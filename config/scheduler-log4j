@@ -1,31 +1,44 @@
-# This file represents the log4j config file for non regression tests.
-# It is given as property (in the proactive.xml) when starting nonregression tests
+# This file represents the log4j config file for Scheduler and Resource Manager.
+# It is given as property in the env.sh or init.bat script
 
 # The default logging level is INFO
-# The root logger logs in the test.log file
+# The root logger logs in the SchedulerLogs/SchedulerDev.log file
 
-log4j.rootLogger=INFO,CONSOLE
+log4j.rootLogger=INFO,SchedulerDevFileAppender
 
-#avoid displaying additivity of the inherit loggers
+# avoid displaying additivity of the inherit loggers
 log4j.additivity.proactive.scheduler=false
-#define SCHEDULER loggers
-log4j.logger.proactive.scheduler=INFO,schedulerAppenderINFO
-#also exist schedulerAppenderDEBUG that display method name
-log4j.logger.proactive.scheduler.core=INFO
-log4j.logger.proactive.scheduler.database=INFO
-log4j.logger.proactive.scheduler.util=INFO
-log4j.logger.proactive.scheduler.frontend=INFO
-log4j.logger.proactive.scheduler.connection=INFO
-log4j.logger.proactive.scheduler.factory=INFO
-log4j.logger.proactive.scheduler.RM.proxy=INFO
-log4j.logger.proactive.scheduler.ext=INFO
-#log4j.logger.proactive.scheduler.ext.matlab=DEBUG
-#log4j.logger.proactive.scheduler.ext.scilab=DEBUG
+log4j.additivity.proactive.scheduler.dev=false
+log4j.additivity.proactive.scheduler.dev.admin=true
+# define SCHEDULER loggers
+log4j.logger.proactive.scheduler.dev=INFO,SchedulerDevFileAppender
+log4j.logger.proactive.scheduler.dev.admin=INFO,SchedulerFileAppender
+log4j.logger.proactive.scheduler.dev.admin.consol=INFO,CONSOLE
+#log4j.logger.proactive.scheduler.dev.core=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.core=DEBUG
+#log4j.logger.proactive.scheduler.dev.database=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.database=DEBUG
+#log4j.logger.proactive.scheduler.dev.util=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.util=DEBUG
+#log4j.logger.proactive.scheduler.dev.frontend=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.frontend=DEBUG
+#log4j.logger.proactive.scheduler.dev.connection=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.connection=DEBUG
+#log4j.logger.proactive.scheduler.dev.factory=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.factory=DEBUG
+#log4j.logger.proactive.scheduler.dev.RMproxy=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.RMproxy=DEBUG
+#log4j.logger.proactive.scheduler.dev.launcher=DEBUG
+#log4j.logger.proactive.scheduler.dev.script=DEBUG
+#log4j.logger.proactive.scheduler.dev.matlab=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.matlab=DEBUG
+#log4j.logger.proactive.scheduler.dev.scilab=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.scilab=DEBUG
 
-#avoid displaying additivity of the inherit loggers
+# avoid displaying additivity of the inherit loggers
 log4j.additivity.proactive.resourceManager=false
-#define RESOURCE MANAGER loggers
-log4j.logger.proactive.resourceManager=INFO,resourceManagerAppender
+# define RESOURCE MANAGER loggers
+log4j.logger.proactive.resourceManager=INFO,SchedulerDevFileAppender
 log4j.logger.proactive.resourceManager.core=INFO
 log4j.logger.proactive.resourceManager.user=INFO
 log4j.logger.proactive.resourceManager.monitoring=INFO
@@ -34,61 +47,54 @@ log4j.logger.proactive.resourceManager.rmnode=INFO
 log4j.logger.proactive.resourceManager.rmfactory=INFO
 log4j.logger.proactive.resourceManager.rmlauncher=INFO
 
-#Hibernate logger
+# Hibernate logger
 log4j.additivity.org.hibernate=false
-log4j.logger.org.hibernate=WARN,hibernate
+log4j.logger.org.hibernate=INFO,SchedulerDevHibFileAppender
 
+# File appender for Administrator logging level (FILE1)
+log4j.appender.SchedulerFileAppender=org.apache.log4j.RollingFileAppender
+log4j.appender.SchedulerFileAppender.File=SchedulerLogs/Scheduler.log
+log4j.appender.SchedulerFileAppender.MaxFileSize=10MB
+log4j.appender.SchedulerFileAppender.MaxBackupIndex=5
+log4j.appender.SchedulerFileAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.SchedulerFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] %m%n
 
-# Appender FILE writes to the file "tests.log".
-log4j.appender.FILE=org.apache.log4j.FileAppender
-log4j.appender.FILE.File=tests.log
-# the following recreates a file for each run
-log4j.appender.FILE.Append=false
-# Appender FILE uses the PatternLayout.
-log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
-# %X{hostname} adds the hostname
-# %X{runtime} adds the runtime url
-log4j.appender.FILE.layout.ConversionPattern=%5p [%t]: %m%n
+# File appender for verbose developer logging level (FILE2)
+log4j.appender.SchedulerDevFileAppender=org.apache.log4j.RollingFileAppender
+log4j.appender.SchedulerDevFileAppender.File=SchedulerLogs/SchedulerDev.log
+log4j.appender.SchedulerDevFileAppender.MaxFileSize=10MB
+log4j.appender.SchedulerDevFileAppender.MaxBackupIndex=5
+log4j.appender.SchedulerDevFileAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.SchedulerDevFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] [SCHED.%C{1}.%M] %m%n
 
+#File appender for hibernate verbose developer logging level (FILE2)
+log4j.appender.SchedulerDevHibFileAppender=org.apache.log4j.RollingFileAppender
+log4j.appender.SchedulerDevHibFileAppender.File=SchedulerLogs/SchedulerDev.log
+log4j.appender.SchedulerDevHibFileAppender.MaxFileSize=10MB
+log4j.appender.SchedulerDevHibFileAppender.MaxBackupIndex=5
+log4j.appender.SchedulerDevHibFileAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.SchedulerDevHibFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] [SCHED_HIB.%C{1}.%M] %m%n
 
-#CONSOLE uses PatternLayout
-#and displays the associated message (%m)
-#using the platform dependant separator (%n)
-#Use %M for method names, 
-#%X{hostname} for hostname and %X{runtime} for runtime url
-#see log4j documentation for details
+# CONSOLE uses PatternLayout
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-# %X{hostname} adds the hostname
-# %X{runtime} adds the runtime url
-#log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{runtime} - [%20.20c{2}] %m
-log4j.appender.CONSOLE.layout.ConversionPattern=%m %n
+log4j.appender.CONSOLE.layout.ConversionPattern=%m%n
 
-
-#SCHEDULER Appender configuration
+# SCHEDULER Appender configuration (CONSOLE)
 log4j.appender.schedulerAppenderINFO=org.apache.log4j.ConsoleAppender
-#Layout definition
 log4j.appender.schedulerAppenderINFO.layout=org.apache.log4j.PatternLayout
-#Pattern display
 log4j.appender.schedulerAppenderINFO.layout.ConversionPattern=[%-5p] [SCHEDULER.%C{1}] %m%n
-
 log4j.appender.schedulerAppenderDEBUG=org.apache.log4j.ConsoleAppender
-#Layout definition
 log4j.appender.schedulerAppenderDEBUG.layout=org.apache.log4j.PatternLayout
-#Pattern display
 log4j.appender.schedulerAppenderDEBUG.layout.ConversionPattern=[%-5p] [SCHEDULER.%C{1}.%M] %m%n
 
-
-#SCHEDULER Appender configuration
+# RM Appender configuration (CONSOLE)
 log4j.appender.resourceManagerAppender=org.apache.log4j.ConsoleAppender
-#Layout definition
 log4j.appender.resourceManagerAppender.layout=org.apache.log4j.PatternLayout
-#Pattern display
 log4j.appender.resourceManagerAppender.layout.ConversionPattern=[%-5p] [RESOURCE_MANAGER.%C{1}] %m%n
 
-
-### HIBERNATE Appender configuration : direct log messages to stdout ###
+# HIBERNATE Appender configuration (CONSOLE)
 log4j.appender.hibernate=org.apache.log4j.ConsoleAppender
 log4j.appender.hibernate.Target=System.out
 log4j.appender.hibernate.layout=org.apache.log4j.PatternLayout
-log4j.appender.hibernate.layout.ConversionPattern=[%-5p] %d{ABSOLUTE} %c{1}:%L - %m%n
+log4j.appender.hibernate.layout.ConversionPattern=[%-5p] [HIB_SCHEDULER.%C{1}] %m%n

@@ -45,6 +45,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Any;
@@ -53,13 +54,16 @@ import org.hibernate.annotations.MetaValue;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.classic.Session;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
@@ -72,6 +76,9 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @since ProActive Scheduling 0.9.1
  */
 public class DatabaseManager {
+
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.DATABASE);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.DATABASE);
 
     //Hibernate configuration file
     private static final String configurationFile = PASchedulerProperties
@@ -101,6 +108,7 @@ public class DatabaseManager {
      */
     private static SessionFactory getSessionFactory() {
         //build if not
+        logger_dev.debug("Request to build the Hibernate session Factory");
         build();
         return sessionFactory;
     }
@@ -115,7 +123,7 @@ public class DatabaseManager {
      */
     public static void setProperty(String propertyName, String value) {
         if (sessionFactory != null) {
-            System.err.println("WARNING : Property set while sessio factory have already been built ! (" +
+            logger.warn("WARNING : Property set while session factory have already been built ! (" +
                 propertyName + ")" + "\n\t -> Build the session factory after setting properties !");
         }
         configuration.setProperty(propertyName, value);
@@ -137,9 +145,12 @@ public class DatabaseManager {
         try {
             if (sessionFactory == null) {
                 // Build the SessionFactory
+                logger_dev.info("Building Hibernate session Factory (configuration File : " +
+                    configurationFile + " )");
                 sessionFactory = configuration.buildSessionFactory();
             }
         } catch (Throwable ex) {
+            logger_dev.error("Initial SessionFactory creation failed.", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed.", ex);
         }
     }
@@ -149,8 +160,12 @@ public class DatabaseManager {
      */
     public static void close() {
         try {
+            logger_dev.info("Closing current session");
+            sessionFactory.getCurrentSession().close();
+            logger_dev.info("Closing session factory");
             sessionFactory.close();
         } catch (Exception e) {
+            logger_dev.error("Error while closing database", e);
         }
     }
 
@@ -164,14 +179,17 @@ public class DatabaseManager {
         checkIsEntity(o);
         Session session = DatabaseManager.getSessionFactory().openSession();
         try {
+            logger_dev.info("Registering new Object : " + o.getClass().getName());
             session.beginTransaction();
             session.save(o);
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
+            logger_dev.error(e);
             throw new DatabaseManagerException("Unable to store the given object !", e);
         } finally {
             session.close();
+            logger_dev.debug("Session closed");
         }
     }
 
@@ -185,14 +203,17 @@ public class DatabaseManager {
         checkIsEntity(o);
         Session session = DatabaseManager.getSessionFactory().openSession();
         try {
+            logger_dev.info("Deleting Object : " + o.getClass().getName());
             session.beginTransaction();
             session.delete(o);
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
+            logger_dev.error(e);
             throw new DatabaseManagerException("Unable to delete the given object !", e);
         } finally {
             session.close();
+            logger_dev.debug("Session closed");
         }
     }
 
@@ -207,14 +228,17 @@ public class DatabaseManager {
         checkIsEntity(o);
         Session session = DatabaseManager.getSessionFactory().openSession();
         try {
+            logger_dev.info("Updating Object : " + o.getClass().getName());
             session.beginTransaction();
             session.update(o);
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
+            logger_dev.error(e);
             throw new DatabaseManagerException("Unable to update the given object !", e);
         } finally {
             session.close();
+            logger_dev.debug("Session closed");
         }
     }
 
@@ -242,8 +266,11 @@ public class DatabaseManager {
         //the goal is take advantage of polymorphism, so don't check if the class is an entity
         //A given class may return its object and every sub-object of this class.
         //checkIsEntity(egClass);
+        logger_dev.info("Trying to recover this class " + egClass + " using " + conditions.length +
+            " conditions");
         Session session = DatabaseManager.getSessionFactory().openSession();
         try {
+            logger_dev.info("Creating query...");
             StringBuilder conds = new StringBuilder("");
             if (conditions != null && conditions.length > 0) {
                 conds.append(" WHERE");
@@ -252,17 +279,22 @@ public class DatabaseManager {
                         conditions[i].getComparator().getSymbol() + " :C" + i);
                 }
             }
-            Query query = session.createQuery("SELECT c from " + egClass.getName() + " c" + conds.toString());
+            String squery = "SELECT c from " + egClass.getName() + " c" + conds.toString();
+            Query query = session.createQuery(squery);
+            logger_dev.info("Created query : " + squery);
             if (conditions != null && conditions.length > 0) {
                 for (int i = 0; i < conditions.length; i++) {
                     query.setParameter("C" + i, conditions[i].getValue());
+                    logger_dev.debug("Set parameter '" + "C" + i + "' value=" + conditions[i].getValue());
                 }
             }
             return query.list();
         } catch (Exception e) {
+            logger_dev.error(e);
             throw new DatabaseManagerException("Unable to recover the objects !", e);
         } finally {
             session.close();
+            logger_dev.debug("Session closed");
         }
     }
 
@@ -281,43 +313,55 @@ public class DatabaseManager {
         //create condition of recovering : recover only non-removed job
         Condition condition = new Condition("jobInfo.removedTime", ConditionComparator.LESS_EQUALS_THAN,
             (long) 0);
+        logger_dev.info("Recovering all jobs using the removeTime condition");
         Session session = DatabaseManager.getSessionFactory().openSession();
         try {
             String conds = " WHERE c." + condition.getField() + " " + condition.getComparator().getSymbol() +
                 " :C0";
             //find ID to recover
-            Query query = session.createQuery("SELECT c.jobInfo.jobId from " + egClass.getName() + " c" +
-                conds);
+            String squery = "SELECT c.jobInfo.jobId from " + egClass.getName() + " c" + conds;
+            Query query = session.createQuery(squery);
+            logger_dev.info("Created query to find IDs : " + squery);
             query.setParameter("C0", condition.getValue());
+            logger_dev.debug("Set parameter " + "'C0' value=" + condition.getValue());
             List<JobId> ids = (List<JobId>) query.list();
+            logger_dev.info("Creating queries for each job to recover");
             //for each ID get the entity
             for (JobId jid : ids) {
-                query = session.createQuery("SELECT c from " + egClass.getName() +
-                    " c WHERE c.jobInfo.jobId=:C0");
+                squery = "SELECT c from " + egClass.getName() + " c WHERE c.jobInfo.jobId=:C0";
+                query = session.createQuery(squery);
+                logger_dev.debug("Created query : " + squery);
                 query.setParameter("C0", jid);
+                logger_dev.debug("Set parameter " + "'C0' value=" + jid);
                 InternalJob job = (InternalJob) query.uniqueResult();
 
                 try {
                     Collection<TaskResult> results = job.getJobResult().getAllResults().values();
                     //unload taskResult
+                    logger_dev.debug("Unloading taskResult for job " + jid);
                     for (TaskResult r : results) {
                         unload(r);
                     }
                 } catch (NullPointerException e) {
+                    logger_dev.debug("No result yet in this job " + jid);
                     //this exception means their is no results in this job
                 }
                 //unload InternalTask
+                logger_dev.debug("Unloading internalTask for job " + jid);
                 Collection<InternalTask> tasks = job.getTasks();
                 for (InternalTask it : tasks) {
                     unload(it);
                 }
                 jobs.add(job);
+                logger_dev.info("Job " + jid + " added to the final list");
             }
             return jobs;
         } catch (Exception e) {
+            logger_dev.error(e);
             throw new DatabaseManagerException("Unable to recover a job !", e);
         } finally {
             session.close();
+            logger_dev.debug("Session closed");
         }
     }
 
@@ -338,6 +382,7 @@ public class DatabaseManager {
         String hql;
         Field[] fields = getDeclaredFields(clazz, true);
         boolean hasAlterable = false;
+        logger_dev.info("Synchronizing " + o.getClass().getName());
         Session session = DatabaseManager.getSessionFactory().openSession();
         try {
             //begin transaction
@@ -347,30 +392,40 @@ public class DatabaseManager {
             id.setAccessible(true);
             for (Field f : fields) {
                 if (f.isAnnotationPresent(Alterable.class)) {
+                    logger_dev.debug("Found alterable field : " + f.getName());
                     hasAlterable = true;
                     //create the request (ie:SET c.field=:alterableXX) with a specific id
                     hql = hqlUpdate + "c." + f.getName() + " = :" + ALTERABLE_REQUEST_FIELD;
                     hql += " WHERE c." + hibernateId + " = :" + OBJECTID_REQUEST_FIELD;
                     Query query = session.createQuery(hql);
+                    logger_dev.debug("Created query : " + hql);
                     f.setAccessible(true);
                     query.setParameter(ALTERABLE_REQUEST_FIELD, f.get(o));
+                    logger_dev.debug("Set parameter '" + ALTERABLE_REQUEST_FIELD + "' value=" + f.get(o));
                     //Set identifier for WHERE clause
                     query.setParameter(OBJECTID_REQUEST_FIELD, id.get(o));
+                    logger_dev.debug("Set WHERE clause parameter '" + OBJECTID_REQUEST_FIELD + "' value=" +
+                        id.get(o));
                     //execute request
                     query.executeUpdate();
                 }
             }
             if (!hasAlterable) {
                 //if there is no alterable fields (open session is closed in the 'finally')
+                logger_dev
+                        .warn("Synchronize has been called on an object that does not contains any @alterable field");
                 return;
             }
             //commit
             session.getTransaction().commit();
+            logger_dev.debug("Transaction committed");
         } catch (Exception e) {
             session.getTransaction().rollback();
+            logger_dev.error(e);
             throw new DatabaseManagerException("Unable to synchronize this object !", e);
         } finally {
             session.close();
+            logger_dev.debug("Session closed");
         }
     }
 
@@ -396,6 +451,7 @@ public class DatabaseManager {
                 f.setAccessible(true);
                 //if it is unloadable and null
                 if (f.isAnnotationPresent(Unloadable.class) && f.get(o) == null) {
+                    logger_dev.debug("Found unloadable null field : " + f.getName());
                     Object value;
                     //related to improvement SCHEDULING-161 - to FIX : REMOVE FROM HERE
                     Any any = f.getAnnotation(Any.class);
@@ -406,10 +462,12 @@ public class DatabaseManager {
                         //Check this bug in next Hibernate annotation, and remove this condition if the bug is fixed.
                         //
                         //Create Native SQL query
-                        Query query = session.createSQLQuery("SELECT c." + any.metaColumn().name() + ", c." +
+                        String squery = "SELECT c." + any.metaColumn().name() + ", c." +
                             f.getAnnotation(JoinColumn.class).name() + " FROM " +
                             clazz.getAnnotation(Table.class).name() + " c" + " WHERE c." + hibernateId +
-                            " = " + fid.get(o).toString());
+                            " = " + fid.get(o).toString();
+                        logger_dev.debug("Created query : " + squery);
+                        Query query = session.createSQLQuery(squery);
                         //get results
                         Object[] values = (Object[]) query.uniqueResult();
                         if (values == null || values.length == 0 || values[0] == null) {
@@ -424,18 +482,25 @@ public class DatabaseManager {
                                 break;
                             }
                         }
+                        squery = "FROM " + ((Class<?>) values[0]).getName() + " WHERE " + hibernateId +
+                            " = :" + OBJECTID_REQUEST_FIELD;
                         //create HQL request
-                        query = session.createQuery("FROM " + ((Class<?>) values[0]).getName() + " WHERE " +
-                            hibernateId + " = :" + OBJECTID_REQUEST_FIELD);
+                        query = session.createQuery(squery);
+                        logger_dev.debug("Created query : " + squery);
                         //In SQL language, hibernate id is stored as a BigInteger -> in HQL as a long.
-                        query.setParameter(OBJECTID_REQUEST_FIELD, ((BigInteger) values[1]).longValue());
+                        long lvalue = ((BigInteger) values[1]).longValue();
+                        query.setParameter(OBJECTID_REQUEST_FIELD, lvalue);
+                        logger_dev.debug("Set parameter '" + OBJECTID_REQUEST_FIELD + "=" + lvalue);
                         value = query.uniqueResult();
                     } else {
                         //SCHEDULING-161 - to FIX : TO HERE
                         //get the field value in the database and...
-                        Query query = session.createQuery("SELECT c." + f.getName() + " FROM " +
-                            clazz.getName() + " c WHERE c." + hibernateId + " = :" + OBJECTID_REQUEST_FIELD);
+                        String squery = "SELECT c." + f.getName() + " FROM " + clazz.getName() +
+                            " c WHERE c." + hibernateId + " = :" + OBJECTID_REQUEST_FIELD;
+                        Query query = session.createQuery(squery);
+                        logger_dev.debug("Created query : " + squery);
                         query.setParameter(OBJECTID_REQUEST_FIELD, fid.get(o));
+                        logger_dev.debug("Set parameter '" + OBJECTID_REQUEST_FIELD + "=" + fid.get(o));
                         value = query.uniqueResult();
                     }//SCHEDULING-161 - to FIX : and HERE
                     //... store it in the object
@@ -443,9 +508,11 @@ public class DatabaseManager {
                 }
             }
         } catch (Exception e) {
+            logger_dev.error(e);
             throw new DatabaseManagerException("Unable to load this object [" + o + "]", e);
         } finally {
             session.close();
+            logger_dev.debug("Session closed");
         }
     }
 
@@ -458,16 +525,19 @@ public class DatabaseManager {
     public static void unload(Object o) {
         Class<?> clazz = o.getClass();
         Field[] fields = getDeclaredFields(clazz, true);
+        logger_dev.info("Unloading object : " + o.getClass().getName());
         try {
             //for each @unloadable field and non-primitive type
             for (Field f : fields) {
                 if (f.isAnnotationPresent(Unloadable.class) && !f.getType().isPrimitive()) {
+                    logger_dev.debug("SET null to unloadable non primitive field : " + f.getName());
                     //the the value to null
                     f.setAccessible(true);
                     f.set(o, null);
                 }
             }
         } catch (Exception e) {
+            logger_dev.error(e);
             throw new DatabaseManagerException("Unable to unload one or more fields !", e);
         }
     }

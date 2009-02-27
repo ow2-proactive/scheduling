@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.scheduler.resourcemanager;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,13 +51,13 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -77,8 +76,9 @@ import org.ow2.proactive.utils.NodeSet;
  */
 public class ResourceManagerProxy implements InitActive, RunActive {
 
-    private static final long VERIF_TIMEOUT = 10000;
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.RMPROXY);
+    private static Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.RMPROXY);
+    private static final long VERIF_TIMEOUT = 10000;
     private RMUser user;
     private HashMap<Node, ScriptResult<?>> nodes;
     private boolean running = true;
@@ -108,14 +108,11 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @throws LoginException if the login or password are not correct
      * @throws ActiveObjectCreationException if the resource manager proxy cannot be created
      */
-    public static ResourceManagerProxy getProxy(URI uriIM) throws RMException, IOException, NodeException,
-            LoginException, ActiveObjectCreationException {
+    public static ResourceManagerProxy getProxy(URI uriIM) throws RMException, NodeException,
+            ActiveObjectCreationException {
         String url = uriIM.toString();
-        if (!url.endsWith("/")) {
-            url += "/";
-        }
 
-        RMAuthentication auth = RMConnection.join(url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
+        RMAuthentication auth = RMConnection.join(url);
         return (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class.getCanonicalName(),
                 new Object[] { auth });
     }
@@ -132,9 +129,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @param node the node to free
      */
     public void freeNode(Node node) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Node freed : " + node.getNodeInformation().getURL());
-        }
+        logger_dev.info("Node freed : " + node.getNodeInformation().getURL());
 
         user.freeNode(node);
     }
@@ -155,18 +150,16 @@ public class ResourceManagerProxy implements InitActive, RunActive {
                     ScriptHandler handler = ScriptLoader.createHandler(node);
                     nodes.put(node, handler.handle(cleaningScript));
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Cleaning Script handled on node" + node.getNodeInformation().getURL());
-                    }
+                    logger_dev.info("Cleaning Script handled on node" + node.getNodeInformation().getURL());
                 } catch (ActiveObjectCreationException e) {
                     // TODO what happen if node is down ?
                     // CHOICE 1 : return node without doing anything
-                    e.printStackTrace();
+                    logger_dev.error(e);
                     freeNode(node);
                 } catch (NodeException e) {
                     // TODO what happen if node is down ?
                     // CHOICE 1 : return node without doing anything
-                    e.printStackTrace();
+                    logger_dev.error(e);
                     freeNode(node);
                 }
             }
@@ -180,9 +173,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @param nodes the node set to free
      */
     public void freeNodes(NodeSet nodes) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Nodes freed : " + nodes.size() + " nodes");
-        }
+        logger_dev.info("Nodes freed : " + nodes.size() + " nodes");
 
         user.freeNodes(nodes);
     }
@@ -204,18 +195,16 @@ public class ResourceManagerProxy implements InitActive, RunActive {
                     ScriptResult<?> res = handler.handle(cleaningScript);
                     this.nodes.put(node, res);
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Cleaning Script handled on node" + node.getNodeInformation().getURL());
-                    }
+                    logger_dev.info("Cleaning Script handled on node" + node.getNodeInformation().getURL());
                 } catch (ActiveObjectCreationException e) {
                     // TODO Que faire si noeud mort ?
                     // CHOIX 1 : on retourne le noeud sans rien faire
-                    logger.error("Error during cleaning script", e);
+                    logger_dev.error("Error during cleaning script", e);
                     freeNode(node);
                 } catch (NodeException e) {
                     // TODO Que faire si noeud mort ?
                     // CHOIX 1 : on retourne le noeud sans rien faire
-                    logger.error("Error during cleaning script", e);
+                    logger_dev.error("Error during cleaning script", e);
                     freeNode(node);
                 }
             }
@@ -287,7 +276,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
                 user = auth.logAsUser(PASchedulerProperties.RESOURCE_MANAGER_USER.getValueAsString(),
                         PASchedulerProperties.RESOURCE_MANAGER_PASSWORD.getValueAsString());
             } catch (LoginException e) {
-                throw new RuntimeException(e.getMessage());
+                throw new RuntimeException(e);
             }
         }
 
