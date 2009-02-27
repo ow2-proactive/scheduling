@@ -14,3 +14,4 @@ Eclipse-LazyStart: true
 Export-Package: org.ow2.proactive.resourcemanager
 Bundle-ClassPath: bin/,
  .
+Import-Package: org.objectweb.proactive.core.ssh.httpssh
