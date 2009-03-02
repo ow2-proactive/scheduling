@@ -41,9 +41,9 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
@@ -51,7 +51,6 @@ import org.ow2.proactive.scheduler.gui.data.TableManager;
 import org.ow2.proactive.scheduler.gui.listeners.EventJobsListener;
 import org.ow2.proactive.scheduler.gui.listeners.EventTasksListener;
 import org.ow2.proactive.scheduler.gui.listeners.RunningJobsListener;
-import org.ow2.proactive.scheduler.gui.views.JobInfo;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
 import org.ow2.proactive.scheduler.gui.views.TaskView;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -218,7 +217,8 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
 
                     if (j.length == 1) {
                         if (i == j[0]) {
-                            JobInfo jobInfo = JobInfo.getInstance();
+                            org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                                    .getInstance();
                             if (jobInfo != null) {
                                 jobInfo.clear();
                             }
@@ -237,7 +237,8 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                         List<InternalJob> jobs = JobsController.getLocalView().getJobsByIds(
                                 TableManager.getInstance().getJobsIdOfSelectedItems());
 
-                        JobInfo jobInfo = JobInfo.getInstance();
+                        org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                                .getInstance();
                         if (jobInfo != null) {
                             jobInfo.updateInfos(jobs);
                         }
@@ -268,19 +269,19 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
     // ----------------- implements FinishedTasksListener ----------------- //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventTasksListener#runningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.gui.listeners.EventTasksListener#runningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskInfo)
      */
-    public void runningTaskEvent(TaskEvent event) {
-        super.stateUpdate(event.getJobId());
+    public void runningTaskEvent(TaskInfo info) {
+        super.stateUpdate(info.getJobId());
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventTasksListener#finishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.gui.listeners.EventTasksListener#finishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskInfo)
      */
-    public void finishedTaskEvent(TaskEvent event) {
-        super.stateUpdate(event.getJobId());
+    public void finishedTaskEvent(TaskInfo info) {
+        super.stateUpdate(info.getJobId());
         if (!this.isDisposed()) {
-            final TaskEvent taskEvent = event;
+            final TaskInfo taskInfo = info;
 
             getDisplay().syncExec(new Runnable() {
                 public void run() {
@@ -288,13 +289,13 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                     TableItem[] items = table.getItems();
                     TableItem item = null;
                     for (TableItem it : items)
-                        if (((JobId) (it.getData())).equals(taskEvent.getJobId())) {
+                        if (((JobId) (it.getData())).equals(taskInfo.getJobId())) {
                             item = it;
                             break;
                         }
 
                     TableColumn[] cols = table.getColumns();
-                    InternalJob job = JobsController.getLocalView().getJobById(taskEvent.getJobId());
+                    InternalJob job = JobsController.getLocalView().getJobById(taskInfo.getJobId());
                     for (int i = 0; i < cols.length; i++) {
                         String title = cols[i].getText();
                         if ((title != null) &&
@@ -316,24 +317,24 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
     // -------------------------------------------------------------------- //
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void pausedEvent(JobEvent event) {
-        stateUpdate(event);
+    public void pausedEvent(JobInfo info) {
+        stateUpdate(info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void resumedEvent(JobEvent event) {
-        stateUpdate(event);
+    public void resumedEvent(JobInfo info) {
+        stateUpdate(info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void priorityChangedEvent(JobEvent event) {
-        JobId jobId = event.getJobId();
+    public void priorityChangedEvent(JobInfo info) {
+        JobId jobId = info.getJobId();
         if (getJobs().contains(jobId)) {
             super.priorityUpdate(jobId);
         }
@@ -342,8 +343,8 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
     // -------------------------------------------------------------------- //
     // ------------------- implements EventJobsListener ------------------- //
     // -------------------------------------------------------------------- //
-    private void stateUpdate(JobEvent event) {
-        JobId jobId = event.getJobId();
+    private void stateUpdate(JobInfo info) {
+        JobId jobId = info.getJobId();
         if (getJobs().contains(jobId)) {
             super.stateUpdate(jobId);
         }

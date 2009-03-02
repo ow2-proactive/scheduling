@@ -80,7 +80,7 @@ import org.ow2.proactive.scheduler.common.UserSchedulerInterface_;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -106,7 +106,7 @@ import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
-import org.ow2.proactive.scheduler.job.JobEventImpl;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
@@ -380,15 +380,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * - Create the list of taskEvent containing in the given job.
-     * - Clear the task event modify status. It is used to change all status of all tasks
+     * - Create the list of taskInfo containing in the given job.
+     * - Clear the task info modify status. It is used to change all status of all tasks
      * with only one request. It has to be cleared after sending events.
      * - Send the change to the data base.
      *
-     * @param currentJob the job where the task event are.
+     * @param currentJob the job where the task info are.
      */
-    private void updateTaskEventsList(InternalJob currentJob) {
-        Map<TaskId, TaskState> tsm = ((JobEventImpl) currentJob.getJobInfo()).getTaskStatusModify();
+    private void updateTaskInfosList(InternalJob currentJob) {
+        Map<TaskId, TaskState> tsm = ((JobInfoImpl) currentJob.getJobInfo()).getTaskStatusModify();
         for (Entry<TaskId, TaskState> e : tsm.entrySet()) {
             if (e.getValue() != TaskState.RUNNING) {
                 DatabaseManager.synchronize(currentJob.getHMTasks().get(e.getKey()).getTaskInfo());
@@ -482,10 +482,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 if (job.getState() == JobState.PAUSED) {
                     job.setUnPause();
 
-                    JobEvent event = job.getJobInfo();
-                    updateTaskEventsList(job);
+                    JobInfo info = job.getJobInfo();
+                    updateTaskInfosList(job);
                     //send event to front_end
-                    frontend.jobResumedEvent(event);
+                    frontend.jobResumedEvent(info);
                 }
             }
 
@@ -732,7 +732,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             pendingJobs.remove(currentJob);
                             runningJobs.add(currentJob);
                             //create tasks events list
-                            updateTaskEventsList(currentJob);
+                            updateTaskInfosList(currentJob);
                             logger.info("Job '" + currentJob.getId() + "' started");
                             // send job event to front-end
                             frontend.jobPendingToRunningEvent(currentJob.getJobInfo());
@@ -984,7 +984,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         terminateJobHandling(job.getId());
 
         //create tasks events list
-        updateTaskEventsList(job);
+        updateTaskInfosList(job);
 
         logger.info("Job '" + job.getId() + "' terminated (" + jobState + ")");
 
@@ -1052,7 +1052,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     job.newWaitingTask();
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
                     job.reStartTask(descriptor);
-                    //update job and task events
+                    //update job and task info
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
                     //free execution node even if it is dead
@@ -1080,7 +1080,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     job.newWaitingTask();
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
                     job.reStartTask(descriptor);
-                    //update job and task events
+                    //update job and task info
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
                     //free execution node even if it is dead
@@ -1134,7 +1134,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), res, descriptor
                             .isPreciousResult());
                     //and update database
-                    //update job and task events
+                    //update job and task info
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
                     DatabaseManager.update(job.getJobResult());
@@ -1632,16 +1632,16 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         boolean change = job.setPaused();
-        JobEvent event = job.getJobInfo();
+        JobInfo info = job.getJobInfo();
 
         if (change) {
             logger.debug("Job " + jobId + " has just been paused !");
         }
 
         //create tasks events list
-        updateTaskEventsList(job);
+        updateTaskInfosList(job);
         //send event to user
-        frontend.jobPausedEvent(event);
+        frontend.jobPausedEvent(info);
 
         return new BooleanWrapper(change);
     }
@@ -1665,16 +1665,16 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         boolean change = job.setUnPause();
-        JobEvent event = job.getJobInfo();
+        JobInfo info = job.getJobInfo();
 
         if (change) {
             logger.debug("Job " + jobId + " has just been resumed !");
         }
 
         //create tasks events list
-        updateTaskEventsList(job);
+        updateTaskInfosList(job);
         //send event to user
-        frontend.jobResumedEvent(event);
+        frontend.jobResumedEvent(info);
 
         return new BooleanWrapper(change);
     }

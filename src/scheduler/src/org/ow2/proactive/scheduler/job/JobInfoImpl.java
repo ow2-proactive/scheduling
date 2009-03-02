@@ -47,7 +47,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -56,20 +56,20 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 
 
 /**
- * JobEvent provides some informations about a job.<br>
+ * JobInfo provides some informations about a job.<br>
  * These informations and only them are able to change inside the job,
  * that's what the scheduler will send to each listener.<br>
- * To have a job up to date, you must use InternalJob.setJobInfo(JobEvent);<br>.
+ * To have a job up to date, you must use InternalJob.setJobInfo(JobInfo);<br>.
  * This will automatically put the job up to date.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @Entity
-@Table(name = "JOB_EVENT")
+@Table(name = "JOB_INFO")
 @AccessType("field")
 @Proxy(lazy = false)
-public class JobEventImpl implements JobEvent {
+public class JobInfoImpl implements JobInfo {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -149,11 +149,11 @@ public class JobEventImpl implements JobEvent {
     private Map<TaskId, Long> taskFinishedTimeModify = null;
 
     /** Hibernate default constructor */
-    public JobEventImpl() {
+    public JobInfoImpl() {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getJobId()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getJobId()
      */
     public JobId getJobId() {
         return jobId;
@@ -169,7 +169,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getFinishedTime()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getFinishedTime()
      */
     public long getFinishedTime() {
         return finishedTime;
@@ -185,7 +185,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getRemovedTime()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getRemovedTime()
      */
     public long getRemovedTime() {
         return removedTime;
@@ -201,7 +201,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getStartTime()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getStartTime()
      */
     public long getStartTime() {
         return startTime;
@@ -217,7 +217,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getSubmittedTime()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getSubmittedTime()
      */
     public long getSubmittedTime() {
         return submittedTime;
@@ -233,7 +233,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getTotalNumberOfTasks()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getTotalNumberOfTasks()
      */
     public int getTotalNumberOfTasks() {
         return totalNumberOfTasks;
@@ -276,7 +276,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getNumberOfFinishedTasks()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getNumberOfFinishedTasks()
      */
     public int getNumberOfFinishedTasks() {
         return numberOfFinishedTasks;
@@ -292,7 +292,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getNumberOfPendingTasks()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getNumberOfPendingTasks()
      */
     public int getNumberOfPendingTasks() {
         return numberOfPendingTasks;
@@ -308,7 +308,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getNumberOfRunningTasks()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getNumberOfRunningTasks()
      */
     public int getNumberOfRunningTasks() {
         return numberOfRunningTasks;
@@ -333,7 +333,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getPriority()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getPriority()
      */
     public JobPriority getPriority() {
         return priority;
@@ -349,7 +349,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#getState()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getState()
      */
     public JobState getState() {
         return state;
@@ -365,7 +365,7 @@ public class JobEventImpl implements JobEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobEvent#isToBeRemoved()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#isToBeRemoved()
      */
     public boolean isToBeRemoved() {
         return toBeRemoved;

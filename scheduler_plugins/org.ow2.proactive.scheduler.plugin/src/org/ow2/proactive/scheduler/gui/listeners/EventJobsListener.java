@@ -30,7 +30,7 @@
  */
 package org.ow2.proactive.scheduler.gui.listeners;
 
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 
 
 /**
@@ -42,21 +42,21 @@ public interface EventJobsListener {
     /**
      * Invoked when a job has been paused on the scheduler.
      *
-     * @param event the informations on the paused job.
+     * @param info the informations on the paused job.
      */
-    public void pausedEvent(JobEvent event);
+    public void pausedEvent(JobInfo info);
 
     /**
      * Invoked when a job has been resumed on the scheduler.
      *
-     * @param event the informations on the resumed job.
+     * @param info the informations on the resumed job.
      */
-    public void resumedEvent(JobEvent event);
+    public void resumedEvent(JobInfo info);
 
     /**
      * Invoked when a job priority has been changed.
      *
-     * @param event the informations on the resumed job.
+     * @param info the informations on the resumed job.
      */
-    public void priorityChangedEvent(JobEvent event);
+    public void priorityChangedEvent(JobInfo info);
 }

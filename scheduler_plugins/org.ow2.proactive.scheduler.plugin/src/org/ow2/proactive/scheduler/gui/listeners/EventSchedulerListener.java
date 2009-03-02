@@ -48,10 +48,6 @@ public interface EventSchedulerListener {
 
     /**
      * Invoked when the scheduler has just been paused.
-     *
-     * @param event the scheduler informations about the status of every tasks.
-     *            use <code>SchedulerEvent.update(Vector<<Job>>)</code> to
-     *            update your job.
      */
     public void pausedEvent();
 
@@ -66,7 +62,7 @@ public interface EventSchedulerListener {
     public void resumedEvent();
 
     /**
-     * Invoked when the scheduler shutdown sequence is initialised.
+     * Invoked when the scheduler shutdown sequence is initialized.
      */
     public void shuttingDownEvent();
 

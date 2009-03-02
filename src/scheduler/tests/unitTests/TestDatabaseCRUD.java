@@ -41,7 +41,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
@@ -49,7 +49,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
@@ -67,7 +67,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.TaskEventImpl;
+import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
@@ -347,11 +347,11 @@ public class TestDatabaseCRUD {
             }
         }
         //update (1 task is enough)
-        TaskEventImpl infoMem = (TaskEventImpl) itfJob.getTasks().get(0).getTaskInfo();
+        TaskInfoImpl infoMem = (TaskInfoImpl) itfJob.getTasks().get(0).getTaskInfo();
         TaskId id = infoMem.getTaskId();
         new Condition("taskId", ConditionComparator.EQUALS_TO, id);
         //check MEM vs DB instance
-        TaskEvent infoDB = DatabaseManager.recover(TaskEvent.class,
+        TaskInfo infoDB = DatabaseManager.recover(TaskInfo.class,
                 new Condition("taskId", ConditionComparator.EQUALS_TO, id)).get(0);
         Assert.assertEquals(infoDB.getExecutionHostName(), infoMem.getExecutionHostName());
         Assert.assertEquals(infoDB.getFinishedTime(), infoMem.getFinishedTime());
@@ -360,7 +360,7 @@ public class TestDatabaseCRUD {
                 .getNumberOfExecutionOnFailureLeft());
         Assert.assertEquals(infoDB.getStartTime(), infoMem.getStartTime());
         Assert.assertEquals(infoDB.getStatus(), infoMem.getStatus());
-        Assert.assertEquals(infoDB.getJobEvent().getJobId(), infoMem.getJobEvent().getJobId());
+        Assert.assertEquals(infoDB.getJobInfo().getJobId(), infoMem.getJobInfo().getJobId());
         //update MEM instance
         infoMem.setExecutionHostName("toto");
         infoMem.setStartTime(1142564);
@@ -369,7 +369,7 @@ public class TestDatabaseCRUD {
         //synchronize update with database
         DatabaseManager.synchronize(infoMem);
         //re-check MEM vs DB instance
-        infoDB = DatabaseManager.recover(TaskEvent.class,
+        infoDB = DatabaseManager.recover(TaskInfo.class,
                 new Condition("taskId", ConditionComparator.EQUALS_TO, id)).get(0);
         Assert.assertEquals(infoDB.getExecutionHostName(), infoMem.getExecutionHostName());
         Assert.assertEquals(infoDB.getExecutionHostName(), "toto");
@@ -380,15 +380,15 @@ public class TestDatabaseCRUD {
         Assert.assertEquals(infoDB.getStartTime(), infoMem.getStartTime());
         Assert.assertEquals(infoDB.getStartTime(), 1142564);
         Assert.assertEquals(infoDB.getStatus(), infoMem.getStatus());
-        Assert.assertEquals(infoDB.getJobEvent().getJobId(), infoMem.getJobEvent().getJobId());
+        Assert.assertEquals(infoDB.getJobInfo().getJobId(), infoMem.getJobInfo().getJobId());
         Assert.assertTrue(!infoDB.getTaskId().equals(infoMem.getTaskId()));
         log("Test DELETE");
         infoMem.setTaskId(id);
         DatabaseManager.delete(itfJob);
         Assert.assertEquals(DatabaseManager.recover(InternalJob.class).size(), 0);
         Assert.assertEquals(DatabaseManager.recover(InternalTask.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(JobEvent.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(TaskEvent.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.recover(JobInfo.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.recover(TaskInfo.class).size(), 0);
         Assert.assertEquals(DatabaseManager.recover(JobId.class).size(), 0);
         Assert.assertEquals(DatabaseManager.recover(TaskId.class).size(), 0);
         Assert.assertEquals(DatabaseManager.recover(ForkEnvironment.class).size(), 0);

@@ -30,7 +30,7 @@
  */
 package org.ow2.proactive.scheduler.gui.listeners;
 
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
 /**
@@ -44,14 +44,14 @@ public interface EventTasksListener {
     /**
      * Invoke by jobs controller when a task has just been started
      *
-     * @param event
+     * @param info
      */
-    public void runningTaskEvent(TaskEvent event);
+    public void runningTaskEvent(TaskInfo info);
 
     /**
      * Invoke by jobs controller when a task has just been terminated
      *
-     * @param event
+     * @param info
      */
-    public void finishedTaskEvent(TaskEvent event);
+    public void finishedTaskEvent(TaskInfo info);
 }

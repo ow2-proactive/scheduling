@@ -33,9 +33,9 @@ package org.ow2.proactive.scheduler.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
 /**
@@ -48,22 +48,22 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
 @PublicAPI
 public class AbstractSchedulerEventListener implements SchedulerEventListener {
 
-    public void jobChangePriorityEvent(JobEvent event) {
+    public void jobChangePriorityEvent(JobInfo info) {
     }
 
-    public void jobPausedEvent(JobEvent event) {
+    public void jobPausedEvent(JobInfo info) {
     }
 
-    public void jobPendingToRunningEvent(JobEvent event) {
+    public void jobPendingToRunningEvent(JobInfo info) {
     }
 
-    public void jobRemoveFinishedEvent(JobEvent event) {
+    public void jobRemoveFinishedEvent(JobInfo info) {
     }
 
-    public void jobResumedEvent(JobEvent event) {
+    public void jobResumedEvent(JobInfo info) {
     }
 
-    public void jobRunningToFinishedEvent(JobEvent event) {
+    public void jobRunningToFinishedEvent(JobInfo info) {
     }
 
     public void jobSubmittedEvent(Job job) {
@@ -99,13 +99,13 @@ public class AbstractSchedulerEventListener implements SchedulerEventListener {
     public void schedulerStoppedEvent() {
     }
 
-    public void taskPendingToRunningEvent(TaskEvent event) {
+    public void taskPendingToRunningEvent(TaskInfo info) {
     }
 
-    public void taskRunningToFinishedEvent(TaskEvent event) {
+    public void taskRunningToFinishedEvent(TaskInfo info) {
     }
 
-    public void taskWaitingForRestart(TaskEvent event) {
+    public void taskWaitingForRestart(TaskInfo info) {
     }
 
     public void usersUpdate(UserIdentification userIdentification) {

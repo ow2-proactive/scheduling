@@ -41,7 +41,7 @@ import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -132,21 +132,21 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
         log("Test 4 : Verifying start of job execution...");
         //wait for event : job pending to running
         receiver.waitForNEvent(1);
-        ArrayList<JobEvent> eventsList = receiver.cleanNgetJobPendingToRunningEvents();
-        assertTrue(eventsList.size() == 1);
-        JobEvent jEvent = eventsList.get(0);
+        ArrayList<JobInfo> infosList = receiver.cleanNgetJobPendingToRunningEvents();
+        assertTrue(infosList.size() == 1);
+        JobInfo jEvent = infosList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
 
         log("Test 5 : Verifying job termination...");
         //wait for event : job Running to finished
         while (true) {
             receiver.waitForNEvent(1);
-            eventsList = receiver.cleanNgetjobRunningToFinishedEvents();
-            if (eventsList.size() == 1) {
+            infosList = receiver.cleanNgetjobRunningToFinishedEvents();
+            if (infosList.size() == 1) {
                 break;
             }
         }
-        jEvent = eventsList.get(0);
+        jEvent = infosList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
         assertTrue(receiver.cleanNgetTaskRunningToFinishedEvents().size() == 12);
 

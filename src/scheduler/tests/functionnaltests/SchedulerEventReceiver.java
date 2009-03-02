@@ -45,9 +45,9 @@ import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
 /**
@@ -62,19 +62,19 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
 
     private MutableInteger nbEventReceived = new MutableInteger(0);
 
-    private ArrayList<JobEvent> jobPendingToRunningEvents;
+    private ArrayList<JobInfo> jobPendingToRunningEvents;
 
-    private ArrayList<JobEvent> jobRunningToFinishedEvents;
+    private ArrayList<JobInfo> jobRunningToFinishedEvents;
 
     private ArrayList<Job> jobSubmittedEvents;
 
-    private ArrayList<JobEvent> jobRemoveFinishedEvents;
+    private ArrayList<JobInfo> jobRemoveFinishedEvents;
 
-    private ArrayList<TaskEvent> taskPendingToRunningEvents;
+    private ArrayList<TaskInfo> taskPendingToRunningEvents;
 
-    private ArrayList<TaskEvent> taskRunningToFinishedEvents;
+    private ArrayList<TaskInfo> taskRunningToFinishedEvents;
 
-    private ArrayList<TaskEvent> taskWaitingForRestartEvents;
+    private ArrayList<TaskInfo> taskWaitingForRestartEvents;
 
     private Vector<String> methodCalls;
 
@@ -84,13 +84,13 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      * ProActive Empty constructor
      */
     public SchedulerEventReceiver() {
-        jobPendingToRunningEvents = new ArrayList<JobEvent>();
-        jobRunningToFinishedEvents = new ArrayList<JobEvent>();
+        jobPendingToRunningEvents = new ArrayList<JobInfo>();
+        jobRunningToFinishedEvents = new ArrayList<JobInfo>();
         jobSubmittedEvents = new ArrayList<Job>();
-        jobRemoveFinishedEvents = new ArrayList<JobEvent>();
-        taskWaitingForRestartEvents = new ArrayList<TaskEvent>();
-        taskPendingToRunningEvents = new ArrayList<TaskEvent>();
-        taskRunningToFinishedEvents = new ArrayList<TaskEvent>();
+        jobRemoveFinishedEvents = new ArrayList<JobInfo>();
+        taskWaitingForRestartEvents = new ArrayList<TaskInfo>();
+        taskPendingToRunningEvents = new ArrayList<TaskInfo>();
+        taskRunningToFinishedEvents = new ArrayList<TaskInfo>();
         miscEvents = new ArrayList<SchedulerEvent>();
 
         methodCalls = new Vector<String>();
@@ -155,8 +155,8 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      *
      * @return the eventual 'Job Pending To Running' events received by this monitor.
      */
-    public ArrayList<JobEvent> cleanNgetJobPendingToRunningEvents() {
-        ArrayList<JobEvent> toReturn = (ArrayList<JobEvent>) this.jobPendingToRunningEvents.clone();
+    public ArrayList<JobInfo> cleanNgetJobPendingToRunningEvents() {
+        ArrayList<JobInfo> toReturn = (ArrayList<JobInfo>) this.jobPendingToRunningEvents.clone();
         this.jobPendingToRunningEvents.clear();
         return toReturn;
     }
@@ -166,8 +166,8 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      *
      * @return the eventual 'Task Pending To Running' events received by this monitor.
      */
-    public ArrayList<TaskEvent> cleanNgetTaskPendingToRunningEvents() {
-        ArrayList<TaskEvent> toReturn = (ArrayList<TaskEvent>) this.taskPendingToRunningEvents.clone();
+    public ArrayList<TaskInfo> cleanNgetTaskPendingToRunningEvents() {
+        ArrayList<TaskInfo> toReturn = (ArrayList<TaskInfo>) this.taskPendingToRunningEvents.clone();
         this.taskPendingToRunningEvents.clear();
         return toReturn;
     }
@@ -177,8 +177,8 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      *
      * @return the eventual 'Task Running To Finished' events received by this monitor.
      */
-    public ArrayList<TaskEvent> cleanNgetTaskRunningToFinishedEvents() {
-        ArrayList<TaskEvent> toReturn = (ArrayList<TaskEvent>) this.taskRunningToFinishedEvents.clone();
+    public ArrayList<TaskInfo> cleanNgetTaskRunningToFinishedEvents() {
+        ArrayList<TaskInfo> toReturn = (ArrayList<TaskInfo>) this.taskRunningToFinishedEvents.clone();
         this.taskRunningToFinishedEvents.clear();
         return toReturn;
     }
@@ -188,8 +188,8 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      *
      * @return the eventual 'job submitted' events received by this monitor.
      */
-    public ArrayList<JobEvent> cleanNgetjobRunningToFinishedEvents() {
-        ArrayList<JobEvent> toReturn = (ArrayList<JobEvent>) this.jobRunningToFinishedEvents.clone();
+    public ArrayList<JobInfo> cleanNgetjobRunningToFinishedEvents() {
+        ArrayList<JobInfo> toReturn = (ArrayList<JobInfo>) this.jobRunningToFinishedEvents.clone();
         this.jobRunningToFinishedEvents.clear();
         return toReturn;
     }
@@ -199,8 +199,8 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      *
      * @return the eventual 'job submitted' events received by this monitor.
      */
-    public ArrayList<JobEvent> cleanNgetjobRemoveFinishedEvents() {
-        ArrayList<JobEvent> toReturn = (ArrayList<JobEvent>) this.jobRemoveFinishedEvents.clone();
+    public ArrayList<JobInfo> cleanNgetjobRemoveFinishedEvents() {
+        ArrayList<JobInfo> toReturn = (ArrayList<JobInfo>) this.jobRemoveFinishedEvents.clone();
         this.jobRemoveFinishedEvents.clear();
         return toReturn;
     }
@@ -210,8 +210,8 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      *
      * @return the eventual 'job submitted' events received by this monitor.
      */
-    public ArrayList<TaskEvent> cleanNgetTaskWaitingForRestartEvents() {
-        ArrayList<TaskEvent> toReturn = (ArrayList<TaskEvent>) this.taskWaitingForRestartEvents.clone();
+    public ArrayList<TaskInfo> cleanNgetTaskWaitingForRestartEvents() {
+        ArrayList<TaskInfo> toReturn = (ArrayList<TaskInfo>) this.taskWaitingForRestartEvents.clone();
         this.taskWaitingForRestartEvents.clear();
         return toReturn;
     }
@@ -226,24 +226,24 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobPendingToRunningEvent(JobEvent event) {
-        jobPendingToRunningEvents.add(event);
+    public void jobPendingToRunningEvent(JobInfo info) {
+        jobPendingToRunningEvents.add(info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobRemoveFinishedEvent(JobEvent event) {
-        jobRemoveFinishedEvents.add(event);
+    public void jobRemoveFinishedEvent(JobInfo info) {
+        jobRemoveFinishedEvents.add(info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobRunningToFinishedEvent(JobEvent event) {
-        jobRunningToFinishedEvents.add(event);
+    public void jobRunningToFinishedEvent(JobInfo info) {
+        jobRunningToFinishedEvents.add(info);
     }
 
     /**
@@ -254,37 +254,37 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
-    public void taskPendingToRunningEvent(TaskEvent event) {
-        taskPendingToRunningEvents.add(event);
+    public void taskPendingToRunningEvent(TaskInfo info) {
+        taskPendingToRunningEvents.add(info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
-    public void taskRunningToFinishedEvent(TaskEvent event) {
-        taskRunningToFinishedEvents.add(event);
+    public void taskRunningToFinishedEvent(TaskInfo info) {
+        taskRunningToFinishedEvents.add(info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobChangePriorityEvent(JobEvent event) {
+    public void jobChangePriorityEvent(JobInfo info) {
         // TODO Auto-generated method stub	
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobPausedEvent(JobEvent event) {
+    public void jobPausedEvent(JobInfo info) {
         // TODO Auto-generated method stub
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobResumedEvent(JobEvent event) {
+    public void jobResumedEvent(JobInfo info) {
         // TODO Auto-generated method stub
     }
 
@@ -366,9 +366,9 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
-    public void taskWaitingForRestart(TaskEvent event) {
+    public void taskWaitingForRestart(TaskInfo event) {
         taskWaitingForRestartEvents.add(event);
     }
 

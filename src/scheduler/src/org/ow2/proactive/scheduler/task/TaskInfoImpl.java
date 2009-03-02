@@ -44,29 +44,29 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.job.JobEventImpl;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
 
 
 /**
  * Informations about the task that is able to change.<br>
  * These informations are not in the {@link Task} class in order to permit
  * the scheduler listener to send this class as event.
- * To keep an internalTask up to date, just use the {@link InternalTask.update(TaskEvent)} method.
+ * To keep an internalTask up to date, just use the {@link InternalTask.update(TaskInfo)} method.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @Entity
-@Table(name = "TASK_EVENT")
+@Table(name = "TASK_INFO")
 @AccessType("field")
 @Proxy(lazy = false)
-public class TaskEventImpl implements TaskEvent {
+public class TaskInfoImpl implements TaskInfo {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -79,8 +79,8 @@ public class TaskEventImpl implements TaskEvent {
 
     /** informations about the job */
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobEventImpl.class)
-    private JobEvent jobEvent = null;
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobInfoImpl.class)
+    private JobInfo jobInfo = null;
 
     /** task started time */
     @Alterable
@@ -113,27 +113,27 @@ public class TaskEventImpl implements TaskEvent {
     private int numberOfExecutionOnFailureLeft = 1;
 
     /** Hibernate default constructor */
-    public TaskEventImpl() {
+    public TaskInfoImpl() {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskEvent#getJobEvent()
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getJobInfo()
      */
-    public JobEvent getJobEvent() {
-        return jobEvent;
+    public JobInfo getJobInfo() {
+        return jobInfo;
     }
 
     /**
-     * To set the jobEvent
+     * To set the jobInfo
      *
-     * @param jobEvent the jobEvent to set
+     * @param jobInfo the jobInfo to set
      */
-    public void setJobEvent(JobEvent jobEvent) {
-        this.jobEvent = jobEvent;
+    public void setJobInfo(JobInfo jobInfo) {
+        this.jobInfo = jobInfo;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskEvent#getFinishedTime()
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getFinishedTime()
      */
     public long getFinishedTime() {
         return finishedTime;
@@ -149,11 +149,11 @@ public class TaskEventImpl implements TaskEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskEvent#getJobId()
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getJobId()
      */
     public JobId getJobId() {
-        if (jobEvent != null) {
-            return jobEvent.getJobId();
+        if (jobInfo != null) {
+            return jobInfo.getJobId();
         }
 
         return null;
@@ -165,13 +165,13 @@ public class TaskEventImpl implements TaskEvent {
      * @param jobId the jobId to set
      */
     public void setJobId(JobId jobId) {
-        if (jobEvent != null) {
-            ((JobEventImpl) jobEvent).setJobId(jobId);
+        if (jobInfo != null) {
+            ((JobInfoImpl) jobInfo).setJobId(jobId);
         }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskEvent#getStartTime()
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getStartTime()
      */
     public long getStartTime() {
         return startTime;
@@ -187,7 +187,7 @@ public class TaskEventImpl implements TaskEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskEvent#getTaskId()
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getTaskId()
      */
     public TaskId getTaskId() {
         return taskId;
@@ -204,7 +204,7 @@ public class TaskEventImpl implements TaskEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskEvent#getStatus()
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getStatus()
      */
     public TaskState getStatus() {
         return taskState;
@@ -220,7 +220,7 @@ public class TaskEventImpl implements TaskEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskEvent#getExecutionHostName()
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getExecutionHostName()
      */
     public String getExecutionHostName() {
         return executionHostName;
@@ -236,7 +236,7 @@ public class TaskEventImpl implements TaskEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskEvent#getNumberOfExecutionLeft()
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getNumberOfExecutionLeft()
      */
     public int getNumberOfExecutionLeft() {
         return numberOfExecutionLeft;
@@ -252,7 +252,7 @@ public class TaskEventImpl implements TaskEvent {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskEvent#getNumberOfExecutionOnFailureLeft()
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getNumberOfExecutionOnFailureLeft()
      */
     public int getNumberOfExecutionOnFailureLeft() {
         return numberOfExecutionOnFailureLeft;

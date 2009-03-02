@@ -34,10 +34,10 @@ package org.ow2.proactive.scheduler.core.db;
 import java.util.List;
 import java.util.Map;
 
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.job.InternalJob;
 
@@ -56,26 +56,26 @@ public class RecoverableState {
     /** all job result */
     private List<JobResult> jobResults = null;
 
-    /** all job events */
-    private Map<JobId, JobEvent> jobEvents = null;
+    /** all job info */
+    private Map<JobId, JobInfo> jobInfos = null;
 
-    /** all task events */
-    private Map<TaskId, TaskEvent> taskEvents = null;
+    /** all task info */
+    private Map<TaskId, TaskInfo> taskInfos = null;
 
     /**
      * The default constructor
      *
      * @param jobs all jobs
-     * @param jobsEvents all job events
-     * @param tasksEvents all task events
+     * @param jobsInfos all job info
+     * @param tasksInfos all task info
      * @param jobsResults all job result
      */
     public RecoverableState(List<InternalJob> jobs, List<JobResult> jobsResults,
-            Map<JobId, JobEvent> jobsEvents, Map<TaskId, TaskEvent> tasksEvents) {
+            Map<JobId, JobInfo> jobsInfos, Map<TaskId, TaskInfo> tasksInfos) {
         this.jobs = jobs;
         this.jobResults = jobsResults;
-        this.jobEvents = jobsEvents;
-        this.taskEvents = tasksEvents;
+        this.jobInfos = jobsInfos;
+        this.taskInfos = tasksInfos;
     }
 
     /**
@@ -115,38 +115,38 @@ public class RecoverableState {
     }
 
     /**
-     * To get the jobEvents
+     * To get the jobInfos
      *
-     * @return the jobEvents
+     * @return the jobInfos
      */
-    public Map<JobId, JobEvent> getJobEvents() {
-        return jobEvents;
+    public Map<JobId, JobInfo> getJobInfos() {
+        return jobInfos;
     }
 
     /**
-     * To set the jobEvents
+     * To set the jobInfos
      *
-     * @param jobEvents the jobEvents to set
+     * @param jobInfos the jobInfos to set
      */
-    public void setJobEvents(Map<JobId, JobEvent> jobEvents) {
-        this.jobEvents = jobEvents;
+    public void setJobInfos(Map<JobId, JobInfo> jobInfos) {
+        this.jobInfos = jobInfos;
     }
 
     /**
-     * To get the taskEvents
+     * To get the taskInfos
      *
-     * @return the taskEvents
+     * @return the taskInfos
      */
-    public Map<TaskId, TaskEvent> getTaskEvents() {
-        return taskEvents;
+    public Map<TaskId, TaskInfo> getTaskInfos() {
+        return taskInfos;
     }
 
     /**
-     * To set the taskEvents
+     * To set the taskInfos
      *
-     * @param taskEvents the taskEvents to set
+     * @param taskInfos the taskInfos to set
      */
-    public void setTaskEvents(Map<TaskId, TaskEvent> taskEvents) {
-        this.taskEvents = taskEvents;
+    public void setTaskInfos(Map<TaskId, TaskInfo> taskInfos) {
+        this.taskInfos = taskInfos;
     }
 }

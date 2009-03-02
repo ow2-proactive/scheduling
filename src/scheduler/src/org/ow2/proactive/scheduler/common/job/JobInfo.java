@@ -29,39 +29,22 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.task;
+package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
-import org.ow2.proactive.scheduler.common.job.JobId;
 
 
 /**
- * Informations about the task that is able to change.<br>
- * These informations are not in the {@link Task} class in order to permit
- * the scheduler listener to send this class as event.
+ * JobInfo provides some informations about a job.<br>
+ * These informations and only them are able to change inside the job.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public interface TaskEvent extends Serializable {
-
-    /**
-     * To get the jobEvent
-     *
-     * @return the jobEvent
-     */
-    public JobEvent getJobEvent();
-
-    /**
-     * To get the finishedTime
-     *
-     * @return the finishedTime
-     */
-    public long getFinishedTime();
+public interface JobInfo extends Serializable {
 
     /**
      * To get the jobId
@@ -71,6 +54,20 @@ public interface TaskEvent extends Serializable {
     public JobId getJobId();
 
     /**
+     * To get the finishedTime
+     *
+     * @return the finishedTime
+     */
+    public long getFinishedTime();
+
+    /**
+     * To get the removedTime
+     *
+     * @return the removedTime
+     */
+    public long getRemovedTime();
+
+    /**
      * To get the startTime
      *
      * @return the startTime
@@ -78,38 +75,59 @@ public interface TaskEvent extends Serializable {
     public long getStartTime();
 
     /**
-     * To get the taskId
+     * To get the submittedTime
      *
-     * @return the taskId
+     * @return the submittedTime
      */
-    public TaskId getTaskId();
+    public long getSubmittedTime();
 
     /**
-     * To get the taskState
+     * To get the totalNumberOfTasks
      *
-     * @return the taskState
+     * @return the totalNumberOfTasks
      */
-    public TaskState getStatus();
+    public int getTotalNumberOfTasks();
 
     /**
-     * To get the executionHostName
+     * To get the numberOfFinishedTasks
      *
-     * @return the executionHostName
+     * @return the numberOfFinishedTasks
      */
-    public String getExecutionHostName();
+    public int getNumberOfFinishedTasks();
 
     /**
-     * Get the number of execution left.
+     * To get the numberOfPendingTasks
      *
-     * @return the number of execution left.
+     * @return the numberOfPendingTasks
      */
-    public int getNumberOfExecutionLeft();
+    public int getNumberOfPendingTasks();
 
     /**
-     * Get the numberOfExecutionOnFailureLeft value.
-     * 
-     * @return the numberOfExecutionOnFailureLeft value.
+     * To get the numberOfRunningTasks
+     *
+     * @return the numberOfRunningTasks
      */
-    public int getNumberOfExecutionOnFailureLeft();
+    public int getNumberOfRunningTasks();
+
+    /**
+     * To get the priority.
+     *
+     * @return the priority.
+     */
+    public JobPriority getPriority();
+
+    /**
+     * Return the state of the job.
+     *
+     * @return the state of the job.
+     */
+    public JobState getState();
+
+    /**
+     * Get the toBeRemoved property.
+     *
+     * @return the toBeRemoved property.
+     */
+    public boolean isToBeRemoved();
 
 }

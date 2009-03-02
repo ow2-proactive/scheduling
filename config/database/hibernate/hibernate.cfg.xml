@@ -43,7 +43,7 @@
         <!-- JOB -->
         <mapping class="org.ow2.proactive.scheduler.common.job.JobEnvironment"/>
         <mapping class="org.ow2.proactive.scheduler.common.job.Job"/>
-        <mapping class="org.ow2.proactive.scheduler.job.JobEventImpl"/>
+        <mapping class="org.ow2.proactive.scheduler.job.JobInfoImpl"/>
         <mapping class="org.ow2.proactive.scheduler.job.JobIdImpl"/>
         <!-- TASK -->
         <mapping class="org.ow2.proactive.scheduler.common.task.UpdatableProperties"/>
@@ -53,7 +53,7 @@
         <mapping class="org.ow2.proactive.scheduler.common.task.ForkEnvironment"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.Log4JTaskLogs"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.SimpleTaskLogs"/>
-        <mapping class="org.ow2.proactive.scheduler.task.TaskEventImpl"/>
+        <mapping class="org.ow2.proactive.scheduler.task.TaskInfoImpl"/>
         <mapping class="org.ow2.proactive.scheduler.task.TaskIdImpl"/>
         <!-- UTIL -->
         <mapping class="org.ow2.proactive.scheduler.common.task.util.BooleanWrapper"/>

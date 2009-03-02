@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
@@ -228,59 +228,59 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         return super.terminate();
     }
 
-    public void jobChangePriorityEvent(JobEvent event) {
+    public void jobChangePriorityEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobPausedEvent(JobEvent event) {
+    public void jobPausedEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobPendingToRunningEvent(JobEvent event) {
+    public void jobPendingToRunningEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobRemoveFinishedEvent(JobEvent event) {
+    public void jobRemoveFinishedEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobResumedEvent(JobEvent event) {
+    public void jobResumedEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobRunningToFinishedEvent(JobEvent event) {
-        if (event.getState() == JobState.KILLED) {
-            if (!processing.containsKey(event.getJobId())) {
+    public void jobRunningToFinishedEvent(JobInfo info) {
+        if (info.getState() == JobState.KILLED) {
+            if (!processing.containsKey(info.getJobId())) {
                 return;
             }
 
-            jobDidNotSucceed(event.getJobId(), new TaskException(new SchedulerException("Job id=" +
-                event.getJobId() + " was killed")));
+            jobDidNotSucceed(info.getJobId(), new TaskException(new SchedulerException("Job id=" +
+                info.getJobId() + " was killed")));
         } else {
 
             if (debug) {
                 logger.debug(name + " receives job finished event...");
             }
 
-            if (event == null) {
+            if (info == null) {
                 return;
             }
 
-            if (!processing.containsKey(event.getJobId())) {
+            if (!processing.containsKey(info.getJobId())) {
                 return;
             }
 
             JobResult jResult = null;
 
             try {
-                jResult = scheduler.getJobResult(event.getJobId());
+                jResult = scheduler.getJobResult(info.getJobId());
             } catch (SchedulerException e) {
-                jobDidNotSucceed(event.getJobId(), new TaskException(e));
+                jobDidNotSucceed(info.getJobId(), new TaskException(e));
                 return;
             }
 
@@ -288,7 +288,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                 logger.debug(this.getName() + ": updating results of job: " + jResult.getName());
             }
 
-            Collection<TaskIntern<Serializable>> tasksOld = processing.remove(event.getJobId());
+            Collection<TaskIntern<Serializable>> tasksOld = processing.remove(info.getJobId());
 
             ArrayList<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
             Map<String, TaskResult> allTaskResults = jResult.getAllResults();
@@ -387,12 +387,12 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
     }
 
-    public void taskPendingToRunningEvent(TaskEvent event) {
+    public void taskPendingToRunningEvent(TaskInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void taskRunningToFinishedEvent(TaskEvent event) {
+    public void taskRunningToFinishedEvent(TaskInfo info) {
         // TODO Auto-generated method stub 
     }
 
@@ -444,7 +444,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
     }
 
-    public void taskWaitingForRestart(TaskEvent event) {
+    public void taskWaitingForRestart(TaskInfo info) {
         // TODO Auto-generated method stub
 
     }

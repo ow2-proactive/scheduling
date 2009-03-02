@@ -41,11 +41,11 @@ import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
@@ -117,15 +117,15 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
         log("Test 3 : Verifying start of job execution...");
         //wait for event : job pending to running
         receiver.waitForNEvent(1);
-        ArrayList<JobEvent> eventsList = receiver.cleanNgetJobPendingToRunningEvents();
-        assertTrue(eventsList.size() == 1);
-        JobEvent jEvent = eventsList.get(0);
+        ArrayList<JobInfo> infosList = receiver.cleanNgetJobPendingToRunningEvents();
+        assertTrue(infosList.size() == 1);
+        JobInfo jEvent = infosList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
 
         log("Test 4 : Verifying start of each tasks...");
         //wait whole tasks execution : two events per task, task pending to running, and task running to finished  
         receiver.waitForNEvent(jEvent.getTotalNumberOfTasks() * 2);
-        ArrayList<TaskEvent> tEventList = receiver.cleanNgetTaskPendingToRunningEvents();
+        ArrayList<TaskInfo> tEventList = receiver.cleanNgetTaskPendingToRunningEvents();
         assertTrue(tEventList.size() == jEvent.getTotalNumberOfTasks());
         tEventList = receiver.cleanNgetTaskRunningToFinishedEvents();
         assertTrue(tEventList.size() == jEvent.getTotalNumberOfTasks());
@@ -133,9 +133,9 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
         log("Test 5 : Verifying job termination...");
         //wait for event : job Running to finished
         receiver.waitForNEvent(1);
-        eventsList = receiver.cleanNgetjobRunningToFinishedEvents();
-        assertTrue(eventsList.size() == 1);
-        jEvent = eventsList.get(0);
+        infosList = receiver.cleanNgetjobRunningToFinishedEvents();
+        assertTrue(infosList.size() == 1);
+        jEvent = infosList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
 
         log("Test 6 : Getting job result...");
@@ -145,9 +145,9 @@ public class TestJobProActiveSubmission extends FunctionalTDefaultScheduler {
         assertTrue(res.getExceptionResults().size() == 0);
         //wait for event : result retrieval
         receiver.waitForNEvent(1);
-        eventsList = receiver.cleanNgetjobRemoveFinishedEvents();
-        assertTrue(eventsList.size() == 1);
-        jEvent = eventsList.get(0);
+        infosList = receiver.cleanNgetjobRemoveFinishedEvents();
+        assertTrue(infosList.size() == 1);
+        jEvent = infosList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
         Map<String, TaskResult> results = res.getAllResults();
         //check that number of results correspond to number of tasks       

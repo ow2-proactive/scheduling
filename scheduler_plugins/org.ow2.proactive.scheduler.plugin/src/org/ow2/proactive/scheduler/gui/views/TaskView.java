@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.gui.composite.TaskComposite;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
@@ -116,16 +116,16 @@ public class TaskView extends ViewPart {
      * To update only one line of the jobs informations displayed in the view. use this method to
      * avoid flicker
      * 
-     * @param taskEvent
+     * @param taskInfo
      * 
      * @param taskDescriptor
      */
-    public void lineUpdate(TaskEvent taskEvent, InternalTask taskDescriptor) {
-        final TaskEvent aTaskEvent = taskEvent;
+    public void lineUpdate(TaskInfo taskInfo, InternalTask taskDescriptor) {
+        final TaskInfo aTaskInfo = taskInfo;
         final InternalTask aTaskDescriptor = taskDescriptor;
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                taskComposite.changeLine(aTaskEvent.getTaskId(), aTaskDescriptor);
+                taskComposite.changeLine(aTaskInfo.getTaskId(), aTaskDescriptor);
             }
         });
     }

@@ -64,7 +64,7 @@ import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -72,7 +72,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.scilab.exception.SciLabTaskException;
@@ -344,27 +344,27 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         this.terminated = true;
     }
 
-    public void jobChangePriorityEvent(JobEvent event) {
+    public void jobChangePriorityEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobPausedEvent(JobEvent event) {
+    public void jobPausedEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobPendingToRunningEvent(JobEvent event) {
+    public void jobPendingToRunningEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobRemoveFinishedEvent(JobEvent event) {
+    public void jobRemoveFinishedEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobResumedEvent(JobEvent event) {
+    public void jobResumedEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
@@ -388,14 +388,14 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         isJobFinished = true;
     }
 
-    public void jobRunningToFinishedEvent(JobEvent event) {
-        if (event.getState() == JobState.KILLED) {
+    public void jobRunningToFinishedEvent(JobInfo info) {
+        if (info.getState() == JobState.KILLED) {
             if (logger.isDebugEnabled()) {
                 logger.info("Received job killed event...");
             }
 
             // Filtering the right job
-            if ((currentJobId == null) || !event.getJobId().equals(currentJobId)) {
+            if ((currentJobId == null) || !info.getJobId().equals(currentJobId)) {
                 return;
             }
             this.jobKilled = true;
@@ -404,26 +404,26 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                 logger.info("Received job finished event...");
             }
 
-            if (event == null) {
+            if (info == null) {
                 return;
             }
 
             // Filtering the right job
-            if (!event.getJobId().equals(currentJobId)) {
+            if (!info.getJobId().equals(currentJobId)) {
                 return;
             }
             // Getting the Job result from the Scheduler
             JobResult jResult = null;
 
             try {
-                jResult = scheduler.getJobResult(event.getJobId());
+                jResult = scheduler.getJobResult(info.getJobId());
             } catch (SchedulerException e) {
-                jobDidNotSucceed(event.getJobId(), e, true, null);
+                jobDidNotSucceed(info.getJobId(), e, true, null);
                 return;
             }
 
             if (logger.isDebugEnabled()) {
-                System.out.println("Updating results of job: " + jResult.getName() + "(" + event.getJobId() +
+                System.out.println("Updating results of job: " + jResult.getName() + "(" + info.getJobId() +
                     ")");
             }
 
@@ -443,7 +443,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
                 // No result received
                 if (res.getValue() == null) {
-                    jobDidNotSucceed(event.getJobId(), new RuntimeException("Task id = " + res.getKey() +
+                    jobDidNotSucceed(info.getJobId(), new RuntimeException("Task id = " + res.getKey() +
                         " was not returned by the scheduler"), false, null);
 
                 } else if (res.getValue().hadException()) {
@@ -452,11 +452,11 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                         // We filter this specific exception which means that the "out" variable was not set by the function 
                         // due to an error inside the script
                         String logs = res.getValue().getOutput().getAllLogs(false);
-                        jobDidNotSucceed(event.getJobId(), new SciLabTaskException(logs), false, logs);
+                        jobDidNotSucceed(info.getJobId(), new SciLabTaskException(logs), false, logs);
                     } else {
                         // For other types of exception we forward it as it is.
-                        jobDidNotSucceed(event.getJobId(), res.getValue().getException(), true, res
-                                .getValue().getOutput().getAllLogs(false));
+                        jobDidNotSucceed(info.getJobId(), res.getValue().getException(), true, res.getValue()
+                                .getOutput().getAllLogs(false));
                     }
                 } else {
                     // Normal success
@@ -471,9 +471,9 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                             logger.info(logs);
                         }
                     } catch (ptolemy.kernel.util.IllegalActionException e1) {
-                        jobDidNotSucceed(event.getJobId(), new SciLabTaskException(logs), false, logs);
+                        jobDidNotSucceed(info.getJobId(), new SciLabTaskException(logs), false, logs);
                     } catch (Throwable e2) {
-                        jobDidNotSucceed(event.getJobId(), e2, true, logs);
+                        jobDidNotSucceed(info.getJobId(), e2, true, logs);
                     }
                 }
             }
@@ -643,17 +643,17 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         }
     }
 
-    public void taskPendingToRunningEvent(TaskEvent event) {
+    public void taskPendingToRunningEvent(TaskInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void taskRunningToFinishedEvent(TaskEvent event) {
+    public void taskRunningToFinishedEvent(TaskInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void taskWaitingForRestart(TaskEvent event) {
+    public void taskWaitingForRestart(TaskInfo info) {
         // TODO Auto-generated method stub
 
     }

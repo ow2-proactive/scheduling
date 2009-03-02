@@ -46,10 +46,10 @@ import org.ow2.proactive.scheduler.common.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
@@ -62,7 +62,6 @@ import org.ow2.proactive.scheduler.gui.listeners.FinishedJobsListener;
 import org.ow2.proactive.scheduler.gui.listeners.PendingJobsListener;
 import org.ow2.proactive.scheduler.gui.listeners.RunningJobsListener;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerUsersListener;
-import org.ow2.proactive.scheduler.gui.views.JobInfo;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 import org.ow2.proactive.scheduler.gui.views.TaskView;
@@ -154,15 +153,15 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /** call "runningTaskEvent" method on listeners */
-    private void pendingToRunningTaskEventInternal(TaskEvent event) {
+    private void pendingToRunningTaskEventInternal(TaskInfo info) {
         for (EventTasksListener listener : eventTasksListeners)
-            listener.runningTaskEvent(event);
+            listener.runningTaskEvent(info);
     }
 
     /** call "finishedTaskEvent" method on listeners */
-    private void runningToFinishedTaskEventInternal(TaskEvent event) {
+    private void runningToFinishedTaskEventInternal(TaskInfo info) {
         for (EventTasksListener listener : eventTasksListeners)
-            listener.finishedTaskEvent(event);
+            listener.finishedTaskEvent(info);
     }
 
     /** call "startedEvent" method on listeners */
@@ -214,21 +213,21 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /** call "pausedEvent" method on listeners */
-    private void jobPausedEventInternal(JobEvent event) {
+    private void jobPausedEventInternal(JobInfo info) {
         for (EventJobsListener listener : eventJobsListeners)
-            listener.pausedEvent(event);
+            listener.pausedEvent(info);
     }
 
     /** call "resumedEvent" method on listeners */
-    private void jobResumedEventInternal(JobEvent event) {
+    private void jobResumedEventInternal(JobInfo info) {
         for (EventJobsListener listener : eventJobsListeners)
-            listener.resumedEvent(event);
+            listener.resumedEvent(info);
     }
 
     /** call "priorityChangedEvent" method on listeners */
-    private void jobPriorityChangedEventInternal(JobEvent event) {
+    private void jobPriorityChangedEventInternal(JobInfo info) {
         for (EventJobsListener listener : eventJobsListeners)
-            listener.priorityChangedEvent(event);
+            listener.priorityChangedEvent(info);
     }
 
     /**
@@ -267,12 +266,12 @@ public class JobsController implements SchedulerEventListener {
     /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void jobPendingToRunningEvent(JobEvent event) {
-        final JobId jobId = event.getJobId();
+    public void jobPendingToRunningEvent(JobInfo info) {
+        final JobId jobId = info.getJobId();
         final InternalJob job = getJobById(jobId);
-        job.update(event);
+        job.update(info);
 
         // remember if the job, which changing list, was selected
         boolean rememberIsOnly = TableManager.getInstance().isOnlyJobSelected(jobId);
@@ -311,7 +310,8 @@ public class JobsController implements SchedulerEventListener {
                     List<InternalJob> jobs = getJobsByIds(jobsId);
 
                     // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
                     if (jobInfo != null) {
                         if (jobsId.size() == 1)
                             jobInfo.updateInfos(job);
@@ -333,18 +333,18 @@ public class JobsController implements SchedulerEventListener {
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
-     * runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * jobRunningToFinishedEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void jobRunningToFinishedEvent(JobEvent event) {
-        final JobId jobId = event.getJobId();
+    public void jobRunningToFinishedEvent(JobInfo info) {
+        final JobId jobId = info.getJobId();
         final InternalJob job = getJobById(jobId);
-        job.update(event);
+        job.update(info);
 
         // remember if the job, which changing list, was selected
         boolean rememberIsOnly = TableManager.getInstance().isOnlyJobSelected(jobId);
         boolean rememberIsSelectedButNotOnly = TableManager.getInstance().isJobSelected(jobId);
 
-        if (event.getStartTime() == -1) {
+        if (info.getStartTime() == -1) {
             // call method on listeners
             removePendingJobEventInternal(jobId);
 
@@ -387,7 +387,8 @@ public class JobsController implements SchedulerEventListener {
                     List<InternalJob> jobs = getJobsByIds(jobsId);
 
                     // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
                     if (jobInfo != null) {
                         if (jobsId.size() == 1)
                             jobInfo.updateInfos(job);
@@ -410,10 +411,10 @@ public class JobsController implements SchedulerEventListener {
     /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#removeFinishedJobEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void jobRemoveFinishedEvent(JobEvent event) {
-        final JobId jobId = event.getJobId();
+    public void jobRemoveFinishedEvent(JobInfo info) {
+        final JobId jobId = info.getJobId();
         boolean rememberIsSelected = TableManager.getInstance().isJobSelected(jobId);
 
         // call method on listeners
@@ -444,7 +445,8 @@ public class JobsController implements SchedulerEventListener {
                     List<InternalJob> jobs = getJobsByIds(jobsId);
 
                     // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
                     if (jobInfo != null) {
                         if (jobsId.isEmpty())
                             jobInfo.clear();
@@ -470,16 +472,16 @@ public class JobsController implements SchedulerEventListener {
 
     /**
      * @seeorg.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
-     * pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+     * pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskInfo)
      */
-    public void taskPendingToRunningEvent(TaskEvent event) {
-        JobId jobId = event.getJobId();
-        getJobById(jobId).update(event);
+    public void taskPendingToRunningEvent(TaskInfo info) {
+        JobId jobId = info.getJobId();
+        getJobById(jobId).update(info);
 
         // call method on listeners
-        pendingToRunningTaskEventInternal(event);
+        pendingToRunningTaskEventInternal(info);
 
-        final TaskEvent taskEvent = event;
+        final TaskInfo taskInfo = info;
 
         // if this job is selected in the Running table
         if (TableManager.getInstance().isJobSelected(jobId)) {
@@ -489,7 +491,8 @@ public class JobsController implements SchedulerEventListener {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
 
                     // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
                     if (jobInfo != null) {
                         if (jobsId.size() == 1)
                             jobInfo.updateInfos(job);
@@ -499,7 +502,7 @@ public class JobsController implements SchedulerEventListener {
 
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
-                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskEvent.getTaskId()));
+                        taskView.lineUpdate(taskInfo, getTaskDescriptorById(job, taskInfo.getTaskId()));
                     }
                 }
             });
@@ -508,15 +511,15 @@ public class JobsController implements SchedulerEventListener {
 
     /**
      * @seeorg.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
-     * runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+     * runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskInfo)
      */
-    public void taskRunningToFinishedEvent(TaskEvent event) {
-        JobId jobId = event.getJobId();
-        getJobById(jobId).update(event);
-        final TaskEvent taskEvent = event;
+    public void taskRunningToFinishedEvent(TaskInfo info) {
+        JobId jobId = info.getJobId();
+        getJobById(jobId).update(info);
+        final TaskInfo taskInfo = info;
 
         // call method on listeners
-        runningToFinishedTaskEventInternal(event);
+        runningToFinishedTaskEventInternal(info);
 
         // if this job is selected in the Running table
         if (TableManager.getInstance().isJobSelected(jobId)) {
@@ -526,7 +529,8 @@ public class JobsController implements SchedulerEventListener {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
 
                     // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
                     if (jobInfo != null) {
                         if (jobsId.size() == 1)
                             jobInfo.updateInfos(job);
@@ -536,8 +540,8 @@ public class JobsController implements SchedulerEventListener {
 
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
-                        TaskId taskId = taskEvent.getTaskId();
-                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskId));
+                        TaskId taskId = taskInfo.getTaskId();
+                        taskView.lineUpdate(taskInfo, getTaskDescriptorById(job, taskId));
 
                         if (taskId.equals(taskView.getIdOfSelectedTask())) {
                             TaskResult tr = TaskComposite.getTaskResult(job.getId(), taskId);
@@ -667,21 +671,22 @@ public class JobsController implements SchedulerEventListener {
     /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobPausedEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void jobPausedEvent(JobEvent event) {
-        final InternalJob job = getJobById(event.getJobId());
-        job.update(event);
+    public void jobPausedEvent(JobInfo info) {
+        final InternalJob job = getJobById(info.getJobId());
+        job.update(info);
 
         // if this job is selected in a table
-        if (TableManager.getInstance().isJobSelected(event.getJobId())) {
+        if (TableManager.getInstance().isJobSelected(info.getJobId())) {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
                     List<InternalJob> jobs = getJobsByIds(jobsId);
 
                     // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
                     if (jobInfo != null) {
                         if (jobsId.size() == 1)
                             jobInfo.updateInfos(job);
@@ -700,27 +705,28 @@ public class JobsController implements SchedulerEventListener {
             });
         }
         // call method on listeners
-        jobPausedEventInternal(event);
+        jobPausedEventInternal(info);
     }
 
     /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobResumedEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void jobResumedEvent(JobEvent event) {
-        final InternalJob job = getJobById(event.getJobId());
-        job.update(event);
+    public void jobResumedEvent(JobInfo info) {
+        final InternalJob job = getJobById(info.getJobId());
+        job.update(info);
 
         // if this job is selected in a table
-        if (TableManager.getInstance().isJobSelected(event.getJobId())) {
+        if (TableManager.getInstance().isJobSelected(info.getJobId())) {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
                     List<InternalJob> jobs = getJobsByIds(jobsId);
 
                     // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
                     if (jobInfo != null) {
                         if (jobsId.size() == 1)
                             jobInfo.updateInfos(job);
@@ -740,16 +746,16 @@ public class JobsController implements SchedulerEventListener {
         }
 
         // call method on listeners
-        jobResumedEventInternal(event);
+        jobResumedEventInternal(info);
     }
 
     /**
      * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
-     * changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void jobChangePriorityEvent(JobEvent event) {
-        getJobById(event.getJobId()).update(event);
-        jobPriorityChangedEventInternal(event);
+    public void jobChangePriorityEvent(JobInfo info) {
+        getJobById(info.getJobId()).update(info);
+        jobPriorityChangedEventInternal(info);
     }
 
     /**
@@ -769,16 +775,16 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.objectweb.proactive.extensions.scheduler.common.task.TaskInfo)
      */
-    public void taskWaitingForRestart(TaskEvent event) {
-        JobId jobId = event.getJobId();
-        getJobById(jobId).update(event);
+    public void taskWaitingForRestart(TaskInfo info) {
+        JobId jobId = info.getJobId();
+        getJobById(jobId).update(info);
 
         // call method on listeners
-        pendingToRunningTaskEventInternal(event);
+        pendingToRunningTaskEventInternal(info);
 
-        final TaskEvent taskEvent = event;
+        final TaskInfo taskInfo = info;
 
         // if this job is selected in the Running table
         if (TableManager.getInstance().isJobSelected(jobId)) {
@@ -788,7 +794,8 @@ public class JobsController implements SchedulerEventListener {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
 
                     // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
+                    org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
+                            .getInstance();
                     if (jobInfo != null) {
                         if (jobsId.size() == 1)
                             jobInfo.updateInfos(job);
@@ -798,7 +805,7 @@ public class JobsController implements SchedulerEventListener {
 
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
-                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskEvent.getTaskId()));
+                        taskView.lineUpdate(taskInfo, getTaskDescriptorById(job, taskInfo.getTaskId()));
                     }
                 }
             });

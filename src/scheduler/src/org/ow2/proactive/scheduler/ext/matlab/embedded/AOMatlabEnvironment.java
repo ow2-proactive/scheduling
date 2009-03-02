@@ -58,7 +58,7 @@ import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -66,7 +66,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabTaskException;
@@ -342,39 +342,39 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         this.terminated = true;
     }
 
-    public void jobChangePriorityEvent(JobEvent event) {
+    public void jobChangePriorityEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobPausedEvent(JobEvent event) {
+    public void jobPausedEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobPendingToRunningEvent(JobEvent event) {
+    public void jobPendingToRunningEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobRemoveFinishedEvent(JobEvent event) {
+    public void jobRemoveFinishedEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobResumedEvent(JobEvent event) {
+    public void jobResumedEvent(JobInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void jobRunningToFinishedEvent(JobEvent event) {
-        if (event.getState() == JobState.KILLED) {
+    public void jobRunningToFinishedEvent(JobInfo info) {
+        if (info.getState() == JobState.KILLED) {
             if (debugCurrentJob) {
                 System.out.println("Received job killed event...");
             }
 
             // Filtering the right job
-            if ((currentJobId == null) || !event.getJobId().equals(currentJobId)) {
+            if ((currentJobId == null) || !info.getJobId().equals(currentJobId)) {
                 return;
             }
             this.jobKilled = true;
@@ -383,26 +383,26 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
                 System.out.println("Received job finished event...");
             }
 
-            if (event == null) {
+            if (info == null) {
                 return;
             }
 
             // Filtering the right job
-            if (!event.getJobId().equals(currentJobId)) {
+            if (!info.getJobId().equals(currentJobId)) {
                 return;
             }
             // Getting the Job result from the Scheduler
             JobResult jResult = null;
 
             try {
-                jResult = scheduler.getJobResult(event.getJobId());
+                jResult = scheduler.getJobResult(info.getJobId());
             } catch (SchedulerException e) {
-                jobDidNotSucceed(event.getJobId(), e, true, null);
+                jobDidNotSucceed(info.getJobId(), e, true, null);
                 return;
             }
 
             if (debugCurrentJob) {
-                System.out.println("Updating results of job: " + jResult.getName() + "(" + event.getJobId() +
+                System.out.println("Updating results of job: " + jResult.getName() + "(" + info.getJobId() +
                     ")");
             }
 
@@ -430,7 +430,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
                 // No result received
                 if (res == null) {
-                    jobDidNotSucceed(event.getJobId(), new RuntimeException("Task id = " + key +
+                    jobDidNotSucceed(info.getJobId(), new RuntimeException("Task id = " + key +
                         " was not returned by the scheduler"), false, null);
 
                 } else if (res.hadException()) {
@@ -440,10 +440,10 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
                         // We filter this specific exception which means that the "out" variable was not set by the function 
                         // due to an error inside the script or a missing licence 
 
-                        jobDidNotSucceed(event.getJobId(), new MatlabTaskException(logs), false, logs);
+                        jobDidNotSucceed(info.getJobId(), new MatlabTaskException(logs), false, logs);
                     } else {
                         // For other types of exception we forward it as it is.
-                        jobDidNotSucceed(event.getJobId(), res.getException(), true, logs);
+                        jobDidNotSucceed(info.getJobId(), res.getException(), true, logs);
                     }
                 } else {
                     // Normal success
@@ -456,9 +456,9 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
                             System.out.println(logs);
                         }
                     } catch (ptolemy.kernel.util.IllegalActionException e1) {
-                        jobDidNotSucceed(event.getJobId(), new MatlabTaskException(logs), false, logs);
+                        jobDidNotSucceed(info.getJobId(), new MatlabTaskException(logs), false, logs);
                     } catch (Throwable e2) {
-                        jobDidNotSucceed(event.getJobId(), e2, true, logs);
+                        jobDidNotSucceed(info.getJobId(), e2, true, logs);
                     }
                 }
             }
@@ -522,12 +522,12 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         schedulerStopped = true;
     }
 
-    public void taskPendingToRunningEvent(TaskEvent event) {
+    public void taskPendingToRunningEvent(TaskInfo info) {
         // TODO Auto-generated method stub
 
     }
 
-    public void taskRunningToFinishedEvent(TaskEvent event) {
+    public void taskRunningToFinishedEvent(TaskInfo info) {
         // TODO Auto-generated method stub
 
     }
@@ -671,7 +671,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
     }
 
-    public void taskWaitingForRestart(TaskEvent event) {
+    public void taskWaitingForRestart(TaskInfo info) {
         // TODO Auto-generated method stub
 
     }

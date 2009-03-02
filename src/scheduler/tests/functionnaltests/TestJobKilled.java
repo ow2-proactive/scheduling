@@ -43,11 +43,11 @@ import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
@@ -111,16 +111,16 @@ public class TestJobKilled extends FunctionalTDefaultScheduler {
         log("Test 3 : Verifying start of job execution...");
         //wait for event : job pending to running
         receiver.waitForNEvent(1);
-        ArrayList<JobEvent> eventsList = receiver.cleanNgetJobPendingToRunningEvents();
-        assertTrue(eventsList.size() == 1);
-        JobEvent jEvent = eventsList.get(0);
+        ArrayList<JobInfo> infosList = receiver.cleanNgetJobPendingToRunningEvents();
+        assertTrue(infosList.size() == 1);
+        JobInfo jEvent = infosList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
 
         System.out
                 .println("------------------------------ Test 4 : Verifying start and termination of each tasks...");
         //Check first start tasks execution
         receiver.waitForNEvent(1);
-        ArrayList<TaskEvent> tEventList = receiver.cleanNgetTaskPendingToRunningEvents();
+        ArrayList<TaskInfo> tEventList = receiver.cleanNgetTaskPendingToRunningEvents();
         assertTrue(tEventList.size() == 1);
         assertTrue(tEventList.get(0).getTaskId().getReadableName().equals("task1"));
         //check that the first task terminate first
@@ -152,9 +152,9 @@ public class TestJobKilled extends FunctionalTDefaultScheduler {
         log("Test 5 : Verifying job termination...");
         //wait for event : job Running to finished
         receiver.waitForNEvent(1);
-        eventsList = receiver.cleanNgetjobRunningToFinishedEvents();
-        assertTrue(eventsList.size() == 1);
-        jEvent = eventsList.get(0);
+        infosList = receiver.cleanNgetjobRunningToFinishedEvents();
+        assertTrue(infosList.size() == 1);
+        jEvent = infosList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
 
         log("Test 6 : Getting job result...");
@@ -164,9 +164,9 @@ public class TestJobKilled extends FunctionalTDefaultScheduler {
         assertTrue(res.getExceptionResults().size() == 1);
         //wait for event : result retrieval
         receiver.waitForNEvent(1);
-        eventsList = receiver.cleanNgetjobRemoveFinishedEvents();
-        assertTrue(eventsList.size() == 1);
-        jEvent = eventsList.get(0);
+        infosList = receiver.cleanNgetjobRemoveFinishedEvents();
+        assertTrue(infosList.size() == 1);
+        jEvent = infosList.get(0);
         assertTrue(jEvent.getJobId().equals(id));
         Map<String, TaskResult> results = res.getAllResults();
         //check that number of results correspond to number of tasks

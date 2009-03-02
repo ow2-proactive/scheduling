@@ -58,10 +58,10 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -69,7 +69,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.TaskEventImpl;
+import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -121,8 +121,8 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
 
     /** Task information : this is the informations that can change during process. */
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskEventImpl.class)
-    private TaskEventImpl taskInfo = new TaskEventImpl();
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskInfoImpl.class)
+    private TaskInfoImpl taskInfo = new TaskInfoImpl();
 
     /** Node exclusion for this task if desired */
     @Transient
@@ -257,7 +257,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      *
      * @return the taskInfo
      */
-    public TaskEvent getTaskInfo() {
+    public TaskInfo getTaskInfo() {
         return taskInfo;
     }
 
@@ -266,8 +266,8 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      *
      * @param taskInfo the taskInfo to set
      */
-    public void update(TaskEvent taskInfo) {
-        this.taskInfo = (TaskEventImpl) taskInfo;
+    public void update(TaskInfo taskInfo) {
+        this.taskInfo = (TaskInfoImpl) taskInfo;
     }
 
     /**
@@ -357,8 +357,8 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      *
      * @param jobInfo a job info containing job id and others informations
      */
-    public void setJobInfo(JobEvent jobInfo) {
-        taskInfo.setJobEvent(jobInfo);
+    public void setJobInfo(JobInfo jobInfo) {
+        taskInfo.setJobInfo(jobInfo);
     }
 
     /**

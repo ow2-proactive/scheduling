@@ -33,7 +33,7 @@ package org.ow2.proactive.scheduler.gui.composite;
 import java.util.Vector;
 
 import org.eclipse.swt.widgets.Composite;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.listeners.EventJobsListener;
@@ -113,24 +113,24 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
     // -------------------------------------------------------------------- //
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void pausedEvent(JobEvent event) {
-        stateUpdate(event);
+    public void pausedEvent(JobInfo info) {
+        stateUpdate(info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void resumedEvent(JobEvent event) {
-        stateUpdate(event);
+    public void resumedEvent(JobInfo info) {
+        stateUpdate(info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
-    public void priorityChangedEvent(JobEvent event) {
-        JobId jobId = event.getJobId();
+    public void priorityChangedEvent(JobInfo info) {
+        JobId jobId = info.getJobId();
         if (getJobs().contains(jobId)) {
             super.priorityUpdate(jobId);
         }
@@ -139,8 +139,8 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
     // -------------------------------------------------------------------- //
     // ------------------- implements EventJobsListener ------------------- //
     // -------------------------------------------------------------------- //
-    private void stateUpdate(JobEvent event) {
-        JobId jobId = event.getJobId();
+    private void stateUpdate(JobInfo info) {
+        JobId jobId = info.getJobId();
         if (getJobs().contains(jobId)) {
             super.stateUpdate(jobId);
         }

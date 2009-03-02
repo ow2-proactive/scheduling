@@ -61,14 +61,14 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -138,8 +138,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /** Informations (that can be modified) about job execution */
     @Alterable
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobEventImpl.class)
-    protected JobEventImpl jobInfo = new JobEventImpl();
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobInfoImpl.class)
+    protected JobInfoImpl jobInfo = new JobInfoImpl();
 
     /** Job descriptor for dependences management */
     @Transient
@@ -185,15 +185,15 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     public abstract JobType getType();
 
     /**
-     * Set the jobEvent contained in the TaskEvent to this job.
+     * Set the jobInfo contained in the TaskInfo to this job.
      *
-     * @param event a taskEvent containing a job event.
+     * @param info a taskInfo containing a job info.
      */
-    public synchronized void update(TaskEvent event) {
-        //ensure that is a JobEventImpl
-        //if not, we are in client side and client brings its own JobEvent Implementation
-        jobInfo = (JobEventImpl) event.getJobEvent();
-        tasks.get(event.getTaskId()).update(event);
+    public synchronized void update(TaskInfo info) {
+        //ensure that is a JobInfoImpl
+        //if not, we are in client side and client brings its own JobInfo Implementation
+        jobInfo = (JobInfoImpl) info.getJobInfo();
+        tasks.get(info.getTaskId()).update(info);
     }
 
     /**
@@ -201,8 +201,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @param jobInfo the jobInfo to set
      */
-    public synchronized void update(JobEvent jobInfo) {
-        this.jobInfo = (JobEventImpl) jobInfo;
+    public synchronized void update(JobInfo jobInfo) {
+        this.jobInfo = (JobInfoImpl) jobInfo;
 
         if (this.jobInfo.getTaskStatusModify() != null) {
             for (TaskId id : tasks.keySet()) {
@@ -225,7 +225,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @return the jobInfo
      */
-    public JobEvent getJobInfo() {
+    public JobInfo getJobInfo() {
         return jobInfo;
     }
 
@@ -723,7 +723,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
 
     /**
      * Prepare tasks in order to be ready to be scheduled.
-     * The task may have a consistent id and job event.
+     * The task may have a consistent id and job info.
      */
     public synchronized void prepareTasks() {
         logger_dev.debug(" ");

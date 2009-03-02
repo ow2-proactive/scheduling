@@ -61,13 +61,13 @@ import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEvent;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.policy.Policy;
-import org.ow2.proactive.scheduler.common.task.TaskEvent;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
@@ -933,17 +933,17 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobPausedEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_PAUSED, new Class<?>[] { JobEvent.class }, event);
+    public void jobPausedEvent(JobInfo info) {
+        dispatch(SchedulerEvent.JOB_PAUSED, new Class<?>[] { JobInfo.class }, info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobResumedEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_RESUMED, new Class<?>[] { JobEvent.class }, event);
+    public void jobResumedEvent(JobInfo info) {
+        dispatch(SchedulerEvent.JOB_RESUMED, new Class<?>[] { JobInfo.class }, info);
     }
 
     /**
@@ -955,57 +955,57 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobPendingToRunningEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_PENDING_TO_RUNNING, new Class<?>[] { JobEvent.class }, event);
+    public void jobPendingToRunningEvent(JobInfo info) {
+        dispatch(SchedulerEvent.JOB_PENDING_TO_RUNNING, new Class<?>[] { JobInfo.class }, info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobRunningToFinishedEvent(JobEvent event) {
-        jobs.get(event.getJobId()).setFinished(true);
-        dispatch(SchedulerEvent.JOB_RUNNING_TO_FINISHED, new Class<?>[] { JobEvent.class }, event);
+    public void jobRunningToFinishedEvent(JobInfo info) {
+        jobs.get(info.getJobId()).setFinished(true);
+        dispatch(SchedulerEvent.JOB_RUNNING_TO_FINISHED, new Class<?>[] { JobInfo.class }, info);
         //stats
-        stats.increaseFinishedJobCount(event.getNumberOfFinishedTasks());
+        stats.increaseFinishedJobCount(info.getNumberOfFinishedTasks());
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobRemoveFinishedEvent(JobEvent event) {
+    public void jobRemoveFinishedEvent(JobInfo info) {
         //removing jobs from the global list : this job is no more managed
-        jobs.remove(event.getJobId());
-        dispatch(SchedulerEvent.JOB_REMOVE_FINISHED, new Class<?>[] { JobEvent.class }, event);
+        jobs.remove(info.getJobId());
+        dispatch(SchedulerEvent.JOB_REMOVE_FINISHED, new Class<?>[] { JobInfo.class }, info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
-    public void taskPendingToRunningEvent(TaskEvent event) {
-        dispatch(SchedulerEvent.TASK_PENDING_TO_RUNNING, new Class<?>[] { TaskEvent.class }, event);
+    public void taskPendingToRunningEvent(TaskInfo info) {
+        dispatch(SchedulerEvent.TASK_PENDING_TO_RUNNING, new Class<?>[] { TaskInfo.class }, info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
-    public void taskRunningToFinishedEvent(TaskEvent event) {
-        dispatch(SchedulerEvent.TASK_RUNNING_TO_FINISHED, new Class<?>[] { TaskEvent.class }, event);
+    public void taskRunningToFinishedEvent(TaskInfo info) {
+        dispatch(SchedulerEvent.TASK_RUNNING_TO_FINISHED, new Class<?>[] { TaskInfo.class }, info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
-    public void taskWaitingForRestart(TaskEvent event) {
-        dispatch(SchedulerEvent.TASK_WAITING_FOR_RESTART, new Class<?>[] { TaskEvent.class }, event);
+    public void taskWaitingForRestart(TaskInfo info) {
+        dispatch(SchedulerEvent.TASK_WAITING_FOR_RESTART, new Class<?>[] { TaskInfo.class }, info);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
-    public void jobChangePriorityEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_CHANGE_PRIORITY, new Class<?>[] { JobEvent.class }, event);
+    public void jobChangePriorityEvent(JobInfo info) {
+        dispatch(SchedulerEvent.JOB_CHANGE_PRIORITY, new Class<?>[] { JobInfo.class }, info);
     }
 
     /**
