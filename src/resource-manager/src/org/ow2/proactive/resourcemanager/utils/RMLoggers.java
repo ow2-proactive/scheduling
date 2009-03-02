@@ -88,4 +88,6 @@ public interface RMLoggers {
      * Selection manager logger's name. 
      */
     static final public String RMSELECTION = RESOURCEMANAGER + ".rmselection";
+
+    static final public String CONSOLE = RESOURCEMANAGER + ".consol";
 }

@@ -200,6 +200,7 @@ public class SchedulerStarter {
                     logger.warn(e);
                 }
 
+                logger.info("(Press 'e' to shutdown)");
                 while (System.in.read() != 'e')
                     ;
                 //shutdown scheduler if 'e' is pressed

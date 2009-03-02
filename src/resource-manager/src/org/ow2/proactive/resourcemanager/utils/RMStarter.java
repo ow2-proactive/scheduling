@@ -59,7 +59,7 @@ public class RMStarter {
     /**
      * Log4j logger name.
      */
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
+    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.CONSOLE);
 
     private static Options options = new Options();
 
@@ -125,7 +125,7 @@ public class RMStarter {
                 }
             }
 
-            logger.info("Starting Resource Manager: Press 'e' to shutdown.");
+            logger.info("Starting Resource-Manager, Please wait...");
             RMFactory.setOsJavaProperty();
 
             if (cmd.hasOption("n")) {
@@ -146,9 +146,9 @@ public class RMStarter {
                 RMFactory.startLocal(deploymentDescriptors);
             }
 
-            while (System.in.read() != 'e') {
-                logger.info("Press 'e' to shutdown.");
-            }
+            logger.info("(Press 'e' to shutdown)");
+            while (System.in.read() != 'e')
+                ;
 
             logger.info("Shutting down the resource manager");
 
