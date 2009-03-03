@@ -526,7 +526,7 @@ public class HelloTask extends JavaExecutable{
 			<para>			 
 			 <emphasis role="bold">file : </emphasis>nativTask.c
 			</para>
-			<programlisting><textobject><textdata fileref="scheduler_tuto/job_descriptors/native_code_c.txt"/></textobject></programlisting>
+			<programlisting language="c"><textobject><textdata fileref="scheduler_tuto/job_descriptors/native_code_c.txt"/></textobject></programlisting>
 			<para>	
 			You have also an unix compiled version of this program named nativTask in the same directory. Compile the native code above (or take the already compiled version), and place the executable in your <literal>[working_dir]</literal>.		
 			Now we need to write an XML file which describe the job.

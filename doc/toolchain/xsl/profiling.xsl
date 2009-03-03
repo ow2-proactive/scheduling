@@ -26,11 +26,10 @@
 			<xsl:value-of select="."/>
 		</xsl:variable>
 		<xsl:choose>
-			<xsl:when test="name()='fileref'">
+			<xsl:when test="name()='fileref' and name(..)='textdata'">
 					<xsl:attribute name="fileref">
 						<xsl:value-of select="concat('file://',$tmp.dir,$filename)"/>
 					</xsl:attribute>
-
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:copy/>
