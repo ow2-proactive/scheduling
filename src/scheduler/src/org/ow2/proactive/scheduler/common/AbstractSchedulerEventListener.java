@@ -32,8 +32,8 @@
 package org.ow2.proactive.scheduler.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
@@ -66,7 +66,7 @@ public class AbstractSchedulerEventListener implements SchedulerEventListener {
     public void jobRunningToFinishedEvent(JobInfo info) {
     }
 
-    public void jobSubmittedEvent(Job job) {
+    public void jobSubmittedEvent(JobState job) {
     }
 
     public void schedulerFrozenEvent() {

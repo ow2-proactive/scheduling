@@ -15,7 +15,7 @@ if [ $# -lt 1 ]; then
 fi
 
 workingDir=`dirname $0`
-. $workingDir/env.sh
+. $workingDir/env.sh cli
 $JAVACMD org.objectweb.proactive.core.node.StartNode "$@"
 
 echo

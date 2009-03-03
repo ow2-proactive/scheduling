@@ -44,6 +44,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -124,7 +125,7 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
         log("Test 3 : Verifying submission...");
         // wait for event : job submitted
         receiver.waitForNEvent(1);
-        ArrayList<Job> jobsList = receiver.cleanNgetJobSubmittedEvents();
+        ArrayList<JobState> jobsList = receiver.cleanNgetJobSubmittedEvents();
         assertTrue(jobsList.size() == 1);
         Job job = jobsList.get(0);
         assertTrue(job.getId().equals(id));

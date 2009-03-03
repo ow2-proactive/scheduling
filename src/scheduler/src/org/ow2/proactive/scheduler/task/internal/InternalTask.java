@@ -56,14 +56,13 @@ import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
@@ -77,7 +76,8 @@ import org.ow2.proactive.utils.NodeSet;
 /**
  * Internal and global description of a task.
  * This class contains all informations about the task to launch.
- * It also provides a method to create its own launcher.
+ * It also provides methods to create its own launcher and manage the content regarding the scheduling order.<br/>
+ * Specific internal task may extend this abstract class.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -86,22 +86,7 @@ import org.ow2.proactive.utils.NodeSet;
 @Table(name = "INTERNAL_TASK")
 @AccessType("field")
 @Proxy(lazy = false)
-public abstract class InternalTask extends Task implements Comparable<InternalTask> {
-
-    /** Sorting constant, this will allow the user to sort the descriptor. */
-    public static final int SORT_BY_ID = 1;
-    public static final int SORT_BY_NAME = 2;
-    public static final int SORT_BY_STATUS = 3;
-    public static final int SORT_BY_DESCRIPTION = 4;
-    public static final int SORT_BY_EXECUTIONLEFT = 5;
-    public static final int SORT_BY_EXECUTIONONFAILURELEFT = 6;
-    public static final int SORT_BY_STARTED_TIME = 8;
-    public static final int SORT_BY_FINISHED_TIME = 9;
-    public static final int SORT_BY_HOST_NAME = 10;
-    public static final int ASC_ORDER = 1;
-    public static final int DESC_ORDER = 2;
-    private static int currentSort = SORT_BY_ID;
-    private static int currentOrder = ASC_ORDER;
+public abstract class InternalTask extends TaskState {
 
     /** Parents list : null if no dependences */
     @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
@@ -158,68 +143,6 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
             NodeException;
 
     /**
-     * Set the field to sort on.
-     *
-     * @param sortBy
-     *            the field on which the sort will be made.
-     */
-    public static void setSortingBy(int sortBy) {
-        currentSort = sortBy;
-    }
-
-    /**
-     * Set the order for the next sort.
-     *
-     * @param order ASC_ORDER or DESC_ORDER
-     */
-    public static void setSortingOrder(int order) {
-        if ((order == ASC_ORDER) || (order == DESC_ORDER)) {
-            currentOrder = order;
-        } else {
-            currentOrder = ASC_ORDER;
-        }
-    }
-
-    /**
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
-    public int compareTo(InternalTask task) {
-        switch (currentSort) {
-            case SORT_BY_DESCRIPTION:
-                return (currentOrder == ASC_ORDER) ? (description.compareTo(task.description))
-                        : (task.description.compareTo(description));
-            case SORT_BY_NAME:
-                return (currentOrder == ASC_ORDER) ? (name.compareTo(task.name))
-                        : (task.name.compareTo(name));
-            case SORT_BY_STATUS:
-                return (currentOrder == ASC_ORDER) ? (getStatus().compareTo(task.getStatus())) : (task
-                        .getStatus().compareTo(getStatus()));
-            case SORT_BY_STARTED_TIME:
-                return (currentOrder == ASC_ORDER) ? ((int) (getStartTime() - task.getStartTime()))
-                        : ((int) (task.getStartTime() - getStartTime()));
-            case SORT_BY_FINISHED_TIME:
-                return (currentOrder == ASC_ORDER) ? ((int) (getFinishedTime() - task.getFinishedTime()))
-                        : ((int) (task.getFinishedTime() - getFinishedTime()));
-            case SORT_BY_EXECUTIONLEFT:
-                return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getNumberOfExecutionLeft())
-                        .compareTo(Integer.valueOf(task.getNumberOfExecutionLeft()))) : (Integer.valueOf(task
-                        .getNumberOfExecutionLeft()).compareTo(Integer.valueOf(getNumberOfExecutionLeft())));
-            case SORT_BY_EXECUTIONONFAILURELEFT:
-                return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getNumberOfExecutionOnFailureLeft())
-                        .compareTo(Integer.valueOf(task.getNumberOfExecutionOnFailureLeft()))) : (Integer
-                        .valueOf(task.getNumberOfExecutionOnFailureLeft()).compareTo(Integer
-                        .valueOf(getNumberOfExecutionOnFailureLeft())));
-            case SORT_BY_HOST_NAME:
-                return (currentOrder == ASC_ORDER) ? (getExecutionHostName().compareTo(task
-                        .getExecutionHostName())) : (task.getExecutionHostName()
-                        .compareTo(getExecutionHostName()));
-            default:
-                return (currentOrder == ASC_ORDER) ? (getId().compareTo(task.getId())) : (task.getId()
-                        .compareTo(getId()));
-        }
-    }
-
-    /**
      * Return a container for the user executable represented by this task descriptor.
      * 
      * @return the user executable represented by this task descriptor.
@@ -243,30 +166,28 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * Return true if this task has dependencies.
-     * It means the first eligible tasks in case of TASK_FLOW job type.
-     *
-     * @return true if this task has dependencies, false otherwise.
+     * @see org.ow2.proactive.scheduler.common.task.TaskState#hasDependences()
      */
     public boolean hasDependences() {
         return (idependences != null && idependences.size() > 0);
     }
 
     /**
-     * To get the taskInfo
-     *
-     * @return the taskInfo
+     * @see org.ow2.proactive.scheduler.common.task.TaskState#getTaskInfo()
      */
     public TaskInfo getTaskInfo() {
         return taskInfo;
     }
 
     /**
-     * To set the taskInfo
-     *
-     * @param taskInfo the taskInfo to set
+     * @see org.ow2.proactive.scheduler.common.task.TaskState#update(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
-    public void update(TaskInfo taskInfo) {
+    public synchronized void update(TaskInfo taskInfo) {
+        if (!getId().equals(taskInfo.getTaskId())) {
+            throw new IllegalArgumentException(
+                "This task info is not applicable for this task. (expected id is '" + getId() +
+                    "' but was '" + taskInfo.getTaskId() + "'");
+        }
         this.taskInfo = (TaskInfoImpl) taskInfo;
     }
 
@@ -281,30 +202,12 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * To get the finishedTime
-     *
-     * @return the finishedTime
-     */
-    public long getFinishedTime() {
-        return taskInfo.getFinishedTime();
-    }
-
-    /**
      * To set the finishedTime
      *
      * @param finishedTime the finishedTime to set
      */
     public void setFinishedTime(long finishedTime) {
         taskInfo.setFinishedTime(finishedTime);
-    }
-
-    /**
-     * To get the jobID
-     *
-     * @return the jobID
-     */
-    public JobId getJobId() {
-        return taskInfo.getJobId();
     }
 
     /**
@@ -317,30 +220,12 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * To get the startTime
-     *
-     * @return the startTime
-     */
-    public long getStartTime() {
-        return taskInfo.getStartTime();
-    }
-
-    /**
      * To set the startTime
      *
      * @param startTime the startTime to set
      */
     public void setStartTime(long startTime) {
         taskInfo.setStartTime(startTime);
-    }
-
-    /**
-     * To get the taskId
-     *
-     * @return the taskID
-     */
-    public TaskId getId() {
-        return taskInfo.getTaskId();
     }
 
     /**
@@ -362,53 +247,21 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * To get the status
-     *
-     * @return the status
-     */
-    public TaskState getStatus() {
-        return taskInfo.getStatus();
-    }
-
-    /**
      * To set the status
      *
-     * @param taskState the status to set
+     * @param taskStatus the status to set
      */
-    public void setStatus(TaskState taskState) {
-        taskInfo.setStatus(taskState);
+    public void setStatus(TaskStatus taskStatus) {
+        taskInfo.setStatus(taskStatus);
     }
 
     /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return getId().hashCode();
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (InternalTask.class.isAssignableFrom(obj.getClass())) {
-            return ((InternalTask) obj).getId().equals(getId());
-        }
-
-        return false;
-    }
-
-    /**
-     * To get the dependences of this task.
+     * To get the dependences of this task as internal tasks.
      * Return null if this task has no dependence.
      *
      * @return the dependences
      */
-    public List<InternalTask> getDependences() {
+    public List<InternalTask> getIDependences() {
         //set to null if needed
         if (idependences != null && idependences.size() == 0) {
             idependences = null;
@@ -417,12 +270,19 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * To get the executionHostName
-     *
-     * @return the executionHostName
+     * @see org.ow2.proactive.scheduler.common.task.TaskState#getDependences()
      */
-    public String getExecutionHostName() {
-        return taskInfo.getExecutionHostName();
+    public List<TaskState> getDependences() {
+        //set to null if needed
+        if (idependences == null || idependences.size() == 0) {
+            idependences = null;
+            return null;
+        }
+        List<TaskState> tmp = new ArrayList<TaskState>(idependences.size());
+        for (TaskState ts : idependences) {
+            tmp.add(ts);
+        }
+        return tmp;
     }
 
     /**
@@ -471,28 +331,10 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * Get the number of execution left.
-     *
-     * @return the number of execution left.
-     */
-    public int getNumberOfExecutionLeft() {
-        return taskInfo.getNumberOfExecutionLeft();
-    }
-
-    /**
      * Decrease the number of re-run left.
      */
     public void decreaseNumberOfExecutionLeft() {
         taskInfo.decreaseNumberOfExecutionLeft();
-    }
-
-    /**
-     * Get the numberOfExecutionOnFailureLeft value.
-     * 
-     * @return the numberOfExecutionOnFailureLeft value.
-     */
-    public int getNumberOfExecutionOnFailureLeft() {
-        return taskInfo.getNumberOfExecutionOnFailureLeft();
     }
 
     /**
@@ -503,37 +345,36 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * Get the number of execution on failure allowed by the task.
-     * 
-     * @return the number of execution on failure allowed by the task
+     * @see org.ow2.proactive.scheduler.common.task.TaskState#getMaxNumberOfExecutionOnFailure()
      */
     public int getMaxNumberOfExecutionOnFailure() {
         return maxNumberOfExecutionOnFailure;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.Task#getName()
+     * Set the given launcher the local wallTime
+     *
+     * @param launcher the launcher on which to set the walltime
      */
-    @Override
-    public String getName() {
-        if (getId() == null || getId().getReadableName().equals(SchedulerConstants.TASK_DEFAULT_NAME)) {
-            return super.getName();
-        } else {
-            return getId().getReadableName();
-        }
-    }
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "(" + getId() + ")";
-    }
-
     protected void setKillTaskTimer(TaskLauncher launcher) {
         if (isWallTime()) {
             launcher.setWallTime(wallTime);
         }
     }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (InternalTask.class.isAssignableFrom(obj.getClass())) {
+            return ((InternalTask) obj).getId().equals(getId());
+        }
+
+        return false;
+    }
+
 }

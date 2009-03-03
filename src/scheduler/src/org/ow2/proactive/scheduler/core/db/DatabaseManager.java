@@ -348,7 +348,7 @@ public class DatabaseManager {
                 }
                 //unload InternalTask
                 logger_dev.debug("Unloading internalTask for job " + jid);
-                Collection<InternalTask> tasks = job.getTasks();
+                Collection<InternalTask> tasks = job.getITasks();
                 for (InternalTask it : tasks) {
                     unload(it);
                 }

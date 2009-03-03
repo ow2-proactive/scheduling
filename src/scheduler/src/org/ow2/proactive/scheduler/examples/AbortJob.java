@@ -38,7 +38,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
 /**
- * AbortJob is a task state that will throw an exception 3s after starting.
+ * AbortJob is a task behavior that will throw an exception 3s after starting.
  *
  * @author The ProActive Team
  * @date 2 juil. 08

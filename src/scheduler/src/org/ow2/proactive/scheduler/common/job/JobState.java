@@ -31,72 +31,306 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 
 
 /**
- * Scheduling state of a job.
- * The different job states are best described below.
+ * This class contains all informations about the state of the job.
+ * It also provides methods and static fields to order the jobs if you hold them in a list.
+ * It references the list of task contains in the job.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public enum JobState implements java.io.Serializable {
-    /**
-     * The job is waiting to be scheduled.
-     */
-    PENDING("Pending"),
-    /**
-     * The job is running. Actually at least one of its task has been scheduled.
-     */
-    RUNNING("Running"),
-    /**
-     * The job has been launched but no task are currently running.
-     */
-    STALLED("Stalled"),
-    /**
-     * The job is finished. Every tasks are finished.
-     */
-    FINISHED("Finished"),
-    /**
-     * The job is paused waiting for user to resume it.
-     */
-    PAUSED("Paused"),
-    /**
-     * The job has been canceled due to user exception and order.
-     * This state runs when a user exception occurs in a task
-     * and when the user has asked to cancel On exception.
-     */
-    CANCELED("Canceled"),
-    /**
-     * The job has failed. One or more tasks have failed (due to resources failure).
-     * There is no more executionOnFailure left for a task.
-     */
-    FAILED("Failed"),
-    /**
-     * The job has been killed by a user..
-     * Nothing can be done anymore on this job expect read execution informations
-     * such as output, time, etc...
-     */
-    KILLED("Killed");
+public abstract class JobState extends Job implements Comparable<JobState> {
 
-    /** The textual definition of the state */
-    private String definition;
+    /** Used to sort by id */
+    public static final int SORT_BY_ID = 1;
+    /** Used to sort by name */
+    public static final int SORT_BY_NAME = 2;
+    /** Used to sort by priority */
+    public static final int SORT_BY_PRIORITY = 3;
+    /** Used to sort by type */
+    public static final int SORT_BY_TYPE = 4;
+    /** Used to sort by description */
+    public static final int SORT_BY_DESCRIPTION = 5;
+    /** Used to sort by owner */
+    public static final int SORT_BY_OWNER = 6;
+    /** Used to sort by status */
+    public static final int SORT_BY_STATUS = 7;
+    /** Used to sort by project name */
+    public static final int SORT_BY_PROJECT = 8;
+    /** Used to sort according to ascendant order */
+    public static final int ASC_ORDER = 1;
+    /** Used to sort according to descendant order */
+    public static final int DESC_ORDER = 2;
+    private static int currentSort = SORT_BY_ID;
+    private static int currentOrder = ASC_ORDER;
 
-    /**
-     * Default constructor.
-     * @param def the textual definition of the state.
-     */
-    JobState(String def) {
-        definition = def;
+    /** ProActive default constructor */
+    public JobState() {
     }
 
     /**
-     * @see java.lang.Enum#toString()
+     * Set the jobInfo contained in the TaskInfo to this job.
+     *
+     * @param info a taskInfo containing a job info.
+     */
+    public abstract void update(TaskInfo info);
+
+    /**
+     * To update the content of this job with a jobInfo.
+     *
+     * @param jobInfo the jobInfo to set
+     */
+    public abstract void update(JobInfo jobInfo);
+
+    /**
+     * Set the field to sort on.
+     *
+     * @param sortBy the field on which the sort will be made.
+     */
+    public static void setSortingBy(int sortBy) {
+        currentSort = sortBy;
+    }
+
+    /**
+     * Set the order for the next sort.
+     *
+     * @param order
+     */
+    public static void setSortingOrder(int order) {
+        if ((order == ASC_ORDER) || (order == DESC_ORDER)) {
+            currentOrder = order;
+        } else {
+            currentOrder = ASC_ORDER;
+        }
+    }
+
+    /**
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * @param job The internal job to be compared.
+     * @return  a negative integer, zero, or a positive integer as this job
+     *		is less than, equal to, or greater than the specified job.
+     *
+     */
+    public int compareTo(JobState job) {
+        switch (currentSort) {
+            case SORT_BY_DESCRIPTION:
+                return (currentOrder == ASC_ORDER) ? (description.compareTo(job.description))
+                        : (job.description.compareTo(description));
+            case SORT_BY_NAME:
+                return (currentOrder == ASC_ORDER) ? (name.compareTo(job.name)) : (job.name.compareTo(name));
+            case SORT_BY_PRIORITY:
+                return (currentOrder == ASC_ORDER) ? (getJobInfo().getPriority().getPriority() - job
+                        .getJobInfo().getPriority().getPriority()) : (job.getJobInfo().getPriority()
+                        .getPriority() - getJobInfo().getPriority().getPriority());
+            case SORT_BY_TYPE:
+                return (currentOrder == ASC_ORDER) ? (getType().compareTo(job.getType())) : (job.getType()
+                        .compareTo(getType()));
+            case SORT_BY_OWNER:
+                return (currentOrder == ASC_ORDER) ? (getOwner().compareTo(job.getOwner())) : (job.getOwner()
+                        .compareTo(getOwner()));
+            case SORT_BY_STATUS:
+                return (currentOrder == ASC_ORDER) ? (getJobInfo().getStatus().compareTo(job.getJobInfo()
+                        .getStatus())) : (job.getJobInfo().getStatus().compareTo(getJobInfo().getStatus()));
+            case SORT_BY_PROJECT:
+                return (currentOrder == ASC_ORDER) ? (getProjectName().compareTo(job.getProjectName()))
+                        : (job.getProjectName().compareTo(getProjectName()));
+            default:
+                return (currentOrder == ASC_ORDER) ? (getId().compareTo(job.getId())) : (job.getId()
+                        .compareTo(getId()));
+        }
+    }
+
+    /**
+     * To get the jobInfo of this job.
+     *
+     * @return the jobInfo of this job.
+     */
+    public abstract JobInfo getJobInfo();
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.Job#getId()
+     */
+    @Override
+    public JobId getId() {
+        return getJobInfo().getJobId();
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.Job#getPriority()
+     */
+    @Override
+    public JobPriority getPriority() {
+        return getJobInfo().getPriority();
+    }
+
+    /**
+     * To get the tasks as an array list.
+     *
+     * @return the tasks contains in this job.
+     */
+    public abstract ArrayList<TaskState> getTasks();
+
+    /**
+     * To get the tasks as a hash map.
+     *
+     * @return the tasks as a hash map
+     */
+    public abstract Map<TaskId, TaskState> getHMTasks();
+
+    /**
+     * To get the numberOfFinishedTask
+     *
+     * @return the numberOfFinishedTask
+     */
+    public int getNumberOfFinishedTask() {
+        return getJobInfo().getNumberOfFinishedTasks();
+    }
+
+    /**
+     * To get the finishedTime
+     *
+     * @return the finishedTime
+     */
+    public long getFinishedTime() {
+        return getJobInfo().getFinishedTime();
+    }
+
+    /**
+     * To get the numberOfPendingTask
+     *
+     * @return the numberOfPendingTask
+     */
+    public int getNumberOfPendingTask() {
+        return getJobInfo().getNumberOfPendingTasks();
+    }
+
+    /**
+     * To get the numberOfRunningTask
+     *
+     * @return the numberOfRunningTask
+     */
+    public int getNumberOfRunningTask() {
+        return getJobInfo().getNumberOfRunningTasks();
+    }
+
+    /**
+     * To get the startTime
+     *
+     * @return the startTime
+     */
+    public long getStartTime() {
+        return getJobInfo().getStartTime();
+    }
+
+    /**
+     * To get the totalNumberOfTasks
+     *
+     * @return the totalNumberOfTasks
+     */
+    public int getTotalNumberOfTasks() {
+        return getJobInfo().getTotalNumberOfTasks();
+    }
+
+    /**
+     * To get the removedTime
+     *
+     * @return the removedTime
+     */
+    public long getRemovedTime() {
+        return getJobInfo().getRemovedTime();
+    }
+
+    /**
+     * To get the submittedTime
+     *
+     * @return the submittedTime
+     */
+    public long getSubmittedTime() {
+        return getJobInfo().getSubmittedTime();
+    }
+
+    /**
+     * To get the status of the job.
+     *
+     * @return the status of the job.
+     */
+    public JobStatus getStatus() {
+        return getJobInfo().getStatus();
+    }
+
+    /**
+     * To get the owner of the job.
+     *
+     * @return the owner of the job.
+     */
+    public abstract String getOwner();
+
+    /**
+     * Returns the job result.
+     *
+     * @return the job result.
+     */
+    public abstract JobResult getJobResult();
+
+    /**
+     * Get the toBeRemoved property.
+     * If this method returns true, this job is about to be removed from scheduler.
+     *
+     * @return the toBeRemoved property.
+     */
+    public boolean isToBeRemoved() {
+        return getJobInfo().isToBeRemoved();
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.Job#getName()
+     */
+    @Override
+    public String getName() {
+        if (getId() == null || getId().getReadableName().equals(SchedulerConstants.JOB_DEFAULT_NAME)) {
+            return super.getName();
+        } else {
+            return getId().getReadableName();
+        }
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof JobState) {
+            return getId().equals(((JobState) o).getId());
+        }
+
+        return false;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return definition;
+        return getClass().getSimpleName() + "[" + getId() + "]";
     }
+
 }

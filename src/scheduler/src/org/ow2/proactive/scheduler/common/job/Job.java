@@ -104,9 +104,9 @@ public abstract class Job extends CommonAttribute {
     }
 
     /**
-     * To get the type
+     * To get the type of this job
      *
-     * @return the type
+     * @return the type of this job
      */
     public abstract JobType getType();
 

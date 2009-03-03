@@ -38,7 +38,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -93,10 +93,11 @@ public class SubmitJobAction extends SchedulerGUIAction {
     }
 
     @Override
-    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
-        if (connected && (schedulerState != SchedulerState.KILLED) &&
-            (schedulerState != SchedulerState.SHUTTING_DOWN) && (schedulerState != SchedulerState.STOPPED))
+        if (connected && (schedulerStatus != SchedulerStatus.KILLED) &&
+            (schedulerStatus != SchedulerStatus.SHUTTING_DOWN) &&
+            (schedulerStatus != SchedulerStatus.STOPPED))
             setEnabled(true);
         else
             setEnabled(false);

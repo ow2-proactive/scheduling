@@ -800,7 +800,7 @@ job.setTask(aTask);
 							that the concerned task will be restart on any available resources or especially on a different one.
 							A task can be restart when an exception occurred (Java Task) or an error code is returned (Native Task) and 
 							if the maximum number of execution has not been reached yet. Each time an error occurred, the task is placed in
-							a Faulty(n/m) state and the numberOfExecutionLeft count is decrease. n is the current number of executions and
+							a Faulty(n/m) status and the numberOfExecutionLeft count is decrease. n is the current number of executions and
 							m is the maximum number of executions.
 						</para>
 						<para>
@@ -1160,7 +1160,7 @@ JobResult myResult = scheduler.getJobResult(myJobId);
 				that will inform you of some events, like job submitting, job or task finished, scheduling
 				state changing, etc... To add a listener, just make your listener by implementing the
 				<emphasis>SchedulerEventListener</emphasis> interface and add it to the scheduler. You will
-				then receive the scheduler initial state containing some information about the current
+				then receive the scheduler state containing some information about the current
 				scheduling state. See the ProActive Scheduler JAVADOC for more details.
 			</para>
 			<programlisting language="java">

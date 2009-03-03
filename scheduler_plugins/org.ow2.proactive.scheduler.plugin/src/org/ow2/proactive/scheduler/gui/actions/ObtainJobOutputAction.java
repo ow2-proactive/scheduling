@@ -33,7 +33,7 @@ package org.ow2.proactive.scheduler.gui.actions;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.gui.data.JobsOutputController;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
@@ -59,7 +59,7 @@ public class ObtainJobOutputAction extends SchedulerGUIAction {
     }
 
     @Override
-    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
         if (connected && jobSelected && (admin || owner))
             setEnabled(true);

@@ -31,7 +31,7 @@
 package org.ow2.proactive.scheduler.gui.actions;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -77,13 +77,14 @@ public class StartStopSchedulerAction extends SchedulerGUIAction {
     }
 
     @Override
-    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
-        if (connected && admin && (schedulerState == SchedulerState.STOPPED)) {
+        if (connected && admin && (schedulerStatus == SchedulerStatus.STOPPED)) {
             setStartMode();
             setEnabled(true);
-        } else if (connected && admin && (schedulerState != SchedulerState.KILLED) &&
-            (schedulerState != SchedulerState.UNLINKED) && (schedulerState != SchedulerState.SHUTTING_DOWN)) {
+        } else if (connected && admin && (schedulerStatus != SchedulerStatus.KILLED) &&
+            (schedulerStatus != SchedulerStatus.UNLINKED) &&
+            (schedulerStatus != SchedulerStatus.SHUTTING_DOWN)) {
             setStopMode();
             setEnabled(true);
         } else

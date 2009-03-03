@@ -41,8 +41,9 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
@@ -53,7 +54,6 @@ import org.ow2.proactive.scheduler.gui.listeners.EventTasksListener;
 import org.ow2.proactive.scheduler.gui.listeners.RunningJobsListener;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
 import org.ow2.proactive.scheduler.gui.views.TaskView;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -148,10 +148,10 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite#createItem(org.objectweb.proactive.extra.scheduler.job.Job)
+     * @see org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite#createItem(org.ow2.proactive.scheduler.common.job.JobState, int)
      */
     @Override
-    protected TableItem createItem(InternalJob job, int itemIndex) {
+    protected TableItem createItem(JobState job, int itemIndex) {
         Table table = getTable();
         TableItem item = super.createItem(job, itemIndex);
         TableColumn[] cols = table.getColumns();
@@ -234,7 +234,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                             }
                         }
                     } else if (j.length > 1) {
-                        List<InternalJob> jobs = JobsController.getLocalView().getJobsByIds(
+                        List<JobState> jobs = JobsController.getLocalView().getJobsByIds(
                                 TableManager.getInstance().getJobsIdOfSelectedItems());
 
                         org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
@@ -295,7 +295,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                         }
 
                     TableColumn[] cols = table.getColumns();
-                    InternalJob job = JobsController.getLocalView().getJobById(taskInfo.getJobId());
+                    JobState job = JobsController.getLocalView().getJobById(taskInfo.getJobId());
                     for (int i = 0; i < cols.length; i++) {
                         String title = cols[i].getText();
                         if ((title != null) &&

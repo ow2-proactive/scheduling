@@ -44,8 +44,8 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
@@ -66,7 +66,7 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
 
     private ArrayList<JobInfo> jobRunningToFinishedEvents;
 
-    private ArrayList<Job> jobSubmittedEvents;
+    private ArrayList<JobState> jobSubmittedEvents;
 
     private ArrayList<JobInfo> jobRemoveFinishedEvents;
 
@@ -86,7 +86,7 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     public SchedulerEventReceiver() {
         jobPendingToRunningEvents = new ArrayList<JobInfo>();
         jobRunningToFinishedEvents = new ArrayList<JobInfo>();
-        jobSubmittedEvents = new ArrayList<Job>();
+        jobSubmittedEvents = new ArrayList<JobState>();
         jobRemoveFinishedEvents = new ArrayList<JobInfo>();
         taskWaitingForRestartEvents = new ArrayList<TaskInfo>();
         taskPendingToRunningEvents = new ArrayList<TaskInfo>();
@@ -144,8 +144,8 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
      *
      * @return the eventual 'job submitted' events received by this monitor.
      */
-    public ArrayList<Job> cleanNgetJobSubmittedEvents() {
-        ArrayList<Job> toReturn = (ArrayList<Job>) this.jobSubmittedEvents.clone();
+    public ArrayList<JobState> cleanNgetJobSubmittedEvents() {
+        ArrayList<JobState> toReturn = (ArrayList<JobState>) this.jobSubmittedEvents.clone();
         this.jobSubmittedEvents.clear();
         return toReturn;
     }
@@ -247,9 +247,9 @@ public class SchedulerEventReceiver implements SchedulerEventListener, InitActiv
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.Job)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
      */
-    public void jobSubmittedEvent(Job job) {
+    public void jobSubmittedEvent(JobState job) {
         jobSubmittedEvents.add(job);
     }
 

@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
  * This test will first commit 3 jobs.
  * When the each one will be in each list (pending, running, finished), the scheduler will
  * be interrupt abnormally.
- * After restart, It will check that every data, tags, state are those expected.
+ * After restart, It will check that every data, tags, status are those expected.
  * It will finally check if the scheduling process will terminate.
  *
  * @author The ProActive Team
@@ -129,7 +129,7 @@ public class TestJobRecover extends FunctionalTDefaultScheduler {
 
         log("Check scheduling process...");
         //...and check that the scheduling process is as expected
-        ready = 1;//one job already finished
+        ready = 1 + receiver.cleanNgetjobRunningToFinishedEvents().size();//one job already finished + maybe one more
         while (true) {
             receiver.waitForNEvent(1);
             int jrtf = receiver.cleanNgetjobRunningToFinishedEvents().size();

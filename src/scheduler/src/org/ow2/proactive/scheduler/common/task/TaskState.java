@@ -31,91 +31,253 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.util.List;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.job.JobId;
 
 
 /**
- * This class represents every state that a task is able to be in.<br>
- * Each state are best describe below.
+ * This class contains all informations about the state of the task.
+ * It also provides methods and static fields to order the tasks if you hold them in a list.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public enum TaskState implements java.io.Serializable {
+public abstract class TaskState extends Task implements Comparable<TaskState> {
 
-    /**
-     * The task has just been submitted by the user.
-     */
-    SUBMITTED("Submitted"),
-    /**
-     * The task is in the scheduler pending queue.
-     */
-    PENDING("Pending"),
-    /**
-     * The task is paused.
-     */
-    PAUSED("Paused"),
-    /**
-     * The task is executing.
-     */
-    RUNNING("Running"),
-    /**
-     * The task is waiting for restart after an error. (ie:native code != 0 or exception)
-     */
-    WAITING_ON_ERROR("Faulty..."),
-    /**
-     * The task is waiting for restart after a failure. (ie:node down)
-     */
-    WAITING_ON_FAILURE("Failed..."),
-    /**
-     * The task is failed 
-     * (only if max execution time has been reached and the node on which it was started is down).
-     */
-    FAILED("Resource down"),
-    /**
-     * The task could not be started.<br>
-     * It means that the task could not be started due to
-     * dependences failure.
-     */
-    NOT_STARTED("Could not start"),
-    /**
-     * The task could not be restarted.<br>
-     * It means that the task could not be restarted after an error
-     * during the previous execution
-     */
-    NOT_RESTARTED("Could not restart"),
-    /**
-     * The task has been aborted by an exception on an other task. (job is cancelOnError=true)
-     * Can be also in this state if the job is killed while the concerned task was running.
-     */
-    ABORTED("Aborted"),
-    /**
-     * The task has finished execution with error code (!=0) or exception.
-     */
-    FAULTY("Faulty"),
-    /**
-     * The task has finished execution.
-     */
-    FINISHED("Finished");
+    /** Sorting constant, this will allow the user to sort the descriptor. */
+    public static final int SORT_BY_ID = 1;
+    public static final int SORT_BY_NAME = 2;
+    public static final int SORT_BY_STATUS = 3;
+    public static final int SORT_BY_DESCRIPTION = 4;
+    public static final int SORT_BY_EXECUTIONLEFT = 5;
+    public static final int SORT_BY_EXECUTIONONFAILURELEFT = 6;
+    public static final int SORT_BY_STARTED_TIME = 8;
+    public static final int SORT_BY_FINISHED_TIME = 9;
+    public static final int SORT_BY_HOST_NAME = 10;
+    public static final int ASC_ORDER = 1;
+    public static final int DESC_ORDER = 2;
+    protected static int currentSort = SORT_BY_ID;
+    protected static int currentOrder = ASC_ORDER;
 
-    /** The name of the current status. */
-    private String name;
-
-    /**
-     * Implicit constructor of a status.
-     *
-     * @param name the name of the status.
-     */
-    TaskState(String name) {
-        this.name = name;
+    /** ProActive default constructor */
+    public TaskState() {
     }
 
     /**
-     * @see java.lang.Enum#toString()
+     * To update this taskState using a taskInfo
+     *
+     * @param taskInfo the taskInfo to set
+     */
+    public abstract void update(TaskInfo taskInfo);
+
+    /**
+     * Set the field to sort on.
+     *
+     * @param sortBy the field on which the sort will be made.
+     */
+    public static void setSortingBy(int sortBy) {
+        currentSort = sortBy;
+    }
+
+    /**
+     * Set the order for the next sort.
+     *
+     * @param order ASC_ORDER or DESC_ORDER
+     */
+    public static void setSortingOrder(int order) {
+        if ((order == ASC_ORDER) || (order == DESC_ORDER)) {
+            currentOrder = order;
+        } else {
+            currentOrder = ASC_ORDER;
+        }
+    }
+
+    /**
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(TaskState task) {
+        switch (currentSort) {
+            case SORT_BY_DESCRIPTION:
+                return (currentOrder == ASC_ORDER) ? (description.compareTo(task.description))
+                        : (task.description.compareTo(description));
+            case SORT_BY_NAME:
+                return (currentOrder == ASC_ORDER) ? (name.compareTo(task.name))
+                        : (task.name.compareTo(name));
+            case SORT_BY_STATUS:
+                return (currentOrder == ASC_ORDER) ? (getStatus().compareTo(task.getStatus())) : (task
+                        .getStatus().compareTo(getStatus()));
+            case SORT_BY_STARTED_TIME:
+                return (currentOrder == ASC_ORDER) ? ((int) (getStartTime() - task.getStartTime()))
+                        : ((int) (task.getStartTime() - getStartTime()));
+            case SORT_BY_FINISHED_TIME:
+                return (currentOrder == ASC_ORDER) ? ((int) (getFinishedTime() - task.getFinishedTime()))
+                        : ((int) (task.getFinishedTime() - getFinishedTime()));
+            case SORT_BY_EXECUTIONLEFT:
+                return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getNumberOfExecutionLeft())
+                        .compareTo(Integer.valueOf(task.getNumberOfExecutionLeft()))) : (Integer.valueOf(task
+                        .getNumberOfExecutionLeft()).compareTo(Integer.valueOf(getNumberOfExecutionLeft())));
+            case SORT_BY_EXECUTIONONFAILURELEFT:
+                return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getNumberOfExecutionOnFailureLeft())
+                        .compareTo(Integer.valueOf(task.getNumberOfExecutionOnFailureLeft()))) : (Integer
+                        .valueOf(task.getNumberOfExecutionOnFailureLeft()).compareTo(Integer
+                        .valueOf(getNumberOfExecutionOnFailureLeft())));
+            case SORT_BY_HOST_NAME:
+                return (currentOrder == ASC_ORDER) ? (getExecutionHostName().compareTo(task
+                        .getExecutionHostName())) : (task.getExecutionHostName()
+                        .compareTo(getExecutionHostName()));
+            default:
+                return (currentOrder == ASC_ORDER) ? (getId().compareTo(task.getId())) : (task.getId()
+                        .compareTo(getId()));
+        }
+    }
+
+    /**
+     * Return true if this task has dependencies.
+     * It means the first eligible tasks in case of TASK_FLOW job type.
+     *
+     * @return true if this task has dependencies, false otherwise.
+     */
+    public abstract boolean hasDependences();
+
+    /**
+     * To get the taskInfo
+     *
+     * @return the taskInfo
+     */
+    public abstract TaskInfo getTaskInfo();
+
+    /**
+     * To get the finishedTime
+     *
+     * @return the finishedTime
+     */
+    public long getFinishedTime() {
+        return getTaskInfo().getFinishedTime();
+    }
+
+    /**
+     * To get the jobID
+     *
+     * @return the jobID
+     */
+    public JobId getJobId() {
+        return getTaskInfo().getJobId();
+    }
+
+    /**
+     * To get the startTime
+     *
+     * @return the startTime
+     */
+    public long getStartTime() {
+        return getTaskInfo().getStartTime();
+    }
+
+    /**
+     * To get the taskId
+     *
+     * @return the taskID
+     */
+    public TaskId getId() {
+        return getTaskInfo().getTaskId();
+    }
+
+    /**
+     * To get the status of this job
+     *
+     * @return the status of this job
+     */
+    public TaskStatus getStatus() {
+        return getTaskInfo().getStatus();
+    }
+
+    /**
+     * To get the dependences of this task.
+     * Return null if this task has no dependence.
+     *
+     * @return the dependences of this task
+     */
+    public abstract List<TaskState> getDependences();
+
+    /**
+     * To get the executionHostName
+     *
+     * @return the executionHostName
+     */
+    public String getExecutionHostName() {
+        return getTaskInfo().getExecutionHostName();
+    }
+
+    /**
+     * Get the number of execution left.
+     *
+     * @return the number of execution left.
+     */
+    public int getNumberOfExecutionLeft() {
+        return getTaskInfo().getNumberOfExecutionLeft();
+    }
+
+    /**
+     * Get the numberOfExecutionOnFailureLeft value.
+     *
+     * @return the numberOfExecutionOnFailureLeft value.
+     */
+    public int getNumberOfExecutionOnFailureLeft() {
+        return getTaskInfo().getNumberOfExecutionOnFailureLeft();
+    }
+
+    /**
+     * Get the number of execution on failure allowed by the task.
+     *
+     * @return the number of execution on failure allowed by the task
+     */
+    public abstract int getMaxNumberOfExecutionOnFailure();
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.Task#getName()
+     */
+    @Override
+    public String getName() {
+        if (getId() == null || getId().getReadableName().equals(SchedulerConstants.TASK_DEFAULT_NAME)) {
+            return super.getName();
+        } else {
+            return getId().getReadableName();
+        }
+    }
+
+    /**
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return name;
+        return getClass().getSimpleName() + "(" + getId() + ")";
     }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (TaskState.class.isAssignableFrom(obj.getClass())) {
+            return ((TaskState) obj).getId().equals(getId());
+        }
+
+        return false;
+    }
+
 }

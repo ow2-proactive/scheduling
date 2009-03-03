@@ -42,9 +42,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -199,6 +197,7 @@ public class NativeTaskLauncher extends TaskLauncher {
         ScriptResult<String> res = handler.handle(script);
 
         if (res.errorOccured()) {
+            res.getException().printStackTrace();
             logger_dev.error(res.getException());
             throw new UserException("Command generation script execution has failed on the current node");
         }

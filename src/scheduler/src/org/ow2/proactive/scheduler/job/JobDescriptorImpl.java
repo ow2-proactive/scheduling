@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.task.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -117,8 +117,8 @@ public class JobDescriptorImpl implements JobDescriptor {
             makeTree(job);
         } else {
             //every tasks are eligible
-            for (InternalTask td : job.getTasks()) {
-                if (td.getStatus() == TaskState.SUBMITTED) {
+            for (InternalTask td : job.getITasks()) {
+                if (td.getStatus() == TaskStatus.SUBMITTED) {
                     eligibleTasks.put(td.getId(), new EligibleTaskDescriptorImpl(td));
                 }
             }
@@ -135,7 +135,7 @@ public class JobDescriptorImpl implements JobDescriptor {
         Map<InternalTask, TaskDescriptor> mem = new HashMap<InternalTask, TaskDescriptor>();
 
         //create task descriptor list
-        for (InternalTask td : job.getTasks()) {
+        for (InternalTask td : job.getITasks()) {
             //if this task is a first task, put it in eligible tasks list
             EligibleTaskDescriptor lt = new EligibleTaskDescriptorImpl(td);
 
@@ -147,11 +147,11 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
 
         //now for each taskDescriptor, set the parents and children list
-        for (InternalTask td : job.getTasks()) {
+        for (InternalTask td : job.getITasks()) {
             if (td.getDependences() != null) {
                 TaskDescriptor taskDescriptor = mem.get(td);
 
-                for (InternalTask depends : td.getDependences()) {
+                for (InternalTask depends : td.getIDependences()) {
                     ((EligibleTaskDescriptorImpl) taskDescriptor).addParent(mem.get(depends));
                 }
 
@@ -236,18 +236,18 @@ public class JobDescriptorImpl implements JobDescriptor {
      * Update the list of eligible tasks according to the status of each task.
      * This method is called only if user pause a job.
      *
-     * @param taskState the taskId with their current status.
+     * @param taskStatus the taskId with their current status.
      */
-    public void update(Map<TaskId, TaskState> taskState) {
+    public void update(Map<TaskId, TaskStatus> taskStatus) {
         logger_dev.debug(" ");
-        for (Entry<TaskId, TaskState> tid : taskState.entrySet()) {
-            if (tid.getValue() == TaskState.PAUSED) {
+        for (Entry<TaskId, TaskStatus> tid : taskStatus.entrySet()) {
+            if (tid.getValue() == TaskStatus.PAUSED) {
                 TaskDescriptor lt = eligibleTasks.get(tid.getKey());
 
                 if (lt != null) {
                     pausedTasks.put(tid.getKey(), eligibleTasks.remove(tid.getKey()));
                 }
-            } else if ((tid.getValue() == TaskState.PENDING) || (tid.getValue() == TaskState.SUBMITTED)) {
+            } else if ((tid.getValue() == TaskStatus.PENDING) || (tid.getValue() == TaskStatus.SUBMITTED)) {
                 EligibleTaskDescriptor lt = (EligibleTaskDescriptor) pausedTasks.get(tid.getKey());
 
                 if (lt != null) {

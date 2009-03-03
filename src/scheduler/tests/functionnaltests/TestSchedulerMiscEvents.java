@@ -80,7 +80,7 @@ public class TestSchedulerMiscEvents extends FunctionalTDefaultScheduler {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        log("Try many tests about scheduler state");
+        log("Try many tests about scheduler status");
         assertTrue(!schedAdminInterface.start().booleanValue());
         assertTrue(!schedAdminInterface.resume().booleanValue());
         assertTrue(schedAdminInterface.stop().booleanValue());

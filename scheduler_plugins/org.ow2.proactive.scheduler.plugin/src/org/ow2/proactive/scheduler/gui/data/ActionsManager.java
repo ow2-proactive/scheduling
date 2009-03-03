@@ -3,11 +3,11 @@ package org.ow2.proactive.scheduler.gui.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -19,20 +19,20 @@ public class ActionsManager {
 
     private static ActionsManager instance = null;
     private List<SchedulerGUIAction> actions = null;
-    private SchedulerState schedulerState = null;
+    private SchedulerStatus schedulerStatus = null;
     private boolean connected = false;
 
     private ActionsManager() {
         actions = new ArrayList<SchedulerGUIAction>();
-        schedulerState = SchedulerState.KILLED;
+        schedulerStatus = SchedulerStatus.KILLED;
     }
 
     public void setConnected(boolean connected) {
         this.connected = connected;
     }
 
-    public void setSchedulerState(SchedulerState schedulerState) {
-        this.schedulerState = schedulerState;
+    public void setSchedulerStatus(SchedulerStatus schedulerStatus) {
+        this.schedulerStatus = schedulerStatus;
     }
 
     public boolean addAction(SchedulerGUIAction action) {
@@ -47,13 +47,13 @@ public class ActionsManager {
         if (connected) {
             List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
             if (jobsId.size() > 0) {
-                List<InternalJob> jobs = JobsController.getLocalView().getJobsByIds(jobsId);
+                List<JobState> jobs = JobsController.getLocalView().getJobsByIds(jobsId);
                 if (jobs.size() > 0) {
-                    InternalJob job = jobs.get(0);
+                    JobState job = jobs.get(0);
                     jobSelected = true;
-                    jobInFinishQueue = (job.getState() == JobState.CANCELED) ||
-                        (job.getState() == JobState.FAILED) || (job.getState() == JobState.FINISHED) ||
-                        (job.getState() == JobState.KILLED);
+                    jobInFinishQueue = (job.getStatus() == JobStatus.CANCELED) ||
+                        (job.getStatus() == JobStatus.FAILED) || (job.getStatus() == JobStatus.FINISHED) ||
+                        (job.getStatus() == JobStatus.KILLED);
                     owner = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
                     for (int i = 1; owner && (i < jobs.size()); i++) {
                         owner &= SchedulerProxy.getInstance().isItHisJob(jobs.get(i).getOwner());
@@ -63,7 +63,7 @@ public class ActionsManager {
         }
 
         for (SchedulerGUIAction action : actions)
-            action.setEnabled(connected, schedulerState, SchedulerProxy.getInstance().isAnAdmin(),
+            action.setEnabled(connected, schedulerStatus, SchedulerProxy.getInstance().isAnAdmin(),
                     jobSelected, owner, jobInFinishQueue);
     }
 

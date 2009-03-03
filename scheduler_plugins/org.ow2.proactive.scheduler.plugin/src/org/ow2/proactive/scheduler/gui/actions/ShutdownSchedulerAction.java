@@ -33,7 +33,7 @@ package org.ow2.proactive.scheduler.gui.actions;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -62,10 +62,10 @@ public class ShutdownSchedulerAction extends SchedulerGUIAction {
     }
 
     @Override
-    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
-        if (connected && admin && (schedulerState != SchedulerState.SHUTTING_DOWN) &&
-            (schedulerState != SchedulerState.UNLINKED) && (schedulerState != SchedulerState.KILLED))
+        if (connected && admin && (schedulerStatus != SchedulerStatus.SHUTTING_DOWN) &&
+            (schedulerStatus != SchedulerStatus.UNLINKED) && (schedulerStatus != SchedulerStatus.KILLED))
             setEnabled(true);
         else
             setEnabled(false);

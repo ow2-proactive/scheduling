@@ -316,6 +316,7 @@ public abstract class TaskLauncher implements InitActive {
         ScriptResult<String> res = handler.handle(pre);
 
         if (res.errorOccured()) {
+            res.getException().printStackTrace();
             logger_dev.error("Error on pre-script occured : ", res.getException());
             throw new UserException("Pre-script has failed on the current node", res.getException());
         }
@@ -338,6 +339,7 @@ public abstract class TaskLauncher implements InitActive {
         ScriptResult<String> res = handler.handle(post);
 
         if (res.errorOccured()) {
+            res.getException().printStackTrace();
             logger_dev.error("Error on post-script occured : ", res.getException());
             throw new UserException("Post-script has failed on the current node", res.getException());
         }

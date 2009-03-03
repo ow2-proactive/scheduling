@@ -99,16 +99,16 @@ public class IdentifiedJob implements Serializable {
     /**
      * Return true if the job isFinished, false otherwise.
      *
-     * @return the finished state of the job.
+     * @return the finished status of the job.
      */
     public boolean isFinished() {
         return finished;
     }
 
     /**
-     * Set the finish state of the job.
+     * Set the finish status of the job.
      *
-     * @param finished the finish state to set.
+     * @param finished the finish status to set.
      */
     public void setFinished(boolean finished) {
         this.finished = finished;

@@ -31,6 +31,15 @@
  */
 package org.ow2.proactive.scheduler.ext.masterworker;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+
+import javax.security.auth.login.LoginException;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -48,19 +57,18 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
-import javax.security.auth.login.LoginException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
 
 
 public class AOSchedulerWorker extends AOWorker implements SchedulerEventListener {
@@ -254,7 +262,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     }
 
     public void jobRunningToFinishedEvent(JobInfo info) {
-        if (info.getState() == JobState.KILLED) {
+        if (info.getStatus() == JobStatus.KILLED) {
             if (!processing.containsKey(info.getJobId())) {
                 return;
             }
@@ -339,7 +347,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         }
     }
 
-    public void jobSubmittedEvent(Job job) {
+    public void jobSubmittedEvent(JobState job) {
         // TODO Auto-generated method stub
 
     }

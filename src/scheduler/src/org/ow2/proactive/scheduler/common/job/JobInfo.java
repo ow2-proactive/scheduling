@@ -117,11 +117,11 @@ public interface JobInfo extends Serializable {
     public JobPriority getPriority();
 
     /**
-     * Return the state of the job.
+     * Return the status of the job.
      *
-     * @return the state of the job.
+     * @return the status of the job.
      */
-    public JobState getState();
+    public JobStatus getStatus();
 
     /**
      * Get the toBeRemoved property.

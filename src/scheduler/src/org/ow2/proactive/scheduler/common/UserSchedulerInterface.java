@@ -111,8 +111,8 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * @return the scheduler current state containing the different lists of jobs.
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right), or if the registered listener is not a remote object.
      */
-    public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener sel,
-            SchedulerEvent... events) throws SchedulerException;
+    public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, SchedulerEvent... events)
+            throws SchedulerException;
 
     /**
      * Remove the current scheduler event listener your listening on.<br>

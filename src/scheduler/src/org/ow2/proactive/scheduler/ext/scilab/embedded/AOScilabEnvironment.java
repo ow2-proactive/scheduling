@@ -37,7 +37,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -63,12 +62,12 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -389,7 +388,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
     }
 
     public void jobRunningToFinishedEvent(JobInfo info) {
-        if (info.getState() == JobState.KILLED) {
+        if (info.getStatus() == JobStatus.KILLED) {
             if (logger.isDebugEnabled()) {
                 logger.info("Received job killed event...");
             }
@@ -482,7 +481,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         }
     }
 
-    public void jobSubmittedEvent(Job job) {
+    public void jobSubmittedEvent(JobState job) {
         // TODO Auto-generated method stub
 
     }

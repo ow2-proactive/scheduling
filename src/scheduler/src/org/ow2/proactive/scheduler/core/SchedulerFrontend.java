@@ -55,8 +55,8 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -65,6 +65,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -127,7 +128,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
     private Map<UniqueID, SchedulerEventListener> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener>();
 
     /** Scheduler's statistics */
-    private StatsImpl stats = new StatsImpl(SchedulerState.STARTED);
+    private StatsImpl stats = new StatsImpl(SchedulerStatus.STARTED);
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -221,7 +222,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
                 jobs.put(e.getKey(), ij);
 
                 //if the job is finished set it
-                switch (e.getValue().getState()) {
+                switch (e.getValue().getStatus()) {
                     case CANCELED:
                     case FINISHED:
                     case FAILED:
@@ -462,8 +463,8 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, org.ow2.proactive.scheduler.common.SchedulerEvent[])
      */
-    public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener sel,
-            SchedulerEvent... events) throws SchedulerException {
+    public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, SchedulerEvent... events)
+            throws SchedulerException {
 
         // first check if the listener is a reified remote object
         if (!MOP.isReifiedObject(sel)) {
@@ -489,9 +490,9 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         usersUpdate(uIdent);
         //add the listener to the list of listener for this user.
         schedulerListeners.put(id, sel);
-        //get the initialState
-        SchedulerInitialStateImpl initState = (SchedulerInitialStateImpl) (PAFuture.getFutureValue(scheduler
-                .getSchedulerInitialState()));
+        //get the scheduler State
+        SchedulerStateImpl initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler
+                .getSchedulerState()));
         //and update the connected users list.
         initState.setUsers(connectedUsers);
         //return to the user
@@ -564,7 +565,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         if (bool.booleanValue()) {
             //stats
             stats.startTime();
-            stats.updateStatus(SchedulerState.STARTED);
+            stats.updateStatus(SchedulerStatus.STARTED);
         }
         return bool;
     }
@@ -581,7 +582,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         if (bool.booleanValue()) {
             //stats
             stats.stopTime();
-            stats.updateStatus(SchedulerState.STOPPED);
+            stats.updateStatus(SchedulerStatus.STOPPED);
         }
         return bool;
     }
@@ -598,7 +599,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         if (bool.booleanValue()) {
             //stats
             stats.pauseTime();
-            stats.updateStatus(SchedulerState.PAUSED);
+            stats.updateStatus(SchedulerStatus.PAUSED);
         }
         return bool;
     }
@@ -615,7 +616,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         if (bool.booleanValue()) {
             //stats
             stats.pauseTime();
-            stats.updateStatus(SchedulerState.FROZEN);
+            stats.updateStatus(SchedulerStatus.FROZEN);
         }
         return bool;
     }
@@ -631,7 +632,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         BooleanWrapper bool = scheduler.resume();
         if (bool.booleanValue()) {
             //stats
-            stats.updateStatus(SchedulerState.STARTED);
+            stats.updateStatus(SchedulerStatus.STARTED);
         }
         return bool;
     }
@@ -647,7 +648,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         BooleanWrapper bool = scheduler.shutdown();
         if (bool.booleanValue()) {
             //stats
-            stats.updateStatus(SchedulerState.SHUTTING_DOWN);
+            stats.updateStatus(SchedulerStatus.SHUTTING_DOWN);
         }
         return bool;
     }
@@ -663,7 +664,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         BooleanWrapper bool = scheduler.kill();
         if (bool.booleanValue()) {
             //stats
-            stats.updateStatus(SchedulerState.KILLED);
+            stats.updateStatus(SchedulerStatus.KILLED);
         }
         return bool;
     }
@@ -947,11 +948,11 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.Job)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
      * @param job The job that have just be submitted.
      */
-    public void jobSubmittedEvent(Job job) {
-        dispatch(SchedulerEvent.JOB_SUBMITTED, new Class<?>[] { Job.class }, job);
+    public void jobSubmittedEvent(JobState job) {
+        dispatch(SchedulerEvent.JOB_SUBMITTED, new Class<?>[] { JobState.class }, job);
     }
 
     /**

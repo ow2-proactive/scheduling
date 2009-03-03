@@ -29,87 +29,74 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.task;
-
-import java.io.Serializable;
+package org.ow2.proactive.scheduler.common.job;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobId;
 
 
 /**
- * Informations about the task that is able to change.<br>
- * These informations are not in the {@link Task} class in order to permit
- * the scheduler listener to send this class as event.
+ * Scheduling status of a job.
+ * The different job status are best described below.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public interface TaskInfo extends Serializable {
+public enum JobStatus implements java.io.Serializable {
+    /**
+     * The job is waiting to be scheduled.
+     */
+    PENDING("Pending"),
+    /**
+     * The job is running. Actually at least one of its task has been scheduled.
+     */
+    RUNNING("Running"),
+    /**
+     * The job has been launched but no task are currently running.
+     */
+    STALLED("Stalled"),
+    /**
+     * The job is finished. Every tasks are finished.
+     */
+    FINISHED("Finished"),
+    /**
+     * The job is paused waiting for user to resume it.
+     */
+    PAUSED("Paused"),
+    /**
+     * The job has been canceled due to user exception and order.
+     * This status runs when a user exception occurs in a task
+     * and when the user has asked to cancel On exception.
+     */
+    CANCELED("Canceled"),
+    /**
+     * The job has failed. One or more tasks have failed (due to resources failure).
+     * There is no more executionOnFailure left for a task.
+     */
+    FAILED("Failed"),
+    /**
+     * The job has been killed by a user..
+     * Nothing can be done anymore on this job expect read execution informations
+     * such as output, time, etc...
+     */
+    KILLED("Killed");
+
+    /** The textual definition of the status */
+    private String definition;
 
     /**
-     * To get the jobInfo
-     *
-     * @return the jobInfo
+     * Default constructor.
+     * @param def the textual definition of the status.
      */
-    public JobInfo getJobInfo();
+    JobStatus(String def) {
+        definition = def;
+    }
 
     /**
-     * To get the finishedTime
-     *
-     * @return the finishedTime
+     * @see java.lang.Enum#toString()
      */
-    public long getFinishedTime();
-
-    /**
-     * To get the jobId
-     *
-     * @return the jobId
-     */
-    public JobId getJobId();
-
-    /**
-     * To get the startTime
-     *
-     * @return the startTime
-     */
-    public long getStartTime();
-
-    /**
-     * To get the taskId
-     *
-     * @return the taskId
-     */
-    public TaskId getTaskId();
-
-    /**
-     * To get the taskStatus
-     *
-     * @return the taskStatus
-     */
-    public TaskStatus getStatus();
-
-    /**
-     * To get the executionHostName
-     *
-     * @return the executionHostName
-     */
-    public String getExecutionHostName();
-
-    /**
-     * Get the number of execution left.
-     *
-     * @return the number of execution left.
-     */
-    public int getNumberOfExecutionLeft();
-
-    /**
-     * Get the numberOfExecutionOnFailureLeft value.
-     * 
-     * @return the numberOfExecutionOnFailureLeft value.
-     */
-    public int getNumberOfExecutionOnFailureLeft();
-
+    @Override
+    public String toString() {
+        return definition;
+    }
 }

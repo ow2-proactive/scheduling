@@ -35,7 +35,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
@@ -90,7 +90,7 @@ public class KillRemoveJobAction extends SchedulerGUIAction {
     }
 
     @Override
-    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
         if (connected && jobSelected && (owner || admin))
             setEnabled(true);

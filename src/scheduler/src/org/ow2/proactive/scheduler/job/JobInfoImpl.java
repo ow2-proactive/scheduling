@@ -50,9 +50,9 @@ import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 
 /**
@@ -128,10 +128,10 @@ public class JobInfoImpl implements JobInfo {
     @Alterable
     private JobPriority priority = JobPriority.NORMAL;
 
-    /** state of the job */
-    @Column(name = "STATE")
+    /** status of the job */
+    @Column(name = "STATUS")
     @Alterable
-    private JobState state = JobState.PENDING;
+    private JobStatus status = JobStatus.PENDING;
 
     /** to know if the job has to be removed after the fixed admin delay or not */
     @Column(name = "TO_REMOVE")
@@ -141,7 +141,7 @@ public class JobInfoImpl implements JobInfo {
     /** If this status is not null, it means the tasks have to change their status */
     //not Hibernate informations
     @Transient
-    private Map<TaskId, TaskState> taskStatusModify = null;
+    private Map<TaskId, TaskStatus> taskStatusModify = null;
 
     /** If this finished time is not null, it means the tasks have to change their finished time */
     //not Hibernate informations
@@ -244,7 +244,7 @@ public class JobInfoImpl implements JobInfo {
      *
      * @param taskStatusModify the taskStatusModify to set
      */
-    public void setTaskStatusModify(Map<TaskId, TaskState> taskStatusModify) {
+    public void setTaskStatusModify(Map<TaskId, TaskStatus> taskStatusModify) {
         this.taskStatusModify = taskStatusModify;
     }
 
@@ -253,7 +253,7 @@ public class JobInfoImpl implements JobInfo {
      *
      * @return the taskStatusModify
      */
-    public Map<TaskId, TaskState> getTaskStatusModify() {
+    public Map<TaskId, TaskStatus> getTaskStatusModify() {
         return taskStatusModify;
     }
 
@@ -349,19 +349,19 @@ public class JobInfoImpl implements JobInfo {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getState()
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getStatus()
      */
-    public JobState getState() {
-        return state;
+    public JobStatus getStatus() {
+        return status;
     }
 
     /**
-     * To set the state of the job.
+     * To set the status of the job.
      *
-     * @param state the state to set.
+     * @param status the status to set.
      */
-    public void setState(JobState state) {
-        this.state = state;
+    public void setStatus(JobStatus status) {
+        this.status = status;
     }
 
     /**

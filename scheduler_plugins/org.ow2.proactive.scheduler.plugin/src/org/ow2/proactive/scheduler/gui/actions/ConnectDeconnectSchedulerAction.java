@@ -38,7 +38,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
@@ -97,7 +97,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                 Rectangle parentBounds = parent.getShell().getBounds();
                 int x = parentBounds.x + parentBounds.width / 2;
                 int y = parentBounds.y + parentBounds.height / 2;
-                waitShell.setLocation(x, y);
+                waitShell.setLocation(x - waitShell.getSize().x / 2, y - waitShell.getSize().y / 2);
                 waitShell.pack();
                 waitShell.open();
 
@@ -144,7 +144,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
     }
 
     @Override
-    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+    public void setEnabled(boolean connected, SchedulerStatus chedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
         if (!connected)
             setDisconnectionMode();

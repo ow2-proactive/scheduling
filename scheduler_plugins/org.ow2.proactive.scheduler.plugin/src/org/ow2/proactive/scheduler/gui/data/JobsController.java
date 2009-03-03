@@ -42,16 +42,17 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite;
 import org.ow2.proactive.scheduler.gui.composite.TaskComposite;
@@ -65,8 +66,6 @@ import org.ow2.proactive.scheduler.gui.listeners.SchedulerUsersListener;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 import org.ow2.proactive.scheduler.gui.views.TaskView;
-import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 /**
@@ -81,7 +80,7 @@ public class JobsController implements SchedulerEventListener {
     private static JobsController activeView = null;
 
     // jobs
-    private Map<JobId, InternalJob> jobs = null;
+    private Map<JobId, JobState> jobs = null;
 
     // jobs id
     private Vector<JobId> pendingJobsIds = null;
@@ -247,15 +246,15 @@ public class JobsController implements SchedulerEventListener {
     /**
      * @see
      * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#newPendingJobEvent
-     * (org.objectweb.proactive.extra.scheduler.job.Job)
+     * (org.objectweb.proactive.extra.scheduler.job.JobState)
      */
-    public void jobSubmittedEvent(Job job) {
+    public void jobSubmittedEvent(JobState job) {
         // add job to the global jobs map
-        jobs.put(job.getId(), (InternalJob) job);
+        jobs.put(job.getId(), job);
 
         // add job to the pending jobs list
         if (!pendingJobsIds.add(job.getId())) {
-            throw new IllegalStateException("can't add the job (id = " + ((InternalJob) job).getJobInfo() +
+            throw new IllegalStateException("can't add the job (id = " + job.getJobInfo() +
                 ") from the pendingJobsIds list !");
         }
 
@@ -270,7 +269,7 @@ public class JobsController implements SchedulerEventListener {
      */
     public void jobPendingToRunningEvent(JobInfo info) {
         final JobId jobId = info.getJobId();
-        final InternalJob job = getJobById(jobId);
+        final JobState job = getJobById(jobId);
         job.update(info);
 
         // remember if the job, which changing list, was selected
@@ -307,7 +306,7 @@ public class JobsController implements SchedulerEventListener {
 
                     // this job is not the only selected job
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
-                    List<InternalJob> jobs = getJobsByIds(jobsId);
+                    List<JobState> jobs = getJobsByIds(jobsId);
 
                     // update info
                     org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
@@ -337,7 +336,7 @@ public class JobsController implements SchedulerEventListener {
      */
     public void jobRunningToFinishedEvent(JobInfo info) {
         final JobId jobId = info.getJobId();
-        final InternalJob job = getJobById(jobId);
+        final JobState job = getJobById(jobId);
         job.update(info);
 
         // remember if the job, which changing list, was selected
@@ -384,7 +383,7 @@ public class JobsController implements SchedulerEventListener {
 
                     // this job is not the only selected job
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
-                    List<InternalJob> jobs = getJobsByIds(jobsId);
+                    List<JobState> jobs = getJobsByIds(jobsId);
 
                     // update info
                     org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
@@ -442,7 +441,7 @@ public class JobsController implements SchedulerEventListener {
 
                     // this job is not the only selected job
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
-                    List<InternalJob> jobs = getJobsByIds(jobsId);
+                    List<JobState> jobs = getJobsByIds(jobsId);
 
                     // update info
                     org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
@@ -471,7 +470,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @seeorg.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
+     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
      * pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskInfo)
      */
     public void taskPendingToRunningEvent(TaskInfo info) {
@@ -485,7 +484,7 @@ public class JobsController implements SchedulerEventListener {
 
         // if this job is selected in the Running table
         if (TableManager.getInstance().isJobSelected(jobId)) {
-            final InternalJob job = getJobById(jobId);
+            final JobState job = getJobById(jobId);
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
@@ -502,7 +501,7 @@ public class JobsController implements SchedulerEventListener {
 
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
-                        taskView.lineUpdate(taskInfo, getTaskDescriptorById(job, taskInfo.getTaskId()));
+                        taskView.lineUpdate(taskInfo, getTaskStateById(job, taskInfo.getTaskId()));
                     }
                 }
             });
@@ -523,7 +522,7 @@ public class JobsController implements SchedulerEventListener {
 
         // if this job is selected in the Running table
         if (TableManager.getInstance().isJobSelected(jobId)) {
-            final InternalJob job = getJobById(jobId);
+            final JobState job = getJobById(jobId);
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
@@ -541,7 +540,7 @@ public class JobsController implements SchedulerEventListener {
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
                         TaskId taskId = taskInfo.getTaskId();
-                        taskView.lineUpdate(taskInfo, getTaskDescriptorById(job, taskId));
+                        taskView.lineUpdate(taskInfo, getTaskStateById(job, taskId));
 
                         if (taskId.equals(taskView.getIdOfSelectedTask())) {
                             TaskResult tr = TaskComposite.getTaskResult(job.getId(), taskId);
@@ -564,7 +563,7 @@ public class JobsController implements SchedulerEventListener {
      * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
     public void schedulerFrozenEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.FROZEN);
+        ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.FROZEN);
         ActionsManager.getInstance().update();
 
         // call method on listeners
@@ -577,7 +576,7 @@ public class JobsController implements SchedulerEventListener {
      * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
     public void schedulerPausedEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.PAUSED);
+        ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.PAUSED);
         ActionsManager.getInstance().update();
 
         // call method on listeners
@@ -590,7 +589,7 @@ public class JobsController implements SchedulerEventListener {
      * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
     public void schedulerResumedEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.STARTED);
+        ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.STARTED);
         ActionsManager.getInstance().update();
 
         // call method on listeners
@@ -602,7 +601,7 @@ public class JobsController implements SchedulerEventListener {
      * SchedulerShutDownEvent()
      */
     public void schedulerShutDownEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.KILLED);
+        ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 SeparatedJobView.clearOnDisconnection(false);
@@ -618,7 +617,7 @@ public class JobsController implements SchedulerEventListener {
      * SchedulerShuttingDownEvent()
      */
     public void schedulerShuttingDownEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.SHUTTING_DOWN);
+        ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.SHUTTING_DOWN);
         ActionsManager.getInstance().update();
 
         // call method on listeners
@@ -631,7 +630,7 @@ public class JobsController implements SchedulerEventListener {
      * ()
      */
     public void schedulerStartedEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.STARTED);
+        ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.STARTED);
         ActionsManager.getInstance().update();
 
         // call method on listeners
@@ -644,7 +643,7 @@ public class JobsController implements SchedulerEventListener {
      * ()
      */
     public void schedulerStoppedEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.STOPPED);
+        ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.STOPPED);
         ActionsManager.getInstance().update();
 
         // call method on listeners
@@ -657,7 +656,7 @@ public class JobsController implements SchedulerEventListener {
      * ()
      */
     public void schedulerKilledEvent() {
-        ActionsManager.getInstance().setSchedulerState(SchedulerState.KILLED);
+        ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 SeparatedJobView.clearOnDisconnection(false);
@@ -674,7 +673,7 @@ public class JobsController implements SchedulerEventListener {
      * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
     public void jobPausedEvent(JobInfo info) {
-        final InternalJob job = getJobById(info.getJobId());
+        final JobState job = getJobById(info.getJobId());
         job.update(info);
 
         // if this job is selected in a table
@@ -682,7 +681,7 @@ public class JobsController implements SchedulerEventListener {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
-                    List<InternalJob> jobs = getJobsByIds(jobsId);
+                    List<JobState> jobs = getJobsByIds(jobsId);
 
                     // update info
                     org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
@@ -714,7 +713,7 @@ public class JobsController implements SchedulerEventListener {
      * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
      */
     public void jobResumedEvent(JobInfo info) {
-        final InternalJob job = getJobById(info.getJobId());
+        final JobState job = getJobById(info.getJobId());
         job.update(info);
 
         // if this job is selected in a table
@@ -722,7 +721,7 @@ public class JobsController implements SchedulerEventListener {
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
-                    List<InternalJob> jobs = getJobsByIds(jobsId);
+                    List<JobState> jobs = getJobsByIds(jobsId);
 
                     // update info
                     org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
@@ -788,7 +787,7 @@ public class JobsController implements SchedulerEventListener {
 
         // if this job is selected in the Running table
         if (TableManager.getInstance().isJobSelected(jobId)) {
-            final InternalJob job = getJobById(jobId);
+            final JobState job = getJobById(jobId);
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
@@ -805,7 +804,7 @@ public class JobsController implements SchedulerEventListener {
 
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
-                        taskView.lineUpdate(taskInfo, getTaskDescriptorById(job, taskInfo.getTaskId()));
+                        taskView.lineUpdate(taskInfo, getTaskStateById(job, taskInfo.getTaskId()));
                     }
                 }
             });
@@ -900,39 +899,39 @@ public class JobsController implements SchedulerEventListener {
     // ---------------------------- sort jobs ----------------------------- //
     // -------------------------------------------------------------------- //
     public void sortPendingsJobs() {
-        Vector<InternalJob> jobs = new Vector<InternalJob>();
+        Vector<JobState> jobs = new Vector<JobState>();
         for (JobId id : pendingJobsIds)
             jobs.add(getJobById(id));
         Collections.sort(jobs);
 
         Vector<JobId> tmp = new Vector<JobId>();
-        for (InternalJob job : jobs)
+        for (JobState job : jobs)
             tmp.add(job.getId());
 
         pendingJobsIds = tmp;
     }
 
     public void sortRunningsJobs() {
-        Vector<InternalJob> jobs = new Vector<InternalJob>();
+        Vector<JobState> jobs = new Vector<JobState>();
         for (JobId id : runningJobsIds)
             jobs.add(getJobById(id));
         Collections.sort(jobs);
 
         Vector<JobId> tmp = new Vector<JobId>();
-        for (InternalJob job : jobs)
+        for (JobState job : jobs)
             tmp.add(job.getId());
 
         runningJobsIds = tmp;
     }
 
     public void sortFinishedJobs() {
-        Vector<InternalJob> jobs = new Vector<InternalJob>();
+        Vector<JobState> jobs = new Vector<JobState>();
         for (JobId id : finishedJobsIds)
             jobs.add(getJobById(id));
         Collections.sort(jobs);
 
         Vector<JobId> tmp = new Vector<JobId>();
-        for (InternalJob job : jobs)
+        for (JobState job : jobs)
             tmp.add(job.getId());
 
         finishedJobsIds = tmp;
@@ -941,27 +940,27 @@ public class JobsController implements SchedulerEventListener {
     // -------------------------------------------------------------------- //
     // ------------------------------ others ------------------------------ //
     // -------------------------------------------------------------------- //
-    public InternalJob getJobById(JobId id) {
-        InternalJob res = jobs.get(id);
+    public JobState getJobById(JobId id) {
+        JobState res = jobs.get(id);
         if (res == null)
             throw new IllegalArgumentException("there are no jobs with the id : " + id);
         return res;
     }
 
-    public List<InternalJob> getJobsByIds(List<JobId> ids) {
-        List<InternalJob> res = new ArrayList<InternalJob>();
+    public List<JobState> getJobsByIds(List<JobId> ids) {
+        List<JobState> res = new ArrayList<JobState>();
         for (JobId id : ids)
             res.add(jobs.get(id));
         return res;
     }
 
-    public InternalTask getTaskDescriptorById(InternalJob job, TaskId id) {
-        InternalTask taskDescriptor = job.getHMTasks().get(id);
-        if (taskDescriptor == null) {
-            throw new IllegalArgumentException("there are no taskDescriptor with the id : " + id +
-                " in the job : " + job.getId());
+    public TaskState getTaskStateById(JobState job, TaskId id) {
+        TaskState taskState = job.getHMTasks().get(id);
+        if (taskState == null) {
+            throw new IllegalArgumentException("there are no task with the id : " + id + " in the job : " +
+                job.getId());
         }
-        return taskDescriptor;
+        return taskState;
     }
 
     public SchedulerUsers getUsers() {
@@ -974,7 +973,7 @@ public class JobsController implements SchedulerEventListener {
      * @return true only if no error caught, for synchronous call.
      */
     public boolean init() {
-        SchedulerInitialState state = null;
+        SchedulerState state = null;
         state = SchedulerProxy.getInstance().addSchedulerEventListener(
                 ((SchedulerEventListener) PAActiveObject.getStubOnThis()));
 
@@ -982,9 +981,9 @@ public class JobsController implements SchedulerEventListener {
             return false;
         }
 
-        SchedulerState schedulerState = state.getState();
-        ActionsManager.getInstance().setSchedulerState(schedulerState);
-        switch (schedulerState) {
+        SchedulerStatus SchedulerStatus = state.getStatus();
+        ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus);
+        switch (SchedulerStatus) {
             case KILLED:
                 schedulerKilledEvent();
                 break;
@@ -1005,25 +1004,25 @@ public class JobsController implements SchedulerEventListener {
                 break;
         }
 
-        jobs = new HashMap<JobId, InternalJob>();
+        jobs = new HashMap<JobId, JobState>();
         pendingJobsIds = new Vector<JobId>();
         runningJobsIds = new Vector<JobId>();
         finishedJobsIds = new Vector<JobId>();
 
-        Vector<InternalJob> tmp = convert(state.getPendingJobs());
-        for (InternalJob job : tmp) {
+        Vector<JobState> tmp = state.getPendingJobs();
+        for (JobState job : tmp) {
             jobs.put(job.getId(), job);
             pendingJobsIds.add(job.getId());
         }
 
-        tmp = convert(state.getRunningJobs());
-        for (InternalJob job : tmp) {
+        tmp = state.getRunningJobs();
+        for (JobState job : tmp) {
             jobs.put(job.getId(), job);
             runningJobsIds.add(job.getId());
         }
 
-        tmp = convert(state.getFinishedJobs());
-        for (InternalJob job : tmp) {
+        tmp = state.getFinishedJobs();
+        for (JobState job : tmp) {
             jobs.put(job.getId(), job);
             finishedJobsIds.add(job.getId());
         }
@@ -1033,14 +1032,6 @@ public class JobsController implements SchedulerEventListener {
 
         // for synchronous call
         return true;
-    }
-
-    private Vector<InternalJob> convert(Vector<Job> jobs) {
-        Vector<InternalJob> jobs2 = new Vector<InternalJob>();
-        for (Job j : jobs) {
-            jobs2.add((InternalJob) j);
-        }
-        return jobs2;
     }
 
     public static JobsController getLocalView() {

@@ -49,7 +49,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 
 
@@ -92,10 +92,10 @@ public class TaskInfoImpl implements TaskInfo {
     @Column(name = "FINISHED_TIME")
     private long finishedTime = -1;
 
-    /** Current taskState of the task */
+    /** Current taskStatus of the task */
     @Alterable
     @Column(name = "TASK_STATE")
-    private TaskState taskState = TaskState.SUBMITTED;
+    private TaskStatus taskStatus = TaskStatus.SUBMITTED;
 
     /** name of the host where the task is executed */
     @Alterable
@@ -206,17 +206,17 @@ public class TaskInfoImpl implements TaskInfo {
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getStatus()
      */
-    public TaskState getStatus() {
-        return taskState;
+    public TaskStatus getStatus() {
+        return taskStatus;
     }
 
     /**
-     * To set the taskState
+     * To set the taskStatus
      *
-     * @param taskState the taskState to set
+     * @param taskStatus the taskStatus to set
      */
-    public void setStatus(TaskState taskState) {
-        this.taskState = taskState;
+    public void setStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
     }
 
     /**

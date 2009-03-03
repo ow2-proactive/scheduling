@@ -73,18 +73,18 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scheduler.common.AdminMethodsInterface;
-import org.ow2.proactive.scheduler.common.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface_;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
@@ -95,7 +95,7 @@ import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.core.db.Condition;
@@ -106,8 +106,8 @@ import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
-import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
@@ -181,8 +181,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** list of finished jobs among the managed jobs */
     private Vector<InternalJob> finishedJobs = new Vector<InternalJob>();
 
-    /** Scheduler current state */
-    private SchedulerState state = SchedulerState.STOPPED;
+    /** Scheduler current status */
+    private SchedulerStatus status = SchedulerStatus.STOPPED;
 
     /** Thread that will ping the running nodes */
     private Thread pinger;
@@ -388,9 +388,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param currentJob the job where the task info are.
      */
     private void updateTaskInfosList(InternalJob currentJob) {
-        Map<TaskId, TaskState> tsm = ((JobInfoImpl) currentJob.getJobInfo()).getTaskStatusModify();
-        for (Entry<TaskId, TaskState> e : tsm.entrySet()) {
-            if (e.getValue() != TaskState.RUNNING) {
+        Map<TaskId, TaskStatus> tsm = ((JobInfoImpl) currentJob.getJobInfo()).getTaskStatusModify();
+        for (Entry<TaskId, TaskStatus> e : tsm.entrySet()) {
+            if (e.getValue() != TaskStatus.RUNNING) {
                 DatabaseManager.synchronize(currentJob.getHMTasks().get(e.getKey()).getTaskInfo());
             }
         }
@@ -415,13 +415,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 "Scheduler successfully created on " +
                     Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis())));
 
-        if (state != SchedulerState.KILLED) {
+        if (status != SchedulerStatus.KILLED) {
 
             //listen log as immediate Service.
             //PAActiveObject.setImmediateService("listenLog");
             Service service = new Service(body);
 
-            //used to read the enumerate schedulerState in order to know when submit is possible.
+            //used to read the enumerate schedulerStatus in order to know when submit is possible.
             //have to be immediate service
             body.setImmediateService("isSubmitPossible");
             body.setImmediateService("getTaskResult");
@@ -430,16 +430,16 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             //set the filter for serveAll method (user action are privileged)
             RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenLog",
-                "getSchedulerInitialState");
+                "getSchedulerState");
             createPingThread();
 
-            // default scheduler state is started
+            // default scheduler status is started
             ((SchedulerCore) PAActiveObject.getStubOnThis()).start();
 
             do {
                 service.blockingServeOldest();
 
-                while ((state == SchedulerState.STARTED) || (state == SchedulerState.PAUSED)) {
+                while ((status == SchedulerStatus.STARTED) || (status == SchedulerStatus.PAUSED)) {
                     try {
                         //block the loop until a method is invoked and serve it
                         service.blockingServeOldest(SCHEDULER_TIME_OUT);
@@ -462,7 +462,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             //if failed
                             freeze();
                             //scheduler functionality are reduced until now
-                            state = SchedulerState.UNLINKED;
+                            status = SchedulerStatus.UNLINKED;
                             logger
                                     .fatal("******************************\n"
                                         + "Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
@@ -473,13 +473,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         }
                     }
                 }
-            } while ((state != SchedulerState.SHUTTING_DOWN) && (state != SchedulerState.KILLED));
+            } while ((status != SchedulerStatus.SHUTTING_DOWN) && (status != SchedulerStatus.KILLED));
 
             logger.info("Scheduler is shutting down...");
 
             logger_dev.info("Unpause all jobs !");
             for (InternalJob job : jobs.values()) {
-                if (job.getState() == JobState.PAUSED) {
+                if (job.getStatus() == JobStatus.PAUSED) {
                     job.setUnPause();
 
                     JobInfo info = job.getJobInfo();
@@ -515,7 +515,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         resourceManager.shutdownProxy();
         logger_dev.info("Resource Manager proxy shutdown");
 
-        if (state == SchedulerState.SHUTTING_DOWN) {
+        if (status == SchedulerStatus.SHUTTING_DOWN) {
             frontend.schedulerShutDownEvent();
         }
 
@@ -543,7 +543,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         //if scheduler is paused it only finishes running jobs
-        if (state != SchedulerState.PAUSED) {
+        if (status != SchedulerStatus.PAUSED) {
             for (InternalJob j : pendingJobs) {
                 jobDescriptorList.add(j.getJobDescriptor());
             }
@@ -577,7 +577,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //select first task to define the selection script ID
             TaskDescriptor taskDescriptor = taskRetrivedFromPolicy.get(taskToCheck);
             InternalJob currentJob = jobs.get(taskDescriptor.getJobId());
-            InternalTask internalTask = currentJob.getHMTasks().get(taskDescriptor.getId());
+            InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
             InternalTask sentinel = internalTask;
             SelectionScript ss = internalTask.getSelectionScript();
             NodeSet ns = internalTask.getNodeExclusion();
@@ -608,7 +608,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
                 taskDescriptor = taskRetrivedFromPolicy.get(taskToCheck);
                 currentJob = jobs.get(taskDescriptor.getJobId());
-                internalTask = currentJob.getHMTasks().get(taskDescriptor.getId());
+                internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
             }
 
             logger_dev.debug("Number of nodes to ask for : " + nbNodesToAskFor);
@@ -641,7 +641,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 while (nodeSet != null && !nodeSet.isEmpty()) {
                     taskDescriptor = taskRetrivedFromPolicy.get(0);
                     currentJob = jobs.get(taskDescriptor.getJobId());
-                    internalTask = currentJob.getHMTasks().get(taskDescriptor.getId());
+                    internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
 
                     // load and Initialize the executable container
                     logger_dev.debug("Load and Initialize the executable container for task '" +
@@ -695,7 +695,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                             for (int i = 0; i < resultSize; i++) {
                                 //get parent task number i
-                                InternalTask parentTask = currentJob.getHMTasks().get(
+                                InternalTask parentTask = currentJob.getIHMTasks().get(
                                         taskDescriptor.getParents().get(i).getId());
                                 //set the task result in the arguments array.
                                 params[i] = currentJob.getJobResult().getResult(parentTask.getName());
@@ -742,7 +742,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         currentJob.startTask(internalTask);
                         // send task event to front-end
                         frontend.taskPendingToRunningEvent(internalTask.getTaskInfo());
-                        //no need to set this state in database
+                        //no need to set this status in database
                     }
                     //if everything were OK (or if the task could not be launched, 
                     //removed this task from the processed task.
@@ -781,8 +781,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         for (int i = 0; i < runningJobs.size(); i++) {
             InternalJob job = runningJobs.get(i);
 
-            for (InternalTask td : job.getTasks()) {
-                if ((td.getStatus() == TaskState.RUNNING) &&
+            for (InternalTask td : job.getITasks()) {
+                if ((td.getStatus() == TaskStatus.RUNNING) &&
                     !PAActiveObject.pingActiveObject(td.getExecuterInformations().getLauncher())) {
                     logger_dev.info("Node failed on job '" + job.getId() + "', task '" + td.getId() + "'");
 
@@ -799,7 +799,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     logger_dev.info("Number of retry on Failure left for the task '" + td.getId() + "' : " +
                         td.getNumberOfExecutionOnFailureLeft());
                     if (td.getNumberOfExecutionOnFailureLeft() > 0) {
-                        td.setStatus(TaskState.WAITING_ON_FAILURE);
+                        td.setStatus(TaskStatus.WAITING_ON_FAILURE);
                         job.newWaitingTask();
                         job.reStartTask(td);
                         frontend.taskWaitingForRestart(td.getTaskInfo());
@@ -809,7 +809,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                 job,
                                 td,
                                 "An error has occurred due to a node failure and the maximum amout of retries property has been reached.",
-                                JobState.FAILED);
+                                JobStatus.FAILED);
                         i--;
                         break;
                     }
@@ -824,7 +824,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @return true if a submit is possible, false if not.
      */
     public boolean isSubmitPossible() {
-        return !((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.STOPPED));
+        return !((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.STOPPED));
     }
 
     /**
@@ -883,7 +883,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //unload job environment that potentially contains classpath as byte[]
         DatabaseManager.unload(job.getEnvironment());
         //unload heavy object
-        for (InternalTask it : job.getTasks()) {
+        for (InternalTask it : job.getITasks()) {
             DatabaseManager.unload(it);
         }
         logger_dev.info("JobEnvironment and internalTask unloaded for job '" + job.getId() + "'");
@@ -893,22 +893,22 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * End the given job due to the given task failure.
      *
      * @param job the job to end.
-     * @param task the task who has been the caused of failing. **This argument can be null only if jobState is killed**
+     * @param task the task who has been the caused of failing. **This argument can be null only if jobStatus is killed**
      * @param errorMsg the error message to send in the task result.
-     * @param jobState the type of the end for this job. (failed/canceled/killed)
+     * @param jobStatus the type of the end for this job. (failed/canceled/killed)
      */
-    private void endJob(InternalJob job, InternalTask task, String errorMsg, JobState jobState) {
+    private void endJob(InternalJob job, InternalTask task, String errorMsg, JobStatus jobStatus) {
         TaskResult taskResult = null;
 
         if (task != null) {
             logger_dev.info("Job ending request for job '" + job.getId() + "' - cause by task '" +
-                task.getId() + "' - state : " + jobState);
+                task.getId() + "' - status : " + jobStatus);
         } else {
-            logger_dev.info("Job ending request for job '" + job.getId() + "' - state : " + jobState);
+            logger_dev.info("Job ending request for job '" + job.getId() + "' - status : " + jobStatus);
         }
 
-        for (InternalTask td : job.getTasks()) {
-            if (td.getStatus() == TaskState.RUNNING) {
+        for (InternalTask td : job.getITasks()) {
+            if (td.getStatus() == TaskStatus.RUNNING) {
                 //get the nodes that are used for this descriptor
                 NodeSet nodes = td.getExecuterInformations().getNodes();
 
@@ -932,13 +932,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
 
                 //If not killed
-                if (jobState != JobState.KILLED) {
+                if (jobStatus != JobStatus.KILLED) {
                     //deleting tasks results except the one that causes the error
                     if (!td.getId().equals(task.getId())) {
                         job.getJobResult().removeResult(td.getName());
                     }
                     //if canceled, get the result of the canceled task
-                    if ((jobState == JobState.CANCELED) && td.getId().equals(task.getId())) {
+                    if ((jobStatus == JobStatus.CANCELED) && td.getId().equals(task.getId())) {
                         taskResult = job.getJobResult().getResult(task.getName());
                     }
                 }
@@ -946,8 +946,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         //if job has been killed
-        if (jobState == JobState.KILLED) {
-            job.failed(null, jobState);
+        if (jobStatus == JobStatus.KILLED) {
+            job.failed(null, jobStatus);
             //the next line will try to remove job from each list.
             //once removed, it won't be removed from remaining list, but we ensure that the job is in only one of the list.
             if (runningJobs.remove(job) || pendingJobs.remove(job)) {
@@ -955,15 +955,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
         } else {
             //failed the job
-            job.failed(task.getId(), jobState);
+            job.failed(task.getId(), jobStatus);
 
             //store the exception into jobResult
-            if (jobState == JobState.FAILED) {
+            if (jobStatus == JobStatus.FAILED) {
                 taskResult = new TaskResultImpl(task.getId(), new Throwable(errorMsg), new SimpleTaskLogs("",
                     errorMsg));
                 ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
                         .isPreciousResult());
-            } else if (jobState == JobState.CANCELED) {
+            } else if (jobStatus == JobStatus.CANCELED) {
                 taskResult = (TaskResult) PAFuture.getFutureValue(taskResult);
                 ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
                         .isPreciousResult());
@@ -986,7 +986,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //create tasks events list
         updateTaskInfosList(job);
 
-        logger.info("Job '" + job.getId() + "' terminated (" + jobState + ")");
+        logger.info("Job '" + job.getId() + "' terminated (" + jobStatus + ")");
 
         //send event to listeners.
         frontend.jobRunningToFinishedEvent(job.getJobInfo());
@@ -1012,7 +1012,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             return;
         }
 
-        InternalTask descriptor = job.getHMTasks().get(taskId);
+        InternalTask descriptor = job.getIHMTasks().get(taskId);
         // job might have already been removed if job has failed...
         Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
         if (runningTasks != null) {
@@ -1048,7 +1048,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //so we restart independently of user or admin execution property
                     logger_dev.info("Node failed on job '" + jobId + "', task '" + taskId + "'");
                     //change status and update GUI
-                    descriptor.setStatus(TaskState.WAITING_ON_FAILURE);
+                    descriptor.setStatus(TaskStatus.WAITING_ON_FAILURE);
                     job.newWaitingTask();
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
                     job.reStartTask(descriptor);
@@ -1076,7 +1076,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 } catch (RunningProcessException rpe) {
                     //if res.value throws a RunningProcessException, user is not responsible
                     //change status and update GUI
-                    descriptor.setStatus(TaskState.WAITING_ON_FAILURE);
+                    descriptor.setStatus(TaskStatus.WAITING_ON_FAILURE);
                     job.newWaitingTask();
                     frontend.taskWaitingForRestart(descriptor.getTaskInfo());
                     job.reStartTask(descriptor);
@@ -1113,7 +1113,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //if no rerun left, failed the job
                     endJob(job, descriptor,
                             "An error occurred in your task and the maximum number of executions has been reached. "
-                                + "You also ask to cancel the job in such a situation !", JobState.CANCELED);
+                                + "You also ask to cancel the job in such a situation !", JobStatus.CANCELED);
                     return;
                 }
                 if (descriptor.getNumberOfExecutionLeft() > 0) {
@@ -1128,7 +1128,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         //cannot get back the node, RM take care about that.
                     }
                     //change status and update GUI
-                    descriptor.setStatus(TaskState.WAITING_ON_ERROR);
+                    descriptor.setStatus(TaskStatus.WAITING_ON_ERROR);
                     job.newWaitingTask();
                     //store this task result in the job result.
                     ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), res, descriptor
@@ -1236,18 +1236,18 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      *
      * @return the scheduler current state with the pending, running, finished jobs list.
      */
-    public SchedulerInitialState getSchedulerInitialState() {
-        SchedulerInitialStateImpl sState = new SchedulerInitialStateImpl();
+    public SchedulerState getSchedulerState() {
+        SchedulerStateImpl sState = new SchedulerStateImpl();
         sState.setPendingJobs(convert(pendingJobs));
         sState.setRunningJobs(convert(runningJobs));
         sState.setFinishedJobs(convert(finishedJobs));
-        sState.setState(state);
+        sState.setState(status);
         return sState;
     }
 
-    private Vector<Job> convert(Vector<InternalJob> jobs) {
-        Vector<Job> jobs2 = new Vector<Job>();
-        for (Job j : jobs) {
+    private Vector<JobState> convert(Vector<InternalJob> jobs) {
+        Vector<JobState> jobs2 = new Vector<JobState>();
+        for (InternalJob j : jobs) {
             jobs2.add(j);
         }
         return jobs2;
@@ -1435,15 +1435,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#start()
      */
     public BooleanWrapper start() {
-        if (state == SchedulerState.UNLINKED) {
+        if (status == SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
 
-        if (state != SchedulerState.STOPPED) {
+        if (status != SchedulerStatus.STOPPED) {
             return new BooleanWrapper(false);
         }
 
-        state = SchedulerState.STARTED;
+        status = SchedulerStatus.STARTED;
         logger.info("Scheduler has just been started !");
         frontend.schedulerStartedEvent();
 
@@ -1454,16 +1454,16 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#stop()
      */
     public BooleanWrapper stop() {
-        if (state == SchedulerState.UNLINKED) {
+        if (status == SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
 
-        if ((state == SchedulerState.STOPPED) || (state == SchedulerState.SHUTTING_DOWN) ||
-            (state == SchedulerState.KILLED)) {
+        if ((status == SchedulerStatus.STOPPED) || (status == SchedulerStatus.SHUTTING_DOWN) ||
+            (status == SchedulerStatus.KILLED)) {
             return new BooleanWrapper(false);
         }
 
-        state = SchedulerState.STOPPED;
+        status = SchedulerStatus.STOPPED;
         logger.info("Scheduler has just been stopped, no tasks will be launched until start.");
         frontend.schedulerStoppedEvent();
 
@@ -1474,19 +1474,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#pause()
      */
     public BooleanWrapper pause() {
-        if (state == SchedulerState.UNLINKED) {
+        if (status == SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
 
-        if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
+        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
             return new BooleanWrapper(false);
         }
 
-        if ((state != SchedulerState.FROZEN) && (state != SchedulerState.STARTED)) {
+        if ((status != SchedulerStatus.FROZEN) && (status != SchedulerStatus.STARTED)) {
             return new BooleanWrapper(false);
         }
 
-        state = SchedulerState.PAUSED;
+        status = SchedulerStatus.PAUSED;
         logger.info("Scheduler has just been paused !");
         frontend.schedulerPausedEvent();
 
@@ -1497,19 +1497,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#freeze()
      */
     public BooleanWrapper freeze() {
-        if (state == SchedulerState.UNLINKED) {
+        if (status == SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
 
-        if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
+        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
             return new BooleanWrapper(false);
         }
 
-        if ((state != SchedulerState.PAUSED) && (state != SchedulerState.STARTED)) {
+        if ((status != SchedulerStatus.PAUSED) && (status != SchedulerStatus.STARTED)) {
             return new BooleanWrapper(false);
         }
 
-        state = SchedulerState.FROZEN;
+        status = SchedulerStatus.FROZEN;
         logger.info("Scheduler has just been frozen !");
         frontend.schedulerFrozenEvent();
 
@@ -1520,19 +1520,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#resume()
      */
     public BooleanWrapper resume() {
-        if (state == SchedulerState.UNLINKED) {
+        if (status == SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
 
-        if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
+        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
             return new BooleanWrapper(false);
         }
 
-        if ((state != SchedulerState.PAUSED) && (state != SchedulerState.FROZEN)) {
+        if ((status != SchedulerStatus.PAUSED) && (status != SchedulerStatus.FROZEN)) {
             return new BooleanWrapper(false);
         }
 
-        state = SchedulerState.STARTED;
+        status = SchedulerStatus.STARTED;
         logger.info("Scheduler has just been resumed !");
         frontend.schedulerResumedEvent();
 
@@ -1543,15 +1543,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#shutdown()
      */
     public BooleanWrapper shutdown() {
-        if (state == SchedulerState.UNLINKED) {
+        if (status == SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
 
-        if ((state == SchedulerState.KILLED) || (state == SchedulerState.SHUTTING_DOWN)) {
+        if ((status == SchedulerStatus.KILLED) || (status == SchedulerStatus.SHUTTING_DOWN)) {
             return new BooleanWrapper(false);
         }
 
-        state = SchedulerState.SHUTTING_DOWN;
+        status = SchedulerStatus.SHUTTING_DOWN;
         logger.info("Scheduler is shutting down, this make take time to finish every jobs !");
         frontend.schedulerShuttingDownEvent();
 
@@ -1562,15 +1562,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#kill()
      */
     public synchronized BooleanWrapper kill() {
-        if (state == SchedulerState.KILLED) {
+        if (status == SchedulerStatus.KILLED) {
             return new BooleanWrapper(false);
         }
 
         logger_dev.info("Killing all running task processes...");
         //destroying running active object launcher
         for (InternalJob j : runningJobs) {
-            for (InternalTask td : j.getTasks()) {
-                if (td.getStatus() == TaskState.RUNNING) {
+            for (InternalTask td : j.getITasks()) {
+                if (td.getStatus() == TaskStatus.RUNNING) {
                     try {
                         NodeSet nodes = td.getExecuterInformations().getNodes();
 
@@ -1606,7 +1606,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         jobsToBeLoggedinAFile.clear();
         currentlyRunningTasks.clear();
         //finally : shutdown
-        state = SchedulerState.KILLED;
+        status = SchedulerStatus.KILLED;
         logger.info("Scheduler has just been killed !");
         frontend.schedulerKilledEvent();
 
@@ -1617,11 +1617,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#pause(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper pause(JobId jobId) {
-        if (state == SchedulerState.UNLINKED) {
+        if (status == SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
 
-        if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
+        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
             return new BooleanWrapper(false);
         }
 
@@ -1650,11 +1650,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public BooleanWrapper resume(JobId jobId) {
-        if (state == SchedulerState.UNLINKED) {
+        if (status == SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
 
-        if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.KILLED)) {
+        if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
             return new BooleanWrapper(false);
         }
 
@@ -1683,11 +1683,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
      */
     public synchronized BooleanWrapper kill(JobId jobId) {
-        if (state == SchedulerState.UNLINKED) {
+        if (status == SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
 
-        if (state == SchedulerState.KILLED) {
+        if (status == SchedulerStatus.KILLED) {
             return new BooleanWrapper(false);
         }
 
@@ -1695,11 +1695,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         InternalJob job = jobs.get(jobId);
 
-        if (job == null || job.getState() == JobState.KILLED) {
+        if (job == null || job.getStatus() == JobStatus.KILLED) {
             return new BooleanWrapper(false);
         }
 
-        endJob(job, null, "", JobState.KILLED);
+        endJob(job, null, "", JobStatus.KILLED);
 
         terminateJobHandling(job.getId());
 
@@ -1747,14 +1747,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
         //only if unlink
-        if (state != SchedulerState.UNLINKED) {
+        if (status != SchedulerStatus.UNLINKED) {
             return new BooleanWrapper(false);
         }
         try {
             ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL.trim()));
             //re-link the RM
             resourceManager = imp;
-            state = SchedulerState.FROZEN;
+            status = SchedulerStatus.FROZEN;
             logger
                     .info("New resource manager has been linked to the scheduler.\n\t-> Resume to continue the scheduling.");
             frontend.schedulerRMUpEvent();
@@ -1828,7 +1828,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         for (InternalJob job : jobs.values()) {
             //rebuild job descriptor if needed (needed because not stored in database)
             job.getJobDescriptor();
-            switch (job.getState()) {
+            switch (job.getStatus()) {
                 case PENDING:
                     pendingJobs.add(job);
                     currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
@@ -1849,13 +1849,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
 
                     //reset the finished events in the order they have occurred
-                    ArrayList<InternalTask> tasksList = copyAndSort(job.getTasks(), true);
+                    ArrayList<InternalTask> tasksList = copyAndSort(job.getITasks(), true);
 
                     for (InternalTask task : tasksList) {
                         job.update(task.getTaskInfo());
-                        //if the task was in waiting for restart state, restart it
-                        if (task.getStatus() == TaskState.WAITING_ON_ERROR ||
-                            task.getStatus() == TaskState.WAITING_ON_FAILURE) {
+                        //if the task was in waiting for restart status, restart it
+                        if (task.getStatus() == TaskStatus.WAITING_ON_ERROR ||
+                            task.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
                             job.newWaitingTask();
                             job.reStartTask(task);
                         }
@@ -1887,7 +1887,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         runningJobs.add(job);
 
                         //reset the finished events in the order they have occurred
-                        ArrayList<InternalTask> tasksListP = copyAndSort(job.getTasks(), true);
+                        ArrayList<InternalTask> tasksListP = copyAndSort(job.getITasks(), true);
 
                         for (InternalTask task : tasksListP) {
                             job.update(task.getTaskInfo());
@@ -1914,22 +1914,22 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         logger_dev.info("Re-create task dependences");
 
         for (InternalJob job : runningJobs) {
-            ArrayList<InternalTask> tasksList = copyAndSort(job.getTasks(), true);
+            ArrayList<InternalTask> tasksList = copyAndSort(job.getITasks(), true);
 
             //simulate the running execution to recreate the tree.
             for (InternalTask task : tasksList) {
                 job.simulateStartAndTerminate(task.getId());
             }
 
-            if ((job.getState() == JobState.RUNNING) || (job.getState() == JobState.PAUSED)) {
-                //set the state to stalled because the scheduler start in stopped mode.
-                if (job.getState() == JobState.RUNNING) {
-                    job.setState(JobState.STALLED);
+            if ((job.getStatus() == JobStatus.RUNNING) || (job.getStatus() == JobStatus.PAUSED)) {
+                //set the status to stalled because the scheduler start in stopped mode.
+                if (job.getStatus() == JobStatus.RUNNING) {
+                    job.setStatus(JobStatus.STALLED);
                 }
 
                 //set the task to pause inside the job if it is paused.
-                if (job.getState() == JobState.PAUSED) {
-                    job.setState(JobState.STALLED);
+                if (job.getStatus() == JobStatus.PAUSED) {
+                    job.setStatus(JobStatus.STALLED);
                     job.setPaused();
                     job.setTaskStatusModify(null);
                 }
@@ -1942,8 +1942,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         for (InternalJob job : pendingJobs) {
             //set the task to pause inside the job if it is paused.
-            if (job.getState() == JobState.PAUSED) {
-                job.setState(JobState.STALLED);
+            if (job.getStatus() == JobStatus.PAUSED) {
+                job.setStatus(JobStatus.STALLED);
                 job.setPaused();
                 job.setTaskStatusModify(null);
             }

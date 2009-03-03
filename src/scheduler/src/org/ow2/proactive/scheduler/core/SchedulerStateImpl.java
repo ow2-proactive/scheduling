@@ -33,32 +33,32 @@ package org.ow2.proactive.scheduler.core;
 
 import java.util.Vector;
 
-import org.ow2.proactive.scheduler.common.SchedulerInitialState;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
-import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobState;
 
 
 /**
  * This class is a representation of the whole scheduler initial jobs list state.<br>
- * It is basically represented by 3 lists of jobs, and its scheduling state.
+ * It is basically represented by 3 lists of jobs, and its scheduling status.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public final class SchedulerInitialStateImpl implements SchedulerInitialState {
+public final class SchedulerStateImpl implements SchedulerState {
 
     /** Pending jobs */
-    private Vector<Job> pendingJobs = new Vector<Job>();
+    private Vector<JobState> pendingJobs = new Vector<JobState>();
 
     /** Running jobs */
-    private Vector<Job> runningJobs = new Vector<Job>();
+    private Vector<JobState> runningJobs = new Vector<JobState>();
 
     /** Finished jobs */
-    private Vector<Job> finishedJobs = new Vector<Job>();
+    private Vector<JobState> finishedJobs = new Vector<JobState>();
 
-    /** Scheduler state */
-    private SchedulerState state = SchedulerState.STOPPED;
+    /** Scheduler status */
+    private SchedulerStatus status = SchedulerStatus.STOPPED;
 
     /** List of connected user. */
     private SchedulerUsers sUsers;
@@ -66,7 +66,7 @@ public final class SchedulerInitialStateImpl implements SchedulerInitialState {
     /**
      * ProActive Empty constructor.
      */
-    public SchedulerInitialStateImpl() {
+    public SchedulerStateImpl() {
     }
 
     /**
@@ -74,7 +74,7 @@ public final class SchedulerInitialStateImpl implements SchedulerInitialState {
      *
      * @return the finishedJobs
      */
-    public Vector<Job> getFinishedJobs() {
+    public Vector<JobState> getFinishedJobs() {
         return finishedJobs;
     }
 
@@ -83,7 +83,7 @@ public final class SchedulerInitialStateImpl implements SchedulerInitialState {
      *
      * @param finishedJobs the finishedJobs to set
      */
-    public void setFinishedJobs(Vector<Job> finishedJobs) {
+    public void setFinishedJobs(Vector<JobState> finishedJobs) {
         this.finishedJobs = finishedJobs;
     }
 
@@ -92,7 +92,7 @@ public final class SchedulerInitialStateImpl implements SchedulerInitialState {
      *
      * @return the pendingJobs
      */
-    public Vector<Job> getPendingJobs() {
+    public Vector<JobState> getPendingJobs() {
         return pendingJobs;
     }
 
@@ -101,7 +101,7 @@ public final class SchedulerInitialStateImpl implements SchedulerInitialState {
      *
      * @param pendingJobs the pendingJobs to set
      */
-    public void setPendingJobs(Vector<Job> pendingJobs) {
+    public void setPendingJobs(Vector<JobState> pendingJobs) {
         this.pendingJobs = pendingJobs;
     }
 
@@ -110,7 +110,7 @@ public final class SchedulerInitialStateImpl implements SchedulerInitialState {
      *
      * @return the runningJobs
      */
-    public Vector<Job> getRunningJobs() {
+    public Vector<JobState> getRunningJobs() {
         return runningJobs;
     }
 
@@ -119,22 +119,22 @@ public final class SchedulerInitialStateImpl implements SchedulerInitialState {
      *
      * @param runningJobs the runningJobs to set
      */
-    public void setRunningJobs(Vector<Job> runningJobs) {
+    public void setRunningJobs(Vector<JobState> runningJobs) {
         this.runningJobs = runningJobs;
     }
 
     /**
-     * @return the state
+     * @return the status
      */
-    public SchedulerState getState() {
-        return state;
+    public SchedulerStatus getStatus() {
+        return status;
     }
 
     /**
-     * @param state the state to set
+     * @param status the status to set
      */
-    public void setState(SchedulerState state) {
-        this.state = state;
+    public void setState(SchedulerStatus status) {
+        this.status = status;
     }
 
     /**

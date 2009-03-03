@@ -41,9 +41,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.gui.views.JobInfo;
 import org.ow2.proactive.scheduler.gui.views.TaskView;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -135,7 +135,7 @@ public class TableManager {
                         table.select(i);
 
                         // get the job by jobId
-                        InternalJob job = JobsController.getLocalView().getJobById(jId);
+                        JobState job = JobsController.getLocalView().getJobById(jId);
 
                         // update its informations
                         JobInfo jobInfo = JobInfo.getInstance();

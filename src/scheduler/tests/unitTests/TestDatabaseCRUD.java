@@ -51,7 +51,7 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
@@ -137,7 +137,7 @@ public class TestDatabaseCRUD {
         Assert.assertEquals(itfJob.getType(), JobType.TASKSFLOW);
         Assert.assertEquals(itfJob.getTasks().size(), 4);
         //Check task 1 properties
-        for (InternalTask it : itfJob.getTasks()) {
+        for (InternalTask it : itfJob.getITasks()) {
             if (it.getName().equals("task1")) {
                 Assert.assertEquals(it.getName(), "task1");
                 Assert.assertEquals(it.isCancelJobOnError(), false);
@@ -293,12 +293,12 @@ public class TestDatabaseCRUD {
         Assert.assertNull(itfJob.getJobResult().getAllResults().get("task2").getException());
         log("Test UPDATE");
         //unload
-        for (InternalTask it : itfJob.getTasks()) {
+        for (InternalTask it : itfJob.getITasks()) {
             DatabaseManager.unload(it);
             Assert.assertEquals(it.getExecutableContainer(), null);
         }
         //load
-        for (InternalTask it : itfJob.getTasks()) {
+        for (InternalTask it : itfJob.getITasks()) {
             DatabaseManager.load(it);
             if (it.getName().equals("task1")) {
                 Field f = JavaExecutableContainer.class.getDeclaredField("args");
@@ -364,7 +364,7 @@ public class TestDatabaseCRUD {
         //update MEM instance
         infoMem.setExecutionHostName("toto");
         infoMem.setStartTime(1142564);
-        infoMem.setStatus(TaskState.RUNNING);
+        infoMem.setStatus(TaskStatus.RUNNING);
         infoMem.setTaskId(TaskIdImpl.nextId(id.getJobId()));
         //synchronize update with database
         DatabaseManager.synchronize(infoMem);

@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerInitialState;
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -91,10 +91,9 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
      */
-    public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener listener,
-            SchedulerEvent... events) {
+    public SchedulerState addSchedulerEventListener(SchedulerEventListener listener, SchedulerEvent... events) {
         try {
-            return (SchedulerInitialState) scheduler.addSchedulerEventListener(listener, events);
+            return (SchedulerState) scheduler.addSchedulerEventListener(listener, events);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }

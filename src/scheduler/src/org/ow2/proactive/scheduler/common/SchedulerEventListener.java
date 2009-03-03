@@ -36,6 +36,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
@@ -113,7 +114,7 @@ public interface SchedulerEventListener extends Serializable {
      *
      * @param job the new job to schedule.
      */
-    public void jobSubmittedEvent(Job job);
+    public void jobSubmittedEvent(JobState job);
 
     /**
      * Invoked when the scheduling of a job has just started.<br>

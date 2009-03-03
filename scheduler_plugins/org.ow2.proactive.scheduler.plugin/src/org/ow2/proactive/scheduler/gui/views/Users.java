@@ -80,8 +80,8 @@ public class Users extends ViewPart implements SchedulerUsersListener {
     private static boolean isDisposed = true;
     private Table table = null;
 
-    //    private int order = InternalJob.ASC_ORDER;
-    //    private int lastSorting = InternalJob.SORT_BY_ID;
+    //    private int order = JobState.ASC_ORDER;
+    //    private int lastSorting = JobState.SORT_BY_ID;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //

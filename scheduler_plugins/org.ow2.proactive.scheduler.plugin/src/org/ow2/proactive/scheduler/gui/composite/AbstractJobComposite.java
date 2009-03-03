@@ -56,6 +56,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.gui.Colors;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
@@ -64,7 +65,6 @@ import org.ow2.proactive.scheduler.gui.data.TableManager;
 import org.ow2.proactive.scheduler.gui.views.JobInfo;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
 import org.ow2.proactive.scheduler.gui.views.TaskView;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -109,8 +109,8 @@ public abstract class AbstractJobComposite extends Composite {
     private Table table = null;
     private int count = 0;
     private String title = null;
-    private int order = InternalJob.ASC_ORDER;
-    private int lastSorting = InternalJob.SORT_BY_ID;
+    private int order = JobState.ASC_ORDER;
+    private int lastSorting = JobState.SORT_BY_ID;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -168,7 +168,7 @@ public abstract class AbstractJobComposite extends Composite {
 
     private void addJobInTable(JobId jobId, int anItemIndex) {
         if (!isDisposed()) {
-            final InternalJob job = JobsController.getLocalView().getJobById(jobId);
+            final JobState job = JobsController.getLocalView().getJobById(jobId);
             final int itemIndex = anItemIndex;
             getDisplay().syncExec(new Runnable() {
                 public void run() {
@@ -180,22 +180,22 @@ public abstract class AbstractJobComposite extends Composite {
 
     private void sort(SelectionEvent event, int field) {
         if (lastSorting == field) {
-            order = (order == InternalJob.DESC_ORDER) ? InternalJob.ASC_ORDER : InternalJob.DESC_ORDER;
-            InternalJob.setSortingOrder(order);
+            order = (order == JobState.DESC_ORDER) ? JobState.ASC_ORDER : JobState.DESC_ORDER;
+            JobState.setSortingOrder(order);
         }
-        InternalJob.setSortingBy(field);
+        JobState.setSortingBy(field);
         lastSorting = field;
 
         sortJobs();
 
         refreshTable();
         table.setSortColumn((TableColumn) event.widget);
-        table.setSortDirection((order == InternalJob.DESC_ORDER) ? SWT.DOWN : SWT.UP);
+        table.setSortDirection((order == JobState.DESC_ORDER) ? SWT.DOWN : SWT.UP);
     }
 
-    private void fillBackgroundColor(TableItem item, JobState state, Color col) {
+    private void fillBackgroundColor(TableItem item, JobStatus status, Color col) {
         boolean setFont = false;
-        switch (state) {
+        switch (status) {
             case CANCELED:
                 setFont = true;
                 item.setForeground(JOB_CANCELED_BACKGROUND_COLOR);
@@ -263,31 +263,31 @@ public abstract class AbstractJobComposite extends Composite {
         tc1.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalJob.SORT_BY_ID);
+                sort(event, JobState.SORT_BY_ID);
             }
         });
         tc2.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalJob.SORT_BY_PRIORITY);
+                sort(event, JobState.SORT_BY_PRIORITY);
             }
         });
         tc3.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalJob.SORT_BY_NAME);
+                sort(event, JobState.SORT_BY_NAME);
             }
         });
         tc4.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalJob.SORT_BY_STATE);
+                sort(event, JobState.SORT_BY_STATUS);
             }
         });
         tc5.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalJob.SORT_BY_OWNER);
+                sort(event, JobState.SORT_BY_OWNER);
             }
         });
         // setText
@@ -323,7 +323,7 @@ public abstract class AbstractJobComposite extends Composite {
                     JobId jobId = (JobId) widget.getData();
 
                     // get the job by jobId
-                    InternalJob job = JobsController.getLocalView().getJobById(jobId);
+                    JobState job = JobsController.getLocalView().getJobById(jobId);
 
                     // FIXME should be controlled by boolean button
                     // show its output
@@ -376,7 +376,7 @@ public abstract class AbstractJobComposite extends Composite {
         return table;
     }
 
-    /*
+    /**
      * Create and return an item which will be added in the table. The item will has its data set to
      * the jobId of the job.
      * 
@@ -384,20 +384,20 @@ public abstract class AbstractJobComposite extends Composite {
      * 
      * @return the new item
      */
-    protected TableItem createItem(InternalJob job, int itemIndex) {
+    protected TableItem createItem(JobState job, int itemIndex) {
         TableColumn[] cols = table.getColumns();
         TableItem item = new TableItem(table, SWT.NONE);
         item.setData(job.getId());
         if (itemIndex == 0) {
-            fillBackgroundColor(item, job.getState(), null);
+            fillBackgroundColor(item, job.getStatus(), null);
         } else {
-            fillBackgroundColor(item, job.getState(), table.getItem(itemIndex - 1).getBackground());
+            fillBackgroundColor(item, job.getStatus(), table.getItem(itemIndex - 1).getBackground());
         }
 
         for (int i = 0; i < cols.length; i++) {
             String title = cols[i].getText();
             if (title.equals(COLUMN_STATE_TITLE)) {
-                item.setText(i, job.getState().toString());
+                item.setText(i, job.getStatus().toString());
             } else if (title.equals(COLUMN_ID_TITLE)) {
                 item.setText(i, job.getId().toString());
             } else if (title.equals(COLUMN_PRIORITY_TITLE)) {
@@ -430,16 +430,16 @@ public abstract class AbstractJobComposite extends Composite {
                     }
 
                     TableColumn[] cols = table.getColumns();
-                    InternalJob job = JobsController.getLocalView().getJobById(jobId);
+                    JobState job = JobsController.getLocalView().getJobById(jobId);
                     for (int i = 0; i < cols.length; i++) {
                         String title = cols[i].getText();
                         if ((title != null) && (title.equals(COLUMN_STATE_TITLE))) {
                             if (itemIndex == 0) {
-                                fillBackgroundColor(item, job.getState(), null);
+                                fillBackgroundColor(item, job.getStatus(), null);
                             } else {
-                                fillBackgroundColor(item, job.getState(), items[itemIndex].getBackground());
+                                fillBackgroundColor(item, job.getStatus(), items[itemIndex].getBackground());
                             }
-                            item.setText(i, job.getState().toString());
+                            item.setText(i, job.getStatus().toString());
                             break;
                         }
                     }
@@ -464,7 +464,7 @@ public abstract class AbstractJobComposite extends Composite {
                         }
 
                     TableColumn[] cols = table.getColumns();
-                    InternalJob job = JobsController.getLocalView().getJobById(jobId);
+                    JobState job = JobsController.getLocalView().getJobById(jobId);
                     for (int i = 0; i < cols.length; i++) {
                         String title = cols[i].getText();
                         if ((title != null) && (title.equals(COLUMN_PRIORITY_TITLE))) {
@@ -562,7 +562,7 @@ public abstract class AbstractJobComposite extends Composite {
                             }
                         }
                     } else if (j.length > 1) {
-                        List<InternalJob> jobs = JobsController.getLocalView().getJobsByIds(
+                        List<JobState> jobs = JobsController.getLocalView().getJobsByIds(
                                 TableManager.getInstance().getJobsIdOfSelectedItems());
 
                         JobInfo jobInfo = JobInfo.getInstance();

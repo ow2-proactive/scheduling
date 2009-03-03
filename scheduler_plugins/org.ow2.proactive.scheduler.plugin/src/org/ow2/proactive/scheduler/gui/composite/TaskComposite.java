@@ -58,17 +58,17 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.gui.Colors;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
-import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 /**
@@ -117,11 +117,11 @@ public class TaskComposite extends Composite {
      * the background color of tasks that couldn't be started due to dependencies failure
      */
     public static final Color TASKS_NOT_STARTED_BACKGROUND_COLOR = Colors.DEEP_SKY_BLUE;
-    private List<InternalTask> tasks = null;
+    private List<TaskState> tasks = null;
     private Label label = null;
     private Table table = null;
-    private int order = InternalTask.ASC_ORDER;
-    private int lastSorting = InternalTask.SORT_BY_ID;
+    private int order = TaskState.ASC_ORDER;
+    private int lastSorting = TaskState.SORT_BY_ID;
 
     /**
      * This is the default constructor.
@@ -165,55 +165,55 @@ public class TaskComposite extends Composite {
         tc1.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalTask.SORT_BY_ID);
+                sort(event, TaskState.SORT_BY_ID);
             }
         });
         tc2.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalTask.SORT_BY_STATUS);
+                sort(event, TaskState.SORT_BY_STATUS);
             }
         });
         tc3.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalTask.SORT_BY_NAME);
+                sort(event, TaskState.SORT_BY_NAME);
             }
         });
         tc4.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalTask.SORT_BY_HOST_NAME);
+                sort(event, TaskState.SORT_BY_HOST_NAME);
             }
         });
         tc5.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalTask.SORT_BY_STARTED_TIME);
+                sort(event, TaskState.SORT_BY_STARTED_TIME);
             }
         });
         tc6.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalTask.SORT_BY_FINISHED_TIME);
+                sort(event, TaskState.SORT_BY_FINISHED_TIME);
             }
         });
         tc7.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalTask.SORT_BY_EXECUTIONLEFT);
+                sort(event, TaskState.SORT_BY_EXECUTIONLEFT);
             }
         });
         //        tc8.addSelectionListener(new SelectionAdapter() {
         //                
         //                public void widgetSelected(SelectionEvent event) {
-        //                    sort(event, InternalTask.SORT_BY_RUN_TIME_LIMIT);
+        //                    sort(event, TaskState.SORT_BY_RUN_TIME_LIMIT);
         //                }
         //            });
         tc9.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, InternalTask.SORT_BY_DESCRIPTION);
+                sort(event, TaskState.SORT_BY_DESCRIPTION);
             }
         });
         // setText
@@ -303,14 +303,14 @@ public class TaskComposite extends Composite {
 
         //check nevertheless whether creation of view has succeed
         if (resultPreview != null) {
-            InternalJob job = JobsController.getLocalView().getJobById(taskId.getJobId());
+            JobState job = JobsController.getLocalView().getJobById(taskId.getJobId());
 
             // test job owner
             if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
-                InternalTask task = job.getHMTasks().get(taskId);
+                TaskState task = job.getHMTasks().get(taskId);
                 // update its tasks informations if task is finished
-                if (task.getStatus() == TaskState.FINISHED || task.getStatus() == TaskState.FAULTY ||
-                    task.getStatus() == TaskState.WAITING_ON_ERROR) {
+                if (task.getStatus() == TaskStatus.FINISHED || task.getStatus() == TaskStatus.FAULTY ||
+                    task.getStatus() == TaskStatus.WAITING_ON_ERROR) {
                     TaskResult tr = getTaskResult(job.getId(), taskId);
                     if (tr != null) {
                         if (grapchicalPreview) {
@@ -400,16 +400,16 @@ public class TaskComposite extends Composite {
         if (tasks != null) {
             if (lastSorting == field) {
                 // if the new sort is the same as the last sort, invert order.
-                order = (order == InternalTask.DESC_ORDER) ? InternalTask.ASC_ORDER : InternalTask.DESC_ORDER;
-                InternalTask.setSortingOrder(order);
+                order = (order == TaskState.DESC_ORDER) ? TaskState.ASC_ORDER : TaskState.DESC_ORDER;
+                TaskState.setSortingOrder(order);
             }
-            InternalTask.setSortingBy(field);
+            TaskState.setSortingBy(field);
             lastSorting = field;
 
             sort();
 
             table.setSortColumn((TableColumn) event.widget);
-            table.setSortDirection((order == InternalTask.DESC_ORDER) ? SWT.DOWN : SWT.UP);
+            table.setSortDirection((order == TaskState.DESC_ORDER) ? SWT.DOWN : SWT.UP);
         }
     }
 
@@ -429,7 +429,7 @@ public class TaskComposite extends Composite {
             int i = 0;
 
             // then add the entries
-            for (InternalTask td : tasks)
+            for (TaskState td : tasks)
                 createItem(td, i++);
 
             // Turn drawing back on
@@ -441,23 +441,23 @@ public class TaskComposite extends Composite {
         }
     }
 
-    private void createItem(InternalTask internalTask, int itemIndex) {
+    private void createItem(TaskState taskState, int itemIndex) {
         if (!table.isDisposed()) {
             TableItem item = new TableItem(table, SWT.NONE);
             // To have a unique identifier for this TableItem
-            item.setData(internalTask.getId());
+            item.setData(taskState.getId());
             if (itemIndex == 0) {
-                fillItem(item, internalTask, null);
+                fillItem(item, taskState, null);
             } else {
-                fillItem(item, internalTask, table.getItem(itemIndex - 1).getBackground());
+                fillItem(item, taskState, table.getItem(itemIndex - 1).getBackground());
             }
         }
     }
 
-    private void fillItem(TableItem item, InternalTask internalTask, Color col) {
+    private void fillItem(TableItem item, TaskState taskState, Color col) {
         if (!table.isDisposed()) {
             boolean setFont = false;
-            switch (internalTask.getStatus()) {
+            switch (taskState.getStatus()) {
                 case ABORTED:
                     setFont = true;
                     item.setForeground(TASKS_ABORTED_BACKGROUND_COLOR);
@@ -483,7 +483,7 @@ public class TaskComposite extends Composite {
             }
 
             if (!setFont &&
-                ((internalTask.getMaxNumberOfExecution() - internalTask.getNumberOfExecutionLeft()) > 0)) {
+                ((taskState.getMaxNumberOfExecution() - taskState.getNumberOfExecutionLeft()) > 0)) {
                 setFont = true;
             }
             if (setFont) {
@@ -501,49 +501,47 @@ public class TaskComposite extends Composite {
             for (int i = 0; i < cols.length; i++) {
                 String title = cols[i].getText();
                 if (title.equals(COLUMN_ID_TITLE)) {
-                    item.setText(i, "" + internalTask.getId().hashCode());
+                    item.setText(i, "" + taskState.getId().hashCode());
                 } else if (title.equals(COLUMN_STATUS_TITLE)) {
-                    String tmp = internalTask.getStatus().toString();
-                    switch (internalTask.getStatus()) {
+                    String tmp = taskState.getStatus().toString();
+                    switch (taskState.getStatus()) {
                         case RUNNING:
                         case FINISHED:
                         case FAULTY:
-                            int nb = (internalTask.getMaxNumberOfExecution() -
-                                internalTask.getNumberOfExecutionLeft() + 1);
-                            if (nb > internalTask.getMaxNumberOfExecution()) {
-                                nb = internalTask.getMaxNumberOfExecution();
+                            int nb = (taskState.getMaxNumberOfExecution() -
+                                taskState.getNumberOfExecutionLeft() + 1);
+                            if (nb > taskState.getMaxNumberOfExecution()) {
+                                nb = taskState.getMaxNumberOfExecution();
                             }
-                            tmp = tmp + " (" + nb + "/" + internalTask.getMaxNumberOfExecution() + ")";
+                            tmp = tmp + " (" + nb + "/" + taskState.getMaxNumberOfExecution() + ")";
                             break;
                         case WAITING_ON_ERROR:
-                            tmp = tmp +
-                                " (" +
-                                (internalTask.getMaxNumberOfExecution() - internalTask
-                                        .getNumberOfExecutionLeft()) + "/" +
-                                internalTask.getMaxNumberOfExecution() + ")";
+                            tmp = tmp + " (" +
+                                (taskState.getMaxNumberOfExecution() - taskState.getNumberOfExecutionLeft()) +
+                                "/" + taskState.getMaxNumberOfExecution() + ")";
                             break;
                     }
                     item.setText(i, tmp);
                 } else if (title.equals(COLUMN_NAME_TITLE)) {
-                    item.setText(i, internalTask.getName());
+                    item.setText(i, taskState.getName());
                 } else if (title.equals(COLUMN_DESCRIPTION_TITLE)) {
-                    item.setText(i, (internalTask.getDescription() == null) ? "no description available"
-                            : internalTask.getDescription());
+                    item.setText(i, (taskState.getDescription() == null) ? "no description available"
+                            : taskState.getDescription());
                 } else if (title.equals(COLUMN_START_TIME_TITLE)) {
-                    item.setText(i, Tools.getFormattedDate(internalTask.getStartTime()));
+                    item.setText(i, Tools.getFormattedDate(taskState.getStartTime()));
                 } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
-                    item.setText(i, Tools.getFormattedDate(internalTask.getFinishedTime()));
+                    item.setText(i, Tools.getFormattedDate(taskState.getFinishedTime()));
                 } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
-                    if (internalTask.getStatus() == TaskState.FAILED) {
-                        item.setText(i, internalTask.getMaxNumberOfExecutionOnFailure() + "/" +
-                            internalTask.getMaxNumberOfExecutionOnFailure());
+                    if (taskState.getStatus() == TaskStatus.FAILED) {
+                        item.setText(i, taskState.getMaxNumberOfExecutionOnFailure() + "/" +
+                            taskState.getMaxNumberOfExecutionOnFailure());
                     } else {
-                        item.setText(i, (internalTask.getMaxNumberOfExecutionOnFailure() - internalTask
+                        item.setText(i, (taskState.getMaxNumberOfExecutionOnFailure() - taskState
                                 .getNumberOfExecutionOnFailureLeft()) +
-                            "/" + internalTask.getMaxNumberOfExecutionOnFailure());
+                            "/" + taskState.getMaxNumberOfExecutionOnFailure());
                     }
                 } else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
-                    String hostName = internalTask.getExecutionHostName();
+                    String hostName = taskState.getExecutionHostName();
                     if (hostName == null) {
                         item.setText(i, "n/a");
                     } else {
@@ -574,7 +572,7 @@ public class TaskComposite extends Composite {
      * 
      * @param tasks
      */
-    public void setTasks(JobId jobId, ArrayList<InternalTask> tasks) {
+    public void setTasks(JobId jobId, ArrayList<TaskState> tasks) {
         this.tasks = tasks;
         int tmp = tasks.size();
 
@@ -592,7 +590,7 @@ public class TaskComposite extends Composite {
      * 
      * @param tasks
      */
-    public void setTasks(int numberOfJobs, ArrayList<InternalTask> tasks) {
+    public void setTasks(int numberOfJobs, ArrayList<TaskState> tasks) {
         this.tasks = tasks;
         int tmp = tasks.size();
 
@@ -604,22 +602,22 @@ public class TaskComposite extends Composite {
 
     /**
      * This method allow to replace only one line on the task table. This method identify the "good"
-     * item with the taskId. The internalTask is use to fill item.
+     * item with the taskId. The TaskState is use to fill item.
      * 
      * @param taskId the taskId which must be updated
      * 
-     * @param internalTask all informations for fill item
+     * @param taskState all informations for fill item
      */
-    public void changeLine(TaskId taskId, InternalTask internalTask) {
+    public void changeLine(TaskId taskId, TaskState taskState) {
         if (!table.isDisposed()) {
             TableItem[] items = table.getItems();
             int itemIndex = 0;
             for (TableItem item : items) {
                 if (((TaskId) item.getData()).equals(taskId)) {
                     if (itemIndex == 0) {
-                        fillItem(item, internalTask, null);
+                        fillItem(item, taskState, null);
                     } else {
-                        fillItem(item, internalTask, items[itemIndex - 1].getBackground());
+                        fillItem(item, taskState, items[itemIndex - 1].getBackground());
                     }
                     break;
                 }

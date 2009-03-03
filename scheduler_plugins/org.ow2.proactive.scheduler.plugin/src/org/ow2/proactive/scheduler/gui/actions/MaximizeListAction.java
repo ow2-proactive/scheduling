@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Control;
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 
@@ -91,7 +91,7 @@ public class MaximizeListAction extends SchedulerGUIAction {
     }
 
     @Override
-    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
         if (connected)
             setEnabled(true);

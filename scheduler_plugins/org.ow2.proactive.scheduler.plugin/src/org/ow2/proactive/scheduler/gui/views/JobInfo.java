@@ -41,10 +41,10 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -81,14 +81,14 @@ public class JobInfo extends ViewPart {
      * 
      * @param job a job
      */
-    public void updateInfos(InternalJob job) {
+    public void updateInfos(JobState job) {
         setVisible(true);
         Vector<String> propertiesName = new Vector<String>();
         Vector<Object> propertiesValue = new Vector<Object>();
         propertiesName.add("Id");
         propertiesValue.add(job.getId());
         propertiesName.add("State");
-        propertiesValue.add(job.getState());
+        propertiesValue.add(job.getStatus());
         propertiesName.add("Name");
         propertiesValue.add(job.getName());
         propertiesName.add("Priority");
@@ -135,13 +135,13 @@ public class JobInfo extends ViewPart {
      * 
      * @param job a job
      */
-    public void updateInfos(List<InternalJob> jobs) {
+    public void updateInfos(List<JobState> jobs) {
         int pendingTasks = 0;
         int runningTasks = 0;
         int finishedTasks = 0;
         int totalTasks = 0;
 
-        for (InternalJob job : jobs) {
+        for (JobState job : jobs) {
             pendingTasks += job.getJobInfo().getNumberOfPendingTasks();
             runningTasks += job.getJobInfo().getNumberOfRunningTasks();
             finishedTasks += job.getJobInfo().getNumberOfFinishedTasks();

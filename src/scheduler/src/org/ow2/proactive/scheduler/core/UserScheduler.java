@@ -34,7 +34,7 @@ package org.ow2.proactive.scheduler.core;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerInitialState;
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -109,8 +109,8 @@ public class UserScheduler implements UserSchedulerInterface {
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, org.ow2.proactive.scheduler.common.SchedulerEvent[])
      */
-    public SchedulerInitialState addSchedulerEventListener(SchedulerEventListener sel,
-            SchedulerEvent... events) throws SchedulerException {
+    public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, SchedulerEvent... events)
+            throws SchedulerException {
         return schedulerFrontend.addSchedulerEventListener(sel, events);
     }
 

@@ -37,16 +37,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.gui.composite.TaskComposite;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
-import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
-/**
+/***
  * This view display many informations about tasks contains in a job.
  *
  * @author The ProActive Team
@@ -54,7 +54,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  */
 public class TaskView extends ViewPart {
 
-    /* the view part id */
+    /** the view part id */
     public static final String ID = "org.ow2.proactive.scheduler.gui.views.TaskView";
 
     // the shared instance
@@ -62,28 +62,28 @@ public class TaskView extends ViewPart {
     private static boolean isDisposed = true;
     private TaskComposite taskComposite = null;
 
-    /*
+    /**
      * This is the default constructor
      */
     public TaskView() {
         instance = this;
     }
 
-    /*
+    /**
      * This method clear the view
      */
     public void clear() {
         taskComposite.clear();
     }
 
-    /*
+    /**
      * To update fully the view with the new informations about the given job
      * 
      * @param job a job
      */
-    public void fullUpdate(InternalJob job) {
+    public void fullUpdate(JobState job) {
         if (!taskComposite.isDisposed()) {
-            final InternalJob aJob = job;
+            final JobState aJob = job;
             Display.getDefault().asyncExec(new Runnable() {
                 public void run() {
                     taskComposite.setTasks(aJob.getId(), aJob.getTasks());
@@ -92,16 +92,16 @@ public class TaskView extends ViewPart {
         }
     }
 
-    /*
+    /**
      * To update fully the view with the new informations about given jobs
      * 
      * @param jobs a list of job
      */
-    public void fullUpdate(List<InternalJob> jobs) {
+    public void fullUpdate(List<JobState> jobs) {
         if (!taskComposite.isDisposed()) {
             final int numberOfJobs = jobs.size();
-            final ArrayList<InternalTask> tasks = new ArrayList<InternalTask>();
-            for (InternalJob job : jobs)
+            final ArrayList<TaskState> tasks = new ArrayList<TaskState>();
+            for (JobState job : jobs)
                 tasks.addAll(job.getTasks());
 
             Display.getDefault().asyncExec(new Runnable() {
@@ -112,25 +112,25 @@ public class TaskView extends ViewPart {
         }
     }
 
-    /*
+    /**
      * To update only one line of the jobs informations displayed in the view. use this method to
      * avoid flicker
      * 
-     * @param taskInfo
+     * @param taskInfo information about the task
      * 
-     * @param taskDescriptor
+     * @param task the task to update
      */
-    public void lineUpdate(TaskInfo taskInfo, InternalTask taskDescriptor) {
+    public void lineUpdate(TaskInfo taskInfo, TaskState task) {
         final TaskInfo aTaskInfo = taskInfo;
-        final InternalTask aTaskDescriptor = taskDescriptor;
+        final TaskState aTask = task;
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                taskComposite.changeLine(aTaskInfo.getTaskId(), aTaskDescriptor);
+                taskComposite.changeLine(aTaskInfo.getTaskId(), aTask);
             }
         });
     }
 
-    /*
+    /**
      * To display or not the view
      * 
      * @param isVisible
@@ -141,7 +141,7 @@ public class TaskView extends ViewPart {
         }
     }
 
-    /*
+    /**
      * To enabled or not the view
      * 
      * @param isEnabled
@@ -156,7 +156,7 @@ public class TaskView extends ViewPart {
         return taskComposite.getIdOfSelectedTask();
     }
 
-    /*
+    /**
      * Returns the shared instance
      * 
      * @return the shared instance
@@ -171,7 +171,7 @@ public class TaskView extends ViewPart {
     // -------------------------------------------------------------------- //
     // ------------------------ extends ViewPart -------------------------- //
     // -------------------------------------------------------------------- //
-    /*
+    /**
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
     @Override
@@ -196,7 +196,7 @@ public class TaskView extends ViewPart {
         }
     }
 
-    /*
+    /**
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
     @Override
@@ -210,7 +210,7 @@ public class TaskView extends ViewPart {
         // }
     }
 
-    /*
+    /**
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
      */
     @Override

@@ -34,12 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -88,9 +88,9 @@ public class PauseResumeJobAction extends SchedulerGUIAction {
         if (enabled) {
             int count = 0;
             jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
-            List<InternalJob> jobs = JobsController.getLocalView().getJobsByIds(jobsId);
-            for (InternalJob job : jobs) {
-                switch (job.getState()) {
+            List<JobState> jobs = JobsController.getLocalView().getJobsByIds(jobsId);
+            for (JobState job : jobs) {
+                switch (job.getStatus()) {
                     case PAUSED:
                         count++;
                         break;
@@ -121,7 +121,7 @@ public class PauseResumeJobAction extends SchedulerGUIAction {
     }
 
     @Override
-    public void setEnabled(boolean connected, SchedulerState schedulerState, boolean admin,
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
         setEnabled(connected && jobSelected && !jobInFinishQueue && (admin || owner));
     }
