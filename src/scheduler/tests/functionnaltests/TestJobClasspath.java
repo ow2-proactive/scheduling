@@ -39,17 +39,19 @@ import javassist.CtMethod;
 import javassist.CtNewMethod;
 import junit.framework.Assert;
 
-import org.junit.After;
-import org.junit.Before;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+
+import functionalTests.FunctionalTest;
 
 
 /**
@@ -65,28 +67,12 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  * @date 18 Feb. 09
  * @since ProActive 4.0
  */
-public class TestJobClasspath extends FunctionalTDefaultScheduler {
+public class TestJobClasspath extends FunctionalTest {
 
     private static String jobDescriptor = TestJobClasspath.class.getResource(
             "/functionnaltests/descriptors/Job_Test_CP.xml").getPath();
     private static Integer firstValueToTest = 1;
     private static Integer SecondValueToTest = 2;
-
-    private SchedulerEventReceiver receiver = null;
-
-    /**
-     *  Starting and linking new scheduler ! <br/>
-     *  This method will join a new scheduler and connect it as user.<br/>
-     *  Then, it will register an event receiver to check the dispatched event.
-     */
-    @Before
-    public void preRun() throws Exception {
-        //Create an Event receiver AO in order to observe jobs and tasks states changes
-        receiver = (SchedulerEventReceiver) PAActiveObject.newActive(SchedulerEventReceiver.class.getName(),
-                new Object[] {});
-        //Register as EventListener AO previously created
-        schedUserInterface.addSchedulerEventListener(receiver, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
-    }
 
     /**
      * Tests start here.
@@ -95,59 +81,63 @@ public class TestJobClasspath extends FunctionalTDefaultScheduler {
      */
     @org.junit.Test
     public void run() throws Throwable {
+
+        String taskName = "task1";
+
         String[] classPathes = createClasses();
         {
-            log("Test 1 : Without classpath...");
-            //job creation
-            Job submittedJob = JobFactory.getFactory().createJob(jobDescriptor);
-            //job submission
-            JobId id = schedUserInterface.submit(submittedJob);
-            //waiting for job to finish
-            receiver.waitForNEvent(1);
-            receiver.cleanNgetjobRunningToFinishedEvents();
-            //get result
-            JobResult jr = schedUserInterface.getJobResult(id.value());
+            SchedulerTHelper.log("Test 1 : Without classpath...");
+
+            JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+
+            //this task should be faulty
+            TaskInfo tInfo = SchedulerTHelper.waitForEventTaskFinished(id, taskName);
+            Assert.assertEquals(TaskStatus.FAULTY, tInfo.getStatus());
+
+            JobInfo jInfo = SchedulerTHelper.waitForEventJobFinished(id);
+
+            Assert.assertEquals(JobStatus.FINISHED, jInfo.getStatus());
+            JobResult jr = SchedulerTHelper.getJobResult(id);
+
             Assert.assertTrue(jr.hadException());
             Assert.assertEquals(1, jr.getAllResults().size());
             Assert.assertNotNull(jr.getAllResults().get("task1").getException());
         }
 
         {
-            log("Test 2 : With classpath 1...");
+            SchedulerTHelper.log("Test 2 : With classpath 1...");
             //job creation
             Job submittedJob = JobFactory.getFactory().createJob(jobDescriptor);
             JobEnvironment env = new JobEnvironment();
             env.setJobClasspath(new String[] { classPathes[0] });
             submittedJob.setEnvironment(env);
+
             //job submission
-            JobId id = schedUserInterface.submit(submittedJob);
-            //waiting for job to finish
-            receiver.waitForNEvent(1);
-            receiver.cleanNgetjobRunningToFinishedEvents();
+            JobId id = SchedulerTHelper.testJobSubmission(submittedJob);
+
             //get result
-            JobResult jr = schedUserInterface.getJobResult(id.value());
+            JobResult jr = SchedulerTHelper.getJobResult(id);
             Assert.assertFalse(jr.hadException());
             Assert.assertEquals(1, jr.getAllResults().size());
-            Assert.assertEquals(firstValueToTest, (Integer) jr.getAllResults().get("task1").value());
+            Assert.assertEquals(firstValueToTest, (Integer) jr.getAllResults().get(taskName).value());
         }
 
         {
-            log("Test 3 : With classpath 2...");
+            SchedulerTHelper.log("Test 3 : With classpath 2...");
             //job creation
             Job submittedJob = JobFactory.getFactory().createJob(jobDescriptor);
             JobEnvironment env = new JobEnvironment();
             env.setJobClasspath(new String[] { classPathes[1] });
             submittedJob.setEnvironment(env);
+
             //job submission
-            JobId id = schedUserInterface.submit(submittedJob);
-            //waiting for job to finish
-            receiver.waitForNEvent(1);
-            receiver.cleanNgetjobRunningToFinishedEvents();
-            //get result
-            JobResult jr = schedUserInterface.getJobResult(id.value());
+            JobId id = SchedulerTHelper.testJobSubmission(submittedJob);
+
+            //check results
+            JobResult jr = SchedulerTHelper.getJobResult(id);
             Assert.assertFalse(jr.hadException());
             Assert.assertEquals(1, jr.getAllResults().size());
-            Assert.assertEquals(SecondValueToTest, (Integer) jr.getAllResults().get("task1").value());
+            Assert.assertEquals(SecondValueToTest, (Integer) jr.getAllResults().get(taskName).value());
         }
     }
 
@@ -206,16 +196,4 @@ public class TestJobClasspath extends FunctionalTDefaultScheduler {
 
         return classPathes;
     }
-
-    /**
-     * Disconnect the scheduler.
-     *
-     * @throws Exception if an error occurred
-     */
-    @After
-    public void afterTestJobSubmission() throws Exception {
-        log("Disconnecting from scheduler...");
-        schedUserInterface.disconnect();
-    }
-
 }

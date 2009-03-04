@@ -41,16 +41,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
@@ -67,14 +67,14 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.GenerationScript;
 
-import functionnaltests.FunctionalTDefaultScheduler;
+import functionnaltests.SchedulerTHelper;
 
 
 /**
@@ -86,7 +86,7 @@ import functionnaltests.FunctionalTDefaultScheduler;
  */
 public class TestDatabaseCRUD {
 
-    private static String functionalTestSchedulerProperties = FunctionalTDefaultScheduler.class.getResource(
+    private static String functionalTestSchedulerProperties = SchedulerTHelper.class.getResource(
             "config/functionalTSchedulerProperties.ini").getPath();
     private static String jobTaskFlowDescriptor = TestJobFactory.class.getResource(
             "/unitTests/descriptors/Job_TaskFlow.xml").getPath();

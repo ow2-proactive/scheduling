@@ -61,17 +61,34 @@ public class MyAO implements Serializable {
     protected String rmUsername = "jl";
     protected String rmPassword = "jl";
 
+    protected static String schedulerDefaultURL = "//Localhost/";
+
+    /**
+     * ProActive empty constructor
+     */
     public MyAO() {
     }
 
-    public SchedulerAuthenticationInterface createAndJoinForkedScheduler(boolean startWithDefaultConfiguration)
-            throws Exception {
+    /**
+     * Start a Scheduler and Resource Manager in Active's Object's JVM
+     *
+     * @param GCMDPath path to a GCMDeployment file, to deploy at RM's startup.
+     * @param schedPropPath path to a scheduler Properties file, or null if not needed
+     * @param RMPropPath  path to a RM Properties file, or null if not needed
+     * @return SchedulerAuthenticationInteface of created Scheduler
+     * @throws Exception if any error occurs.
+     */
+    public SchedulerAuthenticationInterface createAndJoinForkedScheduler(String GCMDPath,
+            String schedPropPath, String RMPropPath) throws Exception {
 
         SchedulerAuthenticationInterface schedulerAuth = null;
-        PAResourceManagerProperties.updateProperties(FunctionalTDefaultScheduler.functionalTestRMProperties);
-        if (!startWithDefaultConfiguration) {
-            PASchedulerProperties
-                    .updateProperties(FunctionalTDefaultScheduler.functionalTestSchedulerProperties);
+
+        if (RMPropPath != null) {
+            PAResourceManagerProperties.updateProperties(RMPropPath);
+        }
+
+        if (schedPropPath != null) {
+            PASchedulerProperties.updateProperties(schedPropPath);
         }
 
         //Starting a local RM
@@ -80,8 +97,7 @@ public class MyAO implements Serializable {
         RMAdmin admin = auth.logAsAdmin(rmUsername, rmPassword);
 
         RMFactory.setOsJavaProperty();
-        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
-            FunctionalTDefaultScheduler.defaultDescriptor));
+        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(GCMDPath));
         admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
         admin.disconnect();
 
@@ -91,7 +107,7 @@ public class MyAO implements Serializable {
         AdminScheduler
                 .createScheduler(rmp, PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
 
-        schedulerAuth = SchedulerConnection.waitAndJoin(FunctionalTDefaultScheduler.schedulerDefaultURL);
+        schedulerAuth = SchedulerConnection.waitAndJoin(schedulerDefaultURL);
         System.out.println("Scheduler successfully created !");
         return schedulerAuth;
     }

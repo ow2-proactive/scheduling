@@ -5,7 +5,7 @@
 	<variables>
 		<!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
 		<variable name="WORK_DIR" value="${pa.scheduler.home}/jobs_descriptors"/>
-		<variable name="EXCLUSION_STRING" value="paquit"/>
+		<variable name="EXCLUSION_STRING" value="rastapopoulos"/>
 	</variables>
 	<description>8 parallel tasks with variable durations.
 			Each task has a selection script which select a HostName( i.e. a node) that not contains

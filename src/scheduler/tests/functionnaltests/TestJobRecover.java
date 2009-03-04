@@ -33,14 +33,10 @@ package functionnaltests;
 
 import junit.framework.Assert;
 
-import org.junit.After;
-import org.junit.Before;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+
+import functionalTests.FunctionalTest;
 
 
 /**
@@ -59,29 +55,10 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
  * @date 2 jun 08
  * @since ProActive 4.0
  */
-public class TestJobRecover extends FunctionalTDefaultScheduler {
+public class TestJobRecover extends FunctionalTest {
 
     private static String jobDescriptor = TestJobRecover.class.getResource(
             "/functionnaltests/descriptors/Job_PI_recover.xml").getPath();
-
-    private SchedulerEventReceiver receiver = null;
-
-    /**
-     *  Starting and linking new scheduler ! <br/>
-     *  This method will join a new scheduler and connect it as user.<br/>
-     *  Then, it will register an event receiver to check the dispatched event.
-     */
-    @Before
-    public void preRun() throws Exception {
-        //Create an Event receiver AO in order to observe jobs and tasks states changes
-        receiver = (SchedulerEventReceiver) PAActiveObject.newActive(SchedulerEventReceiver.class.getName(),
-                new Object[] {});
-        //Register as EventListener AO previously created
-        schedUserInterface.addSchedulerEventListener(receiver, SchedulerEvent.JOB_SUBMITTED,
-                SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_REMOVE_FINISHED, SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED);
-    }
 
     /**
      * Tests start here.
@@ -90,90 +67,49 @@ public class TestJobRecover extends FunctionalTDefaultScheduler {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        log("Submitting job...");
-        //job creation
-        Job submittedJob = JobFactory.getFactory().createJob(jobDescriptor);
-        //job submission
-        JobId idJ1 = schedUserInterface.submit(submittedJob);
-        JobId idJ2 = schedUserInterface.submit(submittedJob);
-        JobId idJ3 = schedUserInterface.submit(submittedJob);
-        log("Waiting for job to be placed...");
-        //waiting until each job is placed in each list
-        int ready = 0;
-        while (true) {
-            receiver.waitForNEvent(1);
-            int jse = receiver.cleanNgetJobSubmittedEvents().size();
-            int jptre = receiver.cleanNgetJobPendingToRunningEvents().size();
-            int jrtfe = receiver.cleanNgetjobRunningToFinishedEvents().size();
-            if (jse > 0) {
-                ready += jse;
-            }
-            if (jptre > 0) {
-                ready += jptre * 10;
-            }
-            if (jrtfe > 0) {
-                ready += jrtfe * 100;
-            }
-            if (ready == 123) {
-                log("Interrupting scheduling process...");
 
-                //interrupt the scheduler
-                killProActive();
-                break;
-            }
-        }
-        Thread.sleep(3000);
-        log("Restart Scheduler...");
-        //count the number of finished job
-        ready = 1 + receiver.cleanNgetjobRunningToFinishedEvents().size();//one job already finished + maybe one more
-        //restart Scheduler...
-        super.restartScheduler(true);
-        this.preRun();
+        JobId idJ1 = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId idJ2 = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId idJ3 = SchedulerTHelper.submitJob(jobDescriptor);
 
-        log("Check scheduling process...");
-        //...and check that the scheduling process is as expected
-        while (true) {
-            receiver.waitForNEvent(1);
-            int jrtf = receiver.cleanNgetjobRunningToFinishedEvents().size();
-            if (jrtf > 0) {
-                ready += jrtf;
-            }
-            if (ready == 3) {
-                break;
-            }
-        }
-        //check result job 1
-        JobResult result = schedUserInterface.getJobResult(idJ1);
+        SchedulerTHelper.waitForEventJobRunning(idJ1);
+
+        //TODO when Scheduler can be killed ? No more monitor that
+        //can wait for any task submitted or finished
+
+        Thread.sleep(5000);
+        SchedulerTHelper.log("kill Scheduler");
+        SchedulerTHelper.killAndRestartScheduler(true);
+
+        SchedulerTHelper.getUserInterface();
+
+        SchedulerTHelper.log("Waiting for job 1 finished");
+        SchedulerTHelper.waitForFinishedJob(idJ1);
+        SchedulerTHelper.log("Waiting for job 2 finished");
+        SchedulerTHelper.waitForFinishedJob(idJ2);
+        SchedulerTHelper.log("Waiting for job 3 finished");
+        SchedulerTHelper.waitForFinishedJob(idJ3);
+
+        SchedulerTHelper.log("check result job 1");
+        JobResult result = SchedulerTHelper.getJobResult(idJ1);
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
             Assert.assertNotNull(result.getAllResults().get("Computation" + i).value());
             Assert.assertNull(result.getAllResults().get("Computation" + i).getException());
         }
-        //check result job 2
-        result = schedUserInterface.getJobResult(idJ2);
+        SchedulerTHelper.log("check result job 2");
+        result = SchedulerTHelper.getJobResult(idJ2);
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
             Assert.assertNotNull(result.getAllResults().get("Computation" + i).value());
             Assert.assertNull(result.getAllResults().get("Computation" + i).getException());
         }
-        //check result job 3
-        result = schedUserInterface.getJobResult(idJ3);
+        SchedulerTHelper.log("check result job 3");
+        result = SchedulerTHelper.getJobResult(idJ3);
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
             Assert.assertNotNull(result.getAllResults().get("Computation" + i).value());
             Assert.assertNull(result.getAllResults().get("Computation" + i).getException());
         }
     }
-
-    /**
-     * Disconnect the scheduler.
-     *
-     * @throws Exception if an error occurred
-     */
-    @After
-    public void afterTestJobSubmission() throws Exception {
-        log("Disconnecting from scheduler...");
-        schedUserInterface.disconnect();
-    }
-
 }

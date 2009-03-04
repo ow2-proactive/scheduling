@@ -35,11 +35,27 @@ import static junit.framework.Assert.assertTrue;
 
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 
+import functionalTests.FunctionalTest;
 
-public class AuthenticationTest extends FunctionalTDefaultScheduler {
+
+/**
+ * Test connection mechanisms :
+ *
+ * 1/ log as admin with a valid login/password
+ * 2/ log as user  with a valid login/password
+ * 3/ log as user with a valid login/password
+ * 		(an admin can be logged as user too)
+ * 4/ log as admin with an incorrect login/password
+ * 5/ log as user with an incorrect login/password
+ * 6/ log as admin with valid login/password for,
+ * 		but without admin credentials
+ *
+ * @author ProActive team
+ *
+ */
+public class AuthenticationTest extends FunctionalTest {
 
     private String adminName = "jl";
     private String adminPwd = "jl";
@@ -47,84 +63,87 @@ public class AuthenticationTest extends FunctionalTDefaultScheduler {
     private String userName = "user1";
     private String userPwd = "pwd1";
 
+    /**
+     * Tests start here.
+     *
+     * @throws Exception, any exception that can be thrown during the test.
+     */
     @org.junit.Test
     public void action() throws Exception {
 
-        schedUserInterface.disconnect();
+        SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
 
-        SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(schedulerDefaultURL);
-
-        log("Test 1");
-        log("Trying to authorized as an admin with correct user name and password");
+        SchedulerTHelper.log("Test 1");
+        SchedulerTHelper.log("Trying to authorized as an admin with correct user name and password");
 
         try {
             AdminSchedulerInterface admin = auth.logAsAdmin(adminName, adminPwd);
             admin.disconnect();
-            log("Passed: successfull authentication");
+            SchedulerTHelper.log("Passed: successfull authentication");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
-            log("Failed: unexpected error " + e.getMessage());
+            SchedulerTHelper.log("Failed: unexpected error " + e.getMessage());
         }
 
-        log("Test 2");
-        log("Trying to authorized as a user with correct user name and password");
+        SchedulerTHelper.log("Test 2");
+        SchedulerTHelper.log("Trying to authorized as a user with correct user name and password");
 
         try {
             UserSchedulerInterface user = auth.logAsUser(userName, userPwd);
             user.disconnect();
-            log("Passed: successfull authentication");
+            SchedulerTHelper.log("Passed: successfull authentication");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
-            log("Failed: unexpected error " + e.getMessage());
+            SchedulerTHelper.log("Failed: unexpected error " + e.getMessage());
         }
 
-        log("Test 3");
-        log("Trying to authorized as a user with correct administrator name and password");
+        SchedulerTHelper.log("Test 3");
+        SchedulerTHelper.log("Trying to authorized as a user with correct administrator name and password");
 
         try {
             UserSchedulerInterface user = auth.logAsUser(adminName, adminPwd);
             user.disconnect();
-            log("Passed: successfull authentication");
+            SchedulerTHelper.log("Passed: successfull authentication");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
-            log("Failed: unexpected error " + e.getMessage());
+            SchedulerTHelper.log("Failed: unexpected error " + e.getMessage());
         }
 
         // negative
-        log("Test 4");
-        log("Trying to authorized as an admin with incorrect user name and password");
+        SchedulerTHelper.log("Test 4");
+        SchedulerTHelper.log("Trying to authorized as an admin with incorrect user name and password");
 
         try {
             auth.logAsAdmin(adminName, "b");
-            log("Error: successfull authentication");
+            SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);
         } catch (Exception e) {
-            log("Passed: expected error " + e.getMessage());
+            SchedulerTHelper.log("Passed: expected error " + e.getMessage());
         }
 
-        log("Test 5");
-        log("Trying to authorized as a user with incorrect user name and password");
+        SchedulerTHelper.log("Test 5");
+        SchedulerTHelper.log("Trying to authorized as a user with incorrect user name and password");
 
         try {
             auth.logAsUser(userName, "b");
-            log("Error: successfull authentication");
+            SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);
         } catch (Exception e) {
-            log("Passed: expected error " + e.getMessage());
+            SchedulerTHelper.log("Passed: expected error " + e.getMessage());
         }
 
-        log("Test 6");
-        log("Trying to authorized as an admin with correct user name and password");
+        SchedulerTHelper.log("Test 6");
+        SchedulerTHelper.log("Trying to authorized as an admin with correct user name and password");
 
         try {
             auth.logAsAdmin(userName, userPwd);
-            log("Error: successfull authentication");
+            SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);
         } catch (Exception e) {
-            log("Passed: expected error " + e.getMessage());
+            SchedulerTHelper.log("Passed: expected error " + e.getMessage());
         }
     }
 }

@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import functionnaltests.FunctionalTDefaultScheduler;
+import functionnaltests.SchedulerTHelper;
 
 
 /**
@@ -56,7 +56,7 @@ import functionnaltests.FunctionalTDefaultScheduler;
  */
 public class TestDatabaseStringArray {
 
-    private static String functionalTestSchedulerProperties = FunctionalTDefaultScheduler.class.getResource(
+    private static String functionalTestSchedulerProperties = SchedulerTHelper.class.getResource(
             "config/functionalTSchedulerProperties.ini").getPath();
 
     @Before

@@ -31,23 +31,14 @@
  */
 package functionnaltests;
 
-import static junit.framework.Assert.assertTrue;
+import java.util.Map.Entry;
 
-import java.util.ArrayList;
-import java.util.Map;
-
-import org.junit.After;
-import org.junit.Before;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+
+import functionalTests.FunctionalTest;
 
 
 /**
@@ -70,29 +61,10 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * @date 2 jun 08
  * @since ProActive 4.0
  */
-public class TestJobPrePostSubmission extends FunctionalTDefaultScheduler {
+public class TestJobPrePostSubmission extends FunctionalTest {
 
     private static String jobDescriptor = TestJobPrePostSubmission.class.getResource(
             "/functionnaltests/descriptors/Job_pre_post.xml").getPath();
-
-    private SchedulerEventReceiver receiver = null;
-
-    /**
-     *  Starting and linking new scheduler ! <br/>
-     *  This method will join a new scheduler and connect it as user.<br/>
-     *  Then, it will register an event receiver to check the dispatched event.
-     */
-    @Before
-    public void preRun() throws Exception {
-        //Create an Event receiver AO in order to observe jobs and tasks states changes
-        receiver = (SchedulerEventReceiver) PAActiveObject.newActive(SchedulerEventReceiver.class.getName(),
-                new Object[] {});
-        //Register as EventListener AO previously created
-        schedUserInterface.addSchedulerEventListener(receiver, SchedulerEvent.JOB_SUBMITTED,
-                SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_REMOVE_FINISHED, SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED);
-    }
 
     /**
      * Tests start here.
@@ -101,73 +73,20 @@ public class TestJobPrePostSubmission extends FunctionalTDefaultScheduler {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        log("Test 1 : Submitting job...");
-        //job creation
-        Job submittedJob = JobFactory.getFactory().createJob(jobDescriptor);
-        //job submission
-        JobId id = schedUserInterface.submit(submittedJob);
+        JobId id = SchedulerTHelper.testJobSubmission(jobDescriptor);
+        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
-        log("Test 2 : Verifying submission...");
-        // wait for event : job submitted
-        receiver.waitForNEvent(1);
-        ArrayList<JobState> jobsList = receiver.cleanNgetJobSubmittedEvents();
-        assertTrue(jobsList.size() == 1);
-        Job job = jobsList.get(0);
-        assertTrue(job.getId().equals(id));
+        // check result are not null
+        JobResult res = SchedulerTHelper.getJobResult(id);
+        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
-        log("Test 3 : Verifying start of job execution...");
-        //wait for event : job pending to running
-        receiver.waitForNEvent(1);
-        ArrayList<JobInfo> infosList = receiver.cleanNgetJobPendingToRunningEvents();
-        assertTrue(infosList.size() == 1);
-        JobInfo jEvent = infosList.get(0);
-        assertTrue(jEvent.getJobId().equals(id));
-
-        log("Test 4 : Verifying start of each tasks...");
-        //wait whole tasks execution : two events per task, task pending to running, and task running to finished
-        receiver.waitForNEvent(jEvent.getTotalNumberOfTasks() * 2);
-        ArrayList<TaskInfo> tEventList = receiver.cleanNgetTaskPendingToRunningEvents();
-        assertTrue(tEventList.size() == jEvent.getTotalNumberOfTasks());
-        tEventList = receiver.cleanNgetTaskRunningToFinishedEvents();
-        assertTrue(tEventList.size() == jEvent.getTotalNumberOfTasks());
-
-        log("Test 5 : Verifying job termination...");
-        //wait for event : job Running to finished
-        receiver.waitForNEvent(1);
-        infosList = receiver.cleanNgetjobRunningToFinishedEvents();
-        assertTrue(infosList.size() == 1);
-        jEvent = infosList.get(0);
-        assertTrue(jEvent.getJobId().equals(id));
-
-        log("Test 6 : Getting job result...");
-        JobResult res = schedUserInterface.getJobResult(id);
-        schedUserInterface.remove(id);
-        //check that there is no exception in results
-        assertTrue(res.getExceptionResults().size() == 0);
-        //wait for event : result retrieval
-        receiver.waitForNEvent(1);
-        infosList = receiver.cleanNgetjobRemoveFinishedEvents();
-        assertTrue(infosList.size() == 1);
-        jEvent = infosList.get(0);
-        assertTrue(jEvent.getJobId().equals(id));
-        Map<String, TaskResult> results = res.getAllResults();
-        //check that number of results correspond to number of tasks
-        assertTrue(jEvent.getNumberOfFinishedTasks() == results.size());
-        //check that all tasks results are defined
-        for (TaskResult taskRes : results.values()) {
-            assertTrue(taskRes.value() != null);
+        for (Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
+            Assert.assertNotNull(entry.getValue().value());
         }
-    }
+        //remove job
+        SchedulerTHelper.removeJob(id);
+        SchedulerTHelper.waitForEventJobRemoved(id);
+        SchedulerTHelper.killScheduler();
 
-    /**
-     * Disconnect the scheduler.
-     *
-     * @throws Exception if an error occurred
-     */
-    @After
-    public void afterTestJobSubmission() throws Exception {
-        log("Disconnecting from scheduler...");
-        schedUserInterface.disconnect();
     }
-
 }

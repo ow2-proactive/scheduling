@@ -33,11 +33,10 @@ package functionnaltests;
 
 import static junit.framework.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.Before;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+
+import functionalTests.FunctionalTest;
 
 
 /**
@@ -49,88 +48,74 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
  * @date 2 jun 08
  * @since ProActive 4.0
  */
-public class TestSchedulerMiscEvents extends FunctionalTDefaultScheduler {
-
-    private SchedulerEventReceiver receiver = null;
-    private AdminSchedulerInterface schedAdminInterface;
+public class TestSchedulerMiscEvents extends FunctionalTest {
 
     /**
-     *  Starting and linking new scheduler ! <br/>
-     *  This method will join a new scheduler and connect it as user.<br/>
-     *  Then, it will register an event receiver to check the dispatched event.
-     */
-    @Before
-    public void preRun() throws Exception {
-        //Create an Event receiver AO in order to observe jobs and tasks states changes
-        receiver = (SchedulerEventReceiver) PAActiveObject.newActive(SchedulerEventReceiver.class.getName(),
-                new Object[] {});
-        schedUserInterface.disconnect();
-        //Log as admin
-        schedAdminInterface = schedulerAuth.logAsAdmin(username, password);
-        //Register as EventListener AO previously created
-        schedAdminInterface.addSchedulerEventListener(receiver, SchedulerEvent.FROZEN, SchedulerEvent.KILLED,
-                SchedulerEvent.PAUSED, SchedulerEvent.RESUMED, SchedulerEvent.SHUTTING_DOWN,
-                SchedulerEvent.SHUTDOWN, SchedulerEvent.STARTED, SchedulerEvent.STOPPED);
-    }
-
-    /**
-     * Tests start here.
+     * Tests starts here.
      *
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
     public void run() throws Throwable {
-        log("Try many tests about scheduler status");
+
+        AdminSchedulerInterface schedAdminInterface = SchedulerTHelper.getAdminInterface();
+
+        SchedulerTHelper.log("Try many tests about scheduler state");
+
         assertTrue(!schedAdminInterface.start().booleanValue());
         assertTrue(!schedAdminInterface.resume().booleanValue());
         assertTrue(schedAdminInterface.stop().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.STOPPED);
+        SchedulerTHelper.log("waiting scheduler stopped  event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.STOPPED);
+
         assertTrue(!schedAdminInterface.pause().booleanValue());
         assertTrue(!schedAdminInterface.freeze().booleanValue());
         assertTrue(schedAdminInterface.start().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.STARTED);
+        SchedulerTHelper.log("waiting scheduler started event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.STARTED);
+
         assertTrue(schedAdminInterface.pause().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.PAUSED);
+        SchedulerTHelper.log("waiting scheduler paused event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.PAUSED);
+
         assertTrue(schedAdminInterface.freeze().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.FROZEN);
+        SchedulerTHelper.log("waiting scheduler frozen event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.FROZEN);
+
         assertTrue(schedAdminInterface.stop().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.STOPPED);
+        SchedulerTHelper.log("waiting scheduler stopped  event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.STOPPED);
+
         assertTrue(!schedAdminInterface.resume().booleanValue());
+        //TODO resume from stopped doesn't throw any event ?
+
         assertTrue(schedAdminInterface.start().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.STARTED);
+        SchedulerTHelper.log("waiting scheduler started event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.STARTED);
+
         assertTrue(schedAdminInterface.freeze().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.FROZEN);
+        SchedulerTHelper.log("waiting scheduler frozen event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.FROZEN);
+
         assertTrue(schedAdminInterface.resume().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.RESUMED);
+        SchedulerTHelper.log("waiting scheduler resumed  event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.RESUMED);
+
         assertTrue(schedAdminInterface.pause().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.PAUSED);
+        SchedulerTHelper.log("waiting scheduler paused event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.PAUSED);
+
         assertTrue(schedAdminInterface.resume().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.RESUMED);
+        SchedulerTHelper.log("waiting scheduler resumed  event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.RESUMED);
+
         assertTrue(!schedAdminInterface.start().booleanValue());
+        SchedulerTHelper.log("waiting scheduler shutting down event");
         assertTrue(schedAdminInterface.shutdown().booleanValue());
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.SHUTTING_DOWN);
-        receiver.waitForNEvent(1);
-        receiver.checkLastMiscEvents(SchedulerEvent.SHUTDOWN);
-    }
 
-    /**
-     * Disconnect the scheduler.
-     *
-     * @throws Exception if an error occurred
-     */
-    @After
-    public void afterTestJobSubmission() throws Exception {
-    }
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.SHUTTING_DOWN);
 
+        SchedulerTHelper.log("waiting scheduler shutted down event");
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.SHUTDOWN);
+    }
 }

@@ -31,23 +31,20 @@
  */
 package functionnaltests;
 
-import static junit.framework.Assert.assertTrue;
-
-import java.util.ArrayList;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+
+import functionalTests.FunctionalTest;
 
 
 /**
@@ -66,27 +63,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * @date 2 jun 08
  * @since ProActive 4.0
  */
-public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
-
-    private SchedulerEventReceiver receiver = null;
-
-    /**
-     *  Starting and linking new scheduler ! <br/>
-     *  This method will join a new scheduler and connect it as user.<br/>
-     *  Then, it will register an event receiver to check the dispatched event.
-     */
-    @SuppressWarnings("unchecked")
-    @Before
-    public void preRun() throws Exception {
-        //Create an Event receiver AO in order to observe jobs and tasks states changes
-        receiver = (SchedulerEventReceiver) PAActiveObject.newActive(SchedulerEventReceiver.class.getName(),
-                new Object[] {});
-        //Register as EventListener AO previously created
-        schedUserInterface.addSchedulerEventListener(receiver, SchedulerEvent.JOB_SUBMITTED,
-                SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_REMOVE_FINISHED, SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED);
-    }
+public class TestErrorAndFailure extends FunctionalTest {
 
     /**
      * Tests start here.
@@ -95,9 +72,10 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
      */
     @org.junit.Test
     public void run() throws Throwable {
+
         String URLbegin = System.getProperty("pa.scheduler.home") + "/";
         String javaCmd = System.getProperty("java.home") + "/bin/java";
-        log("Test 1 : Creating job...");
+        SchedulerTHelper.log("Test 1 : Creating job...");
         //creating job
         TaskFlowJob submittedJob = new TaskFlowJob();
         submittedJob.setName("Test 12 tasks");
@@ -116,59 +94,51 @@ public class TestErrorAndFailure extends FunctionalTDefaultScheduler {
             finalTask.addDependence(task);
             submittedJob.addTask(task);
         }
+
         submittedJob.addTask(finalTask);
 
-        log("Test 2 : Submitting job...");
-        //job submission
-        JobId id = schedUserInterface.submit(submittedJob);
+        //test submission and event reception
+        JobId id = SchedulerTHelper.submitJob(submittedJob);
+        SchedulerTHelper.log("Job submitted, id " + id.toString());
+        SchedulerTHelper.log("Waiting for jobSubmitted Event");
+        Job receivedJob = SchedulerTHelper.waitForEventJobSubmitted(id);
+        Assert.assertEquals(receivedJob.getId(), id);
+        SchedulerTHelper.log("Waiting for job running");
+        JobInfo jInfo = SchedulerTHelper.waitForEventJobRunning(id);
 
-        log("Test 3 : Verifying submission...");
-        // wait for event : job submitted
-        receiver.waitForNEvent(1);
-        ArrayList<JobState> jobsList = receiver.cleanNgetJobSubmittedEvents();
-        assertTrue(jobsList.size() == 1);
-        Job job = jobsList.get(0);
-        assertTrue(job.getId().equals(id));
+        Assert.assertEquals(jInfo.getJobId(), id);
 
-        log("Test 4 : Verifying start of job execution...");
-        //wait for event : job pending to running
-        receiver.waitForNEvent(1);
-        ArrayList<JobInfo> infosList = receiver.cleanNgetJobPendingToRunningEvents();
-        assertTrue(infosList.size() == 1);
-        JobInfo jEvent = infosList.get(0);
-        assertTrue(jEvent.getJobId().equals(id));
-
-        log("Test 5 : Verifying job termination...");
-        //wait for event : job Running to finished
-        while (true) {
-            receiver.waitForNEvent(1);
-            infosList = receiver.cleanNgetjobRunningToFinishedEvents();
-            if (infosList.size() == 1) {
-                break;
-            }
+        //task running event may occurs several time for this test
+        //TODO how to check that ?
+        for (Task t : ((TaskFlowJob) submittedJob).getTasks()) {
+            SchedulerTHelper.log("Waiting for task running : " + t.getName());
+            SchedulerTHelper.waitForEventTaskRunning(id, t.getName());
         }
-        jEvent = infosList.get(0);
-        assertTrue(jEvent.getJobId().equals(id));
-        assertTrue(receiver.cleanNgetTaskRunningToFinishedEvents().size() == 12);
 
-        log("Test 6 : Getting job result...");
-        JobResult res = schedUserInterface.getJobResult(id);
-        schedUserInterface.remove(id);
+        for (Task t : ((TaskFlowJob) submittedJob).getTasks()) {
+            SchedulerTHelper.log("Waiting for task finished : " + t.getName());
+            SchedulerTHelper.waitForEventTaskFinished(id, t.getName());
+
+        }
+
+        SchedulerTHelper.log("Waiting for job finished");
+        jInfo = SchedulerTHelper.waitForEventJobFinished(id);
+
+        Assert.assertEquals(JobStatus.FINISHED, jInfo.getStatus());
+
+        //check job results
+        JobResult res = SchedulerTHelper.getJobResult(id);
         //Check the results
         Map<String, TaskResult> results = res.getAllResults();
         //check that number of results correspond to number of tasks
-        assertTrue(jEvent.getNumberOfFinishedTasks() == results.size());
-    }
+        Assert.assertEquals(submittedJob.getTasks().size(), results.size());
 
-    /**
-     * Disconnect the scheduler.
-     *
-     * @throws Exception if an error occurred
-     */
-    @After
-    public void afterTestJobSubmission() throws Exception {
-        log("Disconnecting from scheduler...");
-        schedUserInterface.disconnect();
-    }
+        //remove jobs and check its event
+        SchedulerTHelper.removeJob(id);
+        SchedulerTHelper.log("Waiting for job removed");
+        jInfo = SchedulerTHelper.waitForEventJobRemoved(id);
+        Assert.assertEquals(JobStatus.FINISHED, jInfo.getStatus());
+        Assert.assertEquals(jInfo.getJobId(), id);
 
+    }
 }
