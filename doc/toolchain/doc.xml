@@ -69,5 +69,8 @@
 	<target name="javadoc.completeZip"> 
 		<javadoc.completeZip /> 
 	</target>
-
+	
+	<target name="doc.clean">
+	      <clean/>
+	</target>
 </project>

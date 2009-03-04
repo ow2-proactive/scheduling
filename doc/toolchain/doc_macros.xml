@@ -154,6 +154,8 @@
 			  docbookStyle="${docs.xsl.html.one}" 
 			  docbook.profile="html" 
 			  docbookOutputDir="${docs.html.single.dir}"/>
+			<!-- remove temporary folder -->
+			<delete dir="${docs.tmp.dir}"/>
 		</sequential>
 	</macrodef> 
 	
@@ -184,6 +186,8 @@
 				<fileset dir="${docs.pdf.dir}" defaultexcludes="false"
 					includes="**/*"  excludes="${docs.pdf.name}" />
 			</delete>
+			<!-- remove temporary folder -->
+			<delete dir="${docs.tmp.dir}"/>
 		</sequential>
 	</macrodef>
 
@@ -198,6 +202,19 @@
 					docbookStyle="${docs.xsl.html.chunked}" 
 					docbook.profile="html" 
 					docbookOutputDir="${docs.html.multiple.dir}"/>
+			<!-- remove temporary folder -->
+			<delete dir="${docs.tmp.dir}"/>
 		</sequential>
 	</macrodef>
+	<!-- ==================================================================== -->
+	<!--                               Clean                                  -->
+	<!-- ==================================================================== -->
+	<macrodef name="clean" description="Delete generated and temporary files">
+		<sequential>
+		      <delete dir="${docs.tmp.dir}" />
+		      <delete dir="${docs.dir}/built" />
+		</sequential>
+	</macrodef>
+	
+	
 </project>

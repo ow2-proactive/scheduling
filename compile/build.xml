@@ -374,9 +374,6 @@
 		<delete dir="${classes.dir}" />
 		<delete dir="${release.dir}" />
 		<delete dir="${deploy.dir}" />
-		<delete dir="${docs.built.dir}" />
-		<delete dir="${docs.java.classes.dir}" />
-		<delete dir="${docs.tmp.dir}" />
 		<delete dir="${classlibs.dir}" />
 		<delete dir="${test.classes.dir}" />
 		<delete file="tests.log" />
@@ -384,6 +381,9 @@
 		<!-- Database generated classes -->
 		<delete file="${base.dir}/derby.log" />
 		<delete dir="${base.dir}/SCHEDULER_DB" />
+		<subant target="doc.clean" inheritall="true">
+			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		</subant>
 	</target>
 
 
