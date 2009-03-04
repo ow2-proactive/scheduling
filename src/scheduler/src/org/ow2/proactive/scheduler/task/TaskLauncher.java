@@ -170,7 +170,7 @@ public abstract class TaskLauncher implements InitActive {
         PAActiveObject.setImmediateService("getNodes");
         PAActiveObject.setImmediateService("activateLogs");
         PAActiveObject.setImmediateService("terminate");
-        logger_dev.info("Immediate services : getNodes, activateLogs, terminate");
+        logger_dev.debug("Immediate services : getNodes, activateLogs, terminate");
     }
 
     /**

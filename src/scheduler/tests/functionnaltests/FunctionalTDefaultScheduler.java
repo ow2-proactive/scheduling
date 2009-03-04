@@ -124,7 +124,7 @@ public class FunctionalTDefaultScheduler extends FunctionalTest {
     /**
      * Restart the scheduler using a forked JVM.
      *
-     * @param startWithDefaultConfiguration true if you want to start the scheduler with the default
+     * @param startWithDefaultConfiguration true if you want to start the scheduler with the default database
      * 			starting configuration (UPDATE) or false for the test configuration (CREATE-DROP).
      * @throws Exception
      */

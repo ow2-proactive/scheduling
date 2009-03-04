@@ -116,6 +116,7 @@ public class TestJobRecover extends FunctionalTDefaultScheduler {
             }
             if (ready == 123) {
                 log("Interrupting scheduling process...");
+
                 //interrupt the scheduler
                 killProActive();
                 break;
@@ -123,13 +124,14 @@ public class TestJobRecover extends FunctionalTDefaultScheduler {
         }
         Thread.sleep(3000);
         log("Restart Scheduler...");
-        //restart it...
+        //count the number of finished job
+        ready = 1 + receiver.cleanNgetjobRunningToFinishedEvents().size();//one job already finished + maybe one more
+        //restart Scheduler...
         super.restartScheduler(true);
         this.preRun();
 
         log("Check scheduling process...");
         //...and check that the scheduling process is as expected
-        ready = 1 + receiver.cleanNgetjobRunningToFinishedEvents().size();//one job already finished + maybe one more
         while (true) {
             receiver.waitForNEvent(1);
             int jrtf = receiver.cleanNgetjobRunningToFinishedEvents().size();
