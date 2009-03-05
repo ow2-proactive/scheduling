@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
+import org.ow2.proactive.scheduler.common.util.SimpleLoggerServer;
 
 
 /**

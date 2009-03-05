@@ -39,7 +39,7 @@ import org.apache.log4j.spi.LoggingEvent;
 
 
 /**
- * Class defines a log4j AsyncAppender that is able to store all appended event additionnaly
+ * Class defines a log4j AsyncAppender that is able to store all appended event additionally
  * to bufferize and send them to the added appenders.
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9

@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.logforwarder;
+package org.ow2.proactive.scheduler.common.util;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;
@@ -43,11 +43,10 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 public class SimpleLoggerServer implements Runnable {
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+    public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
 
     // socket port
     private int port;
@@ -164,7 +163,7 @@ public class SimpleLoggerServer implements Runnable {
                 this.connections.add(ch);
                 new Thread(ch).start();
             } catch (IOException e1) {
-                logger_dev.error(e1);
+                logger.error(e1);
             }
         }
 
@@ -172,7 +171,7 @@ public class SimpleLoggerServer implements Runnable {
         try {
             this.serverSocket.close();
         } catch (IOException e) {
-            logger_dev.error(e);
+            logger.error(e);
         }
     }
 
@@ -196,7 +195,7 @@ public class SimpleLoggerServer implements Runnable {
                 this.input = input;
                 this.inputStream = new ObjectInputStream(new BufferedInputStream(input.getInputStream()));
             } catch (IOException e) {
-                logger_dev.error(e);
+                logger.error(e);
             }
         }
 
@@ -218,7 +217,7 @@ public class SimpleLoggerServer implements Runnable {
                         // finally log the event as if was generated locally
                         // TODO cdelbe : aName not used ; appender could be null
                         if (aName != null) {
-                            // only in aName appender 
+                            // only in aName appender
                             Appender a = localLogger.getAppender(aName);
 
                             if (a != null) {
@@ -233,16 +232,16 @@ public class SimpleLoggerServer implements Runnable {
             } catch (EOFException e) {
                 // normal case ...
             } catch (IOException e) {
-                logger_dev.error(e);
+                logger.error(e);
             } catch (ClassNotFoundException e) {
-                logger_dev.error(e);
+                logger.error(e);
             }
 
             // close stream
             try {
                 this.inputStream.close();
             } catch (IOException e) {
-                logger_dev.error(e);
+                logger.error(e);
             }
             // remove connexion from server
             SimpleLoggerServer.this.removeConnection(this);

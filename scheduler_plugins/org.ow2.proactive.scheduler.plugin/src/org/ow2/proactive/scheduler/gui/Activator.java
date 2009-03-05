@@ -33,7 +33,7 @@ package org.ow2.proactive.scheduler.gui;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.osgi.framework.BundleContext;
-import org.ow2.proactive.scheduler.util.logforwarder.SimpleLoggerServer;
+import org.ow2.proactive.scheduler.common.util.SimpleLoggerServer;
 
 
 /**
