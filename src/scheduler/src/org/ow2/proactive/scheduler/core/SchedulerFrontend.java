@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -125,7 +126,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     private Map<JobId, IdentifiedJob> jobs;
 
     /** scheduler listeners */
-    private Map<UniqueID, SchedulerEventListener> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener>();
+    private Map<UniqueID, SchedulerEventListener> schedulerListeners = new ConcurrentHashMap<UniqueID, SchedulerEventListener>();
 
     /** Scheduler's statistics */
     private StatsImpl stats = new StatsImpl(SchedulerStatus.STARTED);
@@ -848,26 +849,29 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             }
 
             Method method = SchedulerEventListener.class.getMethod(methodName.toString(), types);
-            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 
-            while (iter.hasNext()) {
-                UniqueID id = iter.next();
-                UserIdentificationImpl userId = null;
-                try {
-                    userId = identifications.get(id);
+            synchronized (method) {
+                Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
+                while (iter.hasNext()) {
+                    UniqueID id = iter.next();
+                    UserIdentificationImpl userId = null;
+                    try {
+                        userId = identifications.get(id);
 
-                    if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(methodName)) {
-                        method.invoke(schedulerListeners.get(id), params);
+                        if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(methodName)) {
+                            method.invoke(schedulerListeners.get(id), params);
+                        }
+                    } catch (Exception e) {
+                        iter.remove();
+                        UserIdentificationImpl ident = identifications.remove(id);
+                        //remove this user to the list of connected user
+                        ident.setToRemove();
+                        connectedUsers.update(ident);
+                        usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE,
+                            ident));
+                        logger.warn(userId.getUsername() + "@" + userId.getHostName() +
+                            " has been disconnected from events listener!");
                     }
-                } catch (Exception e) {
-                    iter.remove();
-                    UserIdentificationImpl ident = identifications.remove(id);
-                    //remove this user to the list of connected user
-                    ident.setToRemove();
-                    connectedUsers.update(ident);
-                    usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
-                    logger.warn(userId.getUsername() + "@" + userId.getHostName() +
-                        " has been disconnected from events listener!");
                 }
             }
         } catch (SecurityException e) {

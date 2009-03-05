@@ -529,7 +529,9 @@ public abstract class InternalJob extends JobState {
     @Override
     public void setPriority(JobPriority priority) {
         jobInfo.setPriority(priority);
-        getJobDescriptor().setPriority(priority);
+        if (jobDescriptor != null) {
+            ((JobDescriptorImpl) jobDescriptor).setPriority(priority);
+        }
     }
 
     /**

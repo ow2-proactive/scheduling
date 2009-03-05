@@ -81,16 +81,6 @@ public class SchedulerStarter {
     public static final String deploymentFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
         File.separator + "config/deployment/Local4JVMDeployment.xml";
 
-    public static void cleanNode() {
-        try {
-            logger_dev.info("Trying to destroy local Scheduler");
-            AdminScheduler.destroyLocalScheduler();
-            logger_dev.info("Local Scheduler destroyed !");
-        } catch (Exception e) {
-            logger_dev.warn(e);
-        }
-    }
-
     /**
      * Start the scheduler creation process.
      *
@@ -203,8 +193,6 @@ public class SchedulerStarter {
                 logger.info("(Press 'e' to shutdown)");
                 while (System.in.read() != 'e')
                     ;
-                //shutdown scheduler if 'e' is pressed
-                cleanNode();
                 //and terminate scheduler JVM
                 System.exit(0);
             }

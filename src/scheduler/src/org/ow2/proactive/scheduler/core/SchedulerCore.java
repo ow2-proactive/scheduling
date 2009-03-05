@@ -453,14 +453,18 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         //this point is reached in case of big problem, sometimes unknown
                         logger
                                 .fatal("\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
-                        logger_dev.error(e);
+                        e.printStackTrace();
                         //trying to check if RM is alive
                         try {
                             logger_dev.error("Check if Resource Manager is alive");
                             resourceManager.isAlive();
                         } catch (Exception rme) {
                             logger_dev.error("Resource Manager seems to be dead");
-                            resourceManager.shutdownProxy();
+                            try {
+                                //try to shutdown the proxy
+                                resourceManager.shutdownProxy();
+                            } catch (Exception ev) {
+                            }
                             //if failed
                             freeze();
                             //scheduler functionality are reduced until now
@@ -762,7 +766,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
 
             } catch (Exception e1) {
-                logger_dev.debug(e1);
+                e1.printStackTrace();
                 //if we are here, it is that something append while launching the current task.
                 logger.warn("Current node (" + node + ") has failed : " + e1.getMessage());
                 //so try to get back the node to the resource manager

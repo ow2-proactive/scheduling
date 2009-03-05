@@ -72,7 +72,7 @@ public class JobLauncher {
 
     public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
 
-    private static final String SCHEDULER_DEFAULT_URL = "//localhost/";
+    private static final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
 
     /**
      * Start the job launcher process.

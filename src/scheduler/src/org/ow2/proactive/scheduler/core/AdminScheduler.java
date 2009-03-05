@@ -39,11 +39,9 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
@@ -151,21 +149,6 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("//localhost/");
 
         return auth.logAsAdmin(login, password);
-    }
-
-    /**
-     * Can be used with parsimony to destroy the deployed local Scheduler.<br />
-     * Cause the Scheduler JVM to exit().
-     */
-    public static void destroyLocalScheduler() {
-        try {
-            String schedulerUrl = "//localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
-            Object schedulerAuth = PAActiveObject.lookupActive(SchedulerAuthentication.class.getName(),
-                    schedulerUrl);
-            PAActiveObject.getActiveObjectNode(schedulerAuth).getProActiveRuntime().killRT(true);
-        } catch (Exception e) {
-            logger_dev.error(e);
-        }
     }
 
     /**

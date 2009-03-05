@@ -68,7 +68,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 public class GetJobResult {
 
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
-    private static final String SCHEDULER_DEFAULT_URL = "//localhost/";
+    private static final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
 
     /**
      * Start the jobResult receiver.
