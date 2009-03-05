@@ -55,7 +55,7 @@ import org.ow2.proactive.scripting.ScriptResult;
 
 
 /**
- * This launcher is the class that will launch a native class.
+ * This launcher is the class that will launch a native process.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9

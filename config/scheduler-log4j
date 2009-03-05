@@ -38,7 +38,7 @@ log4j.logger.proactive.scheduler.dev.admin.consol=DEBUG,CONSOLE
 # avoid displaying additivity of the inherit loggers
 log4j.additivity.proactive.resourceManager=false
 # define RESOURCE MANAGER loggers
-log4j.logger.proactive.resourceManager=DEBUG,SchedulerDevFileAppender
+log4j.logger.proactive.resourceManager=DEBUG,RMDevFileAppender
 log4j.logger.proactive.resourceManager.core=INFO
 log4j.logger.proactive.resourceManager.user=INFO
 log4j.logger.proactive.resourceManager.monitoring=INFO
@@ -68,7 +68,15 @@ log4j.appender.SchedulerDevFileAppender.MaxBackupIndex=5
 log4j.appender.SchedulerDevFileAppender.layout=org.apache.log4j.PatternLayout
 log4j.appender.SchedulerDevFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] [SCHED.%C{1}.%M] %m%n
 
-#File appender for hibernate verbose developer logging level (FILE2)
+# File appender for verbose developer logging level (FILE3)
+log4j.appender.RMDevFileAppender=org.apache.log4j.RollingFileAppender
+log4j.appender.RMDevFileAppender.File=SchedulerLogs/SchedulerDev.log
+log4j.appender.RMDevFileAppender.MaxFileSize=10MB
+log4j.appender.RMDevFileAppender.MaxBackupIndex=5
+log4j.appender.RMDevFileAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.RMDevFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] [RM.%C{1}.%M] %m%n
+
+#File appender for hibernate verbose developer logging level (FILE4)
 log4j.appender.SchedulerDevHibFileAppender=org.apache.log4j.RollingFileAppender
 log4j.appender.SchedulerDevHibFileAppender.File=SchedulerLogs/SchedulerDev.log
 log4j.appender.SchedulerDevHibFileAppender.MaxFileSize=10MB

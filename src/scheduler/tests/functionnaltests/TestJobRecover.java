@@ -74,20 +74,17 @@ public class TestJobRecover extends FunctionalTest {
 
         SchedulerTHelper.waitForEventJobRunning(idJ1);
 
-        //TODO when Scheduler can be killed ? No more monitor that
-        //can wait for any task submitted or finished
+        SchedulerTHelper.log("Waiting for job 1 to finished");
+        SchedulerTHelper.waitForFinishedJob(idJ1);
 
-        Thread.sleep(5000);
-        SchedulerTHelper.log("kill Scheduler");
+        SchedulerTHelper.log("Kill Scheduler");
         SchedulerTHelper.killAndRestartScheduler(true);
 
         SchedulerTHelper.getUserInterface();
 
-        SchedulerTHelper.log("Waiting for job 1 finished");
-        SchedulerTHelper.waitForFinishedJob(idJ1);
-        SchedulerTHelper.log("Waiting for job 2 finished");
+        SchedulerTHelper.log("Waiting for job 2 to finished");
         SchedulerTHelper.waitForFinishedJob(idJ2);
-        SchedulerTHelper.log("Waiting for job 3 finished");
+        SchedulerTHelper.log("Waiting for job 3 to finished");
         SchedulerTHelper.waitForFinishedJob(idJ3);
 
         SchedulerTHelper.log("check result job 1");
@@ -111,5 +108,6 @@ public class TestJobRecover extends FunctionalTest {
             Assert.assertNotNull(result.getAllResults().get("Computation" + i).value());
             Assert.assertNull(result.getAllResults().get("Computation" + i).getException());
         }
+
     }
 }

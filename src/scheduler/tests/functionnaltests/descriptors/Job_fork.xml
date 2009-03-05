@@ -38,6 +38,7 @@
 		<!-- walltime automatically fork -->
 		<task name="Fork2" walltime="5" >
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
+			<forkEnvironment jvmParameters="-Dproactive.test=true" />
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>

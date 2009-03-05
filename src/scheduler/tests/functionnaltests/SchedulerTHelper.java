@@ -708,7 +708,7 @@ public class SchedulerTHelper {
         if (eventReceiver == null) {
             /** create event receiver then turnActive to avoid deepCopy of MonitorsHandler object
              * 	(shared instance between event receiver and static helpers).
-		*/
+            */
             MonitorEventReceiver passiveEventReceiver = new MonitorEventReceiver(mHandler);
             eventReceiver = (MonitorEventReceiver) PAActiveObject.turnActive(passiveEventReceiver);
 

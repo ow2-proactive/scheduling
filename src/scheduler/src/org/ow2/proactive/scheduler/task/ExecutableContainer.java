@@ -34,13 +34,13 @@ package org.ow2.proactive.scheduler.task;
 import java.io.Serializable;
 
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 /**
- * An executable container allows to instanciate the actual executable in a lazy manner, i.e. 
+ * An executable container allows to instantiate the actual executable in a lazy manner, i.e.
  * on the worker node that will execute the actual executable.
  * @author The ProActive Team
  */
@@ -57,8 +57,9 @@ public interface ExecutableContainer extends Serializable {
      * Generic init method for executable containers.
      * This method is called on SchedulerCore just before sending the container
      * on the node that will execute the contained executable.
+     *
      * @param job the job owning the contained executable
      * @param task the task owning the contained executable
      */
-    public void init(InternalJob job, InternalTask task);
+    public void init(JobState job, TaskState task);
 }

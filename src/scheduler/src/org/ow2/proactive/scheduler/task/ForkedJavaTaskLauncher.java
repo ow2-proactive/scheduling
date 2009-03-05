@@ -57,11 +57,9 @@ import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.core.SchedulerCore;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.Script;
@@ -319,7 +317,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      * - cleaning after creating a separate JVM 
      * - informing the schedulerCore about finished task
      */
-    protected void finalizeTask(SchedulerCore core) {
+    protected void finalizeTask(TaskTerminateNotification core) {
         clean();
         super.finalizeTask(core);
     }

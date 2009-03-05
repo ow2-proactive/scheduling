@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -14,6 +15,7 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -37,6 +39,7 @@ public class AdminRM {
     /**
      * Log4j logger name.
      */
+    private static final String RM_DEFAULT_URL = getHostURL("//localhost/");
     public static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
 
     /**
@@ -145,7 +148,7 @@ public class AdminRM {
             } else if (cmd.hasOption("u")) {
                 url = cmd.getOptionValue("u");
             } else {
-                url = cmd.getOptionValue("//localhost/");
+                url = RM_DEFAULT_URL;
             }
 
             logger.info("Trying to connect RM on " + url);
@@ -304,5 +307,19 @@ public class AdminRM {
         for (RMNodeSourceEvent evt : list) {
             logger.info(evt.getSourceName() + "\t" + evt.getSourceType());
         }
+    }
+
+    /**
+     * Normalize the given URL into an URL that only contains protocol://host:port/
+     *
+     * @param url the url to transform
+     * @return an URL that only contains protocol://host:port/
+     */
+    public static String getHostURL(String url) {
+        URI uri = URI.create(url);
+        String scheme = (uri.getScheme() == null) ? "rmi" : uri.getScheme();
+        String host = (uri.getHost() == null) ? "localhost" : uri.getHost();
+        int port = (uri.getPort() == -1) ? PAProperties.PA_RMI_PORT.getValueAsInt() : uri.getPort();
+        return scheme + "://" + host + ":" + port + "/";
     }
 }

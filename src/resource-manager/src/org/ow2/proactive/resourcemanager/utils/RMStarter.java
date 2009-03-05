@@ -75,9 +75,9 @@ public class RMStarter {
         deploy.setArgs(Option.UNLIMITED_VALUES);
         options.addOption(deploy);
 
-        Option noDeploy = new Option("n", "nodeploy", false,
-            "start Resource Manager without deploying default 4 local nodes");
-        noDeploy.setArgName("nodeploy");
+        Option noDeploy = new Option("localNodes", "nodeploy", false,
+            "start Resource Manager deploying default 4 local nodes");
+        noDeploy.setArgName("localNodes");
         noDeploy.setRequired(false);
         options.addOption(noDeploy);
     }
@@ -110,7 +110,7 @@ public class RMStarter {
             cmd = parser.parse(options, args);
             if (cmd.hasOption("h")) {
                 displayHelp();
-            } else if (cmd.hasOption("d") && cmd.hasOption("n")) {
+            } else if (cmd.hasOption("d") && cmd.hasOption("localNodes")) {
                 logger
                         .warn("\nYou cannot specify a deployment (-d|--deploy) and ask to deploy nothing (-n|--nodeply) !\n");
                 displayHelp();
@@ -128,10 +128,7 @@ public class RMStarter {
             logger.info("Starting Resource-Manager, Please wait...");
             RMFactory.setOsJavaProperty();
 
-            if (cmd.hasOption("n")) {
-                // starting clean resource manager
-                RMFactory.startLocal();
-            } else {
+            if (cmd.hasOption("localNodes")) {
                 Collection<String> deploymentDescriptors = new LinkedList<String>();
                 if (cmd.hasOption("d")) {
                     for (String desc : gcmdList) {
@@ -144,6 +141,9 @@ public class RMStarter {
                 }
                 // starting resource manager and deploy given infrastructure
                 RMFactory.startLocal(deploymentDescriptors);
+            } else {
+                // starting clean resource manager
+                RMFactory.startLocal();
             }
 
             logger.info("(Press 'e' to shutdown)");

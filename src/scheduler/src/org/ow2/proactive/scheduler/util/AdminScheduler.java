@@ -73,7 +73,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 public class AdminScheduler {
 
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
-    private static final String SCHEDULER_DEFAULT_URL = "//localhost/";
+    private static final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
 
     private static AdminSchedulerInterface scheduler;
     private static final String STAT_CMD = "stat";

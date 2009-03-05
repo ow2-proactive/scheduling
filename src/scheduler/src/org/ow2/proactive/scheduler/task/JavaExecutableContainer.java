@@ -51,12 +51,12 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.core.SchedulerCore;
-import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 
@@ -137,7 +137,7 @@ public class JavaExecutableContainer implements ExecutableContainer {
     /**
      * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(org.ow2.proactive.scheduler.job.InternalJob, org.ow2.proactive.scheduler.task.internal.InternalTask)
      */
-    public void init(InternalJob job, InternalTask task) {
+    public void init(JobState job, TaskState task) {
         // get the classserver if any (can be null)
         this.classServer = SchedulerCore.getTaskClassServer(job.getId());
     }

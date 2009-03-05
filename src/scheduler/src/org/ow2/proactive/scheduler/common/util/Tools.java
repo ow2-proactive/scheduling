@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.config.PAProperties;
 
 
 /**
@@ -175,7 +176,10 @@ public class Tools implements Serializable {
      */
     public static String getHostURL(String url) {
         URI uri = URI.create(url);
-        return uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + "/";
+        String scheme = (uri.getScheme() == null) ? "rmi" : uri.getScheme();
+        String host = (uri.getHost() == null) ? "localhost" : uri.getHost();
+        int port = (uri.getPort() == -1) ? PAProperties.PA_RMI_PORT.getValueAsInt() : uri.getPort();
+        return scheme + "://" + host + ":" + port + "/";
     }
 
     /**
