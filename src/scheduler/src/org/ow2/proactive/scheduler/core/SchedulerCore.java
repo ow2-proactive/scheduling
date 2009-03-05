@@ -73,6 +73,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scheduler.common.AdminMethodsInterface;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -93,6 +94,7 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -469,7 +471,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                         + "Scheduler is in critical state and its functionalities are reduced : \n"
                                         + "\t-> use the linkResourceManager() method to reconnect a new one.\n"
                                         + "******************************");
-                            frontend.schedulerRMDownEvent();
+                            frontend.schedulerStateUpdated(SchedulerEvent.RM_DOWN);
                         }
                     }
                 }
@@ -485,7 +487,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     JobInfo info = job.getJobInfo();
                     updateTaskInfosList(job);
                     //send event to front_end
-                    frontend.jobResumedEvent(info);
+                    frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_RESUMED, info));
                 }
             }
 
@@ -516,7 +518,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         logger_dev.info("Resource Manager proxy shutdown");
 
         if (status == SchedulerStatus.SHUTTING_DOWN) {
-            frontend.schedulerShutDownEvent();
+            frontend.schedulerStateUpdated(SchedulerEvent.SHUTDOWN);
         }
 
         //destroying scheduler active objects
@@ -735,13 +737,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             updateTaskInfosList(currentJob);
                             logger.info("Job '" + currentJob.getId() + "' started");
                             // send job event to front-end
-                            frontend.jobPendingToRunningEvent(currentJob.getJobInfo());
+                            frontend.jobStateUpdated(new NotificationData<JobInfo>(
+                                SchedulerEvent.JOB_PENDING_TO_RUNNING, currentJob.getJobInfo()));
                         }
 
                         // set the different informations on task
                         currentJob.startTask(internalTask);
                         // send task event to front-end
-                        frontend.taskPendingToRunningEvent(internalTask.getTaskInfo());
+                        frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                            SchedulerEvent.TASK_PENDING_TO_RUNNING, internalTask.getTaskInfo()));
                         //no need to set this status in database
                     }
                     //if everything were OK (or if the task could not be launched, 
@@ -802,7 +806,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         td.setStatus(TaskStatus.WAITING_ON_FAILURE);
                         job.newWaitingTask();
                         job.reStartTask(td);
-                        frontend.taskWaitingForRestart(td.getTaskInfo());
+                        frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                            SchedulerEvent.TASK_WAITING_FOR_RESTART, td.getTaskInfo()));
                         logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
                     } else {
                         endJob(
@@ -978,7 +983,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             finishedJobs.add(job);
 
             //send task event
-            frontend.taskRunningToFinishedEvent(task.getTaskInfo());
+            frontend.taskStateUpdated(new NotificationData<TaskInfo>(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                task.getTaskInfo()));
         }
 
         terminateJobHandling(job.getId());
@@ -989,7 +995,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         logger.info("Job '" + job.getId() + "' terminated (" + jobStatus + ")");
 
         //send event to listeners.
-        frontend.jobRunningToFinishedEvent(job.getJobInfo());
+        frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_RUNNING_TO_FINISHED, job
+                .getJobInfo()));
     }
 
     /**
@@ -1050,7 +1057,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //change status and update GUI
                     descriptor.setStatus(TaskStatus.WAITING_ON_FAILURE);
                     job.newWaitingTask();
-                    frontend.taskWaitingForRestart(descriptor.getTaskInfo());
+                    frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                        SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
                     DatabaseManager.synchronize(job.getJobInfo());
@@ -1078,7 +1086,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //change status and update GUI
                     descriptor.setStatus(TaskStatus.WAITING_ON_FAILURE);
                     job.newWaitingTask();
-                    frontend.taskWaitingForRestart(descriptor.getTaskInfo());
+                    frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                        SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
                     DatabaseManager.synchronize(job.getJobInfo());
@@ -1139,7 +1148,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
                     DatabaseManager.update(job.getJobResult());
                     //send event to user
-                    frontend.taskWaitingForRestart(descriptor.getTaskInfo());
+                    frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                        SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
 
                     //the job is not restarted directly
                     RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
@@ -1173,7 +1183,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             }
             //send event
-            frontend.taskRunningToFinishedEvent(descriptor.getTaskInfo());
+            frontend.taskStateUpdated(new NotificationData<TaskInfo>(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                descriptor.getTaskInfo()));
 
             //if this job is finished (every task have finished)
             logger_dev.info("Number of finished tasks : " + job.getNumberOfFinishedTask() +
@@ -1194,7 +1205,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     DatabaseManager.unload(tr);
                 }
                 //send event to client
-                frontend.jobRunningToFinishedEvent(job.getJobInfo());
+                frontend.jobStateUpdated(new NotificationData<JobInfo>(
+                    SchedulerEvent.JOB_RUNNING_TO_FINISHED, job.getJobInfo()));
             }
 
             //free every execution nodes
@@ -1427,7 +1439,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
             logger.info("Job " + jobId + " removed !");
             //send event to front-end
-            frontend.jobRemoveFinishedEvent(job.getJobInfo());
+            frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED, job
+                    .getJobInfo()));
         }
     }
 
@@ -1445,7 +1458,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         status = SchedulerStatus.STARTED;
         logger.info("Scheduler has just been started !");
-        frontend.schedulerStartedEvent();
+        frontend.schedulerStateUpdated(SchedulerEvent.STARTED);
 
         return new BooleanWrapper(true);
     }
@@ -1465,7 +1478,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         status = SchedulerStatus.STOPPED;
         logger.info("Scheduler has just been stopped, no tasks will be launched until start.");
-        frontend.schedulerStoppedEvent();
+        frontend.schedulerStateUpdated(SchedulerEvent.STOPPED);
 
         return new BooleanWrapper(true);
     }
@@ -1488,7 +1501,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         status = SchedulerStatus.PAUSED;
         logger.info("Scheduler has just been paused !");
-        frontend.schedulerPausedEvent();
+        frontend.schedulerStateUpdated(SchedulerEvent.PAUSED);
 
         return new BooleanWrapper(true);
     }
@@ -1511,7 +1524,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         status = SchedulerStatus.FROZEN;
         logger.info("Scheduler has just been frozen !");
-        frontend.schedulerFrozenEvent();
+        frontend.schedulerStateUpdated(SchedulerEvent.FROZEN);
 
         return new BooleanWrapper(true);
     }
@@ -1534,7 +1547,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         status = SchedulerStatus.STARTED;
         logger.info("Scheduler has just been resumed !");
-        frontend.schedulerResumedEvent();
+        frontend.schedulerStateUpdated(SchedulerEvent.RESUMED);
 
         return new BooleanWrapper(true);
     }
@@ -1553,7 +1566,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         status = SchedulerStatus.SHUTTING_DOWN;
         logger.info("Scheduler is shutting down, this make take time to finish every jobs !");
-        frontend.schedulerShuttingDownEvent();
+        frontend.schedulerStateUpdated(SchedulerEvent.SHUTTING_DOWN);
 
         return new BooleanWrapper(true);
     }
@@ -1608,7 +1621,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //finally : shutdown
         status = SchedulerStatus.KILLED;
         logger.info("Scheduler has just been killed !");
-        frontend.schedulerKilledEvent();
+        frontend.schedulerStateUpdated(SchedulerEvent.KILLED);
 
         return new BooleanWrapper(true);
     }
@@ -1641,7 +1654,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //create tasks events list
         updateTaskInfosList(job);
         //send event to user
-        frontend.jobPausedEvent(info);
+        frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_PAUSED, info));
 
         return new BooleanWrapper(change);
     }
@@ -1674,7 +1687,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //create tasks events list
         updateTaskInfosList(job);
         //send event to user
-        frontend.jobResumedEvent(info);
+        frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_RESUMED, info));
 
         return new BooleanWrapper(change);
     }
@@ -1715,7 +1728,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         InternalJob job = jobs.get(jobId);
         job.setPriority(priority);
         DatabaseManager.synchronize(job.getJobInfo());
-        frontend.jobChangePriorityEvent(job.getJobInfo());
+        frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_CHANGE_PRIORITY, job
+                .getJobInfo()));
     }
 
     /**
@@ -1729,7 +1743,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
         try {
             policy = newPolicyFile.newInstance();
-            frontend.schedulerPolicyChangedEvent(newPolicyFile.getName());
+            frontend.policyChanged(newPolicyFile.getName());
             logger_dev.info("New policy changed ! new policy name : " + newPolicyFile.getName());
         } catch (InstantiationException e) {
             logger_dev.error(e);
@@ -1757,7 +1771,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             status = SchedulerStatus.FROZEN;
             logger
                     .info("New resource manager has been linked to the scheduler.\n\t-> Resume to continue the scheduling.");
-            frontend.schedulerRMUpEvent();
+            frontend.schedulerStateUpdated(SchedulerEvent.RM_UP);
             return new BooleanWrapper(true);
         } catch (Exception e) {
             throw new SchedulerException("Error while connecting the new Resource Manager !", e);
@@ -1777,8 +1791,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             logger.info("Hibernate successfully started !");
         } catch (Exception e) {
             //if the database doesn't exist
-            logger.error("*********  ERROR ********** " + e.getMessage());
-            logger_dev.error(e);
+            logger.error(e);
             kill();
             return;
         }

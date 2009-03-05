@@ -46,8 +46,6 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
- *
- * @param <E> The job is used in the event that can either be an {@link InternalJob} for administrator or {@link Job} for a user.
  */
 @PublicAPI
 public interface SchedulerEventListener extends Serializable {

@@ -61,8 +61,8 @@ import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -91,7 +91,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerFrontend implements InitActive, SchedulerEventListener, AdminSchedulerInterface {
+public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, AdminSchedulerInterface {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
@@ -308,12 +308,12 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         ident.addSubmit();
         //send update user event only if the user is in the list of connected users.
         if (connectedUsers.getUsers().contains(ident)) {
-            usersUpdate(ident);
+            usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
         }
         //stats
         stats.increaseSubmittedJobCount(job.getType());
         stats.submitTime();
-        jobSubmittedEvent(job);
+        jobSubmitted(job);
         logger.info("New job submitted '" + job.getId() + "' containing " + job.getTotalNumberOfTasks() +
             " tasks (owner is '" + job.getOwner() + "')");
         return job.getId();
@@ -487,7 +487,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         }
         //put this new user in the list of connected user
         connectedUsers.addUser(uIdent);
-        usersUpdate(uIdent);
+        usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, uIdent));
         //add the listener to the list of listener for this user.
         schedulerListeners.put(id, sel);
         //get the scheduler State
@@ -686,7 +686,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
         //remove this user to the list of connected user
         ident.setToRemove();
         connectedUsers.update(ident);
-        usersUpdate(ident);
+        usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
         logger_dev.info("User '" + user + "' has left the scheduler !");
     }
 
@@ -865,7 +865,7 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
                     //remove this user to the list of connected user
                     ident.setToRemove();
                     connectedUsers.update(ident);
-                    usersUpdate(ident);
+                    usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
                     logger.warn(userId.getUsername() + "@" + userId.getHostName() +
                         " has been disconnected from events listener!");
                 }
@@ -878,163 +878,103 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener, Ad
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerFrozenEvent()
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#schedulerStateUpdated(org.ow2.proactive.scheduler.common.SchedulerEvent)
      */
-    public void schedulerFrozenEvent() {
-        dispatch(SchedulerEvent.FROZEN, null);
+    public void schedulerStateUpdated(SchedulerEvent eventType) {
+        switch (eventType) {
+            case STARTED:
+            case STOPPED:
+            case PAUSED:
+            case FROZEN:
+            case RESUMED:
+            case SHUTTING_DOWN:
+            case SHUTDOWN:
+            case KILLED:
+            case RM_DOWN:
+            case RM_UP:
+                dispatch(eventType, null);
+                break;
+            default:
+                logger_dev.error("Unconsistent update type received from Scheduler Core : " + eventType);
+        }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPausedEvent()
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobSubmitted(org.ow2.proactive.scheduler.common.job.JobState)
      */
-    public void schedulerPausedEvent() {
-        dispatch(SchedulerEvent.PAUSED, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerResumedEvent()
-     */
-    public void schedulerResumedEvent() {
-        dispatch(SchedulerEvent.RESUMED, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShutDownEvent()
-     */
-    public void schedulerShutDownEvent() {
-        dispatch(SchedulerEvent.SHUTDOWN, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShuttingDownEvent()
-     */
-    public void schedulerShuttingDownEvent() {
-        dispatch(SchedulerEvent.SHUTTING_DOWN, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStartedEvent()
-     */
-    public void schedulerStartedEvent() {
-        dispatch(SchedulerEvent.STARTED, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStoppedEvent()
-     */
-    public void schedulerStoppedEvent() {
-        dispatch(SchedulerEvent.STOPPED, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerKilledEvent()
-     */
-    public void schedulerKilledEvent() {
-        dispatch(SchedulerEvent.KILLED, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
-     */
-    public void jobPausedEvent(JobInfo info) {
-        dispatch(SchedulerEvent.JOB_PAUSED, new Class<?>[] { JobInfo.class }, info);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
-     */
-    public void jobResumedEvent(JobInfo info) {
-        dispatch(SchedulerEvent.JOB_RESUMED, new Class<?>[] { JobInfo.class }, info);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
-     * @param job The job that have just be submitted.
-     */
-    public void jobSubmittedEvent(JobState job) {
+    public void jobSubmitted(JobState job) {
         dispatch(SchedulerEvent.JOB_SUBMITTED, new Class<?>[] { JobState.class }, job);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobStateUpdated(org.ow2.proactive.scheduler.core.NotificationData)
      */
-    public void jobPendingToRunningEvent(JobInfo info) {
-        dispatch(SchedulerEvent.JOB_PENDING_TO_RUNNING, new Class<?>[] { JobInfo.class }, info);
+    public void jobStateUpdated(NotificationData<JobInfo> notification) {
+        switch (notification.getEventType()) {
+            case JOB_PAUSED:
+            case JOB_RESUMED:
+            case JOB_PENDING_TO_RUNNING:
+            case JOB_CHANGE_PRIORITY:
+                dispatch(notification.getEventType(), new Class<?>[] { JobInfo.class }, notification
+                        .getData());
+                break;
+            case JOB_RUNNING_TO_FINISHED:
+                //set this job finished, user can get its result
+                jobs.get(notification.getData().getJobId()).setFinished(true);
+                dispatch(notification.getEventType(), new Class<?>[] { JobInfo.class }, notification
+                        .getData());
+                //stats
+                stats.increaseFinishedJobCount(notification.getData().getNumberOfFinishedTasks());
+                break;
+            case JOB_REMOVE_FINISHED:
+                //removing jobs from the global list : this job is no more managed
+                jobs.remove(notification.getData().getJobId());
+                dispatch(notification.getEventType(), new Class<?>[] { JobInfo.class }, notification
+                        .getData());
+                break;
+            default:
+                logger_dev.error("Unconsistent update type received from Scheduler Core : " +
+                    notification.getEventType());
+        }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#taskStateUpdated(org.ow2.proactive.scheduler.core.NotificationData)
      */
-    public void jobRunningToFinishedEvent(JobInfo info) {
-        jobs.get(info.getJobId()).setFinished(true);
-        dispatch(SchedulerEvent.JOB_RUNNING_TO_FINISHED, new Class<?>[] { JobInfo.class }, info);
-        //stats
-        stats.increaseFinishedJobCount(info.getNumberOfFinishedTasks());
+    public void taskStateUpdated(NotificationData<TaskInfo> notification) {
+        switch (notification.getEventType()) {
+            case TASK_PENDING_TO_RUNNING:
+            case TASK_RUNNING_TO_FINISHED:
+            case TASK_WAITING_FOR_RESTART:
+                dispatch(notification.getEventType(), new Class<?>[] { TaskInfo.class }, notification
+                        .getData());
+                break;
+            default:
+                logger_dev.error("Unconsistent update type received from Scheduler Core : " +
+                    notification.getEventType());
+        }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#policyChanged(java.lang.String)
      */
-    public void jobRemoveFinishedEvent(JobInfo info) {
-        //removing jobs from the global list : this job is no more managed
-        jobs.remove(info.getJobId());
-        dispatch(SchedulerEvent.JOB_REMOVE_FINISHED, new Class<?>[] { JobInfo.class }, info);
+    public void policyChanged(String newPolicyFullName) {
+        dispatch(SchedulerEvent.POLICY_CHANGED, new Class<?>[] { String.class }, newPolicyFullName);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#usersChanged(org.ow2.proactive.scheduler.core.NotificationData)
      */
-    public void taskPendingToRunningEvent(TaskInfo info) {
-        dispatch(SchedulerEvent.TASK_PENDING_TO_RUNNING, new Class<?>[] { TaskInfo.class }, info);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
-     */
-    public void taskRunningToFinishedEvent(TaskInfo info) {
-        dispatch(SchedulerEvent.TASK_RUNNING_TO_FINISHED, new Class<?>[] { TaskInfo.class }, info);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskInfo)
-     */
-    public void taskWaitingForRestart(TaskInfo info) {
-        dispatch(SchedulerEvent.TASK_WAITING_FOR_RESTART, new Class<?>[] { TaskInfo.class }, info);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
-     */
-    public void jobChangePriorityEvent(JobInfo info) {
-        dispatch(SchedulerEvent.JOB_CHANGE_PRIORITY, new Class<?>[] { JobInfo.class }, info);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMDownEvent()
-     */
-    public void schedulerRMDownEvent() {
-        dispatch(SchedulerEvent.RM_DOWN, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMUpEvent()
-     */
-    public void schedulerRMUpEvent() {
-        dispatch(SchedulerEvent.RM_UP, null);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdate(org.ow2.proactive.scheduler.common.job.UserIdentification)
-     */
-    public void usersUpdate(UserIdentification userIdentification) {
-        dispatch(SchedulerEvent.USERS_UPDATE, new Class<?>[] { UserIdentification.class }, userIdentification);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPolicyChangedEvent(java.lang.String)
-     */
-    public void schedulerPolicyChangedEvent(String newPolicyName) {
-        dispatch(SchedulerEvent.POLICY_CHANGED, new Class<?>[] { String.class }, newPolicyName);
+    public void usersChanged(NotificationData<UserIdentification> notification) {
+        switch (notification.getEventType()) {
+            case USERS_UPDATE:
+                dispatch(notification.getEventType(), new Class<?>[] { UserIdentification.class },
+                        notification.getData());
+                break;
+            default:
+                logger_dev.error("Unconsistent update type received from Scheduler Core : " +
+                    notification.getEventType());
+        }
     }
 
 }
