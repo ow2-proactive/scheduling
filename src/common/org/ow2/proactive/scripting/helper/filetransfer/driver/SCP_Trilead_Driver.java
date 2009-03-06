@@ -27,10 +27,6 @@ public class SCP_Trilead_Driver implements FileTransfertDriver {
 	
 	
 	
-	@Override
-    /** Retrieve connection parameters contains into the Initializer
-     * @param myInit the Initializer used to set connection informations
-     */
 	public void init(FileTransfertInitializer myInit) {
 		debug("init "+this.getClass().getName());
 		FileTransfertInitializerSCP connexionParamaters = (FileTransfertInitializerSCP) myInit;
@@ -79,7 +75,6 @@ public class SCP_Trilead_Driver implements FileTransfertDriver {
 	}
 	
 	
-	@Override
 	public void getFile(String remoteFilePath, String localFolder) throws IOException, AuthentificationFailedException {
 		connect();
 		File destFolder = new File(localFolder);
@@ -91,17 +86,11 @@ public class SCP_Trilead_Driver implements FileTransfertDriver {
 		disconnect();
 	}
 
-	@Override
 	public ArrayList<String> list(String remoteFolder) throws Exception {
 		throw new NotImplementedException();
 	}
 
 	
-	@Override
-	/**
-	 * Copy the local file in the remote folder
-	 * Throws an exception if the remote folder does not exist
-	 */
 	public void putFile(String localFilePath, String remoteFolder)
 			throws Exception {
 		connect();
@@ -142,13 +131,11 @@ public class SCP_Trilead_Driver implements FileTransfertDriver {
 	
 	
 	
-	@Override
 	public void getFolder(String remoteFolderPath, String localFolderPath)
 			throws Exception {
 		throw new Exception("This method is not implemented by the "+this.getClass()+" driver.");
 	}
 
-	@Override
 	public void putFolder(String localFolderPath, String remoteFolderPath)
 			throws Exception {
 		// TODO Auto-generated method stub

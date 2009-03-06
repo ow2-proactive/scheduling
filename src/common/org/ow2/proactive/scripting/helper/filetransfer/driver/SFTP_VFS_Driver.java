@@ -48,10 +48,6 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 	private FileSystemOptions opts;
 	
 	
-	@Override
-    /** Retrieve connection parameters contains into the Initializer
-     * @param myInit the Initializer used to set connection informations
-     */
 	public void init(FileTransfertInitializer myInit) {
 		debug("init "+this.getClass().getName());
 		FileTransfertInitializerSCP connexionParamaters = (FileTransfertInitializerSCP) myInit;
@@ -62,12 +58,6 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 	}
 
 	
-	@Override
-    /** get a file from remote to local
-     * @param remotePathFile the remote path like "myRmFld/myFile.txt"
-     * @param localFolder the destination path where the file must be copied (empty string considered like current folder)
-     * @param value will be compared
-     */
 	public void getFile(String remotePath, String destFolderPath) throws Exception{
 		
 		connect();
@@ -123,7 +113,6 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 	
 	
 	
-	@Override
 	public void putFile(String localPathFile, String remoteFolder) throws Exception {
 		if(remoteFolder == "")
 			remoteFolder = ".";
@@ -179,11 +168,6 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 				
 	}
 	
-	@Override
-    /** List of files & folders name which a directory contains (dont change the working directory)
-     * @param remoteFolder folder which must be read
-     * @return List of files & folders name which a directory contains
-     */
 	public ArrayList<String> list(String remoteFolder) throws Exception {		
 		//--Setup the FTP connection
 		connect();
@@ -226,14 +210,12 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 	
 	}
 
-	@Override
 	public void getFolder(String remoteFolderPath, String localFolderPath)
 			throws Exception {
 		// TODO Auto-generated method stub
 		throw new NotImplementedException();
 	}
 
-	@Override
 	public void putFolder(String localFolderPath, String remoteFolderPath)
 			throws Exception {
 		// TODO Auto-generated method stub
@@ -241,7 +223,6 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 	}
 
 
-	@Override
 	public void getFiles(List<String> files, String localFolder)
 			throws Exception {
 		Iterator<String> it = files.iterator();
@@ -253,7 +234,6 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 	}
 
 
-	@Override
 	public void putFiles(List<String> localFilePaths, String remoteFolder)
 			throws Exception {
 		Iterator<String> it = localFilePaths.iterator();

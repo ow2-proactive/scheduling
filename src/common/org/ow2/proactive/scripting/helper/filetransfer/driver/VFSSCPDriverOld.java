@@ -38,10 +38,6 @@ public class VFSSCPDriverOld implements FileTransfertDriver {
 	private FileSystemOptions opts;
 	
 	
-	@Override
-    /** Retrieve connection parameters contains into the Initializer
-     * @param myInit the Initializer used to set connection informations
-     */
 	public void init(FileTransfertInitializer myInit) {
 		System.out.println("init vfs scp");
 		FileTransfertInitializerSCP connexionParamaters = (FileTransfertInitializerSCP) myInit;
@@ -52,12 +48,6 @@ public class VFSSCPDriverOld implements FileTransfertDriver {
 	}
 
 	
-	@Override
-    /** get a file from remote to local
-     * @param remotePathFile the remote path like "myRmFld/myFile.txt"
-     * @param localFolder the destination path where the file must be copied (empty string considered like current folder)
-     * @param value will be compared
-     */
 	public void getFile(String remotePathFile, String localFolder)throws Exception {
 		System.out.println("Use FileTransfertDriverVFSSCP to get " + remotePathFile + " in " + localFolder);
 		
@@ -88,7 +78,6 @@ public class VFSSCPDriverOld implements FileTransfertDriver {
 
 	
 	
-	@Override
 	public void putFile(String localPathFile, String remoteFolder) throws Exception {
 		if(remoteFolder == "")
 			remoteFolder = ".";
@@ -110,11 +99,6 @@ public class VFSSCPDriverOld implements FileTransfertDriver {
 		System.out.println("end putFile");		
 	}
 	
-	@Override
-    /** List of files & folders name which a directory contains (dont change the working directory)
-     * @param remoteFolder folder which must be read
-     * @return List of files & folders name which a directory contains
-     */
 	public ArrayList<String> list(String remoteFolder) throws Exception {		
 		//--Setup the FTP connection
 		connect();
@@ -151,14 +135,12 @@ public class VFSSCPDriverOld implements FileTransfertDriver {
 		manager.close();
 	}
 
-	@Override
 	public void getFolder(String remoteFolderPath, String localFolderPath)
 			throws Exception {
 		// TODO Auto-generated method stub
 		throw new NotImplementedException();
 	}
 
-	@Override
 	public void putFolder(String localFolderPath, String remoteFolderPath)
 			throws Exception {
 		// TODO Auto-generated method stub
@@ -166,7 +148,6 @@ public class VFSSCPDriverOld implements FileTransfertDriver {
 	}
 
 
-	@Override
 	public void getFiles(List<String> files, String localFolder)
 			throws Exception {
 		// TODO Auto-generated method stub
@@ -174,7 +155,6 @@ public class VFSSCPDriverOld implements FileTransfertDriver {
 	}
 
 
-	@Override
 	public void putFiles(List<String> localFilePaths, String remoteFolder)
 			throws Exception {
 		// TODO Auto-generated method stub

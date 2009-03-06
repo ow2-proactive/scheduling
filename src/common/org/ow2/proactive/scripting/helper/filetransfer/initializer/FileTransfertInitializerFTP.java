@@ -53,27 +53,22 @@ public class FileTransfertInitializerFTP implements FileTransfertInitializer {
 		_driverClass = driver;
 	}
 
-	@Override
 	public Class<? extends FileTransfertDriver> getDriverClass() {
 		return _driverClass;
 	}
 
-	@Override
 	public Protocol getProtocol() {
 		return Protocol.FTP;
 	}
 	
-	@Override
 	public String getHost(){
 		return host;
 	}
 	
-	@Override
 	public int getPort(){
 		return _port;
 	}
 
-	@Override
 	public String getUser() {
 		return user;
 	}

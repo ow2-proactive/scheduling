@@ -42,7 +42,6 @@ public class SFTP_Trilead_Driver implements FileTransfertDriver {
 	 	        public static final int S_IFDIR  = 0040000;  // directory
 	
 	
-	@Override
 	public void init(FileTransfertInitializer myInit) {
 		
 		FileTransfertInitializerSCP connexionParamaters = (FileTransfertInitializerSCP) myInit;
@@ -74,7 +73,6 @@ public class SFTP_Trilead_Driver implements FileTransfertDriver {
         debug ("disconnected from the remote host " + host);
 	}
 	
-	@Override
 	public void putFile(String localFilePath, String remoteFolder)
 			throws Exception {
 		putFile(localFilePath, remoteFolder,true);
@@ -117,7 +115,6 @@ public class SFTP_Trilead_Driver implements FileTransfertDriver {
 	
 	
 	
-	@Override
 	public void getFile(String remoteFilePath, String localFolder) throws Exception {
 		this.getFile(remoteFilePath, localFolder,true);
 	}
@@ -154,21 +151,18 @@ public class SFTP_Trilead_Driver implements FileTransfertDriver {
 	
 	
 	
-	@Override
 	public ArrayList<String> list(String remoteFolder) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
-	@Override
 	public void getFolder(String remoteFolderPath, String localFolderPath)
 			throws Exception {
 		// TODO Auto-generated method stub
 		throw new NotImplementedException();
 	}
 
-	@Override
 	public void putFolder(String localFolderPath, String remoteFolderPath)
 			throws Exception {
 		// TODO Auto-generated method stub
@@ -177,7 +171,6 @@ public class SFTP_Trilead_Driver implements FileTransfertDriver {
 
 
 	
-	@Override
 	public void getFiles(List<String> files, String localFolder)
 			throws Exception {
 		
@@ -193,7 +186,6 @@ public class SFTP_Trilead_Driver implements FileTransfertDriver {
 	}
 
 	
-	@Override
 	public void putFiles(List<String> localFilePaths, String remoteFolder)
 			throws Exception {
 

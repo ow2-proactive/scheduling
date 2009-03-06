@@ -42,27 +42,22 @@ public class FileTransfertInitializerSCP implements FileTransfertInitializer {
 	
 	
 	
-	@Override
 	public Class<? extends FileTransfertDriver> getDriverClass() {
 		return _driverClass;
 	}
 
-	@Override
 	public Protocol getProtocol() {
 		return Protocol.SCP;
 	}
 
-	@Override
 	public String getHost() {
 		return _host;
 	}
 
-	@Override
 	public int getPort() {
 		return _port;
 	}
 
-	@Override
 	public String getUser() {
 		return _user;
 	}

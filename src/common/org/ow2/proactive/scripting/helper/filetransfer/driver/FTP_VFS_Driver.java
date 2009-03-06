@@ -30,7 +30,6 @@ public class FTP_VFS_Driver  implements FileTransfertDriver {
 	private int port = 21;
 	
 	
-	@Override
     /** Retrieve connection parameters contained into the Initializer
      * @param myInit the Initializer used to set connection informations
      */
@@ -45,13 +44,6 @@ public class FTP_VFS_Driver  implements FileTransfertDriver {
 		usePassiveMode = connexionParamaters.isPassiveMode();
 	}
 	
-	@Override
-    /** Get a file from the remote location to the local folder
-     *  Uses a single connection
-     * @param remoteFilePath the remote path. This paths is relative to the remote ftp server user's root folder  
-     * @param localFolder the destination path where the file must be copied 
-     * @param value will be compared
-     */
 	public void getFile(String remoteFilePath, String localFolder)throws Exception {
 		this.getFile(remoteFilePath, localFolder, true);
 	}
@@ -164,8 +156,6 @@ public class FTP_VFS_Driver  implements FileTransfertDriver {
 
 
 	
-	
-		@Override
 	public void putFile(String localPathFile, String remoteFolder) throws Exception {
 		
 		this.putFile(localPathFile, remoteFolder, true);
@@ -224,7 +214,6 @@ public class FTP_VFS_Driver  implements FileTransfertDriver {
 	}
 	
 	
-	@Override
     /** List of files & folders name which a directory contains (dont change the working directory)
      * @param remoteFolder folder which must be read
      * @return List of files & folders name which a directory contains
@@ -376,7 +365,6 @@ public class FTP_VFS_Driver  implements FileTransfertDriver {
 	}
 
 	
-	@Override
 	public void getFiles(List<String> files, String localFolder) throws Exception {
 		this.connect();
 		Iterator<String> it = files.iterator();
@@ -389,7 +377,6 @@ public class FTP_VFS_Driver  implements FileTransfertDriver {
 		this.disconnect();
 	}
 
-	@Override
 	public void putFiles(List<String> localFilePaths, String remoteFolder) throws Exception {
 		this.connect();
 		if (!ftpClient.changeWorkingDirectory(remoteFolder))
