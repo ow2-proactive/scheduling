@@ -88,7 +88,7 @@ public class CreateSourceDialog extends Dialog {
         dynamicButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 shell.close();
-                CreateDynamicSourceDialog.showDialog(parentShell);
+                //CreateDynamicSourceDialog.showDialog(parentShell);
             }
         });
 
