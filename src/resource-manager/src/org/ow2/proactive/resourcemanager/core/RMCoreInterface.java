@@ -77,21 +77,6 @@ public interface RMCoreInterface {
     public void createGCMNodesource(GCMApplication GCMApp, String sourceName) throws RMException;
 
     /**
-     * Creates a Dynamic Node source Active Object.
-     * Creates a new dynamic node source which is a 
-     * {@link org.ow2.proactive.resourcemanager.nodesource.p2p.P2PNodeSource} active object.
-     * Other dynamic node source (PBS, OAR) are not yet implemented
-     * @param id name of the dynamic node source to create
-     * @param nbMaxNodes max number of nodes the NodeSource has to provide.
-     * @param nice nice time in ms, time to wait between a node remove and a new node acquisition
-     * @param ttr Time to release in ms, time during the node will be kept by the nodes source and the Core.
-     * @param peerUrls vector of ProActive P2P living peer and able to provide nodes.
-     * @throws RMException if the creation of the node fails.
-     */
-    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
-            throws RMException;
-
-    /**
      * Add nodes to a static Node Source.
      * Ask to a static Node source to deploy a GCMApplication descriptor.
      * nodes deployed will be added after to RMCore, by the NodeSource itself.

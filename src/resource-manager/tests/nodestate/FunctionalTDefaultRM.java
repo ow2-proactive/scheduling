@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -90,7 +91,7 @@ public class FunctionalTDefaultRM extends FunctionalTest {
         RMAuthentication auth = RMConnection.waitAndJoin(null);
         admin = auth.logAsAdmin(username, password);
 
-        monitor = RMFactory.getMonitoring();
+        monitor = auth.logAsMonitor();
     }
 
     /**
@@ -112,32 +113,7 @@ public class FunctionalTDefaultRM extends FunctionalTest {
      * @throws NodeException if lookup of the new node fails.
      */
     public void createNode(String nodeName) throws IOException, NodeException {
-
-        JVMProcessImpl nodeProcess = new JVMProcessImpl(
-            new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
-        nodeProcess.setClassname("org.objectweb.proactive.core.node.StartNode");
-        nodeProcess.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
-        nodeProcess.setParameters(nodeName);
-        nodeProcess.startProcess();
-        try {
-            Node newNode = null;
-            Thread.sleep(1000);
-
-            for (int i = 0; i < 5; i++) {
-                try {
-                    newNode = NodeFactory.getNode(nodeName);
-                } catch (NodeException e) {
-                    //nothing, wait another loop
-                }
-                if (newNode != null)
-                    return;
-                else
-                    Thread.sleep(1000);
-            }
-            throw new NodeException("unable to create the node " + nodeName);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        createNode(nodeName, null);
     }
 
     /**
@@ -158,12 +134,16 @@ public class FunctionalTDefaultRM extends FunctionalTest {
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         nodeProcess.setClassname("org.objectweb.proactive.core.node.StartNode");
 
-        String jvmParameters = FunctionalTest.JVM_PARAMETERS;
-        for (Entry<String, String> entry : vmParameters.entrySet()) {
-            if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
-                jvmParameters += " -D" + entry.getKey() + "=" + entry.getValue();
+        String jvmParameters = "";
+        if (vmParameters != null) {
+            for (Entry<String, String> entry : vmParameters.entrySet()) {
+                if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
+                    jvmParameters += " -D" + entry.getKey() + "=" + entry.getValue();
+                }
             }
         }
+
+        jvmParameters += " " + getJvmParameters();
         nodeProcess.setJvmOptions(jvmParameters);
         nodeProcess.setParameters(nodeName);
         nodeProcess.startProcess();
@@ -173,7 +153,8 @@ public class FunctionalTDefaultRM extends FunctionalTest {
 
             for (int i = 0; i < 5; i++) {
                 try {
-                    newNode = NodeFactory.getNode(nodeName);
+                    newNode = NodeFactory.getNode("//" + ProActiveInet.getInstance().getHostname() + "/" +
+                        nodeName);
                 } catch (NodeException e) {
                     //nothing, wait another loop
                 }

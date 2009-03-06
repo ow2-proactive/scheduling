@@ -99,7 +99,7 @@ public final class PAAgentServiceRMStarter {
         // 1 - Create a node on localhost
         Node n = null;
         try {
-            n = NodeFactory.createNode("//localhost/" + nodename);
+            n = NodeFactory.createLocalNode(nodename, false, null, null, null);
             if (n == null) {
                 throw new RuntimeException("The node returned by the NodeFactory is null");
             }

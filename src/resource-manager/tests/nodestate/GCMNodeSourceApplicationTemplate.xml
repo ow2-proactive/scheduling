@@ -18,7 +18,9 @@
 				<pathElement base="proactive" relpath="/dist/lib/commons-cli-1.1.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/script-api.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
+				<pathElement base="proactive" relpath="/dist/lib/js.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/clover.jar"/>
+
 		</applicationClasspath>
 	</configuration>			
 			<virtualNode id="Workers">

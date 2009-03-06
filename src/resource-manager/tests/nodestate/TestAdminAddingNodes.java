@@ -87,9 +87,9 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         admin.setDefaultNodeSourcePingFrequency(pingFrequency);
 
         log("Test 1");
-
-        String node1URL = "rmi://" + hostName + "/node1";
-        createNode(node1URL);
+        String node1Name = "node1";
+        String node1URL = "//" + hostName + "/" + node1Name;
+        createNode(node1Name);
 
         admin.addNode(node1URL);
 
@@ -109,9 +109,9 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         log("Test 3");
-
-        String node2URL = "rmi://" + hostName + "/node2";
-        createNode(node2URL);
+        String node2Name = "node2";
+        String node2URL = "//" + hostName + "/" + node2Name;
+        createNode(node2Name);
 
         admin.addNode(node2URL);
 
@@ -125,7 +125,6 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         Node node2 = NodeFactory.getNode(node2URL);
         try {
             node2.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
         }
 
@@ -136,7 +135,7 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         //create another node with the same URL, and add it to Resource manager
-        createNode(node2URL);
+        createNode(node2Name);
         admin.addNode(node2URL);
 
         //wait for removal of the previous down node with the same URL
@@ -161,12 +160,12 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         node2 = NodeFactory.getNode(node2URL);
         try {
             node2.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
         }
 
         //create another node with the same URL, and add it to Resource manager
-        createNode(node2URL);
+
+        createNode(node2Name);
         admin.addNode(node2URL);
 
         //wait for removal of the previous free node with the same URL
@@ -195,12 +194,11 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         node2 = NodeFactory.getNode(node2URL);
         try {
             node2.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
         }
 
         //create another node with the same URL, and add it to Resource manager
-        createNode(node2URL);
+        createNode(node2Name);
         admin.addNode(node2URL);
 
         //wait for removal of the previous free node with the same URL
@@ -238,12 +236,11 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         node2 = NodeFactory.getNode(node2URL);
         try {
             node2.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
         }
 
         //create another node with the same URL, and add it to Resource manager
-        createNode(node2URL);
+        createNode(node2Name);
         admin.addNode(node2URL);
 
         //wait for removal of the previous free node with the same URL

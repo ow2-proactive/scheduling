@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.gcm;
 
-import java.io.IOException;
 import java.rmi.dgc.VMID;
 import java.util.Collection;
 import java.util.HashMap;
@@ -124,8 +123,6 @@ public class GCMNodeSource extends NodeSource {
                 if (!this.isThereNodesInSameJVM(node)) {
                     node.getProActiveRuntime().killRT(false);
                 }
-            } catch (IOException e) {
-                //do nothing, no exception treatment for node just killed before
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -211,9 +208,8 @@ public class GCMNodeSource extends NodeSource {
                         if (!this.isThereNodesInSameJVM(entry.getValue())) {
                             entry.getValue().getProActiveRuntime().killRT(false);
                         }
-                    } catch (IOException e) {
-                        //do nothing, no exception treatment for node just killed before
                     } catch (Exception e) {
+                        //do nothing, no exception treatment for node just killed before
                         e.printStackTrace();
                     }
                     //preemptive shutdown remove the node from 

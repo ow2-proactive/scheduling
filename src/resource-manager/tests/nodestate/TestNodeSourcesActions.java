@@ -118,7 +118,6 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
 
         try {
             n2.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -180,7 +179,6 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
 
         try {
             n2.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
             e.printStackTrace();
         }

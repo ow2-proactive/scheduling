@@ -98,12 +98,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void initActivity(Body body) {
         try {
-            MonitoringUrl = "//" + PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
-                RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING;
-            PAActiveObject.register(PAActiveObject.getStubOnThis(), this.MonitoringUrl);
+            PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
+                    RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
             e.printStackTrace();
         }
     }

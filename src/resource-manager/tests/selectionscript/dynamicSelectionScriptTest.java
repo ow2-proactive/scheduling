@@ -111,12 +111,15 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
 
         String hostName = ProActiveInet.getInstance().getHostname();
 
-        String node1URL = "rmi://" + hostName + "/node1";
+        String node1Name = "node1";
+        String node2Name = "node2";
+        String node1URL = "rmi://" + hostName + "/" + node1Name;
+        String node2URL = "rmi://" + hostName + "/" + node2Name;
 
         HashMap<String, String> vmProperties = new HashMap<String, String>();
         vmProperties.put(this.vmPropKey, this.vmPropValue);
 
-        createNode(node1URL, vmProperties);
+        createNode(node1Name, vmProperties);
         admin.addNode(node1URL);
 
         //wait node adding event
@@ -173,9 +176,7 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
 
         //add a second with JVM env var
 
-        String node2URL = "rmi://" + hostName + "/node2";
-
-        createNode(node2URL, vmProperties);
+        createNode(node2Name, vmProperties);
         admin.addNode(node2URL);
 
         //wait node adding event

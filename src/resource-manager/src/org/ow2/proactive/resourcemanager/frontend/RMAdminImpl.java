@@ -36,7 +36,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -113,36 +112,30 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
      */
     public void initActivity(Body body) {
         try {
-            try {
-                PAActiveObject.register(PAActiveObject.getStubOnThis(), "//" +
-                    PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
+            PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
 
-                //test that gcmApplicationFile is an absolute path or not
-                if (!(new File(gcmApplicationFile).isAbsolute())) {
-                    //file path is relative, so we complete the path with the prefix RM_Home constant
-                    gcmApplicationFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                        File.separator + gcmApplicationFile;
-                }
-
-                //check that GCM Application template file exists
-                if (!(new File(gcmApplicationFile).exists())) {
-                    logger
-                            .info("*********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
-                                gcmApplicationFile +
-                                ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
-                } else if (GCMD_PROPERTY_NAME == null || "".equals(GCMD_PROPERTY_NAME)) {
-                    logger.info("*********  ERROR ********** Java Property used by " + gcmApplicationFile +
-                        ", to specify GCMD deployment file is not defined," +
-                        " Resource Manager will be unable to deploy nodes by GCM Deployment descriptor.");
-                }
-
-                registerTrustedService(authentication);
-                registerTrustedService(rmcore);
-
-            } catch (NodeException e) {
-                e.printStackTrace();
+            //test that gcmApplicationFile is an absolute path or not
+            if (!(new File(gcmApplicationFile).isAbsolute())) {
+                //file path is relative, so we complete the path with the prefix RM_Home constant
+                gcmApplicationFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator +
+                    gcmApplicationFile;
             }
+
+            //check that GCM Application template file exists
+            if (!(new File(gcmApplicationFile).exists())) {
+                logger
+                        .info("*********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
+                            gcmApplicationFile +
+                            ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
+            } else if (GCMD_PROPERTY_NAME == null || "".equals(GCMD_PROPERTY_NAME)) {
+                logger.info("*********  ERROR ********** Java Property used by " + gcmApplicationFile +
+                    ", to specify GCMD deployment file is not defined," +
+                    " Resource Manager will be unable to deploy nodes by GCM Deployment descriptor.");
+            }
+
+            registerTrustedService(authentication);
+            registerTrustedService(rmcore);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -186,14 +179,6 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
         } else {
             this.rmcore.createGCMNodesource(null, sourceName);
         }
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#createDynamicNodeSource(java.lang.String, int, int, int, java.util.Vector)
-     */
-    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
-            throws RMException {
-        this.rmcore.createDynamicNodeSource(id, nbMaxNodes, nice, ttr, peerUrls);
     }
 
     /**

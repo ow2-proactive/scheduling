@@ -118,11 +118,8 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      */
     public void initActivity(Body body) {
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//" +
-                PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
-                RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
-        } catch (NodeException e) {
-            e.printStackTrace();
+            PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
+                    RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
         } catch (IOException e) {
             e.printStackTrace();
         }

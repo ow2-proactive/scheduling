@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -77,7 +76,6 @@ import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.RMUserImpl;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.p2p.P2PNodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.ProbablisticSelectionManager;
@@ -261,9 +259,8 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             logger.debug("RMCore start : initActivity");
         }
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//" +
-                PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
-                RMConstants.NAME_ACTIVE_OBJECT_RMCORE);
+            PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
+                    RMConstants.NAME_ACTIVE_OBJECT_RMCORE);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("active object RMAuthentication");
@@ -568,39 +565,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             } catch (Exception e) {
                 throw new RMException(e);
             }
-        }
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#createDynamicNodeSource(java.lang.String,
-     *      int, int, int, java.util.Vector)
-     */
-    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
-            throws RMException {
-        logger.info("Creating a P2P source " + id);
-
-        // check that a Node Source with a same name is not already existing
-        if (this.nodeSources.containsKey(id)) {
-            throw new RMException("Node Source name " + id + " is already existing");
-        } else {
-            // check that a P2P node source is not already existing
-            // It's a drawback, but for the moment we are just able to start one
-            // peer to peer service per JVM
-            for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
-                if (entry.getValue().getSourceEvent().getSourceType()
-                        .equals(RMConstants.P2P_NODE_SOURCE_TYPE)) {
-                    throw new RMException("A P2P node source is already existing");
-                }
-            }
-        }
-        try {
-            PAActiveObject.newActive(P2PNodeSource.class.getName(),
-                    new Object[] { id, (RMCoreSourceInterface) PAActiveObject.getStubOnThis(), nbMaxNodes,
-                            nice, ttr, peerUrls }, nodeRM);
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
         }
     }
 

@@ -47,7 +47,6 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -169,9 +168,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             body.setImmediateService("getTaskResult");
             body.setImmediateService("getJobResult");
             logger_dev.debug("Front-end immediate services : getTaskResult,getJobResult");
-            //scheduler URL
-            String schedulerUrl = "//" + NodeFactory.getDefaultNode().getVMInformation().getHostName() + "/" +
-                SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+
             //creating scheduler authentication
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
@@ -185,7 +182,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             scheduler = (SchedulerCore) PAActiveObject.turnActive(scheduler_local);
 
             logger_dev.info("Registering scheduler...");
-            PAActiveObject.register(schedulerAuth, schedulerUrl);
+            PAActiveObject.registerByName(schedulerAuth, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
             // run !!
         } catch (Exception e) {
             logger_dev.error(e);

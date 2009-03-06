@@ -169,7 +169,6 @@ public class TestNodesStates extends FunctionalTDefaultRM {
 
         try {
             n.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -199,7 +198,6 @@ public class TestNodesStates extends FunctionalTDefaultRM {
         log("Test 5");
         try {
             n2.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -239,7 +237,6 @@ public class TestNodesStates extends FunctionalTDefaultRM {
         //kill the node
         try {
             n.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
             e.printStackTrace();
         }

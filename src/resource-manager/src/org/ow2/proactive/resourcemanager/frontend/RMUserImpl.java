@@ -110,14 +110,11 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
      */
     public void initActivity(Body body) {
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//" +
-                PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
-                RMConstants.NAME_ACTIVE_OBJECT_RMUSER);
+            PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
+                    RMConstants.NAME_ACTIVE_OBJECT_RMUSER);
 
             registerTrustedService(authentication);
             registerTrustedService(rmcore);
-        } catch (NodeException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

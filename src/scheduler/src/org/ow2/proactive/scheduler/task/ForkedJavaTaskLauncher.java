@@ -49,6 +49,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -151,7 +152,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         Random random = new Random((new Date()).getTime());
         deploymentID = random.nextInt(1000000);
 
-        forkedNodeName = "//localhost/" + this.getClass().getName() + getDeploymentId();
+        forkedNodeName = this.getClass().getName() + getDeploymentId();
     }
 
     /**
@@ -287,17 +288,17 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
     private JavaTaskLauncher createRemoteTaskLauncher() throws Exception {
         /* creating a ProActive node on a newly created JVM */
-        String nodeUrl = childRuntime.createLocalNode(forkedNodeName, true, null, DEFAULT_VN_NAME,
+        Node forkedNode = childRuntime.createLocalNode(forkedNodeName, true, null, DEFAULT_VN_NAME,
                 DEFAULT_JOB_ID);
 
         /* JavaTaskLauncher is will be an active object created on a newly created ProActive node */
         JavaTaskLauncher newLauncher = null;
         if (pre == null && post == null) {
             newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                    new Object[] { taskId }, nodeUrl);
+                    new Object[] { taskId }, forkedNode);
         } else {
             newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                    new Object[] { taskId, pre, post }, nodeUrl);
+                    new Object[] { taskId, pre, post }, forkedNode);
         }
         return newLauncher;
     }

@@ -110,9 +110,12 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTDefaultRM {
 
         String hostName = ProActiveInet.getInstance().getHostname();
 
-        String node1URL = "rmi://" + hostName + "/node1";
-        String node2URL = "rmi://" + hostName + "/node2";
-        String node3URL = "rmi://" + hostName + "/node3";
+        String node1Name = "node1";
+        String node2Name = "node2";
+        String node3Name = "node3";
+        String node1URL = "rmi://" + hostName + "/" + node1Name;
+        String node2URL = "rmi://" + hostName + "/" + node2Name;
+        String node3URL = "rmi://" + hostName + "/" + node3Name;
 
         //---------------------------------------------------
         //create a first node with the two VM properties
@@ -122,7 +125,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTDefaultRM {
         vmTwoProperties.put(this.vmPropKey1, this.vmPropValue1);
         vmTwoProperties.put(this.vmPropKey2, this.vmPropValue2);
 
-        createNode(node1URL, vmTwoProperties);
+        createNode(node1Name, vmTwoProperties);
         admin.addNode(node1URL);
 
         //wait node adding event
@@ -136,7 +139,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTDefaultRM {
         HashMap<String, String> vmProp1 = new HashMap<String, String>();
         vmProp1.put(this.vmPropKey1, this.vmPropValue1);
 
-        createNode(node2URL, vmProp1);
+        createNode(node2Name, vmProp1);
         admin.addNode(node2URL);
 
         //wait node adding event
@@ -150,7 +153,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTDefaultRM {
         HashMap<String, String> vmProp2 = new HashMap<String, String>();
         vmProp1.put(this.vmPropKey2, this.vmPropValue2);
 
-        createNode(node3URL, vmProp2);
+        createNode(node3Name, vmProp2);
         admin.addNode(node3URL);
 
         //wait node adding event

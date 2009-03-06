@@ -180,7 +180,6 @@ public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
 
         try {
             n4.getProActiveRuntime().killRT(false);
-        } catch (IOException e) {
         } catch (Exception e) {
             e.printStackTrace();
         }

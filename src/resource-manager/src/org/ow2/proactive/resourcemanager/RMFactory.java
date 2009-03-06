@@ -92,7 +92,7 @@ public class RMFactory {
 
         String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
         if (rmcore == null) {
-            Node nodeRM = NodeFactory.createNode(RM_NODE_NAME);
+            Node nodeRM = NodeFactory.createLocalNode(RM_NODE_NAME, false, null, null, null);
             rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                     new Object[] { RMCoreName, nodeRM }, nodeRM);
 
@@ -121,7 +121,7 @@ public class RMFactory {
 
         String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
         if (rmcore == null) {
-            Node nodeRM = NodeFactory.createNode(RM_NODE_NAME);
+            Node nodeRM = NodeFactory.createLocalNode(RM_NODE_NAME, false, null, null, null);
             rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                     new Object[] { RMCoreName, nodeRM, localGCMDeploymentDescriptors }, nodeRM);
 
@@ -132,21 +132,6 @@ public class RMFactory {
             if (logger.isInfoEnabled()) {
                 logger.info("RM Core already localy running");
             }
-        }
-    }
-
-    /**
-     * @return IMMonitoring active object on local host.
-     * @throws RMException if the resource Manager hasn't been created before
-     */
-    public static RMMonitoring getMonitoring() throws RMException {
-        try {
-            return (RMMonitoring) PAActiveObject.lookupActive(RMMonitoringImpl.class.getName(), "/" +
-                RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
-        } catch (ActiveObjectCreationException e) {
-            throw new RMException(e);
-        } catch (IOException e) {
-            throw new RMException(e);
         }
     }
 
