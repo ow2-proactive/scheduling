@@ -75,7 +75,7 @@ public class RMStarter {
         deploy.setArgs(Option.UNLIMITED_VALUES);
         options.addOption(deploy);
 
-        Option noDeploy = new Option("localNodes", "nodeploy", false,
+        Option noDeploy = new Option("ln", "localNodes", false,
             "start Resource Manager deploying default 4 local nodes");
         noDeploy.setArgName("localNodes");
         noDeploy.setRequired(false);
@@ -128,22 +128,24 @@ public class RMStarter {
             logger.info("Starting Resource-Manager, Please wait...");
             RMFactory.setOsJavaProperty();
 
+            Collection<String> deploymentDescriptors = new LinkedList<String>();
             if (cmd.hasOption("localNodes")) {
-                Collection<String> deploymentDescriptors = new LinkedList<String>();
+                String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                    File.separator + "config/deployment/Local4JVMDeployment.xml";
+                deploymentDescriptors.add(gcmDeployFile);
+                // starting resource manager and deploy given infrastructure
+                RMFactory.startLocal(deploymentDescriptors);
+            } else {
                 if (cmd.hasOption("d")) {
                     for (String desc : gcmdList) {
                         deploymentDescriptors.add(desc);
                     }
+                    // starting resource manager and deploy given infrastructure
+                    RMFactory.startLocal(deploymentDescriptors);
                 } else {
-                    String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                        File.separator + "config/deployment/Local4JVMDeployment.xml";
-                    deploymentDescriptors.add(gcmDeployFile);
+                    // starting clean resource manager
+                    RMFactory.startLocal();
                 }
-                // starting resource manager and deploy given infrastructure
-                RMFactory.startLocal(deploymentDescriptors);
-            } else {
-                // starting clean resource manager
-                RMFactory.startLocal();
             }
 
             logger.info("(Press 'e' to shutdown)");
