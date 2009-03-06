@@ -185,7 +185,7 @@ public class DatabaseManager {
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to store the given object !", e);
         } finally {
             session.close();
@@ -209,7 +209,7 @@ public class DatabaseManager {
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to delete the given object !", e);
         } finally {
             session.close();
@@ -234,7 +234,7 @@ public class DatabaseManager {
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to update the given object !", e);
         } finally {
             session.close();
@@ -290,7 +290,7 @@ public class DatabaseManager {
             }
             return query.list();
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to recover the objects !", e);
         } finally {
             session.close();
@@ -357,7 +357,7 @@ public class DatabaseManager {
             }
             return jobs;
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to recover a job !", e);
         } finally {
             session.close();
@@ -421,7 +421,7 @@ public class DatabaseManager {
             logger_dev.debug("Transaction committed");
         } catch (Exception e) {
             session.getTransaction().rollback();
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to synchronize this object !", e);
         } finally {
             session.close();
@@ -508,7 +508,7 @@ public class DatabaseManager {
                 }
             }
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to load this object [" + o + "]", e);
         } finally {
             session.close();
@@ -537,7 +537,7 @@ public class DatabaseManager {
                 }
             }
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to unload one or more fields !", e);
         }
     }

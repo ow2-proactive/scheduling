@@ -154,12 +154,12 @@ public class ResourceManagerProxy implements InitActive, RunActive {
                 } catch (ActiveObjectCreationException e) {
                     // TODO what happen if node is down ?
                     // CHOICE 1 : return node without doing anything
-                    logger_dev.error(e);
+                    logger_dev.error("", e);
                     freeNode(node);
                 } catch (NodeException e) {
                     // TODO what happen if node is down ?
                     // CHOICE 1 : return node without doing anything
-                    logger_dev.error(e);
+                    logger_dev.error("", e);
                     freeNode(node);
                 }
             }

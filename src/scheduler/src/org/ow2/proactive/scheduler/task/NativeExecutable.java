@@ -158,7 +158,7 @@ public class NativeExecutable extends Executable {
         } catch (Exception e) {
             //in this case, the error is certainly due to the user (ie : command not found)
             //we have to inform him about the cause.
-            logger_dev.info(e);
+            logger_dev.info("", e);
             System.err.println(e);
             throw new StartProcessException(e.getMessage());
         }
@@ -180,7 +180,7 @@ public class NativeExecutable extends Executable {
             //killTreeProcess(process);
             return process.exitValue();
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             //exception during process
             //means that for most cases, user is not responsible
             throw new RunningProcessException(e.getMessage());

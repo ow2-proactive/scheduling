@@ -353,13 +353,13 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             authentication.setActivated(true);
 
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("", e);
         } catch (ActiveObjectCreationException e) {
-            logger.error(e);
+            logger.error("", e);
         } catch (NodeException e) {
-            logger.error(e);
+            logger.error("", e);
         } catch (RMException e) {
-            logger.error(e);
+            logger.error("", e);
         }
         if (logger.isDebugEnabled()) {
             logger.debug("RMCore end : initActivity");

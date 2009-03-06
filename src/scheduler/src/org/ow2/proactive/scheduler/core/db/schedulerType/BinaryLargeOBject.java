@@ -157,7 +157,7 @@ public class BinaryLargeOBject implements UserType {
         try {
             return new SerialBlob(ObjectToByteConverter.ObjectStream.convert(o));
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             return null;
         }
     }
@@ -169,7 +169,7 @@ public class BinaryLargeOBject implements UserType {
             Object o = ois.readObject();
             return o;
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             return null;
         } finally {
             if (ois != null) {

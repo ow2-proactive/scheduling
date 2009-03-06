@@ -206,7 +206,7 @@ public class SelectionScript extends Script<Boolean> {
         try {
             this.id_ = MessageDigest.getInstance("SHA-1").digest(stringId.getBytes());
         } catch (NoSuchAlgorithmException e) {
-		logger_dev.error(e);
+		logger_dev.error("",e);
             this.id_ = stringId.getBytes();
         }
     }

@@ -160,7 +160,7 @@ public class InternalJavaTask extends InternalTask {
                 content.append(line + "\n");
             }
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             content = new StringBuilder("grant {\npermission java.security.AllPermission;\n};\n");
         }
         return content.toString();

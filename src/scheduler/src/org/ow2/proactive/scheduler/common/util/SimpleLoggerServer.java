@@ -163,7 +163,7 @@ public class SimpleLoggerServer implements Runnable {
                 this.connections.add(ch);
                 new Thread(ch).start();
             } catch (IOException e1) {
-                logger.error(e1);
+                logger.error("", e1);
             }
         }
 
@@ -171,7 +171,7 @@ public class SimpleLoggerServer implements Runnable {
         try {
             this.serverSocket.close();
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("", e);
         }
     }
 
@@ -195,7 +195,7 @@ public class SimpleLoggerServer implements Runnable {
                 this.input = input;
                 this.inputStream = new ObjectInputStream(new BufferedInputStream(input.getInputStream()));
             } catch (IOException e) {
-                logger.error(e);
+                logger.error("", e);
             }
         }
 
@@ -232,16 +232,16 @@ public class SimpleLoggerServer implements Runnable {
             } catch (EOFException e) {
                 // normal case ...
             } catch (IOException e) {
-                logger.error(e);
+                logger.error("", e);
             } catch (ClassNotFoundException e) {
-                logger.error(e);
+                logger.error("", e);
             }
 
             // close stream
             try {
                 this.inputStream.close();
             } catch (IOException e) {
-                logger.error(e);
+                logger.error("", e);
             }
             // remove connexion from server
             SimpleLoggerServer.this.removeConnection(this);

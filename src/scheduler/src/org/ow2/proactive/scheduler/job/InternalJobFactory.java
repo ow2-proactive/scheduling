@@ -103,7 +103,7 @@ public class InternalJobFactory implements Serializable {
             setJobCommonProperties(job, iJob);
             return iJob;
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new SchedulerException("Error while creating the internalJob !", e);
         }
     }

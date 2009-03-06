@@ -110,7 +110,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         try {
             this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
         } catch (SchedulerException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new LoginException(e.getMessage());
         }
 
@@ -134,7 +134,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         try {
             this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
         } catch (SchedulerException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new LoginException(e.getMessage());
         }
 

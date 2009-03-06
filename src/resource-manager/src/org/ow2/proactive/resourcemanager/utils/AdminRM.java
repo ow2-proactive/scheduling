@@ -174,7 +174,7 @@ public class AdminRM {
                 password = PasswordField.getPassword(System.in, pwdMsg);
                 rmPassword = (password == null) ? "" : String.valueOf(password);
             } catch (IOException ioe) {
-                logger.error(ioe);
+                logger.error("", ioe);
             }
 
             RMAdmin admin = auth.logAsAdmin(rmUser, rmPassword);
@@ -260,7 +260,7 @@ public class AdminRM {
 
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("", e);
         }
 
         System.exit(0);

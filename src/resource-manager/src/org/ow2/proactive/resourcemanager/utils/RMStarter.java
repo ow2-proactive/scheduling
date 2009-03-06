@@ -155,7 +155,7 @@ public class RMStarter {
         } catch (ParseException e1) {
             displayHelp();
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("", e);
             System.exit(3);
         }
 

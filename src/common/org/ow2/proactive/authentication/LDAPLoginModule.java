@@ -246,7 +246,7 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
         try {
             userDN = getLDAPUserDN(username);
         } catch (NamingException e) {
-		logger.error(e);
+		logger.error("",e);
             succeeded = false;
             throw new FailedLoginException("Cannot connect to LDAP server");
         }
@@ -426,7 +426,7 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
                     ctx.close();
                 }
             } catch (NamingException e) {
-		logger.error(e);
+		logger.error("",e);
                 logger.error("Problem closing LDAP connection : " + e.getMessage());
             }
         }
@@ -489,7 +489,7 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
                     ctx.close();
                 }
             } catch (NamingException e) {
-		logger.error(e);
+		logger.error("",e);
                 logger.error("Problem closing LDAP connection : " + e.getMessage());
             }
         }

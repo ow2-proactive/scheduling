@@ -123,7 +123,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
         try {
             nodesList.add(super.getNodes().get(0));
         } catch (NodeException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
         }
 
         try {
@@ -156,7 +156,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             //return result
             return new TaskResultImpl(taskId, userResult, this.getLogs());
         } catch (Throwable ex) {
-            logger_dev.info(ex);
+            logger_dev.info("", ex);
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {

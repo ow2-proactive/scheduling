@@ -158,7 +158,7 @@ public class TaskResultImpl implements TaskResult {
         try {
             this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
         } catch (IOException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
         }
         this.output = output;
     }
@@ -176,7 +176,7 @@ public class TaskResultImpl implements TaskResult {
         try {
             this.serializedException = ObjectToByteConverter.ObjectStream.convert(exception);
         } catch (IOException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
         }
         this.output = output;
     }
@@ -213,11 +213,11 @@ public class TaskResultImpl implements TaskResult {
             try {
                 return this.instanciateValue(this.getTaskClassLoader());
             } catch (IOException e) {
-                logger_dev.error(e);
+                logger_dev.error("", e);
                 throw new SchedulerException("Cannot instanciate result of the task " + this.id + " : " +
                     e.getMessage());
             } catch (ClassNotFoundException e) {
-                logger_dev.error(e);
+                logger_dev.error("", e);
                 throw new SchedulerException("Cannot instanciate result of the task " + this.id + " : " +
                     e.getMessage());
             }

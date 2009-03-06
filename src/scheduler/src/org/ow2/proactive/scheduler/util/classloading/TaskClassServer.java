@@ -147,7 +147,7 @@ public class TaskClassServer {
                     reuseExistingFiles = false;
                 }
             } catch (Exception e) {
-                logger_dev.warn(e);
+                logger_dev.warn("", e);
                 // if any exception occurs, cancel 
                 reuseExistingFiles = false;
             }
@@ -231,7 +231,7 @@ public class TaskClassServer {
                     this.cachedClasses.put(classname, cb);
                 }
             } catch (IOException e) {
-                logger_dev.error(e);
+                logger_dev.error("", e);
                 throw new ClassNotFoundException("Class " + classname + " has not be found in " +
                     classpath.getAbsolutePath() + ". Caused by " + e);
             }

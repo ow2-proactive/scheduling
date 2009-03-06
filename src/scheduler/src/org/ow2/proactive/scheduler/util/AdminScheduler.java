@@ -95,9 +95,10 @@ public class AdminScheduler {
     private static boolean displayException = false;
 
     private static void error(String message, Exception e) {
-        logger.error(message);
         if (displayException) {
-            logger.error(e);
+            logger.error(message, e);
+        } else {
+            logger.error(message);
         }
     }
 
@@ -177,7 +178,7 @@ public class AdminScheduler {
                     password = PasswordField.getPassword(System.in, pwdMsg);
                     pwd = String.valueOf(password);
                 } catch (IOException ioe) {
-                    logger.error(ioe);
+                    logger.error("" + ioe);
                 }
 
                 scheduler = auth.logAsAdmin(user, pwd);
@@ -202,8 +203,7 @@ public class AdminScheduler {
         } catch (ParseException e) {
             displayHelp = true;
         } catch (Exception e) {
-            logger.error("A fatal error has occured : " + e.getMessage() + "\n Shutdown the shell.\n");
-            logger.error(e);
+            logger.error("A fatal error has occured : " + e.getMessage() + "\n Shutdown the shell.\n", e);
             System.exit(1);
         } finally {
             if (reader != null)
@@ -388,7 +388,7 @@ public class AdminScheduler {
                                 try {
                                     logger.info("\t " + e.getKey() + " : " + tRes.value());
                                 } catch (Throwable e1) {
-                                    logger.error(tRes.getException());
+                                    logger.error("", tRes.getException());
                                 }
                             }
                         } else {

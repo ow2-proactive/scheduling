@@ -129,7 +129,7 @@ public class SchedulerTester {
                 try {
                     tmp = bu.readLine();
                 } catch (IOException e) {
-                    logger.error(e);
+                    logger.error("", e);
                 }
                 if ("".equals(tmp)) {
                     for (User u : users) {
@@ -138,13 +138,13 @@ public class SchedulerTester {
                 }
             }
         } catch (SchedulerException e) {
-            logger.error(e);
+            logger.error("", e);
         } finally {
             if (bu != null) {
                 try {
                     bu.close();
                 } catch (IOException e) {
-                    logger.error(e);
+                    logger.error("", e);
                 }
             }
         }
@@ -220,20 +220,20 @@ public class SchedulerTester {
                 new Thread(user).start();
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("", e);
         } finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    logger.error(e);
+                    logger.error("", e);
                 }
             }
             if (l != null) {
                 try {
                     l.close();
                 } catch (IOException e) {
-                    logger.error(e);
+                    logger.error("", e);
                 }
             }
         }
@@ -314,7 +314,7 @@ public class SchedulerTester {
                                 break;
                         }
                     } catch (Exception e) {
-                        logger.error(e);
+                        logger.error("", e);
                     }
                 }
 
@@ -322,7 +322,7 @@ public class SchedulerTester {
                 try {
                     Thread.sleep(generator.nextInt(maxSubmissionPeriod));
                 } catch (InterruptedException e) {
-                    logger.error(e);
+                    logger.error("", e);
                 }
 
                 if (results.size() == 0)
@@ -336,7 +336,7 @@ public class SchedulerTester {
                                 this.results.remove(id);
                             }
                         } catch (SchedulerException e) {
-                            logger.error(e);
+                            logger.error("", e);
                         }
                     }
                 }

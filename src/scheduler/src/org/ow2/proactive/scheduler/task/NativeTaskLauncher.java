@@ -173,7 +173,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             //return result
             return result;
         } catch (Throwable ex) {
-            logger_dev.info(ex);
+            logger_dev.info("", ex);
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
@@ -198,7 +198,7 @@ public class NativeTaskLauncher extends TaskLauncher {
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();
-            logger_dev.error(res.getException());
+            logger_dev.error("", res.getException());
             throw new UserException("Command generation script execution has failed on the current node");
         }
 

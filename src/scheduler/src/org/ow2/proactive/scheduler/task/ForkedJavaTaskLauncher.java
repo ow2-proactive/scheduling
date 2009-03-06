@@ -196,7 +196,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             return result;
 
         } catch (Throwable ex) {
-            logger_dev.info(ex);
+            logger_dev.info("", ex);
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
             if (isWallTime())
@@ -352,7 +352,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
                 process = null;
             }
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
         }
     }
 

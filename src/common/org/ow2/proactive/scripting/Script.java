@@ -225,7 +225,7 @@ public abstract class Script<E> implements Serializable {
 
             return getResult(bindings);
         } catch (Throwable e) {
-		logger_dev.error(e);
+		logger_dev.error("",e);
             return new ScriptResult<E>(new Exception("An exception occured while executing the script ", e));
 
         }

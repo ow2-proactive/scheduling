@@ -242,19 +242,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             classServers.put(jid, (TaskClassServer) new RemoteObjectAdapter(rro).getObjectProxy());
             remoteClassServers.put(jid, remoteExposer);// stored to be unregistered later
         } catch (FileNotFoundException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new SchedulerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         } catch (IOException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new SchedulerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         } catch (UnknownProtocolException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new SchedulerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         } catch (ProActiveException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new SchedulerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         }
@@ -280,7 +280,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 roe.unregisterAll();
             } catch (ProActiveException e) {
                 logger.error("Unable to unregister remote taskClassServer because : " + e);
-                logger_dev.error(e);
+                logger_dev.error("", e);
             }
         }
         return (tcs != null);
@@ -332,7 +332,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 this.port = slf.getPort();
             } catch (IOException e) {
                 logger.error("Cannot create logger server : " + e.getMessage());
-                logger_dev.error(e);
+                logger_dev.error("", e);
                 throw new RuntimeException(e);
             }
             logger_dev.info("Instanciating policy : " + policyFullName);
@@ -340,16 +340,16 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             logger.info("Scheduler Core ready !");
         } catch (InstantiationException e) {
             logger.error("The policy class cannot be found : " + e.getMessage());
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             logger.error("The method cannot be accessed " + e.getMessage());
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
             logger.error("The class definition cannot be found, it might be due to case sentivity : " +
                 e.getMessage());
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new RuntimeException(e);
         }
     }
@@ -453,13 +453,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         //this point is reached in case of big problem, sometimes unknown
                         logger
                                 .fatal("\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
-                        e.printStackTrace();
                         //trying to check if RM is alive
                         try {
-                            logger_dev.error("Check if Resource Manager is alive");
+                            logger_dev.error("Check if Resource Manager is alive", e);
                             resourceManager.isAlive();
                         } catch (Exception rme) {
-                            logger_dev.error("Resource Manager seems to be dead");
+                            logger_dev.error("Resource Manager seems to be dead", e);
                             try {
                                 //try to shutdown the proxy
                                 resourceManager.shutdownProxy();
@@ -508,7 +507,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     service.blockingServeOldest(SCHEDULER_TIME_OUT);
                 } catch (Exception e) {
                     logger.debug(" ");
-                    logger_dev.error(e);
+                    logger_dev.error("", e);
                 }
             }
 
@@ -766,7 +765,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
 
             } catch (Exception e1) {
-                e1.printStackTrace();
+                logger_dev.error("", e1);
                 //if we are here, it is that something append while launching the current task.
                 logger.warn("Current node (" + node + ") has failed : " + e1.getMessage());
                 //so try to get back the node to the resource manager
@@ -1243,7 +1242,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             }
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
         }
     }
 
@@ -1367,7 +1366,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 logger_dev.info("Job '" + jobId + "' will be removed in " +
                     (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
             } catch (Exception e) {
-                logger_dev.error(e);
+                logger_dev.error("", e);
             }
         }
 
@@ -1750,10 +1749,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             frontend.policyChanged(newPolicyFile.getName());
             logger_dev.info("New policy changed ! new policy name : " + newPolicyFile.getName());
         } catch (InstantiationException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new SchedulerException("Exception occurs while instanciating the policy !");
         } catch (IllegalAccessException e) {
-            logger_dev.error(e);
+            logger_dev.error("", e);
             throw new SchedulerException("Exception occurs while accessing the policy !");
         }
 
@@ -1856,7 +1855,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                     .getJobClasspathContent(), job.getEnvironment().containsJarFile());
                         } catch (SchedulerException e) {
                             // TODO cdelbe : exception handling ?
-                            logger_dev.error(e);
+                            logger_dev.error("", e);
                         }
                     }
                     break;
@@ -1885,7 +1884,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                     .getJobClasspathContent(), job.getEnvironment().containsJarFile());
                         } catch (SchedulerException e) {
                             // TODO cdelbe : exception handling ?
-                            logger_dev.error(e);
+                            logger_dev.error("", e);
                         }
                     }
 
@@ -1917,7 +1916,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                     .getJobClasspathContent(), job.getEnvironment().containsJarFile());
                         } catch (SchedulerException e) {
                             // TODO cdelbe : exception handling ?
-                            logger_dev.error(e);
+                            logger_dev.error("", e);
                         }
                     }
             }
