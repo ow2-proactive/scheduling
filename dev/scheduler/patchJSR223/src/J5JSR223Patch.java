@@ -124,6 +124,8 @@ public class J5JSR223Patch extends JFrame implements HyperlinkListener {
 					    	if (result.isSuccess()){
 					    		JOptionPane.showConfirmDialog(th,result.getMsg(),"Successfully patched !!",JOptionPane.CLOSED_OPTION,JOptionPane.INFORMATION_MESSAGE);
 					    		startApplication();
+							th.setVisible(false);
+							th.dispose();
 					    	} else {
 					    		JOptionPane.showConfirmDialog(th,result.getMsg(),"Error !!",JOptionPane.CLOSED_OPTION,JOptionPane.ERROR_MESSAGE);
 					    	}

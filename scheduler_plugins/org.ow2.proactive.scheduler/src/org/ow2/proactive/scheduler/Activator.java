@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.Permission;
 import java.util.Hashtable;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -67,6 +68,16 @@ public class Activator extends AbstractUIPlugin {
      */
     @Override
     public void start(BundleContext context) throws Exception {
+        /* Grant all permission to security manager */
+        System.setSecurityManager(new SecurityManager() {
+            @Override
+            public void checkPermission(Permission perm, Object context) {
+            }
+
+            @Override
+            public void checkPermission(Permission perm) {
+            }
+        });
         /* This code is used to the httpssh, fixes an Eclipse bug */
         Hashtable<String, String[]> properties = new Hashtable<String, String[]>(1);
         properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] { "httpssh" });
