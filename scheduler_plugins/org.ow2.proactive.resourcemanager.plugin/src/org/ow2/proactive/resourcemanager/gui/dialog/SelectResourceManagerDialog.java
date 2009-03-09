@@ -65,11 +65,18 @@ import org.objectweb.proactive.core.util.URIBuilder;
  */
 public class SelectResourceManagerDialog extends Dialog {
 
+    public static final String RM_CONFIG_DIR = ".ProActive_ResourceManager";
+    public static final String USER_DIR = System.getProperty("user.home");
+
     /** Name of the file which store the good url */
     public static final String URL_FILE = "urls";
+    public static final String URL_FILE_PATH = USER_DIR + File.separator + RM_CONFIG_DIR + File.separator +
+        URL_FILE;
 
     /** Name of the file which store the good login */
     public static final String LOGIN_FILE = ".proActive_rm_logins";
+    public static final String LOGIN_FILE_PATH = USER_DIR + File.separator + RM_CONFIG_DIR + File.separator +
+        LOGIN_FILE;
     private static List<String> urls = null;
     private static List<String> logins = null;
     private static String url = null;
@@ -243,8 +250,7 @@ public class SelectResourceManagerDialog extends Dialog {
      */
     private static void loadUrls() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") +
-                "/.ProActive_ResourceManager/" + URL_FILE));
+            BufferedReader reader = new BufferedReader(new FileReader(URL_FILE_PATH));
             try {
                 urls = new ArrayList<String>();
                 String url = null;
@@ -286,8 +292,7 @@ public class SelectResourceManagerDialog extends Dialog {
         BufferedWriter bw = null;
         PrintWriter pw = null;
         try {
-            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") +
-                "/.ProActive_ResourceManager/" + URL_FILE, false));
+            bw = new BufferedWriter(new FileWriter(URL_FILE_PATH));
             pw = new PrintWriter(bw, true);
 
             // Record urls
@@ -324,8 +329,7 @@ public class SelectResourceManagerDialog extends Dialog {
      */
     private static void loadLogins() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(System.getProperty("user.home") +
-                "/.ProActive_Scheduler/" + LOGIN_FILE));
+            BufferedReader reader = new BufferedReader(new FileReader(LOGIN_FILE_PATH));
             try {
                 logins = new ArrayList<String>();
                 String login = null;
@@ -367,11 +371,10 @@ public class SelectResourceManagerDialog extends Dialog {
         BufferedWriter bw = null;
         PrintWriter pw = null;
         try {
-            File file = new File(System.getProperty("user.home") + "/.ProActive_Scheduler/");
+            File file = new File(USER_DIR + File.separator + RM_CONFIG_DIR);
             if (!file.exists())
                 file.mkdir();
-            bw = new BufferedWriter(new FileWriter(System.getProperty("user.home") +
-                "/.ProActive_Scheduler/" + LOGIN_FILE, false));
+            bw = new BufferedWriter(new FileWriter(LOGIN_FILE_PATH, false));
             pw = new PrintWriter(bw, true);
 
             // Record logins
