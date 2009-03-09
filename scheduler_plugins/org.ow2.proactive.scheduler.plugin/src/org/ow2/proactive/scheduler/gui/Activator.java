@@ -111,4 +111,8 @@ public class Activator extends AbstractUIPlugin {
             throw new RuntimeException("Logger server is not created yet");
         }
     }
+
+    public static String getPluginId() {
+        return PLUGIN_ID;
+    }
 }

@@ -31,8 +31,13 @@
 package org.ow2.proactive.scheduler.gui.actions;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -42,7 +47,9 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -68,27 +75,53 @@ public class SubmitJobAction extends SchedulerGUIAction {
 
         String[] filesNames = fileDialog.getFileNames();
         String directoryPath = fileDialog.getFilterPath();
-        ArrayList<Job> jobs = new ArrayList<Job>();
-        String filePath = null;
-        String jobName = null;
 
-        try {
-            //create jobs
-            for (String fileName : filesNames) {
-                filePath = directoryPath + File.separator + fileName;
-                jobs.add(JobFactory.getFactory().createJob(filePath));
+        //map of submitted jobs, for submission summary
+        HashMap<JobId, String> submittedJobs = new HashMap<JobId, String>();
+        //which creation or submission has failed
+        HashMap<String, String> failedJobs = new HashMap<String, String>();
+
+        String filePath = null;
+
+        //create jobs
+        for (String fileName : filesNames) {
+            filePath = directoryPath + File.separator + fileName;
+            try {
+                Job job = JobFactory.getFactory().createJob(filePath);
+                JobId id = SchedulerProxy.getInstance().submit(job);
+                submittedJobs.put(id, fileName);
+            } catch (JobCreationException e) {
+                failedJobs.put(fileName, "Job creation error : " + e.getMessage());
+            } catch (SchedulerException e) {
+                failedJobs.put(fileName, "Job submission error : " + e.getMessage());
             }
-            //submit jobs
-            for (Job job : jobs) {
-                jobName = job.getName();
-                SchedulerProxy.getInstance().submit(job);
+        }
+
+        if (failedJobs.size() != 0) {
+            //one error for one job to submit : display a simple dialog box
+            if (filesNames.length == 1) {
+                MessageDialog.openError(parent.getShell(), "Job submission error", failedJobs
+                        .get(filesNames[0]));
+            } else {
+                //display a dialog box with details for each job
+                String text = "Submission summary : \n\n" + submittedJobs.size() + " submitted. \n" +
+                    failedJobs.size() + " failed to submit.";
+
+                MultiStatus ms = new MultiStatus(Activator.getPluginId(), 0,
+                    "Creation or submission from some xml files has failed, see details.", null);
+
+                for (Entry<JobId, String> entry : submittedJobs.entrySet()) {
+                    String ErrorText = "file name : " + entry.getValue() + " submitted, job ID : " +
+                        entry.getKey().toString();
+                    ms.add(new Status(IStatus.INFO, Activator.getPluginId(), ErrorText));
+                }
+                for (Entry<String, String> entry : failedJobs.entrySet()) {
+                    String ErrorText = "file name : " + entry.getKey() + "\n" + entry.getValue();
+                    ms.add(new Status(IStatus.ERROR, Activator.getPluginId(), ErrorText));
+                }
+                ErrorDialog.openError(parent.getShell(), "Job submission error", text, ms, IStatus.ERROR |
+                    IStatus.INFO);
             }
-        } catch (JobCreationException e) {
-            MessageDialog.openError(parent.getShell(), "Job creation error",
-                    "Failed to create job from file " + filePath + " :\n\n" + e.getMessage());
-        } catch (SchedulerException e) {
-            MessageDialog.openError(parent.getShell(), "Job submission error", "Couldn't submit job " +
-                jobName + " :\n\n" + e.getMessage());
         }
     }
 
