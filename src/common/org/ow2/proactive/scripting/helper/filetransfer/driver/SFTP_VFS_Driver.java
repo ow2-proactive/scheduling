@@ -24,7 +24,6 @@ import org.ow2.proactive.scripting.helper.filetransfer.initializer.FileTransfert
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
-
 /***
  * Simple implementation of SFTP protocol based on Apache VFS
  * TODO: Does not work for large Files
@@ -32,223 +31,183 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  *
  */
 public class SFTP_VFS_Driver implements FileTransfertDriver {
-	
-	private StandardFileSystemManager manager = null;
-	
-	
-	DefaultFileSystemManager fsManager;
-	
-	//--- Information connection ---
-	private String _host;
-	private String _user;
-	private String _pass;
-	private int _port;
-	
-	private String sftpUri = "";
-	private FileSystemOptions opts;
-	
-	
-	public void init(FileTransfertInitializer myInit) {
-		debug("init "+this.getClass().getName());
-		FileTransfertInitializerSCP connexionParamaters = (FileTransfertInitializerSCP) myInit;
-		_host = connexionParamaters.getHost();
-		_user = connexionParamaters.getUser();
-		_pass = connexionParamaters.getPassword();
-		_port = connexionParamaters.getPort();
-	}
 
-	
-	public void getFile(String remotePath, String destFolderPath) throws Exception{
-		
-		connect();
-		debug ("Getting file "+remotePath+ " to local folder "+destFolderPath);
-		
-				
-			String fileName = (new File(remotePath).getName());
-			String localPath = destFolderPath+File.separator+fileName;
-		
-		
-		
-		    // we first set strict key checking off
-		    FileSystemOptions fsOptions = new FileSystemOptions();
-		    SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(
-		            fsOptions, "no");
-		    // now we create a new filesystem manager
-		    
-		    // the url is of form sftp://user:pass@host/remotepath/
-		    String uri = "sftp://" + _user + ":" + _pass + "@" + _host
-		            + "/" 
-		            + remotePath;
-		    // get file object representing the local file
-		    FileObject fo = fsManager.resolveFile(uri, fsOptions);
+    private StandardFileSystemManager manager = null;
 
-		    
-		    // open input stream from the remote file
-		    BufferedInputStream is = new BufferedInputStream(fo.getContent().getInputStream());
-		    // open output stream to local file
-		    OutputStream os = new BufferedOutputStream(new FileOutputStream(
-		            localPath));
-		    int c;
-		    // do copying
-		    while ((c = is.read()) != -1) {
-		        os.write(c);
-		    }
-		    os.close();
-		    is.close();
-		    // close the file object
-		    fo.close();
-		
-		    debug ("File copied "+remotePath+ " to local folder "+destFolderPath);
-		    
-		    // NOTE: if you close the file system manager, you won't be able to 
-		    // use VFS again in the same VM. If you wish to copy multiple files,
-		    // make the fsManager static, initialize it once, and close just
-		    // before exiting the process.
-		   // fsManager.close();
-		    //System.out.println("Finished copying the file");
-		    disconnect();
-		}
-	
-	
-	
-	
-	
-	public void putFile(String localPathFile, String remoteFolder) throws Exception {
-		if(remoteFolder == "")
-			remoteFolder = ".";
-		
-		debug("Putting file " + localPathFile + " to " + remoteFolder);
-		
-		//--Setup the SCP connection
-		connect();
-		
-		
-		//--Define paths
-//		String localFolder = FileTransfertUtils.getFolderFromPathfile(localPathFile);
-		String fileName = new File(localPathFile).getName();
-		
+    DefaultFileSystemManager fsManager;
 
-		
-	    // we first set strict key checking off
-	    FileSystemOptions fsOptions = new FileSystemOptions();
-	    SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(
-	            fsOptions, "no");
-	    // now we create a new filesystem manager
-	    
-	    // the url is of form sftp://user:pass@host/remotepath/
-	    String uri = "sftp://" + _user + ":" + _pass + "@" + _host
-	            + "/" 
-	            + remoteFolder
-	            + "/"
-	            +fileName;
-	    // get file object representing the local file
-	    FileObject fo = fsManager.resolveFile(uri, fsOptions);
-	    fo.createFile();
-	    OutputStream os = fo.getContent().getOutputStream();
-	    BufferedInputStream is = new BufferedInputStream(new FileInputStream(new File(localPathFile)));
-	    
-	    int c;
-	    // do copying
-	    while ((c = is.read()) != -1) {
-	        os.write(c);
-	    }
-	    os.close();
-	    is.close();
-	    fo.close();
-	    
-	    
-		debug ("File copied :"+ localPathFile + " to " + remoteFolder);  
-		
-		
-		
+    //--- Information connection ---
+    private String _host;
+    private String _user;
+    private String _pass;
+    private int _port;
 
-		//--Logout and disconnect
-		disconnect();
-		
-				
-	}
-	
-	public ArrayList<String> list(String remoteFolder) throws Exception {		
-		//--Setup the FTP connection
-		connect();
-		
-		//--Set remote folder to current
-	/*	if (remoteFolder == "") {
-			remoteFolder = ".";
-		}
-		System.out.println("Reading of = "+remoteFolder);
+    private String sftpUri = "";
+    private FileSystemOptions opts;
 
-		FTPFile[] ftpFiles = ftp.listFiles(remoteFolder);*/
-		ArrayList<String>files = new ArrayList<String>();
-		/*
-		for (int i = 0; i < ftpFiles.length; i++) {
-			files.add(ftpFiles[i].getName());
-			System.out.println("=>" + ftpFiles[i].getName());
-		}*/
-		
-		return files;
-	}
-	
-	/************************************************************************
-	 * Connect and disconnect methods
-	 ************************************************************************/
-	private void connect() throws Exception{
-//		sftpUri = "sftp://"+_user+":"+_pass+"@"+_host;
-//		opts = new FileSystemOptions();
-//		SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, "no");
-//		manager = new StandardFileSystemManager();
-//		manager.init();   
+    public void init(FileTransfertInitializer myInit) {
+        debug("init " + this.getClass().getName());
+        FileTransfertInitializerSCP connexionParamaters = (FileTransfertInitializerSCP) myInit;
+        _host = connexionParamaters.getHost();
+        _user = connexionParamaters.getUser();
+        _pass = connexionParamaters.getPassword();
+        _port = connexionParamaters.getPort();
+    }
 
-			fsManager= (DefaultFileSystemManager) VFS.getManager();
-	
-	}
-	
-	private void disconnect() throws Exception{
-		if (manager!=null)
-			manager.close();
-	
-	
-	}
+    public void getFile(String remotePath, String destFolderPath) throws Exception {
 
-	public void getFolder(String remoteFolderPath, String localFolderPath)
-			throws Exception {
-		// TODO Auto-generated method stub
-		throw new NotImplementedException();
-	}
+        connect();
+        debug("Getting file " + remotePath + " to local folder " + destFolderPath);
 
-	public void putFolder(String localFolderPath, String remoteFolderPath)
-			throws Exception {
-		// TODO Auto-generated method stub
-		throw new NotImplementedException();
-	}
+        String fileName = (new File(remotePath).getName());
+        String localPath = destFolderPath + File.separator + fileName;
 
+        // we first set strict key checking off
+        FileSystemOptions fsOptions = new FileSystemOptions();
+        SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(fsOptions, "no");
+        // now we create a new filesystem manager
 
-	public void getFiles(List<String> files, String localFolder)
-			throws Exception {
-		Iterator<String> it = files.iterator();
-		while (it.hasNext())
-		{
-			String file = it.next();
-			this.getFile(file,localFolder);
-		}
-	}
+        // the url is of form sftp://user:pass@host/remotepath/
+        String uri = "sftp://" + _user + ":" + _pass + "@" + _host + "/" + remotePath;
+        // get file object representing the local file
+        FileObject fo = fsManager.resolveFile(uri, fsOptions);
 
+        // open input stream from the remote file
+        BufferedInputStream is = new BufferedInputStream(fo.getContent().getInputStream());
+        // open output stream to local file
+        OutputStream os = new BufferedOutputStream(new FileOutputStream(localPath));
+        int c;
+        // do copying
+        while ((c = is.read()) != -1) {
+            os.write(c);
+        }
+        os.close();
+        is.close();
+        // close the file object
+        fo.close();
 
-	public void putFiles(List<String> localFilePaths, String remoteFolder)
-			throws Exception {
-		Iterator<String> it = localFilePaths.iterator();
-		while (it.hasNext())
-		{
-			String file = it.next();
-			this.putFile(file, remoteFolder);
-		}
-	}
+        debug("File copied " + remotePath + " to local folder " + destFolderPath);
 
-	
-	private void debug (String msg)
-	{
-		System.out.println(this.getClass().getSimpleName()+": "+msg);
-	}
-	
-	
+        // NOTE: if you close the file system manager, you won't be able to 
+        // use VFS again in the same VM. If you wish to copy multiple files,
+        // make the fsManager static, initialize it once, and close just
+        // before exiting the process.
+        // fsManager.close();
+        //System.out.println("Finished copying the file");
+        disconnect();
+    }
+
+    public void putFile(String localPathFile, String remoteFolder) throws Exception {
+        if (remoteFolder == "")
+            remoteFolder = ".";
+
+        debug("Putting file " + localPathFile + " to " + remoteFolder);
+
+        //--Setup the SCP connection
+        connect();
+
+        //--Define paths
+        //		String localFolder = FileTransfertUtils.getFolderFromPathfile(localPathFile);
+        String fileName = new File(localPathFile).getName();
+
+        // we first set strict key checking off
+        FileSystemOptions fsOptions = new FileSystemOptions();
+        SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(fsOptions, "no");
+        // now we create a new filesystem manager
+
+        // the url is of form sftp://user:pass@host/remotepath/
+        String uri = "sftp://" + _user + ":" + _pass + "@" + _host + "/" + remoteFolder + "/" + fileName;
+        // get file object representing the local file
+        FileObject fo = fsManager.resolveFile(uri, fsOptions);
+        fo.createFile();
+        OutputStream os = fo.getContent().getOutputStream();
+        BufferedInputStream is = new BufferedInputStream(new FileInputStream(new File(localPathFile)));
+
+        int c;
+        // do copying
+        while ((c = is.read()) != -1) {
+            os.write(c);
+        }
+        os.close();
+        is.close();
+        fo.close();
+
+        debug("File copied :" + localPathFile + " to " + remoteFolder);
+
+        //--Logout and disconnect
+        disconnect();
+
+    }
+
+    public ArrayList<String> list(String remoteFolder) throws Exception {
+        //--Setup the FTP connection
+        connect();
+
+        //--Set remote folder to current
+        /*	if (remoteFolder == "") {
+        		remoteFolder = ".";
+        	}
+        	System.out.println("Reading of = "+remoteFolder);
+
+        	FTPFile[] ftpFiles = ftp.listFiles(remoteFolder);*/
+        ArrayList<String> files = new ArrayList<String>();
+        /*
+        for (int i = 0; i < ftpFiles.length; i++) {
+        	files.add(ftpFiles[i].getName());
+        	System.out.println("=>" + ftpFiles[i].getName());
+        }*/
+
+        return files;
+    }
+
+    /************************************************************************
+     * Connect and disconnect methods
+     ************************************************************************/
+    private void connect() throws Exception {
+        //		sftpUri = "sftp://"+_user+":"+_pass+"@"+_host;
+        //		opts = new FileSystemOptions();
+        //		SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, "no");
+        //		manager = new StandardFileSystemManager();
+        //		manager.init();   
+
+        fsManager = (DefaultFileSystemManager) VFS.getManager();
+
+    }
+
+    private void disconnect() throws Exception {
+        if (manager != null)
+            manager.close();
+
+    }
+
+    public void getFolder(String remoteFolderPath, String localFolderPath) throws Exception {
+        // TODO Auto-generated method stub
+        throw new NotImplementedException();
+    }
+
+    public void putFolder(String localFolderPath, String remoteFolderPath) throws Exception {
+        // TODO Auto-generated method stub
+        throw new NotImplementedException();
+    }
+
+    public void getFiles(List<String> files, String localFolder) throws Exception {
+        Iterator<String> it = files.iterator();
+        while (it.hasNext()) {
+            String file = it.next();
+            this.getFile(file, localFolder);
+        }
+    }
+
+    public void putFiles(List<String> localFilePaths, String remoteFolder) throws Exception {
+        Iterator<String> it = localFilePaths.iterator();
+        while (it.hasNext()) {
+            String file = it.next();
+            this.putFile(file, remoteFolder);
+        }
+    }
+
+    private void debug(String msg) {
+        System.out.println(this.getClass().getSimpleName() + ": " + msg);
+    }
+
 }
