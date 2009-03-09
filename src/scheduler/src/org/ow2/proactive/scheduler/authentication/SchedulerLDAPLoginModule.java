@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.LDAPLoginModule;
@@ -50,7 +52,13 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
      * Returns LDAP configuration file name defined in scheduler configuration file
      */
     protected String getLDAPConfigFileName() {
-        return PASchedulerProperties.SCHEDULER_LDAP_CONFIG_FILE_PATH.getValueAsString();
+        String ldapFile = PASchedulerProperties.SCHEDULER_LDAP_CONFIG_FILE_PATH.getValueAsString();
+        //test that ldap file path is an absolute path or not
+        if (!(new File(ldapFile).isAbsolute())) {
+            //file path is relative, so we complete the path with the scheduler home
+            ldapFile = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + ldapFile;
+        }
+        return ldapFile;
     }
 
     /**

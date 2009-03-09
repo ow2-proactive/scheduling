@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.LDAPLoginModule;
@@ -50,7 +52,14 @@ public class RMLDAPLoginModule extends LDAPLoginModule {
      * Returns LDAP configuration file name defined in resource manager configuration file
      */
     protected String getLDAPConfigFileName() {
-        return PAResourceManagerProperties.RM_LDAP_CONFIG.getValueAsString();
+        String loginFile = PAResourceManagerProperties.RM_LDAP_CONFIG.getValueAsString();
+        //test that login file path is an absolute path or not
+        if (!(new File(loginFile).isAbsolute())) {
+            //file path is relative, so we complete the path with the prefix RM_Home constant
+            loginFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + loginFile;
+        }
+
+        return loginFile;
     }
 
     /**
