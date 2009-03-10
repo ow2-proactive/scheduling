@@ -1,23 +1,5 @@
 <project>
 	<import file="doc_paths.xml" />
-	<!-- If a needed file doesn't exist, it will be fetched on the web -->	
-	<xmlcatalog id="docbookcatalog">
-		<!-- If a needed file doesn't exist, it will be fetched on the web -->
-		
-		<classpath>
-			<pathelement location="${docs.toolchain.dir}/${docbook.archive}" />
-		</classpath>
-		
-		<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="${docs.docbook.dtd}" />
-		<dtd publicId="http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd"  location="${docs.docbook.dtd}"/>
-		
-		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/profiling/profile.xsl" location="docbook-xsl-ns-${docbook.version}/profiling/profile.xsl" />
-		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/html/chunk.xsl" location="docbook-xsl-ns-${docbook.version}/html/chunk.xsl" />
-		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/html/docbook.xsl" location="docbook-xsl-ns-${docbook.version}/html/docbook.xsl" />
-		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/fo/docbook.xsl" location="docbook-xsl-ns-${docbook.version}/fo/docbook.xsl" />
-	</xmlcatalog>
-	
-	
 	<!-- ==================================================================== -->
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
@@ -94,9 +76,6 @@
 			<xslt basedir="${docs.src.dir}"  in="${docs.tmp.dir}/@{docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${docs.xsl.profiling}" force="yes">
 				<param name="profile.os" expression="@{docbook.profile}" />
 				<param name="tmp.dir" expression="${docs.tmp.dir}/" />
-				<!-- the date for the first page --> 
-				<!--docbook.profile can be html, pdf or empty-->
-				<xmlcatalog refid="docbookcatalog" />
 				<classpath refid="docs.utils.classpath" />
 			</xslt>
 
@@ -215,6 +194,6 @@
 		      <delete dir="${docs.dir}/built" />
 		</sequential>
 	</macrodef>
-
-
+	
+	
 </project>

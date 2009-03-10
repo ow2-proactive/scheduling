@@ -4,7 +4,7 @@
                 xmlns:date="http://exslt.org/dates-and-times"
                 exclude-result-prefixes="date" version="1.0">
 
-	<xsl:import href="http://docbook.sourceforge.net/release/xsl-ns/1.74.0/profiling/profile.xsl" />
+	<xsl:import href="../docbook-xsl/profiling/profile.xsl" />
 
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 	<!-- These templates change fileref attributes of textdata tags from relative paths to absolute paths-->
@@ -27,9 +27,9 @@
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="name()='fileref' and name(..)='textdata'">
-					<xsl:attribute name="fileref">
-						<xsl:value-of select="concat('file://',$tmp.dir,$filename)"/>
-					</xsl:attribute>
+						<xsl:attribute name="fileref">
+							<xsl:value-of select="concat('file://',$tmp.dir,$filename)"/>
+						</xsl:attribute>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:copy/>

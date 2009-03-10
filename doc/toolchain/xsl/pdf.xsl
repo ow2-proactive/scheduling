@@ -5,10 +5,7 @@
 	xmlns:destination="http://xml.apache.org/fop/extensions"
 	exclude-result-prefixes="date" version="1.0">
 
-	<xsl:import
-			href="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" />
-<!-- 		href="http://docbook.sourceforge.net/release/xsl-ns/1.74.0/fo/docbook.xsl"  -->
-
+ <xsl:import href="../docbook-xsl/fo/docbook.xsl" />
 	<xsl:import href="common.xsl" />
 
    <!-- Import profiled highlighting color -->

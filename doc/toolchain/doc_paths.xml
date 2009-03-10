@@ -10,6 +10,7 @@
 	<property name="docs.tmp.dir"  			value="${docs.dir}/tmp" /> <!-- doc/tmp folder -->
 	<property name="docs.toolchain.dir"		value="${docs.dir}/toolchain" /> <!-- doc/toolchain folder -->
 	<property name="docs.xsl.dir"			value="${docs.toolchain.dir}/xsl" />
+	<property name="doc.name"			value="generic_manual" />
 	<property name="docs.built.dir"			value="${docs.dir}/built/${doc.name}" /> <!--why-->
 	
 	<property name="docs.api.complete.dir"		value="${docs.built.dir}/api_complete" />

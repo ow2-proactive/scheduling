@@ -113,7 +113,7 @@
       <target name="doc.Scheduler.javadoc.complete"  description="Generate the Scheduler complete javadoc">
         <mkdir dir="${docs.tmp.dir}" />
         <javadoc  
-            destdir="${docs.built.dir}/Scheduler/api_complete"
+            destdir="${docs.built.dir}/api_complete"
             author="true" 
             version="true" 
             source="${source}" 
