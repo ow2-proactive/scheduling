@@ -145,7 +145,7 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 
         //--Set remote folder to current
         /*	if (remoteFolder == "") {
-		remoteFolder = ".";
+        remoteFolder = ".";
         }
         System.out.println("Reading of = "+remoteFolder);
 

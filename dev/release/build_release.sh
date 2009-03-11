@@ -95,9 +95,9 @@ find . -type f -exec sed -i "s#http://proactive.inria.fr/schemas/jobdescriptor/d
 find . -type f -exec sed -i "s#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
 
 # Handle JSR223
-cp $JSR_223_HOME/script-js.jar ./lib/common/
-cp $JSR_223_HOME/js.jar ./lib/common/
-cp $JSR_223_HOME/script-api.jar ./lib/common/
+cp $JSR_223_HOME/script-js.jar ./lib/common/script/
+cp $JSR_223_HOME/js.jar ./lib/common/script/
+cp $JSR_223_HOME/script-api.jar ./lib/common/script/
 
 cd compile || warn_and_exit "Cannot move in compile"
 ./build clean
@@ -116,9 +116,9 @@ cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 echo " [i] Clean"
 
 # Clean JSR223
-rm -rf ./lib/common/script-js.jar
-rm -rf ./lib/common/js.jar
-rm -rf ./lib/common/script-api.jar
+rm -rf ./lib/common/script/script-js.jar
+rm -rf ./lib/common/script/js.jar
+rm -rf ./lib/common/script/script-api.jar
 rm -rf ./dist/lib/script-js.jar
 rm -rf ./dist/lib/js.jar
 rm -rf ./dist/lib/script-api.jar

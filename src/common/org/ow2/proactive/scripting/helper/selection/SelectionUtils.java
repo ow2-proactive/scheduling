@@ -33,7 +33,9 @@ package org.ow2.proactive.scripting.helper.selection;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -45,13 +47,10 @@ import java.util.regex.PatternSyntaxException;
 import org.jruby.RubyArray;
 import org.jruby.javasupport.JavaUtil;
 import org.jruby.runtime.builtin.IRubyObject;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeJavaObject;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.python.core.PyList;
-import org.uwin.registry.RegException;
-import org.uwin.registry.RegFolder;
-
-import sun.org.mozilla.javascript.internal.NativeArray;
-import sun.org.mozilla.javascript.internal.NativeJavaObject;
 
 
 /**
@@ -64,6 +63,8 @@ import sun.org.mozilla.javascript.internal.NativeJavaObject;
  */
 @PublicAPI
 public class SelectionUtils {
+    //import org.uwin.registry.RegException;
+    //import org.uwin.registry.RegFolder; >>> use uwin-1.0.0.jar & uwin-1.0.0.dll if needed
 
     /** Less than operator */
     public static final int LESS_THAN = 1;
@@ -75,6 +76,7 @@ public class SelectionUtils {
     public static final int MATCH = 4;
 
     private static final String winTestCuda = "deviceQueryWin.exe";
+    private static final String unixTestCuda = "deviceQueryUnix";
     private static final boolean isWindows = System.getProperty("os.name").contains("Windows");
 
     /**
@@ -185,8 +187,10 @@ public class SelectionUtils {
      * @return true if the OS name is the one expected
      */
     public static boolean checkOSName(String exp) {
-        if (exp == null)
+        if (exp == null) {
+            System.err.println("Given OS name was NULL");
             return false;
+        }
 
         String localOS = System.getProperty("os.name");
 
@@ -209,11 +213,13 @@ public class SelectionUtils {
      * @return true if the OS architecture is the one expected
      */
     public static boolean checkOSArch(String osArch) {
-        if (osArch == null)
+        if (osArch == null) {
+            System.err.println("Given OS architecture was NULL");
             return false;
+        }
 
         String localOSArch = System.getProperty("os.arch");
-        if ((osArch.toLowerCase()).equals(localOSArch.toLowerCase())) {
+        if (localOSArch.toUpperCase().contains(osArch.toUpperCase())) {
             return true;
         }
         return false;
@@ -226,11 +232,13 @@ public class SelectionUtils {
      * @return true if the OS version is the one expected
      */
     public static boolean checkOSVersion(String osVersion) {
-        if (osVersion == null)
+        if (osVersion == null) {
+            System.err.println("Given OS version was NULL");
             return false;
+        }
 
         String localOSVersion = System.getProperty("os.version");
-        if (osVersion.equals(localOSVersion)) {
+        if (localOSVersion.contains(osVersion)) {
             return true;
         }
         return false;
@@ -243,8 +251,13 @@ public class SelectionUtils {
      * @param propertyValue the excepted value.
      * @return true if the couple exists
      */
-    public static boolean checkPropertySelection(String propertyName, String propertyValue) {
+    public static boolean checkJavaProperty(String propertyName, String propertyValue) {
         if (propertyName == null) {
+            System.err.println("Given property Name was NULL");
+            return false;
+        }
+        if (propertyValue == null) {
+            System.err.println("Given property Value was NULL");
             return false;
         }
         try {
@@ -272,11 +285,22 @@ public class SelectionUtils {
             System.err.println("Error trying to check Cuda library : the system must be under Windows.");
             return false;
         }
+        File tmp = null;
         try {
-            File f = new File(SelectionUtils.class.getResource(winTestCuda).toURI());
-            Process p = Runtime.getRuntime().exec(f.getAbsolutePath());
+            InputStream is = SelectionUtils.class.getResourceAsStream(winTestCuda);
+            tmp = File.createTempFile("wcuda", ".exe");
+            FileOutputStream fos = new FileOutputStream(tmp);
+            //copy
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = is.read(buf)) != -1) {
+                fos.write(buf, 0, len);
+            }
+            is.close();
+            fos.close();
+            //execute
+            Process p = Runtime.getRuntime().exec(tmp.getAbsolutePath());
             p.waitFor();
-            //System.out.println("exit=" + p.exitValue());
             return (p.exitValue() > 0);
         } catch (IllegalMonitorStateException ex) {
             ex.printStackTrace();
@@ -284,18 +308,22 @@ public class SelectionUtils {
             in.printStackTrace();
         } catch (Exception err) {
             err.printStackTrace();
+        } finally {
+            if (tmp != null) {
+                tmp.delete();
+            }
         }
         return false;
     }
 
     /**
-     * Check the total Memory
+     * Check if their is enough free memory.
      *
-     * @param requiredMemory the minimum amount of memory which is required
-     * @return true if the required memory is equal or greater than available memory, false otherwise.
+     * @param requiredMemory the minimum amount of memory which is required (measured in byte)
+     * @return true if the required memory is equal or lesser than the available memory, false otherwise.
      */
-    public static boolean checkTotalMemory(long requiredMemory) {
-        if (Runtime.getRuntime().totalMemory() >= requiredMemory) {
+    public static boolean checkFreeMemory(long requiredMemory) {
+        if (Runtime.getRuntime().freeMemory() >= requiredMemory) {
             return true;
         }
         return false;

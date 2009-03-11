@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.1"?>
+<?pde version="3.4"?>
 
 <product name="ProActive Resource Manager" id="org.ow2.proactive.resourcemanager.resourcemanager" application="org.ow2.proactive.resourcemanager.application" useFeatures="false">
 
@@ -10,11 +10,13 @@
       </text>
    </aboutInfo>
 
-   <configIni use="default"/>
+   <configIni use="default">
+   </configIni>
 
    <launcherArgs>
       <vmArgs>-Xmx512M -Xms512M
--Djava.security.policy=resource.manager.java.policy</vmArgs>
+-Djava.security.policy=resource.manager.java.policy
+-Dproactive.net.nolocal=true</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.ow2.proactive.resourcemanager/icons/alt_window_16.gif" i32="/org.ow2.proactive.resourcemanager/icons/alt_window_32.gif"/>

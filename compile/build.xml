@@ -55,12 +55,12 @@
 		</fileset>
 		<else>
 			<fileset dir="${cl.rm.tests.dir}" id="rm.testsuite">
-				<exclude name="**/*$*.class"/>
 				<include name="**/*Test*.class" />
+				<exclude name="**/*$*.class"/>
 			</fileset>
 			<fileset dir="${cl.scheduler.tests.dir}" id="scheduler.testsuite">
-				<exclude name="**/*$*.class"/>
 				<include name="**/*Test*.class" />
+				<exclude name="**/*$*.class"/>
 			</fileset>
 		</else>
 	</if>		

@@ -30,11 +30,11 @@
 								and
 								<literal>js.jar</literal>
 								files must be added in the
-								<literal>/ProActive/dist/lib/</literal>
+								<literal>/dist/lib/</literal>
 								directory if you are using the bin release
 								or ProActive, or in the
-								<literal>/ProActive/lib/</literal>
-								directory if you build ProActive from the
+								<literal>lib/common/script/</literal>
+								directory if you build Scheduler from the
 								source release.
 							</para>
 						</listitem>

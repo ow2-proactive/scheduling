@@ -99,14 +99,14 @@
 						<listitem>
 							<para>
 								First, the <literal>script-api.jar</literal>, <literal>script-js.jar</literal>
-								and <literal>js.jar</literal> files must be added in the <literal>ProActive/dist/lib/</literal>
+								and <literal>js.jar</literal> files must be added in the <literal>dist/lib/</literal>
 								directory if you are using the bin release of ProActive Scheduler, or in the
-								<literal>ProActive/lib/</literal> directory if you build ProActive Scheduler from the source release.
+								<literal>lib/common/script/</literal> directory if you build ProActive Scheduler from the source release.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
-								Then the <literal>java5_jsr223_patch.jar</literal> patch (released with the Scheduler RCP
+								Then the <literal>J5jsr223Patch.jar</literal> patch (released with the Scheduler RCP
 								Client) should be executed in the Scheduler RCP Client directory : unzip the
 								<literal>java5_jsr223_patch.zip</literal> file and execute
 								<literal> java -jar java5_jsr223_patch.jar </literal>.
