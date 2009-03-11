@@ -344,7 +344,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             this.monitoring.rmStartedEvent(new RMEvent());
 
             ProActiveLogger.getLogger(RMLoggers.CONSOLE).info(
-                    "Resource-Manager successfully created on " +
+                    "Resource Manager successfully created on " +
                         getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis())));
 
             authentication.setActivated(true);

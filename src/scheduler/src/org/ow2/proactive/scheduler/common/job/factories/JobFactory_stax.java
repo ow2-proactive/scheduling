@@ -211,19 +211,14 @@ public class JobFactory_stax extends JobFactory {
         // We use sun multi validator (msv)
         VerifierFactory vfactory = new com.sun.msv.verifier.jarv.TheFactoryImpl();
         InputStream schemaStream = this.getClass().getResourceAsStream(SCHEMA_LOCATION);
-        Schema schema;
-        try {
-            schema = vfactory.compileSchema(schemaStream);
-        } catch (SAXException e) {
-            throw e;
-        }
+        Schema schema = vfactory.compileSchema(schemaStream);
         Verifier verifier = schema.newVerifier();
         ValidatingErrorHandler veh = new ValidatingErrorHandler();
         verifier.setErrorHandler(veh);
         try {
             verifier.verify(filePath);
         } catch (SAXException e) {
-            //nothing to do check after
+            //nothing to do, check after
         }
         if (veh.mistakes > 0) {
             throw new SAXException(veh.mistakesStack.toString());

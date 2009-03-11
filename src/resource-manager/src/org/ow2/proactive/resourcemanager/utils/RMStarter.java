@@ -125,7 +125,7 @@ public class RMStarter {
                 }
             }
 
-            logger.info("Starting Resource-Manager, Please wait...");
+            logger.info("Starting Resource Manager, Please wait...");
             RMFactory.setOsJavaProperty();
 
             Collection<String> deploymentDescriptors = new LinkedList<String>();

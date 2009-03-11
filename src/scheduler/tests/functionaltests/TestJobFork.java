@@ -38,7 +38,6 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 import functionalTests.FunctionalTest;
@@ -120,21 +119,17 @@ public class TestJobFork extends FunctionalTest {
         // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertTrue(res.hadException());
-        
+
         Assert.assertFalse(res.getAllResults().get(task1Name).hadException());
-        Assert.assertNotNull(res.getAllResults().get(task1Name).value());
         Assert.assertNull(res.getAllResults().get(task1Name).getException());
-        
+
         Assert.assertFalse(res.getAllResults().get(task2Name).hadException());
-        Assert.assertNotNull(res.getAllResults().get(task2Name).value());
         Assert.assertNull(res.getAllResults().get(task2Name).getException());
-        
-        Assert.assertTrue(res.getAllResults().get(taskForked1Name).hadException());
-        Assert.assertNull(res.getAllResults().get(taskForked1Name).value());
-        Assert.assertNotNull(res.getAllResults().get(taskForked1Name).getException());
-        
+
+        Assert.assertFalse(res.getAllResults().get(taskForked1Name).hadException());
+        Assert.assertNull(res.getAllResults().get(taskForked1Name).getException());
+
         Assert.assertTrue(res.getAllResults().get(taskForked2Name).hadException());
-        Assert.assertNull(res.getAllResults().get(taskForked2Name).value());
         Assert.assertNotNull(res.getAllResults().get(taskForked2Name).getException());
 
         //remove job

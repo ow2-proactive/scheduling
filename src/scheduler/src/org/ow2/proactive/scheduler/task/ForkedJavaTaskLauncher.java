@@ -96,10 +96,10 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     private ForkEnvironment forkEnvironment = null;
 
     /* for tryAcquire primitive */
-    private static final long SEMAPHORE_TIMEOUT = 1;
+    private static final long SEMAPHORE_TIMEOUT = 2;
 
     /* for tryAcquire primitive */
-    private static final int RETRY_ACQUIRE = 5;
+    private static final int RETRY_ACQUIRE = 10;
 
     private Process process = null;
     private ProActiveRuntime childRuntime = null;
@@ -253,7 +253,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         int numberOfTrials = 0;
         for (; numberOfTrials < RETRY_ACQUIRE; numberOfTrials++) {
             boolean permit = semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.SECONDS);
-            if (permit){
+            if (permit) {
                 break;
             }
 
@@ -264,7 +264,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             } catch (IllegalThreadStateException e) {
             }
         }
-        if (numberOfTrials == RETRY_ACQUIRE){
+        if (numberOfTrials == RETRY_ACQUIRE) {
             throw new SchedulerException("Unable to create a separate java process after " + RETRY_ACQUIRE +
                 " tries");
         }
