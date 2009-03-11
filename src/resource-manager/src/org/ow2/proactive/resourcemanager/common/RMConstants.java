@@ -32,6 +32,7 @@
 package org.ow2.proactive.resourcemanager.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource;
 
 
 /**
@@ -58,18 +59,13 @@ public interface RMConstants {
     /** name of RMMonitoring AO registered in RMI register */
     public static final String NAME_ACTIVE_OBJECT_RMMONITORING = "RMMONITORING";
 
+    /** name of RMAuthentication AO registered in RMI register */
     public static final String NAME_ACTIVE_OBJECT_RMAUTHENTICATION = "RMAUTHENTICATION";
 
-    /** constants for {@link org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource} source type name*/
+    /** constants for {@link GCMNodeSource} source type name*/
     public static final String GCM_NODE_SOURCE_TYPE = "GCM_NODE_SOURCE";
 
-    /** constants for {@link org.ow2.proactive.resourcemanager.nodesource.p2p.P2PNodeSource} 
-     * source type name*/
-    public static final String P2P_NODE_SOURCE_TYPE = "P2P_NODE_SOURCE";
-
-    /** The default name of the static node source created 
-     * at Resource manager Startup 
-     */
+    /** The default name of the static node source created  at Resource manager Startup */
     public static final String DEFAULT_STATIC_SOURCE_NAME = "Default";
 
 }

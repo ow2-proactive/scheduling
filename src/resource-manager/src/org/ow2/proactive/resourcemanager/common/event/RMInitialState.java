@@ -71,14 +71,12 @@ public class RMInitialState implements Serializable {
 
     /**
      * Creates an InitialState object.
-     * @param freeNodesList RM's free nodes.
-     * @param busyNodesList RM's busy nodes.
-     * @param toReleaseNodesList RM's 'to release' nodes.
-     * @param downNodesList RM's down nodes.
+     * 
+     * @param nodesEventList RM's node events.
      * @param nodeSourcesList RM's node sources list.
      */
-    public RMInitialState(ArrayList<RMNodeEvent> nodesList, ArrayList<RMNodeSourceEvent> nodeSourcesList) {
-        this.nodesList = nodesList;
+    public RMInitialState(ArrayList<RMNodeEvent> nodesEventList, ArrayList<RMNodeSourceEvent> nodeSourcesList) {
+        this.nodesList = nodesEventList;
         this.nodeSources = nodeSourcesList;
     }
 

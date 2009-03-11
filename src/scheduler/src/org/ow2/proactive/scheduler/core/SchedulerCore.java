@@ -837,9 +837,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
     /**
      * Submit a new job to the scheduler.
+     * This method will prepare the new job and get it ready for scheduling.
      *
-     * @param job the job to be scheduled.
-     * @throws SchedulerException
+     * @throws SchedulerException if problem occurs during job preparation
      */
     public void submit() throws SchedulerException {
         InternalJob job = currentJobToSubmit.getJob();

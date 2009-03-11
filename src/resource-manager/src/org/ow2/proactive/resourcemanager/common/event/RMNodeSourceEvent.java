@@ -36,6 +36,7 @@ import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource;
 
 
 /**
@@ -47,8 +48,7 @@ import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
  *
  * A node source has to aspects in a Monitor's point of view :<BR>
  * -A name, its sourceID.<BR>
- * -A type : {@link org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource}, 
- * {@link org.ow2.proactive.resourcemanager.nodesource.p2p.P2PNodeSource}...<BR>
+ * -A type : {@link GCMNodeSource}, ...<BR>
  * NodeSource types are defined in {@link RMConstants}.
  *
  * @see RMMonitoring

@@ -56,7 +56,7 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
  * {@link #setName(String)} will be used to identified the job.<br>
  * {@link #setDescription(String)} to set a short description of your job.<br>
  * {@link #setPriority(JobPriority)} to set the priority for the job, see {@link JobPriority} for more details.<br>
- * {@link #setCancelOnError(boolean)} used if you want to abort the job if an exception occurred in at least one of the task.<br>
+ * {@link #setCancelJobOnError(boolean)} used if you want to abort the job if an exception occurred in at least one of the task.<br>
  * {@link #setLogFile(String)} allow you to save the output of the job tasks in a specific file.<br>
  * <p>
  * Once the job created, you can submit it to the scheduler using the {@link UserSchedulerInterface}.
@@ -70,9 +70,6 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 @AccessType("field")
 @Proxy(lazy = false)
 public abstract class Job extends CommonAttribute {
-    // TODO cdelbe, jlscheef
-    // all setters are needed only for InternalJob creation. (JL) (also for (user API) job creation (?))
-    // Is there a more elegant way...? (JL) Constructors ?
 
     /** Name of the job */
     @Column(name = "NAME")

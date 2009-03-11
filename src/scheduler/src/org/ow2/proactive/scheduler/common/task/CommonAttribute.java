@@ -101,9 +101,9 @@ public abstract class CommonAttribute implements Serializable {
     private Map<String, BigString> genericInformations = new HashMap<String, BigString>();
 
     /**
-     * To get the cancelOnError
+     * To get the cancelOnError property
      *
-     * @return the cancelOnError
+     * @return the cancelOnError property
      */
     public boolean isCancelJobOnError() {
         return cancelJobOnError.getValue().booleanValue();

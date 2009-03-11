@@ -89,10 +89,10 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     public ResourceManagerProxy() {
     }
 
-    /** IMProxy constructor.
+    /** 
+     * Resource Manager Proxy constructor.
      *
-     * @param user the User interface
-     * @throws LoginException
+     * @param auth the RM authentication interface
      */
     public ResourceManagerProxy(RMAuthentication auth) {
         this.auth = auth;

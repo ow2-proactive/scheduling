@@ -92,9 +92,8 @@ public class TaskClassServer {
 
     /**
      * Create a new class server. 
-     * @param pathToClasspath the path to the jar file containing the classes that 
-     * should be served.
-     * @throws IOException if the class server cannot be created.
+     * 
+     * @param jid the jobId of the job that will be served by this class server
      */
     public TaskClassServer(JobId jid) {
         this.servedJobId = jid;

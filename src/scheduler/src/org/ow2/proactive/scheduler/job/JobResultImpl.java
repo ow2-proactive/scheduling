@@ -161,7 +161,7 @@ public class JobResultImpl implements JobResult {
      *
      * @param taskName user define name (in XML) of the task.
      * @param taskResult the corresponding result of the task.
-     * @param isFinal true if this taskResult is a final one.
+     * @param isPrecious true if this taskResult is a precious one. It will figure out in the precious result list.
      */
     public void addTaskResult(String taskName, TaskResult taskResult, boolean isPrecious) {
         //remove futur Result
