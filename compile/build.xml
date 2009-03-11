@@ -357,6 +357,7 @@
 	<target name="format" description="hibernate's eclipse-based source code formatter">
 		<eclipse_format_m>
 			<sourcefileset>
+				<fileset dir="${src.common}" includes="**/*.java" />
 				<fileset dir="${src.scheduler.dir}" includes="**/*.java" />
 				<fileset dir="${src.scheduler.tests.dir}" includes="**/*.java" />
 				<fileset dir="${src.rm.dir}" includes="**/*.java" />

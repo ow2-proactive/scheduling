@@ -159,13 +159,13 @@ public class GenerationScript extends Script<String> {
             if (result instanceof String) {
                 return new ScriptResult<String>((String) result);
             } else {
-		String msg = "Bad result format : awaited String, found " + result.getClass().getName();
-		logger_dev.warn(msg);
+                String msg = "Bad result format : awaited String, found " + result.getClass().getName();
+                logger_dev.warn(msg);
                 return new ScriptResult<String>(new Exception(msg));
             }
         } else {
-		String msg = "No binding for key " + RESULT_VARIABLE;
-		logger_dev.warn(msg);
+            String msg = "No binding for key " + RESULT_VARIABLE;
+            logger_dev.warn(msg);
             return new ScriptResult<String>(new Exception(msg));
         }
     }

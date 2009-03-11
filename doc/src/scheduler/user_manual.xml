@@ -626,7 +626,7 @@ public void init(Map&lt;String, Object&gt; args) {
 					order to start 'workers' on them. The <code>execute(nodes)</code> method shows what can be done
 					inside this kind of task. For more details about how to use the ProActive API,
 					see the appropriate documentation.
-					The complete example file can be found under 'jobs_descriptors/Job_ProActive.xml'.
+					The complete example file can be found under 'sample/jobs_descriptors/Job_ProActive.xml'.
 				</para>
 				</section>
 			</section>
@@ -1039,7 +1039,7 @@ job.setTask(aTask);
 				<para>
 					For example :
 					<emphasis>
-						submit.[sh|bat] -j ../../jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
+						submit.[sh|bat] -j ../../sample/jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
 					</emphasis>
 					will submit 12 times the <literal>Job_with_dep</literal> job to a local
 					ProActive Scheduler and only your password will be requested.

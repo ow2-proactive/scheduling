@@ -171,8 +171,8 @@ public class SFTP_Trilead_Driver implements FileTransfertDriver {
      * This considers that a connection has already been opend
      * @param path
      * @throws IOException
-     * @throws AuthentificationFailedException 
-     * @throws NotConnectedException 
+     * @throws AuthentificationFailedException
+     * @throws NotConnectedException
      */
     private void createRemoteDirs(String path) throws IOException, AuthentificationFailedException,
             NotConnectedException {

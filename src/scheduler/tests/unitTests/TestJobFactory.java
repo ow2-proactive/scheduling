@@ -96,7 +96,7 @@ public class TestJobFactory {
         Assert.assertTrue(tfJob.getTask("task1").getPreScript().getScript().contains(
                 "Beginning of Pre-Script"));
         Assert.assertTrue(tfJob.getTask("task1").getPostScript().getScript().contains(
-                "Content is equals to " + URLbegin + "jobs_descriptors/unset.js"));
+                "Content is equals to " + URLbegin + "sample/jobs_descriptors/unset.js"));
         Assert.assertEquals(tfJob.getTask("task1").getPostScript().getParameters(), null);
         Assert.assertTrue(tfJob.getTask("task1").getCleaningScript().getScript().contains(
                 "Beginning of clean script"));
@@ -178,7 +178,7 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task3").getGenericInformations().size(), 0);
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine().length, 5);
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[0], URLbegin +
-            "jobs_descriptors/job_native_linux/nativTask");
+            "sample/jobs_descriptors/job_native_linux/nativTask");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[1], "1");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[2], "2 2");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[3], "3");
@@ -205,10 +205,10 @@ public class TestJobFactory {
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getScript(),
                 "command=args[0]+\" 12\";\n");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getParameters()[0],
-                URLbegin + "jobs_descriptors/job_native_linux/nativTask");
+                URLbegin + "sample/jobs_descriptors/job_native_linux/nativTask");
         Assert.assertEquals(
                 ((NativeTask) tfJob.getTask("task4")).getGenerationScript().execute().getResult(), URLbegin +
-                    "jobs_descriptors/job_native_linux/nativTask 12");
+                    "sample/jobs_descriptors/job_native_linux/nativTask 12");
 
         log("Test Job PROACTIVE");
         ProActiveJob paJob = (ProActiveJob) JobFactory.getFactory().createJob(jobProActiveDescriptor);

@@ -33,6 +33,7 @@ package org.ow2.proactive.authentication;
 
 import java.io.Serializable;
 
+
 /**
  * 
  * Authentication interface.
@@ -41,10 +42,10 @@ import java.io.Serializable;
  * @since ProActive Scheduling 0.9.1
  */
 public interface Authentication extends Loggable, Serializable {
-    
+
     /**
      * Checks whether an authentication is activated or in other words is ready to authenticate users.
      */
     public boolean isActivated();
-    
+
 }

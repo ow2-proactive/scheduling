@@ -84,7 +84,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * Defines group file name
      */
     protected abstract String getGroupFileName();
-    
+
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
 
@@ -107,7 +107,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         this.callbackHandler = callbackHandler;
     }
 
-	/**
+    /**
      * @see javax.security.auth.spi.LoginModule#login()
      */
     public boolean login() throws LoginException {
@@ -139,10 +139,10 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
             params.clear();
             ((NoCallback) callbacks[0]).clear();
         } catch (java.io.IOException ioe) {
-            logger.error("",ioe);
+            logger.error("", ioe);
             throw new LoginException(ioe.toString());
         } catch (UnsupportedCallbackException uce) {
-		logger.error("",uce);
+            logger.error("", uce);
             throw new LoginException("Error: " + uce.getCallback().toString() +
                 " not available to garner authentication information from the user");
 
@@ -215,11 +215,11 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                 throw new FailedLoginException("User group not matching");
             }
         } catch (GroupException e) {
-		logger.error("",e);
+            logger.error("", e);
             throw new FailedLoginException("Groups hierarchy not found");
         }
 
-        logger.info("authentication succeeded for user '"+username+"' in group '"+group+"'");
+        logger.info("authentication succeeded for user '" + username + "' in group '" + group + "'");
         succeeded = true;
         return true;
     }

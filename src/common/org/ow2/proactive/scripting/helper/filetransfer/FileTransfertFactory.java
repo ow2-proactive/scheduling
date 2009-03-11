@@ -7,7 +7,7 @@ import org.ow2.proactive.scripting.helper.filetransfer.initializer.*;
 public class FileTransfertFactory {
 
     /**
-     * 
+     *
      * @param myInit
      * @return
      */
@@ -31,9 +31,9 @@ public class FileTransfertFactory {
         return null;
     }
 
-    //	//TODO: to check this 
+    //	//TODO: to check this
     //	public FileTransfertInitializerFTP getInitializerFTP(String host, String user, String pass, int port, Class<? extends FileTransfertDriver> driver, boolean useBinaryMode){
     //		return new FileTransfertInitializerFTP(host, user, pass, port, driver, useBinaryMode);
-    //	}	
+    //	}
 
 }

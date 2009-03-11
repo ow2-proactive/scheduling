@@ -31,8 +31,6 @@
  */
 package org.ow2.proactive.authentication;
 
-
-
 /**
  * GroupHierarchy...
  *

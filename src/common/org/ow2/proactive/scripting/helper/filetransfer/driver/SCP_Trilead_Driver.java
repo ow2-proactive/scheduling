@@ -103,12 +103,12 @@ public class SCP_Trilead_Driver implements FileTransfertDriver {
         //
         //		BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
         //		String line = br.readLine();
-        //		
+        //
         //		while (line!=null)
         //		{
         //			System.out.println(line);
         //			line = br.readLine();
-        //	
+        //
         //		}
         s.close();
         debug("putting files " + files + " to remote folder " + remoteFolder);

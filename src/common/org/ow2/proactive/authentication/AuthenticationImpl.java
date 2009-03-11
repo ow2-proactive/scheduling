@@ -40,6 +40,7 @@ import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAActiveObject;
 
+
 /**
  * An active object responsible for authentication.
  *
@@ -48,7 +49,7 @@ import org.objectweb.proactive.api.PAActiveObject;
  */
 public abstract class AuthenticationImpl implements Authentication {
 
-	// activation is used to control authentication during scheduling initialization
+    // activation is used to control authentication during scheduling initialization
     private boolean activated = false;
 
     /**
@@ -73,11 +74,12 @@ public abstract class AuthenticationImpl implements Authentication {
     /**
      * Performs login
      */
-    protected void loginAs(String role, String[] groups, String username, String password) throws LoginException {
+    protected void loginAs(String role, String[] groups, String username, String password)
+            throws LoginException {
 
-		if (activated == false) {
-	        throw new LoginException("Authentication active object is not activated.");
-		}
+        if (activated == false) {
+            throw new LoginException("Authentication active object is not activated.");
+        }
 
         if (username == null | username.equals("")) {
             throw new LoginException("Bad user name (user is null or empty)");
@@ -85,7 +87,7 @@ public abstract class AuthenticationImpl implements Authentication {
 
         try {
             // Verify that this user//password can connect to this existing scheduler
-		getLogger().info(username + " is trying to connect as " + role);
+            getLogger().info(username + " is trying to connect as " + role);
 
             Map<String, Object> params = new HashMap<String, Object>(4);
             //user name to check
@@ -101,10 +103,10 @@ public abstract class AuthenticationImpl implements Authentication {
             LoginContext lc = new LoginContext(getLoginMethod(), new NoCallbackHandler(params));
 
             lc.login();
-            getLogger().info("Logged successfull as a "+role+" : " + username);
+            getLogger().info("Logged successfull as a " + role + " : " + username);
 
         } catch (LoginException e) {
-        	getLogger().info(e.getMessage());
+            getLogger().info(e.getMessage());
             //Nature of exception is hidden for user, we don't want to inform
             //user about the reason of non authentication
             throw new LoginException("Authentication failed");
@@ -115,17 +117,17 @@ public abstract class AuthenticationImpl implements Authentication {
      * Indicates whether the authentication active object is active.
      */
     public boolean isActivated() {
-		return activated;
-	}
+        return activated;
+    }
 
     /**
      * Activates or deactivates authentication active object
      */
-	public void setActivated(boolean activated) {
-		this.activated = activated;
-	}
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
 
-	/**
+    /**
      * Terminates the active object
      */
     public boolean terminate() {

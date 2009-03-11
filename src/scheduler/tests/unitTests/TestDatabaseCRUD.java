@@ -151,7 +151,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getSelectionScript().getParameters()[0], "paquit");
                 Assert.assertTrue(it.getPreScript().getScript().contains("Beginning of Pre-Script"));
                 Assert.assertTrue(it.getPostScript().getScript().contains(
-                        "Content is equals to " + URLbegin + "jobs_descriptors/unset.js"));
+                        "Content is equals to " + URLbegin + "sample/jobs_descriptors/unset.js"));
                 Assert.assertNull(it.getPostScript().getParameters());
                 Assert.assertTrue(it.getCleaningScript().getScript().contains("Beginning of clean script"));
                 Assert.assertNull(it.getCleaningScript().getParameters());
@@ -241,7 +241,7 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer())).length, 5);
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer()))[0], URLbegin +
-                    "jobs_descriptors/job_native_linux/nativTask");
+                    "sample/jobs_descriptors/job_native_linux/nativTask");
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer()))[1], "1");
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer()))[2], "2 2");
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer()))[3], "3");
@@ -274,9 +274,9 @@ public class TestDatabaseCRUD {
                         "command=args[0]+\" 12\";\n");
                 Assert.assertEquals(
                         ((GenerationScript) f.get(it.getExecutableContainer())).getParameters()[0], URLbegin +
-                            "jobs_descriptors/job_native_linux/nativTask");
+                            "sample/jobs_descriptors/job_native_linux/nativTask");
                 Assert.assertEquals(((GenerationScript) f.get(it.getExecutableContainer())).execute()
-                        .getResult(), URLbegin + "jobs_descriptors/job_native_linux/nativTask 12");
+                        .getResult(), URLbegin + "sample/jobs_descriptors/job_native_linux/nativTask 12");
             }
         }
         //test job and task result
@@ -329,7 +329,7 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer())).length, 5);
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer()))[0], URLbegin +
-                    "jobs_descriptors/job_native_linux/nativTask");
+                    "sample/jobs_descriptors/job_native_linux/nativTask");
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer()))[1], "1");
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer()))[2], "2 2");
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer()))[3], "3");
@@ -341,9 +341,9 @@ public class TestDatabaseCRUD {
                         "command=args[0]+\" 12\";\n");
                 Assert.assertEquals(
                         ((GenerationScript) f.get(it.getExecutableContainer())).getParameters()[0], URLbegin +
-                            "jobs_descriptors/job_native_linux/nativTask");
+                            "sample/jobs_descriptors/job_native_linux/nativTask");
                 Assert.assertEquals(((GenerationScript) f.get(it.getExecutableContainer())).execute()
-                        .getResult(), URLbegin + "jobs_descriptors/job_native_linux/nativTask 12");
+                        .getResult(), URLbegin + "sample/jobs_descriptors/job_native_linux/nativTask 12");
             }
         }
         //update (1 task is enough)

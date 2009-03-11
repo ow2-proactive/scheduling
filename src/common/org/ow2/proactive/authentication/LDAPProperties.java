@@ -102,12 +102,12 @@ public class LDAPProperties {
      *
      */
     public LDAPProperties(String propertiesFileName) {
-		try {
-		    prop.load(new FileInputStream(new File(propertiesFileName)));
-		    setUserJavaProperties();
-		} catch (IOException e) {
-		    throw new RuntimeException(e);
-		}    	
+        try {
+            prop.load(new FileInputStream(new File(propertiesFileName)));
+            setUserJavaProperties();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -124,6 +124,6 @@ public class LDAPProperties {
     }
 
     public String getProperty(String key) {
-    	return prop.getProperty(key);
+        return prop.getProperty(key);
     }
 }

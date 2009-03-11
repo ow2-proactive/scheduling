@@ -6,7 +6,7 @@ import org.ow2.proactive.scripting.helper.filetransfer.initializer.FileTransfert
 
 
 /**
- * Initializer class for an ftp connection 
+ * Initializer class for an ftp connection
  * By default the port is 21, the file transfer type is ASCII (binaryType is set to false), and the connection mode is active
  * @author esalagea
  *

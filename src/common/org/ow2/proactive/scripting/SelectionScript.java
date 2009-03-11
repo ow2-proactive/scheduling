@@ -79,7 +79,7 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @AccessType("field")
 @Proxy(lazy = false)
 public class SelectionScript extends Script<Boolean> {
-	public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
 
     @Id
     @GeneratedValue
@@ -206,7 +206,7 @@ public class SelectionScript extends Script<Boolean> {
         try {
             this.id_ = MessageDigest.getInstance("SHA-1").digest(stringId.getBytes());
         } catch (NoSuchAlgorithmException e) {
-		logger_dev.error("",e);
+            logger_dev.error("", e);
             this.id_ = stringId.getBytes();
         }
     }
@@ -252,10 +252,10 @@ public class SelectionScript extends Script<Boolean> {
                         result.getClass().getName()));
             }
         } else {
-		String msg = "No binding for key : " + RESULT_VARIABLE +
-		"\na Selection script must define a variable named '" + RESULT_VARIABLE +
-		"' set to true or false";
-		logger_dev.error(msg);
+            String msg = "No binding for key : " + RESULT_VARIABLE +
+                "\na Selection script must define a variable named '" + RESULT_VARIABLE +
+                "' set to true or false";
+            logger_dev.error(msg);
             return new ScriptResult<Boolean>(new Exception(msg));
         }
     }

@@ -74,7 +74,7 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @Proxy(lazy = false)
 public abstract class Script<E> implements Serializable {
 
-	public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
 
     /** Variable name for script arguments */
     public static final String ARGUMENTS_NAME = "args";
@@ -225,7 +225,7 @@ public abstract class Script<E> implements Serializable {
 
             return getResult(bindings);
         } catch (Throwable e) {
-		logger_dev.error("",e);
+            logger_dev.error("", e);
             return new ScriptResult<E>(new Exception("An exception occured while executing the script ", e));
 
         }

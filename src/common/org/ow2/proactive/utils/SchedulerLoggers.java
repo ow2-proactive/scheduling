@@ -38,8 +38,8 @@ package org.ow2.proactive.utils;
  */
 public interface SchedulerLoggers {
 
-	static final public String PREFIX = "proactive.scheduler.dev";
+    static final public String PREFIX = "proactive.scheduler.dev";
 
-	static final public String SCRIPT = PREFIX+".script";
+    static final public String SCRIPT = PREFIX + ".script";
 
 }

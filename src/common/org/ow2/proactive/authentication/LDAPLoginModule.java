@@ -90,7 +90,8 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
     private final String USER_DN = ldapProperties.getProperty(LDAPProperties.LDAP_USERS_SUBTREE);
 
     /** attribute name in a LDAP user entry that corresponds to user login name*/
-    private final String USER_LOGIN_ATTR_NAME = ldapProperties.getProperty(LDAPProperties.LDAP_USER_LOGIN_ATTR);
+    private final String USER_LOGIN_ATTR_NAME = ldapProperties
+            .getProperty(LDAPProperties.LDAP_USER_LOGIN_ATTR);
 
     /** DN of an entry of type groupOfUniqueNames, that contains users DN that have user permissions */
     private final String USERS_GROUP_DN = ldapProperties.getProperty(LDAPProperties.LDAP_USERS_GROUP_DN);
@@ -102,7 +103,8 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
      * Authentication method used to bind to LDAP : none, simple, 
      * or one of the SASL authentication methods
      */
-    private final String AUTHENTICATION_METHOD = ldapProperties.getProperty(LDAPProperties.LDAP_AUTHENTICATION_METHOD);
+    private final String AUTHENTICATION_METHOD = ldapProperties
+            .getProperty(LDAPProperties.LDAP_AUTHENTICATION_METHOD);
 
     /** user name used to bind to LDAP (if authentication method is different from none) */
     private final String BIND_LOGIN = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_LOGIN);
@@ -122,35 +124,36 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
     private Map<String, String> groupDNMap;
 
     public LDAPLoginModule() {
-    	
+
         //initialize system properties for SSL/TLS connection
         String keyStore = ldapProperties.getProperty(LDAPProperties.LDAP_KEYSTORE_PATH);
         if (!alreadyDefined(SSL_KEYSTORE_PATH_PROPERTY, keyStore)) {
             System.setProperty(SSL_KEYSTORE_PATH_PROPERTY, keyStore);
-            System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY, ldapProperties.getProperty(LDAPProperties.LDAP_KEYSTORE_PASSWD));
+            System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY, ldapProperties
+                    .getProperty(LDAPProperties.LDAP_KEYSTORE_PASSWD));
         }
 
         String trustStore = ldapProperties.getProperty(LDAPProperties.LDAP_TRUSTSTORE_PATH);
         if (!alreadyDefined(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore)) {
             System.setProperty(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore);
-            System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY,
-            		ldapProperties.getProperty(LDAPProperties.LDAP_TRUSTSTORE_PASSWD));
+            System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY, ldapProperties
+                    .getProperty(LDAPProperties.LDAP_TRUSTSTORE_PASSWD));
         }
     }
-    
+
     private boolean alreadyDefined(String propertyName, String propertyValue) {
-    	
-    	if ( propertyName != null && propertyName.length() != 0 ) {
-	    	String definedPropertyValue = System.getProperty(propertyName);
-	    	
-	    	if (System.getProperty(propertyName) != null && !definedPropertyValue.equals(propertyValue)) {
-	    		logger.warn("Property " + propertyName + " is already defined");
-	    		logger.warn("Using old value " + propertyValue);
-	    		return true;
-	    	}
-    	}
-    	
-    	return false;
+
+        if (propertyName != null && propertyName.length() != 0) {
+            String definedPropertyValue = System.getProperty(propertyName);
+
+            if (System.getProperty(propertyName) != null && !definedPropertyValue.equals(propertyValue)) {
+                logger.warn("Property " + propertyName + " is already defined");
+                logger.warn("Using old value " + propertyValue);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -246,7 +249,7 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
         try {
             userDN = getLDAPUserDN(username);
         } catch (NamingException e) {
-		logger.error("",e);
+            logger.error("", e);
             succeeded = false;
             throw new FailedLoginException("Cannot connect to LDAP server");
         }
@@ -426,7 +429,7 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
                     ctx.close();
                 }
             } catch (NamingException e) {
-		logger.error("",e);
+                logger.error("", e);
                 logger.error("Problem closing LDAP connection : " + e.getMessage());
             }
         }
@@ -489,7 +492,7 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
                     ctx.close();
                 }
             } catch (NamingException e) {
-		logger.error("",e);
+                logger.error("", e);
                 logger.error("Problem closing LDAP connection : " + e.getMessage());
             }
         }
@@ -518,6 +521,6 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
         // Create the initial directory context
         return new InitialDirContext(env);
     }
-    
+
     protected abstract String getLDAPConfigFileName();
 }

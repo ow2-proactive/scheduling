@@ -49,7 +49,7 @@ public class FTP_VFS_Driver implements FileTransfertDriver {
 
     /**
      * Get a file from the remote location to the local folder
-     * 
+     *
      * @param remoteFilePath
      * @param localFolder
      * @param manageConnection - if set to true, it will initiate a connection by calling the connect() method, otherwise it considers that the caller has already initiated a connection
@@ -94,8 +94,8 @@ public class FTP_VFS_Driver implements FileTransfertDriver {
     }
 
     /**
-     * 
-     * @param localFilePath - absolute path, on the local machine, of the file to be copied 
+     *
+     * @param localFilePath - absolute path, on the local machine, of the file to be copied
      * @param remoteFolder - the path for the remote folder, relative to the ftp user's root folder
      * @param manageConnection - if set to true, it will initiate a connection by calling the connect() method, otherwise it considers that the caller has already initiated a connection
      * @throws Exception
@@ -149,7 +149,7 @@ public class FTP_VFS_Driver implements FileTransfertDriver {
     }
 
     /**
-     * 
+     *
      * @param remoteFolder
      * @param manageConnection
      * @return
@@ -231,7 +231,7 @@ public class FTP_VFS_Driver implements FileTransfertDriver {
     }
 
     /**
-     * Recursively copies all files and folders in the localFolderPath to the current ftp folder  
+     * Recursively copies all files and folders in the localFolderPath to the current ftp folder
      * @param localFolderPath
      * @throws Exception
      */

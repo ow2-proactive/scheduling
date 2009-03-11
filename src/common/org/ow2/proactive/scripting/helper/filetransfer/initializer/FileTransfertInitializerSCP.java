@@ -10,7 +10,7 @@ public class FileTransfertInitializerSCP implements FileTransfertInitializer {
     private String _user = "";
     private String _pass = "";
 
-    //default scp port is 22  
+    //default scp port is 22
     private int _port = 22;
 
     //--FileTransfertDriverVFSSCP is the default driver

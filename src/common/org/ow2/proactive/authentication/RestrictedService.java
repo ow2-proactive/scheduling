@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 
+
 /**
  * Class represents an active object with restricted access. It accepts and serves requests only from
  * objects which had been registered as trusted services.
@@ -54,105 +55,109 @@ import org.objectweb.proactive.core.mop.StubObject;
  */
 public abstract class RestrictedService implements Loggable, RunActive {
 
-	// public methods
-	private Set<String> publicMethods = new TreeSet<String>();
-	// trusted services
-	private HashMap<UniqueID, Boolean> trustedServices = new HashMap<UniqueID, Boolean>();
-	private Logger logger = getLogger();
-	
-	/**
-	 * Performs filtering of requests.
-	 */
-	public void runActivity(Body body) {
-		Service service = new Service(body);
-		
-		while (body.isActive()) {			
-			service.waitForRequest();
+    // public methods
+    private Set<String> publicMethods = new TreeSet<String>();
+    // trusted services
+    private HashMap<UniqueID, Boolean> trustedServices = new HashMap<UniqueID, Boolean>();
+    private Logger logger = getLogger();
 
-			Request request = service.blockingRemoveOldest();
-			if ( request.getSender().equals(body) || trustedServices.containsKey(request.getSourceBodyID()) || publicMethods.contains(request.getMethodName())) {
-				service.serve(request);
-			} else {
-				logger.debug("Unauthorized request " + request.getMethodName() + " from " + request.getSender() + " to class " + this.getClass().getName());
-				continue;
-			}
-		}
-	}
-	
-	/**
-	 * Intended to be used for immediate services filtering
-	 */
-	protected boolean trustedImmediateServiceCaller(UniqueID id) {
-		return trustedServices.containsKey(id);
-	}
+    /**
+     * Performs filtering of requests.
+     */
+    public void runActivity(Body body) {
+        Service service = new Service(body);
 
-	/**
-	 * Registers a trusted service. Body id of caller active objects is used as request identifier. 
-	 */
-	protected void registerTrustedService(Object service) {
-		UniqueID id = getBodyId(service);
-		logger.debug("Trying to register service " + service.getClass().getName() + " with id " + id);
-		registerTrustedService(id);
-	}
+        while (body.isActive()) {
+            service.waitForRequest();
 
-	/**
-	 * Unregisters a trusted service.
-	 */
+            Request request = service.blockingRemoveOldest();
+            if (request.getSender().equals(body) || trustedServices.containsKey(request.getSourceBodyID()) ||
+                publicMethods.contains(request.getMethodName())) {
+                service.serve(request);
+            } else {
+                logger.debug("Unauthorized request " + request.getMethodName() + " from " +
+                    request.getSender() + " to class " + this.getClass().getName());
+                continue;
+            }
+        }
+    }
+
+    /**
+     * Intended to be used for immediate services filtering
+     */
+    protected boolean trustedImmediateServiceCaller(UniqueID id) {
+        return trustedServices.containsKey(id);
+    }
+
+    /**
+     * Registers a trusted service. Body id of caller active objects is used as request identifier.
+     */
+    protected void registerTrustedService(Object service) {
+        UniqueID id = getBodyId(service);
+        logger.debug("Trying to register service " + service.getClass().getName() + " with id " + id);
+        registerTrustedService(id);
+    }
+
+    /**
+     * Unregisters a trusted service.
+     */
     protected void unregisterTrustedService(Object service) {
-		UniqueID id = getBodyId(service);
-		logger.debug("Trying to unregister service " + service.getClass().getName() + " with id " + id);
-		unregisterTrustedService(id);
-	}
+        UniqueID id = getBodyId(service);
+        logger.debug("Trying to unregister service " + service.getClass().getName() + " with id " + id);
+        unregisterTrustedService(id);
+    }
 
-	/**
-	 * Registers a trusted service with a given id.
-	 */
-	protected boolean registerTrustedService(UniqueID id) {
-		if (id!=null && !trustedServices.containsKey(id)) {
-			trustedServices.put(id, true);
-			logger.debug("Trusted service registred: id " + id + " for " + this.getClass().getName());
-			return true;
-		} else {
-			logger.debug("Cannot register trusted service with id " + id + " for " + this.getClass().getName());
-			return false;
-		}
-	}
-	
-	/**
-	 * Unregisters a trusted service with a given id.
-	 */
+    /**
+     * Registers a trusted service with a given id.
+     */
+    protected boolean registerTrustedService(UniqueID id) {
+        if (id != null && !trustedServices.containsKey(id)) {
+            trustedServices.put(id, true);
+            logger.debug("Trusted service registred: id " + id + " for " + this.getClass().getName());
+            return true;
+        } else {
+            logger.debug("Cannot register trusted service with id " + id + " for " +
+                this.getClass().getName());
+            return false;
+        }
+    }
+
+    /**
+     * Unregisters a trusted service with a given id.
+     */
     protected void unregisterTrustedService(UniqueID id) {
-    	
-		if (id !=null && trustedServices.containsKey(id)) {
-			trustedServices.remove(id);
-			logger.debug("Trusted service unregistred: id " + id + " in " + this.getClass().getName());
-		} else {
-			logger.debug("Cannot unregister trusted service with id " + id + " in " + this.getClass().getName());
-		}
-	}
-    
+
+        if (id != null && trustedServices.containsKey(id)) {
+            trustedServices.remove(id);
+            logger.debug("Trusted service unregistred: id " + id + " in " + this.getClass().getName());
+        } else {
+            logger.debug("Cannot unregister trusted service with id " + id + " in " +
+                this.getClass().getName());
+        }
+    }
+
     /**
      * Extract id from active object.
      * TODO find more straightforward way to do that   
      */
     private UniqueID getBodyId(Object service) {
 
-		if (service instanceof StubObject && ((StubObject)service).getProxy()!=null) {
-			Proxy proxy = ((StubObject)service).getProxy();
+        if (service instanceof StubObject && ((StubObject) service).getProxy() != null) {
+            Proxy proxy = ((StubObject) service).getProxy();
 
- 			if (proxy instanceof BodyProxy) {
-				return ((BodyProxy)proxy).getBodyID();
-			}
-		}
+            if (proxy instanceof BodyProxy) {
+                return ((BodyProxy) proxy).getBodyID();
+            }
+        }
 
-		return null;
+        return null;
     }
-    
+
     /**
      * Declares public method for restricted service. Accessable for all objects.
      * Use case: callback to resource manager during GCM deployment
      */
     protected void setPublicMethod(String methodName) {
-    	publicMethods.add(methodName);
+        publicMethods.add(methodName);
     }
 }

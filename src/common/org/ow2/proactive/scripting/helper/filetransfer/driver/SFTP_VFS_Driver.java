@@ -88,7 +88,7 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 
         debug("File copied " + remotePath + " to local folder " + destFolderPath);
 
-        // NOTE: if you close the file system manager, you won't be able to 
+        // NOTE: if you close the file system manager, you won't be able to
         // use VFS again in the same VM. If you wish to copy multiple files,
         // make the fsManager static, initialize it once, and close just
         // before exiting the process.
@@ -145,16 +145,16 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 
         //--Set remote folder to current
         /*	if (remoteFolder == "") {
-        		remoteFolder = ".";
-        	}
-        	System.out.println("Reading of = "+remoteFolder);
+		remoteFolder = ".";
+        }
+        System.out.println("Reading of = "+remoteFolder);
 
-        	FTPFile[] ftpFiles = ftp.listFiles(remoteFolder);*/
+        FTPFile[] ftpFiles = ftp.listFiles(remoteFolder);*/
         ArrayList<String> files = new ArrayList<String>();
         /*
         for (int i = 0; i < ftpFiles.length; i++) {
-        	files.add(ftpFiles[i].getName());
-        	System.out.println("=>" + ftpFiles[i].getName());
+        files.add(ftpFiles[i].getName());
+        System.out.println("=>" + ftpFiles[i].getName());
         }*/
 
         return files;
@@ -168,7 +168,7 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
         //		opts = new FileSystemOptions();
         //		SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, "no");
         //		manager = new StandardFileSystemManager();
-        //		manager.init();   
+        //		manager.init();
 
         fsManager = (DefaultFileSystemManager) VFS.getManager();
 

@@ -14,7 +14,7 @@ public class ScriptLoggerHelper {
      * If filepath is absolute, we append in that file
      * If it is relative, we append in tmpDir+file.separator+filePath
      * @param filePath
-     * @throws IOException 
+     * @throws IOException
      */
     public static void logToFile(String filePath, String message) throws IOException {
         String logsAbsoluteFilePath;
