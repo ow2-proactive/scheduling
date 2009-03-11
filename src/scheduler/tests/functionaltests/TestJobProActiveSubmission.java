@@ -29,16 +29,14 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionnaltests;
+package functionaltests;
+
+import java.util.Map.Entry;
 
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 import functionalTests.FunctionalTest;
 
@@ -48,25 +46,25 @@ import functionalTests.FunctionalTest;
  * Connection to scheduler, with authentication
  * Register a monitor to Scheduler in order to receive events concerning
  * job submission.
- *
- * Submit a Native job (test 1).
+ * 
+ * Submit a job (test 1). 
  * After the job submission, the test monitor all jobs states changes, in order
  * to observe its execution :
  * job submitted (test 2),
  * job pending to running (test 3),
  * the task pending to running, and task running to finished (test 4),
  * job running to finished (test 5).
- * After it retrieves job's result and check that the
+ * After it retrieves job's result and check that the 
  * task result is available (test 6).
- *
+ * 
  * @author The ProActive Team
  * @date 2 jun 08
  * @since ProActive 4.0
  */
-public class TestJobNativeSubmission extends FunctionalTest {
+public class TestJobProActiveSubmission extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobNativeSubmission.class.getResource(
-            "/functionnaltests/descriptors/Job_nativ.xml").getPath();
+    private static String jobDescriptor = TestJobProActiveSubmission.class.getResource(
+            "/functionaltests/descriptors/Job_ProActive.xml").getPath();
 
     /**
      * Tests start here.
@@ -75,43 +73,20 @@ public class TestJobNativeSubmission extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        JobId id = SchedulerTHelper.testJobSubmission(jobDescriptor);
 
-        String task1Name = "task1";
-        String task2Name = "task2";
-
-        //test submission and event reception
-        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
-
-        SchedulerTHelper.log("Job submitted, id " + id.toString());
-
-        SchedulerTHelper.log("Waiting for jobSubmitted Event");
-        JobState receivedState = SchedulerTHelper.waitForEventJobSubmitted(id);
-
-        Assert.assertEquals(receivedState.getId(), id);
-
-        SchedulerTHelper.log("Waiting for job running");
-        JobInfo jInfo = SchedulerTHelper.waitForEventJobRunning(id);
-        Assert.assertEquals(jInfo.getJobId(), id);
-        Assert.assertEquals(JobStatus.RUNNING, jInfo.getStatus());
-
-        SchedulerTHelper.waitForEventTaskRunning(id, task1Name);
-        TaskInfo tInfo = SchedulerTHelper.waitForEventTaskFinished(id, task1Name);
-
-        Assert.assertEquals(TaskStatus.FINISHED, tInfo.getStatus());
-
-        SchedulerTHelper.waitForEventTaskRunning(id, task2Name);
-        tInfo = SchedulerTHelper.waitForEventTaskFinished(id, task2Name);
-
-        Assert.assertEquals(TaskStatus.FAULTY, tInfo.getStatus());
-
-        SchedulerTHelper.waitForEventJobFinished(id);
+        // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
+        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
-        //check that there is one exception in results
-        Assert.assertTrue(res.getExceptionResults().size() == 1);
+        for (Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
+            Assert.assertNotNull(entry.getValue().value());
+        }
 
         //remove job
         SchedulerTHelper.removeJob(id);
         SchedulerTHelper.waitForEventJobRemoved(id);
+
+        SchedulerTHelper.killScheduler();
     }
 }

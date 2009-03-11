@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionnaltests;
+package functionaltests;
 
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -57,7 +57,7 @@ import functionalTests.FunctionalTest;
 public class TestJobFork extends FunctionalTest {
 
     private static String jobDescriptor = TestJobFork.class.getResource(
-            "/functionnaltests/descriptors/Job_fork.xml").getPath();
+            "/functionaltests/descriptors/Job_fork.xml").getPath();
 
     /**
      * Tests start here.
@@ -120,14 +120,22 @@ public class TestJobFork extends FunctionalTest {
         // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertTrue(res.hadException());
-
-        for (TaskResult taskRes : res.getAllResults().values()) {
-            if (taskRes.hadException()) {
-                Assert.assertNotNull(taskRes.getException());
-            } else {
-                Assert.assertNotNull(taskRes.value());
-            }
-        }
+        
+        Assert.assertFalse(res.getAllResults().get(task1Name).hadException());
+        Assert.assertNotNull(res.getAllResults().get(task1Name).value());
+        Assert.assertNull(res.getAllResults().get(task1Name).getException());
+        
+        Assert.assertFalse(res.getAllResults().get(task2Name).hadException());
+        Assert.assertNotNull(res.getAllResults().get(task2Name).value());
+        Assert.assertNull(res.getAllResults().get(task2Name).getException());
+        
+        Assert.assertTrue(res.getAllResults().get(taskForked1Name).hadException());
+        Assert.assertNull(res.getAllResults().get(taskForked1Name).value());
+        Assert.assertNotNull(res.getAllResults().get(taskForked1Name).getException());
+        
+        Assert.assertTrue(res.getAllResults().get(taskForked2Name).hadException());
+        Assert.assertNull(res.getAllResults().get(taskForked2Name).value());
+        Assert.assertNotNull(res.getAllResults().get(taskForked2Name).getException());
 
         //remove job
         SchedulerTHelper.removeJob(id);

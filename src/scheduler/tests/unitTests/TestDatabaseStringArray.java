@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import functionnaltests.SchedulerTHelper;
+import functionaltests.SchedulerTHelper;
 
 
 /**

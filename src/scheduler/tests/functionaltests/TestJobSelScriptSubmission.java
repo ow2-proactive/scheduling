@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionnaltests;
+package functionaltests;
 
 import java.util.Map.Entry;
 
@@ -63,7 +63,7 @@ import functionalTests.FunctionalTest;
 public class TestJobSelScriptSubmission extends FunctionalTest {
 
     private static String jobDescriptor = TestJobSelScriptSubmission.class.getResource(
-            "/functionnaltests/descriptors/Job_with_select_script.xml").getPath();
+            "/functionaltests/descriptors/Job_with_select_script.xml").getPath();
 
     /**
      * Tests start here.

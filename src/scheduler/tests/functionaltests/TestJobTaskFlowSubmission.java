@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionnaltests;
+package functionaltests;
 
 import java.util.Map.Entry;
 
@@ -46,35 +46,35 @@ import functionalTests.FunctionalTest;
  * Connection to scheduler, with authentication
  * Register a monitor to Scheduler in order to receive events concerning
  * job submission.
- *
- * Submit job pre post script. (test 1).
+ * 
+ * Submit a Task flow job (test 1). 
  * After the job submission, the test monitor all jobs states changes, in order
  * to observe its execution :
  * job submitted (test 2),
  * job pending to running (test 3),
- * the task pending to running, and task running to finished (test 4),
+ * all task pending to running, and all tasks running to finished (test 4),
  * job running to finished (test 5).
- * After it retrieves job's result and check that the
- * task result is available (test 6).
- *
+ * After it retrieves job's result and check that all 
+ * tasks results are available (test 6).
+ * 
  * @author The ProActive Team
  * @date 2 jun 08
  * @since ProActive 4.0
  */
-public class TestJobPrePostSubmission extends FunctionalTest {
+public class TestJobTaskFlowSubmission extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobPrePostSubmission.class.getResource(
-            "/functionnaltests/descriptors/Job_pre_post.xml").getPath();
+    private static String jobDescriptor = TestJobTaskFlowSubmission.class.getResource(
+            "/functionaltests/descriptors/Job_PI.xml").getPath();
 
     /**
-     * Tests start here.
-     *
-     * @throws Throwable any exception that can be thrown during the test.
-     */
+    * Tests start here.
+    *
+    * @throws Throwable any exception that can be thrown during the test.
+    */
     @org.junit.Test
     public void run() throws Throwable {
+
         JobId id = SchedulerTHelper.testJobSubmission(jobDescriptor);
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
         // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
@@ -83,10 +83,10 @@ public class TestJobPrePostSubmission extends FunctionalTest {
         for (Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
             Assert.assertNotNull(entry.getValue().value());
         }
+
         //remove job
         SchedulerTHelper.removeJob(id);
         SchedulerTHelper.waitForEventJobRemoved(id);
         SchedulerTHelper.killScheduler();
-
     }
 }

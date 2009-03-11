@@ -19,6 +19,7 @@
 		</task>
 		<task name="Task2">
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo" fork="true">
+			<forkEnvironment jvmParameters="-Dproactive.test=true" />
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>

@@ -1,4 +1,4 @@
-package functionnaltests.monitor;
+package functionaltests.monitor;
 
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;

@@ -74,7 +74,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.GenerationScript;
 
-import functionnaltests.SchedulerTHelper;
+import functionaltests.SchedulerTHelper;
 
 
 /**

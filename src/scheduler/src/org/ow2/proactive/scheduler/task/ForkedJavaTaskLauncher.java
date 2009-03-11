@@ -253,8 +253,9 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         int numberOfTrials = 0;
         for (; numberOfTrials < RETRY_ACQUIRE; numberOfTrials++) {
             boolean permit = semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.SECONDS);
-            if (permit)
+            if (permit){
                 break;
+            }
 
             try {
                 process.exitValue();
@@ -263,9 +264,10 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             } catch (IllegalThreadStateException e) {
             }
         }
-        if (numberOfTrials == RETRY_ACQUIRE)
+        if (numberOfTrials == RETRY_ACQUIRE){
             throw new SchedulerException("Unable to create a separate java process after " + RETRY_ACQUIRE +
                 " tries");
+        }
 
     }
 

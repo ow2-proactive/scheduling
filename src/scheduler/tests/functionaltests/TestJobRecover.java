@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionnaltests;
+package functionaltests;
 
 import junit.framework.Assert;
 
@@ -58,7 +58,7 @@ import functionalTests.FunctionalTest;
 public class TestJobRecover extends FunctionalTest {
 
     private static String jobDescriptor = TestJobRecover.class.getResource(
-            "/functionnaltests/descriptors/Job_PI_recover.xml").getPath();
+            "/functionaltests/descriptors/Job_PI_recover.xml").getPath();
 
     /**
      * Tests start here.

@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionnaltests;
+package functionaltests;
 
 import java.util.Map;
 
@@ -57,7 +57,7 @@ import functionalTests.FunctionalTest;
 public class TestJobKilled extends FunctionalTest {
 
     private static String jobDescriptor = TestJobKilled.class.getResource(
-            "/functionnaltests/descriptors/Job_Killed.xml").getPath();
+            "/functionaltests/descriptors/Job_Killed.xml").getPath();
 
     /**
      * Tests start here.

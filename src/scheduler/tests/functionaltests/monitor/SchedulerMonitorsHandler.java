@@ -1,4 +1,4 @@
-package functionnaltests.monitor;
+package functionaltests.monitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;

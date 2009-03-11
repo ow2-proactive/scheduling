@@ -29,7 +29,7 @@
  * ################################################################
  * $PROACTIVE_INITIAL_DEV$
  */
-package functionnaltests;
+package functionaltests;
 
 import java.io.File;
 import java.io.Serializable;

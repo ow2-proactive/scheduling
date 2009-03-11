@@ -1,4 +1,4 @@
-package functionnaltests;
+package functionaltests;
 
 import java.net.URL;
 
@@ -39,8 +39,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
-import functionnaltests.monitor.MonitorEventReceiver;
-import functionnaltests.monitor.SchedulerMonitorsHandler;
+import functionaltests.monitor.MonitorEventReceiver;
+import functionaltests.monitor.SchedulerMonitorsHandler;
 
 
 /**
@@ -90,7 +90,7 @@ public class SchedulerTHelper {
             "config/GCMNodeSourceDeployment.xml").getPath();
 
     protected static URL startForkedSchedulerApplication = SchedulerTHelper.class
-            .getResource("/functionnaltests/config/StartForkedSchedulerApplication.xml");
+            .getResource("/functionaltests/config/StartForkedSchedulerApplication.xml");
 
     protected static String functionalTestRMProperties = SchedulerTHelper.class.getResource(
             "config/functionalTRMProperties.ini").getPath();

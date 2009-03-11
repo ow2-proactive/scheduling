@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionnaltests;
+package functionaltests;
 
 import java.io.File;
 
@@ -70,7 +70,7 @@ import functionalTests.FunctionalTest;
 public class TestJobClasspath extends FunctionalTest {
 
     private static String jobDescriptor = TestJobClasspath.class.getResource(
-            "/functionnaltests/descriptors/Job_Test_CP.xml").getPath();
+            "/functionaltests/descriptors/Job_Test_CP.xml").getPath();
     private static Integer firstValueToTest = 1;
     private static Integer SecondValueToTest = 2;
 
