@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 /**
  * UserSchedulerInterface_ represents the methods that have to access the Core to be performed.
  * This interface only exists to make the refactoring easy.
- * It contains all the method that HAVE to acces the core. In fact, the core implements it.
+ * It contains all the method that HAVE to access the core. In fact, the core implements it.
  * It provides methods for someone connected to the scheduler as user.<br>
  * This interface provides methods to managed the user task and jobs on the scheduler.
  *

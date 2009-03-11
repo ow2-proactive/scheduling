@@ -10,9 +10,8 @@ fi
 SCHEDULER_DIR=$1
 VERSION=$2
 JAVA_HOME=$3
-JSR_223_HOME=$4
-if [ ! -z "$5" ] ; then
-	TMP=$5
+if [ ! -z "$4" ] ; then
+	TMP=$4
 fi
 
 RELEASE_BASENAME="ProActiveScheduling"
@@ -22,7 +21,6 @@ TMP_DIR=""
 echo " [i] SCHEDULER_DIR: $SCHEDULER_DIR"
 echo " [i] VERSION:       $VERSION"
 echo " [i] JAVA_HOME:     $JAVA_HOME"
-echo " [i] JSR_223_HOME:  $JSR_223_HOME"
 echo " [i] TMP:           $TMP"
 function warn_and_exit {
 	echo "$1" 1>&2
@@ -32,7 +30,7 @@ function warn_and_exit {
 function warn_print_usage_and_exit {
 	echo "$1" 1>&2
 	echo "" 1>&2
-	echo "Usage: $0 SCHEDULER_DIR VERSION JAVA_HOME JSR_223_HOME" 1>&2
+	echo "Usage: $0 SCHEDULER_DIR VERSION JAVA_HOME" 1>&2
 	exit 1
 }
 
@@ -47,10 +45,6 @@ fi
 
 if [ -z "$JAVA_HOME" ] ; then
 	warn_print_usage_and_exit "JAVA_HOME is not defined"
-fi
-
-if [ -z "$JSR_223_HOME" ] ; then
-	echo "JAVA_223_HOME is not defined : Assume jdk is 1.6 ..."
 fi
 
 export JAVA_HOME=${JAVA_HOME}
@@ -87,6 +81,7 @@ find . -type d -a -name ".svn" -exec rm -rf {} \;
 
 # Remove database directory if exist
 find . -type d -name "SCHEDULER_DB" -exec rm -rf {} \;
+find . -name "derby.log" -exec rm -rf {} \;
 
 # Replace all 'dev' version number by this version number in every XML, XSD, RNC files
 echo Replacing 'dev' tag with current version for XML files
@@ -94,10 +89,6 @@ find . -type f -exec sed -i "s#urn:proactive:jobdescriptor:dev#urn:proactive:job
 find . -type f -exec sed -i "s#http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd#http://proactive.inria.fr/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
 find . -type f -exec sed -i "s#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
 
-# Handle JSR223
-cp $JSR_223_HOME/script-js.jar ./lib/common/script/
-cp $JSR_223_HOME/js.jar ./lib/common/script/
-cp $JSR_223_HOME/script-api.jar ./lib/common/script/
 
 cd compile || warn_and_exit "Cannot move in compile"
 ./build clean
@@ -114,14 +105,6 @@ ssh sea.inria.fr chmod 555 /net/servers/www-sop/teams/oasis/proactive/schemas/jo
 
 cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 echo " [i] Clean"
-
-# Clean JSR223
-rm -rf ./lib/common/script/script-js.jar
-rm -rf ./lib/common/script/js.jar
-rm -rf ./lib/common/script/script-api.jar
-rm -rf ./dist/lib/script-js.jar
-rm -rf ./dist/lib/js.jar
-rm -rf ./dist/lib/script-api.jar
 
 # Clean RCP plugins
 find ./scheduler_plugins/ -name "*.jar" -exec rm -rf {} \;

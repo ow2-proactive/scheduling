@@ -2,19 +2,6 @@ Thanks for your interest in ProActive Scheduling.
 
 ProActive Scheduling 2008-09-08 14:04:11
 
-IMPORTANT NOTE :
-		
-Some parts of the ProActive Scheduler and ProActive  Resource Manager rely on Java Scripting capabilities.
-As a consequence, it requires either:
-	- 1.6 or greater Java Runtime Environment, without any modifications,
-	- or, with a 1.5 JRE, the JSR 223 jar files (available at :  http://jcp.org/en/jsr/detail?id=223)
-		    * First, the script-api.jar, script-js.jar and js.jar files must be added 
-			in the /dist/lib/ directory if you are using the bin release of
-			ProActive Scheduler, or in the /ProActive/lib/ directory if you build ProActive Scheduler from the source release.
-		    * Then the java5_jsr223_patch.jar patch (released with the Scheduler RCP Client)
-			should be executed in the Scheduler RCP Client directory : unzip the
-			java5_jsr223_patch.zip file and execute java -jar java5_jsr223_patch.jar.
-
 You can find the documentation of ProActive Scheduler in the docs directory :
 
 Javadoc and updated documentation are available online: http://proactive.inria.fr
@@ -34,7 +21,7 @@ script. If run without an argument, it will first start a Resources Manager on
 the local host and deploy 4 nodes. Then the scheduler will be started and
 connected to this resource Manager. Scheduler is starting sequence, that  is finished
 when the line :
-	 [...] Scheduler has just been started !
+	 Scheduler successfully created on rmi://hostname:port/
 
 is displayed. At this point, ProActive Scheduler is started with 4 nodes available.
 
@@ -46,7 +33,7 @@ you need a login and password, a default couple one is user1:pwd1
 There are many other jobs examples in job_descriptors directory.
 
 
-* Once executed, you can see that the scheduler is now scheduling this
+* Once executed, The scheduler is now scheduling this
 job. For further information, please refers to the Scheduler
 documentation; an administration guide will help you to tune your scheduler, 
 and user guide will explain how to build jobs.

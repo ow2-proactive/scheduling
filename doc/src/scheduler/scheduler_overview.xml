@@ -76,47 +76,6 @@
 				</para>
 			</listitem>
 		</itemizedlist>
-		<warning>
-		<para>
-		
-			Some parts of the ProActive Scheduler and ProActive Resource
-			Manager rely on Java Scripting capabilities (
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/en/jsr/detail?id=223">JSR 223</link>).
-			As a consequence, it requires either:
-			<itemizedlist>
-				<listitem>
-					<para>
-						a 1.6 or greater Java Runtime Environment, without any modifications,
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						or, with a 1.5 JRE, the
-						<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">
-							JSR 223 jar files</link> :
-					</para>
-					<itemizedlist>
-						<listitem>
-							<para>
-								First, the <literal>script-api.jar</literal>, <literal>script-js.jar</literal>
-								and <literal>js.jar</literal> files must be added in the <literal>dist/lib/</literal>
-								directory if you are using the bin release of ProActive Scheduler, or in the
-								<literal>lib/common/script/</literal> directory if you build ProActive Scheduler from the source release.
-							</para>
-						</listitem>
-						<listitem>
-							<para>
-								Then the <literal>J5jsr223Patch.jar</literal> patch (released with the Scheduler RCP
-								Client) should be executed in the Scheduler RCP Client directory : unzip the
-								<literal>java5_jsr223_patch.zip</literal> file and execute
-								<literal> java -jar java5_jsr223_patch.jar </literal>.
-							</para>
-						</listitem>
-					</itemizedlist>
-				</listitem>
-			</itemizedlist>
-		</para>
-		</warning>
 	</section>
 	<section xml:id="scheduler_concept"><info><title>Scheduler Basics</title></info>
 

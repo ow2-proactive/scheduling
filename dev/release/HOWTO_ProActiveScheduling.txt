@@ -5,7 +5,7 @@ For a major release (aka x.y.0):
 		- Check copyrights
 	- Build the release
 		- cd SCHEDULER_HOME
-		- dev/release/build_release.sh . x.y.z $JAVA_HOME JSR_223_JAR_HOME
+		- dev/release/build_release.sh . x.y.z $JAVA_HOME
 		- release can now be found in /tmp/ProActiveScheduling-x.y.z(.tar.gz)
 
 

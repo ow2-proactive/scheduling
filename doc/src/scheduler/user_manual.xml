@@ -921,12 +921,12 @@ job.setTask(aTask);
 							The ProActive scheduler supports portable scripts execution through the
 							JSR 223 Java Scripting capabilities; scripts can be written in any language
 							supported by the underlying Java Runtime Environment. Scripts are used in the
-							ProActive scheduler to :
+							ProActive Scheduler to :
 						</para>
 						<itemizedlist>
 							<listitem>
 								<para>
-									Execute some simple pre, post and cleaning processing: optional pre-script,
+									Execute some simple Pre, Post and Cleaning processing: optional pre-script,
 									post-script, and cleaning-script
 								</para>
 							</listitem>
@@ -955,30 +955,52 @@ job.setTask(aTask);
 									must set the boolean variable <literal>selected</literal>
 									, that indicates if the candidate node is suitable for
 									the execution of the associated task.
+									A java helper (org.ow2.proactive.scripting.helper.selection.SelectionUtils)
+									is provided for javascript, ruby and python script languages allowing user to simply
+									make some kind of selections. (script samples are available in 'sample/scripts/selection' directory.)
 								</para>
 							</listitem>
 							<listitem>
 								<para>
 									<emphasis>pre-script</emphasis>
-									The pre-script (if set) is always executed on the node that has
+									The pre-script (if used) is always executed on the node that has
 									been selected by the Resource Manager <emphasis>before</emphasis>
 									the execution of the task itself.
+									Java helper (org.ow2.proactive.scripting.helper.filetransfer package) is also available
+									for file transfer purposes to manage file copies. 
+									Some script samples are available in 'sample/scripts/filetransfer' directory.
 								</para>
 							</listitem>
 							<listitem>
 								<para>
 									<emphasis>post-script</emphasis> The post-script is executed on the same node
 									<emphasis>after</emphasis> the task itself and only if this last one has succeed.
+									The same helper than for pre-script can be used in the post-script.
 								</para>
 							</listitem>
 							<listitem>
 								<para>
 									<emphasis>cleaning-script</emphasis> The cleaning-script is always
-									executed by the resource manager <emphasis>after</emphasis> the execution
-									of the task itself or after the post-script (if set).
+									executed by the Resource Manager <emphasis>after</emphasis> the execution
+									of the task itself or after the post-script (if used).
+									The same helper than for pre-script can be used in the cleaning-script.
 								</para>
 							</listitem>
 						</itemizedlist>
+						<para>
+							Note : For any script engines or script implementation used in this package or brought by you,
+							you must notice that :
+						</para>
+						<para>
+							THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+							OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+							AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+							CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+							DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+							DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+							IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+							OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+						</para>
 					</listitem>
 				</itemizedlist>
 				<para>
