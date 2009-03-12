@@ -60,7 +60,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 
 
 /**

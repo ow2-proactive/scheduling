@@ -16,7 +16,7 @@ public class Source extends TreeParentElement {
     }
 
     public boolean isDynamic() {
-        return type.equals(RMConstants.P2P_NODE_SOURCE_TYPE);
+        return false;
     }
 
     public boolean isStatic() {

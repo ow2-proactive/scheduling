@@ -37,9 +37,7 @@ import java.util.Observer;
 
 import javax.security.auth.login.LoginException;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -362,8 +360,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             userName = null;
             logAsAdmin = false;
             return LOGIN_OR_PASSWORD_WRONG;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
             userName = null;
             logAsAdmin = false;
             return CONNECTION_REFUSED;
@@ -387,14 +385,19 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     // -------------------------------------------------------------------- //
     // ------------------------------ Static ------------------------------ //
     // -------------------------------------------------------------------- //
+    public static SchedulerProxy getInstanceWithException() throws Throwable {
+        if (instance == null) {
+            instance = (SchedulerProxy) PAActiveObject.newActive(SchedulerProxy.class.getName(), null);
+        }
+        return instance;
+    }
+
     public static SchedulerProxy getInstance() {
         if (instance == null) {
             try {
-                instance = (SchedulerProxy) PAActiveObject.newActive(SchedulerProxy.class.getName(), null);
-            } catch (ActiveObjectCreationException e) {
-                e.printStackTrace();
-            } catch (NodeException e) {
-                e.printStackTrace();
+                instance = getInstanceWithException();
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
         }
         return instance;

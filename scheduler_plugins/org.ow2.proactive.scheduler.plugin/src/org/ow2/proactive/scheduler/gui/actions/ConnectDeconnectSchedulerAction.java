@@ -74,56 +74,63 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
         SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(parent.getShell());
 
         if (dialogResult != null) {
-            int res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
+            try {
+                int res = SchedulerProxy.getInstanceWithException().connectToScheduler(dialogResult);
 
-            if (res == SchedulerProxy.CONNECTED) {
-                isConnected = true;
-                ActionsManager.getInstance().setConnected(true);
+                if (res == SchedulerProxy.CONNECTED) {
+                    isConnected = true;
+                    ActionsManager.getInstance().setConnected(true);
 
-                // connection successful, so record "valid" url and login
-                SelectSchedulerDialog.saveInformations();
-                this.setText("Disconnect");
-                this.setToolTipText("Disconnect from the ProActive Scheduler");
-                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                        "icons/disconnect.gif"));
-                waitShell = new Shell(parent.getShell(), SWT.PRIMARY_MODAL);
-                FormLayout layout = new FormLayout();
-                layout.marginHeight = 20;
-                layout.marginWidth = 20;
-                waitShell.setLayout(layout);
-                Label jobNameLabel = new Label(waitShell, SWT.NONE);
-                jobNameLabel.setText("Download scheduler state, please wait...");
-                waitShell.pack();
-                Rectangle parentBounds = parent.getShell().getBounds();
-                int x = parentBounds.x + parentBounds.width / 2;
-                int y = parentBounds.y + parentBounds.height / 2;
-                waitShell.setLocation(x - waitShell.getSize().x / 2, y - waitShell.getSize().y / 2);
-                waitShell.pack();
-                waitShell.open();
+                    // connection successful, so record "valid" url and login
+                    SelectSchedulerDialog.saveInformations();
+                    this.setText("Disconnect");
+                    this.setToolTipText("Disconnect from the ProActive Scheduler");
+                    this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
+                            "icons/disconnect.gif"));
+                    waitShell = new Shell(parent.getShell(), SWT.PRIMARY_MODAL);
+                    FormLayout layout = new FormLayout();
+                    layout.marginHeight = 20;
+                    layout.marginWidth = 20;
+                    waitShell.setLayout(layout);
+                    Label jobNameLabel = new Label(waitShell, SWT.NONE);
+                    jobNameLabel.setText("Download scheduler state, please wait...");
+                    waitShell.pack();
+                    Rectangle parentBounds = parent.getShell().getBounds();
+                    int x = parentBounds.x + parentBounds.width / 2;
+                    int y = parentBounds.y + parentBounds.height / 2;
+                    waitShell.setLocation(x - waitShell.getSize().x / 2, y - waitShell.getSize().y / 2);
+                    waitShell.pack();
+                    waitShell.open();
 
-                // wait result for synchronous call
-                boolean futurRes = JobsController.getActiveView().init();
+                    // wait result for synchronous call
+                    boolean futurRes = JobsController.getActiveView().init();
 
-                //synchronous call ; wait futur 
-                if (futurRes) {
-                    waitShell.close();
+                    //synchronous call ; wait futur
+                    if (futurRes) {
+                        waitShell.close();
+                    }
+
+                    // the call "JobsController.getActiveView().init();"
+                    // must be terminated here, before starting other call.
+                    SeparatedJobView.getPendingJobComposite().initTable();
+                    SeparatedJobView.getRunningJobComposite().initTable();
+                    SeparatedJobView.getFinishedJobComposite().initTable();
+
+                    ActionsManager.getInstance().update();
+
+                    SeparatedJobView.setVisible(true);
+                } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
+                    MessageDialog.openError(parent.getShell(), "Couldn't connect",
+                            "The login and/or the password are wrong !");
+                } else {
+                    MessageDialog.openError(parent.getShell(), "Couldn't connect",
+                            "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl());
                 }
-
-                // the call "JobsController.getActiveView().init();"
-                // must be terminated here, before starting other call.
-                SeparatedJobView.getPendingJobComposite().initTable();
-                SeparatedJobView.getRunningJobComposite().initTable();
-                SeparatedJobView.getFinishedJobComposite().initTable();
-
-                ActionsManager.getInstance().update();
-
-                SeparatedJobView.setVisible(true);
-            } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
+            } catch (Throwable t) {
+                t.printStackTrace();
                 MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                        "The login and/or the password are wrong !");
-            } else {
-                MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                        "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl());
+                        "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl() +
+                            "\n cause : " + t.getMessage());
             }
         }
     }
