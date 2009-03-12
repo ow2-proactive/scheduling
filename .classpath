@@ -103,7 +103,11 @@
 	<classpathentry kind="lib" path="lib/hibernate/annotation/ejb3-persistence.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate/annotation/hibernate-annotations.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate/core/hibernate-core.jar"/>
-	<classpathentry kind="lib" path="lib/common/commons-net-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/common/commons-vfs-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/common/script/commons-net-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/common/script/commons-vfs-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/common/script/script-api.jar"/>
+	<classpathentry kind="lib" path="lib/common/script/jruby.jar"/>
+	<classpathentry kind="lib" path="lib/common/script/jython.jar"/>
+	<classpathentry kind="lib" path="lib/common/script/js.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
