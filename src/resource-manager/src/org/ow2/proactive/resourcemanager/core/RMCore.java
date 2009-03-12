@@ -221,17 +221,11 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     /**
      * Creates the RMCore object with further deployment of given data.
      * 
-     * @param id
-     *            Name for RMCOre.
-     * @param nodeRM
-     *            Name of the ProActive Node object containing RM active
-     *            objects.
-     * @param gcmDeploymentData
-     *            data to deploy.
-     * @throws ActiveObjectCreationException
-     *             if creation of the active object failed.
-     * @throws NodeException
-     *             if a problem occurs on the target node.
+     * @param id Name for RMCOre.
+     * @param nodeRM Name of the ProActive Node object containing RM active objects.
+     * @param localGCMDeploymentFiles file data to deploy.
+     * @throws ActiveObjectCreationException if creation of the active object failed.
+     * @throws NodeException if a problem occurs on the target node.
      */
     public RMCore(String id, Node nodeRM, Collection<String> localGCMDeploymentFiles)
             throws ActiveObjectCreationException, NodeException {

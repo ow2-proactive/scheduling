@@ -41,7 +41,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
  * Comparator for {@link RMNode} objects :<BR>
  * compare two nodes by their chances to verify a script.
  * This comparator is used to sort a nodes collection according to results
- * of a {@link SelectionScript}.
+ * of a {@link org.ow2.proactive.scripting.SelectionScript}.
  *
  */
 public class NodeProbabilityComparator implements Comparator<RMNode> {

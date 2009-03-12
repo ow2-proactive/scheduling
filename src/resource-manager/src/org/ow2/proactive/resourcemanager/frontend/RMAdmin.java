@@ -31,9 +31,9 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Vector;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
@@ -116,7 +116,7 @@ public interface RMAdmin extends RMUser, Serializable {
      * application and a Resource Manager, an RCP plugin for example. GCMDeployment is stored in a byte array
      * because GCMDeployment object isn't serializable.
      * Before using this function You can use 
-     * {@link org.ow2.proactive.resourcemanager.utils.FileToBytesConverter#convertFileToByteArray}
+     * {@link org.ow2.proactive.utils.FileToBytesConverter#convertFileToByteArray(File)}
      * to transform your GCMDeployment file to a byte array before calling this method.
      * @param gcmDeploymentData byte array containing GCM deployment XML description
      * @throws RMException if an error occurs during the deployment of GCM deployment 
@@ -133,7 +133,7 @@ public interface RMAdmin extends RMUser, Serializable {
      * application and a Resource Manager, an RCP plugin for example. GCMDeployment is stored in a byte array
      * because GCMDeployment object isn't serializable.
      * Before using this function You can use 
-     * {@link org.ow2.proactive.resourcemanager.utils.FileToBytesConverter#convertFileToByteArray}
+     * {@link org.ow2.proactive.utils.FileToBytesConverter#convertFileToByteArray(java.io.File)}
      * to transform your GCMDeployment file to a byte array before calling this method.
      * @param gcmDeploymentData byte array containing GCM deployment xml description
      * @param sourceName Name of the node source already created that will handle new nodes.
