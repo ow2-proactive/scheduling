@@ -192,7 +192,7 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.CommonAttribute#setNumberOfExecution(int)
+     * @see org.ow2.proactive.scheduler.common.task.CommonAttribute#setMaxNumberOfExecution(int)
      */
     @Override
     public void setMaxNumberOfExecution(int numberOfExecution) {
@@ -324,7 +324,7 @@ public abstract class InternalTask extends TaskState {
     /**
      * Sets the nodes Exclusion to the given nodeExclusion value.
      *
-     * @param nodes Exclusion the nodeExclusion to set.
+     * @param nodeExclusion the nodeExclusion to set.
      */
     public void setNodeExclusion(NodeSet nodeExclusion) {
         this.nodeExclusion = nodeExclusion;

@@ -60,7 +60,7 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * </p>
      * Thus, user could get the job result according to the precious result.
      * <br /><br />
-     * It is possible to get a listener on the scheduler. (see {@link UserSchedulerInterface.addSchedulerEventListener()} for more details)
+     * It is possible to get a listener on the scheduler. (see {@link UserSchedulerInterface#addSchedulerEventListener(SchedulerEventListener,SchedulerEvent...)} for more details)
      *
      * @param job the new job to submit.
      * @return the generated new job ID.
@@ -70,7 +70,7 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
 
     /**
      * Get the result for the given jobId.<br>
-     * The jobId is given as a string. It's in fact the string returned by the {@link JobId.value()} method.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
      * A user can only get HIS result back except if he is admin.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.<br>
      * So, if you have the right to get the job result represented by the given jobId and if the job exists,
@@ -84,7 +84,7 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
 
     /**
      * Get the result for the given task name in the given jobId. <br />
-     * The jobId is given as a string. It's in fact the string returned by the {@link JobId.value()} method.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
      * A user can only get HIS result back.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.<br>
      * So, if you have the right to get the task result that is in the job represented by the given jobId and if the job and task name exist,

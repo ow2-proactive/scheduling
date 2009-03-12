@@ -104,9 +104,9 @@ import org.xml.sax.SAXParseException;
  * JobFactory_xpath is am implementation of the JobFactory using XPATH
  *
  * @author The ProActive Team
- * @date 2 July 07
  * @since ProActive Scheduling 0.9
  *
+ * $Id$
  */
 public class JobFactory_xpath extends JobFactory {
 

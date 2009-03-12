@@ -46,9 +46,9 @@ import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
  * You must use provided methods in order to get the Scheduler properties.
  * 
  * @author The ProActiveTeam
- * @date 11 june 08
  * @since ProActive 4.0
  *
+ * $Id$
  */
 @PublicAPI
 public enum PASchedulerProperties {

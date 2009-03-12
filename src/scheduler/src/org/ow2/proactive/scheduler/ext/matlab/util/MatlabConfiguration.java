@@ -107,7 +107,7 @@ public class MatlabConfiguration implements Serializable {
     }
 
     /**
-     * Returns the current matlab version
+     * Returns the current matlab version.
      * @return matlab version
      */
     public String getMatlabVersion() {
@@ -115,8 +115,8 @@ public class MatlabConfiguration implements Serializable {
     }
 
     /**
-     * Returns the name of the matlab command
-     * @return
+     * Returns the name of the matlab command.
+     * @return returns the String containing the name of the Matlab command
      */
     public String getMatlabCommandName() {
         return matlabCommandName;

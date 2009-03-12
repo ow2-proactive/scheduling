@@ -48,10 +48,10 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * It provides methods for someone connected to the scheduler as user.<br>
  * This interface provides methods to managed the user task and jobs on the scheduler.
  *
- * @author The ProActive Team
- * @date 20 févr. 08
+ * @author The ProActive Team 
  * @since ProActive Scheduling 0.9
  *
+ * $Id$
  */
 @PublicAPI
 public interface UserSchedulerInterface_ extends Serializable {

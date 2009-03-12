@@ -355,7 +355,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobResult(java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobResult(java.lang.String)
      */
     public JobResult getJobResult(String jobId) throws SchedulerException {
         return this.getJobResult(JobIdImpl.makeJobId(jobId));
@@ -394,7 +394,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getTaskResult(java.lang.String, java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getTaskResult(java.lang.String, java.lang.String)
      */
     public TaskResult getTaskResult(String jobId, String taskName) throws SchedulerException {
         return this.getTaskResult(JobIdImpl.makeJobId(jobId), taskName);

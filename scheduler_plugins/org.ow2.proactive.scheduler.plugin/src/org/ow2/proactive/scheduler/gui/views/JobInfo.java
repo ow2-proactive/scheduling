@@ -266,8 +266,8 @@ public class JobInfo extends ViewPart {
      */
     @Override
     public void setFocus() {
-        // TODO petit problème, Eclipse envoi 3 fois d'afiler le mm event
-        // setFocus quand la fenêtre a une fenetre "onglet" voisine...
+        // TODO petit probl??me, Eclipse envoi 3 fois d'afiler le mm event
+        // setFocus quand la fen??tre a une fenetre "onglet" voisine...
 
         //	 TableManager tableManager = TableManager.getInstance();
         //	 if (tableManager != null) {

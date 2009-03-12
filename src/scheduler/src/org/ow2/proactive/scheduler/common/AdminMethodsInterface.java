@@ -43,9 +43,9 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
  * This interface represents what a scheduler administrator should do.
  *
  * @author The ProActive Team
- * @date 20 févr. 08
  * @since ProActive Scheduling 0.9
  *
+ * $Id$
  */
 @PublicAPI
 public interface AdminMethodsInterface {

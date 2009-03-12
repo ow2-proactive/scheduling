@@ -46,8 +46,8 @@ import org.ow2.proactive.scripting.Script;
  * JavaTaskLauncher is the class that will start a Java Process.
  *
  * @author The ProActive Team
- * @date 24 avr. 08
  *
+ * $Id$
  */
 public class JavaTaskLauncher extends TaskLauncher {
 

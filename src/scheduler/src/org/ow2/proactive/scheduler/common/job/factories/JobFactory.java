@@ -44,9 +44,9 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
  * It can use different implementation of parsing.
  *
  * @author The ProActive Team
- * @date 2 July 07
  * @since ProActive Scheduling 0.9
  *
+ * $Id$
  */
 @PublicAPI
 public abstract class JobFactory {

@@ -29,7 +29,7 @@ import org.ow2.proactive.scripting.SimpleScript;
  * parsed file. This is a way to avoid creation of XML job descriptor for creation of simple jobs.
  *
  * Every line of the text file is taken and considered as a native command from which a native task is built,
- * except lines beginning with {@value FlatJobFactory#CMD_FILE_COMMENT_CHAR} and empty lines.
+ * except lines beginning with {@link FlatJobFactory#CMD_FILE_COMMENT_CHAR} and empty lines.
  * dependencies between tasks cannot be set, task names are automatically set. A log file can be specified.
  * A selection script can be associated for all the tasks, but not specific selection script for each tasks.
  * A Job name can be specified too.
@@ -84,12 +84,12 @@ public class FlatJobFactory {
     /**
      * Create a job from a String representing file path, this text file contains native commands to launch
      * Every line of the text file is taken and considered as a native command from which a native task is built,
-     * except lines beginning with {@value FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} and empty lines.
+     * except lines beginning with {@link FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} and empty lines.
      * So job in result is made of several native tasks without dependencies.
      *
      * @param commandFilePath a string representing a text file containing native commands.
      * @param jobName A String representing a name to give to the job. If null, default job name is made of
-     * {@value FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} + userName parameter.
+     * {@link FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} + userName parameter.
      * @param selectionScriptPath a Path to a file containing a selection script, or null if
      * no script is needed.
      * @param outputFile a path to file that will contain log of STDOUT and STDERR of job's tasks execution.
@@ -166,7 +166,7 @@ public class FlatJobFactory {
      *
      * @param command a string representing an executable command to launch.
      * @param jobName A String representing a name to give to the job, if null. default job name is made of
-     * {@value FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} + userName parameter.
+     * {link FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} + userName parameter.
      * @param selectionScriptPath A Path to a file containing a selection script, or null if
      * no script is needed.
      * @param outputFile a path to file that will contain log of STDOUT and STDERR of the task's execution

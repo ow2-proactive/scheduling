@@ -180,7 +180,7 @@ public abstract class InternalJob extends JobState {
     /**
      * To update the content of this job with a jobInfo.
      *
-     * @param jobInfo the jobInfo to set
+     * @param info the JobInfo to set
      */
     public synchronized void update(JobInfo info) {
         if (!getId().equals(info.getJobId())) {
@@ -288,7 +288,7 @@ public abstract class InternalJob extends JobState {
     /**
      * Terminate a task, change status, managing dependences
      *
-     * @param errorOccured has an error occurred for this termination
+     * @param errorOccurred has an error occurred for this termination
      * @param taskId the task to terminate.
      * @return the taskDescriptor that has just been terminated.
      */

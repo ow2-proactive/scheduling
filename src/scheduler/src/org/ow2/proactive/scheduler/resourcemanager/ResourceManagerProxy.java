@@ -139,7 +139,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @see RMUser#freeNode(Node)
      *
      * @param node the node to free
-     * @param CleaningScript the cleaning script to apply to this node when freeing
+     * @param cleaningScript the cleaning script to apply to this node when freeing
      */
     public void freeNode(Node node, Script<?> cleaningScript) {
         if (node != null) {

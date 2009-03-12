@@ -57,7 +57,7 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
  * Informations about the task that is able to change.<br>
  * These informations are not in the {@link Task} class in order to permit
  * the scheduler listener to send this class as event.
- * To keep an internalTask up to date, just use the {@link InternalTask.update(TaskInfo)} method.
+ * To keep an internalTask up to date, just use the {@link org.ow2.proactive.scheduler.task.internal.InternalTask#update(TaskInfo)} method.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9

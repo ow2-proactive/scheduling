@@ -42,8 +42,8 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
  * RMState represents informations about RM activity.
  *
  * @author The ProActive Team
- * @date 12 mars 08
  *
+ * $Id$
  */
 @PublicAPI
 public class RMState implements Serializable {

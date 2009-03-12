@@ -111,7 +111,6 @@
 
 
       <target name="doc.Scheduler.javadoc.complete"  description="Generate the Scheduler complete javadoc">
-        <mkdir dir="${docs.tmp.dir}" />
         <javadoc  
             destdir="${docs.built.dir}/api_complete"
             author="true" 
@@ -193,6 +192,7 @@
                 <package name="org.ow2.proactive.resourcemanager*" />
             </group>
             
-        </javadoc>			
+        </javadoc>
+	<delete dir="${docs.tmp.dir}"/>
     </target>
 </project>

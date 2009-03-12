@@ -41,8 +41,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * It provides some information like user name, admin status, etc...
  *
  * @author The ProActive Team
- * @date 20 mars 08
- *
+ * 
+ * $Id$
  */
 @PublicAPI
 public abstract class UserIdentification implements Serializable, Comparable<UserIdentification> {

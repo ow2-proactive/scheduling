@@ -135,7 +135,7 @@ public class JavaExecutableContainer implements ExecutableContainer {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(org.ow2.proactive.scheduler.job.InternalJob, org.ow2.proactive.scheduler.task.internal.InternalTask)
+     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(JobState, TaskState)
      */
     public void init(JobState job, TaskState task) {
         // get the classserver if any (can be null)

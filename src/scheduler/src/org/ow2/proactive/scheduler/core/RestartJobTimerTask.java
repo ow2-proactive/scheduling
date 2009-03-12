@@ -41,9 +41,9 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * This timeout will increase according to a function defined in the job.
  *
  * @author jlscheef - ProActiveTeam
- * @date 10 juin 08
  * @since ProActive 4.0
  *
+ * $Id$
  */
 public class RestartJobTimerTask extends TimerTask {
 

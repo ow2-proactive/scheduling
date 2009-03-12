@@ -40,7 +40,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
 /**
  * Scheduler Authentication Interface provides method to connect to the scheduler.<br>
- * Before using the scheduler communication interface {@link UserSchedulerInterface}, you have to connect it using a login/password using this interface.<br>
+ * Before using the scheduler communication interface {@link org.ow2.proactive.scheduler.core.UserScheduler}, you have to connect it using a login/password using this interface.<br>
  * You can get this interface by using the scheduler connection {@link SchedulerConnection}
  *
  * @author The ProActive Team
@@ -59,7 +59,7 @@ public interface SchedulerAuthenticationInterface extends Authentication {
      *
      * @param user the user name of the user to connect.
      * @param password the password of the user to connect.
-     * @return The {@link UserScheduler} interface if this user can access to the scheduler.
+     * @return The {@link org.ow2.proactive.scheduler.core.UserScheduler} interface if this user can access to the scheduler.
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
@@ -76,7 +76,7 @@ public interface SchedulerAuthenticationInterface extends Authentication {
      *
      * @param user the user name of the user to connect.
      * @param password the password of the user to connect.
-     * @return The {@link UserScheduler} interface if this user can access to the scheduler.
+     * @return The {@link org.ow2.proactive.scheduler.core.UserScheduler} interface if this user can access to the scheduler.
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */

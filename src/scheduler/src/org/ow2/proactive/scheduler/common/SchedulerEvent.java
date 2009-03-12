@@ -40,8 +40,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * See {@link UserSchedulerInterface}.addSchedulerEventListener for more details.
  *
  * @author The ProActive Team
- * @date 18 oct. 07
  * @since ProActive Scheduling 0.9
+ *
+ * $Id$
  */
 @PublicAPI
 public enum SchedulerEvent {

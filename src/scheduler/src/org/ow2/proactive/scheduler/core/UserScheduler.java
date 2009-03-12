@@ -72,14 +72,14 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobResult(java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobResult(java.lang.String)
      */
     public JobResult getJobResult(String jobId) throws SchedulerException {
         return schedulerFrontend.getJobResult(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getTaskResult(java.lang.String, java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getTaskResult(java.lang.String, java.lang.String)
      */
     public TaskResult getTaskResult(String jobId, String taskName) throws SchedulerException {
         return schedulerFrontend.getTaskResult(jobId, taskName);

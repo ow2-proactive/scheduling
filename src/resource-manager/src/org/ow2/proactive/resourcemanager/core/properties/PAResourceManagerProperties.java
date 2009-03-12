@@ -46,9 +46,9 @@ import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
  * You must use provide methods in order to get this RM properties.
  * 
  * @author The ProActiveTeam
- * @date 11 june 08
  * @since ProActive 4.0
  *
+ * $Id$
  */
 @PublicAPI
 public enum PAResourceManagerProperties {

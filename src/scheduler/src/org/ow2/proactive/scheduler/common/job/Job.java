@@ -220,7 +220,7 @@ public abstract class Job extends CommonAttribute {
 
     /**
      * Set the environment for this job.
-     * @param env the environment to set
+     * @param environment the environment to set
      */
     public void setEnvironment(JobEnvironment environment) {
         this.environment = environment;

@@ -47,8 +47,8 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
  * This can provide informations about who is connected, what are their status, etc...
  *
  * @author The ProActive Team
- * @date 19 mars 08
- *
+ * 
+ * $Id$
  */
 @PublicAPI
 public class SchedulerUsers implements Serializable {

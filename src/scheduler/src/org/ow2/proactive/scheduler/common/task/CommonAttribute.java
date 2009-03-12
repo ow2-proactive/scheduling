@@ -157,7 +157,7 @@ public abstract class CommonAttribute implements Serializable {
     /**
      * Get the number of execution allowed for this task.
      * 
-     * @return the number of execution allowed for this task.
+     * @return the number of execution allowed for this task
      */
     public int getMaxNumberOfExecution() {
         return maxNumberOfExecution.getValue().integerValue();
@@ -166,7 +166,7 @@ public abstract class CommonAttribute implements Serializable {
     /**
      * To set the number of execution for this task. (Default is 1)
      *
-     * @param the number of times this task can be executed.
+     * @param numberOfExecution the number of times this task can be executed
      */
     public void setMaxNumberOfExecution(int numberOfExecution) {
         if (numberOfExecution <= 0) {
@@ -179,7 +179,7 @@ public abstract class CommonAttribute implements Serializable {
     /**
      * Get the maximum number Of Execution updatable property.
      * 
-     * @return the maximum number Of Execution updatable property.
+     * @return the maximum number Of Execution updatable property
      */
     public UpdatableProperties<IntegerWrapper> getMaxNumberOfExecutionProperty() {
         return maxNumberOfExecution;

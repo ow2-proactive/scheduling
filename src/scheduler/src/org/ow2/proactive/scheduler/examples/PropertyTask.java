@@ -42,9 +42,9 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  * It will also wait for 10 seconds before.
  *
  * @author The ProActive Team
- * @date 2 juil. 08
  * @since ProActive 4.0
  *
+ * $Id$
  */
 public class PropertyTask extends JavaExecutable {
 

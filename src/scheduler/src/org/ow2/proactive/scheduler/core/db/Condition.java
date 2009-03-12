@@ -75,7 +75,7 @@ public class Condition {
     /**
      * Set the field value to the given field value.
      *
-     * @param field the field to set.
+     * @param fieldFullName the field to set.
      */
     public void setField(String fieldFullName) {
         this.fieldFullName = fieldFullName;
