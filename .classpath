@@ -108,6 +108,5 @@
 	<classpathentry kind="lib" path="lib/common/script/script-api.jar"/>
 	<classpathentry kind="lib" path="lib/common/script/jruby.jar"/>
 	<classpathentry kind="lib" path="lib/common/script/jython.jar"/>
-	<classpathentry kind="lib" path="lib/common/script/js.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

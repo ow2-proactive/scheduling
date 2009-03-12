@@ -36,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -47,8 +48,6 @@ import java.util.regex.PatternSyntaxException;
 import org.jruby.RubyArray;
 import org.jruby.javasupport.JavaUtil;
 import org.jruby.runtime.builtin.IRubyObject;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeJavaObject;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.python.core.PyList;
 
@@ -80,6 +79,34 @@ public class SelectionUtils {
     private static final boolean isWindows = System.getProperty("os.name").contains("Windows");
 
     /**
+     * Hack to manage different package name for NativeArray, NativeJavaObject and Scriptable classes
+     * Java 6 or later package : sun.org.mozilla.javascript.internal
+     * Java 5 or earlier package : org.mozilla.javascript
+     */
+    private static Class<?> nativeArray;
+    private static Class<?> nativeJavaObject;
+    private static Class<?> scriptable;
+
+    static {
+        String packageNameJ6 = "sun.org.mozilla.javascript.internal.";
+        String packageNameJ5 = "org.mozilla.javascript.";
+        try {
+            nativeArray = Class.forName(packageNameJ6 + "NativeArray");
+            nativeJavaObject = Class.forName(packageNameJ6 + "NativeJavaObject");
+            scriptable = Class.forName(packageNameJ6 + "Scriptable");
+        } catch (ClassNotFoundException e) {
+            try {
+                nativeArray = Class.forName(packageNameJ5 + "NativeArray");
+                nativeJavaObject = Class.forName(packageNameJ5 + "NativeJavaObject");
+                scriptable = Class.forName(packageNameJ5 + "Scriptable");
+            } catch (ClassNotFoundException e1) {
+                //it won't works with javascript engine
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * Check all given conditions in the given configuration file path.<br>
      * This method returns true if (and only if) every conditions match the given file.
      *
@@ -93,8 +120,8 @@ public class SelectionUtils {
         //convert into the proper array
         if (params instanceof RubyArray) {
             conditions = convertRubyArrayToConditionArray((RubyArray) params);
-        } else if (params instanceof NativeArray) {
-            conditions = convertNativeArrayToConditionArray((NativeArray) params);
+        } else if (nativeArray.isInstance(params)) {
+            conditions = convertNativeArrayToConditionArray(nativeArray.cast(params));
         } else if (params instanceof PyList) {
             conditions = convertPyListToConditionArray((PyList) params);
         } else {
@@ -464,15 +491,21 @@ public class SelectionUtils {
      *
      * @param nativeArray the javaScript array to convert
      */
-    private static Condition[] convertNativeArrayToConditionArray(NativeArray nativeArray) {
-        Condition[] conditions = new Condition[(int) nativeArray.getLength()];
-
-        for (int i = 0; i < (int) nativeArray.getLength(); i++) {
-            NativeJavaObject nativeJavaObject = (NativeJavaObject) nativeArray.get(i, nativeArray);
-            conditions[i] = (Condition) nativeJavaObject.unwrap();
+    private static Condition[] convertNativeArrayToConditionArray(Object natArray) {
+        try {
+            //kind of awful code due to different package name between script API in J5 and J6
+            Method get = nativeArray.getMethod("get", int.class, scriptable);
+            Method unwrap = nativeJavaObject.getMethod("unwrap");
+            int l = ((Long) nativeArray.getMethod("getLength").invoke(natArray)).intValue();
+            Condition[] conditions = new Condition[l];
+            for (int i = 0; i < l; i++) {
+                conditions[i] = (Condition) unwrap.invoke(get.invoke(natArray, i, natArray));
+            }
+            return conditions;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-
-        return conditions;
     }
 
     /**
