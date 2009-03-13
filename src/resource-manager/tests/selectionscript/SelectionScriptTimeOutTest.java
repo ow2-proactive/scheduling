@@ -7,6 +7,7 @@ import java.io.File;
 import nodestate.FunctionalTDefaultRM;
 import nodestate.RMEventReceiver;
 
+import org.junit.Assert;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -69,7 +70,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTDefaultRM {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 0);
-        assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
+        Assert.assertEquals(0, nodes.size());
+        Assert.assertEquals(defaultDescriptorNodesNb, admin.getFreeNodesNumber().intValue());
     }
 }
