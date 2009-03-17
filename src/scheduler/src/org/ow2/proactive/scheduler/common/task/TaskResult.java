@@ -87,20 +87,6 @@ public interface TaskResult extends Serializable {
     public TaskLogs getOutput();
 
     /**
-     * Set the class that is able to describe this result. See ResultPreview.
-     *
-     * @param descClass the name of the class that is able to describe this result.
-     */
-    public void setPreviewerClassName(String descClass);
-
-    /**
-     * Set the classpath of the job that contained the corresponding task.
-     *
-     * @param jcp the classpath of the job
-     */
-    public void setJobClasspath(String[] jcp);
-
-    /**
      * Return a swing panel describing this result.
      *
      * @return a swing panel describing this result.

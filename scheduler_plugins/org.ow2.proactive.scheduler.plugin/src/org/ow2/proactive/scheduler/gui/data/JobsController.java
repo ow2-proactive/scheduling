@@ -36,12 +36,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -70,14 +71,10 @@ import org.ow2.proactive.scheduler.gui.views.TaskView;
 
 
 /**
+ * JobsController...
+ * 
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
- */
-/**
- * JobsController...
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 1.0
  */
 public class JobsController implements SchedulerEventListener {
     // The shared instance view as a direct reference
@@ -250,6 +247,39 @@ public class JobsController implements SchedulerEventListener {
     // -------------------------------------------------------------------- //
     // ---------------- implements SchedulerEventListener ----------------- //
     // -------------------------------------------------------------------- //
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
+     */
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+        switch (eventType) {
+            case FROZEN:
+                schedulerFrozenEvent();
+                break;
+            case PAUSED:
+                schedulerPausedEvent();
+                break;
+            case RESUMED:
+                schedulerResumedEvent();
+                break;
+            case SHUTDOWN:
+                schedulerShutDownEvent();
+                break;
+            case SHUTTING_DOWN:
+                schedulerShuttingDownEvent();
+                break;
+            case STARTED:
+                schedulerStartedEvent();
+                break;
+            case STOPPED:
+                schedulerStoppedEvent();
+                break;
+            case KILLED:
+                schedulerKilledEvent();
+                break;
+        }
+    }
+
     /**
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
      */
@@ -268,9 +298,56 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
-    public void jobPendingToRunningEvent(JobInfo info) {
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+        switch (notification.getEventType()) {
+            case JOB_PENDING_TO_RUNNING:
+                jobPendingToRunningEvent(notification.getData());
+                break;
+            case JOB_RUNNING_TO_FINISHED:
+                jobRunningToFinishedEvent(notification.getData());
+                break;
+            case JOB_REMOVE_FINISHED:
+                jobRemoveFinishedEvent(notification.getData());
+                break;
+            case JOB_PAUSED:
+                jobPausedEvent(notification.getData());
+                break;
+            case JOB_RESUMED:
+                jobResumedEvent(notification.getData());
+                break;
+            case JOB_CHANGE_PRIORITY:
+                jobChangePriorityEvent(notification.getData());
+                break;
+        }
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
+        switch (notification.getEventType()) {
+            case TASK_PENDING_TO_RUNNING:
+                taskPendingToRunningEvent(notification.getData());
+                break;
+            case TASK_RUNNING_TO_FINISHED:
+                taskRunningToFinishedEvent(notification.getData());
+                break;
+            case TASK_WAITING_FOR_RESTART:
+                taskWaitingForRestart(notification.getData());
+                break;
+        }
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
+        usersUpdate(notification.getData());
+    }
+
+    private void jobPendingToRunningEvent(JobInfo info) {
         final JobId jobId = info.getJobId();
         final JobState job = getJobById(jobId);
         job.update(info);
@@ -333,10 +410,7 @@ public class JobsController implements SchedulerEventListener {
         }
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
-     */
-    public void jobRunningToFinishedEvent(JobInfo info) {
+    private void jobRunningToFinishedEvent(JobInfo info) {
         final JobId jobId = info.getJobId();
         final JobState job = getJobById(jobId);
         job.update(info);
@@ -409,10 +483,7 @@ public class JobsController implements SchedulerEventListener {
         }
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
-     */
-    public void jobRemoveFinishedEvent(JobInfo info) {
+    private void jobRemoveFinishedEvent(JobInfo info) {
         final JobId jobId = info.getJobId();
         boolean rememberIsSelected = TableManager.getInstance().isJobSelected(jobId);
 
@@ -469,10 +540,7 @@ public class JobsController implements SchedulerEventListener {
         }
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
-     */
-    public void taskPendingToRunningEvent(TaskInfo info) {
+    private void taskPendingToRunningEvent(TaskInfo info) {
         JobId jobId = info.getJobId();
         getJobById(jobId).update(info);
 
@@ -507,10 +575,7 @@ public class JobsController implements SchedulerEventListener {
         }
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
-     */
-    public void taskRunningToFinishedEvent(TaskInfo info) {
+    private void taskRunningToFinishedEvent(TaskInfo info) {
         JobId jobId = info.getJobId();
         getJobById(jobId).update(info);
         final TaskInfo taskInfo = info;
@@ -555,10 +620,7 @@ public class JobsController implements SchedulerEventListener {
         }
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerFrozenEvent()
-     */
-    public void schedulerFrozenEvent() {
+    private void schedulerFrozenEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.FROZEN);
         ActionsManager.getInstance().update();
 
@@ -566,10 +628,7 @@ public class JobsController implements SchedulerEventListener {
         schedulerFreezeEventInternal();
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPausedEvent()
-     */
-    public void schedulerPausedEvent() {
+    private void schedulerPausedEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.PAUSED);
         ActionsManager.getInstance().update();
 
@@ -577,10 +636,7 @@ public class JobsController implements SchedulerEventListener {
         schedulerPausedEventInternal();
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerResumedEvent()
-     */
-    public void schedulerResumedEvent() {
+    private void schedulerResumedEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.STARTED);
         ActionsManager.getInstance().update();
 
@@ -588,10 +644,7 @@ public class JobsController implements SchedulerEventListener {
         schedulerResumedEventInternal();
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShutDownEvent()
-     */
-    public void schedulerShutDownEvent() {
+    private void schedulerShutDownEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
@@ -603,10 +656,7 @@ public class JobsController implements SchedulerEventListener {
         schedulerShutDownEventInternal();
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShuttingDownEvent()
-     */
-    public void schedulerShuttingDownEvent() {
+    private void schedulerShuttingDownEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.SHUTTING_DOWN);
         ActionsManager.getInstance().update();
 
@@ -614,10 +664,7 @@ public class JobsController implements SchedulerEventListener {
         schedulerShuttingDownEventInternal();
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStartedEvent()
-     */
-    public void schedulerStartedEvent() {
+    private void schedulerStartedEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.STARTED);
         ActionsManager.getInstance().update();
 
@@ -625,10 +672,7 @@ public class JobsController implements SchedulerEventListener {
         schedulerStartedEventInternal();
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStoppedEvent()
-     */
-    public void schedulerStoppedEvent() {
+    private void schedulerStoppedEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.STOPPED);
         ActionsManager.getInstance().update();
 
@@ -636,10 +680,7 @@ public class JobsController implements SchedulerEventListener {
         schedulerStoppedEventInternal();
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerKilledEvent()
-     */
-    public void schedulerKilledEvent() {
+    private void schedulerKilledEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
@@ -651,10 +692,7 @@ public class JobsController implements SchedulerEventListener {
         schedulerKilledEventInternal();
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
-     */
-    public void jobPausedEvent(JobInfo info) {
+    private void jobPausedEvent(JobInfo info) {
         final JobState job = getJobById(info.getJobId());
         job.update(info);
 
@@ -689,10 +727,7 @@ public class JobsController implements SchedulerEventListener {
         jobPausedEventInternal(info);
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
-     */
-    public void jobResumedEvent(JobInfo info) {
+    private void jobResumedEvent(JobInfo info) {
         final JobState job = getJobById(info.getJobId());
         job.update(info);
 
@@ -728,32 +763,12 @@ public class JobsController implements SchedulerEventListener {
         jobResumedEventInternal(info);
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
-     */
-    public void jobChangePriorityEvent(JobInfo info) {
+    private void jobChangePriorityEvent(JobInfo info) {
         getJobById(info.getJobId()).update(info);
         jobPriorityChangedEventInternal(info);
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMDownEvent()
-     */
-    public void schedulerRMDownEvent() {
-        // TODO Auto-generated method stub
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMUpEvent()
-     */
-    public void schedulerRMUpEvent() {
-        // TODO Auto-generated method stub
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskInfo)
-     */
-    public void taskWaitingForRestart(TaskInfo info) {
+    private void taskWaitingForRestart(TaskInfo info) {
         JobId jobId = info.getJobId();
         getJobById(jobId).update(info);
 
@@ -788,10 +803,7 @@ public class JobsController implements SchedulerEventListener {
         }
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdate(org.ow2.proactive.scheduler.common.job.UserIdentification)
-     */
-    public void usersUpdate(UserIdentification userIdentification) {
+    private void usersUpdate(UserIdentification userIdentification) {
         users.update(userIdentification);
         usersUpdateInternal();
     }
@@ -1042,7 +1054,4 @@ public class JobsController implements SchedulerEventListener {
         activeView = null;
     }
 
-    public void schedulerPolicyChangedEvent(String arg0) {
-        // TODO Auto-generated method stub
-    }
 }

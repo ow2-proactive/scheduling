@@ -1,5 +1,6 @@
 package functionaltests.monitor;
 
+import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -39,156 +40,69 @@ public class MonitorEventReceiver implements SchedulerEventListener {
     //---------------------------------------------------------------//
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
      */
-    public void jobPendingToRunningEvent(JobInfo jInfo) {
-        monitorsHandler.handleJobEvent(SchedulerEvent.JOB_PENDING_TO_RUNNING, jInfo);
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+        switch (eventType) {
+            case STARTED:
+            case STOPPED:
+            case KILLED:
+            case FROZEN:
+            case PAUSED:
+            case RM_DOWN:
+            case RM_UP:
+            case RESUMED:
+            case SHUTDOWN:
+            case SHUTTING_DOWN:
+            case POLICY_CHANGED:
+                monitorsHandler.handleSchedulerStateEvent(eventType);
+                break;
+        }
+
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
-    public void jobRemoveFinishedEvent(JobInfo jInfo) {
-        monitorsHandler.handleJobEvent(SchedulerEvent.JOB_REMOVE_FINISHED, jInfo);
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+        switch (notification.getEventType()) {
+            case JOB_PENDING_TO_RUNNING:
+            case JOB_RUNNING_TO_FINISHED:
+            case JOB_REMOVE_FINISHED:
+            case JOB_CHANGE_PRIORITY:
+            case JOB_PAUSED:
+            case JOB_RESUMED:
+                monitorsHandler.handleJobEvent(notification.getEventType(), notification.getData());
+                break;
+        }
+
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
-    public void jobRunningToFinishedEvent(JobInfo jInfo) {
-        monitorsHandler.handleJobEvent(SchedulerEvent.JOB_RUNNING_TO_FINISHED, jInfo);
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
+        switch (notification.getEventType()) {
+            case TASK_PENDING_TO_RUNNING:
+            case TASK_RUNNING_TO_FINISHED:
+            case TASK_WAITING_FOR_RESTART:
+                monitorsHandler.handleTaskEvent(notification.getEventType(), notification.getData());
+                break;
+        }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.Job)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
      */
     public void jobSubmittedEvent(JobState jState) {
         monitorsHandler.handleJobEvent(SchedulerEvent.JOB_SUBMITTED, jState);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
-    public void taskPendingToRunningEvent(TaskInfo tInfo) {
-        monitorsHandler.handleTaskEvent(SchedulerEvent.TASK_PENDING_TO_RUNNING, tInfo);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskEvent)
-     */
-    public void taskRunningToFinishedEvent(TaskInfo tInfo) {
-        monitorsHandler.handleTaskEvent(SchedulerEvent.TASK_RUNNING_TO_FINISHED, tInfo);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskEvent)
-     */
-    public void taskWaitingForRestart(TaskInfo tInfo) {
-        monitorsHandler.handleTaskEvent(SchedulerEvent.TASK_WAITING_FOR_RESTART, tInfo);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
-     */
-    public void jobChangePriorityEvent(JobInfo jInfo) {
-        monitorsHandler.handleJobEvent(SchedulerEvent.JOB_CHANGE_PRIORITY, jInfo);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
-     */
-    public void jobPausedEvent(JobInfo jInfo) {
-        monitorsHandler.handleJobEvent(SchedulerEvent.JOB_PAUSED, jInfo);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobEvent)
-     */
-    public void jobResumedEvent(JobInfo jInfo) {
-        monitorsHandler.handleJobEvent(SchedulerEvent.JOB_RESUMED, jInfo);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerFrozenEvent()
-     */
-    public void schedulerFrozenEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.FROZEN);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerKilledEvent()
-     */
-    public void schedulerKilledEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.KILLED);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerPausedEvent()
-     */
-    public void schedulerPausedEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.PAUSED);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerRMDownEvent()
-     */
-    public void schedulerRMDownEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.RM_DOWN);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerRMUpEvent()
-     */
-    public void schedulerRMUpEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.RM_UP);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerResumedEvent()
-     */
-    public void schedulerResumedEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.RESUMED);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerShutDownEvent()
-     */
-    public void schedulerShutDownEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.SHUTDOWN);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerShuttingDownEvent()
-     */
-    public void schedulerShuttingDownEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.SHUTTING_DOWN);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerStartedEvent()
-     */
-    public void schedulerStartedEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.STARTED);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#schedulerStoppedEvent()
-     */
-    public void schedulerStoppedEvent() {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.STOPPED);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.scheduler.SchedulerEventListener#usersUpdate(org.ow2.proactive.scheduler.common.job.UserIdentification)
-     */
-    public void usersUpdate(UserIdentification userIdentification) {
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.USERS_UPDATE);
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPolicyChangedEvent(java.lang.String)
-     */
-    public void schedulerPolicyChangedEvent(String newPolicyName) {
-        monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.POLICY_CHANGED);
-    }
 }

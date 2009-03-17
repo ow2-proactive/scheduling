@@ -73,6 +73,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scheduler.common.AdminMethodsInterface;
+import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -894,6 +895,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             DatabaseManager.unload(it);
         }
         logger_dev.info("JobEnvironment and internalTask unloaded for job '" + job.getId() + "'");
+        frontend.jobSubmitted(job);
     }
 
     /**
@@ -1039,10 +1041,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //
             //check if the task result future has an error due to node death.
             //if the node has died, a runtimeException is sent instead of the result
-            TaskResult res = null;
-            res = ((JobResultImpl) job.getJobResult()).getAnyResult(descriptor.getName());
+            TaskResult tmp = ((JobResultImpl) job.getJobResult()).getAnyResult(descriptor.getName());
             //unwrap future
-            res = (TaskResult) PAFuture.getFutureValue(res);
+            TaskResultImpl res = (TaskResultImpl) PAFuture.getFutureValue(tmp);
             logger_dev.info("Task '" + taskId + "' futur result unwrapped");
 
             updateTaskIdReferences(res, descriptor.getId());
@@ -1746,7 +1747,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
         try {
             policy = newPolicyFile.newInstance();
-            frontend.policyChanged(newPolicyFile.getName());
+            frontend.schedulerStateUpdated(SchedulerEvent.POLICY_CHANGED);
             logger_dev.info("New policy changed ! new policy name : " + newPolicyFile.getName());
         } catch (InstantiationException e) {
             logger_dev.error("", e);

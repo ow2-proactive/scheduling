@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.core;
 
 import java.io.Serializable;
 
+import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -79,17 +80,10 @@ public interface SchedulerStateUpdate extends Serializable {
     public void taskStateUpdated(NotificationData<TaskInfo> notification);
 
     /**
-     * Invoked each time the policy has changed.
-     *
-     * @param newPolicyFullName the new policy full name as a string.
-     */
-    public void policyChanged(String newPolicyFullName);
-
-    /**
-     * Invoked each time a something change about users.
+     * Invoked each time something change about users.
      *
      * @param notification the data composed of the type of the event and the data linked to the change.
      */
-    public void usersChanged(NotificationData<UserIdentification> notification);
+    public void usersUpdated(NotificationData<UserIdentification> notification);
 
 }

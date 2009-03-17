@@ -101,7 +101,7 @@ public class TestJobClasspath extends FunctionalTest {
 
             Assert.assertTrue(jr.hadException());
             Assert.assertEquals(1, jr.getAllResults().size());
-            Assert.assertNotNull(jr.getAllResults().get("task1").getException());
+            Assert.assertNotNull(jr.getResult("task1").getException());
         }
 
         {
@@ -119,7 +119,7 @@ public class TestJobClasspath extends FunctionalTest {
             JobResult jr = SchedulerTHelper.getJobResult(id);
             Assert.assertFalse(jr.hadException());
             Assert.assertEquals(1, jr.getAllResults().size());
-            Assert.assertEquals(firstValueToTest, (Integer) jr.getAllResults().get(taskName).value());
+            Assert.assertEquals(firstValueToTest, (Integer) jr.getResult(taskName).value());
         }
 
         {
@@ -137,7 +137,7 @@ public class TestJobClasspath extends FunctionalTest {
             JobResult jr = SchedulerTHelper.getJobResult(id);
             Assert.assertFalse(jr.hadException());
             Assert.assertEquals(1, jr.getAllResults().size());
-            Assert.assertEquals(SecondValueToTest, (Integer) jr.getAllResults().get(taskName).value());
+            Assert.assertEquals(SecondValueToTest, (Integer) jr.getResult(taskName).value());
         }
     }
 

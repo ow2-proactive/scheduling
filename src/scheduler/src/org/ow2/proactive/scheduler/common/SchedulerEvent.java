@@ -47,53 +47,52 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public enum SchedulerEvent {
 
-    //WARNING : State must be followed by a string representing the name of the method associated in
-    //the schedulerEventListener class.
+    //WARNING : New State must be added at the end of the existing one in order to keep associated ordinal number.
 
     /** The scheduler has just been frozen, this pause will stop every process except the running one. */
-    FROZEN("schedulerFrozenEvent"),
+    FROZEN("Frozen"),
     /** The scheduler has just been resumed. */
-    RESUMED("schedulerResumedEvent"),
+    RESUMED("Resumed"),
     /** The scheduler has just been shutdown. */
-    SHUTDOWN("schedulerShutDownEvent"),
+    SHUTDOWN("Shutdown"),
     /** The scheduler is shutting down. */
-    SHUTTING_DOWN("schedulerShuttingDownEvent"),
+    SHUTTING_DOWN("Shutting down"),
     /** The scheduler has just been started. */
-    STARTED("schedulerStartedEvent"),
+    STARTED("Started"),
     /** The scheduler has just been stopped. Every jobs will be stopped and running tasks will finished. */
-    STOPPED("schedulerStoppedEvent"),
+    STOPPED("Stopped"),
     /** The scheduler has just been killed. */
-    KILLED("schedulerKilledEvent"),
+    KILLED("Killed"),
     /** A job has just been paused. It will finished the running task. */
-    JOB_PAUSED("jobPausedEvent"),
+    JOB_PAUSED("Job paused"),
     /** A job has just been scheduled. At least one of its task is running. */
-    JOB_PENDING_TO_RUNNING("jobPendingToRunningEvent"),
+    JOB_PENDING_TO_RUNNING("Job pending to running"),
     /** A job has just been resumed. */
-    JOB_RESUMED("jobResumedEvent"),
+    JOB_RESUMED("Job resumed"),
     /** A job has just been submitted. */
-    JOB_SUBMITTED("jobSubmittedEvent"),
+    JOB_SUBMITTED("Job submitted"),
     /** A job has just finished. All tasks are finished. */
-    JOB_RUNNING_TO_FINISHED("jobRunningToFinishedEvent"),
+    JOB_RUNNING_TO_FINISHED("Job running to finished"),
     /** A job has just been removed from scheduler. */
-    JOB_REMOVE_FINISHED("jobRemoveFinishedEvent"),
+    JOB_REMOVE_FINISHED("Job remove finished"),
     /** A task has just been scheduled. It is now running. */
-    TASK_PENDING_TO_RUNNING("taskPendingToRunningEvent"),
+    TASK_PENDING_TO_RUNNING("Task pending to running"),
     /** A task has just finished. */
-    TASK_RUNNING_TO_FINISHED("taskRunningToFinishedEvent"),
+    TASK_RUNNING_TO_FINISHED("Task running to finished"),
     /** A task has just had an error, it will wait for restart. */
-    TASK_WAITING_FOR_RESTART("taskWaitingForRestart"),
+    TASK_WAITING_FOR_RESTART("Task waiting for restart"),
     /** The priority of a job has just been change. */
-    JOB_CHANGE_PRIORITY("jobChangePriorityEvent"),
+    JOB_CHANGE_PRIORITY("Job change piority"),
     /** The scheduler has just been paused. Every running job will be finished. */
-    PAUSED("schedulerPausedEvent"),
+    PAUSED("Paused"),
     /** The Resource Manager is no more available. */
-    RM_DOWN("schedulerRMDownEvent"),
+    RM_DOWN("RM down"),
     /** The Resource Manager is re-available . */
-    RM_UP("schedulerRMUpEvent"),
+    RM_UP("RM up"),
     /** A user has just connect the scheduler or submit a job. */
-    USERS_UPDATE("usersUpdate"),
+    USERS_UPDATE("Users updated"),
     /** The scheduling policy has been changed. */
-    POLICY_CHANGED("schedulerPolicyChangedEvent");
+    POLICY_CHANGED("Policy changed");
 
     /** Name of the method */
     private String methodName;

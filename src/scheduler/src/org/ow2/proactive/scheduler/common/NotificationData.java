@@ -29,11 +29,11 @@
  * ################################################################
  * $PROACTIVE_INITIAL_DEV$
  */
-package org.ow2.proactive.scheduler.core;
+package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
 
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
 
 
 /**

@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -51,6 +50,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -306,12 +306,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         ident.addSubmit();
         //send update user event only if the user is in the list of connected users.
         if (connectedUsers.getUsers().contains(ident)) {
-            usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
+            usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
         }
-        //stats
-        stats.increaseSubmittedJobCount(job.getType());
-        stats.submitTime();
-        jobSubmitted(job);
         logger.info("New job submitted '" + job.getId() + "' containing " + job.getTotalNumberOfTasks() +
             " tasks (owner is '" + job.getOwner() + "')");
         return job.getId();
@@ -485,7 +481,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         }
         //put this new user in the list of connected user
         connectedUsers.addUser(uIdent);
-        usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, uIdent));
+        usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, uIdent));
         //add the listener to the list of listener for this user.
         schedulerListeners.put(id, sel);
         //get the scheduler State
@@ -684,7 +680,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         //remove this user to the list of connected user
         ident.setToRemove();
         connectedUsers.update(ident);
-        usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
+        usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
         logger_dev.info("User '" + user + "' has left the scheduler !");
     }
 
@@ -828,55 +824,168 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /* ########################################################################################### */
 
     /**
-     * Events dispatcher.
-     * This method will invoke the given method on every listener.
-     * The method is selected with the class type arguments and an optional parameter.
-     * WARNING : in case of re-factoring, make sure that the textual occurrences of method names are modify as well.
-     *
-     * @param methodName a string representing the name of the method to invoke.
-     * @param types the class type to select the right method.
-     * @param params the arguments to send to the method.
+     * Clear a listener that is no more responding
+     * 
+     * @param iter the iterator corresponding to the listener
+     * @param id the identification of the user that is no more available
+     * @param userId the userIdentification corresponding to the id.
      */
-    private void dispatch(SchedulerEvent methodName, Class<?>[] types, Object... params) {
+    private void clearListener(Iterator<UniqueID> iter, UniqueID id, UserIdentification userId) {
+        iter.remove();
+        UserIdentificationImpl ident = identifications.remove(id);
+        //remove this user to the list of connected user
+        ident.setToRemove();
+        connectedUsers.update(ident);
+        usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
+        logger.warn(userId.getUsername() + "@" + userId.getHostName() +
+            " has been disconnected from events listener!");
+    }
+
+    /**
+     * Dispatch the scheduler state updated event
+     * 
+     * @param eventType the type of the concrete event
+     */
+    private void dispatchSchedulerStateUpdated(SchedulerEvent eventType) {
         try {
             if (logger_dev.isDebugEnabled()) {
-                if (params != null && params.length > 0) {
-                    logger_dev.debug("Dispatch event '" + methodName + "' - parameter : " + params[0]);
-                }
+                logger_dev.debug("Dispatch event '" + eventType.toString() + "'");
             }
-
-            Method method = SchedulerEventListener.class.getMethod(methodName.toString(), types);
-
-            synchronized (method) {
-                Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
-                while (iter.hasNext()) {
-                    UniqueID id = iter.next();
-                    UserIdentificationImpl userId = null;
-                    try {
-                        userId = identifications.get(id);
-
-                        if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(methodName)) {
-                            method.invoke(schedulerListeners.get(id), params);
-                        }
-                    } catch (Exception e) {
-                        iter.remove();
-                        UserIdentificationImpl ident = identifications.remove(id);
-                        //remove this user to the list of connected user
-                        ident.setToRemove();
-                        connectedUsers.update(ident);
-                        usersChanged(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE,
-                            ident));
-                        logger.warn(userId.getUsername() + "@" + userId.getHostName() +
-                            " has been disconnected from events listener!");
+            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
+            while (iter.hasNext()) {
+                UniqueID id = iter.next();
+                UserIdentificationImpl userId = null;
+                try {
+                    userId = identifications.get(id);
+                    if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(eventType)) {
+                        schedulerListeners.get(id).schedulerStateUpdatedEvent(eventType);
                     }
+                } catch (Exception e) {
+                    clearListener(iter, id, userId);
                 }
             }
         } catch (SecurityException e) {
             logger_dev.error(e);
-        } catch (NoSuchMethodException e) {
+        }
+    }
+
+    /**
+     * Dispatch the job submitted event
+     * 
+     * @param job the new submitted job
+     */
+    private void dispatchJobSubmitted(JobState job) {
+        try {
+            if (logger_dev.isDebugEnabled()) {
+                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
+            }
+            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
+            while (iter.hasNext()) {
+                UniqueID id = iter.next();
+                UserIdentificationImpl userId = null;
+                try {
+                    userId = identifications.get(id);
+                    if ((userId.getUserEvents() == null) ||
+                        userId.getUserEvents().contains(SchedulerEvent.JOB_SUBMITTED)) {
+                        schedulerListeners.get(id).jobSubmittedEvent(job);
+                    }
+                } catch (Exception e) {
+                    clearListener(iter, id, userId);
+                }
+            }
+        } catch (SecurityException e) {
             logger_dev.error(e);
         }
     }
+
+    /**
+     * Dispatch the job state updated event
+     * 
+     * @param notification the data to send to every client
+     */
+    private void dispatchJobStateUpdated(NotificationData<JobInfo> notification) {
+        try {
+            if (logger_dev.isDebugEnabled()) {
+                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
+            }
+            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
+            while (iter.hasNext()) {
+                UniqueID id = iter.next();
+                UserIdentificationImpl userId = null;
+                try {
+                    userId = identifications.get(id);
+                    if ((userId.getUserEvents() == null) ||
+                        userId.getUserEvents().contains(notification.getEventType())) {
+                        schedulerListeners.get(id).jobStateUpdatedEvent(notification);
+                    }
+                } catch (Exception e) {
+                    clearListener(iter, id, userId);
+                }
+            }
+        } catch (SecurityException e) {
+            logger_dev.error(e);
+        }
+    }
+
+    /**
+     * Dispatch the task state updated event
+     * 
+     * @param notification the data to send to every client
+     */
+    private void dispatchTaskStateUpdated(NotificationData<TaskInfo> notification) {
+        try {
+            if (logger_dev.isDebugEnabled()) {
+                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
+            }
+            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
+            while (iter.hasNext()) {
+                UniqueID id = iter.next();
+                UserIdentificationImpl userId = null;
+                try {
+                    userId = identifications.get(id);
+                    if ((userId.getUserEvents() == null) ||
+                        userId.getUserEvents().contains(notification.getEventType())) {
+                        schedulerListeners.get(id).taskStateUpdatedEvent(notification);
+                    }
+                } catch (Exception e) {
+                    clearListener(iter, id, userId);
+                }
+            }
+        } catch (SecurityException e) {
+            logger_dev.error(e);
+        }
+    }
+
+    /**
+     * Dispatch the users updated event
+     * 
+     * @param notification the data to send to every client
+     */
+    private void dispatchUsersUpdated(NotificationData<UserIdentification> notification) {
+        try {
+            if (logger_dev.isDebugEnabled()) {
+                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
+            }
+            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
+            while (iter.hasNext()) {
+                UniqueID id = iter.next();
+                UserIdentificationImpl userId = null;
+                try {
+                    userId = identifications.get(id);
+                    if ((userId.getUserEvents() == null) ||
+                        userId.getUserEvents().contains(notification.getEventType())) {
+                        schedulerListeners.get(id).usersUpdatedEvent(notification);
+                    }
+                } catch (Exception e) {
+                    clearListener(iter, id, userId);
+                }
+            }
+        } catch (SecurityException e) {
+            logger_dev.error(e);
+        }
+    }
+
+    //--------------------------------------------------------------------------------------------
 
     /**
      * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#schedulerStateUpdated(org.ow2.proactive.scheduler.common.SchedulerEvent)
@@ -893,7 +1002,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case KILLED:
             case RM_DOWN:
             case RM_UP:
-                dispatch(eventType, null);
+            case POLICY_CHANGED:
+                dispatchSchedulerStateUpdated(eventType);
                 break;
             default:
                 logger_dev.error("Unconsistent update type received from Scheduler Core : " + eventType);
@@ -904,11 +1014,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobSubmitted(org.ow2.proactive.scheduler.common.job.JobState)
      */
     public void jobSubmitted(JobState job) {
-        dispatch(SchedulerEvent.JOB_SUBMITTED, new Class<?>[] { JobState.class }, job);
+        //stats
+        stats.increaseSubmittedJobCount(job.getType());
+        stats.submitTime();
+        dispatchJobSubmitted(job);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobStateUpdated(org.ow2.proactive.scheduler.core.NotificationData)
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobStateUpdated(org.ow2.proactive.scheduler.common.NotificationData)
      */
     public void jobStateUpdated(NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
@@ -916,22 +1029,19 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case JOB_RESUMED:
             case JOB_PENDING_TO_RUNNING:
             case JOB_CHANGE_PRIORITY:
-                dispatch(notification.getEventType(), new Class<?>[] { JobInfo.class }, notification
-                        .getData());
+                dispatchJobStateUpdated(notification);
                 break;
             case JOB_RUNNING_TO_FINISHED:
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
-                dispatch(notification.getEventType(), new Class<?>[] { JobInfo.class }, notification
-                        .getData());
+                dispatchJobStateUpdated(notification);
                 //stats
                 stats.increaseFinishedJobCount(notification.getData().getNumberOfFinishedTasks());
                 break;
             case JOB_REMOVE_FINISHED:
                 //removing jobs from the global list : this job is no more managed
                 jobs.remove(notification.getData().getJobId());
-                dispatch(notification.getEventType(), new Class<?>[] { JobInfo.class }, notification
-                        .getData());
+                dispatchJobStateUpdated(notification);
                 break;
             default:
                 logger_dev.error("Unconsistent update type received from Scheduler Core : " +
@@ -940,15 +1050,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#taskStateUpdated(org.ow2.proactive.scheduler.core.NotificationData)
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#taskStateUpdated(org.ow2.proactive.scheduler.common.NotificationData)
      */
     public void taskStateUpdated(NotificationData<TaskInfo> notification) {
         switch (notification.getEventType()) {
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
-                dispatch(notification.getEventType(), new Class<?>[] { TaskInfo.class }, notification
-                        .getData());
+                dispatchTaskStateUpdated(notification);
                 break;
             default:
                 logger_dev.error("Unconsistent update type received from Scheduler Core : " +
@@ -957,20 +1066,12 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#policyChanged(java.lang.String)
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#usersUpdated(org.ow2.proactive.scheduler.common.NotificationData)
      */
-    public void policyChanged(String newPolicyFullName) {
-        dispatch(SchedulerEvent.POLICY_CHANGED, new Class<?>[] { String.class }, newPolicyFullName);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#usersChanged(org.ow2.proactive.scheduler.core.NotificationData)
-     */
-    public void usersChanged(NotificationData<UserIdentification> notification) {
+    public void usersUpdated(NotificationData<UserIdentification> notification) {
         switch (notification.getEventType()) {
             case USERS_UPDATE:
-                dispatch(notification.getEventType(), new Class<?>[] { UserIdentification.class },
-                        notification.getData());
+                dispatchUsersUpdated(notification);
                 break;
             default:
                 logger_dev.error("Unconsistent update type received from Scheduler Core : " +

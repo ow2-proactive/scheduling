@@ -283,14 +283,14 @@ public class TestDatabaseCRUD {
         Assert.assertEquals(1, itfJob.getJobResult().getAllResults().size());
         Assert.assertEquals(1, itfJob.getJobResult().getPreciousResults().size());
         Assert.assertEquals(0, itfJob.getJobResult().getExceptionResults().size());
-        Assert.assertNotNull(itfJob.getJobResult().getAllResults().get("task2"));
+        Assert.assertNotNull(itfJob.getJobResult().getResult("task2"));
         //before loading
-        Assert.assertNull(itfJob.getJobResult().getAllResults().get("task2").value());
-        DatabaseManager.load(itfJob.getJobResult().getAllResults().get("task2"));
+        Assert.assertNull(itfJob.getJobResult().getResult("task2").value());
+        DatabaseManager.load(itfJob.getJobResult().getResult("task2"));
         //after loading
-        Assert.assertNotNull(itfJob.getJobResult().getAllResults().get("task2").value());
-        Assert.assertEquals("salut", itfJob.getJobResult().getAllResults().get("task2").value());
-        Assert.assertNull(itfJob.getJobResult().getAllResults().get("task2").getException());
+        Assert.assertNotNull(itfJob.getJobResult().getResult("task2").value());
+        Assert.assertEquals("salut", itfJob.getJobResult().getResult("task2").value());
+        Assert.assertNull(itfJob.getJobResult().getResult("task2").getException());
         log("Test UPDATE");
         //unload
         for (InternalTask it : itfJob.getITasks()) {

@@ -34,7 +34,6 @@ package org.ow2.proactive.scheduler.common;
 import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -43,6 +42,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 /**
  * Class providing events that the scheduler is able to send using the described listener.
+ * Each event may represent a group of similar events.<br>
+ * The difference between events is specified by the SchedulerEvent contains in each events.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -51,155 +52,45 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public interface SchedulerEventListener extends Serializable {
 
     /**
-     * Invoked when the scheduler has just been started.
-     */
-    public void schedulerStartedEvent();
-
-    /**
-     * Invoked when the scheduler has just been stopped.
-     */
-    public void schedulerStoppedEvent();
-
-    /**
-     * Invoked when the scheduler has just been paused.
+     * Invoked each time a scheduler event occurs.<br />
+     * Scheduler events are stopped,started, paused, frozen, ...
      *
+     * @param eventType the type of the event received.
      */
-    public void schedulerPausedEvent();
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType);
 
     /**
-     * Invoked when the scheduler has received a freeze signal.
-     */
-    public void schedulerFrozenEvent();
-
-    /**
-     * Invoked when the scheduler has just been resumed.
-     */
-    public void schedulerResumedEvent();
-
-    /**
-     * Invoked when the scheduler shutdown sequence is initialized.
-     */
-    public void schedulerShuttingDownEvent();
-
-    /**
-     * Invoked when the scheduler has just been shutdown.
-     */
-    public void schedulerShutDownEvent();
-
-    /**
-     * Invoked when the scheduler has just been killed.<br>
+     * Invoked each time a new job has been submitted to the Scheduler and validated.
      *
-     * Scheduler is not reachable anymore.
-     */
-    public void schedulerKilledEvent();
-
-    /**
-     * Invoked when a job has been paused on the scheduler.
-     *
-     * @param info the informations on the paused job.
-     */
-    public void jobPausedEvent(JobInfo info);
-
-    /**
-     * Invoked when a job has been resumed on the scheduler.
-     *
-     * @param info the informations on the resumed job.
-     */
-    public void jobResumedEvent(JobInfo info);
-
-    /**
-     * Invoked when the scheduler has received a new job to schedule.
-     *
-     * @param job the new job to schedule.
+     * @param job the newly submitted job.
      */
     public void jobSubmittedEvent(JobState job);
 
     /**
-     * Invoked when the scheduling of a job has just started.<br>
-     * The description of the job is contained in the given jobInfo.<br>
-     * Use Job.update(JobInfo) to update your job.
+     * Invoked each time the state of a job has changed.<br>
+     * If you want to maintain an up to date list of jobs, 
+     * just use the {@link org.ow2.proactive.scheduler.common.job.JobState#update(org.ow2.proactive.scheduler.common.job.JobInfo)} 
+     * method to update the content of your job.
      *
-     * @param info the event describing the job concerned.
+     * @param notification the data composed of the type of the event and the information that have change in the job.
      */
-    public void jobPendingToRunningEvent(JobInfo info);
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification);
 
     /**
-     * Invoked when the scheduling of a job has just been terminated.<br>
-     * The description of the job is contained in the given jobInfo.<br>
-     * Use {@link Job}.update(JobInfo) to update your job.
+     * Invoked each time the state of a task has changed.<br>
+     * In this case you can use the 
+     * {@link org.ow2.proactive.scheduler.common.job.JobState#update(org.ow2.proactive.scheduler.common.task.TaskInfo)} 
+     * method to update the content of the designated task inside your job.
      *
-     * @param info the event describing the job concerned.
+     * @param notification the data composed of the type of the event and the information that have change in the task.
      */
-    public void jobRunningToFinishedEvent(JobInfo info);
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification);
 
     /**
-     * Invoked when the scheduler has removed a job due to result reclamation.<br>
-     * The description of the job is contained in the given jobInfo.<br>
-     * Use {@link Job}.update(JobInfo) to update your job.
+     * Invoked each time something change about users.
      *
-     * @param info the event describing the job concerned.
+     * @param notification the data composed of the type of the event and the data linked to the change.
      */
-    public void jobRemoveFinishedEvent(JobInfo info);
-
-    /**
-     * Invoked when the scheduling of a task has just started.<br>
-     * The description of the task is contained in the TaskInfo given.<br>
-     * Use {@link Job}.update(TaskInfo) to update your job.
-     *
-     * @param info the event describing the task concerned.
-     */
-    public void taskPendingToRunningEvent(TaskInfo info);
-
-    /**
-     * Invoked when the scheduling of a task has just finished.<br>
-     * The description of the task is contained in the TaskInfo given.<br>
-     * Use {@link Job}.update(TaskInfo) to update your job.
-     *
-     * @param info the event describing the task concerned.
-     */
-    public void taskRunningToFinishedEvent(TaskInfo info);
-
-    /**
-     * Invoked when a task had an error (error code or exception).
-     * The task will be restart after a dynamic amount of time.
-     * This event specified that a task is waiting for restart.
-     *
-     * @param info the event describing the task concerned.
-     */
-    public void taskWaitingForRestart(TaskInfo info);
-
-    /**
-     * Invoked when the scheduler has changed the priority of a job.<br>
-     * The description of the job is contained in the given jobInfo.<br>
-     * Use {@link Job}.update(JobInfo) to update your job.
-     *
-     * @param info the event describing the job concerned.
-     */
-    public void jobChangePriorityEvent(JobInfo info);
-
-    /**
-     * Invoked if the Resource Manager has failed.<br>
-     * Use the {@link AdminSchedulerInterface#linkResourceManager(String rmURL)} to reconnect a new Resource Manager.
-     */
-    public void schedulerRMDownEvent();
-
-    /**
-     * Invoked when the Resource Manager has been reconnect to the scheduler.
-     */
-    public void schedulerRMUpEvent();
-
-    /**
-     * Invoked when a new user is connected or when a user submit a new job.
-     *
-     * @param userIdentification the identification of the user that have just connect/disconnect the scheduler.
-     */
-    public void usersUpdate(UserIdentification userIdentification);
-
-    /**
-     * Invoked when the scheduling policy has been changed.
-     *
-     * @param newPolicyName the new name of the policy as a string.
-     */
-    public void schedulerPolicyChangedEvent(String newPolicyName);
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification);
 
 }

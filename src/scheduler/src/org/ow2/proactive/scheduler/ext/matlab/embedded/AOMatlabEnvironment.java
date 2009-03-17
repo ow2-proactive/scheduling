@@ -50,6 +50,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -338,202 +339,163 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         return stubOnThis.waitAllResults();
     }
 
+    /**
+     * terminate
+     */
     public void terminate() {
         this.terminated = true;
     }
 
-    public void jobChangePriorityEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobPausedEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobPendingToRunningEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobRemoveFinishedEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobResumedEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobRunningToFinishedEvent(JobInfo info) {
-        if (info.getStatus() == JobStatus.KILLED) {
-            if (debugCurrentJob) {
-                System.out.println("Received job killed event...");
-            }
-
-            // Filtering the right job
-            if ((currentJobId == null) || !info.getJobId().equals(currentJobId)) {
-                return;
-            }
-            this.jobKilled = true;
-        } else {
-            if (debugCurrentJob) {
-                System.out.println("Received job finished event...");
-            }
-
-            if (info == null) {
-                return;
-            }
-
-            // Filtering the right job
-            if (!info.getJobId().equals(currentJobId)) {
-                return;
-            }
-            // Getting the Job result from the Scheduler
-            JobResult jResult = null;
-
-            try {
-                jResult = scheduler.getJobResult(info.getJobId());
-            } catch (SchedulerException e) {
-                jobDidNotSucceed(info.getJobId(), e, true, null);
-                return;
-            }
-
-            if (debugCurrentJob) {
-                System.out.println("Updating results of job: " + jResult.getName() + "(" + info.getJobId() +
-                    ")");
-            }
-
-            // Geting the task results from the job result
-            Map<String, TaskResult> task_results = null;
-            if (jResult.hadException()) {
-                task_results = jResult.getExceptionResults();
-            } else {
-                // sorted results
-
-                task_results = jResult.getAllResults();
-            }
-            ArrayList<Integer> keys = new ArrayList<Integer>();
-            for (String key : task_results.keySet()) {
-                keys.add(Integer.parseInt(key));
-            }
-            Collections.sort(keys);
-            // Iterating over the task results
-            for (Integer key : keys) {
-                TaskResult res = task_results.get("" + key);
-                if (debugCurrentJob) {
-                    System.out.println("Looking for result of task: " + key);
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
+     */
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+        switch (eventType) {
+            case KILLED:
+            case SHUTDOWN:
+            case SHUTTING_DOWN:
+            case STOPPED:
+                if (debug) {
+                    logger.debug("Received " + eventType.toString() + " event");
                 }
-                String logs = res.getOutput().getAllLogs(false);
-
-                // No result received
-                if (res == null) {
-                    jobDidNotSucceed(info.getJobId(), new RuntimeException("Task id = " + key +
-                        " was not returned by the scheduler"), false, null);
-
-                } else if (res.hadException()) {
-
-                    //Exception took place inside the framework
-                    if (res.getException() instanceof ptolemy.kernel.util.IllegalActionException) {
-                        // We filter this specific exception which means that the "out" variable was not set by the function 
-                        // due to an error inside the script or a missing licence 
-
-                        jobDidNotSucceed(info.getJobId(), new MatlabTaskException(logs), false, logs);
-                    } else {
-                        // For other types of exception we forward it as it is.
-                        jobDidNotSucceed(info.getJobId(), res.getException(), true, logs);
-                    }
-                } else {
-                    // Normal success
-                    Token computedResult = null;
-                    try {
-                        computedResult = (Token) res.value();
-                        results.add(computedResult);
-                        // We print the logs of the job, if any
-                        if (logs.length() > 0) {
-                            System.out.println(logs);
-                        }
-                    } catch (ptolemy.kernel.util.IllegalActionException e1) {
-                        jobDidNotSucceed(info.getJobId(), new MatlabTaskException(logs), false, logs);
-                    } catch (Throwable e2) {
-                        jobDidNotSucceed(info.getJobId(), e2, true, logs);
-                    }
-                }
-            }
-
-            isJobFinished = true;
+                schedulerStopped = true;
+                break;
         }
-    }
-
-    public void jobSubmittedEvent(JobState job) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerFrozenEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerKilledEvent() {
-        if (debug) {
-            logger.debug("Received Scheduler killed event");
-        }
-        schedulerStopped = true;
-
-    }
-
-    public void schedulerPausedEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerResumedEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerShutDownEvent() {
-        if (debug) {
-            logger.debug("Received Scheduler ShutDown event");
-        }
-        schedulerStopped = true;
-
-    }
-
-    public void schedulerShuttingDownEvent() {
-        if (debug) {
-            logger.debug("Received Scheduler Shutting Down event");
-        }
-        schedulerStopped = true;
-    }
-
-    public void schedulerStartedEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerStoppedEvent() {
-        if (debug) {
-            logger.debug("Received Scheduler Stop event");
-        }
-        schedulerStopped = true;
-    }
-
-    public void taskPendingToRunningEvent(TaskInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void taskRunningToFinishedEvent(TaskInfo info) {
-        // TODO Auto-generated method stub
 
     }
 
     /**
-     * Handles case of an unsucessful job
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+        switch (notification.getEventType()) {
+            case JOB_RUNNING_TO_FINISHED:
+                JobInfo info = notification.getData();
+                if (info.getStatus() == JobStatus.KILLED) {
+                    if (debugCurrentJob) {
+                        System.out.println("Received job killed event...");
+                    }
+
+                    // Filtering the right job
+                    if ((currentJobId == null) || !info.getJobId().equals(currentJobId)) {
+                        return;
+                    }
+                    this.jobKilled = true;
+                } else {
+                    if (debugCurrentJob) {
+                        System.out.println("Received job finished event...");
+                    }
+
+                    if (info == null) {
+                        return;
+                    }
+
+                    // Filtering the right job
+                    if (!info.getJobId().equals(currentJobId)) {
+                        return;
+                    }
+                    // Getting the Job result from the Scheduler
+                    JobResult jResult = null;
+
+                    try {
+                        jResult = scheduler.getJobResult(info.getJobId());
+                    } catch (SchedulerException e) {
+                        jobDidNotSucceed(info.getJobId(), e, true, null);
+                        return;
+                    }
+
+                    if (debugCurrentJob) {
+                        System.out.println("Updating results of job: " + jResult.getName() + "(" +
+                            info.getJobId() + ")");
+                    }
+
+                    // Geting the task results from the job result
+                    Map<String, TaskResult> task_results = null;
+                    if (jResult.hadException()) {
+                        task_results = jResult.getExceptionResults();
+                    } else {
+                        // sorted results
+
+                        task_results = jResult.getAllResults();
+                    }
+                    ArrayList<Integer> keys = new ArrayList<Integer>();
+                    for (String key : task_results.keySet()) {
+                        keys.add(Integer.parseInt(key));
+                    }
+                    Collections.sort(keys);
+                    // Iterating over the task results
+                    for (Integer key : keys) {
+                        TaskResult res = task_results.get("" + key);
+                        if (debugCurrentJob) {
+                            System.out.println("Looking for result of task: " + key);
+                        }
+                        String logs = res.getOutput().getAllLogs(false);
+
+                        // No result received
+                        if (res == null) {
+                            jobDidNotSucceed(info.getJobId(), new RuntimeException("Task id = " + key +
+                                " was not returned by the scheduler"), false, null);
+
+                        } else if (res.hadException()) {
+
+                            //Exception took place inside the framework
+                            if (res.getException() instanceof ptolemy.kernel.util.IllegalActionException) {
+                                // We filter this specific exception which means that the "out" variable was not set by the function 
+                                // due to an error inside the script or a missing licence 
+
+                                jobDidNotSucceed(info.getJobId(), new MatlabTaskException(logs), false, logs);
+                            } else {
+                                // For other types of exception we forward it as it is.
+                                jobDidNotSucceed(info.getJobId(), res.getException(), true, logs);
+                            }
+                        } else {
+                            // Normal success
+                            Token computedResult = null;
+                            try {
+                                computedResult = (Token) res.value();
+                                results.add(computedResult);
+                                // We print the logs of the job, if any
+                                if (logs.length() > 0) {
+                                    System.out.println(logs);
+                                }
+                            } catch (ptolemy.kernel.util.IllegalActionException e1) {
+                                jobDidNotSucceed(info.getJobId(), new MatlabTaskException(logs), false, logs);
+                            } catch (Throwable e2) {
+                                jobDidNotSucceed(info.getJobId(), e2, true, logs);
+                            }
+                        }
+                    }
+
+                    isJobFinished = true;
+                }
+                break;
+        }
+
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
+     */
+    public void jobSubmittedEvent(JobState job) {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * Handles case of an unsuccessful job
      *
      * @param jobId      id of the job
      * @param ex         exception thrown
@@ -654,31 +616,6 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             }
             return true;
         }
-    }
-
-    public void schedulerRMDownEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerRMUpEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void usersUpdate(UserIdentification userIdentification) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void taskWaitingForRestart(TaskInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerPolicyChangedEvent(String newPolicyName) {
-        // TODO Auto-generated method stub
-
     }
 
 }

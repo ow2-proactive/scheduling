@@ -91,22 +91,22 @@ public class TestJobRecover extends FunctionalTest {
         JobResult result = SchedulerTHelper.getJobResult(idJ1);
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
-            Assert.assertNotNull(result.getAllResults().get("Computation" + i).value());
-            Assert.assertNull(result.getAllResults().get("Computation" + i).getException());
+            Assert.assertNotNull(result.getResult("Computation" + i).value());
+            Assert.assertNull(result.getResult("Computation" + i).getException());
         }
         SchedulerTHelper.log("check result job 2");
         result = SchedulerTHelper.getJobResult(idJ2);
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
-            Assert.assertNotNull(result.getAllResults().get("Computation" + i).value());
-            Assert.assertNull(result.getAllResults().get("Computation" + i).getException());
+            Assert.assertNotNull(result.getResult("Computation" + i).value());
+            Assert.assertNull(result.getResult("Computation" + i).getException());
         }
         SchedulerTHelper.log("check result job 3");
         result = SchedulerTHelper.getJobResult(idJ3);
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
-            Assert.assertNotNull(result.getAllResults().get("Computation" + i).value());
-            Assert.assertNull(result.getAllResults().get("Computation" + i).getException());
+            Assert.assertNotNull(result.getResult("Computation" + i).value());
+            Assert.assertNull(result.getResult("Computation" + i).getException());
         }
 
     }

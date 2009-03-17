@@ -1187,18 +1187,22 @@ JobResult myResult = scheduler.getJobResult(myJobId);
 			</para>
 			<programlisting language="java">
 //make your listener
-SchedulerEventListener mySchedulerEventListener = new chedulerEventListener () {
-	public void jobRunningToFinishedEvent(JobInfo info){
-		//if my job is finished
-		if (event.getJobId().equals(myJobId)){
-			//get its result
-			JobResult myResult = scheduler.getJobResult(myJobId);
+SchedulerEventListener mySchedulerEventListener = new SchedulerEventListener () {
+	jobStateUpdatedEvent(NotificationData&lt;JobInfo&gt; notification){
+		switch(notification.getEventType()){
+			case JOB_RUNNING_TO_FINISHED :
+				//if my job is finished
+				if (notification.getData().getJobId().equals(myJobId)){
+					//get its result
+					JobResult myResult = scheduler.getJobResult(myJobId);
+				}
+				break;
 		}
 	}
 	//Implement other methods...
 }
 //add the listener to the scheduler specified which events you want to receive.
-scheduler.addSchedulerEventListener(MySchedulerEventListener,SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+scheduler.addSchedulerEventListener(mySchedulerEventListener,SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 			</programlisting>
 			<para>
 				This example shows you how to listen to the scheduler events (here the finished job event

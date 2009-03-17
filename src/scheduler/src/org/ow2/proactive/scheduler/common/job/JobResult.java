@@ -71,7 +71,8 @@ public interface JobResult extends Serializable {
     /**
      * Return every task results of this job as a mapping between
      * user task name (in XML job description) and its task result.<br>
-     * User that wants to get a specific result may get this map and ask for a specific mapping.
+     * User that wants to get a specific result may get this map and ask for a specific mapping
+     * or use the {@link #getResult(String)} method.
      *
      * @return the task result as a map.
      */

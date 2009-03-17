@@ -244,7 +244,9 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskResult#setPreviewerClassName(java.lang.String)
+     * Set the class that is able to describe this result. See ResultPreview.
+     *
+     * @param descClass the name of the class that is able to describe this result.
      */
     public void setPreviewerClassName(String descClass) {
         if (this.previewerClassName != null) {
@@ -255,7 +257,9 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskResult#setJobClasspath(java.lang.String[])
+     * Set the classpath of the job that contained the corresponding task.
+     *
+     * @param jcp the classpath of the job
      */
     public void setJobClasspath(String[] jcp) {
         this.jobClasspath = jcp;

@@ -99,14 +99,14 @@ public class TestJobCoverage extends FunctionalTest {
         //        SchedulerTHelper.log("Checking results...");
         //        JobResult result = SchedulerTHelper.getJobResult(id);
         //        Assert.assertEquals("Working", result.getPreciousResults().get("task1").value());
-        //        Assert.assertTrue(result.getAllResults().get("task2").getException().getMessage().contains("WorkingAt3rd - Status : Number is"));
-        //        Assert.assertTrue(result.getAllResults().get("task3").value().toString().contains("WorkingAt3rd - Status : OK / File deleted :"));
-        //        Assert.assertEquals("Throwing",result.getAllResults().get("task4").getException().getMessage());
-        //        Assert.assertEquals("Throwing",result.getAllResults().get("task5").getException().getMessage());
-        //        Assert.assertEquals(0,result.getAllResults().get("task6").value());
-        //        Assert.assertEquals(12,result.getAllResults().get("task7").value());
-        //        Assert.assertEquals(12,result.getAllResults().get("task8").value());
-        //        Assert.assertEquals(result.getAllResults().get("task9").getException().getClass(),Exception.class);
+        //        Assert.assertTrue(result.getResult("task2").getException().getMessage().contains("WorkingAt3rd - Status : Number is"));
+        //        Assert.assertTrue(result.getResult("task3").value().toString().contains("WorkingAt3rd - Status : OK / File deleted :"));
+        //        Assert.assertEquals("Throwing",result.getResult("task4").getException().getMessage());
+        //        Assert.assertEquals("Throwing",result.getResult("task5").getException().getMessage());
+        //        Assert.assertEquals(0,result.getResult("task6").value());
+        //        Assert.assertEquals(12,result.getResult("task7").value());
+        //        Assert.assertEquals(12,result.getResult("task8").value());
+        //        Assert.assertEquals(result.getResult("task9").getException().getClass(),Exception.class);
         //
         //        //checking all processes
         //        SchedulerTHelper.log("Checking all received events...");

@@ -50,6 +50,7 @@ import org.objectweb.proactive.extensions.masterworker.core.ResultInternImpl;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
+import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -236,182 +237,138 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         return super.terminate();
     }
 
-    public void jobChangePriorityEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobPausedEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobPendingToRunningEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobRemoveFinishedEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobResumedEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobRunningToFinishedEvent(JobInfo info) {
-        if (info.getStatus() == JobStatus.KILLED) {
-            if (!processing.containsKey(info.getJobId())) {
-                return;
-            }
-
-            jobDidNotSucceed(info.getJobId(), new TaskException(new SchedulerException("Job id=" +
-                info.getJobId() + " was killed")));
-        } else {
-
-            if (debug) {
-                logger.debug(name + " receives job finished event...");
-            }
-
-            if (info == null) {
-                return;
-            }
-
-            if (!processing.containsKey(info.getJobId())) {
-                return;
-            }
-
-            JobResult jResult = null;
-
-            try {
-                jResult = scheduler.getJobResult(info.getJobId());
-            } catch (SchedulerException e) {
-                jobDidNotSucceed(info.getJobId(), new TaskException(e));
-                return;
-            }
-
-            if (debug) {
-                logger.debug(this.getName() + ": updating results of job: " + jResult.getName());
-            }
-
-            Collection<TaskIntern<Serializable>> tasksOld = processing.remove(info.getJobId());
-
-            ArrayList<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
-            Map<String, TaskResult> allTaskResults = jResult.getAllResults();
-
-            for (TaskIntern<Serializable> task : tasksOld) {
-                if (debug) {
-                    logger.debug(this.getName() + ": looking for result of task: " + task.getId());
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
+     */
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+        switch (eventType) {
+            case KILLED:
+            case SHUTTING_DOWN:
+                for (JobId jobId : processing.keySet()) {
+                    jobDidNotSucceed(jobId, new TaskException(new SchedulerException("Scheduler was " +
+                        eventType)));
                 }
-                ResultIntern<Serializable> intres = new ResultInternImpl(task.getId());
-                TaskResult result = allTaskResults.get("" + task.getId());
-
-                if (result == null) {
-                    intres.setException(new TaskException(new SchedulerException("Task id=" + task.getId() +
-                        " was not returned by the scheduler")));
-                    if (debug) {
-                        logger.debug("Task result not found in job result: " +
-                            intres.getException().getMessage());
-                    }
-                } else if (result.hadException()) { //Exception took place inside the framework
-                    intres.setException(new TaskException(result.getException()));
-                    if (debug) {
-                        logger.debug("Task result contains exception: " + intres.getException().getMessage());
-                    }
-                } else {
-                    try {
-                        Serializable computedResult = (Serializable) result.value();
-
-                        intres.setResult(computedResult);
-
-                    } catch (Throwable e) {
-                        intres.setException(new TaskException(e));
-                        if (debug) {
-                            logger.debug(intres.getException().getMessage());
-                        }
-                    }
-                }
-
-                results.add(intres);
-
-            }
-
-            Queue<TaskIntern<Serializable>> newTasks = provider.sendResultsAndGetTasks(results, name, true);
-
-            pendingTasksFutures.offer(newTasks);
-
-            // Schedule a new job
-            stubOnThis.scheduleTask();
+                break;
         }
+
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+        switch (notification.getEventType()) {
+            case JOB_RUNNING_TO_FINISHED:
+                JobInfo info = notification.getData();
+                if (info.getStatus() == JobStatus.KILLED) {
+                    if (!processing.containsKey(info.getJobId())) {
+                        return;
+                    }
+
+                    jobDidNotSucceed(info.getJobId(), new TaskException(new SchedulerException("Job id=" +
+                        info.getJobId() + " was killed")));
+                } else {
+
+                    if (debug) {
+                        logger.debug(name + " receives job finished event...");
+                    }
+
+                    if (info == null) {
+                        return;
+                    }
+
+                    if (!processing.containsKey(info.getJobId())) {
+                        return;
+                    }
+
+                    JobResult jResult = null;
+
+                    try {
+                        jResult = scheduler.getJobResult(info.getJobId());
+                    } catch (SchedulerException e) {
+                        jobDidNotSucceed(info.getJobId(), new TaskException(e));
+                        return;
+                    }
+
+                    if (debug) {
+                        logger.debug(this.getName() + ": updating results of job: " + jResult.getName());
+                    }
+
+                    Collection<TaskIntern<Serializable>> tasksOld = processing.remove(info.getJobId());
+
+                    ArrayList<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
+                    Map<String, TaskResult> allTaskResults = jResult.getAllResults();
+
+                    for (TaskIntern<Serializable> task : tasksOld) {
+                        if (debug) {
+                            logger.debug(this.getName() + ": looking for result of task: " + task.getId());
+                        }
+                        ResultIntern<Serializable> intres = new ResultInternImpl(task.getId());
+                        TaskResult result = allTaskResults.get("" + task.getId());
+
+                        if (result == null) {
+                            intres.setException(new TaskException(new SchedulerException("Task id=" +
+                                task.getId() + " was not returned by the scheduler")));
+                            if (debug) {
+                                logger.debug("Task result not found in job result: " +
+                                    intres.getException().getMessage());
+                            }
+                        } else if (result.hadException()) { //Exception took place inside the framework
+                            intres.setException(new TaskException(result.getException()));
+                            if (debug) {
+                                logger.debug("Task result contains exception: " +
+                                    intres.getException().getMessage());
+                            }
+                        } else {
+                            try {
+                                Serializable computedResult = (Serializable) result.value();
+
+                                intres.setResult(computedResult);
+
+                            } catch (Throwable e) {
+                                intres.setException(new TaskException(e));
+                                if (debug) {
+                                    logger.debug(intres.getException().getMessage());
+                                }
+                            }
+                        }
+
+                        results.add(intres);
+
+                    }
+
+                    Queue<TaskIntern<Serializable>> newTasks = provider.sendResultsAndGetTasks(results, name,
+                            true);
+
+                    pendingTasksFutures.offer(newTasks);
+
+                    // Schedule a new job
+                    stubOnThis.scheduleTask();
+                }
+                break;
+        }
+
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
+     */
     public void jobSubmittedEvent(JobState job) {
         // TODO Auto-generated method stub
-
     }
 
-    public void schedulerFrozenEvent() {
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
         // TODO Auto-generated method stub
-
     }
 
-    public void schedulerKilledEvent() {
-        for (JobId jobId : processing.keySet()) {
-            jobDidNotSucceed(jobId, new TaskException(new SchedulerException("Scheduler was killed")));
-        }
-
-    }
-
-    public void schedulerPausedEvent() {
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerResumedEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerShutDownEvent() {
-
-    }
-
-    public void schedulerShuttingDownEvent() {
-        for (JobId jobId : processing.keySet()) {
-            jobDidNotSucceed(jobId, new TaskException(new SchedulerException("Scheduler is shutting down")));
-        }
-
-    }
-
-    public void schedulerStartedEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerStoppedEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void taskPendingToRunningEvent(TaskInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void taskRunningToFinishedEvent(TaskInfo info) {
-        // TODO Auto-generated method stub 
-    }
-
-    public void schedulerRMDownEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerRMUpEvent() {
-        // TODO Auto-generated method stub
-
     }
 
     /**
@@ -447,18 +404,4 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         stubOnThis.scheduleTask();
     }
 
-    public void usersUpdate(UserIdentification userIdentification) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void taskWaitingForRestart(TaskInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerPolicyChangedEvent(String newPolicyName) {
-        // TODO Auto-generated method stub
-
-    }
 }

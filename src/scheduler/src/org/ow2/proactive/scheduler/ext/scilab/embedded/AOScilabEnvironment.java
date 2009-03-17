@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -343,31 +344,6 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         this.terminated = true;
     }
 
-    public void jobChangePriorityEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobPausedEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobPendingToRunningEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobRemoveFinishedEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void jobResumedEvent(JobInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
     /**
      * Handles case of an unsuccessful job
      *
@@ -387,161 +363,145 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         isJobFinished = true;
     }
 
-    public void jobRunningToFinishedEvent(JobInfo info) {
-        if (info.getStatus() == JobStatus.KILLED) {
-            if (logger.isDebugEnabled()) {
-                logger.info("Received job killed event...");
-            }
-
-            // Filtering the right job
-            if ((currentJobId == null) || !info.getJobId().equals(currentJobId)) {
-                return;
-            }
-            this.jobKilled = true;
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.info("Received job finished event...");
-            }
-
-            if (info == null) {
-                return;
-            }
-
-            // Filtering the right job
-            if (!info.getJobId().equals(currentJobId)) {
-                return;
-            }
-            // Getting the Job result from the Scheduler
-            JobResult jResult = null;
-
-            try {
-                jResult = scheduler.getJobResult(info.getJobId());
-            } catch (SchedulerException e) {
-                jobDidNotSucceed(info.getJobId(), e, true, null);
-                return;
-            }
-
-            if (logger.isDebugEnabled()) {
-                System.out.println("Updating results of job: " + jResult.getName() + "(" + info.getJobId() +
-                    ")");
-            }
-
-            // Getting the task results from the job result
-            Map<String, TaskResult> task_results = null;
-            if (jResult.hadException()) {
-                task_results = jResult.getExceptionResults();
-            } else {
-                task_results = jResult.getAllResults();
-            }
-
-            // Iterating over the task results
-            for (Map.Entry<String, TaskResult> res : task_results.entrySet()) {
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
+     */
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+        switch (eventType) {
+            case KILLED:
+            case SHUTDOWN:
+            case SHUTTING_DOWN:
                 if (logger.isDebugEnabled()) {
-                    logger.info("Looking for result of task: " + res.getKey());
+                    logger.info("Received Scheduler '" + eventType + "' event");
                 }
-
-                // No result received
-                if (res.getValue() == null) {
-                    jobDidNotSucceed(info.getJobId(), new RuntimeException("Task id = " + res.getKey() +
-                        " was not returned by the scheduler"), false, null);
-
-                } else if (res.getValue().hadException()) {
-                    //Exception took place inside the framework
-                    if (res.getValue().getException() instanceof ptolemy.kernel.util.IllegalActionException) {
-                        // We filter this specific exception which means that the "out" variable was not set by the function 
-                        // due to an error inside the script
-                        String logs = res.getValue().getOutput().getAllLogs(false);
-                        jobDidNotSucceed(info.getJobId(), new SciLabTaskException(logs), false, logs);
-                    } else {
-                        // For other types of exception we forward it as it is.
-                        jobDidNotSucceed(info.getJobId(), res.getValue().getException(), true, res.getValue()
-                                .getOutput().getAllLogs(false));
-                    }
-                } else {
-                    // Normal success
-                    SciData computedResult = null;
-                    String logs = null;
-                    try {
-                        logs = res.getValue().getOutput().getAllLogs(false);
-                        computedResult = ((ArrayList<SciData>) res.getValue().value()).get(0);
-                        results.put(res.getKey(), computedResult);
-                        // We print the logs of the job, if any
-                        if (logs.length() > 0) {
-                            logger.info(logs);
-                        }
-                    } catch (ptolemy.kernel.util.IllegalActionException e1) {
-                        jobDidNotSucceed(info.getJobId(), new SciLabTaskException(logs), false, logs);
-                    } catch (Throwable e2) {
-                        jobDidNotSucceed(info.getJobId(), e2, true, logs);
-                    }
-                }
-            }
-
-            isJobFinished = true;
+                schedulerStopped = true;
+                break;
         }
+
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+        switch (notification.getEventType()) {
+            case JOB_RUNNING_TO_FINISHED:
+                JobInfo info = notification.getData();
+                if (info.getStatus() == JobStatus.KILLED) {
+                    if (logger.isDebugEnabled()) {
+                        logger.info("Received job killed event...");
+                    }
+
+                    // Filtering the right job
+                    if ((currentJobId == null) || !info.getJobId().equals(currentJobId)) {
+                        return;
+                    }
+                    this.jobKilled = true;
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.info("Received job finished event...");
+                    }
+
+                    if (info == null) {
+                        return;
+                    }
+
+                    // Filtering the right job
+                    if (!info.getJobId().equals(currentJobId)) {
+                        return;
+                    }
+                    // Getting the Job result from the Scheduler
+                    JobResult jResult = null;
+
+                    try {
+                        jResult = scheduler.getJobResult(info.getJobId());
+                    } catch (SchedulerException e) {
+                        jobDidNotSucceed(info.getJobId(), e, true, null);
+                        return;
+                    }
+
+                    if (logger.isDebugEnabled()) {
+                        System.out.println("Updating results of job: " + jResult.getName() + "(" +
+                            info.getJobId() + ")");
+                    }
+
+                    // Getting the task results from the job result
+                    Map<String, TaskResult> task_results = null;
+                    if (jResult.hadException()) {
+                        task_results = jResult.getExceptionResults();
+                    } else {
+                        task_results = jResult.getAllResults();
+                    }
+
+                    // Iterating over the task results
+                    for (Map.Entry<String, TaskResult> res : task_results.entrySet()) {
+                        if (logger.isDebugEnabled()) {
+                            logger.info("Looking for result of task: " + res.getKey());
+                        }
+
+                        // No result received
+                        if (res.getValue() == null) {
+                            jobDidNotSucceed(info.getJobId(), new RuntimeException("Task id = " +
+                                res.getKey() + " was not returned by the scheduler"), false, null);
+
+                        } else if (res.getValue().hadException()) {
+                            //Exception took place inside the framework
+                            if (res.getValue().getException() instanceof ptolemy.kernel.util.IllegalActionException) {
+                                // We filter this specific exception which means that the "out" variable was not set by the function 
+                                // due to an error inside the script
+                                String logs = res.getValue().getOutput().getAllLogs(false);
+                                jobDidNotSucceed(info.getJobId(), new SciLabTaskException(logs), false, logs);
+                            } else {
+                                // For other types of exception we forward it as it is.
+                                jobDidNotSucceed(info.getJobId(), res.getValue().getException(), true, res
+                                        .getValue().getOutput().getAllLogs(false));
+                            }
+                        } else {
+                            // Normal success
+                            SciData computedResult = null;
+                            String logs = null;
+                            try {
+                                logs = res.getValue().getOutput().getAllLogs(false);
+                                computedResult = ((ArrayList<SciData>) res.getValue().value()).get(0);
+                                results.put(res.getKey(), computedResult);
+                                // We print the logs of the job, if any
+                                if (logs.length() > 0) {
+                                    logger.info(logs);
+                                }
+                            } catch (ptolemy.kernel.util.IllegalActionException e1) {
+                                jobDidNotSucceed(info.getJobId(), new SciLabTaskException(logs), false, logs);
+                            } catch (Throwable e2) {
+                                jobDidNotSucceed(info.getJobId(), e2, true, logs);
+                            }
+                        }
+                    }
+
+                    isJobFinished = true;
+                }
+                break;
+        }
+
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
+     */
     public void jobSubmittedEvent(JobState job) {
         // TODO Auto-generated method stub
-
     }
 
-    public void schedulerFrozenEvent() {
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
         // TODO Auto-generated method stub
-
     }
 
-    public void schedulerKilledEvent() {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received Scheduler killed event");
-        }
-        schedulerStopped = true;
-
-    }
-
-    public void schedulerPausedEvent() {
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+     */
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerRMDownEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerRMUpEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerResumedEvent() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void schedulerShutDownEvent() {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received Scheduler ShutDown event");
-        }
-        schedulerStopped = true;
-
-    }
-
-    public void schedulerShuttingDownEvent() {
-        if (logger.isDebugEnabled()) {
-            logger.info("Received Scheduler Shutting Down event");
-        }
-        schedulerStopped = true;
-
-    }
-
-    public void schedulerStartedEvent() {
-
-    }
-
-    public void schedulerStoppedEvent() {
-        // TODO Auto-generated method stub
-
     }
 
     /**
@@ -642,26 +602,6 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         }
     }
 
-    public void taskPendingToRunningEvent(TaskInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void taskRunningToFinishedEvent(TaskInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void taskWaitingForRestart(TaskInfo info) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void usersUpdate(UserIdentification userIdentification) {
-        // TODO Auto-generated method stub
-
-    }
-
     public static void main(String[] args) throws ActiveObjectCreationException, NodeException,
             LoginException, SchedulerException {
 
@@ -674,8 +614,4 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         logger.info(ret);
     }
 
-    public void schedulerPolicyChangedEvent(String newPolicyName) {
-        // TODO Auto-generated method stub
-
-    }
 }

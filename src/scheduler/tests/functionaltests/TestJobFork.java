@@ -120,17 +120,17 @@ public class TestJobFork extends FunctionalTest {
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertTrue(res.hadException());
 
-        Assert.assertFalse(res.getAllResults().get(task1Name).hadException());
-        Assert.assertNull(res.getAllResults().get(task1Name).getException());
+        Assert.assertFalse(res.getResult(task1Name).hadException());
+        Assert.assertNull(res.getResult(task1Name).getException());
 
-        Assert.assertFalse(res.getAllResults().get(task2Name).hadException());
-        Assert.assertNull(res.getAllResults().get(task2Name).getException());
+        Assert.assertFalse(res.getResult(task2Name).hadException());
+        Assert.assertNull(res.getResult(task2Name).getException());
 
-        Assert.assertFalse(res.getAllResults().get(taskForked1Name).hadException());
-        Assert.assertNull(res.getAllResults().get(taskForked1Name).getException());
+        Assert.assertFalse(res.getResult(taskForked1Name).hadException());
+        Assert.assertNull(res.getResult(taskForked1Name).getException());
 
-        Assert.assertTrue(res.getAllResults().get(taskForked2Name).hadException());
-        Assert.assertNotNull(res.getAllResults().get(taskForked2Name).getException());
+        Assert.assertTrue(res.getResult(taskForked2Name).hadException());
+        Assert.assertNotNull(res.getResult(taskForked2Name).getException());
 
         //remove job
         SchedulerTHelper.removeJob(id);
