@@ -43,74 +43,140 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  * Just Override the events you want to receive.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9.1
+ * @since ProActive Scheduling 1.0
  */
 @PublicAPI
 public class AbstractSchedulerEventListener implements SchedulerEventListener {
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     */
     public void jobChangePriorityEvent(JobInfo info) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     */
     public void jobPausedEvent(JobInfo info) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     */
     public void jobPendingToRunningEvent(JobInfo info) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     */
     public void jobRemoveFinishedEvent(JobInfo info) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     */
     public void jobResumedEvent(JobInfo info) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
+     */
     public void jobRunningToFinishedEvent(JobInfo info) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
+     */
     public void jobSubmittedEvent(JobState job) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerFrozenEvent()
+     */
     public void schedulerFrozenEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerKilledEvent()
+     */
     public void schedulerKilledEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPausedEvent()
+     */
     public void schedulerPausedEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMDownEvent()
+     */
     public void schedulerRMDownEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMUpEvent()
+     */
     public void schedulerRMUpEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerResumedEvent()
+     */
     public void schedulerResumedEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShutDownEvent()
+     */
     public void schedulerShutDownEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShuttingDownEvent()
+     */
     public void schedulerShuttingDownEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStartedEvent()
+     */
     public void schedulerStartedEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStoppedEvent()
+     */
     public void schedulerStoppedEvent() {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
+     */
     public void taskPendingToRunningEvent(TaskInfo info) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
+     */
     public void taskRunningToFinishedEvent(TaskInfo info) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskInfo)
+     */
     public void taskWaitingForRestart(TaskInfo info) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdate(org.ow2.proactive.scheduler.common.job.UserIdentification)
+     */
     public void usersUpdate(UserIdentification userIdentification) {
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPolicyChangedEvent(java.lang.String)
+     */
     public void schedulerPolicyChangedEvent(String newPolicyName) {
     }
 

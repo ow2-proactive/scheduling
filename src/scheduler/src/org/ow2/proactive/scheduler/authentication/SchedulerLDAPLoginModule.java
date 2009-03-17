@@ -50,6 +50,8 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
 
     /**
      * Returns LDAP configuration file name defined in scheduler configuration file
+     *
+     * @return LDAP configuration file name defined in scheduler configuration file
      */
     protected String getLDAPConfigFileName() {
         String ldapFile = PASchedulerProperties.SCHEDULER_LDAP_CONFIG_FILE_PATH.getValueAsString();
@@ -63,6 +65,8 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
 
     /**
      * Returns logger for authentication
+     *
+     * @return logger for authentication
      */
     public Logger getLogger() {
         return ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);

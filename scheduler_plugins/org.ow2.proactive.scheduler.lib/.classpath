@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-6.1.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-util-6.1.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager.jar"/>

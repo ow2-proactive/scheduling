@@ -127,7 +127,7 @@ public class PendingJobComposite extends AbstractJobComposite implements Pending
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.gui.listeners.EventJobsListener#priorityChangedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
     public void priorityChangedEvent(JobInfo info) {
         JobId jobId = info.getJobId();

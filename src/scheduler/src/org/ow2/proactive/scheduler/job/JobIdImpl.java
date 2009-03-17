@@ -158,7 +158,6 @@ public final class JobIdImpl implements JobId {
         if ((o != null) && o instanceof JobIdImpl) {
             return ((JobIdImpl) o).id == id;
         }
-
         return false;
     }
 

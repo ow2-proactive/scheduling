@@ -50,16 +50,29 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 @PublicAPI
 public class SchedulerConnection extends Connection<SchedulerAuthenticationInterface> {
 
+    /** Instance of the connection */
     private static SchedulerConnection instance;
 
+    /**
+     * Create a new instance of SchedulerConnection.
+     *
+     */
     private SchedulerConnection() {
         super(SchedulerAuthenticationInterface.class);
     }
 
+    /**
+     * @see org.ow2.proactive.authentication.Loggable#getLogger()
+     */
     public Logger getLogger() {
         return ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
     }
 
+    /**
+     * Get the instance of the Scheduler connection
+     *
+     * @return the instance of the Scheduler connection
+     */
     public static synchronized SchedulerConnection getInstance() {
         if (instance == null) {
             instance = new SchedulerConnection();
@@ -92,6 +105,8 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      * connection established or an error occurs.<br>
      * Note that you can use the provided {@link SchedulerAuthenticationGUIHelper} class to display a
      * graphical interface that will ask the URL, login and password.
+     *
+     * @return the interface to be authenticate by the Scheduler
      */
     public static SchedulerAuthenticationInterface waitAndJoin(String url) throws SchedulerException {
         return waitAndJoin(url, 0);
@@ -103,6 +118,8 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      * block until established or an error occurs.<br>
      * Note that you can use the provided {@link SchedulerAuthenticationGUIHelper} class to display a
      * graphical interface that will ask the URL, login and password.
+     *
+     * @return the interface to be authenticate by the Scheduler
      */
     public static SchedulerAuthenticationInterface waitAndJoin(String url, long timeout)
             throws SchedulerException {

@@ -65,7 +65,7 @@ import functionalTests.FunctionalTest;
  *
  * @author The ProActive Team
  * @date 18 Feb. 09
- * @since ProActive 4.0
+ * @since ProActive Scheduling 1.0
  */
 public class TestJobClasspath extends FunctionalTest {
 

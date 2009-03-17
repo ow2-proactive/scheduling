@@ -115,7 +115,6 @@ import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.ProActiveTaskLauncher;
-import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
@@ -967,7 +966,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             //store the exception into jobResult
             if (jobStatus == JobStatus.FAILED) {
-                taskResult = new TaskResultImpl(task.getId(), new Throwable(errorMsg), new SimpleTaskLogs("",
+                taskResult = new TaskResultImpl(task.getId(), new Exception(errorMsg), new SimpleTaskLogs("",
                     errorMsg));
                 ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
                         .isPreciousResult());
@@ -1046,7 +1045,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             res = (TaskResult) PAFuture.getFutureValue(res);
             logger_dev.info("Task '" + taskId + "' futur result unwrapped");
 
-            updateJobIdReference(job.getJobResult(), res);
+            updateTaskIdReferences(res, descriptor.getId());
 
             if (res != null) {
                 // HANDLE DESCIPTORS
@@ -1224,20 +1223,21 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * For Hibernate use : a Hibernate session cannot accept two different java objects with the same
      * Hibernate identifier.
      * To avoid this duplicate object (due to serialization),
-     * this method will join JobId references in the Job result graph object.
+     * this method will join taskId references in the Job result graph object.
      *
      * @param jobResult the result in which to join cross dependences
      * @param res the current result to check. (avoid searching for any)
+     * @param id the taskId reference known by the Scheduler
      */
-    private void updateJobIdReference(JobResult jobResult, TaskResult res) {
+    private void updateTaskIdReferences(TaskResult res, TaskId id) {
         try {
-            logger_dev.info("jobResult : " + jobResult.getJobId() + " - taskResult : " + res.getTaskId());
-            //find the jobId field
-            for (Field f : TaskIdImpl.class.getDeclaredFields()) {
-                if (f.getType().equals(JobId.class)) {
+            logger_dev.info("TaskResult : " + res.getTaskId());
+            //find the taskId field
+            for (Field f : TaskResultImpl.class.getDeclaredFields()) {
+                if (f.getType().equals(TaskId.class)) {
                     f.setAccessible(true);
                     //set to the existing reference
-                    f.set(res.getTaskId(), jobResult.getJobId());
+                    f.set(res, id);
                     break;
                 }
             }

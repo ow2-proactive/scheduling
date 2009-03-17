@@ -53,6 +53,7 @@ import functionalTests.FunctionalTest;
  * 		but without admin credentials
  *
  * @author ProActive team
+ * @since ProActive Scheduling 1.0
  *
  */
 public class AuthenticationTest extends FunctionalTest {

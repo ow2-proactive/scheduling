@@ -61,7 +61,7 @@ import functionalTests.FunctionalTest;
  * 
  * @author The ProActive Team
  * @date 2 jun 08
- * @since ProActive 4.0
+ * @since ProActive Scheduling 1.0
  */
 public class TestErrorAndFailure extends FunctionalTest {
 

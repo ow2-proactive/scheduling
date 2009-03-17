@@ -95,6 +95,7 @@ public enum SchedulerEvent {
     /** The scheduling policy has been changed. */
     POLICY_CHANGED("schedulerPolicyChangedEvent");
 
+    /** Name of the method */
     private String methodName;
 
     /**

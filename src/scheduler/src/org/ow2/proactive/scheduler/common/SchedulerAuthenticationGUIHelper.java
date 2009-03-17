@@ -73,6 +73,9 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 @PublicAPI
 public class SchedulerAuthenticationGUIHelper {
 
+    /**
+     * Create a new instance of SchedulerAuthenticationGUIHelper.
+     */
     private SchedulerAuthenticationGUIHelper() {
     }
 

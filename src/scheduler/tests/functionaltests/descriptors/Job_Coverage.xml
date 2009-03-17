@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="Job_MaximumCoverage">
+	<variables>
+		<variable name="executables" value="functionaltests.executables"/>
+		<variable name="javaCmd" value="${java.home}/bin/java"/>
+		<!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
+		<variable name="classPath" value="${pa.scheduler.home}/classes/schedulerTests/"/>
+	</variables>
+	<jobClasspath>
+		<pathElement path="${classPath}"/>
+	</jobClasspath>
+	<taskFlow>
+		<task name="task1" preciousResult="true">
+			<javaExecutable class="functionaltests.executables.Working" />
+		</task>
+		<task name="task2" maxNumberOfExecution="2">
+			<javaExecutable class="functionaltests.executables.WorkingAt3rd" />
+		</task>
+		<task name="task3" maxNumberOfExecution="4">
+			<javaExecutable class="functionaltests.executables.WorkingAt3rd" />
+		</task>
+		<task name="task4">
+			<javaExecutable class="functionaltests.executables.Throwing" />
+		</task>
+		<task name="task5" maxNumberOfExecution="3" restartTaskOnError="elsewhere">
+			<javaExecutable class="functionaltests.executables.Throwing" />
+		</task>
+		<task name="task6" preciousResult="true">
+			<nativeExecutable>
+				<staticCommand value="${javaCmd} -cp ${classPath} ${executables}.ExitNormally" />
+			</nativeExecutable>
+		</task>
+		<task name="task7">
+			<nativeExecutable>
+				<staticCommand value="${javaCmd} -cp ${classPath} ${executables}.ExitWithErrorCode" />
+			</nativeExecutable>
+		</task>
+		<task name="task8" maxNumberOfExecution="2">
+			<nativeExecutable>
+				<staticCommand value="${javaCmd} -cp ${classPath} ${executables}.ExitWithErrorCode" />
+			</nativeExecutable>
+		</task>
+		<task name="task9">
+			<!-- Cause node to be killed, so run at the end -->
+			<depends>
+				<task ref="task1"/>
+				<task ref="task2"/>
+				<task ref="task3"/>
+				<task ref="task4"/>
+				<task ref="task5"/>
+				<task ref="task6"/>
+				<task ref="task7"/>
+				<task ref="task8"/>
+			</depends>
+			<javaExecutable class="functionaltests.executables.Killing" />
+		</task>
+	</taskFlow>
+</job>

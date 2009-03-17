@@ -344,14 +344,14 @@ public class TaskComposite extends Composite {
         try {
             previewPanel = result.getGraphicalDescription();
             resultPreview.update(previewPanel);
-        } catch (Throwable e) {
+        } catch (Throwable t) {
             // root exception can be wrapped into ProActive level exception
             // try to display also cause exception.
             // TODO cdelbe : recursive display ?
-            String cause = e.getCause() != null ? System.getProperty("line.separator") + "caused by " +
-                e.getCause() : "";
+            String cause = t.getCause() != null ? System.getProperty("line.separator") + "caused by " +
+                t.getCause() : "";
             resultPreview.update(new SimpleTextPanel("[ERROR] Cannot create graphical previewer: " +
-                System.getProperty("line.separator") + e + cause));
+                System.getProperty("line.separator") + t + cause));
         }
     }
 
@@ -365,13 +365,13 @@ public class TaskComposite extends Composite {
         try {
             previewPanel = new SimpleTextPanel(result.getTextualDescription());
             resultPreview.update(previewPanel);
-        } catch (Throwable e) {
+        } catch (Throwable t) {
             // root exception can be wrapped into ProActive level exception
             // try to display also cause exception.
-            String cause = e.getCause() != null ? System.getProperty("line.separator") + "caused by " +
-                e.getCause() : "";
+            String cause = t.getCause() != null ? System.getProperty("line.separator") + "caused by " +
+                t.getCause() : "";
             resultPreview.update(new SimpleTextPanel("[ERROR] Cannot create textual previewer: " +
-                System.getProperty("line.separator") + e + cause));
+                System.getProperty("line.separator") + t + cause));
         }
     }
 

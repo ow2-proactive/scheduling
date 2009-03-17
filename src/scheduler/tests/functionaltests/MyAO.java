@@ -54,7 +54,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * It is used to start A scheduler in a separate JVM than the Test itself.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9.1
+ * @since ProActive Scheduling 1.0
  */
 public class MyAO implements Serializable {
 

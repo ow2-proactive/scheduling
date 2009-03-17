@@ -142,17 +142,27 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         return as;
     }
 
-    //get the host name of the sender.
+    /**
+     * get the host name of the sender
+     *
+     * @return the host name of the sender
+     */
     private String getSenderHostName() {
         String senderURL = PAActiveObject.getContext().getCurrentRequest().getSender().getNodeURL();
         senderURL = senderURL.replaceFirst(".*//", "").replaceFirst("/.*", "");
         return senderURL;
     }
 
+    /**
+     * @see org.ow2.proactive.authentication.Loggable#getLogger()
+     */
     public Logger getLogger() {
         return ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);
     }
 
+    /**
+     * @see org.ow2.proactive.authentication.AuthenticationImpl#getLoginMethod()
+     */
     protected String getLoginMethod() {
         return PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString();
     }

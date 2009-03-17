@@ -92,19 +92,19 @@ public class JobResultImpl implements JobResult {
     @JoinColumn(name = "ALL_RESULTS")
     private Map<String, TaskResult> allResults = null;
 
-    /** List of precious result */
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
-    @Cascade(CascadeType.ALL)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @JoinColumn(name = "PRECIOUS_RESULTS")
-    private Map<String, TaskResult> preciousResults = null;
-
     /** List of result that ends with an exception */
     @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
     @Cascade(CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @JoinColumn(name = "EXCEPTION_RESULTS")
     private Map<String, TaskResult> exceptionResults = null;
+
+    /** List of precious result */
+    @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
+    @Cascade(CascadeType.ALL)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    @JoinColumn(name = "PRECIOUS_RESULTS")
+    private Map<String, TaskResult> preciousResults = null;
 
     /**
      * ProActive empty constructor
@@ -175,7 +175,7 @@ public class JobResultImpl implements JobResult {
             preciousResults.put(taskName, taskResult);
 
         //exceptionResults
-        if (!PAFuture.isAwaited(taskResult) && taskResult.hadException()) {
+        if (taskResult.hadException()) {
             exceptionResults.put(taskName, taskResult);
         }
     }

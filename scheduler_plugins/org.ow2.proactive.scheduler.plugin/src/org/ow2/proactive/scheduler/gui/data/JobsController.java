@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -71,6 +72,12 @@ import org.ow2.proactive.scheduler.gui.views.TaskView;
 /**
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
+ */
+/**
+ * JobsController...
+ *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 1.0
  */
 public class JobsController implements SchedulerEventListener {
     // The shared instance view as a direct reference
@@ -244,9 +251,7 @@ public class JobsController implements SchedulerEventListener {
     // ---------------- implements SchedulerEventListener ----------------- //
     // -------------------------------------------------------------------- //
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#newPendingJobEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobState)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
      */
     public void jobSubmittedEvent(JobState job) {
         // add job to the global jobs map
@@ -263,9 +268,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPendingToRunningEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
     public void jobPendingToRunningEvent(JobInfo info) {
         final JobId jobId = info.getJobId();
@@ -331,8 +334,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
-     * jobRunningToFinishedEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRunningToFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
     public void jobRunningToFinishedEvent(JobInfo info) {
         final JobId jobId = info.getJobId();
@@ -408,9 +410,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#removeFinishedJobEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobRemoveFinishedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
     public void jobRemoveFinishedEvent(JobInfo info) {
         final JobId jobId = info.getJobId();
@@ -470,8 +470,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
-     * pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskPendingToRunningEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
     public void taskPendingToRunningEvent(TaskInfo info) {
         JobId jobId = info.getJobId();
@@ -509,8 +508,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @seeorg.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#
-     * runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskRunningToFinishedEvent(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
     public void taskRunningToFinishedEvent(TaskInfo info) {
         JobId jobId = info.getJobId();
@@ -558,9 +556,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerFrozenEvent
-     * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerFrozenEvent()
      */
     public void schedulerFrozenEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.FROZEN);
@@ -571,9 +567,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent
-     * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerPausedEvent()
      */
     public void schedulerPausedEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.PAUSED);
@@ -584,9 +578,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent
-     * (org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerResumedEvent()
      */
     public void schedulerResumedEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.STARTED);
@@ -597,8 +589,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
-     * SchedulerShutDownEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShutDownEvent()
      */
     public void schedulerShutDownEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
@@ -613,8 +604,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
-     * SchedulerShuttingDownEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerShuttingDownEvent()
      */
     public void schedulerShuttingDownEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.SHUTTING_DOWN);
@@ -625,9 +615,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent
-     * ()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStartedEvent()
      */
     public void schedulerStartedEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.STARTED);
@@ -638,9 +626,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent
-     * ()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStoppedEvent()
      */
     public void schedulerStoppedEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.STOPPED);
@@ -651,9 +637,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent
-     * ()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerKilledEvent()
      */
     public void schedulerKilledEvent() {
         ActionsManager.getInstance().setSchedulerStatus(SchedulerStatus.KILLED);
@@ -668,9 +652,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobPausedEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobPausedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
     public void jobPausedEvent(JobInfo info) {
         final JobState job = getJobById(info.getJobId());
@@ -708,9 +690,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobResumedEvent
-     * (org.objectweb.proactive.extra.scheduler.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobResumedEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
     public void jobResumedEvent(JobInfo info) {
         final JobState job = getJobById(info.getJobId());
@@ -749,8 +729,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @seeorg.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#
-     * changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobChangePriorityEvent(org.ow2.proactive.scheduler.common.job.JobInfo)
      */
     public void jobChangePriorityEvent(JobInfo info) {
         getJobById(info.getJobId()).update(info);
@@ -758,23 +737,21 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#
-     * schedulerRMDownEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMDownEvent()
      */
     public void schedulerRMDownEvent() {
         // TODO Auto-generated method stub
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#
-     * schedulerRMUpEvent()
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerRMUpEvent()
      */
     public void schedulerRMUpEvent() {
         // TODO Auto-generated method stub
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#taskWaitingForRestart(org.objectweb.proactive.extensions.scheduler.common.task.TaskInfo)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskWaitingForRestart(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
     public void taskWaitingForRestart(TaskInfo info) {
         JobId jobId = info.getJobId();
@@ -812,9 +789,7 @@ public class JobsController implements SchedulerEventListener {
     }
 
     /**
-     * @see
-     * org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#usersUpdate
-     * (org.objectweb.proactive.extensions.scheduler.common.job.UserIdentification)
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdate(org.ow2.proactive.scheduler.common.job.UserIdentification)
      */
     public void usersUpdate(UserIdentification userIdentification) {
         users.update(userIdentification);
@@ -942,15 +917,17 @@ public class JobsController implements SchedulerEventListener {
     // -------------------------------------------------------------------- //
     public JobState getJobById(JobId id) {
         JobState res = jobs.get(id);
-        if (res == null)
+        if (res == null) {
             throw new IllegalArgumentException("there are no jobs with the id : " + id);
+        }
         return res;
     }
 
     public List<JobState> getJobsByIds(List<JobId> ids) {
         List<JobState> res = new ArrayList<JobState>();
-        for (JobId id : ids)
+        for (JobId id : ids) {
             res.add(jobs.get(id));
+        }
         return res;
     }
 

@@ -50,6 +50,8 @@ public class SchedulerFileLoginModule extends FileLoginModule {
 
     /**
      * Returns login file name from scheduler configuration file
+     *
+     * @return login file name from scheduler configuration file
      */
     protected String getLoginFileName() {
         String loginFile = PASchedulerProperties.SCHEDULER_LOGIN_FILENAME.getValueAsString();
@@ -64,6 +66,8 @@ public class SchedulerFileLoginModule extends FileLoginModule {
 
     /**
      * Returns group file name from scheduler configuration file
+     *
+     * @return group file name from scheduler configuration file
      */
     protected String getGroupFileName() {
         String groupFile = PASchedulerProperties.SCHEDULER_GROUP_FILENAME.getValueAsString();
@@ -78,6 +82,8 @@ public class SchedulerFileLoginModule extends FileLoginModule {
 
     /**
      * Returns logger used for authentication
+     *
+     * @return logger used for authentication
      */
     public Logger getLogger() {
         return ProActiveLogger.getLogger(SchedulerLoggers.CONNECTION);

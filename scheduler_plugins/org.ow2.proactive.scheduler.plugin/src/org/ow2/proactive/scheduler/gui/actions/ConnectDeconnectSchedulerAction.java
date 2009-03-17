@@ -75,7 +75,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
 
         if (dialogResult != null) {
             try {
-                int res = SchedulerProxy.getInstanceWithException().connectToScheduler(dialogResult);
+                int res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
 
                 if (res == SchedulerProxy.CONNECTED) {
                     isConnected = true;
@@ -126,7 +126,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                     MessageDialog.openError(parent.getShell(), "Couldn't connect",
                             "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl());
                 }
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 t.printStackTrace();
                 MessageDialog.openError(parent.getShell(), "Couldn't connect",
                         "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl() +
