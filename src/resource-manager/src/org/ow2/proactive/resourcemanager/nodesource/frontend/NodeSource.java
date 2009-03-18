@@ -152,7 +152,7 @@ public abstract class NodeSource extends RestrictedService implements Serializab
         // lead to a lock if source is blocked
         try {
             pinger = (Pinger) PAActiveObject.newActive(Pinger.class.getName(), new Object[] { PAActiveObject
-                    .getStubOnThis() });
+                    .getStubOnThis() }, PAActiveObject.getNode());
 
             registerTrustedService(pinger);
             pinger.ping();
