@@ -110,6 +110,13 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public abstract long getLastSubmitTime();
 
     /**
+     * Get the myEventsOnly.
+     *
+     * @return the myEventsOnly.
+     */
+    public abstract boolean isMyEventsOnly();
+
+    /**
      * Set the field to sort on.
      *
      * @param sortBy

@@ -455,12 +455,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
      */
-    public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, SchedulerEvent... events)
-            throws SchedulerException {
+    public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, boolean myEventsOnly,
+            SchedulerEvent... events) throws SchedulerException {
 
-        // first check if the listener is a reified remote object
+        // check if listener is not null
+        if (sel == null) {
+            String msg = "Scheduler listener must not be null !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
+        }
+        // check if the listener is a reified remote object
         if (!MOP.isReifiedObject(sel)) {
             String msg = "Scheduler listener must be a remote object !";
             logger_dev.info(msg);
@@ -470,6 +476,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         UserIdentificationImpl uIdent = identifications.get(id);
+        uIdent.setMyEventsOnly(myEventsOnly);
 
         if (uIdent == null) {
             logger_dev.info(ACCESS_DENIED);
@@ -857,6 +864,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
+                    //if their is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(eventType)) {
                         schedulerListeners.get(id).schedulerStateUpdatedEvent(eventType);
                     }
@@ -885,10 +893,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
+                    //if their is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(SchedulerEvent.JOB_SUBMITTED)) {
-                        schedulerListeners.get(id).jobSubmittedEvent(job);
+                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
+                            schedulerListeners.get(id).jobSubmittedEvent(job);
+                        }
                     }
+                } catch (NullPointerException e) {
+                    //can't do anything
+                    logger_dev.debug("", e);
                 } catch (Exception e) {
                     clearListener(iter, id, userId);
                 }
@@ -901,9 +917,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /**
      * Dispatch the job state updated event
      * 
+     * @param owner the owner of this job
      * @param notification the data to send to every client
      */
-    private void dispatchJobStateUpdated(NotificationData<JobInfo> notification) {
+    private void dispatchJobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         try {
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
@@ -914,9 +931,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
+                    //if their is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
-                        schedulerListeners.get(id).jobStateUpdatedEvent(notification);
+                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
+                            schedulerListeners.get(id).jobStateUpdatedEvent(notification);
+                        }
                     }
                 } catch (Exception e) {
                     clearListener(iter, id, userId);
@@ -930,9 +952,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /**
      * Dispatch the task state updated event
      * 
+     * @param owner the owner of this task
      * @param notification the data to send to every client
      */
-    private void dispatchTaskStateUpdated(NotificationData<TaskInfo> notification) {
+    private void dispatchTaskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         try {
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
@@ -943,9 +966,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
+                    //if their is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
-                        schedulerListeners.get(id).taskStateUpdatedEvent(notification);
+                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
+                            schedulerListeners.get(id).taskStateUpdatedEvent(notification);
+                        }
                     }
                 } catch (Exception e) {
                     clearListener(iter, id, userId);
@@ -972,9 +1000,15 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
+                    //if their is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
-                        schedulerListeners.get(id).usersUpdatedEvent(notification);
+                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() && userId.getUsername().equals(
+                                    notification.getData().getUsername()))) {
+                            schedulerListeners.get(id).usersUpdatedEvent(notification);
+                        }
                     }
                 } catch (Exception e) {
                     clearListener(iter, id, userId);
@@ -1021,27 +1055,27 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobStateUpdated(org.ow2.proactive.scheduler.common.NotificationData)
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobStateUpdated(java.lang.String, org.ow2.proactive.scheduler.common.NotificationData)
      */
-    public void jobStateUpdated(NotificationData<JobInfo> notification) {
+    public void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
             case JOB_PAUSED:
             case JOB_RESUMED:
             case JOB_PENDING_TO_RUNNING:
             case JOB_CHANGE_PRIORITY:
-                dispatchJobStateUpdated(notification);
+                dispatchJobStateUpdated(owner, notification);
                 break;
             case JOB_RUNNING_TO_FINISHED:
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
-                dispatchJobStateUpdated(notification);
+                dispatchJobStateUpdated(owner, notification);
                 //stats
                 stats.increaseFinishedJobCount(notification.getData().getNumberOfFinishedTasks());
                 break;
             case JOB_REMOVE_FINISHED:
                 //removing jobs from the global list : this job is no more managed
                 jobs.remove(notification.getData().getJobId());
-                dispatchJobStateUpdated(notification);
+                dispatchJobStateUpdated(owner, notification);
                 break;
             default:
                 logger_dev.error("Unconsistent update type received from Scheduler Core : " +
@@ -1050,14 +1084,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#taskStateUpdated(org.ow2.proactive.scheduler.common.NotificationData)
+     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#taskStateUpdated(java.lang.String, org.ow2.proactive.scheduler.common.NotificationData)
      */
-    public void taskStateUpdated(NotificationData<TaskInfo> notification) {
+    public void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         switch (notification.getEventType()) {
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
-                dispatchTaskStateUpdated(notification);
+                dispatchTaskStateUpdated(owner, notification);
                 break;
             default:
                 logger_dev.error("Unconsistent update type received from Scheduler Core : " +

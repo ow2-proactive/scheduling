@@ -107,11 +107,11 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
      */
-    public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, SchedulerEvent... events)
-            throws SchedulerException {
-        return schedulerFrontend.addSchedulerEventListener(sel, events);
+    public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, boolean myEventsOnly,
+            SchedulerEvent... events) throws SchedulerException {
+        return schedulerFrontend.addSchedulerEventListener(sel, myEventsOnly, events);
     }
 
     /**

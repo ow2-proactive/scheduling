@@ -91,11 +91,12 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     // ---------------- implements AdminSchedulerInterface ---------------- //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
      */
-    public SchedulerState addSchedulerEventListener(SchedulerEventListener listener, SchedulerEvent... events) {
+    public SchedulerState addSchedulerEventListener(SchedulerEventListener listener, boolean myEventsOnly,
+            SchedulerEvent... events) {
         try {
-            return (SchedulerState) scheduler.addSchedulerEventListener(listener, events);
+            return (SchedulerState) scheduler.addSchedulerEventListener(listener, myEventsOnly, events);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }

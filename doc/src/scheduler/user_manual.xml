@@ -1185,6 +1185,9 @@ JobResult myResult = scheduler.getJobResult(myJobId);
 				then receive the scheduler state containing some information about the current
 				scheduling state. See the ProActive Scheduler JAVADOC for more details.
 			</para>
+			<para>
+				It is also possible to specify if you want to receive events concerning your jobs, or any jobs from any users in the Scheduler.
+			</para>
 			<programlisting language="java">
 //make your listener
 SchedulerEventListener mySchedulerEventListener = new SchedulerEventListener () {
@@ -1202,7 +1205,7 @@ SchedulerEventListener mySchedulerEventListener = new SchedulerEventListener () 
 	//Implement other methods...
 }
 //add the listener to the scheduler specified which events you want to receive.
-scheduler.addSchedulerEventListener(mySchedulerEventListener,SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 			</programlisting>
 			<para>
 				This example shows you how to listen to the scheduler events (here the finished job event

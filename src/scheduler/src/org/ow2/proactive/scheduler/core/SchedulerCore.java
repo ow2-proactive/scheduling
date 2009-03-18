@@ -490,7 +490,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     JobInfo info = job.getJobInfo();
                     updateTaskInfosList(job);
                     //send event to front_end
-                    frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_RESUMED, info));
+                    frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
+                        SchedulerEvent.JOB_RESUMED, info));
                 }
             }
 
@@ -740,14 +741,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             updateTaskInfosList(currentJob);
                             logger.info("Job '" + currentJob.getId() + "' started");
                             // send job event to front-end
-                            frontend.jobStateUpdated(new NotificationData<JobInfo>(
+                            frontend.jobStateUpdated(currentJob.getOwner(), new NotificationData<JobInfo>(
                                 SchedulerEvent.JOB_PENDING_TO_RUNNING, currentJob.getJobInfo()));
                         }
 
                         // set the different informations on task
                         currentJob.startTask(internalTask);
                         // send task event to front-end
-                        frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                        frontend.taskStateUpdated(currentJob.getOwner(), new NotificationData<TaskInfo>(
                             SchedulerEvent.TASK_PENDING_TO_RUNNING, internalTask.getTaskInfo()));
                         //no need to set this status in database
                     }
@@ -809,7 +810,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         td.setStatus(TaskStatus.WAITING_ON_FAILURE);
                         job.newWaitingTask();
                         job.reStartTask(td);
-                        frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                        frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                             SchedulerEvent.TASK_WAITING_FOR_RESTART, td.getTaskInfo()));
                         logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
                     } else {
@@ -987,8 +988,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             finishedJobs.add(job);
 
             //send task event
-            frontend.taskStateUpdated(new NotificationData<TaskInfo>(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                task.getTaskInfo()));
+            frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED, task.getTaskInfo()));
         }
 
         terminateJobHandling(job.getId());
@@ -999,8 +1000,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         logger.info("Job '" + job.getId() + "' terminated (" + jobStatus + ")");
 
         //send event to listeners.
-        frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_RUNNING_TO_FINISHED, job
-                .getJobInfo()));
+        frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
+            SchedulerEvent.JOB_RUNNING_TO_FINISHED, job.getJobInfo()));
     }
 
     /**
@@ -1060,7 +1061,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //change status and update GUI
                     descriptor.setStatus(TaskStatus.WAITING_ON_FAILURE);
                     job.newWaitingTask();
-                    frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                    frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
@@ -1089,7 +1090,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //change status and update GUI
                     descriptor.setStatus(TaskStatus.WAITING_ON_FAILURE);
                     job.newWaitingTask();
-                    frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                    frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
@@ -1151,7 +1152,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
                     DatabaseManager.update(job.getJobResult());
                     //send event to user
-                    frontend.taskStateUpdated(new NotificationData<TaskInfo>(
+                    frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
 
                     //the job is not restarted directly
@@ -1186,8 +1187,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             }
             //send event
-            frontend.taskStateUpdated(new NotificationData<TaskInfo>(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                descriptor.getTaskInfo()));
+            frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED, descriptor.getTaskInfo()));
 
             //if this job is finished (every task have finished)
             logger_dev.info("Number of finished tasks : " + job.getNumberOfFinishedTask() +
@@ -1208,7 +1209,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     DatabaseManager.unload(tr);
                 }
                 //send event to client
-                frontend.jobStateUpdated(new NotificationData<JobInfo>(
+                frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                     SchedulerEvent.JOB_RUNNING_TO_FINISHED, job.getJobInfo()));
             }
 
@@ -1443,8 +1444,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
             logger.info("Job " + jobId + " removed !");
             //send event to front-end
-            frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED, job
-                    .getJobInfo()));
+            frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
+                SchedulerEvent.JOB_REMOVE_FINISHED, job.getJobInfo()));
         }
     }
 
@@ -1658,7 +1659,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //create tasks events list
         updateTaskInfosList(job);
         //send event to user
-        frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_PAUSED, info));
+        frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(SchedulerEvent.JOB_PAUSED,
+            info));
 
         return new BooleanWrapper(change);
     }
@@ -1691,7 +1693,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //create tasks events list
         updateTaskInfosList(job);
         //send event to user
-        frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_RESUMED, info));
+        frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(SchedulerEvent.JOB_RESUMED,
+            info));
 
         return new BooleanWrapper(change);
     }
@@ -1732,8 +1735,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         InternalJob job = jobs.get(jobId);
         job.setPriority(priority);
         DatabaseManager.synchronize(job.getJobInfo());
-        frontend.jobStateUpdated(new NotificationData<JobInfo>(SchedulerEvent.JOB_CHANGE_PRIORITY, job
-                .getJobInfo()));
+        frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
+            SchedulerEvent.JOB_CHANGE_PRIORITY, job.getJobInfo()));
     }
 
     /**

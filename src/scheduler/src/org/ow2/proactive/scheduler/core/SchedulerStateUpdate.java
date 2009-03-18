@@ -67,17 +67,19 @@ public interface SchedulerStateUpdate extends Serializable {
      * Invoked each time the state of a job has changed.<br>
      * In this case you can use the {@link org.ow2.proactive.scheduler.common.job.JobState#update(org.ow2.proactive.scheduler.common.job.JobInfo)} method to update the content of your job.
      *
+     * @param owner the owner of this job
      * @param notification the data composed of the type of the event and the information that have change in the job.
      */
-    public void jobStateUpdated(NotificationData<JobInfo> notification);
+    public void jobStateUpdated(String owner, NotificationData<JobInfo> notification);
 
     /**
      * Invoked each time the state of a task has changed.
      * In this case you can use the {@link org.ow2.proactive.scheduler.common.job.JobState#update(org.ow2.proactive.scheduler.common.task.TaskInfo)} method to update the content of your job.
      *
+     * @param owner the owner of this task
      * @param notification the data composed of the type of the event and the information that have change in the task.
      */
-    public void taskStateUpdated(NotificationData<TaskInfo> notification);
+    public void taskStateUpdated(String owner, NotificationData<TaskInfo> notification);
 
     /**
      * Invoked each time something change about users.

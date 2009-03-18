@@ -714,7 +714,8 @@ public class SchedulerTHelper {
             eventReceiver = (MonitorEventReceiver) PAActiveObject.turnActive(passiveEventReceiver);
 
         }
-        SchedulerState state = schedInt.addSchedulerEventListener((SchedulerEventListener) eventReceiver);
+        SchedulerState state = schedInt.addSchedulerEventListener((SchedulerEventListener) eventReceiver,
+                false);
         mHandler.init(state);
     }
 

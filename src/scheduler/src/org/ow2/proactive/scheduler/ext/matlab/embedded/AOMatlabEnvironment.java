@@ -170,7 +170,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
         this.scheduler = auth.logAsUser(user, passwd);
 
-        this.scheduler.addSchedulerEventListener((AOMatlabEnvironment) stubOnThis,
+        this.scheduler.addSchedulerEventListener((AOMatlabEnvironment) stubOnThis, false,
                 SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN);
 

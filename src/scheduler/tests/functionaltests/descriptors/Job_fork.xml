@@ -22,7 +22,7 @@
 			<forkEnvironment jvmParameters="-Dproactive.test=true" />
 				<parameters>
 					<parameter name="steps" value="20"/>
-					<parameter name="iterations" value="100000000"/>
+					<parameter name="iterations" value="10000000"/>
 				</parameters>
 			</javaExecutable>
 		</task>

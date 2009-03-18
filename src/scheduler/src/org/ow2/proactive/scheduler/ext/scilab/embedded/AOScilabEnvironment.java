@@ -168,7 +168,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
         this.scheduler = auth.logAsUser(user, passwd);
 
-        this.scheduler.addSchedulerEventListener((AOScilabEnvironment) stubOnThis,
+        this.scheduler.addSchedulerEventListener((AOScilabEnvironment) stubOnThis, false,
                 SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN);
 

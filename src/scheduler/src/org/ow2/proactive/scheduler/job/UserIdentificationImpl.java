@@ -63,6 +63,9 @@ public class UserIdentificationImpl extends UserIdentification {
     /** Host name of this user. */
     private String hostName;
 
+    /** Tell if this user want to receive all events or only his events */
+    private boolean myEventsOnly = false;
+
     /** List of events that the user want to receive. */
     private HashSet<SchedulerEvent> userEvents = null;
 
@@ -180,6 +183,23 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public long getLastSubmitTime() {
         return lastSubmitTime;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.UserIdentification#isMyEventsOnly()
+     */
+    @Override
+    public boolean isMyEventsOnly() {
+        return myEventsOnly;
+    }
+
+    /**
+     * Set the myEventsOnly value to the given myEventsOnly value.
+     * 
+     * @param myEventsOnly the myEventsOnly to set.
+     */
+    public void setMyEventsOnly(boolean myEventsOnly) {
+        this.myEventsOnly = myEventsOnly;
     }
 
     /**
