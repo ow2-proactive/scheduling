@@ -923,7 +923,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     private void dispatchJobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         try {
             if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
+                logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
             Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
             while (iter.hasNext()) {
@@ -958,7 +958,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     private void dispatchTaskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         try {
             if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
+                logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
             Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
             while (iter.hasNext()) {
@@ -992,7 +992,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     private void dispatchUsersUpdated(NotificationData<UserIdentification> notification) {
         try {
             if (logger_dev.isDebugEnabled()) {
-                logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
+                logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
             Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
             while (iter.hasNext()) {

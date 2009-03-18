@@ -148,7 +148,7 @@ public class RMStarter {
                 }
             }
 
-            logger.info("(Press 'e' to shutdown)");
+            logger.info("(Once started, press 'e' to shutdown)");
             while (System.in.read() != 'e')
                 ;
 
