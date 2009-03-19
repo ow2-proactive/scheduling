@@ -1,9 +1,9 @@
 @echo off
 echo.
 
-IF EXIST SCHEDULER_DB (
-    RMDIR /S /Q SCHEDULER_DB
-    RM derby.log
+IF EXIST ..\..\SCHEDULER_DB (
+    RMDIR /S /Q ..\..\SCHEDULER_DB
+    RM ..\..\logs\derby.log
 )
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat

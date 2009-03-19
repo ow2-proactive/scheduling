@@ -242,7 +242,7 @@
 				</classpath>
 
 				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
-				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j" />
+				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/log4j/scheduler-log4j" />
 				<jvmarg value="-Dproactive.http.jetty.xml=${base.dir}/src/resource-manager/tests/nodestate/jetty.xml"/>
 				<jvmargs />
 
@@ -380,8 +380,7 @@
 		<delete file="tests.log" />
 		<delete dir="${junit.dir}" />
 		<!-- Database generated classes -->
-		<delete file="${base.dir}/derby.log" />
-		<delete dir="${base.dir}/SCHEDULER_DB" />
+		<delete file="${base.dir}/logs/derby.log" />
 		<subant target="doc.clean" inheritall="true">
 			<fileset dir="../doc/toolchain" includes="doc.xml"/>
 		</subant>

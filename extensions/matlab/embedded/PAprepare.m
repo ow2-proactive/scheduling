@@ -74,7 +74,7 @@ else
     
     
     % Log4J file
-    log4jFile = java.io.File([scheduling_dir filesep 'config' filesep 'scheduler-log4j']);
+    log4jFile = java.io.File([scheduling_dir filesep 'config/log4j' filesep 'scheduler-log4j']);
     urlLog4jFile = log4jFile.toURI().toURL();
     java.lang.System.setProperty('log4j.configuration',urlLog4jFile.toExternalForm());
 

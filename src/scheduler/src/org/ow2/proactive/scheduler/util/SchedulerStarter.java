@@ -154,11 +154,11 @@ public class SchedulerStarter {
                                 .info("Resource Manager URL was not specified, connection made to the local Resource Manager at " +
                                     uri);
                     } catch (Exception e) {
-                        logger_dev.info("Resource Manager doesn't exist on " + uri);
+                        logger.info("Resource Manager doesn't exist on " + uri);
                         try {
                             //Starting a local RM using default deployment descriptor
                             RMFactory.setOsJavaProperty();
-                            logger_dev.info("Trying to start a local Resource Manager");
+                            logger.info("Trying to start a local Resource Manager");
                             RMFactory.startLocal(java.util.Collections.singletonList(deploymentFile));
 
                             logger_dev.info("Trying to join the local Resource Manager");
@@ -170,7 +170,7 @@ public class SchedulerStarter {
                             //get the proxy on the Resource Manager
                             imp = ResourceManagerProxy.getProxy(uri);
 
-                            logger.warn("Resource Manager created on " +
+                            logger.debug("Resource Manager created on " +
                                 Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(imp)) +
                                 " as it does not exist locally");
                         } catch (AlreadyBoundException abe) {

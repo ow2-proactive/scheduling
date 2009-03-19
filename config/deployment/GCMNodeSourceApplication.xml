@@ -19,6 +19,7 @@
 					<pathElement base="proactive" relpath="/dist/lib/script-api.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/js.jar"/>
 				</applicationClasspath>
+				<log4jProperties base="proactive" relpath="/config/log4j/defaultNode-log4j"/>
 			</configuration>
 			<virtualNode id="Workers">
 				<nodeProvider refid="workers" />

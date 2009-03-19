@@ -81,7 +81,8 @@ find . -type d -a -name ".svn" -exec rm -rf {} \;
 
 # Remove database directory if exist
 find . -type d -name "SCHEDULER_DB" -exec rm -rf {} \;
-find . -name "derby.log" -exec rm -rf {} \;
+# Remove logs directory
+rm -rf ${SCHEDULER_DIR}/logs
 
 # Replace all 'dev' version number by this version number in every XML, XSD, RNC files
 echo Replacing 'dev' tag with current version for XML files

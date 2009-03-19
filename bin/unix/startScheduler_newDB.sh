@@ -1,9 +1,9 @@
 #!/bin/sh
 
-if [ -d SCHEDULER_DB ]
+if [ -d ../../SCHEDULER_DB ]
 then
-rm -rf SCHEDULER_DB
-rm derby.log
+rm -rf ../../SCHEDULER_DB
+rm ../../logs/derby.log
 fi
 
 

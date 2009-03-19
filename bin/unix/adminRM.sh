@@ -2,7 +2,7 @@
 
 CLASSPATH=.
 workingDir=`dirname $0`
-. $workingDir/env.sh cli
+. $workingDir/env.sh client
 
 opt="-Xms128m -Xmx2048m"
 
