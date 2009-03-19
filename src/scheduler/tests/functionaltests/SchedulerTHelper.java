@@ -594,6 +594,44 @@ public class SchedulerTHelper {
     }
 
     /**
+     * Wait for a task failed that waits for restart.
+     * If corresponding event has been already thrown by scheduler, returns immediately
+     * with TaskInfo object associated to event, otherwise wait for reception
+     * of the corresponding event.
+     *
+     * @param jobId job identifier, for which task belongs.
+     * @param taskName for which event is waited for.
+     * @return TaskInfo event's associated object.
+     */
+    public static TaskInfo waitForEventTaskWaitingForRestart(JobId jobId, String taskName) {
+        try {
+            return waitForEventTaskWaitingForRestart(jobId, taskName, 0);
+        } catch (ProActiveTimeoutException e) {
+            //unreachable block, 0 means infinite, no timeout
+            //log sthing ?
+            return null;
+        }
+    }
+
+    /**
+     * Wait for a task failed that waits for restart.
+     * If corresponding event has been already thrown by scheduler, returns immediately
+     * with TaskInfo object associated to event, otherwise wait for reception
+     * of the corresponding event.
+     *
+     * @param jobId job identifier, for which task belongs.
+     * @param taskName for which event is waited for.
+     * @param timeout max waiting time in milliseconds.
+     * @return TaskInfo event's associated object.
+     * @throws ProActiveTimeoutException if timeout is reached.
+     */
+    public static TaskInfo waitForEventTaskWaitingForRestart(JobId jobId, String taskName, long timeout)
+            throws ProActiveTimeoutException {
+        return getMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_WAITING_FOR_RESTART, jobId,
+                taskName, timeout);
+    }
+
+    /**
      * Wait for a task passing from running to finished.
      * If corresponding event has been already thrown by scheduler, returns immediately
      * with TaskInfo object associated to event, otherwise wait for reception
