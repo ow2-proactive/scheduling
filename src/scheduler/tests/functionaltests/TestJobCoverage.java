@@ -35,6 +35,7 @@ import junit.framework.Assert;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 import functionalTests.FunctionalTest;
 
@@ -88,29 +89,36 @@ public class TestJobCoverage extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
         //job submission
-        //    	SchedulerTHelper.log("Submitting job...");
-        //        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
-        //
-        //        //waiting for job termination
-        //        SchedulerTHelper.log("Waiting for job to finish...");
-        //        SchedulerTHelper.waitForEventJobFinished(id);
-        //
-        //        //checking results
-        //        SchedulerTHelper.log("Checking results...");
-        //        JobResult result = SchedulerTHelper.getJobResult(id);
-        //        Assert.assertEquals("Working", result.getPreciousResults().get("task1").value());
-        //        Assert.assertTrue(result.getResult("task2").getException().getMessage().contains("WorkingAt3rd - Status : Number is"));
-        //        Assert.assertTrue(result.getResult("task3").value().toString().contains("WorkingAt3rd - Status : OK / File deleted :"));
-        //        Assert.assertEquals("Throwing",result.getResult("task4").getException().getMessage());
-        //        Assert.assertEquals("Throwing",result.getResult("task5").getException().getMessage());
-        //        Assert.assertEquals(0,result.getResult("task6").value());
-        //        Assert.assertEquals(12,result.getResult("task7").value());
-        //        Assert.assertEquals(12,result.getResult("task8").value());
-        //        Assert.assertEquals(result.getResult("task9").getException().getClass(),Exception.class);
-        //
-        //        //checking all processes
-        //        SchedulerTHelper.log("Checking all received events...");
-        //        SchedulerTHelper.log("Checking task1 process...");
+        SchedulerTHelper.log("Submitting job...");
+        JobId id = SchedulerTHelper.submitJob(jobDescriptor);
+
+        //waiting for job termination
+        SchedulerTHelper.log("Waiting for job to finish...");
+        SchedulerTHelper.waitForEventJobFinished(id);
+
+        //checking results
+        SchedulerTHelper.log("Checking results...");
+        JobResult result = SchedulerTHelper.getJobResult(id);
+        Assert.assertEquals(9, result.getAllResults().size());
+        Assert.assertEquals(2, result.getPreciousResults().size());
+        Assert.assertNotNull(result.getPreciousResults().get("task1"));
+        Assert.assertNotNull(result.getPreciousResults().get("task6"));
+
+        Assert.assertEquals("Working", result.getPreciousResults().get("task1").value());
+        Assert.assertTrue(result.getResult("task2").getException().getMessage().contains(
+                "WorkingAt3rd - Status : Number is 1"));
+        Assert.assertTrue(result.getResult("task3").value().toString().contains(
+                "WorkingAt3rd - Status : OK / File deleted :"));
+        Assert.assertEquals("Throwing", result.getResult("task4").getException().getMessage());
+        Assert.assertEquals("Throwing", result.getResult("task5").getException().getMessage());
+        Assert.assertEquals(0, result.getPreciousResults().get("task6").value());
+        Assert.assertEquals(12, result.getResult("task7").value());
+        Assert.assertEquals(12, result.getResult("task8").value());
+        Assert.assertEquals(result.getResult("task9").getException().getClass(), Exception.class);
+
+        //checking all processes
+        SchedulerTHelper.log("Checking all received events :");
+        SchedulerTHelper.log("Checking task1 process...");
 
     }
 

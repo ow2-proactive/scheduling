@@ -124,7 +124,8 @@ public class GCMNodeSource extends NodeSource {
                     node.getProActiveRuntime().killRT(false);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                //do nothing, no exception treatment for node just killed before
+                logger.debug("While killing a node, EOF file exception expected", e);
             }
             this.removeFromList(this.getNodebyUrl(nodeUrl));
         }
@@ -210,7 +211,6 @@ public class GCMNodeSource extends NodeSource {
                         }
                     } catch (Exception e) {
                         //do nothing, no exception treatment for node just killed before
-                        e.printStackTrace();
                     }
                     //preemptive shutdown remove the node from 
                     //the node list, because no confirmation is awaited from RMCore 

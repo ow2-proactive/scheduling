@@ -16,10 +16,20 @@
 			<javaExecutable class="functionaltests.executables.Working" />
 		</task>
 		<task name="task2" maxNumberOfExecution="2">
-			<javaExecutable class="functionaltests.executables.WorkingAt3rd" />
+			<javaExecutable class="functionaltests.executables.WorkingAt3rd" >
+				<parameters>
+					<parameter name="prefix" value="WorkingAt3rdT2_"/>
+					<parameter name="suffix" value="13031984"/>
+				</parameters>
+			</javaExecutable>
 		</task>
 		<task name="task3" maxNumberOfExecution="4">
-			<javaExecutable class="functionaltests.executables.WorkingAt3rd" />
+			<javaExecutable class="functionaltests.executables.WorkingAt3rd" >
+				<parameters>
+					<parameter name="prefix" value="WorkingAt3rdT3_"/>
+					<parameter name="suffix" value="13031984"/>
+				</parameters>
+			</javaExecutable>
 		</task>
 		<task name="task4">
 			<javaExecutable class="functionaltests.executables.Throwing" />
