@@ -4,7 +4,7 @@
 	name="job_denoise" priority="normal" cancelJobOnError="true" logFile="${WORK_DIR}/denoise.log">
 	<variables>
 		<!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
-		<variable name="WORK_DIR" value="${pa.scheduler.home}/sample/jobs_descriptors/job_picture"/>
+		<variable name="WORK_DIR" value="${pa.scheduler.home}/samples/jobs_descriptors/job_picture"/>
 		<variable name="FILE_NAME" value="ISS"/>
 		<variable name="FILE_EXT" value="jpg"/>
 	</variables>

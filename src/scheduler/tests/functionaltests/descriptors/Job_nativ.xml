@@ -4,7 +4,7 @@
 	name="job_nativ" priority="normal" cancelJobOnError="false">
 	<variables>
 		<!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
-		<variable name="WORK_DIR" value="${pa.scheduler.home}/sample/jobs_descriptors/job_native_linux"/>
+		<variable name="WORK_DIR" value="${pa.scheduler.home}/samples/jobs_descriptors/job_native_linux"/>
 	</variables>
 	<!-- description also test that description can contain more than 255 char -->
 	<description>Will execute 2 native C tasks with dependences,Will execute 2 native C tasks with dependences

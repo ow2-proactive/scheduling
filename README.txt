@@ -27,7 +27,7 @@ is displayed. At this point, ProActive Scheduler is started with 4 nodes availab
 
 * You can now submit a job. To do so, just start the
 submit.[sh|bat] script with proper parameters. You can try using :
-submit.[sh|bat] -j ../../sample/jobs_descriptors/Job_8_tasks.xml -n 1, this will
+submit.[sh|bat] -j ../../samples/jobs_descriptors/Job_8_tasks.xml -n 1, this will
 request for login and password, and then submit this job to the scheduler. If
 you need a login and password, a default couple one is user1:pwd1
 There are many other jobs examples in job_descriptors directory.

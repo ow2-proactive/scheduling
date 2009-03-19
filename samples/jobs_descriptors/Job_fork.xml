@@ -4,7 +4,7 @@
 	name="job_fork" priority="normal" cancelJobOnError="true">
 	<variables>
 		<!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
-		<variable name="WORK_DIR" value="${pa.scheduler.home}/sample/jobs_descriptors/job_native_linux"/>
+		<variable name="WORK_DIR" value="${pa.scheduler.home}/samples/jobs_descriptors/job_native_linux"/>
 	</variables>
 	<description> Computing PI according to MonteCarlo method.</description>
 	<taskFlow>

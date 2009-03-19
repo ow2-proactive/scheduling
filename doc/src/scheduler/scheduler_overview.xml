@@ -60,7 +60,7 @@
 				<para>
 					What you can do now is submitting a job. To do so, just start the <emphasis>submit.[sh|bat]</emphasis> script with
 					proper parameters. Use 
-					<emphasis>submit.[sh|bat] -j ../../sample/jobs_descriptors/Job_8_tasks.xml -n 1</emphasis>,
+					<emphasis>submit.[sh|bat] -j ../../samples/jobs_descriptors/Job_8_tasks.xml -n 1</emphasis>,
 					this will request for login and password, and then submit this job to the scheduler. The default login and password, 
 					is <emphasis>user1 pwd1</emphasis>.
 				</para>

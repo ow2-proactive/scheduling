@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.job;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -81,7 +82,7 @@ public class JobResultImpl implements JobResult {
     @OneToOne(fetch = FetchType.EAGER, targetEntity = JobIdImpl.class)
     private JobId id = null;
 
-    /** Temporary used to store proActive futur result. */
+    /** Temporary used to store proActive future result. */
     @Transient
     private Map<String, TaskResult> futurResults = new HashMap<String, TaskResult>();
 
@@ -92,14 +93,7 @@ public class JobResultImpl implements JobResult {
     @JoinColumn(name = "ALL_RESULTS")
     private Map<String, TaskResult> allResults = null;
 
-    /** List of result that ends with an exception */
-    @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
-    @Cascade(CascadeType.ALL)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    @JoinColumn(name = "EXCEPTION_RESULTS")
-    private Map<String, TaskResult> exceptionResults = null;
-
-    /** List of precious result */
+    /** List of precious results */
     @OneToMany(cascade = javax.persistence.CascadeType.ALL, targetEntity = TaskResultImpl.class)
     @Cascade(CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
@@ -115,29 +109,23 @@ public class JobResultImpl implements JobResult {
     /**
      * Instantiate a new JobResult with a jobId and a result
      *
-     * @param id
-     *            the jobId associated with this result
+     * @param id the jobId associated with this result
      */
     public JobResultImpl(JobId id) {
         this.id = id;
         this.allResults = new HashMap<String, TaskResult>();
         this.preciousResults = new HashMap<String, TaskResult>();
-        this.exceptionResults = new HashMap<String, TaskResult>();
     }
 
     /**
-     * To get the id
-     *
-     * @return the id
+     * @see org.ow2.proactive.scheduler.common.job.JobResult#getJobId()
      */
     public JobId getJobId() {
         return id;
     }
 
     /**
-     * To get the name of the job that has generate this result.
-     *
-     * @return the name
+     * @see org.ow2.proactive.scheduler.common.job.JobResult#getName()
      */
     public String getName() {
         return getJobId().getReadableName();
@@ -166,17 +154,11 @@ public class JobResultImpl implements JobResult {
     public void addTaskResult(String taskName, TaskResult taskResult, boolean isPrecious) {
         //remove futur Result
         futurResults.remove(taskName);
-
-        //allResults
+        //add to all Results
         allResults.put(taskName, taskResult);
-
-        //preciousResult
-        if (isPrecious)
+        //add to precious results if needed
+        if (isPrecious) {
             preciousResults.put(taskName, taskResult);
-
-        //exceptionResults
-        if (taskResult.hadException()) {
-            exceptionResults.put(taskName, taskResult);
         }
     }
 
@@ -191,7 +173,13 @@ public class JobResultImpl implements JobResult {
      * @see org.ow2.proactive.scheduler.common.job.JobResult#getExceptionResults()
      */
     public Map<String, TaskResult> getExceptionResults() {
-        return exceptionResults;
+        Map<String, TaskResult> exceptions = new HashMap<String, TaskResult>();
+        for (Entry<String, TaskResult> e : allResults.entrySet()) {
+            if (e.getValue().hadException()) {
+                exceptions.put(e.getKey(), e.getValue());
+            }
+        }
+        return exceptions;
     }
 
     /**
@@ -235,7 +223,12 @@ public class JobResultImpl implements JobResult {
      * @see org.ow2.proactive.scheduler.common.job.JobResult#hadException()
      */
     public boolean hadException() {
-        return exceptionResults.size() > 0;
+        for (TaskResult tr : allResults.values()) {
+            if (tr.hadException()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -243,7 +236,6 @@ public class JobResultImpl implements JobResult {
      */
     public void removeResult(String task) {
         allResults.remove(task);
-        exceptionResults.remove(task);
         preciousResults.remove(task);
     }
 

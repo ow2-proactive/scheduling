@@ -626,7 +626,7 @@ public void init(Map&lt;String, Object&gt; args) {
 					order to start 'workers' on them. The <code>execute(nodes)</code> method shows what can be done
 					inside this kind of task. For more details about how to use the ProActive API,
 					see the appropriate documentation.
-					The complete example file can be found under 'sample/jobs_descriptors/Job_ProActive.xml'.
+					The complete example file can be found under 'samples/jobs_descriptors/Job_ProActive.xml'.
 				</para>
 				</section>
 			</section>
@@ -957,7 +957,7 @@ job.setTask(aTask);
 									the execution of the associated task.
 									A java helper (org.ow2.proactive.scripting.helper.selection.SelectionUtils)
 									is provided for javascript, ruby and python script languages allowing user to simply
-									make some kind of selections. (script samples are available in 'sample/scripts/selection' directory.)
+									make some kind of selections. (script samples are available in 'samples/scripts/selection' directory.)
 								</para>
 							</listitem>
 							<listitem>
@@ -968,7 +968,7 @@ job.setTask(aTask);
 									the execution of the task itself.
 									Java helper (org.ow2.proactive.scripting.helper.filetransfer package) is also available
 									for file transfer purposes to manage file copies. 
-									Some script samples are available in 'sample/scripts/filetransfer' directory.
+									Some script samples are available in 'samples/scripts/filetransfer' directory.
 								</para>
 							</listitem>
 							<listitem>
@@ -1061,7 +1061,7 @@ job.setTask(aTask);
 				<para>
 					For example :
 					<emphasis>
-						submit.[sh|bat] -j ../../sample/jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
+						submit.[sh|bat] -j ../../samples/jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
 					</emphasis>
 					will submit 12 times the <literal>Job_with_dep</literal> job to a local
 					ProActive Scheduler and only your password will be requested.
