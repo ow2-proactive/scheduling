@@ -37,6 +37,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -44,6 +47,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -60,6 +64,7 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.jmx.mbean.SchedulerWrapper;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -130,6 +135,15 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /** Scheduler's statistics */
     private StatsImpl stats = new StatsImpl(SchedulerStatus.STARTED);
 
+    /** Scheduler's MBean Server */
+    private MBeanServer mbs = null;
+
+    /** Scheduler's MBean */
+    private SchedulerWrapper schedulerBean = null;
+
+    /** The ProActive Server Connector for the MBeanServer */
+    private ServerConnector connector = null;
+
     /* ########################################################################################### */
     /*                                                                                             */
     /* ################################## SCHEDULER CONSTRUCTION ################################# */
@@ -158,6 +172,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         policyFullName = policyFullClassName;
         logger_dev.debug("Policy used is " + policyFullClassName);
         jobs = new HashMap<JobId, IdentifiedJob>();
+        //Register the scheduler MBean
+        this.registerMBean();
+        //Start the Server Connector for the ProActive Client
+        //it directly connects with our MBean Server
+        String serverName = "SchedulerWrapper";
+        this.connector = new ServerConnector(serverName);
+        try {
+            connector.start();
+            System.out.println("Connector bound at : " + connector.getConnectorServer().getAddress());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -823,6 +849,25 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
         return true;
     }
+
+     /**
+      * Register the Scheduler MBean
+      */
+     public void registerMBean() {
+	 //Get the platform MBeanServer
+         mbs = ManagementFactory.getPlatformMBeanServer();
+         // Unique identification of MBeans
+         schedulerBean = new SchedulerWrapper();
+         ObjectName schedulerName = null;
+
+         try {
+		// Uniquely identify the MBeans and register them with the platform MBeanServer
+		schedulerName = new ObjectName("SchedulerFrontend:name=SchedulerMBean");
+		mbs.registerMBean(schedulerBean, schedulerName);
+         } catch(Exception e) {
+		e.printStackTrace();
+         }
+     }
 
     /* ########################################################################################### */
     /*                                                                                             */
