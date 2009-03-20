@@ -31,53 +31,36 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.embedded;
 
+import javasci.SciData;
+import javasci.SciStringMatrix;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.*;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.SelectionScript;
+
+import javax.security.auth.login.LoginException;
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
-import java.util.TreeMap;
-
-import javasci.SciData;
-
-import javax.security.auth.login.LoginException;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.ext.scilab.exception.SciLabTaskException;
-import org.ow2.proactive.scripting.InvalidScriptException;
-import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -87,10 +70,7 @@ import org.ow2.proactive.scripting.SelectionScript;
  */
 public class AOScilabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
 
-    /**
-     * URL to the scheduler
-     */
-    private String schedulerUrl;
+    private boolean loggedin;
 
     /**
      * Connection to the scheduler
@@ -116,7 +96,9 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      * Results gathered
      */
 
-    private TreeMap<String, SciData> results;
+    private ArrayList<SciData> results;
+
+    private ArrayList<String> job_logs;
 
     /**
      * WaitAllResults Request waiting to be served
@@ -143,6 +125,11 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      */
     private boolean isJobFinished;
 
+    /**
+     * Current debug mode
+     */
+    private boolean debug;
+
     private boolean jobKilled = false;
     private boolean schedulerStopped = false;
 
@@ -150,6 +137,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      * Exception to throw in case of error
      */
     private Throwable errorToThrow;
+    private String errorLogs;
     private SchedulerAuthenticationInterface auth;
 
     public AOScilabEnvironment() {
@@ -168,10 +156,26 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
         this.scheduler = auth.logAsUser(user, passwd);
 
+        loggedin = true;
+
         this.scheduler.addSchedulerEventListener((AOScilabEnvironment) stubOnThis, false,
                 SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN);
 
+    }
+
+    public void startLogin() {
+        loggedin = false;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                LoginFrame lf = new LoginFrame(stubOnThis);
+                lf.start();
+            }
+        });
+    }
+
+    public boolean isLoggedIn() {
+        return loggedin;
     }
 
     /**
@@ -185,13 +189,14 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     @SuppressWarnings("unchecked")
     public void initActivity(Body body) {
         stubOnThis = (AOScilabEnvironment) PAActiveObject.getStubOnThis();
-        results = new TreeMap<String, SciData>();
+        results = new ArrayList<SciData>();
+        job_logs = new ArrayList<String>();
     }
 
     /**
@@ -200,15 +205,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      * @param url url of the scheduler
      * @return true if success, false otherwise
      */
-    public boolean join(String url) {
-        try {
-            auth = SchedulerConnection.join(url);
-        } catch (Exception e1) {
-            System.err.println(e1.getMessage());
-            return false;
-        }
-        this.schedulerUrl = url;
-        return true;
+    public void join(String url) throws SchedulerException {
+        auth = SchedulerConnection.join(url);
     }
 
     /**
@@ -216,33 +214,29 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      *
      * @return array of SciData tokens
      */
-    public ArrayList<SciData> waitAllResults() {
-        ArrayList<SciData> answer = null;
-        if (logger.isDebugEnabled()) {
-            logger.info("Sending the results back...");
+    public ArrayList<ResultsAndLogs> waitAllResults() {
+        ArrayList<ResultsAndLogs> answer = new ArrayList<ResultsAndLogs>();
+        if (debug) {
+            logger.info("[AOScilabEnvironment] Receiving results back...");
         }
 
         if (schedulerStopped) {
-            System.err.println("The scheduler has been stopped");
-            answer = new ArrayList<SciData>();
+            System.err.println("[AOScilabEnvironment] The scheduler has been stopped");
         } else if (jobKilled) {
-            // Job killed 
-            System.err.println("The job has been killed");
-            answer = new ArrayList<SciData>();
+            // Job killed
+            System.err.println("[AOScilabEnvironment] The job has been killed");
         } else if (errorToThrow != null) {
             // Error inside job
-            if (errorToThrow instanceof SciLabTaskException) {
-                System.err.println(errorToThrow.getMessage());
-                answer = new ArrayList<SciData>();
-            } else {
-                results.clear();
-                currentJobId = null;
-                jobKilled = false;
-                throw new RuntimeException(errorToThrow);
+            if (debug) {
+                System.err.println("[AOScilabEnvironment] Exception inside the job");
             }
+            answer.add(new ResultsAndLogs(new SciStringMatrix("out", 0, 0), errorLogs, errorToThrow));
+
         } else {
             // Normal termination
-            answer = new ArrayList<SciData>(results.values());
+            for (int i = 0; i < results.size(); i++) {
+                answer.add(new ResultsAndLogs(results.get(i), job_logs.get(i), null));
+            }
         }
 
         results.clear();
@@ -258,20 +252,24 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      * @param mainScripts  main scripts
      * @param priority     priority of the job
      */
-    public ArrayList<SciData> solve(String[] inputScripts, String[] mainScripts, URL scriptURL,
-            JobPriority priority) {
+    public ArrayList<ResultsAndLogs> solve(String[] inputScripts, String functionsDefinition,
+            String mainScripts, URL scriptURL, JobPriority priority, boolean debug) {
         if (schedulerStopped) {
-            System.err.println("The Scheduler is stopped");
-            return new ArrayList<SciData>();
+            System.err.println("[AOScilabEnvironment] The Scheduler is stopped");
+            return new ArrayList<ResultsAndLogs>();
         }
+
+        this.debug = debug;
+        this.job_logs.clear();
         // We store the script selecting the nodes to use it later at termination.
 
         if (currentJobId != null) {
-            throw new RuntimeException("The Scheduler is already busy with one job");
+            throw new RuntimeException("[AOScilabEnvironment] The Scheduler is already busy with one job");
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.info("Submitting job of " + mainScripts.length + " tasks...");
+        if (debug) {
+            System.out
+                    .println("[AOScilabEnvironment] Submitting job of " + inputScripts.length + " tasks...");
         }
 
         // We verify that the script is available (otherwise we just ignore it)
@@ -294,18 +292,33 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         job.setDescription("Set of parallel scilab tasks");
         // the external log files as the output is forwarded into Scilab directly,
         // in debug mode you might want to read these files though
-        if (logger.isDebugEnabled()) {
-            logger.debug("Log file created at :" + new File("Scilab_job_log_" + lastJobId + ".txt"));
-            job.setLogFile("Scilab_job_log_" + lastJobId + ".txt");
+        if (debug) {
+            System.out.println("[AOScilabEnvironment] Log file created at :" +
+                new File("Scilab_job_" + lastJobId + ".log"));
+            job.setLogFile("Scilab_job_" + lastJobId + ".log");
         }
-        for (int i = 0; i < mainScripts.length; i++) {
+        if (debug) {
+            System.out.println("[AOScilabEnvironment] function definition:");
+            System.out.println(functionsDefinition);
+            System.out.println("[AOScilabEnvironment] main script:");
+            System.out.println(mainScripts);
+            System.out.println("[AOScilabEnvironment] input scripts:");
+        }
+        for (int i = 0; i < inputScripts.length; i++) {
 
             JavaTask schedulerTask = new JavaTask();
 
             schedulerTask.setName("" + lastTaskId++);
             schedulerTask.setPreciousResult(true);
             schedulerTask.addArgument("input", inputScripts[i]);
-            schedulerTask.addArgument("script", mainScripts[i]);
+
+            if (debug) {
+                schedulerTask.addArgument("debug", "true");
+                System.out.println(inputScripts[i]);
+            }
+            schedulerTask.addArgument("functionsDefinition", functionsDefinition);
+            schedulerTask.addArgument("script", mainScripts);
+
             schedulerTask.addArgument("outputs", "out");
             schedulerTask.setExecutableClassName("org.ow2.proactive.scheduler.ext.scilab.SimpleScilab");
             if (availableScript != null) {
@@ -335,7 +348,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         this.isJobFinished = false;
         this.jobKilled = false;
         this.errorToThrow = null;
-        // The last call puts a method in the RequestQueue 
+        this.errorLogs = null;
+        // The last call puts a method in the RequestQueue
         // that won't be executed until all the results are received (see runactivity)
         return stubOnThis.waitAllResults();
     }
@@ -353,19 +367,20 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      * @param logs       logs of the task creating the problem
      */
     private void jobDidNotSucceed(JobId jobId, Throwable ex, boolean printStack, String logs) {
-        System.err.println("Job did not succeed");
+        System.err.println("[AOScilabEnvironment] Job did not succeed");
         if (printStack) {
             ex.printStackTrace();
         }
         if (errorToThrow == null) {
             errorToThrow = ex;
         }
+        errorLogs = logs;
         isJobFinished = true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
-     */
+    * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
+    */
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
         switch (eventType) {
             case KILLED:
@@ -415,61 +430,69 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
                     try {
                         jResult = scheduler.getJobResult(info.getJobId());
+                        if (jResult == null) {
+                            jobDidNotSucceed(info.getJobId(), new RuntimeException(
+                                "[AOScilabEnvironment] Job id = " + info.getJobId() +
+                                    " was not returned by the scheduler"), false, null);
+                            return;
+                        }
                     } catch (SchedulerException e) {
                         jobDidNotSucceed(info.getJobId(), e, true, null);
                         return;
                     }
 
-                    if (logger.isDebugEnabled()) {
-                        System.out.println("Updating results of job: " + jResult.getName() + "(" +
-                            info.getJobId() + ")");
+                    if (debug) {
+                        System.out.println("[AOScilabEnvironment] Updating results of job: " +
+                            jResult.getName() + "(" + info.getJobId() + ")");
                     }
 
-                    // Getting the task results from the job result
+                    // Geting the task results from the job result
                     Map<String, TaskResult> task_results = null;
                     if (jResult.hadException()) {
                         task_results = jResult.getExceptionResults();
                     } else {
+                        // sorted results
+
                         task_results = jResult.getAllResults();
                     }
-
+                    ArrayList<Integer> keys = new ArrayList<Integer>();
+                    for (String key : task_results.keySet()) {
+                        keys.add(Integer.parseInt(key));
+                    }
+                    Collections.sort(keys);
                     // Iterating over the task results
-                    for (Map.Entry<String, TaskResult> res : task_results.entrySet()) {
-                        if (logger.isDebugEnabled()) {
-                            logger.info("Looking for result of task: " + res.getKey());
+                    for (Integer key : keys) {
+                        TaskResult res = task_results.get("" + key);
+                        if (debug) {
+                            System.out.println("[AOScilabEnvironment] Looking for result of task: " + key);
                         }
 
                         // No result received
-                        if (res.getValue() == null) {
-                            jobDidNotSucceed(info.getJobId(), new RuntimeException("Task id = " +
-                                res.getKey() + " was not returned by the scheduler"), false, null);
+                        if (res == null) {
+                            jobDidNotSucceed(info.getJobId(), new RuntimeException(
+                                "[AOScilabEnvironment] Task id = " + key +
+                                    " was not returned by the scheduler"), false, null);
 
-                        } else if (res.getValue().hadException()) {
+                        } else if (res.hadException()) {
                             //Exception took place inside the framework
-                            if (res.getValue().getException() instanceof ptolemy.kernel.util.IllegalActionException) {
-                                // We filter this specific exception which means that the "out" variable was not set by the function 
-                                // due to an error inside the script
-                                String logs = res.getValue().getOutput().getAllLogs(false);
-                                jobDidNotSucceed(info.getJobId(), new SciLabTaskException(logs), false, logs);
-                            } else {
-                                // For other types of exception we forward it as it is.
-                                jobDidNotSucceed(info.getJobId(), res.getValue().getException(), true, res
-                                        .getValue().getOutput().getAllLogs(false));
-                            }
+                            jobDidNotSucceed(info.getJobId(), res.getException(), true, res.getOutput()
+                                    .getAllLogs(true));
+
                         } else {
                             // Normal success
                             SciData computedResult = null;
                             String logs = null;
                             try {
-                                logs = res.getValue().getOutput().getAllLogs(false);
-                                computedResult = ((ArrayList<SciData>) res.getValue().value()).get(0);
-                                results.put(res.getKey(), computedResult);
+                                logs = res.getOutput().getAllLogs(true);
+                                computedResult = ((ArrayList<SciData>) res.value()).get(0);
+                                results.add(computedResult);
                                 // We print the logs of the job, if any
-                                if (logs.length() > 0) {
-                                    logger.info(logs);
+                                if (debug && logs.length() > 0) {
+                                    System.out.println(logs);
                                 }
-                            } catch (ptolemy.kernel.util.IllegalActionException e1) {
-                                jobDidNotSucceed(info.getJobId(), new SciLabTaskException(logs), false, logs);
+
+                                job_logs.add(logs);
+
                             } catch (Throwable e2) {
                                 jobDidNotSucceed(info.getJobId(), e2, true, logs);
                             }
@@ -477,10 +500,10 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                     }
 
                     isJobFinished = true;
+
                 }
                 break;
         }
-
     }
 
     /**
@@ -488,6 +511,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      */
     public void jobSubmittedEvent(JobState job) {
         // TODO Auto-generated method stub
+
     }
 
     /**
@@ -495,6 +519,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      */
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
         // TODO Auto-generated method stub
+
     }
 
     /**
@@ -513,8 +538,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
             try {
 
                 service.waitForRequest();
-                if (logger.isDebugEnabled()) {
-                    logger.info("Request received");
+                if (debug) {
+                    System.out.println("[AOScilabEnvironment] Request received");
                 }
                 // We detect a waitXXX request in the request queue
                 Request waitRequest = service.getOldest("waitAllResults");
@@ -522,8 +547,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                     if (pendingRequest == null) {
                         // if there is one and there was none previously found we remove it and store it for later
                         pendingRequest = waitRequest;
-                        if (logger.isDebugEnabled()) {
-                            logger.info("Blocking removing waitAllResults");
+                        if (debug) {
+                            System.out.println("[AOScilabEnvironment] Blocking removing waitAllResults");
                         }
                         service.blockingRemoveOldest("waitAllResults");
                         //Request submitRequest = buildRequest(body);
@@ -545,7 +570,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
             }
         }
 
-        // we clear the service to avoid dirty pending requests 
+        // we clear the service to avoid dirty pending requests
         service.flushAll();
         // we block the communications because a getTask request might still be coming from a worker created just before the master termination
         body.blockCommunication();
@@ -609,9 +634,9 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                 .getName(), new Object[] {});
         aose.join("//localhost");
         aose.login("jl", "jl");
-        ArrayList<SciData> ret = aose.solve(new String[] { "in=2" }, new String[] { "out=in*in;" }, null,
-                JobPriority.NORMAL);
-        logger.info(ret);
+        ArrayList<ResultsAndLogs> ret = aose.solve(new String[] { "in=2" }, "out=in*in;", null, null,
+                JobPriority.NORMAL, true);
+        System.out.println(ret);
     }
 
 }

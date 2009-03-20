@@ -46,8 +46,8 @@ public class ScilabFinder {
     // the OS where this JVM is running
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
-    private static String SCILAB_SCRIPT_LINUX = "find_matlab_command.sh";
-    private static String SCILAB_SCRIPT_WINDOWS = "find_matlab_command.bat";
+    private static String SCILAB_SCRIPT_LINUX = "find_scilab_command.sh";
+    private static String SCILAB_SCRIPT_WINDOWS = "find_scilab_command.bat";
 
     /**
      * Utility function to find Scilab
@@ -117,7 +117,9 @@ public class ScilabFinder {
         // 2nd line : the name of the os-dependant arch dir
         if (p1.waitFor() == 0) {
             String scilabHome = lines.get(0);
-            answer = new ScilabConfiguration(scilabHome);
+            String scilabLibDir = lines.get(1);
+            String scilabSCIDir = lines.get(2);
+            answer = new ScilabConfiguration(scilabHome, scilabLibDir, scilabSCIDir);
 
         } else {
             StringWriter error_message = new StringWriter();

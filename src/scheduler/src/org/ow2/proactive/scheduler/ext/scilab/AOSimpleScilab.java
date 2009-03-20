@@ -31,69 +31,75 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.io.StringWriter;
+import javasci.SciData;
+import javasci.Scilab;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.ext.scilab.util.ScilabConfiguration;
+import org.ow2.proactive.scheduler.ext.scilab.exception.InvalidParameterException;
+
+import java.io.*;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javasci.SciData;
-import javasci.Scilab;
-
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidParameterException;
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
 
 public class AOSimpleScilab implements Serializable {
 
-    /**
-     *
-     */
     static String nl = System.getProperty("line.separator");
-    private String inputScript = null;
-    private String[] outputVars = null;
-    private ArrayList<String> scriptLines = new ArrayList<String>();
 
-    /** logger **/
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);
-    protected static boolean debug = true; /*logger.isDebugEnabled();*/
+    /**
+     * script executed to initialize the task (input parameter)
+     */
+    private String inputScript = null;
+
+    /**
+     * Output variables
+     */
+    private String[] outputVars = null;
+
+    /**
+     *  Main script to be executed
+     */
+    private ArrayList<String> mainscriptLines = new ArrayList<String>();
+
+    /**
+     * Configuration of Scilab (paths)
+     */
+    private ScilabConfiguration config;
+
+    /**
+     * task executed in debug mode
+     */
+    protected boolean debug = true;
+
+    /**
+     * Definition of user-functions
+     */
+    private String functionsDefinition = null;
 
     public AOSimpleScilab() {
     }
 
     /**
      * Constructor for the Simple task
-     * @param inputScript  a pre-scilab script that will be launched before the main one (e.g. to set input params)
-     * @param scriptLines a list of lines which represent the main script
+     *
+     * @param scilabConfig the configuration for scilab
      */
-    public AOSimpleScilab(String inputScript, ArrayList<String> scriptLines, String[] outputVars) {
-        this.inputScript = inputScript;
-        this.scriptLines = scriptLines;
-        this.outputVars = outputVars;
+    public AOSimpleScilab(ScilabConfiguration scilabConfig) throws UnknownHostException {
 
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            public void run() {
-                Scilab.Finish();
-            }
-        }));
-    }
+        this.config = scilabConfig;
 
-    public Serializable execute(TaskResult... results) throws Throwable {
         try {
             if (debug) {
-                logger.info("Scilab Initialization...");
+                System.out.println("Scilab Initialization...");
             }
+            System.out.println("Starting a new Scilab engine:");
+            System.out.println(config);
             Scilab.init();
             if (debug) {
-                logger.info("Initialization Complete!");
+                System.out.println("Initialization Complete!");
             }
         } catch (UnsatisfiedLinkError e) {
             StringWriter error_message = new StringWriter();
@@ -106,7 +112,36 @@ public class AOSimpleScilab implements Serializable {
             UnsatisfiedLinkError ne = new UnsatisfiedLinkError(error_message.toString());
             ne.initCause(e);
             throw ne;
+        } catch (NoClassDefFoundError e) {
+            StringWriter error_message = new StringWriter();
+            PrintWriter pw = new PrintWriter(error_message);
+            pw.println("Classpath Error in " + java.net.InetAddress.getLocalHost());
+            pw.println("java.class.path=" + System.getProperty("java.class.path"));
+
+            NoClassDefFoundError ne = new NoClassDefFoundError(error_message.toString());
+            ne.initCause(e);
+            throw ne;
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public void run() {
+                Scilab.Finish();
+            }
+        }));
+    }
+
+    public void init(String inputScript, String functionsDefinition, ArrayList<String> scriptLines,
+            String[] outputVars, boolean debug) {
+        this.inputScript = inputScript;
+        this.mainscriptLines = scriptLines;
+        this.outputVars = outputVars;
+        this.debug = debug;
+        this.functionsDefinition = functionsDefinition;
+    }
+
+    public Serializable execute(TaskResult... results) throws Throwable {
+
+        boolean ok = true;
 
         HashMap<String, List<SciData>> newEnv = new HashMap<String, List<SciData>>();
 
@@ -138,25 +173,44 @@ public class AOSimpleScilab implements Serializable {
                 Scilab.sendData(in);
             }
         }
-        executeScript();
-
+        // Initialization, clearing up old variables :
         if (debug) {
-            logger.info("Receiving outputs");
-        }
-        ArrayList<SciData> out = new ArrayList<SciData>();
-        int i = 0;
-        for (String var : outputVars) {
-            if (debug) {
-                logger.info("Receiving output :" + var);
-            }
-            out.add(Scilab.receiveDataByName(var));
+            Scilab.Exec("errclear();clear;mode(3);lines(0);funcprot(0);");
+        } else {
+            Scilab.Exec("errclear();clear;lines(0);funcprot(0);");
         }
 
-        return out;
+        if (functionsDefinition != null) {
+            ok = executeFunctionDefinition();
+        }
+        if (!ok)
+            return getResults();
+        if (inputScript != null) {
+            if (debug) {
+                System.out.println("[AOSimpleScilab] Executing inputscript");
+            }
+            ok = executeScript(inputScript, false);
+            if (debug) {
+                System.out.println("[AOSimpleScilab] End of inputscript execution");
+            }
+        }
+        if (!ok)
+            return getResults();
+        if (debug) {
+            System.out.println("[AOSimpleScilab] Executing mainscript");
+        }
+        ok = executeScript(prepareScript(mainscriptLines), true);
+        if (debug) {
+            System.out.println("[AOSimpleScilab] End of mainscript execution " + (ok ? "ok" : "ko"));
+        }
+
+        return getResults();
+
     }
 
     /**
      * Terminates the Scilab engine
+     *
      * @return true for synchronous call
      */
     public boolean terminate() {
@@ -166,38 +220,150 @@ public class AOSimpleScilab implements Serializable {
     }
 
     /**
-     * Executes both input and main scripts on the engine
-     * @throws Throwable
+     * Loads in Scilab the user-functions definitions
+     * 
+     * @return success
+     * @throws IOException
      */
-    protected final void executeScript() throws Throwable {
-        if (inputScript != null) {
-            if (debug) {
-                logger.info("Feeding input");
-            }
-            Scilab.Exec(inputScript);
-        }
-
-        String execScript = prepareScript();
-        logger.info("Executing Script");
+    protected boolean executeFunctionDefinition() throws IOException {
         File temp;
         BufferedWriter out;
-        temp = File.createTempFile("scilab", ".sce");
+        temp = File.createTempFile("functions", ".sce");
         temp.deleteOnExit();
         out = new BufferedWriter(new FileWriter(temp));
-        out.write(execScript);
+        out.write(functionsDefinition.replaceAll("" + ((char) 31), System.getProperty("line.separator")));
         out.close();
-
-        Scilab.Exec("exec(''" + temp.getAbsolutePath() + "'');");
         if (debug) {
-            logger.info("Script Finished");
+            Scilab.Exec("getf('" + temp.getAbsolutePath() + "');");
+        } else {
+            Scilab.Exec("getf('" + temp.getAbsolutePath() + "')");
         }
+        int errorcode = Scilab.GetLastErrorCode();
+        if ((errorcode != 0) && (errorcode != 2)) {
+            writeError();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Retrieves the output variables
+     *
+     * @return list of Scilab data
+     */
+    protected ArrayList<SciData> getResults() {
+
+        if (debug) {
+            System.out.println("[AOSimpleScilab] Receiving outputs");
+        }
+        ArrayList<SciData> out = new ArrayList<SciData>();
+        int i = 0;
+        for (String var : outputVars) {
+            if (debug) {
+                System.out.println("[AOSimpleScilab] Receiving output :" + var);
+            }
+            if (Scilab.ExistVar(var)) {
+                SciData output = Scilab.receiveDataByName(var);
+                if (debug) {
+                    System.out.println(output);
+                }
+                out.add(Scilab.receiveDataByName(var));
+            } else {
+                throw new IllegalStateException("Variable " + var + " not found");
+            }
+        }
+        return out;
+
+    }
+
+    /**
+     * Executes both input and main scripts on the engine
+     *
+     * @throws Throwable
+     */
+    protected boolean executeScript(String script, boolean eval) throws Throwable {
+
+        if (eval) {
+
+            if (script.indexOf(31) >= 0) {
+                String[] lines = script.split("" + ((char) 31));
+                if (debug) {
+                    System.out.println("[AOSimpleScilab] Executing multi-line: " + script);
+                }
+                for (String line : lines) {
+
+                    // The special character ASCII 30 means that we want to execute the line using execstr instead of directly
+                    // This is used to get clearer error messages from Scilab
+                    if (line.startsWith("" + ((char) 30))) {
+                        String modifiedLine = "execstr('" + line.substring(1) + "','errcatch','n');";
+                        if (debug) {
+                            System.out.println("[AOSimpleScilab] Executing : " + modifiedLine);
+                        }
+                        Scilab.Exec(modifiedLine);
+                        int errorcode = Scilab.GetLastErrorCode();
+                        if ((errorcode != 0) && (errorcode != 2)) {
+                            writeError();
+                            return false;
+                        }
+                    } else {
+                        if (debug) {
+                            System.out.println("[AOSimpleScilab] Executing : " + line);
+                        }
+                        Scilab.Exec(line);
+                        int errorcode = Scilab.GetLastErrorCode();
+                        if ((errorcode != 0) && (errorcode != 2)) {
+                            writeError();
+                            return false;
+                        }
+                    }
+                }
+            } else {
+                if (debug) {
+                    System.out.println("[AOSimpleScilab] Executing single-line: " + script);
+                }
+                Scilab.Exec(script);
+                int errorcode = Scilab.GetLastErrorCode();
+                if ((errorcode != 0) && (errorcode != 2)) {
+                    writeError();
+                    return false;
+                }
+            }
+
+        } else {
+            File temp;
+            BufferedWriter out;
+            temp = File.createTempFile("inpuscript", ".sce");
+            temp.deleteOnExit();
+            out = new BufferedWriter(new FileWriter(temp));
+            out.write(script);
+            out.close();
+            if (debug) {
+                Scilab.Exec("exec('" + temp.getAbsolutePath() + "',3);");
+                Scilab.Exec("errclear();");
+            } else {
+                Scilab.Exec("exec('" + temp.getAbsolutePath() + "',0);");
+                Scilab.Exec("errclear();");
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Ouput in scilab the error occured
+     */
+    private void writeError() {
+
+        Scilab
+                .Exec("[str2,n2,line2,func2]=lasterror(%t);printf('!-- error %i\n%s\n at line %i of function %s\n',n2,str2,line2,func2)");
     }
 
     /**
      * Appends all the script's lines as a single string
-     * @return
+     *
+     * @return single line script
      */
-    private String prepareScript() {
+    private String prepareScript(List<String> scriptLines) {
         String script = "";
 
         for (String line : scriptLines) {

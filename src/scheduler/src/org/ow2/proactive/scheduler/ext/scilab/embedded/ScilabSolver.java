@@ -31,25 +31,19 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.embedded;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import javax.security.auth.login.LoginException;
-
-import javasci.SciComplexMatrix;
-import javasci.SciData;
-import javasci.SciDoubleMatrix;
 import javasci.SciStringMatrix;
-import javasci.Scilab;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.*;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+
+import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
 
 
 public class ScilabSolver {
@@ -68,73 +62,74 @@ public class ScilabSolver {
         //	initIDs();
     }
 
-    public static void solve(String[] inputScripts, String[] mainScripts, String scriptURL, int priority) {
-        logger.info("[ScilabSolver] In Solver");
-        ArrayList<SciData> results = null;
-        results = scilabSolver.solve(inputScripts, mainScripts, null, JobPriority.findPriority(priority));
+    public static String[][] solve(String[] inputScripts, String functionsDefinition, String mainScript,
+            String scriptURL, int priority, int debugVal) {
+        boolean debug = debugVal > 0;
+        if (debug) {
+            System.out.println("[ScilabSolver] In Solver");
+        }
+        String[][] results = null;
+        ArrayList<ResultsAndLogs> sciResults;
+        sciResults = scilabSolver.solve(inputScripts, functionsDefinition, mainScript, null, JobPriority
+                .findPriority(priority), debug);
+        sciResults = (ArrayList<ResultsAndLogs>) PAFuture.getFutureValue(sciResults);
 
-        if (results != null) {
-            logger.info(results);
-            logger.info("[ScilabSolver] Solved");
-
-            /*  send result to scilab through javasci interface
-            	first check instance type of result and then select
-            	appropriate function.
-            	
-            	Do this for all the results.
-             */
-
-            for (Iterator<SciData> iterator = results.iterator(); iterator.hasNext();) {
-                SciData res = (SciData) iterator.next();
-
-                if (res instanceof SciDoubleMatrix) {
-                    SciDoubleMatrix sciDMat = (SciDoubleMatrix) res;
-                    Scilab.sendDoubleMatrix(sciDMat);
-                } else if (res instanceof SciStringMatrix) {
-                    SciStringMatrix sciSMat = (SciStringMatrix) res;
-                    Scilab.sendStringMatrix(sciSMat);
-                }
-
-                else if (res instanceof SciComplexMatrix) {
-                    SciComplexMatrix sciCMat = (SciComplexMatrix) res;
-                    Scilab.sendComplexMatrix(sciCMat);
-                }
+        if (sciResults != null) {
+            if (debug) {
+                System.out.println(sciResults);
+                System.out.println("[ScilabSolver] Solved");
             }
 
-            //return results.toArray(new SciData[] {});
+            results = new String[3][sciResults.size()];
+
+            for (int i = 0; i < sciResults.size(); i++) {
+                if (((SciStringMatrix) sciResults.get(i).getResult()).getNbRow() > 0) {
+                    results[0][i] = ((SciStringMatrix) sciResults.get(i).getResult()).getData()[0];
+                } else {
+                    results[0][i] = "output = %f";
+                }
+                results[1][i] = sciResults.get(i).getLogs();
+                if (sciResults.get(i).getException() != null) {
+                    results[2][i] = sciResults.get(i).getException().getMessage();
+                } else {
+                    results[2][i] = null;
+                }
+            }
         } else {
-            logger.info("[ScilabSolver]Solve returned NULL...");
-            //return null;
+            System.out.println("[ScilabSolver] Solve returned NULL...");
         }
+        return results;
     }
 
-    public static void createConnection() {
-        if (scilabSolver != null)
-            return;
+    public static void createConnection(String url, String login, String passwd) throws SchedulerException,
+            LoginException {
+        if (scilabSolver == null) {
 
-        logger.info("[ScilabSolver] In create Connection");
-        try {
-            scilabSolver = (AOScilabEnvironment) PAActiveObject.newActive(
-                    "org.ow2.proactive.scheduler.ext.scilab.embedded.AOScilabEnvironment", new Object[] {});
-        } catch (ActiveObjectCreationException e) {
-            logger.info("[ScilabSolver] Error Creating AOScilabEnvironment AO..");
-            e.printStackTrace();
-        } catch (NodeException e) {
-            logger.info("[ScilabSolver] Error Connecting to Scheduler..");
-            e.printStackTrace();
+            try {
+                scilabSolver = (AOScilabEnvironment) PAActiveObject.newActive(AOScilabEnvironment.class
+                        .getName(), new Object[] {});
+            } catch (ActiveObjectCreationException e) {
+                System.out.println("[ScilabSolver] Error Creating AOScilabEnvironment AO..");
+                e.printStackTrace();
+            } catch (NodeException e) {
+                System.out.println("[ScilabSolver] Error Connecting to Scheduler..");
+                e.printStackTrace();
+            }
         }
 
-        scilabSolver.join("//localhost");
-        try {
-            scilabSolver.login("jl", "jl");
-        } catch (LoginException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SchedulerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        scilabSolver.join(url);
+
+        scilabSolver.startLogin();
+
+        while (!scilabSolver.isLoggedIn()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        logger.info("[ScilabSolver] leaving create Connection");
+
+        //scilabSolver.login(login, passwd);
 
     }
 }

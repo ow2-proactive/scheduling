@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
@@ -66,13 +67,23 @@ public class SimpleScilab extends JavaExecutable {
 
     /**
      * the lines of inputScript
-     **/
+     */
     protected String inputScript = null;
+
+    /**
+     * Definition of user functions
+     */
+    protected String functionsDefinition = null;
 
     /**
      * The lines of the Scilab script
      */
-    protected List<String> scriptLines = null;
+    protected ArrayList<String> scriptLines = null;
+
+    /**
+     * Node name where this task is being executed
+     */
+    protected String nodeName = null;
 
     /**
      * the array of output variable names
@@ -82,21 +93,26 @@ public class SimpleScilab extends JavaExecutable {
     /**
      * The URI to which the spawned JVM(Node) is registered
      */
-    protected String uri = null;
+    protected static String uri = null;
 
     /**
-     *  Thread which collects the JVM's stderr      
+     * Thread which collects the JVM's stderr
      */
-    private LoggingThread esLogger = null;
+    protected static Map<String, LoggingThread> esLogger = new HashMap<String, LoggingThread>();
     /**
-     *  Thread which collects the JVM's stdout      
+     * Thread which collects the JVM's stdout
      */
-    private LoggingThread isLogger = null;
+    protected static Map<String, LoggingThread> isLogger = new HashMap<String, LoggingThread>();
 
     /**
-     *  tool to build the JavaCommand
+     * Tells if the shutdownhook has been set up for this runtime 
      */
-    private DummyJVMProcess javaCommandBuilder;
+    protected static boolean shutdownhookSet = false;
+
+    /**
+     * tool to build the JavaCommand
+     */
+    protected static DummyJVMProcess javaCommandBuilder;
 
     /**
      * holds the Scilab environment information
@@ -104,19 +120,19 @@ public class SimpleScilab extends JavaExecutable {
     protected static ScilabConfiguration scilabConfig = null;
 
     /**
-     *  the Active Object worker located in the spawned JVM
+     * the Active Object worker located in the spawned JVM
      */
-    private AOSimpleScilab scilabWorker;
+    protected static Map<String, AOSimpleScilab> scilabWorker = new HashMap<String, AOSimpleScilab>();
 
     /**
-     *  the OS where this JVM is running
+     * the OS where this JVM is running
      */
-    private OperatingSystem os = OperatingSystem.getOperatingSystem();
+    private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     /**
-     *  The process holding the spawned JVM
+     * The process holding the spawned JVM
      */
-    private Process process = null;
+    protected static Map<String, Process> processes = new HashMap<String, Process>();
 
     /**
      * ProActive No Arg Constructor
@@ -136,49 +152,70 @@ public class SimpleScilab extends JavaExecutable {
                 throw res.getException();
             }
         }
+        nodeName = PAActiveObject.getNode().getNodeInformation().getName();
+        if (processes.get(nodeName) == null) {
 
-        // First we try to find SCILAB
-        if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] launching script to find Scilab");
+            // First we try to find SCILAB
+            if (debug) {
+                System.out.println("[" + host + " SimpleScilab] launching script to find Scilab");
+            }
+            scilabConfig = ScilabFinder.findScilab(debug);
+            if (debug) {
+                System.out.println(scilabConfig);
+            }
+
+            // We create a custom URI as the node name
+            //uri = URIBuilder.buildURI("localhost", "Scilab" + (new Date()).getTime()).toString();
+            uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(),
+                    "Scilab" + (new Date()).getTime(), Constants.RMI_PROTOCOL_IDENTIFIER,
+                    Integer.parseInt(PAProperties.PA_RMI_PORT.getValue())).toString();
+            if (debug) {
+                System.out.println("[" + host + " SimpleScilab] Starting the Java Process");
+            }
+            // We spawn a new JVM with the SCILAB library paths
+            Process p = startProcess(uri);
+            processes.put(nodeName, p);
+
+            // We add a shutdownhook to terminate children processes
+            if (!shutdownhookSet) {
+                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    public void run() {
+                        for (Process p : processes.values()) {
+                            p.destroy();
+                        }
+                    }
+                }));
+                shutdownhookSet = true;
+            }
+
+            LoggingThread lt1 = new LoggingThread(p.getInputStream(), "[" + host + " OUT]", false);
+            LoggingThread lt2 = new LoggingThread(p.getErrorStream(), "[" + host + " ERR]", true);
+            IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, p.getOutputStream());
+
+            // We define the loggers which will write on standard output what comes from the java process
+            isLogger.put(nodeName, lt1);
+            esLogger.put(nodeName, lt2);
+
+            // We start the loggers thread
+            Thread t1 = new Thread(lt1, "OUT Scilab");
+            t1.setDaemon(true);
+            t1.start();
+
+            Thread t2 = new Thread(lt2, "ERR Scilab");
+            t2.setDaemon(true);
+            t2.start();
+
+            Thread t3 = new Thread(rt1, "Redirecting I/O Scilab");
+            t3.setDaemon(true);
+            t3.start();
+
         }
-        scilabConfig = ScilabFinder.findScilab(debug);
         if (debug) {
-            System.out.println(scilabConfig);
-        }
-
-        // We create a custom URI as the node name
-        //uri = URIBuilder.buildURI("localhost", "Scilab" + (new Date()).getTime()).toString();
-        uri = URIBuilder.buildURI("localhost", "Scilab" + (new Date()).getTime(),
-                Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
-                .toString();
-        if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Starting the Java Process");
-        }
-        // We spawn a new JVM with the SCILAB library paths
-        process = startProcess(uri);
-        // We define the loggers which will write on standard output what comes from the java process
-        isLogger = new LoggingThread(process.getInputStream(), "[" + host + "]", false);
-        esLogger = new LoggingThread(process.getErrorStream(), "[" + host + "]", true);
-
-        // We start the loggers thread
-        Thread t1 = new Thread(isLogger, "OUT Scilab");
-        t1.setDaemon(true);
-        t1.start();
-
-        Thread t2 = new Thread(esLogger, "ERR Scilab");
-        t2.setDaemon(true);
-        t2.start();
-
-        if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Executing the task");
+            System.out.println("[" + host + " SimpleScilab] Executing the task");
         }
 
         // finally we call the internal version of the execute method
         Serializable res = executeInternal(uri, results);
-
-        // Then we destroy the process and return the results
-        process.destroy();
-        process = null;
 
         return res;
     }
@@ -225,10 +262,15 @@ public class SimpleScilab extends JavaExecutable {
             debug = Boolean.parseBoolean(d);
         }
 
-        String input = (String) args.get("input");
+        String input = args.get("input");
 
         if (input != null) {
             inputScript = input;
+        }
+
+        String functionsDef = args.get("functionsDefinition");
+        if (functionsDef != null) {
+            functionsDefinition = functionsDef;
         }
 
         String outputs = (String) args.get("outputs");
@@ -241,16 +283,17 @@ public class SimpleScilab extends JavaExecutable {
 
     /**
      * Deploy an Active Object on the given Node uri
-     * @param uri uri of the Node where to deploy the AO
+     *
+     * @param uri             uri of the Node where to deploy the AO
      * @param workerClassName name of the worker class
-     * @param params parameters of the constructor
+     * @param params          parameters of the constructor
      * @throws Throwable
      */
     protected AOSimpleScilab deploy(String uri, String workerClassName, Object... params) throws Throwable {
         Exception ex = null;
         AOSimpleScilab worker = null;
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Deploying the Worker");
+            System.out.println("[" + host + " SimpleScilab] Deploying the Worker");
         }
 
         // We create an active object on the given node URI, the JVM corresponding to this node URI is starting,
@@ -274,7 +317,7 @@ public class SimpleScilab extends JavaExecutable {
 
         if (worker == null) {
             if (debug) {
-                System.err.println("[" + host + " SCILAB TASK] Worker couldn't be deployed.");
+                System.err.println("[" + host + " SimpleScilab] Worker couldn't be deployed.");
             }
             throw ex;
         }
@@ -284,33 +327,46 @@ public class SimpleScilab extends JavaExecutable {
 
     /**
      * Internal version of the execute method
-     * @param uri a URI to which the spawned JVM is registered
-     * @param results results from preceding tasks
-     * @return result of the task
-     * @throws Throwable
-     */
+          *
+          * @param uri     a URI to which the spawned JVM is registered
+          * @param results results from preceding tasks
+          * @return result of the task
+          * @throws Throwable
+          */
     protected Serializable executeInternal(String uri, TaskResult... results) throws Throwable {
-        if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Deploying Worker (SimpleScilab)");
+        AOSimpleScilab sw = scilabWorker.get(nodeName);
+        if (sw == null) {
+            sw = deploy(uri, AOSimpleScilab.class.getName(), scilabConfig);
+            scilabWorker.put(nodeName, sw);
         }
-        scilabWorker = deploy(uri, AOSimpleScilab.class.getName(), inputScript, scriptLines, out_set);
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Executing (SimpleScilab)");
+            System.out.println("[" + host + " SimpleScilab] Executing");
+        }
+        try {
+            sw.init(inputScript, functionsDefinition, scriptLines, out_set, debug);
+        } catch (Exception e) {
+            // in case the active object died
+            if (debug) {
+                System.out.println("[" + host + " SimpleScilab] Re-deploying Worker");
+            }
+            sw = deploy(uri, AOSimpleScilab.class.getName(), scilabConfig);
+            scilabWorker.put(nodeName, sw);
+            sw.init(inputScript, functionsDefinition, scriptLines, out_set, debug);
         }
 
         // We execute the task on the worker
-        Serializable res = scilabWorker.execute(results);
+        Serializable res = sw.execute(results);
         // We wait for the result
         res = (Serializable) PAFuture.getFutureValue(res);
         // We make a synchronous call to terminate
-        scilabWorker.terminate();
+        //scilabWorker.terminate();
 
         return res;
     }
 
     private final Process startProcess(String uri) throws Throwable {
         if (debug) {
-            System.out.println("[" + host + " SCILAB TASK] Starting a new JVM");
+            System.out.println("[" + host + " SimpleScilab] Starting a new JVM");
         }
         // Build java command
         javaCommandBuilder = new DummyJVMProcess();
@@ -338,16 +394,21 @@ public class SimpleScilab extends JavaExecutable {
 
         env.put("PATH", addScilabToPath(path));
 
+        // Classpath specific
+        String classpath = addScilabJarsToClassPath(javaCommandBuilder.getClasspath());
+        javaCommandBuilder.setClasspath(classpath);
+
         // We add the Scilab specific env variables
-        env.put("SCI", scilabConfig.getScilabHome());
-        env.put("SCIDIR", scilabConfig.getScilabHome());
+        env.put("SCI", scilabConfig.getScilabSCIDir());
+        env.put("SCIDIR", scilabConfig.getScilabSCIDir());
 
         // javaCommandBuilder.setJavaPath(System.getenv("JAVA_HOME") +
         //     "/bin/java");
         // we set as well the java.library.path property (precaution)
-        javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
-            " -Dproactive.rmi.port=" + Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()) +
-            " -Dproactive.http.port=" + Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue()));
+        // "-Djava.library.path=\"" + libPath + "\"" +
+        javaCommandBuilder.setJvmOptions(" -Dproactive.rmi.port=" +
+            Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()) + " -Dproactive.http.port=" +
+            Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue()));
 
         pb.command(javaCommandBuilder.getJavaCommand());
 
@@ -355,7 +416,31 @@ public class SimpleScilab extends JavaExecutable {
     }
 
     /**
+     * Utility function to add SCILAB jar files to the given path-like string
+     *
+     * @param classpath path-like string
+     * @return an augmented path
+     */
+    private String addScilabJarsToClassPath(String classpath) {
+
+        String newPath;
+
+        if (classpath == null) {
+            newPath = "";
+        } else {
+            newPath = os.pathSeparator() + classpath;
+        }
+
+        newPath = (scilabConfig.getScilabSCIDir() + os.fileSeparator() + "modules" + os.fileSeparator() +
+            "jvm" + os.fileSeparator() + "jar" + os.fileSeparator() + "org.scilab.modules.jvm.jar") +
+            newPath;
+
+        return newPath;
+    }
+
+    /**
      * Utility function to add SCILAB directories to the given path-like string
+     *
      * @param path path-like string
      * @return an augmented path
      */
@@ -365,18 +450,19 @@ public class SimpleScilab extends JavaExecutable {
         if (path == null) {
             newPath = "";
         } else {
-            newPath = path + os.pathSeparator();
+            newPath = os.pathSeparator() + path;
         }
 
-        newPath = newPath + (scilabConfig.getScilabHome() + os.fileSeparator() + "bin");
+        newPath = (scilabConfig.getScilabHome() + os.fileSeparator() + scilabConfig.getScilabLibDir()) +
+            newPath;
 
         return newPath;
     }
 
     /**
      * An utility class to build the Java command
-     * @author The ProActive Team
      *
+     * @author The ProActive Team
      */
     private static class DummyJVMProcess extends JVMProcessImpl {
 

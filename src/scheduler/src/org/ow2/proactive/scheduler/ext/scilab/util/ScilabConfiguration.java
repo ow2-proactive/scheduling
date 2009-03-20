@@ -31,13 +31,22 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.util;
 
-public class ScilabConfiguration {
+import java.io.Serializable;
+
+
+public class ScilabConfiguration implements Serializable {
 
     // the Home Dir of Scilab on this machine
     private String scilabHome = null;
+    private String scilabLibdir = null;
+    private String scilabScidir = null;
 
-    public ScilabConfiguration(String scilabHome) {
+    private static final String nl = System.getProperty("line.separator");
+
+    public ScilabConfiguration(String scilabHome, String scilabLibDir, String scilabSciDir) {
         this.scilabHome = scilabHome;
+        this.scilabLibdir = scilabLibDir;
+        this.scilabScidir = scilabSciDir;
     }
 
     /**
@@ -48,8 +57,25 @@ public class ScilabConfiguration {
         return scilabHome;
     }
 
+    /**
+     * The relative path (from Scilab home) where the javasci library can be found
+     * @return scilab path
+     */
+    public String getScilabLibDir() {
+        return scilabLibdir;
+    }
+
+    /**
+     * The absolute path where the scilab SCI dir is supposed to be
+     * @return scilab path
+     */
+    public String getScilabSCIDir() {
+        return scilabScidir;
+    }
+
     public String toString() {
-        return "Scilab Home : " + scilabHome;
+        return "Scilab Home : " + scilabHome + nl + "Scilab libDir : " + scilabLibdir + nl +
+            "Scilab SCIDir : " + scilabScidir;
     }
 
 }
