@@ -213,7 +213,6 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
 
 }
 
-
 int checkException()
 {
     jthrowable exc;
