@@ -105,7 +105,7 @@ public class SimpleScilab extends JavaExecutable {
     protected static Map<String, LoggingThread> isLogger = new HashMap<String, LoggingThread>();
 
     /**
-     * Tells if the shutdownhook has been set up for this runtime 
+     * Tells if the shutdownhook has been set up for this runtime
      */
     protected static boolean shutdownhookSet = false;
 

@@ -221,7 +221,7 @@ public class AOSimpleScilab implements Serializable {
 
     /**
      * Loads in Scilab the user-functions definitions
-     * 
+     *
      * @return success
      * @throws IOException
      */
