@@ -193,7 +193,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
         // Printing the task error message on the scilab console
         const jstring error = (jstring) (*env)->GetObjectArrayElement(env, errorArray, (jsize) i);
         if (error != NULL) {
-            int errorLength = (int) (*env)->GetStringUTFLength(env, error);            
+            int errorLength = (int) (*env)->GetStringUTFLength(env, error);
             if (errorLength > 0) {
                 const char* error_message = (const char*) (*env)->GetStringUTFChars(env, error, NULL);
                 sciprint("%s\n",error_message);
@@ -203,7 +203,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
                 *err = 1;
                 return;
             }
-        }    
+        }
     }
     if (*debug) {
         printf("[ScilabEmbeddedc] Normal termination\n");
@@ -212,6 +212,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
     *err = 0;
 
 }
+
 
 int checkException()
 {
