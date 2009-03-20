@@ -31,12 +31,7 @@
  */
 package org.ow2.proactive.scheduler.ext.common.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 
 
@@ -121,6 +116,29 @@ public class IOTools {
         return lines;
     }
 
+    public static class RedirectionThread implements Runnable, Serializable {
+        private InputStream is;
+        private OutputStream os;
+
+        public RedirectionThread(InputStream is, OutputStream os) {
+            this.is = is;
+            this.os = os;
+        }
+
+        public void run() {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
+            PrintStream out = new PrintStream(new BufferedOutputStream(os));
+            String s;
+            try {
+                while ((s = br.readLine()) != null) {
+                    out.println(s);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * An utility class (Thread) which collects the output from a process and prints it on the JVM's standard output
      *
@@ -162,7 +180,6 @@ public class IOTools {
         public void run() {
             BufferedReader br = new BufferedReader(new InputStreamReader(streamToLog));
             String line = null;
-            ;
             try {
                 boolean first_line = true;
                 while ((line = br.readLine()) != null && goon) {
@@ -177,6 +194,7 @@ public class IOTools {
                         }
                     } else {
                         if (first_line && line.trim().length() > 0) {
+                            first_line = false;
                             System.out.println(appendMessage + line);
                             System.out.flush();
                         } else if (!first_line) {
