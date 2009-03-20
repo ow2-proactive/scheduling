@@ -193,7 +193,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      *
      * @return the numberOfFinishedTask
      */
-    public int getNumberOfFinishedTask() {
+    public int getNumberOfFinishedTasks() {
         return getJobInfo().getNumberOfFinishedTasks();
     }
 
@@ -211,7 +211,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      *
      * @return the numberOfPendingTask
      */
-    public int getNumberOfPendingTask() {
+    public int getNumberOfPendingTasks() {
         return getJobInfo().getNumberOfPendingTasks();
     }
 
@@ -220,7 +220,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      *
      * @return the numberOfRunningTask
      */
-    public int getNumberOfRunningTask() {
+    public int getNumberOfRunningTasks() {
         return getJobInfo().getNumberOfRunningTasks();
     }
 

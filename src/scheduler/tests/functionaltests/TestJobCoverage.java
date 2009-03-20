@@ -34,8 +34,12 @@ package functionaltests;
 import junit.framework.Assert;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 import functionalTests.FunctionalTest;
 
@@ -88,13 +92,16 @@ public class TestJobCoverage extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        JobState jstate;
+        TaskInfo tinfo;
+        JobInfo jinfo;
         //job submission
         SchedulerTHelper.log("Submitting job...");
         JobId id = SchedulerTHelper.submitJob(jobDescriptor);
 
         //waiting for job termination
         SchedulerTHelper.log("Waiting for job to finish...");
-        SchedulerTHelper.waitForEventJobFinished(id);
+        jinfo = SchedulerTHelper.waitForEventJobFinished(id);
 
         //checking results
         SchedulerTHelper.log("Checking results...");
@@ -118,7 +125,174 @@ public class TestJobCoverage extends FunctionalTest {
 
         //checking all processes
         SchedulerTHelper.log("Checking all received events :");
+        jstate = SchedulerTHelper.waitForEventJobSubmitted(id);
+        Assert.assertEquals(JobStatus.PENDING, jstate.getStatus());
+
+        //checking task 1
         SchedulerTHelper.log("Checking task1 process...");
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task1");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+        Assert.assertEquals(JobStatus.RUNNING, jstate.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task1");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.FINISHED, tinfo.getStatus());
+
+        //checking task 2
+        SchedulerTHelper.log("Checking task2 process...");
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task2");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task2");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.WAITING_ON_ERROR, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task2");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task2");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.FAULTY, tinfo.getStatus());
+
+        //checking task 3
+        SchedulerTHelper.log("Checking task3 process...");
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task3");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task3");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.WAITING_ON_ERROR, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task3");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task3");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.WAITING_ON_ERROR, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task3");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task3");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.FINISHED, tinfo.getStatus());
+
+        //checking task 4
+        SchedulerTHelper.log("Checking task4 process...");
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task4");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task4");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.FAULTY, tinfo.getStatus());
+
+        //checking task 5
+        SchedulerTHelper.log("Checking task5 process...");
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task5");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+        String hostName = tinfo.getExecutionHostName();
+
+        tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task5");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.WAITING_ON_ERROR, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task5");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+        Assert.assertFalse(hostName.equals(tinfo.getExecutionHostName()));
+        hostName = tinfo.getExecutionHostName();
+
+        tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task5");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.WAITING_ON_ERROR, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task5");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+        Assert.assertFalse(hostName.equals(tinfo.getExecutionHostName()));
+        hostName = tinfo.getExecutionHostName();
+
+        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task5");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.FAULTY, tinfo.getStatus());
+
+        //checking task 6
+        SchedulerTHelper.log("Checking task6 process...");
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task6");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task6");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.FINISHED, tinfo.getStatus());
+
+        //checking task 7
+        SchedulerTHelper.log("Checking task7 process...");
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task7");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task7");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.FAULTY, tinfo.getStatus());
+
+        //checking task 8
+        SchedulerTHelper.log("Checking task8 process...");
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task8");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task8");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.WAITING_ON_ERROR, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task8");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task8");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.FAULTY, tinfo.getStatus());
+
+        //checking task 9
+        SchedulerTHelper.log("Checking task9 process...");
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task9");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task9");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.WAITING_ON_FAILURE, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task9");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
+
+        tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task9");
+        jstate.update(tinfo);
+        Assert.assertEquals(TaskStatus.FAILED, tinfo.getStatus());
+
+        //checking end of the job...
+        jstate.update(jinfo);
+        Assert.assertEquals(0, jinfo.getNumberOfPendingTasks());
+        Assert.assertEquals(0, jinfo.getNumberOfRunningTasks());
+        Assert.assertEquals(9, jinfo.getNumberOfFinishedTasks());
+        Assert.assertEquals(9, jinfo.getTotalNumberOfTasks());
+        Assert.assertEquals(JobStatus.FAILED, jinfo.getStatus());
+
+        Assert.assertEquals(0, jstate.getNumberOfPendingTasks());
+        Assert.assertEquals(0, jstate.getNumberOfRunningTasks());
+        Assert.assertEquals(9, jstate.getNumberOfFinishedTasks());
+        Assert.assertEquals(9, jstate.getTotalNumberOfTasks());
+        Assert.assertEquals(JobStatus.FAILED, jstate.getStatus());
 
     }
 

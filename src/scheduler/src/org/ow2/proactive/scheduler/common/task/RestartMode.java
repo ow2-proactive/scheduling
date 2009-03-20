@@ -70,8 +70,11 @@ public class RestartMode implements java.io.Serializable {
 
     @Id
     @GeneratedValue
-    @Column(name = "ID")
-    private long index;
+    @SuppressWarnings("unused")
+    private long hibernateId;
+
+    @Column(name = "INDEX")
+    private int index;
 
     @Column(name = "DESCRIPTION")
     private String description;
@@ -119,6 +122,8 @@ public class RestartMode implements java.io.Serializable {
         try {
             return index == ((RestartMode) obj).index;
         } catch (ClassCastException e) {
+            return false;
+        } catch (NullPointerException e) {
             return false;
         }
     }

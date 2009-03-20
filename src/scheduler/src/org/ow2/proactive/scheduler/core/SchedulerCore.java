@@ -809,9 +809,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     if (td.getNumberOfExecutionOnFailureLeft() > 0) {
                         td.setStatus(TaskStatus.WAITING_ON_FAILURE);
                         job.newWaitingTask();
-                        job.reStartTask(td);
                         frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                             SchedulerEvent.TASK_WAITING_FOR_RESTART, td.getTaskInfo()));
+                        job.reStartTask(td);
                         logger_dev.info("Task '" + td.getId() + "' is waiting to restart");
                     } else {
                         endJob(
@@ -1191,9 +1191,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED, descriptor.getTaskInfo()));
 
             //if this job is finished (every task have finished)
-            logger_dev.info("Number of finished tasks : " + job.getNumberOfFinishedTask() +
+            logger_dev.info("Number of finished tasks : " + job.getNumberOfFinishedTasks() +
                 " - Number of tasks : " + job.getTotalNumberOfTasks());
-            if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()) {
+            if (job.getNumberOfFinishedTasks() == job.getTotalNumberOfTasks()) {
                 //terminating job
                 job.terminate();
                 runningJobs.remove(job);
@@ -1900,8 +1900,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     finishedJobs.add(job);
                     break;
                 case PAUSED:
-                    if ((job.getNumberOfPendingTask() + job.getNumberOfRunningTask() + job
-                            .getNumberOfFinishedTask()) == 0) {
+                    if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() + job
+                            .getNumberOfFinishedTasks()) == 0) {
                         pendingJobs.add(job);
                     } else {
                         runningJobs.add(job);
@@ -1955,7 +1955,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
 
                 //update the count of pending and running task.
-                job.setNumberOfPendingTasks(job.getNumberOfPendingTask() + job.getNumberOfRunningTask());
+                job.setNumberOfPendingTasks(job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks());
                 job.setNumberOfRunningTasks(0);
             }
         }

@@ -242,8 +242,8 @@ public abstract class InternalJob extends JobState {
      */
     public void startTask(InternalTask td) {
         logger_dev.debug(" ");
-        setNumberOfPendingTasks(getNumberOfPendingTask() - 1);
-        setNumberOfRunningTasks(getNumberOfRunningTask() + 1);
+        setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);
+        setNumberOfRunningTasks(getNumberOfRunningTasks() + 1);
 
         if (getStatus() == JobStatus.STALLED) {
             setStatus(JobStatus.RUNNING);
@@ -262,8 +262,8 @@ public abstract class InternalJob extends JobState {
      */
     public void newWaitingTask() {
         logger_dev.debug(" ");
-        setNumberOfPendingTasks(getNumberOfPendingTask() + 1);
-        setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
+        setNumberOfPendingTasks(getNumberOfPendingTasks() + 1);
+        setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
     }
 
     /**
@@ -297,10 +297,10 @@ public abstract class InternalJob extends JobState {
         InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
-        setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
-        setNumberOfFinishedTasks(getNumberOfFinishedTask() + 1);
+        setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
+        setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
 
-        if ((getStatus() == JobStatus.RUNNING) && (getNumberOfRunningTask() == 0)) {
+        if ((getStatus() == JobStatus.RUNNING) && (getNumberOfRunningTasks() == 0)) {
             setStatus(JobStatus.STALLED);
         }
 
@@ -351,7 +351,7 @@ public abstract class InternalJob extends JobState {
         setFinishedTime(System.currentTimeMillis());
         setNumberOfPendingTasks(0);
         setNumberOfRunningTasks(0);
-        setNumberOfFinishedTasks(getNumberOfFinishedTask() + 1);
+        setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
         setStatus(jobStatus);
 
         //creating list of status
@@ -494,9 +494,9 @@ public abstract class InternalJob extends JobState {
             return false;
         }
 
-        if ((getNumberOfPendingTask() + getNumberOfRunningTask() + getNumberOfFinishedTask()) == 0) {
+        if ((getNumberOfPendingTasks() + getNumberOfRunningTasks() + getNumberOfFinishedTasks()) == 0) {
             jobInfo.setStatus(JobStatus.PENDING);
-        } else if (getNumberOfRunningTask() == 0) {
+        } else if (getNumberOfRunningTasks() == 0) {
             jobInfo.setStatus(JobStatus.STALLED);
         } else {
             jobInfo.setStatus(JobStatus.RUNNING);

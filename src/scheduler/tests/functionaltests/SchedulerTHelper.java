@@ -127,50 +127,32 @@ public class SchedulerTHelper {
      * @throws Exception
      */
     public static void startScheduler() throws Exception {
-        startScheduler(false);
+        startScheduler(null);
     }
 
     /**
      * Start the scheduler using a forked JVM and
      * deploys, with its associated Resource manager, 5 local ProActive nodes.
      *
-     * @param startWithDefaultConfiguration
-     * true if you want to start the scheduler with the default
-     * starting configuration of Scheduler,
-     * or false for using scheduler Properties file designed for tests.
-     *
+     * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
+     * 			null to use the default one.
      * @throws Exception if an error occurs.
      */
-    public static void startScheduler(boolean startWithDefaultConfiguration) throws Exception {
-        startScheduler(defaultDescriptor, startWithDefaultConfiguration);
-    }
-
-    /**
-     * Start Scheduler with default configuration, or test configuration, with a specific GCM
-     * deployment file for Resource manager.
-     * @param startWithDefaultConfiguration
-     * true if you want to start the scheduler with the default
-     * starting configuration of Scheduler,
-     * or false for using scheduler Properties file designed for tests.
-     * @param GCMDPath path of GCM deployment file to deploy at RM's startup.
-     * @throws Exception if an error occurs.
-     */
-    public static void startScheduler(String GCMDPath, boolean startWithDefaultConfiguration)
-            throws Exception {
-        if (startWithDefaultConfiguration) {
-            startScheduler(defaultDescriptor, null);
-        } else {
-            startScheduler(defaultDescriptor, functionalTestSchedulerProperties);
-        }
+    public static void startScheduler(String configuration) throws Exception {
+        startScheduler(defaultDescriptor, configuration);
     }
 
     /**
      * Starts Scheduler with a specific GCM deployment descriptor and scheduler properties file,
      * @param GCMDPath path to a GCMD deployment file
-     * @param schedPropertiesFilePath a configuration file for Scheduler
+     * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
+     * 			null to use the default one.
      * @throws Exception
      */
     public static void startScheduler(String GCMDPath, String schedPropertiesFilePath) throws Exception {
+        if (schedPropertiesFilePath == null) {
+            schedPropertiesFilePath = functionalTestSchedulerProperties;
+        }
         deploySchedulerGCMA();
         GCMVirtualNode vn = gcmad.getVirtualNode("VN");
         Node node = vn.getANode();
@@ -201,7 +183,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs
      */
     public static void killAndRestartScheduler() throws Exception {
-        killAndRestartScheduler(false);
+        killAndRestartScheduler(null);
     }
 
     /**
@@ -209,16 +191,14 @@ public class SchedulerTHelper {
      * with default GCM deployment descriptor.
      * User or administrator interface is not reconnected automatically.
      *
-     * @param startWithDefaultConfiguration
-     * true if you want to restart the scheduler with the default
-     * starting configuration of Scheduler,
-     * or false for using scheduler Properties file designed for tests.
+     * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
+     * 			null to use the default one.
      * @throws Exception
      */
-    public static void killAndRestartScheduler(boolean startWithDefaultConfiguration) throws Exception {
+    public static void killAndRestartScheduler(String configuration) throws Exception {
         killScheduler();
         deploySchedulerGCMA();
-        startScheduler(startWithDefaultConfiguration);
+        startScheduler(configuration);
     }
 
     /**

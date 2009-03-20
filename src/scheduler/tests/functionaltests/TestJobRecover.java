@@ -68,46 +68,47 @@ public class TestJobRecover extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
-//        JobId idJ1 = SchedulerTHelper.submitJob(jobDescriptor);
-//        JobId idJ2 = SchedulerTHelper.submitJob(jobDescriptor);
-//        JobId idJ3 = SchedulerTHelper.submitJob(jobDescriptor);
-//
-//        SchedulerTHelper.waitForEventJobRunning(idJ1);
-//
-//        SchedulerTHelper.log("Waiting for job 1 to finished");
-//        SchedulerTHelper.waitForFinishedJob(idJ1);
-//
-//        SchedulerTHelper.log("Kill Scheduler");
-//        SchedulerTHelper.killAndRestartScheduler(true);
-//
-//        SchedulerTHelper.getUserInterface();
-//
-//        SchedulerTHelper.log("Waiting for job 2 to finished");
-//        SchedulerTHelper.waitForFinishedJob(idJ2);
-//        SchedulerTHelper.log("Waiting for job 3 to finished");
-//        SchedulerTHelper.waitForFinishedJob(idJ3);
-//
-//        SchedulerTHelper.log("check result job 1");
-//        JobResult result = SchedulerTHelper.getJobResult(idJ1);
-//        Assert.assertEquals(6, result.getAllResults().size());
-//        for (int i = 1; i <= 6; i++) {
-//            Assert.assertNotNull(result.getResult("Computation" + i).value());
-//            Assert.assertNull(result.getResult("Computation" + i).getException());
-//        }
-//        SchedulerTHelper.log("check result job 2");
-//        result = SchedulerTHelper.getJobResult(idJ2);
-//        Assert.assertEquals(6, result.getAllResults().size());
-//        for (int i = 1; i <= 6; i++) {
-//            Assert.assertNotNull(result.getResult("Computation" + i).value());
-//            Assert.assertNull(result.getResult("Computation" + i).getException());
-//        }
-//        SchedulerTHelper.log("check result job 3");
-//        result = SchedulerTHelper.getJobResult(idJ3);
-//        Assert.assertEquals(6, result.getAllResults().size());
-//        for (int i = 1; i <= 6; i++) {
-//            Assert.assertNotNull(result.getResult("Computation" + i).value());
-//            Assert.assertNull(result.getResult("Computation" + i).getException());
-//        }
+        JobId idJ1 = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId idJ2 = SchedulerTHelper.submitJob(jobDescriptor);
+        JobId idJ3 = SchedulerTHelper.submitJob(jobDescriptor);
+
+        SchedulerTHelper.waitForEventJobRunning(idJ1);
+
+        SchedulerTHelper.log("Waiting for job 1 to finish");
+        SchedulerTHelper.waitForFinishedJob(idJ1);
+
+        SchedulerTHelper.log("Kill Scheduler");
+        SchedulerTHelper.killAndRestartScheduler(SchedulerTHelper.class.getResource(
+                "config/functionalTSchedulerProperties-updateDB.ini").getPath());
+
+        SchedulerTHelper.getUserInterface();
+
+        SchedulerTHelper.log("Waiting for job 2 to finish");
+        SchedulerTHelper.waitForFinishedJob(idJ2);
+        SchedulerTHelper.log("Waiting for job 3 to finish");
+        SchedulerTHelper.waitForFinishedJob(idJ3);
+
+        SchedulerTHelper.log("check result job 1");
+        JobResult result = SchedulerTHelper.getJobResult(idJ1);
+        Assert.assertEquals(6, result.getAllResults().size());
+        for (int i = 1; i <= 6; i++) {
+            Assert.assertNotNull(result.getResult("Computation" + i).value());
+            Assert.assertNull(result.getResult("Computation" + i).getException());
+        }
+        SchedulerTHelper.log("check result job 2");
+        result = SchedulerTHelper.getJobResult(idJ2);
+        Assert.assertEquals(6, result.getAllResults().size());
+        for (int i = 1; i <= 6; i++) {
+            Assert.assertNotNull(result.getResult("Computation" + i).value());
+            Assert.assertNull(result.getResult("Computation" + i).getException());
+        }
+        SchedulerTHelper.log("check result job 3");
+        result = SchedulerTHelper.getJobResult(idJ3);
+        Assert.assertEquals(6, result.getAllResults().size());
+        for (int i = 1; i <= 6; i++) {
+            Assert.assertNotNull(result.getResult("Computation" + i).value());
+            Assert.assertNull(result.getResult("Computation" + i).getException());
+        }
 
     }
 }
