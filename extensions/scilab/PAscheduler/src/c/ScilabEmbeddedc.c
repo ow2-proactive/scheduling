@@ -218,7 +218,7 @@ int checkException()
     jthrowable exc;
     exc = (*env)->ExceptionOccurred(env);
     if (exc) {
-        printException(exc);   
+        printException(exc);
         return 1;
     }
     return 0;
