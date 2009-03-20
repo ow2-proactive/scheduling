@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<refentry xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg" xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook" version="5.0-subset Scilab" xml:lang="en" xml:id="PAconnect">
+    <info>
+        <pubdate>12-Jan-2009</pubdate>
+    </info>
+    <refnamediv>
+        <refname>PAconnect</refname>
+        <refpurpose>Initiates a connection to the ProActive scheduler</refpurpose>
+    </refnamediv>
+
+
+    <refsynopsisdiv>
+        <title>Calling Sequence</title>
+        <synopsis>PAconnect(uri,login,password)</synopsis>
+    </refsynopsisdiv>
+
+    <refsection>
+        <title>Parameters</title>
+        <variablelist>
+            <varlistentry>
+                <term>uri</term>
+                <listitem>
+                    <para>
+                        uri of the ProActive scheduler, something like '//hostname/SCHEDULER'
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>login</term>
+                <listitem>
+                    <para>
+                        login name of the user
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>password</term>
+                <listitem>
+                    <para>
+                        password associated with this login
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsection>
+
+    <refsection>
+        <title>Description</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Initiates a connection to the ProActive scheduler. The scheduler must be running and reachable on
+                    the given host.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </refsection>
+
+    <refsection>
+        <title>Examples</title>
+        <programlisting role="example"><![CDATA[
+PAconnect('//localhost/SCHEDULER','foo','bar');
+]]></programlisting>
+    </refsection>
+
+    <refsection>
+        <title>See Also</title>
+        <simplelist type="inline">
+            <member>
+                <link linkend="PAsolve">PAsolve</link>
+            </member>
+        </simplelist>
+    </refsection>
+
+
+    <refsection>
+        <title>Authors</title>
+        <variablelist>
+            <varlistentry>
+                <term>Fabien Viale</term>
+                <listitem>
+                    <para>
+                        INRIA OASIS
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsection>
+
+</refentry>

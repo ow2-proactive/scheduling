@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<refentry xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg" xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook" version="5.0-subset Scilab" xml:lang="en" xml:id="PAsolve">
+    <info>
+        <pubdate>12-Jan-2009</pubdate>
+    </info>
+    <refnamediv>
+        <refname>PAsolve</refname>
+        <refpurpose>Executes a call to a Scilab function(macro) in parallel</refpurpose>
+    </refnamediv>
+
+
+    <refsynopsisdiv>
+        <title>Calling Sequence</title>
+        <synopsis>PAsolve(func, args [, file])</synopsis>
+    </refsynopsisdiv>
+
+    <refsection>
+        <title>Parameters</title>
+        <variablelist>
+            <varlistentry>
+                <term>func</term>
+                <listitem>
+                    <para>the function to evaluate in parallel. The function must take exactly one argument and return
+                        exactly one result. There is no limitation on the arg and result type, thus lists(records) can
+                        be used for multiple input/outputs.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>args</term>
+                <listitem>
+                    <para>a list of arguments. The function will be applied to each element of the list.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>file</term>
+                <listitem>
+                    <para>if the function depends on other user-defined functions. A file, containing all the functions
+                        definitions, must be provided. If the function doesn't depend on any user-defined function and
+                        only Scilab built-in functions, it is not mandatory.
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsection>
+
+    <refsection>
+        <title>Description</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    This call will execute the given function in parallel through the ProActive Scheduler. The scheduler
+                    must be running and this Scilab session must be connected to it through a call to PAconnect. A
+                    single function is given in parameter, this function must have a single input and a single output
+                    e.g. y=f(x). The function's input and output can be of any type so records are possible to store
+                    multiple inputs/outputs.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </refsection>
+
+    <refsection>
+        <title>Examples</title>
+        <programlisting role="example"><![CDATA[
+PAsolve(myfun, list(1,2,3,4,5,6)) // this will run myfun(1), myfun(2), myfun(3), etc.. on 6 different Scilab engines
+PAsolve(myfun, list(1,2,3,4,5,6), 'myfun/myfun.sci') // idem, but specifying a file where myfun is defined
+]]></programlisting>
+    </refsection>
+
+    <refsection>
+        <title>See Also</title>
+        <simplelist type="inline">
+            <member>
+                <link linkend="PAconnect">PAconnect</link>
+            </member>
+        </simplelist>
+    </refsection>
+
+
+    <refsection>
+        <title>Authors</title>
+        <variablelist>
+            <varlistentry>
+                <term>Fabien Viale</term>
+                <listitem>
+                    <para>
+                        INRIA OASIS
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsection>
+
+
+</refentry>

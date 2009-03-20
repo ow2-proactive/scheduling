@@ -1,0 +1,41 @@
+initEmbedded
+
+cinitEmbedded err
+
+out empty
+***********************
+connect url login passwd
+url             string u
+login           string l
+passwd          string p
+
+cconnect url login passwd u l p err
+url             char
+login           char
+passwd          char
+
+out empty
+***********************
+sciSolve    inputscripts functionsDefinition mainscript selectScript debug
+inputscripts        stringmat 1 n
+functionsDefinition string t
+mainscript          string m
+selectScript        string s
+debug               scalar
+results             stringmat 1 n
+
+csciSolve    inputscripts functionsDefinition mainscript selectScript debug results n t m s err
+inputscripts        Cstringv
+functionsDefinition char
+mainscript          char
+selectScript        char
+debug               int
+results             Cstringv
+
+out             sequence results
+***********************
+
+
+
+
+
