@@ -8,4 +8,3 @@ tbx_build_src(['ScilabEmbeddedc'], ['ScilabEmbeddedc.c'], 'c', ..
 
 
 clear tbx_build_src;
-

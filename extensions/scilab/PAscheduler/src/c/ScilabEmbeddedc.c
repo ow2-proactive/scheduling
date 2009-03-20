@@ -76,11 +76,6 @@ void C2F(cconnect) (url, login, passwd, u, l, p, err)
         return;
     }
 
-<<<<<<< HEAD:extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
-    
-=======
-
->>>>>>> ProActive Scilab toolbox (to be built under Scilab):extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
 }
 
 void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript, debug, results, n, t, m, s, err)
@@ -143,11 +138,6 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
     resultsArray = (jobjectArray) (*env)->GetObjectArrayElement(env, resultsAndLogsArray, (jsize) 0);
     logsArray = (jobjectArray) (*env)->GetObjectArrayElement(env, resultsAndLogsArray, (jsize) 1);
     errorArray = (jobjectArray) (*env)->GetObjectArrayElement(env, resultsAndLogsArray, (jsize) 2);
-<<<<<<< HEAD:extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
-    
-=======
-
->>>>>>> ProActive Scilab toolbox (to be built under Scilab):extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
     arrayLength = (int) (*env)->GetArrayLength(env, resultsArray);
 
     if (arrayLength == 0) {
@@ -203,11 +193,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
         // Printing the task error message on the scilab console
         const jstring error = (jstring) (*env)->GetObjectArrayElement(env, errorArray, (jsize) i);
         if (error != NULL) {
-<<<<<<< HEAD:extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
             int errorLength = (int) (*env)->GetStringUTFLength(env, error);            
-=======
-            int errorLength = (int) (*env)->GetStringUTFLength(env, error);
->>>>>>> ProActive Scilab toolbox (to be built under Scilab):extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
             if (errorLength > 0) {
                 const char* error_message = (const char*) (*env)->GetStringUTFChars(env, error, NULL);
                 sciprint("%s\n",error_message);
@@ -217,11 +203,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
                 *err = 1;
                 return;
             }
-<<<<<<< HEAD:extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
         }    
-=======
-        }
->>>>>>> ProActive Scilab toolbox (to be built under Scilab):extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
     }
     if (*debug) {
         printf("[ScilabEmbeddedc] Normal termination\n");
@@ -230,28 +212,13 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
     *err = 0;
 
 }
-<<<<<<< HEAD:extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
-    
-    
-    
-    
-=======
 
-
-
-
->>>>>>> ProActive Scilab toolbox (to be built under Scilab):extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
 int checkException()
 {
     jthrowable exc;
     exc = (*env)->ExceptionOccurred(env);
     if (exc) {
-<<<<<<< HEAD:extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
         printException(exc);   
-=======
-        printException(exc);
->>>>>>> ProActive Scilab toolbox (to be built under Scilab):extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
-
         return 1;
     }
     return 0;
@@ -285,9 +252,5 @@ void printException(jthrowable exc) {
       strcpy(charmessage,(*env)->GetStringUTFChars(env,message, NULL));
       (*env)->ExceptionDescribe(env);
       (*env)->ExceptionClear(env);
-<<<<<<< HEAD:extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
-      sciprint("%s\n",charmessage);     
-=======
       sciprint("%s\n",charmessage);
->>>>>>> ProActive Scilab toolbox (to be built under Scilab):extensions/scilab/PAscheduler/src/c/ScilabEmbeddedc.c
 }
