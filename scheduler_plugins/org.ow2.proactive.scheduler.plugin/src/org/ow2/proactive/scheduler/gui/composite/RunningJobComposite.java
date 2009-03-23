@@ -302,9 +302,8 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                             (title.equals(COLUMN_PROGRESS_BAR_TITLE) && (!item.isDisposed()))) {
                             ((ProgressBar) item.getData("bar")).setSelection(job.getNumberOfFinishedTasks());
                         } else if ((title != null) && (title.equals(COLUMN_PROGRESS_TEXT_TITLE))) {
-                            item
-                                    .setText(i, job.getNumberOfFinishedTasks() + "/" +
-                                        job.getTotalNumberOfTasks());
+                            item.setText(i, job.getNumberOfFinishedTasks() + "/" +
+                                job.getTotalNumberOfTasks());
                         }
                     }
                 }
