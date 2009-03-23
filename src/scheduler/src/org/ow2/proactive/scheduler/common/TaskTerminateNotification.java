@@ -41,7 +41,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
  * Interface that can be notified of a task termination
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9.1
+ * @since ProActive Scheduling 1
  */
 public interface TaskTerminateNotification extends Serializable {
 

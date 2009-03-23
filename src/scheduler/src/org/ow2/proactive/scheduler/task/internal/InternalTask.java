@@ -69,7 +69,7 @@ import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.utils.NodeSet;
 
 

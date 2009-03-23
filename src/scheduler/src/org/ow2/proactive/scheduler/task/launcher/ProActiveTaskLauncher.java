@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
 
@@ -43,6 +43,9 @@ import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
@@ -90,7 +93,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.task.TaskLauncher#initActivity(org.objectweb.proactive.Body)
+     * @see org.ow2.proactive.scheduler.task.launcher.TaskLauncher#initActivity(org.objectweb.proactive.Body)
      */
     @Override
     public void initActivity(Body body) {

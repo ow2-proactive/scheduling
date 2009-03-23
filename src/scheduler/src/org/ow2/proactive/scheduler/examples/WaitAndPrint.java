@@ -77,12 +77,4 @@ public class WaitAndPrint extends JavaExecutable {
         return ("No." + this.number + " hi from " + message + "\t slept for " + sleepTime + " Seconds");
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.JavaExecutable#init(java.util.Map)
-     */
-    @Override
-    public void init(Map<String, String> args) {
-        sleepTime = Integer.parseInt(args.get("sleepTime"));
-        number = Integer.parseInt(args.get("number"));
-    }
 }

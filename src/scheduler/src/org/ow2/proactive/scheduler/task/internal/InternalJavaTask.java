@@ -54,10 +54,10 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.ForkedJavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.JavaTaskLauncher;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.ForkedJavaTaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 

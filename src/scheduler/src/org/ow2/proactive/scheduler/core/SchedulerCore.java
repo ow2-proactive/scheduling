@@ -115,11 +115,13 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.ProActiveTaskLauncher;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.launcher.ProActiveTaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -208,7 +210,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private static Hashtable<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers = new Hashtable<JobId, RemoteObjectExposer<TaskClassServer>>();
 
     /**
-     * Return the task classserver for the job jid
+     * Return the task classserver for the job jid.<br>
+     * return null if the classServer is undefine for the given jobId.
+     * 
+     * 
      * @param jid the job id 
      * @return the task classserver for the job jid
      */
@@ -650,10 +655,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
 
                     // load and Initialize the executable container
+                    DatabaseManager.load(internalTask);
                     logger_dev.debug("Load and Initialize the executable container for task '" +
                         internalTask.getId() + "'");
-                    DatabaseManager.load(internalTask);
-                    internalTask.getExecutableContainer().init(currentJob, internalTask);
+                    ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
+                    if (InternalJavaTask.class.isAssignableFrom(internalTask.getClass())) {
+                        eci.setClassServer(getTaskClassServer(currentJob.getId()));
+                    }
+                    internalTask.getExecutableContainer().init(eci);
 
                     node = nodeSet.get(0);
                     TaskLauncher launcher = null;

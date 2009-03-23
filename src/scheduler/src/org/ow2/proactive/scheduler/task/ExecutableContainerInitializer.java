@@ -27,36 +27,41 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $PROACTIVE_INITIAL_DEV$
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.Serializable;
-
-import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 
 
 /**
- * An executable container allows to instantiate the actual executable in a lazy manner, i.e.
- * on the worker node that will execute the actual executable.
+ * ExecutableContainerInitializer is a generic type that contains required data to initialize
+ * executable containers
+ *
  * @author The ProActive Team
+ * @since ProActive Scheduling 1.0
  */
-public interface ExecutableContainer extends Serializable {
+public class ExecutableContainerInitializer {
+
+    /** Task class server */
+    private TaskClassServer classServer;
 
     /**
-     * Create and return the contained executable
-     * @return the contained executable
-     * @throws ExecutableCreationException if the executable cannot be created
-     */
-    public Executable getExecutable() throws ExecutableCreationException;
-
-    /**
-     * Generic init method for executable containers.
-     * This method is called by SchedulerCore just before sending the container
-     * on the node that will execute the contained executable.
+     * Get the classServer
      *
-     * @param job the job owning the contained executable
+     * @return the classServer
      */
-    public void init(ExecutableContainerInitializer initializer);
+    public TaskClassServer getClassServer() {
+        return classServer;
+    }
+
+    /**
+     * Set the classServer value to the given classServer value
+     * 
+     * @param classServer the classServer to set
+     */
+    public void setClassServer(TaskClassServer classServer) {
+        this.classServer = classServer;
+    }
+
 }

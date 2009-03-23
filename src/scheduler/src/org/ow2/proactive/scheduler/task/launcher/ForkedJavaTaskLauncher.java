@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -61,6 +61,11 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
+import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.NativeExecutable;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.Script;
@@ -157,7 +162,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
     /**
      * Method responsible for creating a a dedicated JVM, execution of the task on this JVM and collecting result
-     * @see org.ow2.proactive.scheduler.task.JavaTaskLauncher#doTask(org.ow2.proactive.scheduler.common.TaskTerminateNotification, org.ow2.proactive.scheduler.task.ExecutableContainer, org.ow2.proactive.scheduler.common.task.TaskResult[])
+     * @see org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher#doTask(org.ow2.proactive.scheduler.common.TaskTerminateNotification, org.ow2.proactive.scheduler.task.ExecutableContainer, org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
@@ -306,7 +311,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.task.TaskLauncher#terminate()
+     * @see org.ow2.proactive.scheduler.task.launcher.TaskLauncher#terminate()
      */
     public void terminate() {
         if (forkedJavaExecutable != null)

@@ -45,8 +45,6 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scripting.GenerationScript;
 
@@ -99,9 +97,9 @@ public class NativeExecutableContainer implements ExecutableContainer {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(org.ow2.proactive.scheduler.common.job.JobState, org.ow2.proactive.scheduler.common.task.TaskState)
+     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(org.ow2.proactive.scheduler.task.ExecutableContainerInitializer)
      */
-    public void init(JobState job, TaskState task) {
+    public void init(ExecutableContainerInitializer initializer) {
         // Nothing to do for now...
     }
 

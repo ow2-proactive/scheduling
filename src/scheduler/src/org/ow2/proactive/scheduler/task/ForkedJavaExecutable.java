@@ -52,11 +52,10 @@ import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 
 
 /**
@@ -142,9 +141,9 @@ public class ForkedJavaExecutable extends JavaExecutable implements ExecutableCo
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(org.ow2.proactive.scheduler.common.job.JobState, org.ow2.proactive.scheduler.common.task.TaskState)
+     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#init(org.ow2.proactive.scheduler.task.ExecutableContainerInitializer)
      */
-    public void init(JobState job, TaskState task) {
+    public void init(ExecutableContainerInitializer initializer) {
         // nothing to do
     }
 
