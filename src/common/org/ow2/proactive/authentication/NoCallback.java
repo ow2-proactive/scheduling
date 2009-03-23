@@ -38,24 +38,39 @@ import javax.security.auth.callback.Callback;
 
 
 /**
- * Actually does no callback. It is given its information by a
- * <code>NoCallbackHandler</code>.
+ * A callback stub to <code>NoCallbackHandler</code>. Holds some properties related to authentication method.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  *
  */
 public class NoCallback implements Callback, Serializable {
+    /**
+     * Properties map
+     */
     private Map<String, Object> values;
 
+    /**
+     * Sets properties of the callback
+     *
+     * @param values properties provided by <code>NoCallbackHandler</code>
+     */
     protected void set(Map<String, Object> values) {
         this.values = values;
     }
 
+    /**
+     * Gets properties map
+     *
+     * @return stored properties map
+     */
     protected Map<String, Object> get() {
         return values;
     }
 
+    /**
+     * Resets properties.
+     */
     protected void clear() {
         values = null;
     }

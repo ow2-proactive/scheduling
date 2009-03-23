@@ -55,14 +55,17 @@ import org.objectweb.proactive.core.mop.StubObject;
  */
 public abstract class RestrictedService implements Loggable, RunActive {
 
-    // public methods
+    /** public methods */
     private Set<String> publicMethods = new TreeSet<String>();
-    // trusted services
+    /** trusted services */
     private HashMap<UniqueID, Boolean> trustedServices = new HashMap<UniqueID, Boolean>();
+    /** class logger */
     private Logger logger = getLogger();
 
     /**
      * Performs filtering of requests.
+     *
+     * @param body an active object body
      */
     public void runActivity(Body body) {
         Service service = new Service(body);
@@ -84,6 +87,10 @@ public abstract class RestrictedService implements Loggable, RunActive {
 
     /**
      * Intended to be used for immediate services filtering
+     *
+     * @param id unique id of the caller
+     *
+     * @return true if id corresponds to registered caller
      */
     protected boolean trustedImmediateServiceCaller(UniqueID id) {
         return trustedServices.containsKey(id);
@@ -91,6 +98,8 @@ public abstract class RestrictedService implements Loggable, RunActive {
 
     /**
      * Registers a trusted service. Body id of caller active objects is used as request identifier.
+     *
+     * @param service an active object to register
      */
     protected void registerTrustedService(Object service) {
         UniqueID id = getBodyId(service);
@@ -100,6 +109,8 @@ public abstract class RestrictedService implements Loggable, RunActive {
 
     /**
      * Unregisters a trusted service.
+     *
+     * @param service an active object to unregister
      */
     protected void unregisterTrustedService(Object service) {
         UniqueID id = getBodyId(service);
@@ -109,6 +120,9 @@ public abstract class RestrictedService implements Loggable, RunActive {
 
     /**
      * Registers a trusted service with a given id.
+     *
+     * @param id of the caller body
+     * @return true if registration succeed
      */
     protected boolean registerTrustedService(UniqueID id) {
         if (id != null && !trustedServices.containsKey(id)) {
@@ -124,6 +138,8 @@ public abstract class RestrictedService implements Loggable, RunActive {
 
     /**
      * Unregisters a trusted service with a given id.
+     *
+     * @param id of the caller body
      */
     protected void unregisterTrustedService(UniqueID id) {
 
@@ -138,7 +154,10 @@ public abstract class RestrictedService implements Loggable, RunActive {
 
     /**
      * Extract id from active object.
-     * TODO find more straightforward way to do that   
+     * TODO find more straightforward way to do that
+     *
+     * @param service a target active object
+     * @return an active object body id
      */
     private UniqueID getBodyId(Object service) {
 
@@ -154,8 +173,10 @@ public abstract class RestrictedService implements Loggable, RunActive {
     }
 
     /**
-     * Declares public method for restricted service. Accessable for all objects.
+     * Declares public method for restricted service. Accessible for all objects.
      * Use case: callback to resource manager during GCM deployment
+     *
+     * @param methodName name of the public method
      */
     protected void setPublicMethod(String methodName) {
         publicMethods.add(methodName);

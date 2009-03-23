@@ -65,6 +65,7 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
     /** connection logger */
     private final Logger logger = getLogger();
 
+    /** LDAP configuration properties */
     private LDAPProperties ldapProperties = new LDAPProperties(getLDAPConfigFileName());
     /** default value for Context.SECURITY_AUTHENTICATION 
      * that correspond to anonymous connection
@@ -123,6 +124,9 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
     /** map defining  a group name and its relative DN in LDAP */
     private Map<String, String> groupDNMap;
 
+    /**
+     * Creates a new instance of LDAPLoginModule
+     */
     public LDAPLoginModule() {
 
         //initialize system properties for SSL/TLS connection
@@ -141,6 +145,14 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
         }
     }
 
+    /**
+     * Checks if property is already defined.
+     *
+     * @param propertyName name of the property
+     * @param propertyValue value of the property
+     * @return true id the property is defined and its value equals the specified value.
+     *
+     */
     private boolean alreadyDefined(String propertyName, String propertyValue) {
 
         if (propertyName != null && propertyName.length() != 0) {
@@ -169,6 +181,11 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
      *            a <code>CallbackHandler</code> to get the credentials of the
      *            user, must work with <code>NoCallback</code> callbacks.
      *            <p>
+     * @param sharedState state shared with other configured LoginModules. <p>
+     *
+     * @param options options specified in the login
+     *			<code>Configuration</code> for this particular
+     *			<code>LDAPLoginModule</code>.
      */
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
@@ -355,6 +372,10 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
      *
      * <p>
      *
+     * @param userDN user name
+     * <p>
+     * @param password user password
+     * <p>
      * @return true if the authentication is successful, false otherwise.
      */
     private boolean checkLDAPPassword(String userDN, String password) {
@@ -393,6 +414,9 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
      * DN of the user <code>username</code>
      *
      * <p>
+     * @exception NamingException
+     *                if a naming exception is encountered.
+     * <p>
      *
      * @return the String containing the UID of the user or null if the user is
      *         not found.
@@ -423,6 +447,7 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
             }
         } catch (NamingException e) {
             logger.error("Problem with the search in mode : " + AUTHENTICATION_METHOD + e);
+            throw e;
         } finally {
             try {
                 if (ctx != null) {
@@ -437,6 +462,15 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
         return userDN;
     }
 
+    /**
+     * Checks is user belongs to the group
+     *
+     * @param userDN user name
+     * @param reqGroup group to check
+     * @param hierarchy group hierarchy
+     *
+     * @return true if user is a member of this group according to hierarchy
+     */
     private boolean checkLDAPGroupMemberShip(String userDN, String reqGroup, GroupHierarchy hierarchy) {
         boolean groupMemberShip = false;
 
@@ -501,7 +535,7 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
 
     /**
      * Performs connection to LDAP with appropriate security parameters
-     * @return
+     * @return directory service interface.
      * @throws NamingException
      */
     private DirContext connectAndGetContext() throws NamingException {
@@ -522,5 +556,10 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
         return new InitialDirContext(env);
     }
 
+    /**
+     * Retrieves LDAP configuration file name.
+     *
+     * @return name of the file with LDAP configuration.
+     */
     protected abstract String getLDAPConfigFileName();
 }

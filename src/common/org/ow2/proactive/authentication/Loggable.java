@@ -41,5 +41,10 @@ import org.apache.log4j.Logger;
  * @since ProActive Scheduling 0.9.1
  */
 public interface Loggable {
+    /**
+     * Retrieves a corresponding logger.
+     *
+     * @return a logger for further utilization
+     */
     public Logger getLogger();
 }

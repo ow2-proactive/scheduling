@@ -100,6 +100,7 @@ public class LDAPProperties {
     /**
      * Create a new instance of LDAPProperties
      *
+     * @param propertiesFileName properties file name
      */
     public LDAPProperties(String propertiesFileName) {
         try {
@@ -123,6 +124,12 @@ public class LDAPProperties {
         }
     }
 
+    /**
+     * Retrieves the value of the property
+     *
+     * @param key property name
+     * @return property value
+     */
     public String getProperty(String key) {
         return prop.getProperty(key);
     }

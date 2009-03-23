@@ -49,8 +49,17 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  *
  */
 public class NoCallbackHandler implements CallbackHandler, Serializable {
+
+    /**
+     * Properties of particular authentication method
+     */
     private Map<String, Object> items;
 
+    /**
+     * Creates a new instance of NoCallbackHandler
+     *
+     * @param items properties of an authentication method.
+     */
     public NoCallbackHandler(Map<String, Object> items) {
         super();
 
