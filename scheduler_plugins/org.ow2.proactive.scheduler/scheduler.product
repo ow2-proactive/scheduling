@@ -15,7 +15,6 @@
 
    <launcherArgs>
       <vmArgs>-Xmx512M -Xms512M
--Djava.security.policy=scheduler.java.policy
 -Dproactive.net.nolocal=true</vmArgs>
    </launcherArgs>
 
