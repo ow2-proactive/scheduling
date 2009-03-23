@@ -38,12 +38,26 @@ package org.ow2.proactive.authentication;
  * @since ProActive Scheduling 0.9.1
  */
 public class GroupHierarchy {
+    /** hierarchy */
     private String[] hierarchy;
 
+    /**
+     * Create a new instance of GroupHierarchy
+     * 
+     * @param hierarchy a string array that represents the hierarchy
+     */
     public GroupHierarchy(String[] hierarchy) {
         this.hierarchy = hierarchy;
     }
 
+    /**
+     * Is the given trueGroup above the given reqGroup
+     * 
+     * @param trueGroup real group
+     * @param reqGroup required group
+     * @return true if the given trueGroup above the given reqGroup
+     * @throws GroupException
+     */
     public boolean isAbove(String trueGroup, String reqGroup) throws GroupException {
         int trueGroupLevel = groupLevel(trueGroup);
 
@@ -60,6 +74,12 @@ public class GroupHierarchy {
         return trueGroupLevel >= reqGroupLevel;
     }
 
+    /**
+     * Return the group level of the given group
+     * 
+     * @param group the group name
+     * @return the group level of the given group
+     */
     private int groupLevel(String group) {
         for (int i = hierarchy.length - 1; i > -1; i--) {
             if (hierarchy[i].equals(group)) {
@@ -70,6 +90,12 @@ public class GroupHierarchy {
         return -1;
     }
 
+    /**
+     * Is the group in hierarchy
+     * 
+     * @param group the group name
+     * @return true if the given group is in hierarchy
+     */
     public boolean isGroupInHierarchy(String group) {
         if (groupLevel(group) != -1) {
             return true;

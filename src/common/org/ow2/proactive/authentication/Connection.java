@@ -42,28 +42,44 @@ import org.objectweb.proactive.api.PAActiveObject;
  * active object and checks that system is up and running (in another words authentication object is activated).
  * Provides an ability to connect in blocking and non blocking manner.
  *
+ * @param T the real type of authentication
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
 public abstract class Connection<T extends Authentication> implements Loggable, Serializable {
 
+    /** Error msg */
     private static final String ERROR_CANNOT_LOOKUP_AUTH = "Cannot lookup authentication active object.";
+    /** Error msg */
     private static final String ERROR_NOT_ACTIVATED = "System is initializing. Try to connect later.";
+    /** Error msg */
     private static final String ERROR_CONNECTION_INTERRUPTED = "Connection is interrupted.";
 
+    /** Time to wait inside connecting loop retries */
     private static final int PERIOD = 1000; // 1 sec	
 
+    /** loggers */
     private Logger logger = getLogger();
+    /** The real class type of the authentication */
     private Class<? extends Authentication> clazz = null;
 
+    /**
+     * Create a new instance of Connection
+     * 
+     * @param clazz the real type of the authentication 
+     */
     public Connection(Class<? extends Authentication> clazz) {
         this.clazz = clazz;
     }
 
     /**
      * Lookup of authentication active object
+     * 
+     * @param url the URL of the service to join.
+     * @throws Exception if something wrong append
      */
-    private T lookupAuthentication(String url) throws Exception {
+    @SuppressWarnings("unchecked")
+	private T lookupAuthentication(String url) throws Exception {
 
         logger.debug("Looking up authentication interface '" + url + "'");
 
@@ -75,6 +91,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      *
      * @param url the URL of the service to join.
      * @return the service authentication interface at the specified URL.
+     * @throws Exception if something wrong append
      */
     public T connect(String url) throws Exception {
         T authentication = lookupAuthentication(url);
@@ -88,6 +105,10 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
     /**
      * Connects to the service using given URL. The current thread will be block until
      * connection established or an error occurs.
+     * 
+     * @param url the url on which to connect
+     * @return the authentication if connection succeed
+     * @throws Exception if something wrong append
      */
     public T waitAndConnect(String url) throws Exception {
         return waitAndConnect(url, 0);
@@ -97,6 +118,11 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      * Connects to the service with a specified timeout value. A timeout of
      * zero is interpreted as an infinite timeout. The connection will then
      * block until established or an error occurs.
+     * 
+     * @param url the url on which to connect
+     * @param timeout the maximum amount of time to wait if it cannot connect
+     * @return the authentication if connection succeed
+     * @throws Exception if something wrong append
      */
     public T waitAndConnect(String url, long timeout) throws Exception {
 

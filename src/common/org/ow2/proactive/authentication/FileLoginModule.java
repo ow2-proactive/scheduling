@@ -54,7 +54,6 @@ import org.apache.log4j.Logger;
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
- *
  */
 public abstract class FileLoginModule implements Loggable, LoginModule {
 
@@ -77,14 +76,22 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
 
     /**
      * Defines login file name
+     * 
+     * @return the login file name
      */
     protected abstract String getLoginFileName();
 
     /**
      * Defines group file name
+     * 
+     * @return the group file name
      */
     protected abstract String getGroupFileName();
 
+    /**
+     * 
+     * @see javax.security.auth.spi.LoginModule#initialize(javax.security.auth.Subject, javax.security.auth.callback.CallbackHandler, java.util.Map, java.util.Map)
+     */
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
 
@@ -108,7 +115,9 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     }
 
     /**
+     * 
      * @see javax.security.auth.spi.LoginModule#login()
+     * @throws LoginException if userName of password are not correct
      */
     public boolean login() throws LoginException {
         // prompt for a user name and password
@@ -224,10 +233,16 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         return true;
     }
 
+    /**
+     * @see javax.security.auth.spi.LoginModule#commit()
+     */
     public boolean commit() throws LoginException {
         return succeeded;
     }
 
+    /**
+     * @see javax.security.auth.spi.LoginModule#abort()
+     */
     public boolean abort() throws LoginException {
         boolean result = succeeded;
         succeeded = false;
@@ -235,6 +250,9 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         return result;
     }
 
+    /**
+     * @see javax.security.auth.spi.LoginModule#logout()
+     */
     public boolean logout() throws LoginException {
         succeeded = false;
 

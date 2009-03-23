@@ -45,6 +45,8 @@ public interface Authentication extends Loggable, Serializable {
 
     /**
      * Checks whether an authentication is activated or in other words is ready to authenticate users.
+     * 
+     * @return true if it is activated.
      */
     public boolean isActivated();
 

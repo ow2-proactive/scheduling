@@ -49,11 +49,13 @@ import org.objectweb.proactive.api.PAActiveObject;
  */
 public abstract class AuthenticationImpl implements Authentication {
 
-    // activation is used to control authentication during scheduling initialization
+    /** Activation is used to control authentication during scheduling initialization */
     private boolean activated = false;
 
     /**
      * Defines login method
+     * 
+     * @return a string which represents the login method.
      */
     protected abstract String getLoginMethod();
 
@@ -73,6 +75,12 @@ public abstract class AuthenticationImpl implements Authentication {
 
     /**
      * Performs login
+     * 
+     * @param role the role of the user to connect, can be admin or user
+     * @param groups the group in which the user is
+     * @param username the user name of the user
+     * @param password the password of the user
+     * @throws LoginException if username or password is incorrect.
      */
     protected void loginAs(String role, String[] groups, String username, String password)
             throws LoginException {
@@ -114,14 +122,16 @@ public abstract class AuthenticationImpl implements Authentication {
     }
 
     /**
-     * Indicates whether the authentication active object is active.
+     * @see org.ow2.proactive.authentication.Authentication#isActivated()
      */
     public boolean isActivated() {
         return activated;
     }
 
     /**
-     * Activates or deactivates authentication active object
+     * Activates or desactivates authentication active object
+     * 
+     * @param activated the status of the desired activated state.
      */
     public void setActivated(boolean activated) {
         this.activated = activated;
@@ -129,6 +139,8 @@ public abstract class AuthenticationImpl implements Authentication {
 
     /**
      * Terminates the active object
+     * 
+     * @return true if the object has been terminated.
      */
     public boolean terminate() {
         PAActiveObject.terminateActiveObject(false);
