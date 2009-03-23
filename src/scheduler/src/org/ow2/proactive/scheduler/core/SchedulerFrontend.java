@@ -1040,7 +1040,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 dispatchSchedulerStateUpdated(eventType);
                 break;
             default:
-                logger_dev.error("Unconsistent update type received from Scheduler Core : " + eventType);
+                logger_dev.info("Unconsistent update type received from Scheduler Core : " + eventType);
         }
     }
 
@@ -1078,7 +1078,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 dispatchJobStateUpdated(owner, notification);
                 break;
             default:
-                logger_dev.error("Unconsistent update type received from Scheduler Core : " +
+                logger_dev.info("Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
         }
     }
@@ -1094,7 +1094,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 dispatchTaskStateUpdated(owner, notification);
                 break;
             default:
-                logger_dev.error("Unconsistent update type received from Scheduler Core : " +
+                logger_dev.info("Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
         }
     }
@@ -1108,7 +1108,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 dispatchUsersUpdated(notification);
                 break;
             default:
-                logger_dev.error("Unconsistent update type received from Scheduler Core : " +
+                logger_dev.info("Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
         }
     }
