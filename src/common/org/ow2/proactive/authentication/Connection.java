@@ -79,7 +79,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      * @throws Exception if something wrong append
      */
     @SuppressWarnings("unchecked")
-	private T lookupAuthentication(String url) throws Exception {
+    private T lookupAuthentication(String url) throws Exception {
 
         logger.debug("Looking up authentication interface '" + url + "'");
 

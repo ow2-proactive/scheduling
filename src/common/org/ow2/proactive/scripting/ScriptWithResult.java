@@ -35,24 +35,43 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- *
  * Composition of selection script and its execution result.
  *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 1.0
  */
 @PublicAPI
 public class ScriptWithResult {
+    /** selection script */
     private SelectionScript script;
+    /** script result */
     private ScriptResult<Boolean> scriptResult;
 
+    /**
+     * Create a new instance of ScriptWithResult
+     * 
+     * @param script a selection script
+     * @param scriptResult a script result
+     */
     public ScriptWithResult(SelectionScript script, ScriptResult<Boolean> scriptResult) {
         this.script = script;
         this.scriptResult = scriptResult;
     }
 
+    /**
+     * Get the selection script
+     * 
+     * @return the selection script
+     */
     public SelectionScript getScript() {
         return script;
     }
 
+    /**
+     * Get the script result
+     * 
+     * @return the script result
+     */
     public ScriptResult<Boolean> getScriptResult() {
         return scriptResult;
     }

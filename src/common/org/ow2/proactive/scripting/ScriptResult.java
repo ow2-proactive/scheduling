@@ -48,8 +48,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class ScriptResult<E> implements Serializable {
 
-    /**  */
+    /** Result of the script */
     private E result = null;
+    /** Exception in the result if so */
     private Throwable exception = null;
 
     /**
@@ -68,6 +69,8 @@ public class ScriptResult<E> implements Serializable {
     }
 
     /**
+     * Create a new instance of ScriptResult
+     * 
      * @param result result to store
      */
     public ScriptResult(E result) {
