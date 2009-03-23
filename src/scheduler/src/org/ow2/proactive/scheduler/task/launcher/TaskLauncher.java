@@ -140,24 +140,15 @@ public abstract class TaskLauncher implements InitActive {
      * Constructor with task identification.
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
-     * @param taskId represents the task the launcher will execute.
+     * @param initializer represents the class that contains information to initialize every task launcher.
      */
-    public TaskLauncher(TaskId taskId) {
-        this.taskId = taskId;
-    }
-
-    /**
-     * Constructor with task identification.
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
-     *
-     * @param taskId represents the task the launcher will execute.
-     * @param pre the script executed before the task.
-     * @param post the script executed after the task.
-     */
-    public TaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
-        this.taskId = taskId;
-        this.pre = pre;
-        this.post = post;
+    public TaskLauncher(TaskLauncherInitializer initializer) {
+        this.taskId = initializer.getTaskId();
+        this.pre = initializer.getPreScript();
+        this.post = initializer.getPostScript();
+        if (initializer.getWalltime() > 0) {
+            this.wallTime = initializer.getWalltime();
+        }
     }
 
     /**
@@ -386,17 +377,6 @@ public abstract class TaskLauncher implements InitActive {
             logger_dev.warn("Loggers are not shut down !", e);
         }
         PAActiveObject.terminateActiveObject(true);
-    }
-
-    /**
-     * Set the walltime of this taskLauncher
-     * 
-     * @param wallTime the maximum execution time of the task
-     */
-    public void setWallTime(long wallTime) {
-        if (wallTime > 0) {
-            this.wallTime = wallTime;
-        }
     }
 
     /**

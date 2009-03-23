@@ -42,16 +42,13 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutable;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
-import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scripting.GenerationScript;
-import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -90,26 +87,12 @@ public class NativeTaskLauncher extends TaskLauncher {
 
     /**
      * Constructor of the native task launcher.
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
-     * @param taskId the task identification.
+     * @param initializer represents the class that contains information to initialize this task launcher.
      */
-    public NativeTaskLauncher(TaskId taskId) {
-        super(taskId);
-        cookie_value = ProcessTreeKiller.createCookie();
-    }
-
-    /**
-     * Constructor of the native task launcher.
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
-     *
-     * @param taskId the task identification.
-     * @param pre the script executed before the task.
-     * @param post the script executed after the task.
-     */
-    public NativeTaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
-        super(taskId, pre, post);
-        cookie_value = ProcessTreeKiller.createCookie();
+    public NativeTaskLauncher(TaskLauncherInitializer initializer) {
+        super(initializer);
     }
 
     /**

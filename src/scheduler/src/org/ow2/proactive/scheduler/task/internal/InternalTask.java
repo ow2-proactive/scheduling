@@ -70,6 +70,7 @@ import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -352,14 +353,20 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * Set the given launcher the local wallTime
-     *
-     * @param launcher the launcher on which to set the walltime
+     * Prepare and return the default task launcher initializer (ie the one that works for every launcher)<br>
+     * Concrete launcher may have to add values to the created initializer to bring more information to the launcher.
+     * 
+     * @return the default created task launcher initializer
      */
-    protected void setKillTaskTimer(TaskLauncher launcher) {
+    protected TaskLauncherInitializer getDefaultTaskLauncherInitializer() {
+        TaskLauncherInitializer tli = new TaskLauncherInitializer();
+        tli.setTaskId(getId());
+        tli.setPreScript(getPreScript());
+        tli.setPostScript(getPostScript());
         if (isWallTime()) {
-            launcher.setWallTime(wallTime);
+            tli.setWalltime(wallTime);
         }
+        return tli;
     }
 
     /**

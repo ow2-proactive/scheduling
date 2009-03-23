@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.launcher.ProActiveTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
@@ -91,19 +92,12 @@ public class InternalProActiveTask extends InternalTask {
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         ProActiveTaskLauncher launcher;
 
-        if (getPreScript() == null && getPostScript() == null) {
-            logger_dev.info("Create ProActive task launcher without script");
-            launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(
-                    ProActiveTaskLauncher.class.getName(), new Object[] { getId() }, node);
-        } else {
-            logger_dev.info("Create ProActive task launcher with scripts");
-            launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(
-                    ProActiveTaskLauncher.class.getName(), new Object[] { getId(), getPreScript(),
-                            getPostScript() }, node);
-        }
+        logger_dev.info("Create ProActive task launcher");
+        TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer();
+        launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(ProActiveTaskLauncher.class.getName(),
+                new Object[] { tli }, node);
 
         setExecuterInformations(new ExecuterInformations(launcher, node));
-        setKillTaskTimer(launcher);
 
         return launcher;
     }

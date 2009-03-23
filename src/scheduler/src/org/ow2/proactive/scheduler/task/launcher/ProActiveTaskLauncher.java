@@ -40,14 +40,12 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
-import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -71,25 +69,13 @@ public class ProActiveTaskLauncher extends TaskLauncher {
     }
 
     /**
-     * Create a new instance of ProActiveTaskLauncher
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
+     * Constructor of the ProActive task launcher.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
-     * @param taskId the identification of the task to launch.
+     * @param initializer represents the class that contains information to initialize this task launcher.
      */
-    public ProActiveTaskLauncher(TaskId taskId) {
-        super(taskId);
-    }
-
-    /**
-     * Create a new instance of ProActiveTaskLauncher
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
-     *
-     * @param taskId the identification of the task to launch.
-     * @param pre the script executed before the task is launched.
-     * @param post the script executed after the task is launched.
-     */
-    public ProActiveTaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
-        super(taskId, pre, post);
+    public ProActiveTaskLauncher(TaskLauncherInitializer initializer) {
+        super(initializer);
     }
 
     /**

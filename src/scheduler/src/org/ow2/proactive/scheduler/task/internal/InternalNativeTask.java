@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.launcher.NativeTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
@@ -91,18 +92,13 @@ public class InternalNativeTask extends InternalTask {
     @Override
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         NativeTaskLauncher launcher;
-        if (getPreScript() == null && getPostScript() == null) {
-            logger_dev.info("Create native task launcher without script");
-            launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                    new Object[] { getId() }, node);
-        } else {
-            logger_dev.info("Create native task launcher with scripts");
-            launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                    new Object[] { getId(), getPreScript(), getPostScript() }, node);
-        }
+
+        logger_dev.info("Create native task launcher");
+        TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer();
+        launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
+                new Object[] { tli }, node);
 
         setExecuterInformations(new ExecuterInformations(launcher, node));
-        setKillTaskTimer(launcher);
 
         return launcher;
     }

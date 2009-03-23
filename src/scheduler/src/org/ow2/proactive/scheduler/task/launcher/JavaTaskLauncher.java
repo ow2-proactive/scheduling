@@ -65,22 +65,10 @@ public class JavaTaskLauncher extends TaskLauncher {
      * Constructor of the java task launcher.
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
-     * @param taskId the task identification.
+     * @param initializer represents the class that contains information to initialize this task launcher.
      */
-    public JavaTaskLauncher(TaskId taskId) {
-        super(taskId);
-    }
-
-    /**
-     * Constructor of the java task launcher.
-     * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
-     *
-     * @param taskId the task identification.
-     * @param pre the script executed before the task.
-     * @param post the script executed after the task.
-     */
-    public JavaTaskLauncher(TaskId taskId, Script<?> pre, Script<?> post) {
-        super(taskId, pre, post);
+    public JavaTaskLauncher(TaskLauncherInitializer initializer) {
+        super(initializer);
     }
 
     /**

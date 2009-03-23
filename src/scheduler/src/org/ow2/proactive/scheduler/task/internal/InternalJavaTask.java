@@ -58,6 +58,7 @@ import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.launcher.ForkedJavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
@@ -114,30 +115,22 @@ public class InternalJavaTask extends InternalTask {
      */
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         JavaTaskLauncher launcher = null;
+
         if (fork || isWallTime()) {
-            String forkedPolicycontent = getJavaPolicy();
             logger_dev.info("Create forked java task launcher");
-            if (getPreScript() == null && getPostScript() == null) {
-                launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
-                        .getName(), new Object[] { getId(), forkedPolicycontent }, node);
-            } else {
-                launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
-                        .getName(), new Object[] { getId(), forkedPolicycontent, getPreScript(),
-                        getPostScript() }, node);
-            }
-            ((ForkedJavaTaskLauncher) launcher).setForkEnvironment(forkEnvironment);
+            TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer();
+            tli.setForkedPolicyContent(getJavaPolicy());
+            tli.setForkEnvironment(forkEnvironment);
+            launcher = (ForkedJavaTaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
+                    .getName(), new Object[] { tli }, node);
         } else {
             logger_dev.info("Create java task launcher");
-            if (getPreScript() == null && getPostScript() == null) {
-                launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                        new Object[] { getId() }, node);
-            } else {
-                launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                        new Object[] { getId(), getPreScript(), getPostScript() }, node);
-            }
+            TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer();
+            launcher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+                    new Object[] { tli }, node);
         }
+
         setExecuterInformations(new ExecuterInformations(launcher, node));
-        setKillTaskTimer(launcher);
 
         return launcher;
     }

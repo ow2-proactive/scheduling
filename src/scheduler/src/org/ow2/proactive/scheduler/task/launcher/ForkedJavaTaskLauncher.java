@@ -58,7 +58,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
@@ -68,7 +67,6 @@ import org.ow2.proactive.scheduler.task.NativeExecutable;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
-import org.ow2.proactive.scripting.Script;
 
 
 /**
@@ -125,28 +123,15 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     /**
-     * Create a new instance of ForkedJavaTaskLauncher.
-     *
-     * @param taskId the task id of the linked executable.
-     * @param forkedPolicyContent the content of the security policy file for this launcher.
-     */
-    public ForkedJavaTaskLauncher(TaskId taskId, String forkedPolicyContent) {
-        super(taskId);
-        securityPolicyContent = forkedPolicyContent;
-    }
-
-    /**
      * Constructor of the forked java task launcher.
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : do not remove.
      *
-     * @param taskId the task identification.
-     * @param forkedPolicyContent the content of the security policy file for this launcher.
-     * @param pre the script executed before the task.
-     * @param post the script executed after the task.
+     * @param initializer represents the class that contains information to initialize this task launcher.
      */
-    public ForkedJavaTaskLauncher(TaskId taskId, String forkedPolicyContent, Script<?> pre, Script<?> post) {
-        super(taskId, pre, post);
-        securityPolicyContent = forkedPolicyContent;
+    public ForkedJavaTaskLauncher(TaskLauncherInitializer initializer) {
+        super(initializer);
+        this.forkEnvironment = initializer.getForkEnvironment();
+        this.securityPolicyContent = initializer.getForkedPolicyContent();
     }
 
     /**
@@ -156,7 +141,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     private void init() {
         Random random = new Random((new Date()).getTime());
         deploymentID = random.nextInt(1000000);
-
         forkedNodeName = this.getClass().getName() + getDeploymentId();
     }
 
@@ -366,20 +350,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
     private long getDeploymentId() {
         return deploymentID;
-    }
-
-    /**
-     * @return the forkEnvironment
-     */
-    public ForkEnvironment getForkEnvironment() {
-        return forkEnvironment;
-    }
-
-    /**
-     * @param forkEnvironment the forkEnvironment to set
-     */
-    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
-        this.forkEnvironment = forkEnvironment;
     }
 
     /**
