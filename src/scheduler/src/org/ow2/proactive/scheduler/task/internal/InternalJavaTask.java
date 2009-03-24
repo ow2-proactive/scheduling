@@ -76,6 +76,9 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 public class InternalJavaTask extends InternalTask {
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
+    /** Policy content for the forked VM */
+    private static StringBuilder policyContent = null;
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -140,23 +143,24 @@ public class InternalJavaTask extends InternalTask {
      *
      * @return the content of the forked java policy or a default one if not found.
      */
-    private String getJavaPolicy() {
-        StringBuilder content;
-        try {
-            content = new StringBuilder("");
-            String forkedPolicyFilePath = PASchedulerProperties
-                    .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_SECURITY_POLICY
-                            .getValueAsString());
-            BufferedReader brin = new BufferedReader(new FileReader(forkedPolicyFilePath));
-            String line;
-            while ((line = brin.readLine()) != null) {
-                content.append(line + "\n");
+    private static String getJavaPolicy() {
+        if (policyContent == null) {
+            try {
+                policyContent = new StringBuilder("");
+                String forkedPolicyFilePath = PASchedulerProperties
+                        .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_SECURITY_POLICY
+                                .getValueAsString());
+                BufferedReader brin = new BufferedReader(new FileReader(forkedPolicyFilePath));
+                String line;
+                while ((line = brin.readLine()) != null) {
+                    policyContent.append(line + "\n");
+                }
+            } catch (Exception e) {
+                logger_dev.error("Policy file not read, applying default basic permission", e);
+                policyContent = new StringBuilder("grant {\npermission java.security.BasicPermission;\n};\n");
             }
-        } catch (Exception e) {
-            logger_dev.error("", e);
-            content = new StringBuilder("grant {\npermission java.security.AllPermission;\n};\n");
         }
-        return content.toString();
+        return policyContent.toString();
     }
 
     /**

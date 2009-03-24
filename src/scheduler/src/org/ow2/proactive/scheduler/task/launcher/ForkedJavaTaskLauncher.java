@@ -282,15 +282,15 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
         Node forkedNode = childRuntime.createLocalNode(forkedNodeName, true, null, DEFAULT_VN_NAME,
                 DEFAULT_JOB_ID);
 
-        /* JavaTaskLauncher is will be an active object created on a newly created ProActive node */
+        /* JavaTaskLauncher will be an active object created on a newly created ProActive node */
         JavaTaskLauncher newLauncher = null;
-        if (pre == null && post == null) {
-            newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                    new Object[] { taskId }, forkedNode);
-        } else {
-            newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
-                    new Object[] { taskId, pre, post }, forkedNode);
-        }
+        logger_dev.info("Create java task launcher");
+        TaskLauncherInitializer tli = new TaskLauncherInitializer();
+        tli.setTaskId(taskId);
+        tli.setPreScript(pre);
+        tli.setPostScript(post);
+        newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+                new Object[] { tli }, forkedNode);
         return newLauncher;
     }
 
