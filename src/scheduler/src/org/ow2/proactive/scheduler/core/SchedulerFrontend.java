@@ -31,11 +31,15 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -71,6 +75,7 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.core.jmx.mbean.SchedulerWrapper;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
@@ -129,6 +134,12 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
     /** Scheduler's statistics */
     private StatsImpl stats = new StatsImpl(SchedulerStatus.STARTED);
+    
+    /** Scheduler's MBean Server */
+    private MBeanServer mbs;
+    
+    /** Scheduler's MBean */
+    private SchedulerWrapper schedulerBean;
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -158,6 +169,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         policyFullName = policyFullClassName;
         logger_dev.debug("Policy used is " + policyFullClassName);
         jobs = new HashMap<JobId, IdentifiedJob>();
+        //Register the scheduler MBean
+        this.registerMBean();
     }
 
     /**
@@ -823,6 +836,24 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
         return true;
     }
+    
+    /**
+     * Register the Scheduler MBean
+     */
+    private void registerMBean() {
+    	//Get the platform MBeanServer
+        mbs = ManagementFactory.getPlatformMBeanServer();
+        // Unique identification of Scheduler MBean
+        schedulerBean = new SchedulerWrapper();
+        ObjectName schedulerName = null;
+        try {
+        	// Uniquely identify the MBeans and register them with the platform MBeanServer 
+        	schedulerName = new ObjectName("SchedulerFrontend:name=SchedulerMBean");
+        	mbs.registerMBean(schedulerBean, schedulerName);
+        } catch(Exception e) {
+        	e.printStackTrace();
+        }
+    }
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -1037,6 +1068,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case RM_DOWN:
             case RM_UP:
             case POLICY_CHANGED:
+            	schedulerBean.schedulerStateUpdated(eventType);
                 dispatchSchedulerStateUpdated(eventType);
                 break;
             default:
@@ -1048,6 +1080,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobSubmitted(org.ow2.proactive.scheduler.common.job.JobState)
      */
     public void jobSubmitted(JobState job) {
+    	schedulerBean.jobSubmittedEvent(job);
         //stats
         stats.increaseSubmittedJobCount(job.getType());
         stats.submitTime();
@@ -1063,9 +1096,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case JOB_RESUMED:
             case JOB_PENDING_TO_RUNNING:
             case JOB_CHANGE_PRIORITY:
+            	schedulerBean.jobStateUpdated(notification);
                 dispatchJobStateUpdated(owner, notification);
                 break;
             case JOB_RUNNING_TO_FINISHED:
+            	schedulerBean.jobRunningToFinishedEvent(notification.getData());
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 dispatchJobStateUpdated(owner, notification);
@@ -1073,6 +1108,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 stats.increaseFinishedJobCount(notification.getData().getNumberOfFinishedTasks());
                 break;
             case JOB_REMOVE_FINISHED:
+            	schedulerBean.jobRemoveFinishedEvent(notification.getData());
                 //removing jobs from the global list : this job is no more managed
                 jobs.remove(notification.getData().getJobId());
                 dispatchJobStateUpdated(owner, notification);
@@ -1091,6 +1127,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
+            	schedulerBean.taskStateUpdated(notification);
                 dispatchTaskStateUpdated(owner, notification);
                 break;
             default:
@@ -1105,6 +1142,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     public void usersUpdated(NotificationData<UserIdentification> notification) {
         switch (notification.getEventType()) {
             case USERS_UPDATE:
+            	schedulerBean.usersUpdate(notification.getData());
                 dispatchUsersUpdated(notification);
                 break;
             default:
@@ -1112,5 +1150,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                     notification.getEventType());
         }
     }
-
+    
 }
+

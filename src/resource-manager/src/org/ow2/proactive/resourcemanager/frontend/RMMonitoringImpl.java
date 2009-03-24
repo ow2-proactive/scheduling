@@ -32,16 +32,19 @@
 package org.ow2.proactive.resourcemanager.frontend;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
@@ -51,6 +54,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
+import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMWrapper;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -76,6 +80,12 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     private RMCoreInterface rmcore;
     private HashMap<UniqueID, RMEventListener> RMListeners;
     private String MonitoringUrl = null;
+    
+    /** Scheduler's MBean Server */
+    private MBeanServer mbs = null;
+    
+    /** Resource Manager's MBean */
+    private RMWrapper rMBean = null;
 
     // ----------------------------------------------------------------------//
     // CONSTRUTORS
@@ -91,6 +101,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     public RMMonitoringImpl(RMCoreInterface rmcore) {
         RMListeners = new HashMap<UniqueID, RMEventListener>();
         this.rmcore = rmcore;
+        // Register the Resource Manager MBean
+        this.registerMBean();
     }
 
     /**
@@ -118,6 +130,24 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         this.RMListeners.put(id, listener);
         return rmcore.getRMInitialState();
+    }
+    
+    /**
+     * Register the Resource Manager MBean
+     */
+    private void registerMBean() {
+    	//Get the platform MBeanServer
+        mbs = ManagementFactory.getPlatformMBeanServer();
+        // Unique identification of Scheduler MBean
+        rMBean = new RMWrapper();
+        ObjectName rMName = null;
+        try {
+        	// Uniquely identify the MBeans and register them with the platform MBeanServer 
+        	rMName = new ObjectName("SchedulerFrontend:name=RMBean");
+        	mbs.registerMBean(rMBean, rMName);
+        } catch(Exception e) {
+        	e.printStackTrace();
+        }
     }
 
     /**
@@ -161,6 +191,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
     public void rmShutDownEvent(RMEvent evt) {
+    	rMBean.rmShutDownEvent(evt);
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.SHUTDOWN, new Class<?>[] { RMEvent.class }, evt);
     }
@@ -169,6 +200,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShuttingDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
     public void rmShuttingDownEvent(RMEvent evt) {
+    	rMBean.rmShuttingDownEvent(evt);
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.SHUTTING_DOWN, new Class<?>[] { RMEvent.class }, evt);
     }
@@ -177,6 +209,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmStartedEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
     public void rmStartedEvent(RMEvent evt) {
+    	rMBean.rmStartedEvent(evt);
         evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.STARTED, new Class<?>[] { RMEvent.class }, evt);
     }
@@ -201,6 +234,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeAddedEvent(RMNodeEvent n) {
+    	rMBean.nodeAddedEvent(n);
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_ADDED, new Class<?>[] { RMNodeEvent.class }, n);
     }
@@ -209,6 +243,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeFreeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeFreeEvent(RMNodeEvent n) {
+    	rMBean.nodeFreeEvent(n);
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_FREE, new Class<?>[] { RMNodeEvent.class }, n);
     }
@@ -217,6 +252,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeBusyEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeBusyEvent(RMNodeEvent n) {
+    	rMBean.nodeBusyEvent(n);
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_BUSY, new Class<?>[] { RMNodeEvent.class }, n);
     }
@@ -233,6 +269,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeDownEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeDownEvent(RMNodeEvent n) {
+    	rMBean.nodeBusyEvent(n);
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_DOWN, new Class<?>[] { RMNodeEvent.class }, n);
     }
@@ -241,6 +278,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeRemovedEvent(RMNodeEvent n) {
+    	rMBean.nodeRemovedEvent(n);
         n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_REMOVED, new Class<?>[] { RMNodeEvent.class }, n);
     }
