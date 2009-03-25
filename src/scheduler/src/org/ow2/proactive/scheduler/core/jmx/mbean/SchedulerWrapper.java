@@ -393,50 +393,50 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
 	}
 	
 	/**
-     * Getter methods for KPI values
-     * 
-     * @return current mean job pending time as formatted duration
-     */
-	public String getMeanJobPendingTime() {
-		return Tools.getFormattedDuration(0, this.meanJobPendingTime);
-	}
-
-	/**
-	 * @return current mean job execution time as formatted duration
-	 */
-	public String getMeanJobExecutionTime() {
-		return Tools.getFormattedDuration(0, this.meanJobExecutionTime);
-	}
-
-	/**
-	 * @return current mean job submitting period as formatted duration
-	 */
-	public String getJobSubmittingPeriod() {
-		return Tools.getFormattedDuration(0,this.jobSubmittingPeriod);
-	}
-	
-	// UTILITY METHODS
-	
-	/**
-	 * Getter methods for the KPI values as integer
+	 * Getter methods for the KPI values
 	 * 
 	 * @return current mean job pending time as integer
 	 */
-	public int getMeanJobPendingTimeAsInt() {
+	public int getMeanJobPendingTime() {
 		return (int)this.meanJobPendingTime;
 	}
 
 	/**
 	 * @return current mean job execution time as integer
 	 */
-	public int getMeanJobExecutionTimeAsInt() {
+	public int getMeanJobExecutionTime() {
 		return (int)this.meanJobExecutionTime;
 	}
 
 	/**
 	 * @return current mean job submitting period as integer
 	 */
-	public int getJobSubmittingPeriodAsInt() {
+	public int getJobSubmittingPeriod() {
 		return (int)this.jobSubmittingPeriod;
+	}
+	
+	// UTILITY METHODS
+	
+	/**
+     * Getter methods for KPI values as String
+     * 
+     * @return current mean job pending time as formatted duration
+     */
+	public String getFormattedMeanJobPendingTime() {
+		return Tools.getFormattedDuration(0, this.meanJobPendingTime);
+	}
+
+	/**
+	 * @return current mean job execution time as formatted duration
+	 */
+	public String getFormattedMeanJobExecutionTime() {
+		return Tools.getFormattedDuration(0, this.meanJobExecutionTime);
+	}
+
+	/**
+	 * @return current mean job submitting period as formatted duration
+	 */
+	public String getFormattedJobSubmittingPeriod() {
+		return Tools.getFormattedDuration(0,this.jobSubmittingPeriod);
 	}
 }

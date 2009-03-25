@@ -237,39 +237,11 @@ public class RMWrapper implements RMWrapperMBean {
 	}
 
 	/**
-	 * Getter method for the KPI value timePercentageOfNodesInactivity as String
-	 * 
-	 * @return the current percentage time of nodes inactivity as String
-	 */
-	public String getTimePercentageOfNodesInactivity() {
-		String result = Double.toString(((double)this.timePercentageOfNodesInactivity/(double)this.totalTimeOfAllAvailableNodes)*100);
-		if(result.length() > 5) {
-			result = result.substring(0, 5);
-		}
-		return result+"%";
-	}
-	
-	/**
-	 * Getter method for the KPI value timePercentageOfNodesUsage as String
-	 * 
-	 * @return the current percentage time of nodes usage as String
-	 */
-	public String getTimePercentageOfNodesUsage() {
-		String result = Double.toString(((double)this.timePercentageOfNodesUsage/(double)this.totalTimeOfAllAvailableNodes)*100);
-		if(result.length() > 5) {
-			result = result.substring(0, 5);
-		}
-		return result+"%";
-	}
-	
-	// UTILITY METHODS
-	
-	/**
 	 * It`s the percentage time of inactivity of all the available nodes 
 	 * 
 	 * @return the percentage time of nodes inactivity as integer
 	 */
-	public int getTimePercentageNodesInactivityAsInt() {
+	public int getTimePercentageOfNodesInactivity() {
 		return (int)(((double)this.timePercentageOfNodesInactivity/(double)this.totalTimeOfAllAvailableNodes)*100);
 	}
 	
@@ -278,7 +250,29 @@ public class RMWrapper implements RMWrapperMBean {
 	 * 
 	 * @return the percentage time of nodes usage as integer
 	 */
-	public int getTimePercentageNodesUsageAsInt() {
+	public int getTimePercentageOfNodesUsage() {
 		return (int)(((double)this.timePercentageOfNodesUsage/(double)this.totalTimeOfAllAvailableNodes)*100);
+	}
+
+	
+	
+	// UTILITY METHODS
+	
+	/**
+	 * Getter method for the KPI value timePercentageOfNodesInactivity as double
+	 * 
+	 * @return the current percentage time of nodes inactivity as double
+	 */
+	public double getTimePercentageOfNodesInactivityAsDouble() {
+		return (((double)this.timePercentageOfNodesInactivity/(double)this.totalTimeOfAllAvailableNodes)*100);
+	}
+	
+	/**
+	 * Getter method for the KPI value timePercentageOfNodesUsage as double
+	 * 
+	 * @return the current percentage time of nodes usage as double
+	 */
+	public double getTimePercentageOfNodesUsageAsDouble() {
+		return (((double)this.timePercentageOfNodesUsage/(double)this.totalTimeOfAllAvailableNodes)*100);
 	}
 }

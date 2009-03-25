@@ -78,30 +78,30 @@ public interface RMWrapperMBean {
 	public String getRMState();
 	
 	/**
-	 * It`s the percentage time of inactivity of all the available nodes as String
+	 * It`s the percentage time of inactivity of all the available nodes
 	 * 
-	 * @return the current percentage time of nodes inactivity as String
+	 * @return the current percentage time of nodes inactivity
 	 */
-	public String getTimePercentageOfNodesInactivity();
+	public int getTimePercentageOfNodesInactivity();
 	
 	/**
-	 * It`s the percentage time of usage of all the available nodes as String
+	 * It`s the percentage time of usage of all the available nodes
 	 * 
-	 * @return the current percentage time of nodes usage as String
+	 * @return the current percentage time of nodes usage
 	 */
-	public String getTimePercentageOfNodesUsage();
+	public int getTimePercentageOfNodesUsage();
 	
 	/**
-	 * It`s the percentage time of inactivity of all the available nodes as integer
+	 * It`s the percentage time of inactivity of all the available nodes as double
 	 * 
-	 * @return the current percentage time of nodes inactivity as integer
+	 * @return the current percentage time of nodes inactivity as double
 	 */
-	public int getTimePercentageNodesInactivityAsInt();
+	public double getTimePercentageOfNodesInactivityAsDouble();
 	
 	/**
-	 * It`s the percentage time of usage of all the available nodes as integer
+	 * It`s the percentage time of usage of all the available nodes as double
 	 * 
-	 * @return the current percentage time of nodes usage as integer
+	 * @return the current percentage time of nodes usage as double
 	 */
-	public int getTimePercentageNodesUsageAsInt();
+	public double getTimePercentageOfNodesUsageAsDouble();
 }
