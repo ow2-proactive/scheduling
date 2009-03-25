@@ -107,7 +107,7 @@ public class TestJobAborted extends FunctionalTest {
 
         Map<String, TaskResult> results = res.getAllResults();
         //check that number of results correspond to 1
-        Assert.assertEquals(results.size(), 1);
+        Assert.assertEquals(1, results.size());
         Assert.assertNotNull(results.get("task2").getException());
 
         //remove jobs and check its event

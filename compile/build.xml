@@ -269,7 +269,7 @@
 		<junitMacro testsuite="rm.testsuite"/>
 	</target>
 
-	<target name="junit.scheduler" depends="deploy.scheduler" description="Run scheduler's tests">		
+	<target name="junit.scheduler" depends="deploy.scheduler.worker" description="Run scheduler's tests">		
 		<junitMacro testsuite="scheduler.testsuite"/>
 	</target>
 

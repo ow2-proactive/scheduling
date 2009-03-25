@@ -69,7 +69,7 @@ if [ "$1" = "client" ]
 then
 	LOG4J_FILE=file:${PA_SCHEDULER}/config/log4j/scheduler-log4j-client
 else
-	LOG4J_FILE=file:${PA_SCHEDULER}/config/log4j/scheduler-log4j
+	LOG4J_FILE=file:${PA_SCHEDULER}/config/log4j/scheduler-log4j-server
 fi
 
 JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Dproactive.configuration=$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml -Djava.security.policy=$PA_SCHEDULER/config/scheduler.java.policy -Dlog4j.configuration=$LOG4J_FILE -Dproactive.home=$PA_SCHEDULER -Dpa.scheduler.home=$PA_SCHEDULER -Dpa.rm.home=$PA_SCHEDULER -Dderby.stream.error.file=$PA_SCHEDULER/.logs/derby.log"
