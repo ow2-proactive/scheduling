@@ -194,31 +194,31 @@
     </target>
 	
 	<target name="deploy.common" depends="-deployCopy, compile.common" description="Populate Common dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/ProActive_SRM-common.jar">
+		<jar destfile="${deploy.lib.dir}/${scheduler.common.jar}">
 			<fileset dir="${cl.common.dir}" includes="**" />
         </jar>
 	</target>
 
 	<target name="deploy.rm" depends="-deployCopy, compile.rm, deploy.common" description="Populate Resourcemanager dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/ProActive_ResourceManager.jar">
+		<jar destfile="${deploy.lib.dir}/${scheduler.rm.jar}">
 			<fileset dir="${cl.rm.dir}" includes="**" />
         </jar>
 	</target>
 
 	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler"  description="Populate Scheduler and Resource Manager dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/ProActive_Scheduler-core.jar">
+		<jar destfile="${deploy.lib.dir}/${scheduler.core.jar}">
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
         </jar>
 	</target>
 
 	<target name="deploy.scheduler.client" depends="deploy.scheduler" description="Generate a client side Scheduler library">
-			<jar destfile="${deploy.lib.dir}/ProActive_Scheduler-client.jar">
+			<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}">
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
 				<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
 	        </jar>
 	</target>
 
-	<target name="deploy.all" depends="deploy.common, deploy.scheduler, deploy.rm, deploy.scheduler.client" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
+	<target name="deploy.all" depends="deploy.common, deploy.scheduler, deploy.rm, deploy.scheduler.client, deploy.scheduler.worker" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
 
 	
 	<!-- ************
@@ -459,4 +459,102 @@
 	
 	<import file="../doc/scheduler.xml" optional="true"/>
 	
+	<!-- last scheduler target for worker library -->
+	<target name="deploy.scheduler.worker" depends="deploy.scheduler" description="Generate a worker side Scheduler library">
+		<mkdir dir="${cl.scheduler.worker.dir}"/>
+
+		<javac  srcdir="${src.scheduler.dir}"
+				destdir="${cl.scheduler.worker.dir}"
+				deprecation="on"
+				source="${source}"
+				debug="${debug}"
+				classpathref="scheduler.libs.worker" >
+			<!-- Use to point every classes that have to be in the worker side library -->
+			<include name="org/ow2/proactive/scheduler/job/JobIdImpl.java" />
+			<include name="org/ow2/proactive/scheduler/exception/RunningProcessException.java" />
+			<include name="org/ow2/proactive/scheduler/exception/StartProcessException.java" />
+			<include name="org/ow2/proactive/scheduler/exception/AdminSchedulerException.java" />
+			<include name="org/ow2/proactive/scheduler/exception/DataBaseNotFoundException.java" />
+			<include name="org/ow2/proactive/scheduler/exception/ProcessException.java" />
+			<include name="org/ow2/proactive/scheduler/exception/AdminException.java" />
+			<include name="org/ow2/proactive/scheduler/task/TaskResultImpl.java" />
+			<include name="org/ow2/proactive/scheduler/task/TaskIdImpl.java" />
+			<include name="org/ow2/proactive/scheduler/task/NativeExecutable.java" />
+			<include name="org/ow2/proactive/scheduler/task/ExecutableContainer.java" />
+			<include name="org/ow2/proactive/scheduler/task/launcher/JavaTaskLauncher.java" />
+			<include name="org/ow2/proactive/scheduler/task/launcher/ForkedJavaTaskLauncher.java" />
+			<include name="org/ow2/proactive/scheduler/task/launcher/NativeTaskLauncher.java" />
+			<include name="org/ow2/proactive/scheduler/task/launcher/TaskLauncher.java" />
+			<include name="org/ow2/proactive/scheduler/task/launcher/ProActiveTaskLauncher.java" />
+			<include name="org/ow2/proactive/scheduler/task/launcher/TaskLauncherInitializer.java" />
+			<include name="org/ow2/proactive/scheduler/task/ExecutableContainerInitializer.java" />
+			<include name="org/ow2/proactive/scheduler/task/JavaExecutableContainer.java" />
+			<include name="org/ow2/proactive/scheduler/task/ForkedJavaExecutable.java" />
+			<include name="org/ow2/proactive/scheduler/task/KillTask.java" />
+			<include name="org/ow2/proactive/scheduler/task/NativeExecutableContainer.java" />
+			<include name="org/ow2/proactive/scheduler/core/properties/PASchedulerProperties.java" />
+			<include name="org/ow2/proactive/scheduler/util/SchedulerDevLoggers.java" />
+			<include name="org/ow2/proactive/scheduler/util/process/EnvVars.java" />
+			<include name="org/ow2/proactive/scheduler/util/process/CaseInsensitiveComparator.java" />
+			<include name="org/ow2/proactive/scheduler/util/process/ThreadReader.java" />
+			<include name="org/ow2/proactive/scheduler/util/process/ProcessTreeKiller.java" />
+			<include name="org/ow2/proactive/scheduler/util/logforwarder/LoggingOutputStream.java" />
+			<include name="org/ow2/proactive/scheduler/util/logforwarder/AsyncAppenderWithStorage.java" />
+			<include name="org/ow2/proactive/scheduler/util/logforwarder/EmptyAppender.java" />
+			<include name="org/ow2/proactive/scheduler/util/classloading/TaskClassServer.java" />
+			<include name="org/ow2/proactive/scheduler/util/classloading/TaskClassLoader.java" />
+			<include name="org/ow2/proactive/scheduler/common/job/JobPriority.java" />
+			<include name="org/ow2/proactive/scheduler/common/job/TaskFlowJob.java" />
+			<include name="org/ow2/proactive/scheduler/common/job/ProActiveJob.java" />
+			<include name="org/ow2/proactive/scheduler/common/job/JobResult.java" />
+			<include name="org/ow2/proactive/scheduler/common/job/JobEnvironment.java" />
+			<include name="org/ow2/proactive/scheduler/common/job/JobType.java" />
+			<include name="org/ow2/proactive/scheduler/common/job/Job.java" />
+			<include name="org/ow2/proactive/scheduler/common/job/JobId.java" />
+			<include name="org/ow2/proactive/scheduler/common/job/JobStatus.java" />
+			<include name="org/ow2/proactive/scheduler/common/db/annotation/Alterable.java" />
+			<include name="org/ow2/proactive/scheduler/common/db/annotation/Unloadable.java" />
+			<include name="org/ow2/proactive/scheduler/common/exception/UserException.java" />
+			<include name="org/ow2/proactive/scheduler/common/exception/DependenceFailedException.java" />
+			<include name="org/ow2/proactive/scheduler/common/exception/ExecutableCreationException.java" />
+			<include name="org/ow2/proactive/scheduler/common/exception/SchedulerException.java" />
+			<include name="org/ow2/proactive/scheduler/common/SchedulerConstants.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/RestartMode.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/TaskDescriptor.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/JavaTask.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/ForkEnvironment.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/TaskLogs.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/NativeTask.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/util/BooleanWrapper.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/util/IntegerWrapper.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/util/ResultPreviewTool.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/util/BigString.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/UpdatableProperties.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/ResultPreview.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/ProActiveTask.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/Log4JTaskLogs.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/TaskId.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/Task.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/SimpleTaskLogs.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/TaskResult.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/executable/Executable.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/executable/ProActiveExecutable.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/executable/JavaExecutable.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/CommonAttribute.java" />
+			<include name="org/ow2/proactive/scheduler/common/task/TaskStatus.java" />
+			<include name="org/ow2/proactive/scheduler/common/util/Tools.java" />
+			<include name="org/ow2/proactive/scheduler/common/util/SchedulerLoggers.java" />
+			<include name="org/ow2/proactive/scheduler/common/util/JarUtils.java" />
+			<include name="org/ow2/proactive/scheduler/common/util/SimpleLoggerServer.java" />
+			<include name="org/ow2/proactive/scheduler/common/util/RegexpMatcher.java" />
+			<include name="org/ow2/proactive/scheduler/common/TaskTerminateNotification.java" />
+		</javac>
+
+		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}">
+			<fileset dir="${cl.scheduler.worker.dir}" includes="**" />
+        </jar>
+
+		<delete dir="${cl.scheduler.worker.dir}" />
+	</target>
+
 </project>

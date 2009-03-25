@@ -43,7 +43,6 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 
 
@@ -59,7 +58,7 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
  * {@link #setCancelJobOnError(boolean)} used if you want to abort the job if an exception occurred in at least one of the task.<br>
  * {@link #setLogFile(String)} allow you to save the output of the job tasks in a specific file.<br>
  * <p>
- * Once the job created, you can submit it to the scheduler using the {@link UserSchedulerInterface}.
+ * Once the job created, you can submit it to the scheduler using the UserSchedulerInterface.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9

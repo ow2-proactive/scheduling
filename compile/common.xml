@@ -40,6 +40,7 @@
 
 	<property name="cl.common.dir"    value="${classes.dir}/common" />
 	<property name="cl.scheduler.dir"    value="${classes.dir}/scheduler" />
+	<property name="cl.scheduler.worker.dir"    value="${cl.scheduler.dir}/worker" />
 	<property name="cl.scheduler.tests.dir"    value="${classes.dir}/schedulerTests" />
 	<property name="cl.rm.dir"           value="${classes.dir}/resource-manager" />
 	<property name="cl.rm.tests.dir"     value="${classes.dir}/resource-managerTests" />
@@ -53,8 +54,6 @@
 	<property name="proactive.ext.path" value="${proactive.path}/ext" />
 	<property name="scheduler.path"    value="${proactive.path}/scheduler"/>
 	<property name="rm.path"    		value="${proactive.path}/resourcemanager"/>
-
-	
 	
 	<property name="scheduler-plugin.dir" value="${base.dir}/scheduler-plugins-src" />
 	<property name="resourcemanager-plugin.dir" value="${base.dir}/resource-manager-plugin-src" />
@@ -70,6 +69,18 @@
 	<property name="clover.historypoint.dir"  value="${base.dir}/clover_db" />
 
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
+
+
+	<!-- ================================================================ -->
+    <!--                    		jar  names                            -->
+	<!--  =============================================================== -->
+
+	<property name="scheduler.common.jar"        value="ProActive_SRM-common.jar" />
+	<property name="scheduler.rm.jar"            value="ProActive_ResourceManager.jar" />
+	<property name="scheduler.core.jar"          value="ProActive_Scheduler-core.jar" />
+	<property name="scheduler.client.jar"        value="ProActive_Scheduler-client.jar" />
+	<property name="scheduler.worker.jar"        value="ProActive_Scheduler-worker.jar" />
+
 
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
@@ -107,6 +118,14 @@
 		<pathelement location="${cl.common.dir}" />
 	</path>
 	
+	<path id="scheduler.libs.worker">
+		<fileset dir="${deploy.lib.dir}">
+			<include name="*.jar"/>
+			<exclude name="${scheduler.client.jar}"/>
+			<exclude name="${scheduler.core.jar}"/>
+		</fileset>
+	</path>
+
 	<path id="project.classpath">
 		<fileset dir="${lib.dir}">
 			<include name="ProActive/**/*.jar"/>
@@ -135,4 +154,5 @@
 		<pathelement path="${cl.scheduler.tests.dir}"/>
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 	</path>
+
 </project>
