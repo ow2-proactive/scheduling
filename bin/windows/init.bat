@@ -34,6 +34,7 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	FOR %%j IN ("%PA_SCHEDULER%\lib\hibernate\annotation\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\lib\hibernate\core\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
+	SET JAR=
 	rem Jars needed by the scheduler
 	FOR %%j IN ("%PA_SCHEDULER%\dist\lib\*.jar") DO SET JARS=!JARS!;%%j
 )
