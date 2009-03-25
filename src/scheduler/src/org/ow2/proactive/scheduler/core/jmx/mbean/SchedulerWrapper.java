@@ -117,7 +117,7 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
 
     /**
      * Methods for dispatching events
-     *
+     *  
      * Call the MBean event for the related Scheduler Updated event type
      *
      * @param eventType
@@ -188,9 +188,9 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
 
     /**
      * Each time that there`s an event is done the related update
-     *
+     * 
      * This is a canonical event to calculate the meanJobPendingTime KPI
-     *
+     * 
      * @param job info
      */
     private void jobPendingToRunningEvent(JobInfo info) {
@@ -216,7 +216,7 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
 
     /**
      * This is a canonical event to calculate the meanJobExecutionTime KPI
-     *
+     * 
      * @param job info
      */
     public void jobRunningToFinishedEvent(JobInfo info) {
@@ -281,7 +281,7 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
 
     // PRIVATE METHODS FOR CALCULATING KPIs
 
-    /**
+    /**  
      * After a given number of Jobs we can have a good current estimation of the mean Job Pending Time
      * calculated each time dividing the accumulator time by the counter.
      * 
@@ -355,115 +355,115 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      * 
      * @return current number of connected users
      */
-	public int getNumberOfConnectedUsers() {
-		return this.numberOfConnectedUsers;
-	}
+    public int getNumberOfConnectedUsers() {
+        return this.numberOfConnectedUsers;
+    }
 
-	/**
-	 * @return current number of finished jobs
-	 */
-	public int getNumberOfFinishedJobs() {
-		return this.numberOfFinishedJobs;
-	}
+    /**
+     * @return current number of finished jobs
+     */
+    public int getNumberOfFinishedJobs() {
+        return this.numberOfFinishedJobs;
+    }
 
-	/**
-	 * @return current number of finished tasks
-	 */
-	public int getNumberOfFinishedTasks() {
-		return this.numberOfFinishedTasks;
-	}
+    /**
+     * @return current number of finished tasks
+     */
+    public int getNumberOfFinishedTasks() {
+        return this.numberOfFinishedTasks;
+    }
 
-	public int getNumberOfPendingJobs() {
-		return this.numberOfPendingJobs;
-	}
+    public int getNumberOfPendingJobs() {
+        return this.numberOfPendingJobs;
+    }
 
-	/**
-	 * @return current number of pending tasks
-	 */
-	public int getNumberOfPendingTasks() {
-		return this.numberOfPendingTasks;
-	}
+    /**
+     * @return current number of pending tasks
+     */
+    public int getNumberOfPendingTasks() {
+        return this.numberOfPendingTasks;
+    }
 
-	/**
-	 * @return current number of running jobs
-	 */
-	public int getNumberOfRunningJobs() {
-		return this.numberOfRunningJobs;
-	}
+    /**
+     * @return current number of running jobs
+     */
+    public int getNumberOfRunningJobs() {
+        return this.numberOfRunningJobs;
+    }
 
-	/**
-	 * @return current number of running tasks
-	 */
-	public int getNumberOfRunningTasks() {
-		return this.numberOfRunningTasks;
-	}
+    /**
+     * @return current number of running tasks
+     */
+    public int getNumberOfRunningTasks() {
+        return this.numberOfRunningTasks;
+    }
 
-	/**
-	 * @return current state of the Scheduler
-	 */
-	public String getSchedulerState() {
-		return this.schedulerState.toString();
-	}
+    /**
+     * @return current state of the Scheduler
+     */
+    public String getSchedulerState() {
+        return this.schedulerState.toString();
+    }
 
-	/**
-	 * @return current number of jobs submitted to the Scheduler
-	 */
-	public int getTotalNumberOfJobs() {
-		return this.totalNumberOfJobs;
-	}
+    /**
+     * @return current number of jobs submitted to the Scheduler
+     */
+    public int getTotalNumberOfJobs() {
+        return this.totalNumberOfJobs;
+    }
 
-	/**
-	 * @return current number of tasks submitted to the Scheduler
-	 */
-	public int getTotalNumberOfTasks() {
-		return this.totalNumberOfTasks;
-	}
-	
-	/**
-	 * Getter methods for the KPI values
-	 * 
-	 * @return current mean job pending time as integer
-	 */
-	public int getMeanJobPendingTime() {
-		return (int)this.meanJobPendingTime;
-	}
+    /**
+     * @return current number of tasks submitted to the Scheduler
+     */
+    public int getTotalNumberOfTasks() {
+        return this.totalNumberOfTasks;
+    }
 
-	/**
-	 * @return current mean job execution time as integer
-	 */
-	public int getMeanJobExecutionTime() {
-		return (int)this.meanJobExecutionTime;
-	}
+    /**
+     * Getter methods for the KPI values
+     * 
+     * @return current mean job pending time as integer
+     */
+    public int getMeanJobPendingTime() {
+        return (int) this.meanJobPendingTime;
+    }
 
-	/**
-	 * @return current mean job submitting period as integer
-	 */
-	public int getJobSubmittingPeriod() {
-		return (int)this.jobSubmittingPeriod;
-	}
-	
-	// UTILITY METHODS
-	
-	/**
+    /**
+     * @return current mean job execution time as integer
+     */
+    public int getMeanJobExecutionTime() {
+        return (int) this.meanJobExecutionTime;
+    }
+
+    /**
+     * @return current mean job submitting period as integer
+     */
+    public int getJobSubmittingPeriod() {
+        return (int) this.jobSubmittingPeriod;
+    }
+
+    // UTILITY METHODS
+
+    /**
      * Getter methods for KPI values as String
      * 
      * @return current mean job pending time as formatted duration
      */
-	public String getFormattedMeanJobPendingTime() {
-		return Tools.getFormattedDuration(0, this.meanJobPendingTime);
-	}
+    public String getFormattedMeanJobPendingTime() {
+        return Tools.getFormattedDuration(0, this.meanJobPendingTime);
+    }
 
-	/**
-	 * @return current mean job execution time as formatted duration
-	 */
-	public String getFormattedMeanJobExecutionTime() {
-		return Tools.getFormattedDuration(0, this.meanJobExecutionTime);
-	}
+    /**
+     * @return current mean job execution time as formatted duration
+     */
+    public String getFormattedMeanJobExecutionTime() {
+        return Tools.getFormattedDuration(0, this.meanJobExecutionTime);
+    }
 
-	/**
-	 * @return current mean job submitting period as formatted duration
-	 */
-	public String getFormattedJobSubmittingPeriod() {
-		return Tools.getFormattedDuration(0,this.jobSubmittingPeriod);
-	}
+    /**
+     * @return current mean job submitting period as formatted duration
+     */
+    public String getFormattedJobSubmittingPeriod() {
+        return Tools.getFormattedDuration(0, this.jobSubmittingPeriod);
+    }
 }

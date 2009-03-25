@@ -111,41 +111,41 @@ public interface SchedulerWrapperMBean {
      *
      * @return The number of finished Tasks of the scheduler.
      */
-	public int getNumberOfFinishedTasks();
-	
-	/**
-	 * @return current mean job pending time as integer
-	 */
-	public int getMeanJobPendingTime();
-	
-	/**
-	 * @return current mean job execution time as integer
-	 */
-	public int getMeanJobExecutionTime();
-	
-	/**
-	 * @return current mean job submitting period as integer
-	 */
-	public int getJobSubmittingPeriod();
-	
-	/**
+    public int getNumberOfFinishedTasks();
+
+    /**
+     * @return current mean job pending time as integer
+     */
+    public int getMeanJobPendingTime();
+
+    /**
+     * @return current mean job execution time as integer
+     */
+    public int getMeanJobExecutionTime();
+
+    /**
+     * @return current mean job submitting period as integer
+     */
+    public int getJobSubmittingPeriod();
+
+    /**
      * Returns the Key Performance Indicator related to the average of pending time for a job.
      *
      * @return A string representing the average pending time for a job.
      */
-	public String getFormattedMeanJobPendingTime();
-	
-	/**
+    public String getFormattedMeanJobPendingTime();
+
+    /**
      * Returns the Key Performance Indicator related to the average of executing time for a job.
      *
      * @return A string representing the average executing time for a job.
      */
-	public String getFormattedMeanJobExecutionTime();
-	
-	/**
+    public String getFormattedMeanJobExecutionTime();
+
+    /**
      * Returns the Key Performance Indicator related to the average period of arrival time for a job.
      *
      * @return A string representing the average submitting period for a job.
      */
-	public String getFormattedJobSubmittingPeriod();
+    public String getFormattedJobSubmittingPeriod();
 }

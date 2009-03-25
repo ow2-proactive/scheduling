@@ -42,67 +42,67 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public interface RMWrapperMBean {
-	
-	/**
-	 * Method to get the total number of nodes used by the Resource Manager
-	 *
-	 * @return the current number of total nodes available
-	 */
-	public int getTotalNumberOfNodes();
-	
-	/**
-	 * Method to get the number of free nodes used by the Resource Manager 
-	 * 
-	 * @return the current number of free nodes
-	 */
-	public int getNumberOfFreeNodes();
-	
-	/**
-	 * Method to get the number of busy nodes used by the Resource Manager
-	 * 
-	 * @return the current number of busy nodes
-	 */
-	public int getNumberOfBusyNodes();
-	
-	/**
-	 * Method to get the number of down nodes used by the Resource Manager
-	 * 
-	 * @return the current number of down nodes
-	 */
-	public int getNumberOfDownNodes();
-	
-	/**
-	 * Method to get the state of the Resource Manager 
-	 * 
-	 * @return the current state of the resource manager
-	 */
-	public String getRMState();
-	
-	/**
-	 * It`s the percentage time of inactivity of all the available nodes
-	 * 
-	 * @return the current percentage time of nodes inactivity
-	 */
-	public int getTimePercentageOfNodesInactivity();
-	
-	/**
-	 * It`s the percentage time of usage of all the available nodes
-	 * 
-	 * @return the current percentage time of nodes usage
-	 */
-	public int getTimePercentageOfNodesUsage();
-	
-	/**
-	 * It`s the percentage time of inactivity of all the available nodes as double
-	 * 
-	 * @return the current percentage time of nodes inactivity as double
-	 */
-	public double getTimePercentageOfNodesInactivityAsDouble();
-	
-	/**
-	 * It`s the percentage time of usage of all the available nodes as double
-	 * 
-	 * @return the current percentage time of nodes usage as double
-	 */
-	public double getTimePercentageOfNodesUsageAsDouble();
+
+    /**
+     * Method to get the total number of nodes used by the Resource Manager
+     *
+     * @return the current number of total nodes available
+     */
+    public int getTotalNumberOfNodes();
+
+    /**
+     * Method to get the number of free nodes used by the Resource Manager 
+     * 
+     * @return the current number of free nodes
+     */
+    public int getNumberOfFreeNodes();
+
+    /**
+     * Method to get the number of busy nodes used by the Resource Manager
+     * 
+     * @return the current number of busy nodes
+     */
+    public int getNumberOfBusyNodes();
+
+    /**
+     * Method to get the number of down nodes used by the Resource Manager
+     * 
+     * @return the current number of down nodes
+     */
+    public int getNumberOfDownNodes();
+
+    /**
+     * Method to get the state of the Resource Manager 
+     * 
+     * @return the current state of the resource manager
+     */
+    public String getRMState();
+
+    /**
+     * It`s the percentage time of inactivity of all the available nodes
+     * 
+     * @return the current percentage time of nodes inactivity
+     */
+    public int getTimePercentageOfNodesInactivity();
+
+    /**
+     * It`s the percentage time of usage of all the available nodes
+     * 
+     * @return the current percentage time of nodes usage
+     */
+    public int getTimePercentageOfNodesUsage();
+
+    /**
+     * It`s the percentage time of inactivity of all the available nodes as double
+     * 
+     * @return the current percentage time of nodes inactivity as double
+     */
+    public double getTimePercentageOfNodesInactivityAsDouble();
+
+    /**
+     * It`s the percentage time of usage of all the available nodes as double
+     * 
+     * @return the current percentage time of nodes usage as double
+     */
+    public double getTimePercentageOfNodesUsageAsDouble();
 }

@@ -142,8 +142,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         rMBean = new RMWrapper();
         ObjectName rMName = null;
         try {
-            // Uniquely identify the MBeans and register them with the platform MBeanServer
-            rMName = new ObjectName("SchedulerFrontend:name=RMBean");
+            // Uniquely identify the MBeans and register them with the platform MBeanServer 
+            rMName = new ObjectName("RMFrontend:name=RMBean");
             mbs.registerMBean(rMBean, rMName);
         } catch (Exception e) {
             e.printStackTrace();

@@ -847,7 +847,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         schedulerBean = new SchedulerWrapper();
         ObjectName schedulerName = null;
         try {
-            // Uniquely identify the MBeans and register them with the platform MBeanServer
+            // Uniquely identify the MBeans and register them with the platform MBeanServer 
             schedulerName = new ObjectName("SchedulerFrontend:name=SchedulerMBean");
             mbs.registerMBean(schedulerBean, schedulerName);
         } catch (Exception e) {

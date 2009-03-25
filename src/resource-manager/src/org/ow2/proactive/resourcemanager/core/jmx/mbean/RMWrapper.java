@@ -90,7 +90,7 @@ public class RMWrapper implements RMWrapperMBean {
     }
 
     /**
-     * This is a canonical event to calculate the Key Performance Indicator
+     * This is a canonical event to calculate the Key Performance Indicator 
      * about the average busy percentage time of a node
      *
      * @param event
@@ -109,7 +109,7 @@ public class RMWrapper implements RMWrapperMBean {
     }
 
     /**
-     * This is a canonical event to calculate the Key Performance Indicator
+     * This is a canonical event to calculate the Key Performance Indicator 
      * about the average busy percentage time of a node
      *
      * @param event
@@ -134,7 +134,7 @@ public class RMWrapper implements RMWrapperMBean {
     }
 
     /**
-     * This is a canonical event to calculate the Key Performance Indicator
+     * This is a canonical event to calculate the Key Performance Indicator 
      * about the average busy percentage time of a node
      *
      * @param event
@@ -153,7 +153,7 @@ public class RMWrapper implements RMWrapperMBean {
     }
 
     /**
-     * This is a canonical event to calculate the Key Performance Indicator
+     * This is a canonical event to calculate the Key Performance Indicator 
      * about the average busy percentage time of a node
      *
      * @param event
@@ -202,35 +202,35 @@ public class RMWrapper implements RMWrapperMBean {
 
     /**
      * Methods to get the attributes of the RMWrapper MBean
-     *
+     * 
      * @return the current number of down nodes
      */
     public int getNumberOfDownNodes() {
         return this.numberOfDownNodes;
     }
 
-    /**
+    /** 
      * @return the current number of free nodes
      */
     public int getNumberOfFreeNodes() {
         return this.numberOfFreeNodes;
     }
 
-    /**
+    /** 
      * @return the current number of busy nodes
      */
     public int getNumberOfBusyNodes() {
         return this.numberOfBusyNodes;
     }
 
-    /**
+    /** 
      * @return the current number of total nodes available
      */
     public int getTotalNumberOfNodes() {
         return this.totalNumberOfNodes;
     }
 
-    /**
+    /** 
      * @return the current state of the resource manager
      */
     public String getRMState() {
@@ -238,70 +238,40 @@ public class RMWrapper implements RMWrapperMBean {
     }
 
     /**
-     * Getter method for the KPI value timePercentageOfNodesInactivity as String
-     *
-     * @return the current percentage time of nodes inactivity as String
+     * It`s the percentage time of inactivity of all the available nodes 
+     * 
+     * @return the percentage time of nodes inactivity as integer
      */
-    public String getTimePercentageOfNodesInactivity() {
-        String result = Double
-                .toString(((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
-        if (result.length() > 5) {
-            result = result.substring(0, 5);
-        }
-        return result + "%";
+    public int getTimePercentageOfNodesInactivity() {
+        return (int) (((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 
     /**
-     * Getter method for the KPI value timePercentageOfNodesUsage as String
-     *
-     * @return the current percentage time of nodes usage as String
+     * It`s the percentage time of usage of all the available nodes
+     * 
+     * @return the percentage time of nodes usage as integer
      */
-    public String getTimePercentageOfNodesUsage() {
-        String result = Double
-                .toString(((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
-        if (result.length() > 5) {
-            result = result.substring(0, 5);
-        }
-        return result + "%";
+    public int getTimePercentageOfNodesUsage() {
+        return (int) (((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 
     // UTILITY METHODS
 
-	/**
-	 * It`s the percentage time of inactivity of all the available nodes 
-	 * 
-	 * @return the percentage time of nodes inactivity as integer
-	 */
-	public int getTimePercentageOfNodesInactivity() {
-		return (int)(((double)this.timePercentageOfNodesInactivity/(double)this.totalTimeOfAllAvailableNodes)*100);
-	}
-	
-	/**
-	 * It`s the percentage time of usage of all the available nodes
-	 * 
-	 * @return the percentage time of nodes usage as integer
-	 */
-	public int getTimePercentageOfNodesUsage() {
-		return (int)(((double)this.timePercentageOfNodesUsage/(double)this.totalTimeOfAllAvailableNodes)*100);
-	}
-	
-	
-	/**
-	 * Getter method for the KPI value timePercentageOfNodesInactivity as double
-	 * 
-	 * @return the current percentage time of nodes inactivity as double
-	 */
-	public double getTimePercentageOfNodesInactivityAsDouble() {
-		return (((double)this.timePercentageOfNodesInactivity/(double)this.totalTimeOfAllAvailableNodes)*100);
-	}
-	
-	/**
-	 * Getter method for the KPI value timePercentageOfNodesUsage as double
-	 * 
-	 * @return the current percentage time of nodes usage as double
-	 */
-	public double getTimePercentageOfNodesUsageAsDouble() {
-		return (((double)this.timePercentageOfNodesUsage/(double)this.totalTimeOfAllAvailableNodes)*100);
-	}
+    /**
+     * Getter method for the KPI value timePercentageOfNodesInactivity as double
+     * 
+     * @return the current percentage time of nodes inactivity as double
+     */
+    public double getTimePercentageOfNodesInactivityAsDouble() {
+        return (((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
+    }
 
+    /**
+     * Getter method for the KPI value timePercentageOfNodesUsage as double
+     * 
+     * @return the current percentage time of nodes usage as double
+     */
+    public double getTimePercentageOfNodesUsageAsDouble() {
+        return (((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
+    }
 }
