@@ -29,12 +29,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.core.jmx;
+package org.ow2.proactive.scheduler.common.jmx.mbean;
 
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.jmx.SchedulerMBean;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -50,11 +49,11 @@ import org.ow2.proactive.scheduler.common.util.Tools;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class SchedulerWrapper implements SchedulerMBean {
+public class SchedulerWrapper implements SchedulerWrapperMBean {
     /** Scheduler current state */
     private SchedulerStatus schedulerState = SchedulerStatus.STOPPED;
 
-    /** Variables representing the attributes of the SchedulerMBean */
+    /** Variables representing the attributes of the SchedulerWrapperMBean */
     private int totalNumberOfJobs = 0;
 
     private int totalNumberOfTasks = 0;

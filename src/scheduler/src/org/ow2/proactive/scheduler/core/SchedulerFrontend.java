@@ -62,6 +62,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.jmx.mbean.SchedulerWrapper;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -73,7 +74,6 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.core.jmx.SchedulerWrapper;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
@@ -102,7 +102,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
-    private static final String SCHEDULER_BEAN_NAME = "SchedulerFrontend:name=SchedulerMBean";
+    private static final String SCHEDULER_BEAN_NAME = "SchedulerFrontend:name=SchedulerWrapperMBean";
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
     private Map<UniqueID, UserIdentificationImpl> identifications = new HashMap<UniqueID, UserIdentificationImpl>();

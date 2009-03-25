@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.jmx;
+package org.ow2.proactive.scheduler.common.jmx.mbean;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -41,7 +41,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 1.0
  */
 @PublicAPI
-public interface SchedulerMBean {
+public interface SchedulerWrapperMBean {
 
     /**
      * Returns the state of the scheduler.
