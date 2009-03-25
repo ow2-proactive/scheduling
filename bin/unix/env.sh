@@ -35,10 +35,18 @@ then
     for i in $PA_SCHEDULER/lib/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
-    for i in $PA_SCHEDULER/lib/ProActive/*.jar ; do
+#    for i in $PA_SCHEDULER/lib/ProActive/*.jar ; do
+#      CLASSPATH=$CLASSPATH:$i
+#    done
+# Use jar index in proactive to point on other lib required by ProActive.jar
+	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/lib/ProActive/ProActive.jar
+    for i in $PA_SCHEDULER/lib/common/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
-    for i in $PA_SCHEDULER/lib/common/*.jar ; do
+    for i in $PA_SCHEDULER/lib/common/script/*.jar ; do
+      CLASSPATH=$CLASSPATH:$i
+    done
+    for i in $PA_SCHEDULER/lib/common/script/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
     #hibernate libs
@@ -64,7 +72,7 @@ else
 	LOG4J_FILE=file:${PA_SCHEDULER}/config/log4j/scheduler-log4j
 fi
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Dproactive.configuration=$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml -Djava.security.policy=$PA_SCHEDULER/config/scheduler.java.policy -Dlog4j.configuration=$LOG4J_FILE -Dproactive.home=$PA_SCHEDULER -Dpa.scheduler.home=$PA_SCHEDULER -Dpa.rm.home=$PA_SCHEDULER -Dderby.stream.error.file=$PA_SCHEDULER/logs/derby.log"
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Dproactive.configuration=$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml -Djava.security.policy=$PA_SCHEDULER/config/scheduler.java.policy -Dlog4j.configuration=$LOG4J_FILE -Dproactive.home=$PA_SCHEDULER -Dpa.scheduler.home=$PA_SCHEDULER -Dpa.rm.home=$PA_SCHEDULER -Dderby.stream.error.file=$PA_SCHEDULER/.logs/derby.log"
 
 #echo $JAVACMD
 

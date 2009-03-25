@@ -36,6 +36,7 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 
+
 /**
  * This class represents a Managed Bean to allow the management of the Resource Manager 
  * following the JMX standard for management.
@@ -46,195 +47,225 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
  */
 @PublicAPI
 public class RMWrapper implements RMWrapperMBean {
-	/** The state of the Resource Manager */
-	private String rMState = "STOPPED";
-	
-	/** Variables representing the fields of the MBean */
-	private int totalNumberOfNodes = 0;
-	
-	private int numberOfDownNodes = 0;
-	
-	private int numberOfFreeNodes = 0;
-	
-	private int numberOfBusyNodes = 0;
-    
-	private int timePercentageOfNodesInactivity;
-	
+    /** The state of the Resource Manager */
+    private String rMState = "STOPPED";
+
+    /** Variables representing the fields of the MBean */
+    private int totalNumberOfNodes = 0;
+
+    private int numberOfDownNodes = 0;
+
+    private int numberOfFreeNodes = 0;
+
+    private int numberOfBusyNodes = 0;
+
+    private int timePercentageOfNodesInactivity;
+
     private int timePercentageOfNodesUsage;
-    
+
     private int totalTimeOfAllAvailableNodes;
-    
+
     private long previousTimeStamp;
-    
+
     /**
      * Methods to manage the events of the Resource Manager
      * 
      * This is a canonical event to calculate the Key Performance Indicator 
      * about the average busy percentage time of a node
      * 
-	 * @param event
-	 */
-	public void nodeAddedEvent(RMNodeEvent event) {
-		// Each time that there`s an event, update global percentage based on the number of free and
-		// on the number of used nodes in the previous event
-		long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-		this.timePercentageOfNodesInactivity += this.numberOfFreeNodes*interval;
-		this.timePercentageOfNodesUsage += this.numberOfBusyNodes*interval;
-		this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes*interval)+(this.numberOfBusyNodes*interval));
-		this.previousTimeStamp = System.currentTimeMillis();
-		//Update fields
-		this.totalNumberOfNodes++;
-		//When a node is added, initially, it is free
-		this.numberOfFreeNodes++;
-	}
-	
-	/**
-	 * This is a canonical event to calculate the Key Performance Indicator 
-     * about the average busy percentage time of a node
-     *
-	 * @param event
-	 */
-	public void nodeBusyEvent(RMNodeEvent event) {
-		// Each time that there`s an event, update global percentage based on the number of free and
-		// on the number of used nodes in the previous event
-		long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-		this.timePercentageOfNodesInactivity += this.numberOfFreeNodes*interval;
-		this.timePercentageOfNodesUsage += this.numberOfBusyNodes*interval;
-		this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes*interval)+(this.numberOfBusyNodes*interval));
-		this.previousTimeStamp = System.currentTimeMillis();
-		// Update fields
-		this.numberOfFreeNodes--;
-		this.numberOfBusyNodes++;
-	}
+     * @param event
+     */
+    public void nodeAddedEvent(RMNodeEvent event) {
+        // Each time that there`s an event, update global percentage based on the number of free and
+        // on the number of used nodes in the previous event
+        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
+        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
+        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
+        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
+        this.previousTimeStamp = System.currentTimeMillis();
+        //Update fields
+        this.totalNumberOfNodes++;
+        //When a node is added, initially, it is free
+        this.numberOfFreeNodes++;
+    }
 
-	/**
-	 * This is a canonical event to calculate the Key Performance Indicator 
+    /**
+     * This is a canonical event to calculate the Key Performance Indicator
      * about the average busy percentage time of a node
      *
      * @param event
-	 */
-	public void nodeDownEvent(RMNodeEvent event) {
-		// Each time that there`s an event, update global percentage based on the number of free and
-		// on the number of used nodes in the previous event
-		long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-		this.timePercentageOfNodesInactivity += this.numberOfFreeNodes*interval;
-		this.timePercentageOfNodesUsage += this.numberOfBusyNodes*interval;
-		this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes*interval)+(this.numberOfBusyNodes*interval));
-		this.previousTimeStamp = System.currentTimeMillis();
-		// Update fields
-		if(event.getState().equals(NodeState.BUSY)) {
-			this.numberOfBusyNodes--;
-			this.numberOfDownNodes++;
-		} else {
-			this.numberOfFreeNodes--;
-			this.numberOfDownNodes++;
-		}
-		
-	}
+     */
+    public void nodeBusyEvent(RMNodeEvent event) {
+        // Each time that there`s an event, update global percentage based on the number of free and
+        // on the number of used nodes in the previous event
+        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
+        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
+        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
+        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
+        this.previousTimeStamp = System.currentTimeMillis();
+        // Update fields
+        this.numberOfFreeNodes--;
+        this.numberOfBusyNodes++;
+    }
 
-	/**
-	 * This is a canonical event to calculate the Key Performance Indicator 
+    /**
+     * This is a canonical event to calculate the Key Performance Indicator
      * about the average busy percentage time of a node
      *
      * @param event
-	 */
-	public void nodeFreeEvent(RMNodeEvent event) {
-		// Each time that there`s an event, update global percentage based on the number of free and
-		// on the number of used nodes in the previous event
-		long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-		this.timePercentageOfNodesInactivity += this.numberOfFreeNodes*interval;
-		this.timePercentageOfNodesUsage += this.numberOfBusyNodes*interval;
-		this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes*interval)+(this.numberOfBusyNodes*interval));
-		this.previousTimeStamp = System.currentTimeMillis();
-		// Update fields
-		this.numberOfBusyNodes--;
-		this.numberOfFreeNodes++;
-	}
+     */
+    public void nodeDownEvent(RMNodeEvent event) {
+        // Each time that there`s an event, update global percentage based on the number of free and
+        // on the number of used nodes in the previous event
+        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
+        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
+        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
+        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
+        this.previousTimeStamp = System.currentTimeMillis();
+        // Update fields
+        if (event.getState().equals(NodeState.BUSY)) {
+            this.numberOfBusyNodes--;
+            this.numberOfDownNodes++;
+        } else {
+            this.numberOfFreeNodes--;
+            this.numberOfDownNodes++;
+        }
 
-	/**
-	 * This is a canonical event to calculate the Key Performance Indicator 
+    }
+
+    /**
+     * This is a canonical event to calculate the Key Performance Indicator
      * about the average busy percentage time of a node
      *
-	 * @param event
-	 */
-	public void nodeRemovedEvent(RMNodeEvent event) {
-		// Each time that there`s an event, update global percentage based on the number of free and
-		// on the number of used nodes in the previous event
-		long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-		this.timePercentageOfNodesInactivity += this.numberOfFreeNodes*interval;
-		this.timePercentageOfNodesUsage += this.numberOfBusyNodes*interval;
-		this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes*interval)+(this.numberOfBusyNodes*interval));
-		this.previousTimeStamp = System.currentTimeMillis();
-		// Update fields
-		this.totalNumberOfNodes--;
-		//Check the state of the removed node
-		if(event.getState().equals(NodeState.BUSY)) {
-			this.numberOfBusyNodes--;
-		} else if(event.getState().equals(NodeState.FREE)) {
-			this.numberOfFreeNodes--;
-		} else {
-			//If the node is not busy, nor free, it is down
-			this.numberOfDownNodes--;
-		}
-	}
+     * @param event
+     */
+    public void nodeFreeEvent(RMNodeEvent event) {
+        // Each time that there`s an event, update global percentage based on the number of free and
+        // on the number of used nodes in the previous event
+        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
+        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
+        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
+        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
+        this.previousTimeStamp = System.currentTimeMillis();
+        // Update fields
+        this.numberOfBusyNodes--;
+        this.numberOfFreeNodes++;
+    }
 
-	/**
-	 * @param event
-	 */
-	public void rmShutDownEvent(RMEvent event) {
-		rMState = "STOPPED";
-	}
+    /**
+     * This is a canonical event to calculate the Key Performance Indicator
+     * about the average busy percentage time of a node
+     *
+     * @param event
+     */
+    public void nodeRemovedEvent(RMNodeEvent event) {
+        // Each time that there`s an event, update global percentage based on the number of free and
+        // on the number of used nodes in the previous event
+        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
+        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
+        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
+        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
+        this.previousTimeStamp = System.currentTimeMillis();
+        // Update fields
+        this.totalNumberOfNodes--;
+        //Check the state of the removed node
+        if (event.getState().equals(NodeState.BUSY)) {
+            this.numberOfBusyNodes--;
+        } else if (event.getState().equals(NodeState.FREE)) {
+            this.numberOfFreeNodes--;
+        } else {
+            //If the node is not busy, nor free, it is down
+            this.numberOfDownNodes--;
+        }
+    }
 
-	/**
-	 * @param event
-	 */
-	public void rmShuttingDownEvent(RMEvent event) {
-		rMState = "SHUTTING_DOWN";
-	}
+    /**
+     * @param event
+     */
+    public void rmShutDownEvent(RMEvent event) {
+        rMState = "STOPPED";
+    }
 
-	/**
-	 * @param event
-	 */
-	public void rmStartedEvent(RMEvent event) {
-		rMState = "STARTED";
-	}
-  
-	/**
-	 * Methods to get the attributes of the RMWrapper MBean
-	 * 
-	 * @return the current number of down nodes
-	 */
-	public int getNumberOfDownNodes() {
-		return this.numberOfDownNodes;
-	}
+    /**
+     * @param event
+     */
+    public void rmShuttingDownEvent(RMEvent event) {
+        rMState = "SHUTTING_DOWN";
+    }
 
-	/** 
-	 * @return the current number of free nodes
-	 */
-	public int getNumberOfFreeNodes() {
-		return this.numberOfFreeNodes;
-	}
+    /**
+     * @param event
+     */
+    public void rmStartedEvent(RMEvent event) {
+        rMState = "STARTED";
+    }
 
-	/** 
-	 * @return the current number of busy nodes
-	 */
-	public int getNumberOfBusyNodes() {
-		return this.numberOfBusyNodes;
-	}
+    /**
+     * Methods to get the attributes of the RMWrapper MBean
+     *
+     * @return the current number of down nodes
+     */
+    public int getNumberOfDownNodes() {
+        return this.numberOfDownNodes;
+    }
 
-	/** 
-	 * @return the current number of total nodes available
-	 */
-	public int getTotalNumberOfNodes() {
-		return this.totalNumberOfNodes;
-	}
-	
-	/** 
-	 * @return the current state of the resource manager
-	 */
-	public String getRMState() {
-		return this.rMState;
-	}
+    /**
+     * @return the current number of free nodes
+     */
+    public int getNumberOfFreeNodes() {
+        return this.numberOfFreeNodes;
+    }
+
+    /**
+     * @return the current number of busy nodes
+     */
+    public int getNumberOfBusyNodes() {
+        return this.numberOfBusyNodes;
+    }
+
+    /**
+     * @return the current number of total nodes available
+     */
+    public int getTotalNumberOfNodes() {
+        return this.totalNumberOfNodes;
+    }
+
+    /**
+     * @return the current state of the resource manager
+     */
+    public String getRMState() {
+        return this.rMState;
+    }
+
+    /**
+     * Getter method for the KPI value timePercentageOfNodesInactivity as String
+     *
+     * @return the current percentage time of nodes inactivity as String
+     */
+    public String getTimePercentageOfNodesInactivity() {
+        String result = Double
+                .toString(((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
+        if (result.length() > 5) {
+            result = result.substring(0, 5);
+        }
+        return result + "%";
+    }
+
+    /**
+     * Getter method for the KPI value timePercentageOfNodesUsage as String
+     *
+     * @return the current percentage time of nodes usage as String
+     */
+    public String getTimePercentageOfNodesUsage() {
+        String result = Double
+                .toString(((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
+        if (result.length() > 5) {
+            result = result.substring(0, 5);
+        }
+        return result + "%";
+    }
+
+    // UTILITY METHODS
 
 	/**
 	 * It`s the percentage time of inactivity of all the available nodes 
@@ -253,10 +284,7 @@ public class RMWrapper implements RMWrapperMBean {
 	public int getTimePercentageOfNodesUsage() {
 		return (int)(((double)this.timePercentageOfNodesUsage/(double)this.totalTimeOfAllAvailableNodes)*100);
 	}
-
 	
-	
-	// UTILITY METHODS
 	
 	/**
 	 * Getter method for the KPI value timePercentageOfNodesInactivity as double
@@ -275,4 +303,5 @@ public class RMWrapper implements RMWrapperMBean {
 	public double getTimePercentageOfNodesUsageAsDouble() {
 		return (((double)this.timePercentageOfNodesUsage/(double)this.totalTimeOfAllAvailableNodes)*100);
 	}
+
 }

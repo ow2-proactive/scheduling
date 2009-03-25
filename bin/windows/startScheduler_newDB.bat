@@ -3,7 +3,7 @@ echo.
 
 IF EXIST ..\..\SCHEDULER_DB (
     RMDIR /S /Q ..\..\SCHEDULER_DB
-    RM ..\..\logs\derby.log
+    RM ..\..\.logs\derby.log
 )
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat

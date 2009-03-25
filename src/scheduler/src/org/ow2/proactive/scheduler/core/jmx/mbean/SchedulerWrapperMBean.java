@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.core.jmx.mbean;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * MBean interface representing the attributes and the KPI values to monitor the ProActive Scheduler
  *
@@ -41,71 +42,71 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public interface SchedulerWrapperMBean {
-	
-	/**
+
+    /**
      * Returns the state of the scheduler.
      *
      * @return The state of the scheduler.
      */
-	public String getSchedulerState();
-	
-	/**
+    public String getSchedulerState();
+
+    /**
      * Returns the number of users connected to the scheduler.
      * 
      * @return the number of users connected to the scheduler.
      */
-	public int getNumberOfConnectedUsers();
-	
-	/**
+    public int getNumberOfConnectedUsers();
+
+    /**
      * Returns the total number of jobs.
      * 
      * @return the total number of jobs.
      */
-	public int getTotalNumberOfJobs();
-	
-	/**
+    public int getTotalNumberOfJobs();
+
+    /**
      * Returns the number of pending jobs of the scheduler.
      *
      * @return The number of pending jobs of the scheduler.
      */
-	public int getNumberOfPendingJobs();
-	
-	/**
+    public int getNumberOfPendingJobs();
+
+    /**
      * Returns the number of running jobs of the scheduler.
      *
      * @return The number of running jobs of the scheduler.
      */
-	public int getNumberOfRunningJobs();
-	
-	/**
+    public int getNumberOfRunningJobs();
+
+    /**
      * Returns the number of finished jobs of the scheduler.
      *
      * @return The number of finished jobs of the scheduler.
      */
-	public int getNumberOfFinishedJobs();
-	
-	/**
+    public int getNumberOfFinishedJobs();
+
+    /**
      * Returns the total number of Tasks.
      * 
      * @return the total number of Tasks.
      */
-	public int getTotalNumberOfTasks();
-	
-	/**
+    public int getTotalNumberOfTasks();
+
+    /**
      * Returns the number of pending Tasks of the scheduler.
      *
      * @return The number of pending Tasks of the scheduler.
      */
-	public int getNumberOfPendingTasks();
-	
-	/**
+    public int getNumberOfPendingTasks();
+
+    /**
      * Returns the number of running Tasks of the scheduler.
      *
      * @return The number of running Tasks of the scheduler.
      */
-	public int getNumberOfRunningTasks();
-	
-	/**
+    public int getNumberOfRunningTasks();
+
+    /**
      * Returns the number of finished Tasks of the scheduler.
      *
      * @return The number of finished Tasks of the scheduler.

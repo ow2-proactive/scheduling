@@ -47,7 +47,7 @@ IF "%1"=="client" (
 	set LOG4J_FILE=file:%PA_SCHEDULER%/config/log4j/scheduler-log4j
 )
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%PA_SCHEDULER%\config\scheduler.java.policy" -Dlog4j.configuration="%LOG4J_FILE%" -Dderby.stream.error.file="%PA_SCHEDULER%\logs\derby.log"
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="file:%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%PA_SCHEDULER%\config\scheduler.java.policy" -Dlog4j.configuration="%LOG4J_FILE%" -Dderby.stream.error.file="%PA_SCHEDULER%\.logs\derby.log"
 
 rem Adding java tools to the path
 SET OK=1

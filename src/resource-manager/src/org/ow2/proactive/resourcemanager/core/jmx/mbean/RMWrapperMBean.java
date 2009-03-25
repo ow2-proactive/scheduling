@@ -33,6 +33,7 @@ package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * MBean interface representing the attributes and the KPI values to monitor the Resource Manager
  *

@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.util.Tools;
 
+
 /**
  * This class represents a Managed Bean to allow the management of the ProActive Scheduler 
  * following the JMX standard for management.
@@ -51,225 +52,251 @@ import org.ow2.proactive.scheduler.common.util.Tools;
  */
 @PublicAPI
 public class SchedulerWrapper implements SchedulerWrapperMBean {
-	 /** Scheduler current state */
+    /** Scheduler current state */
     private SchedulerStatus schedulerState = SchedulerStatus.STOPPED;
-    
+
     /** 
      * Variables representing the attributes of the SchedulerMBean 
      */
     private int totalNumberOfJobs = 0;
-    
+
     private int totalNumberOfTasks = 0;
-    
+
     private int numberOfPendingJobs = 0;
-    
+
     private int numberOfRunningJobs = 0;
-    
+
     private int numberOfFinishedJobs = 0;
-    
+
     private int numberOfPendingTasks = 0;
-    
+
     private int numberOfRunningTasks = 0;
-    
+
     private int numberOfFinishedTasks = 0;
-    
+
     /** Number of Connected Users */
     private int numberOfConnectedUsers = 0;
-    
+
     /**
      * Variables representing the Key Performance Indicators for the SchedulerWrapper
      */
     private long meanJobPendingTime = 0;
-    
+
     private long meanJobExecutionTime = 0;
-    
+
     private long jobSubmittingPeriod = 0;
-    
+
     /** The counter fields for the KPI values */
     private long counterJobPendingTime = 0;
-    
+
     private long counterJobExecutionTime = 0;
-    
+
     private long counterJobArrivalTime = 0;
-    
+
     /** The cumulative Times */
     private long cumulativePendingTime = 0;
-    
+
     private long cumulativeExecutionTime = 0;
-    
+
     private long cumulativeArrivalTime = 0;
-    
+
     /** The previous submitted time, explained later */
     private long previousSubmittedTime = 0;
-    
+
     /** The Scheduler Started Time */
     private long schedulerStartedTime = 0;
-	
-	/**
+
+    /**
      * Empty constructor required by JMX
      */
     public SchedulerWrapper() {
         /* Empty Constructor required by JMX */
     }
-   
+
     // EVENT MANAGEMENT
-	
-	/**
-	 * Methods for dispatching events
-	 *  
+
+    /**
+     * Methods for dispatching events
+     *
      * Call the MBean event for the related Scheduler Updated event type
      *
      * @param eventType
      */
     public void schedulerStateUpdated(SchedulerEvent eventType) {
-    	switch (eventType) {
-	    	case STARTED: schedulerStartedEvent(); break;
-	    	case STOPPED: this.schedulerState = SchedulerStatus.STOPPED; break;
-	    	case PAUSED: this.schedulerState = SchedulerStatus.PAUSED; break;
-	    	case FROZEN: this.schedulerState = SchedulerStatus.FROZEN; break;
-	    	case RESUMED: this.schedulerState = SchedulerStatus.STARTED; break;
-	    	case SHUTTING_DOWN: this.schedulerState = SchedulerStatus.SHUTTING_DOWN; break;
-	    	case SHUTDOWN: this.schedulerState = SchedulerStatus.STOPPED; break;
-	    	case KILLED: this.schedulerState = SchedulerStatus.KILLED; break;
-    	}
+        switch (eventType) {
+            case STARTED:
+                schedulerStartedEvent();
+                break;
+            case STOPPED:
+                this.schedulerState = SchedulerStatus.STOPPED;
+                break;
+            case PAUSED:
+                this.schedulerState = SchedulerStatus.PAUSED;
+                break;
+            case FROZEN:
+                this.schedulerState = SchedulerStatus.FROZEN;
+                break;
+            case RESUMED:
+                this.schedulerState = SchedulerStatus.STARTED;
+                break;
+            case SHUTTING_DOWN:
+                this.schedulerState = SchedulerStatus.SHUTTING_DOWN;
+                break;
+            case SHUTDOWN:
+                this.schedulerState = SchedulerStatus.STOPPED;
+                break;
+            case KILLED:
+                this.schedulerState = SchedulerStatus.KILLED;
+                break;
+        }
     }
-    
+
     /**
      * Call the MBean event for the related Job Updated event type
      *
      * @param notification data containing job info
      */
     public void jobStateUpdated(NotificationData<JobInfo> notification) {
-    	switch (notification.getEventType()) {
-	    	case JOB_PAUSED: this.numberOfRunningJobs--; break;
-	    	case JOB_RESUMED: this.numberOfRunningJobs++; break;
-	    	case JOB_PENDING_TO_RUNNING: jobPendingToRunningEvent(notification.getData()); break;
+        switch (notification.getEventType()) {
+            case JOB_PAUSED:
+                this.numberOfRunningJobs--;
+                break;
+            case JOB_RESUMED:
+                this.numberOfRunningJobs++;
+                break;
+            case JOB_PENDING_TO_RUNNING:
+                jobPendingToRunningEvent(notification.getData());
+                break;
         }
     }
-    
+
     /**
      * Call the MBean event for the related Task Updated event type
      *
      * @param notification data containing task info
      */
     public void taskStateUpdated(NotificationData<TaskInfo> notification) {
-    	switch (notification.getEventType()) {
-	    	case TASK_PENDING_TO_RUNNING: taskPendingToRunningEvent(notification.getData()); break;
-	    	case TASK_RUNNING_TO_FINISHED: taskRunningToFinishedEvent(notification.getData()); break;
-    	}
+        switch (notification.getEventType()) {
+            case TASK_PENDING_TO_RUNNING:
+                taskPendingToRunningEvent(notification.getData());
+                break;
+            case TASK_RUNNING_TO_FINISHED:
+                taskRunningToFinishedEvent(notification.getData());
+                break;
+        }
     }
- 
-	/**
-	 * Each time that there`s an event is done the related update
-	 * 
-	 * This is a canonical event to calculate the meanJobPendingTime KPI
-	 * 
-	 * @param job info
-	 */
-	private void jobPendingToRunningEvent(JobInfo info) {
-		// Update the status
-		this.numberOfPendingJobs--;
-		this.numberOfRunningJobs++;
-		// Call the private method to calculate the mean pending time
-		calculateMeanJobPendingTime(info);
-	}
 
-	/**
-	 * @param job info
-	 */
-	public void jobRemoveFinishedEvent(JobInfo info) {
-		this.numberOfFinishedJobs--;
-		this.totalNumberOfJobs--;
-		// For each task of the Job decrement the number of finished tasks and the total number of tasks
-		for(int i=0; i<info.getTotalNumberOfTasks(); i++) {
-			this.totalNumberOfTasks--;
-			this.numberOfFinishedTasks--;
-		}
-	}
+    /**
+     * Each time that there`s an event is done the related update
+     *
+     * This is a canonical event to calculate the meanJobPendingTime KPI
+     *
+     * @param job info
+     */
+    private void jobPendingToRunningEvent(JobInfo info) {
+        // Update the status
+        this.numberOfPendingJobs--;
+        this.numberOfRunningJobs++;
+        // Call the private method to calculate the mean pending time
+        calculateMeanJobPendingTime(info);
+    }
 
-	/**
-	 * This is a canonical event to calculate the meanJobExecutionTime KPI
-	 * 
-	 * @param job info
-	 */
-	public void jobRunningToFinishedEvent(JobInfo info) {
-		this.numberOfRunningJobs--;
-		this.numberOfFinishedJobs++;
-		// Call the private method to calculate the mean execution time
-		calculateMeanJobExecutionTime(info);
-	}
+    /**
+     * @param job info
+     */
+    public void jobRemoveFinishedEvent(JobInfo info) {
+        this.numberOfFinishedJobs--;
+        this.totalNumberOfJobs--;
+        // For each task of the Job decrement the number of finished tasks and the total number of tasks
+        for (int i = 0; i < info.getTotalNumberOfTasks(); i++) {
+            this.totalNumberOfTasks--;
+            this.numberOfFinishedTasks--;
+        }
+    }
 
-	/**
-	 * This is a canonical event to calculate the meanJobArrivalTime KPI
-	 * @param job state
-	 */
-	public void jobSubmittedEvent(JobState job) {
-		this.totalNumberOfJobs++;
-		this.numberOfPendingJobs++;
-		// For each task of the Job increment the number of pending tasks and the total number of tasks
-		for(int i=0; i<job.getTotalNumberOfTasks(); i++) {
-			this.totalNumberOfTasks++;
-			this.numberOfPendingTasks++;
-		}
-		// Call the private method to calculate the mean arrival time
-		calculateJobSubmittingPeriod(job.getJobInfo());
-	}
+    /**
+     * This is a canonical event to calculate the meanJobExecutionTime KPI
+     *
+     * @param job info
+     */
+    public void jobRunningToFinishedEvent(JobInfo info) {
+        this.numberOfRunningJobs--;
+        this.numberOfFinishedJobs++;
+        // Call the private method to calculate the mean execution time
+        calculateMeanJobExecutionTime(info);
+    }
 
-	/**
-	 * This is a canonical event to calculate the meanJobArrivalTime KPI
-	 */
-	private void schedulerStartedEvent() {
-		this.schedulerState = SchedulerStatus.STARTED;
-		// Set the scheduler started time
-    	setSchedulerStartedTime(System.currentTimeMillis());
-	}
-	
-	/**
-	 * @param task info
-	 */
-	private void taskPendingToRunningEvent(TaskInfo info) {
-		this.numberOfPendingTasks--;
-		this.numberOfRunningTasks++;
-	}
+    /**
+     * This is a canonical event to calculate the meanJobArrivalTime KPI
+     * @param job state
+     */
+    public void jobSubmittedEvent(JobState job) {
+        this.totalNumberOfJobs++;
+        this.numberOfPendingJobs++;
+        // For each task of the Job increment the number of pending tasks and the total number of tasks
+        for (int i = 0; i < job.getTotalNumberOfTasks(); i++) {
+            this.totalNumberOfTasks++;
+            this.numberOfPendingTasks++;
+        }
+        // Call the private method to calculate the mean arrival time
+        calculateJobSubmittingPeriod(job.getJobInfo());
+    }
 
-	/**
-	 * @param task info
-	 */
-	private void taskRunningToFinishedEvent(TaskInfo info) {
-		this.numberOfRunningTasks--;
-		this.numberOfFinishedTasks++;
-	}
+    /**
+     * This is a canonical event to calculate the meanJobArrivalTime KPI
+     */
+    private void schedulerStartedEvent() {
+        this.schedulerState = SchedulerStatus.STARTED;
+        // Set the scheduler started time
+        setSchedulerStartedTime(System.currentTimeMillis());
+    }
 
-	/**
-	 * @param user identification
-	 */
-	public void usersUpdate(UserIdentification userIdentification) {
-		// It can be an update to remove or to add a User
-		if(userIdentification.isToRemove()) {
-			this.numberOfConnectedUsers--;
-		} else {
-			this.numberOfConnectedUsers++;
-		}
-	}
+    /**
+     * @param task info
+     */
+    private void taskPendingToRunningEvent(TaskInfo info) {
+        this.numberOfPendingTasks--;
+        this.numberOfRunningTasks++;
+    }
 
-	// PRIVATE METHODS FOR CALCULATING KPIs
-	
-	/**  
+    /**
+     * @param task info
+     */
+    private void taskRunningToFinishedEvent(TaskInfo info) {
+        this.numberOfRunningTasks--;
+        this.numberOfFinishedTasks++;
+    }
+
+    /**
+     * @param user identification
+     */
+    public void usersUpdate(UserIdentification userIdentification) {
+        // It can be an update to remove or to add a User
+        if (userIdentification.isToRemove()) {
+            this.numberOfConnectedUsers--;
+        } else {
+            this.numberOfConnectedUsers++;
+        }
+    }
+
+    // PRIVATE METHODS FOR CALCULATING KPIs
+
+    /**
      * After a given number of Jobs we can have a good current estimation of the mean Job Pending Time
      * calculated each time dividing the accumulator time by the counter.
      * 
      * @param job info
      */
     private void calculateMeanJobPendingTime(JobInfo info) {
-    	// Calculate the Pending time for this Job (startTime - submittedTime)
-    	// Increment the cumulative pending time
-    	this.cumulativePendingTime += (info.getStartTime()-info.getSubmittedTime());
-    	// Increment the related counter
+        // Calculate the Pending time for this Job (startTime - submittedTime)
+        // Increment the cumulative pending time
+        this.cumulativePendingTime += (info.getStartTime() - info.getSubmittedTime());
+        // Increment the related counter
         this.counterJobPendingTime++;
         // Update the mean pending time dividing the cumulative pending time by the related counter
-    	this.meanJobPendingTime = (this.cumulativePendingTime/this.counterJobPendingTime);
+        this.meanJobPendingTime = (this.cumulativePendingTime / this.counterJobPendingTime);
     }
-    
+
     /**
      * After a given number of Jobs we can have a good current estimation of the mean Job Execution Time
      * calculated each time dividing the accumulator time by the counter.
@@ -277,15 +304,15 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      * @param job info
      */
     private void calculateMeanJobExecutionTime(JobInfo info) {
-    	// Calculate the Running time for this Job (finishedTime - startTime)
-    	// Increment the cumulative execution time
-    	this.cumulativeExecutionTime += (info.getFinishedTime()-info.getStartTime());
-    	// Increment the related counter
+        // Calculate the Running time for this Job (finishedTime - startTime)
+        // Increment the cumulative execution time
+        this.cumulativeExecutionTime += (info.getFinishedTime() - info.getStartTime());
+        // Increment the related counter
         this.counterJobExecutionTime++;
         // Update the mean execution time dividing the cumulative execution time by the related counter
-    	this.meanJobExecutionTime = (this.cumulativeExecutionTime/this.counterJobExecutionTime);
+        this.meanJobExecutionTime = (this.cumulativeExecutionTime / this.counterJobExecutionTime);
     }
-    
+
     /**
      * After a given number of Jobs we can have a good current estimation of the mean Job Arrival Time
      * calculated each time dividing the accumulator time by the counter.
@@ -293,34 +320,34 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      * @param job info
      */
     private void calculateJobSubmittingPeriod(JobInfo info) {
-    	// Calculate the arrival time for this Job (currentSubmittedTime - previousSubmittedTime)
-    	// Only the first time we have this event, we set the cumulative arrival time with the scheduler started time
-    	// Otherwise we set it with the previous submitted time
-    	if(this.counterJobArrivalTime == 0) {
-    		this.cumulativeArrivalTime = (info.getSubmittedTime()-this.schedulerStartedTime);
-    	} else {
-    		this.cumulativeArrivalTime += (info.getSubmittedTime()-this.previousSubmittedTime);
-    	}
-    	// Increments the related counter
-    	this.counterJobArrivalTime++;
-    	// Update the mean arrival time dividing the cumulative arrival time by the related counter
-    	this.jobSubmittingPeriod = (this.cumulativeArrivalTime/this.counterJobArrivalTime);
-    	// This is the previous Submitted Time for the next time that happens this event
-    	this.previousSubmittedTime = info.getSubmittedTime();
-    	
+        // Calculate the arrival time for this Job (currentSubmittedTime - previousSubmittedTime)
+        // Only the first time we have this event, we set the cumulative arrival time with the scheduler started time
+        // Otherwise we set it with the previous submitted time
+        if (this.counterJobArrivalTime == 0) {
+            this.cumulativeArrivalTime = (info.getSubmittedTime() - this.schedulerStartedTime);
+        } else {
+            this.cumulativeArrivalTime += (info.getSubmittedTime() - this.previousSubmittedTime);
+        }
+        // Increments the related counter
+        this.counterJobArrivalTime++;
+        // Update the mean arrival time dividing the cumulative arrival time by the related counter
+        this.jobSubmittingPeriod = (this.cumulativeArrivalTime / this.counterJobArrivalTime);
+        // This is the previous Submitted Time for the next time that happens this event
+        this.previousSubmittedTime = info.getSubmittedTime();
+
     }
-    
+
     /**
      * Set the Scheduler Started Time
      *
      * @param time represented as a long
      */
     private void setSchedulerStartedTime(long time) {
-    	this.schedulerStartedTime = time;
+        this.schedulerStartedTime = time;
     }
-	
+
     // ATTRIBUTES TO CONTROL
-    
+
     /**
      * The following methods represent the Attributes that is possible to monitor from the MBean
      * 

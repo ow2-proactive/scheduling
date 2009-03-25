@@ -380,7 +380,7 @@
 		<delete file="tests.log" />
 		<delete dir="${junit.dir}" />
 		<!-- Database generated classes -->
-		<delete file="${base.dir}/logs/derby.log" />
+		<delete file="${base.dir}/.logs/derby.log" />
 		<subant target="doc.clean" inheritall="true">
 			<fileset dir="../doc/toolchain" includes="doc.xml"/>
 		</subant>
@@ -423,7 +423,7 @@
 
 	<target name="scheduler.libCopy" depends="deploy.all" description="Copy all required libraries to scheduler/rm plugins">
 		<copy todir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/><!--,ProActive_Scheduler-core.jar-->
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/><!--,${scheduler.core.jar}, ${scheduler.worker.jar}-->
 		</copy>
 	</target>
 
@@ -548,6 +548,17 @@
 			<include name="org/ow2/proactive/scheduler/common/util/SimpleLoggerServer.java" />
 			<include name="org/ow2/proactive/scheduler/common/util/RegexpMatcher.java" />
 			<include name="org/ow2/proactive/scheduler/common/TaskTerminateNotification.java" />
+			<include name="org/ow2/proactive/scheduler/examples/PropertyTask.java" />
+			<include name="org/ow2/proactive/scheduler/examples/NativeTestWithRandomDefault.java" />
+			<include name="org/ow2/proactive/scheduler/examples/MonteCarlo.java" />
+			<include name="org/ow2/proactive/scheduler/examples/JoinPreview.java" />
+			<include name="org/ow2/proactive/scheduler/examples/KillJob.java" />
+			<include name="org/ow2/proactive/scheduler/examples/MonteCarloAverage.java" />
+			<include name="org/ow2/proactive/scheduler/examples/ProActiveExample.java" />
+			<include name="org/ow2/proactive/scheduler/examples/WaitAndPrint.java" />
+			<include name="org/ow2/proactive/scheduler/examples/DenoisePreview.java" />
+			<include name="org/ow2/proactive/scheduler/examples/AbortJob.java" />
+			<include name="org/ow2/proactive/scheduler/examples/Worker.java" />
 		</javac>
 
 		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}">
