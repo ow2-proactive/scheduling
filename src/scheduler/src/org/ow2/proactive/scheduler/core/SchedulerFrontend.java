@@ -60,9 +60,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
-import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -104,6 +102,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
+    private static final String SCHEDULER_BEAN_NAME = "SchedulerFrontend:name=SchedulerMBean";
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
     private Map<UniqueID, UserIdentificationImpl> identifications = new HashMap<UniqueID, UserIdentificationImpl>();
@@ -131,12 +130,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
     /** scheduler listeners */
     private Map<UniqueID, SchedulerEventListener> schedulerListeners = new ConcurrentHashMap<UniqueID, SchedulerEventListener>();
-
-    /** Scheduler's statistics */
-    private StatsImpl stats = new StatsImpl(SchedulerStatus.STARTED);
-
-    /** Scheduler's MBean Server */
-    private MBeanServer mbs;
 
     /** Scheduler's MBean */
     private SchedulerWrapper schedulerBean;
@@ -525,20 +518,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         schedulerListeners.remove(id);
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStats()
-     */
-    public Stats getStats() throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-
-        if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
-            throw new SchedulerException(ACCESS_DENIED);
-        }
-
-        return stats;
-    }
-
     /* ########################################################################################### */
     /*                                                                                             */
     /* ##################################### SCHEDULER ORDERS #################################### */
@@ -574,14 +553,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (!ssprsc("You do not have permission to start the scheduler !")) {
             return new BooleanWrapper(false);
         }
-
-        BooleanWrapper bool = scheduler.start();
-        if (bool.booleanValue()) {
-            //stats
-            stats.startTime();
-            stats.updateStatus(SchedulerStatus.STARTED);
-        }
-        return bool;
+        return scheduler.start();
     }
 
     /**
@@ -591,14 +563,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (!ssprsc("You do not have permission to stop the scheduler !")) {
             return new BooleanWrapper(false);
         }
-
-        BooleanWrapper bool = scheduler.stop();
-        if (bool.booleanValue()) {
-            //stats
-            stats.stopTime();
-            stats.updateStatus(SchedulerStatus.STOPPED);
-        }
-        return bool;
+        return scheduler.stop();
     }
 
     /**
@@ -608,14 +573,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (!ssprsc("You do not have permission to pause the scheduler !")) {
             return new BooleanWrapper(false);
         }
-
-        BooleanWrapper bool = scheduler.pause();
-        if (bool.booleanValue()) {
-            //stats
-            stats.pauseTime();
-            stats.updateStatus(SchedulerStatus.PAUSED);
-        }
-        return bool;
+        return scheduler.pause();
     }
 
     /**
@@ -625,14 +583,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (!ssprsc("You do not have permission to pause the scheduler !")) {
             return new BooleanWrapper(false);
         }
-
-        BooleanWrapper bool = scheduler.freeze();
-        if (bool.booleanValue()) {
-            //stats
-            stats.pauseTime();
-            stats.updateStatus(SchedulerStatus.FROZEN);
-        }
-        return bool;
+        return scheduler.freeze();
     }
 
     /**
@@ -642,13 +593,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (!ssprsc("You do not have permission to resume the scheduler !")) {
             return new BooleanWrapper(false);
         }
-
-        BooleanWrapper bool = scheduler.resume();
-        if (bool.booleanValue()) {
-            //stats
-            stats.updateStatus(SchedulerStatus.STARTED);
-        }
-        return bool;
+        return scheduler.resume();
     }
 
     /**
@@ -658,13 +603,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (!ssprsc("You do not have permission to shutdown the scheduler !")) {
             return new BooleanWrapper(false);
         }
-
-        BooleanWrapper bool = scheduler.shutdown();
-        if (bool.booleanValue()) {
-            //stats
-            stats.updateStatus(SchedulerStatus.SHUTTING_DOWN);
-        }
-        return bool;
+        return scheduler.shutdown();
     }
 
     /**
@@ -674,13 +613,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (!ssprsc("You do not have permission to kill the scheduler !")) {
             return new BooleanWrapper(false);
         }
-
-        BooleanWrapper bool = scheduler.kill();
-        if (bool.booleanValue()) {
-            //stats
-            stats.updateStatus(SchedulerStatus.KILLED);
-        }
-        return bool;
+        return scheduler.kill();
     }
 
     /**
@@ -842,13 +775,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     private void registerMBean() {
         //Get the platform MBeanServer
-        mbs = ManagementFactory.getPlatformMBeanServer();
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         // Unique identification of Scheduler MBean
         schedulerBean = new SchedulerWrapper();
         ObjectName schedulerName = null;
         try {
             // Uniquely identify the MBeans and register them with the platform MBeanServer 
-            schedulerName = new ObjectName("SchedulerFrontend:name=SchedulerMBean");
+            schedulerName = new ObjectName(SCHEDULER_BEAN_NAME);
             mbs.registerMBean(schedulerBean, schedulerName);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1068,8 +1001,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case RM_DOWN:
             case RM_UP:
             case POLICY_CHANGED:
-                schedulerBean.schedulerStateUpdated(eventType);
                 dispatchSchedulerStateUpdated(eventType);
+                schedulerBean.schedulerStateUpdated(eventType);
                 break;
             default:
                 logger_dev.info("Unconsistent update type received from Scheduler Core : " + eventType);
@@ -1080,11 +1013,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobSubmitted(org.ow2.proactive.scheduler.common.job.JobState)
      */
     public void jobSubmitted(JobState job) {
-        schedulerBean.jobSubmittedEvent(job);
-        //stats
-        stats.increaseSubmittedJobCount(job.getType());
-        stats.submitTime();
         dispatchJobSubmitted(job);
+        schedulerBean.jobSubmittedEvent(job);
     }
 
     /**
@@ -1096,22 +1026,20 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case JOB_RESUMED:
             case JOB_PENDING_TO_RUNNING:
             case JOB_CHANGE_PRIORITY:
-                schedulerBean.jobStateUpdated(notification);
                 dispatchJobStateUpdated(owner, notification);
+                schedulerBean.jobStateUpdated(notification);
                 break;
             case JOB_RUNNING_TO_FINISHED:
-                schedulerBean.jobRunningToFinishedEvent(notification.getData());
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 dispatchJobStateUpdated(owner, notification);
-                //stats
-                stats.increaseFinishedJobCount(notification.getData().getNumberOfFinishedTasks());
+                schedulerBean.jobRunningToFinishedEvent(notification.getData());
                 break;
             case JOB_REMOVE_FINISHED:
-                schedulerBean.jobRemoveFinishedEvent(notification.getData());
                 //removing jobs from the global list : this job is no more managed
                 jobs.remove(notification.getData().getJobId());
                 dispatchJobStateUpdated(owner, notification);
+                schedulerBean.jobRemoveFinishedEvent(notification.getData());
                 break;
             default:
                 logger_dev.info("Unconsistent update type received from Scheduler Core : " +
@@ -1127,8 +1055,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
-                schedulerBean.taskStateUpdated(notification);
                 dispatchTaskStateUpdated(owner, notification);
+                schedulerBean.taskStateUpdated(notification);
                 break;
             default:
                 logger_dev.info("Unconsistent update type received from Scheduler Core : " +
@@ -1142,8 +1070,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     public void usersUpdated(NotificationData<UserIdentification> notification) {
         switch (notification.getEventType()) {
             case USERS_UPDATE:
-                schedulerBean.usersUpdate(notification.getData());
                 dispatchUsersUpdated(notification);
+                schedulerBean.usersUpdate(notification.getData());
                 break;
             default:
                 logger_dev.info("Unconsistent update type received from Scheduler Core : " +

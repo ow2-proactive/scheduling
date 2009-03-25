@@ -34,7 +34,6 @@ package org.ow2.proactive.scheduler.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.cli.AlreadySelectedException;
@@ -237,8 +236,6 @@ public class AdminScheduler {
             stopCommunicator = true;
         } else if (command.equals("?") || command.equals("help")) {
             helpScreen();
-        } else if (command.equals(STAT_CMD)) {
-            statScreen();
         } else if (command.equals(START_CMD)) {
             try {
                 boolean success = scheduler.start().booleanValue();
@@ -446,21 +443,6 @@ public class AdminScheduler {
             } catch (Exception e) {
                 logger.error("Command error ! plz check your last command !");
             }
-        }
-    }
-
-    private static void statScreen() {
-        try {
-            Map<String, Object> stat = scheduler.getStats().getProperties();
-            String out = "";
-
-            for (Entry<String, Object> e : stat.entrySet()) {
-                out += (e.getKey() + " : " + e.getValue() + "\n");
-            }
-
-            logger.info(out);
-        } catch (SchedulerException e) {
-            e.printStackTrace();
         }
     }
 

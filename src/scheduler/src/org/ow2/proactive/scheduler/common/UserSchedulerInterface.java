@@ -129,15 +129,6 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
     public void removeSchedulerEventListener() throws SchedulerException;
 
     /**
-     * Return the scheduler statistics.<br>
-     * It will be possible to get an HashMap of all properties set in the stats class.
-     *
-     * @return the scheduler statistics.
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
-     */
-    public Stats getStats() throws SchedulerException;
-
-    /**
      * Disconnect properly the user from the scheduler.
      *
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
