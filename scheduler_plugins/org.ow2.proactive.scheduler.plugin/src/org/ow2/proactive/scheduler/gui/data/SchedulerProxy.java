@@ -45,7 +45,6 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.Stats;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -144,18 +143,6 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     public TaskResult getTaskResult(JobId jobId, String taskName) {
         try {
             return scheduler.getTaskResult(jobId, taskName);
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStats()
-     */
-    public Stats getStats() {
-        try {
-            return scheduler.getStats();
         } catch (SchedulerException e) {
             e.printStackTrace();
         }

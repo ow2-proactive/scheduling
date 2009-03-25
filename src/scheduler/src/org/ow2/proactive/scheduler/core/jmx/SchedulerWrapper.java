@@ -29,12 +29,12 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.core.jmx.mbean;
+package org.ow2.proactive.scheduler.core.jmx;
 
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.jmx.SchedulerMBean;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -48,16 +48,13 @@ import org.ow2.proactive.scheduler.common.util.Tools;
  * It provides some attributes and some statistics indicators.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.0
  */
-@PublicAPI
-public class SchedulerWrapper implements SchedulerWrapperMBean {
+public class SchedulerWrapper implements SchedulerMBean {
     /** Scheduler current state */
     private SchedulerStatus schedulerState = SchedulerStatus.STOPPED;
 
-    /** 
-     * Variables representing the attributes of the SchedulerMBean 
-     */
+    /** Variables representing the attributes of the SchedulerMBean */
     private int totalNumberOfJobs = 0;
 
     private int totalNumberOfTasks = 0;
@@ -77,9 +74,7 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     /** Number of Connected Users */
     private int numberOfConnectedUsers = 0;
 
-    /**
-     * Variables representing the Key Performance Indicators for the SchedulerWrapper
-     */
+    /** Variables representing the Key Performance Indicators for the SchedulerWrapper */
     private long meanJobPendingTime = 0;
 
     private long meanJobExecutionTime = 0;
@@ -120,12 +115,14 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      *  
      * Call the MBean event for the related Scheduler Updated event type
      *
-     * @param eventType
+     * @param eventType the type of the received event 
      */
     public void schedulerStateUpdated(SchedulerEvent eventType) {
         switch (eventType) {
             case STARTED:
-                schedulerStartedEvent();
+                this.schedulerState = SchedulerStatus.STARTED;
+                // Set the scheduler started time
+                setSchedulerStartedTime(System.currentTimeMillis());
                 break;
             case STOPPED:
                 this.schedulerState = SchedulerStatus.STOPPED;
@@ -167,6 +164,12 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
             case JOB_PENDING_TO_RUNNING:
                 jobPendingToRunningEvent(notification.getData());
                 break;
+            case JOB_RUNNING_TO_FINISHED:
+                jobRunningToFinishedEvent(notification.getData());
+                break;
+            case JOB_REMOVE_FINISHED:
+                jobRemoveFinishedEvent(notification.getData());
+                break;
         }
     }
 
@@ -202,9 +205,11 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     }
 
     /**
-     * @param job info
+     * the job is no more managed, it is removed from scheduler
+     * 
+     * @param info the job's information
      */
-    public void jobRemoveFinishedEvent(JobInfo info) {
+    private void jobRemoveFinishedEvent(JobInfo info) {
         this.numberOfFinishedJobs--;
         this.totalNumberOfJobs--;
         // For each task of the Job decrement the number of finished tasks and the total number of tasks
@@ -217,9 +222,9 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     /**
      * This is a canonical event to calculate the meanJobExecutionTime KPI
      * 
-     * @param job info
+     * @param info the job's information
      */
-    public void jobRunningToFinishedEvent(JobInfo info) {
+    private void jobRunningToFinishedEvent(JobInfo info) {
         this.numberOfRunningJobs--;
         this.numberOfFinishedJobs++;
         // Call the private method to calculate the mean execution time
@@ -228,7 +233,8 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
 
     /**
      * This is a canonical event to calculate the meanJobArrivalTime KPI
-     * @param job state
+     * 
+     * @param job the state of the job
      */
     public void jobSubmittedEvent(JobState job) {
         this.totalNumberOfJobs++;
@@ -243,16 +249,9 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     }
 
     /**
-     * This is a canonical event to calculate the meanJobArrivalTime KPI
-     */
-    private void schedulerStartedEvent() {
-        this.schedulerState = SchedulerStatus.STARTED;
-        // Set the scheduler started time
-        setSchedulerStartedTime(System.currentTimeMillis());
-    }
-
-    /**
-     * @param task info
+     * Task pending to running event
+     * 
+     * @param info task's information
      */
     private void taskPendingToRunningEvent(TaskInfo info) {
         this.numberOfPendingTasks--;
@@ -260,7 +259,9 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     }
 
     /**
-     * @param task info
+     * Task Running To Finished Event
+     * 
+     * @param info task's information
      */
     private void taskRunningToFinishedEvent(TaskInfo info) {
         this.numberOfRunningTasks--;
@@ -268,7 +269,9 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     }
 
     /**
-     * @param user identification
+     * Users update event
+     * 
+     * @param userIdentification information about new user changes
      */
     public void usersUpdate(UserIdentification userIdentification) {
         // It can be an update to remove or to add a User

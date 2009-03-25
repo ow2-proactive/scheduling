@@ -73,7 +73,7 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.core.jmx.mbean.SchedulerWrapper;
+import org.ow2.proactive.scheduler.core.jmx.SchedulerWrapper;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
@@ -1033,13 +1033,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 dispatchJobStateUpdated(owner, notification);
-                schedulerBean.jobRunningToFinishedEvent(notification.getData());
+                schedulerBean.jobStateUpdated(notification);
                 break;
             case JOB_REMOVE_FINISHED:
                 //removing jobs from the global list : this job is no more managed
                 jobs.remove(notification.getData().getJobId());
                 dispatchJobStateUpdated(owner, notification);
-                schedulerBean.jobRemoveFinishedEvent(notification.getData());
+                schedulerBean.jobStateUpdated(notification);
                 break;
             default:
                 logger_dev.info("Unconsistent update type received from Scheduler Core : " +

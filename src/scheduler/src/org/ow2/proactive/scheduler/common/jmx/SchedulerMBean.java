@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.core.jmx.mbean;
+package org.ow2.proactive.scheduler.common.jmx;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -38,10 +38,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * MBean interface representing the attributes and the KPI values to monitor the ProActive Scheduler
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.0
  */
 @PublicAPI
-public interface SchedulerWrapperMBean {
+public interface SchedulerMBean {
 
     /**
      * Returns the state of the scheduler.
