@@ -3,16 +3,10 @@ echo.
 
 IF EXIST ..\..\SCHEDULER_DB (
     RMDIR /S /Q ..\..\SCHEDULER_DB
-    RM ..\..\.logs\derby.log
+    DEL ..\..\.logs\derby.log
 )
 SETLOCAL ENABLEDELAYEDEXPANSION
-call init.bat
 
-echo. 
+call startScheduler.bat %*
 
-%JAVA_CMD% org.ow2.proactive.scheduler.util.SchedulerStarter  %*
 ENDLOCAL
-
-:end
-echo. 
-
