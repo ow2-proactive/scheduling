@@ -151,7 +151,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getSelectionScript().getParameters()[0], "paquit");
                 Assert.assertTrue(it.getPreScript().getScript().contains("Beginning of Pre-Script"));
                 Assert.assertTrue(it.getPostScript().getScript().contains(
-                        "Content is equals to " + URLbegin + "samples/jobs_descriptors/unset.js"));
+                        "Content is equals to " + URLbegin + "samples/scripts/misc/unset.js"));
                 Assert.assertNull(it.getPostScript().getParameters());
                 Assert.assertTrue(it.getCleaningScript().getScript().contains("Beginning of clean script"));
                 Assert.assertNull(it.getCleaningScript().getParameters());

@@ -72,7 +72,7 @@ public class WaitAndPrint extends JavaExecutable {
             e.printStackTrace();
         }
 
-        System.out.println("Terminaison de la tache numero " + number);
+        System.out.println("Terminate task number " + number);
 
         return ("No." + this.number + " hi from " + message + "\t slept for " + sleepTime + " Seconds");
     }

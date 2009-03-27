@@ -195,7 +195,13 @@ public class JobResultImpl implements JobResult {
     public TaskResult getResult(String taskName) {
         TaskResult tr = futurResults.get(taskName);
         if (tr == null) {
-            return allResults.get(taskName);
+            tr = allResults.get(taskName);
+            if (tr == null) {
+                throw new RuntimeException(taskName + " has not been found in this job result (jobId=" + id +
+                    ")");
+            } else {
+                return tr;
+            }
         } else if (!PAFuture.isAwaited(tr)) {
             return tr;
         } else {

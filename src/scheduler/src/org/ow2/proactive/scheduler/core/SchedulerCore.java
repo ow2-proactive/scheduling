@@ -114,8 +114,8 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
-import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
+import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
@@ -958,7 +958,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     }
                     //if canceled, get the result of the canceled task
                     if ((jobStatus == JobStatus.CANCELED) && td.getId().equals(task.getId())) {
-                        taskResult = job.getJobResult().getResult(task.getName());
+                        try {
+                            taskResult = job.getJobResult().getResult(task.getName());
+                        } catch (RuntimeException e) {
+                            //should never append
+                            logger_dev.error("", e);
+                        }
                     }
                 }
             }
@@ -1192,7 +1197,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
             for (TaskDescriptor td : currentTD.getParents()) {
                 if (td.getChildrenCount() == 0) {
-                    DatabaseManager.unload(job.getJobResult().getResult(td.getId().getReadableName()));
+                    try {
+                        DatabaseManager.unload(job.getJobResult().getResult(td.getId().getReadableName()));
+                    } catch (RuntimeException e) {
+                        //should never append
+                        logger_dev.error("", e);
+                    }
                 }
             }
             //send event

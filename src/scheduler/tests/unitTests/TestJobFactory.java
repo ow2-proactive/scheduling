@@ -96,7 +96,7 @@ public class TestJobFactory {
         Assert.assertTrue(tfJob.getTask("task1").getPreScript().getScript().contains(
                 "Beginning of Pre-Script"));
         Assert.assertTrue(tfJob.getTask("task1").getPostScript().getScript().contains(
-                "Content is equals to " + URLbegin + "samples/jobs_descriptors/unset.js"));
+                "Content is equals to " + URLbegin + "samples/scripts/misc/unset.js"));
         Assert.assertEquals(tfJob.getTask("task1").getPostScript().getParameters(), null);
         Assert.assertTrue(tfJob.getTask("task1").getCleaningScript().getScript().contains(
                 "Beginning of clean script"));

@@ -77,12 +77,12 @@ public class TestDatabaseStringArray {
             }
             sa[k] = sb.toString();
         }
-        SimpleScript ss = new SimpleScript(new File(URLbegin + "samples/jobs_descriptors/set.js"), sa);
+        SimpleScript ss = new SimpleScript(new File(URLbegin + "samples/scripts/misc/set.js"), sa);
         DatabaseManager.register(ss);
         JobEnvironment je = new JobEnvironment();
         je.setJobClasspath(sa);
         DatabaseManager.register(je);
-        GenerationScript gs = new GenerationScript(URLbegin + "samples/jobs_descriptors/set.js", "js");
+        GenerationScript gs = new GenerationScript(URLbegin + "samples/scripts/misc/set.js", "js");
         NativeExecutableContainer nec = new NativeExecutableContainer(sa, gs);
         DatabaseManager.register(nec);
         TaskResultImpl tri = new TaskResultImpl();

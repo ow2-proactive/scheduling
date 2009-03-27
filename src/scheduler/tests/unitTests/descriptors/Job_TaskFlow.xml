@@ -4,8 +4,8 @@
 	name="Job_TaskFlow" cancelJobOnError="true" maxNumberOfExecution="2" projectName="My_project" restartTaskOnError="elsewhere">
 	<variables>
 		<!-- Relative path is from Scheduler root directory for the tests -->
-		<variable name="WORK_DIR" value="${pa.scheduler.home}/samples/jobs_descriptors"/>
-		<variable name="WORK_DIR2" value="${WORK_DIR}/job_native_linux"/>
+		<variable name="WORK_DIR" value="${pa.scheduler.home}/samples/scripts/misc"/>
+		<variable name="WORK_DIR2" value="${pa.scheduler.home}/samples/jobs_descriptors/job_native_linux"/>
 		<variable name="EXCLUSION_STRING" value="paquit"/>
 		<variable name="JAVA_HOME" value="/bin/java/jdk1.5"/>
 	</variables>
