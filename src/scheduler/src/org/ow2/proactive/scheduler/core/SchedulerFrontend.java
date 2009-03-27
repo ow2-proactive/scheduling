@@ -163,7 +163,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         logger_dev.debug("Policy used is " + policyFullClassName);
         jobs = new HashMap<JobId, IdentifiedJob>();
         //Register the scheduler MBean
-        this.registerMBean();
+        registerMBean();
     }
 
     /**

@@ -8,9 +8,9 @@ importPackage(org.ow2.proactive.scripting.helper.filetransfer.initializer);
 //This script example ilustrates the use of org.objectweb.proactive.scheduler.helper API to get files from the remote host to the local node
 
 //set this to true if yo want to have your logs in a file on the remote machine
-var logToFile = true;
+var logToFile = false;
 //set this to true to ienable debug mode
-var mode_debug=true;
+var mode_debug= false;
 
 var task_id=System.getProperty("pas.task.id");
 var logsFile = "task_"+task_id+".log";

@@ -37,8 +37,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -77,6 +79,7 @@ public class SelectionUtils {
     private static final String winTestCuda = "deviceQueryWin.exe";
     private static final String unixTestCuda = "deviceQueryUnix";
     private static final boolean isWindows = System.getProperty("os.name").contains("Windows");
+    private static boolean isJ6 = false;
 
     /**
      * Hack to manage different package name for NativeArray, NativeJavaObject and Scriptable classes
@@ -94,6 +97,7 @@ public class SelectionUtils {
             nativeArray = Class.forName(packageNameJ6 + "NativeArray");
             nativeJavaObject = Class.forName(packageNameJ6 + "NativeJavaObject");
             scriptable = Class.forName(packageNameJ6 + "Scriptable");
+            isJ6 = true;
         } catch (ClassNotFoundException e) {
             try {
                 nativeArray = Class.forName(packageNameJ5 + "NativeArray");
@@ -205,6 +209,30 @@ public class SelectionUtils {
         }
         //checking condition in properties
         return checkProperty(props, condition);
+    }
+
+    /**
+     * Check if the host name is the given one.
+     *
+     * @param hostName the host name to check
+     * @return true if the given host is equals (ignore case) to the physic host name
+     */
+    public static boolean checkHostName(String hostName) {
+        try {
+            return InetAddress.getLocalHost().getHostName().toUpperCase().contains(hostName.toUpperCase());
+        } catch (UnknownHostException e) {
+            return true;
+        }
+    }
+
+    /**
+     * Check if the given file path exist or not.
+     *
+     * @param filePath the file path to check
+     * @return true if the given file path exists
+     */
+    public static boolean checkFileExist(String filePath) {
+        return new File(filePath).exists();
     }
 
     /**
@@ -438,37 +466,45 @@ public class SelectionUtils {
         return false;
     }
 
-    //    /**
-    //     * Check if free space (for a specify path) is greater than space
-    //     *
-    //     * @param space the minimum required space
-    //     * @param path the path which have the required space
-    //     * @return true if free space (for a specify path) is greater or equal than space
-    //     */
-    //    public static boolean checkFreeSpaceDiskAvailable(Long space, String path) {
-    //        if (path == null || space == null){
-    //            return false;
-    //        }
-    //
-    //        try {
-    //            File file = new File(path);
-    //            if (space <= file.getFreeSpace()) {
-    //                return true;
-    //            }
-    //            return false;
-    //        } catch (NullPointerException ex) {
-    //            ex.printStackTrace();
-    //            return false;
-    //        }
-    //    }
-    //
-    //    /** Check if default free space (tmpdir) is greater than parameter
-    //     * @param space the minimum required space
-    //     * @return true if free space (tmpdir) is greater than space
-    //     */
-    //    public static boolean checkFreeSpaceDiskAvailableForTmpDir(Long space) {
-    //        return checkFreeSpaceDiskAvailable(space, System.getProperty("java.io.tmpdir"));
-    //    }
+    /**
+     * Check if free space (for a specify path) is greater than space
+     *
+     * @param space the minimum required space
+     * @param path the path which have the required space
+     * @return true if free space (for a specify path) is greater or equal than space
+     */
+    public static boolean checkFreeSpaceDiskAvailable(Long space, String path) {
+        if (!isJ6) {
+            System.err.println("Check only available with java 6 or later.");
+            return false;
+        }
+
+        if (path == null || space == null) {
+            return false;
+        }
+
+        try {
+            File file = new File(path);
+            Method m = File.class.getDeclaredMethod("getFreeSpace");
+            if (space <= (Long) m.invoke(file)) {
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Check if default free space (tmpdir) is greater than parameter
+     *
+     * @param space the minimum required space
+     * @return true if free space (tmpdir) is greater than space
+     */
+    public static boolean checkFreeSpaceDiskAvailableForTmpDir(Long space) {
+        return checkFreeSpaceDiskAvailable(space, System.getProperty("java.io.tmpdir"));
+    }
 
     /**
      * Convert ruby array into java array

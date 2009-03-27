@@ -137,7 +137,7 @@ public final class JobIdImpl implements JobId {
      * @return the new jobId
      */
     public static JobId makeJobId(String str) {
-        return new JobIdImpl(Integer.parseInt(str));
+        return new JobIdImpl(Integer.parseInt(str.trim()));
     }
 
     /**

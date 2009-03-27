@@ -8,9 +8,9 @@ importPackage(org.ow2.proactive.scripting.helper.filetransfer.initializer);
 //This script example will use SCP_TRILEAD_Driver to putt files from the local node to the remote host
 
 //set this to true if yo want to have your logs in a file on the remote machine
-var logToFile = true;
+var logToFile = false;
 //set this to true to ienable debug mode
-var mode_debug=true;
+var mode_debug=false;
 var task_id=System.getProperty("pas.task.id");
 var logsFile = "task_"+task_id+".log";
 
@@ -80,8 +80,8 @@ var logsFile = "task_"+task_id+".log";
 
     // ----------- OR ----------------
 	//---- (SFTP Protocol) Use this code for in order to use SFTP_VFS_Driver to copy the files ----
-			var driver = new SFTP_VFS_Driver();
-			var ftInit= new FileTransfertInitializerSCP(host, username, password,driver.getClass());
+//			var driver = new SFTP_VFS_Driver();
+//			var ftInit= new FileTransfertInitializerSCP(host, username, password,driver.getClass());
 
 
     // ----------- OR ----------------

@@ -4,7 +4,7 @@ echo.
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat client
 
-%JAVA_CMD% org.ow2.proactive.scheduler.util.AdminScheduler %*
+%JAVA_CMD% org.ow2.proactive.scheduler.util.adminconsole.AdminScheduler %*
 ENDLOCAL
 
 :end
