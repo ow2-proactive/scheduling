@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
@@ -83,7 +84,7 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
     public JobResult getJobResult(String jobId) throws SchedulerException;
 
     /**
-     * Get the result for the given task name in the given jobId. <br />
+     * Get the result for the given task name in the given jobId. <br >
      * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
      * A user can only get HIS result back.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.<br>
@@ -97,6 +98,70 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
     public TaskResult getTaskResult(String jobId, String taskName) throws SchedulerException;
+
+    /**
+     * Remove the job from the scheduler. <br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * A user can only remove HIS job.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     *
+     * @param jobId the job to be removed.
+     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+     */
+    public void remove(String jobId) throws SchedulerException;
+
+    /**
+     * Kill the job represented by jobId.<br>
+     * This method will kill every running tasks of this job, and remove it from the scheduler.<br>
+     * The job won't be terminated, it won't have result.<br><br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * A user can only kill HIS job.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     *
+     * @param jobId the job to kill.
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper kill(String jobId) throws SchedulerException;
+
+    /**
+     * Pause the job represented by jobId.<br>
+     * This method will finish every running tasks of this job, and then pause the job.<br>
+     * The job will have to be resumed in order to finish.<br><br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * A user can only pause HIS job.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     *
+     * @param jobId the job to pause.
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper pause(String jobId) throws SchedulerException;
+
+    /**
+     * Resume the job represented by jobId.<br>
+     * This method will restart every non-finished tasks of this job.<br><br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * A user can only resume HIS job.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     *
+     * @param jobId the job to resume.
+     * @return true if success, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper resume(String jobId) throws SchedulerException;
+
+    /**
+     * Change the priority of the job represented by jobId.<br><br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * A user can only change HIS job priority.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     *
+     * @param jobId the job on which to change the priority.
+     * @param priority The new priority to apply to the job.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public void changePriority(String jobId, JobPriority priority) throws SchedulerException;
 
     /**
      * Add a scheduler event Listener. this listener provides method to notice of

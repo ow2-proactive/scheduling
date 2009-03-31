@@ -74,6 +74,7 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
@@ -102,7 +103,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
-    private static final String SCHEDULER_BEAN_NAME = "SchedulerFrontend:name=SchedulerWrapperMBean";
+    private static final String SCHEDULER_BEAN_NAME = PASchedulerProperties.SCHEDULER_JMX_MBEAN_NAME
+            .getValueAsString();
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
     private Map<UniqueID, UserIdentificationImpl> identifications = new HashMap<UniqueID, UserIdentificationImpl>();
@@ -482,7 +484,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         UserIdentificationImpl uIdent = identifications.get(id);
-        uIdent.setMyEventsOnly(myEventsOnly);
 
         if (uIdent == null) {
             logger_dev.info(ACCESS_DENIED);
@@ -492,6 +493,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (events.length > 0) {
             uIdent.setUserEvents(events);
         }
+        //set if the user wants to get its events only or every events
+        uIdent.setMyEventsOnly(myEventsOnly);
         //put this new user in the list of connected user
         connectedUsers.addUser(uIdent);
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, uIdent));
@@ -720,7 +723,54 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             }
         }
 
+        IdentifiedJob ij = jobs.get(jobId);
+        if (ij == null) {
+            String msg = "Job '" + jobId + "' is unknown";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
+        }
+        if (ij.isFinished()) {
+            String msg = "Job '" + jobId + "' is already finished";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
+        }
+
         scheduler.changePriority(jobId, priority);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#kill(java.lang.String)
+     */
+    public BooleanWrapper kill(String jobId) throws SchedulerException {
+        return this.kill(JobIdImpl.makeJobId(jobId));
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#pause(java.lang.String)
+     */
+    public BooleanWrapper pause(String jobId) throws SchedulerException {
+        return this.pause(JobIdImpl.makeJobId(jobId));
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#remove(java.lang.String)
+     */
+    public void remove(String jobId) throws SchedulerException {
+        this.remove(JobIdImpl.makeJobId(jobId));
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#resume(java.lang.String)
+     */
+    public BooleanWrapper resume(String jobId) throws SchedulerException {
+        return this.resume(JobIdImpl.makeJobId(jobId));
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#changePriority(java.lang.String, org.ow2.proactive.scheduler.common.job.JobPriority)
+     */
+    public void changePriority(String jobId, JobPriority priority) throws SchedulerException {
+        this.changePriority(JobIdImpl.makeJobId(jobId), priority);
     }
 
     /**

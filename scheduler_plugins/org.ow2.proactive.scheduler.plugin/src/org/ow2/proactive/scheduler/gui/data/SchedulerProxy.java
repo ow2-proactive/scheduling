@@ -439,4 +439,29 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         return null;
     }
 
+    public void changePriority(String arg0, JobPriority arg1) throws SchedulerException {
+        // TODO Auto-generated method stub
+
+    }
+
+    public BooleanWrapper kill(String arg0) throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public BooleanWrapper pause(String arg0) throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void remove(String arg0) throws SchedulerException {
+        // TODO Auto-generated method stub
+
+    }
+
+    public BooleanWrapper resume(String arg0) throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

@@ -4,7 +4,7 @@ echo.
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat client
 
-%JAVA_CMD% org.ow2.proactive.resourcemanager.utils.AdminRM %*
+%JAVA_CMD% org.ow2.proactive.resourcemanager.utils.adminconsole.AdminShell %*
 
 ENDLOCAL
 

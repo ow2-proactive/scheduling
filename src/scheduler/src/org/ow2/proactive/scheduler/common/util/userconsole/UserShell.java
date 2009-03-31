@@ -27,9 +27,9 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $PROACTIVE_INITIAL_DEV$
  */
-package org.ow2.proactive.scheduler.util.adminconsole;
+package org.ow2.proactive.scheduler.common.util.userconsole;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,6 +48,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
@@ -55,61 +56,61 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
-import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.SimpleConsole;
 
 
 /**
- * AdminScheduler will help you to manage the scheduler.
+ * UserShell will help you to interact with the scheduler.<br>
+ * Use this class to submit jobs, get results, pause job, etc...
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.0
  */
-public class AdminScheduler {
+public class UserShell {
 
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
-    private static final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
-    private static final String JS_INIT_FILE = "Actions.js";
-    private static final String YES = "yes";
-    private static final String NO = "no";
-    private static final String YES_NO = "(" + YES + "/" + NO + ")";
-    private static final String control = "<ctrl> ";
+    private final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
+    private final String JS_INIT_FILE = "UserActions.js";
 
-    private static final String START_CMD = "start()";
-    private static final String STOP_CMD = "stop()";
-    private static final String PAUSE_CMD = "pause()";
-    private static final String FREEZE_CMD = "freeze()";
-    private static final String RESUME_CMD = "resume()";
-    private static final String SHUTDOWN_CMD = "shutdown()";
-    private static final String KILL_CMD = "kill()";
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
+    protected static final String control = "<ctl> ";
+
     private static final String EXIT_CMD = "exit()";
     private static final String PAUSEJOB_CMD = "pausejob(id)";
+    private static final String PRIORITY_CMD = "priority(id,priority)";
     private static final String RESUMEJOB_CMD = "resumejob(id)";
     private static final String KILLJOB_CMD = "killjob(id)";
     private static final String REMOVEJOB_CMD = "removejob(id)";
     private static final String SUBMIT_CMD = "submit(XMLdescriptor)";
     private static final String GET_RESULT_CMD = "result(id)";
     private static final String GET_OUTPUT_CMD = "output(id)";
-    private static final String LINK_RM_CMD = "linkrm(rmURL)";
     private static final String EXEC_CMD = "exec(commandFilePath)";
-    private static AdminSchedulerInterface scheduler;
-    private static boolean initialized = false;
-    private static boolean terminated = false;
-    private static boolean intercativeMode = false;
-    private static ScriptEngine engine;
-    private static Console console = new SimpleConsole();
+
+    protected UserSchedulerInterface scheduler;
+    protected boolean initialized = false;
+    protected boolean terminated = false;
+    protected boolean intercativeMode = false;
+    protected ScriptEngine engine;
+    protected Console console = new SimpleConsole();
+
+    protected SchedulerAuthenticationInterface auth = null;
+    protected CommandLine cmd = null;
+    protected String user = null;
+    protected String pwd = null;
+
+    protected static UserShell shell;
 
     /**
      * Start the Scheduler administrator
@@ -117,7 +118,11 @@ public class AdminScheduler {
      * @param args the arguments to be passed
      */
     public static void main(String[] args) {
+        shell = new UserShell();
+        shell.load(args);
+    }
 
+    public void load(String[] args) {
         Options options = new Options();
 
         Option help = new Option("h", "help", false, "Display this help");
@@ -126,6 +131,7 @@ public class AdminScheduler {
 
         Option username = new Option("l", "login", true, "The username to join the Scheduler");
         username.setArgName("login");
+        username.setArgs(1);
         username.setRequired(false);
         options.addOption(username);
 
@@ -140,13 +146,10 @@ public class AdminScheduler {
         boolean displayHelp = false;
 
         try {
-            String user = null;
-            String pwd = null;
             String pwdMsg = null;
-            SchedulerAuthenticationInterface auth = null;
 
             Parser parser = new GnuParser();
-            CommandLine cmd = parser.parse(options, args);
+            cmd = parser.parse(options, args);
 
             if (cmd.hasOption("h")) {
                 displayHelp = true;
@@ -181,14 +184,11 @@ public class AdminScheduler {
                     logger.error("" + ioe);
                 }
 
-                scheduler = auth.logAsAdmin(user, pwd);
+                //connect to the scheduler
+                connect();
+                //start the command line or the interactive mode
+                start();
 
-                logger.info("\t-> Admin '" + user + "' successfully connected\n");
-
-                //start one of the two command behavior
-                if (startCommandLine(cmd)) {
-                    startCommandListener();
-                }
             }
         } catch (MissingArgumentException e) {
             logger.error(e.getLocalizedMessage());
@@ -212,10 +212,10 @@ public class AdminScheduler {
         if (displayHelp) {
             logger.info("");
             HelpFormatter hf = new HelpFormatter();
-            hf.setWidth(120);
-            String note = "\nNOTE : if no commands marked with " + control +
+            hf.setWidth(130);
+            String note = "\nNOTE : if no command marked with " + control +
                 "is specified, the administrator will start in interactive mode.";
-            hf.printHelp("adminScheduler" + Tools.shellExtension(), "", options, note, true);
+            hf.printHelp(this.getClass().getSimpleName() + Tools.shellExtension(), "", options, note, true);
             System.exit(2);
         }
 
@@ -223,88 +223,77 @@ public class AdminScheduler {
         System.exit(0);
     }
 
-    private static void addCommandLineOptions(Options options) {
-        Option opt = new Option("start", false, control + "Start the Scheduler");
-        opt.setRequired(false);
-        options.addOption(opt);
+    protected void connect() throws Exception {
+        scheduler = auth.logAsUser(user, pwd);
+        logger.info("\t-> User '" + user + "' successfully connected\n");
+    }
 
-        opt = new Option("stop", false, control + "Stop the Scheduler");
-        opt.setRequired(false);
-        options.addOption(opt);
+    private void start() throws Exception {
+        //start one of the two command behavior
+        if (startCommandLine(cmd)) {
+            startCommandListener();
+        }
+    }
 
-        opt = new Option("pause", false, control +
-            "Pause the Scheduler (cause all non-running jobs to be paused)");
-        opt.setRequired(false);
-        options.addOption(opt);
+    protected OptionGroup addCommandLineOptions(Options options) {
+        OptionGroup actionGroup = new OptionGroup();
 
-        opt = new Option("freeze", false, control +
-            "Freeze the Scheduler (cause all non-running tasks to be paused)");
-        opt.setRequired(false);
-        options.addOption(opt);
-
-        opt = new Option("resume", false, control + "Resume the Scheduler");
-        opt.setRequired(false);
-        options.addOption(opt);
-
-        opt = new Option("shutdown", false, control + "Shutdown the Scheduler");
-        opt.setRequired(false);
-        options.addOption(opt);
-
-        opt = new Option("kill", false, control + "Kill the Scheduler");
-        opt.setRequired(false);
-        options.addOption(opt);
-
-        opt = new Option("submit", true, control + "Submit the given job");
+        Option opt = new Option("submit", true, control + "Submit the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
-        options.addOption(opt);
+        actionGroup.addOption(opt);
 
         opt = new Option("pausejob", true, control + "Pause the given job (pause every non-running tasks)");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
-        options.addOption(opt);
+        actionGroup.addOption(opt);
 
         opt = new Option("resumejob", true, control + "Resume the given job (restart every paused tasks)");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
-        options.addOption(opt);
+        actionGroup.addOption(opt);
 
         opt = new Option("killjob", true, control + "Kill the given job (cause the job to finish)");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
-        options.addOption(opt);
+        actionGroup.addOption(opt);
 
         opt = new Option("removejob", true, control + "Remove the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
-        options.addOption(opt);
+        actionGroup.addOption(opt);
 
         opt = new Option("result", true, control + "Get the result of the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
-        options.addOption(opt);
+        actionGroup.addOption(opt);
 
         opt = new Option("output", true, control + "Get the output of the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
-        options.addOption(opt);
+        actionGroup.addOption(opt);
 
-        opt = new Option("linkrm", true, control + "Reconnect a RM to the scheduler");
-        opt.setArgName("rmURL");
+        opt = new Option("priority", true, control +
+            "Change the priority of the given job (Idle, Lowest, Low, Normal, High, Highest)");
+        opt.setArgName("jobId newPriority");
         opt.setRequired(false);
-        opt.setArgs(1);
-        options.addOption(opt);
+        opt.setArgs(2);
+        actionGroup.addOption(opt);
+
+        options.addOptionGroup(actionGroup);
+
+        return actionGroup;
     }
 
-    private static void startCommandListener() throws Exception {
-        initalize();
+    private void startCommandListener() throws Exception {
+        initialize();
         console.start(" > ");
         console.printf("Type command here (type '?' or help() to see the list of commands)\n");
         String stmt;
@@ -320,23 +309,9 @@ public class AdminScheduler {
         console.stop();
     }
 
-    private static boolean startCommandLine(CommandLine cmd) {
+    protected boolean startCommandLine(CommandLine cmd) {
         intercativeMode = false;
-        if (cmd.hasOption("start")) {
-            start();
-        } else if (cmd.hasOption("stop")) {
-            stop();
-        } else if (cmd.hasOption("pause")) {
-            pause();
-        } else if (cmd.hasOption("freeze")) {
-            freeze();
-        } else if (cmd.hasOption("resume")) {
-            resume();
-        } else if (cmd.hasOption("shutdown")) {
-            shutdown();
-        } else if (cmd.hasOption("kill")) {
-            kill();
-        } else if (cmd.hasOption("pausejob")) {
+        if (cmd.hasOption("pausejob")) {
             pause(cmd.getOptionValue("pausejob"));
         } else if (cmd.hasOption("resumejob")) {
             resume(cmd.getOptionValue("resumejob"));
@@ -350,8 +325,13 @@ public class AdminScheduler {
             result(cmd.getOptionValue("result"));
         } else if (cmd.hasOption("output")) {
             output(cmd.getOptionValue("output"));
-        } else if (cmd.hasOption("linkrm")) {
-            linkRM(cmd.getOptionValue("linkrm"));
+        } else if (cmd.hasOption("priority")) {
+            try {
+                priority(cmd.getOptionValues("priority")[0], cmd.getOptionValues("priority")[1]);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                printf("Missing arguments for job priority. Arguments must be <jobId> <newPriority>\n\t"
+                    + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
+            }
         } else {
             intercativeMode = true;
             return intercativeMode;
@@ -361,7 +341,7 @@ public class AdminScheduler {
 
     //***************** COMMAND LISTENER *******************
 
-    private static void printf(String format, Object... args) {
+    protected void printf(String format, Object... args) {
         if (intercativeMode) {
             console.printf(format, args);
         } else {
@@ -369,7 +349,7 @@ public class AdminScheduler {
         }
     }
 
-    private static void error(String format, Object... args) {
+    protected void error(String format, Object... args) {
         if (intercativeMode) {
             console.error(format, args);
         } else {
@@ -378,150 +358,18 @@ public class AdminScheduler {
     }
 
     public static void help() {
+        shell.help_();
+    }
+
+    private void help_() {
         printf("\n" + helpScreen());
     }
 
-    public static boolean start() {
-        boolean success = false;
-        try {
-            success = scheduler.start().booleanValue();
-        } catch (SchedulerException e) {
-            error("Start Scheduler is not possible : " + e.getMessage());
-            return false;
-        }
-        if (success) {
-            printf("Scheduler started.");
-        } else {
-            printf("Scheduler cannot be started in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean stop() {
-        boolean success = false;
-        try {
-            success = scheduler.stop().booleanValue();
-        } catch (SchedulerException e) {
-            error("Stop Scheduler is not possible : " + e.getMessage());
-            return false;
-        }
-        if (success) {
-            printf("Scheduler stopped.");
-        } else {
-            printf("Scheduler cannot be stopped in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean pause() {
-        boolean success = false;
-        try {
-            success = scheduler.pause().booleanValue();
-        } catch (SchedulerException e) {
-            error("Pause Scheduler is not possible : " + e.getMessage());
-            return false;
-        }
-        if (success) {
-            printf("Scheduler paused.");
-        } else {
-            printf("Scheduler cannot be paused in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean freeze() {
-        boolean success = false;
-        try {
-            success = scheduler.freeze().booleanValue();
-        } catch (SchedulerException e) {
-            error("Freeze Scheduler is not possible : " + e.getMessage());
-            return false;
-        }
-        if (success) {
-            printf("Scheduler frozen.");
-        } else {
-            printf("Scheduler cannot be frozen in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean resume() {
-        boolean success = false;
-        try {
-            success = scheduler.resume().booleanValue();
-        } catch (SchedulerException e) {
-            error("Resume Scheduler is not possible : " + e.getMessage());
-            return false;
-        }
-        if (success) {
-            printf("Scheduler resumed.");
-        } else {
-            printf("Scheduler cannot be resumed in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean shutdown() {
-        boolean success = false;
-        try {
-            if (intercativeMode) {
-                String s = console.readStatement("Are you sure you want to shutdown the Scheduler ? " +
-                    YES_NO + " > ");
-                success = s.equalsIgnoreCase(YES);
-            }
-            if (success || !intercativeMode) {
-                try {
-                    success = scheduler.shutdown().booleanValue();
-                } catch (SchedulerException e) {
-                    error("Shutdown Scheduler is not possible : " + e.getMessage());
-                    return false;
-                }
-                if (success) {
-                    printf("Shutdown sequence initialized, it might take a while to finish all executions, shell will exit.");
-                    terminated = true;
-                } else {
-                    printf("Scheduler cannot be shutdown in its current state.");
-                }
-            } else {
-                printf("Shutdown aborted !");
-            }
-        } catch (Exception e) {
-            error("*ERROR* : " + e.getMessage());
-        }
-        return success;
-    }
-
-    public static boolean kill() {
-        boolean success = false;
-        try {
-            if (intercativeMode) {
-                String s = console.readStatement("Are you sure you want to kill the Scheduler ? " + YES_NO +
-                    " > ");
-                success = s.equalsIgnoreCase(YES);
-            }
-            if (success || !intercativeMode) {
-                try {
-                    success = scheduler.kill().booleanValue();
-                } catch (SchedulerException e) {
-                    error("Kill Scheduler is not possible : " + e.getMessage());
-                    return false;
-                }
-                if (success) {
-                    printf("Sheduler has just been killed, shell will exit.");
-                    terminated = true;
-                } else {
-                    printf("Scheduler cannot be killed in its current state.");
-                }
-            } else {
-                printf("Kill aborted !");
-            }
-        } catch (Exception e) {
-            error("*ERROR* : " + e.getMessage());
-        }
-        return success;
-    }
-
     public static String submit(String xmlDescriptor) {
+        return shell.submit_(xmlDescriptor);
+    }
+
+    private String submit_(String xmlDescriptor) {
         try {
             Job job = JobFactory.getFactory().createJob(xmlDescriptor);
             JobId id = scheduler.submit(job);
@@ -534,9 +382,13 @@ public class AdminScheduler {
     }
 
     public static boolean pause(String jobId) {
+        return shell.pause_(jobId);
+    }
+
+    private boolean pause_(String jobId) {
         boolean success = false;
         try {
-            success = scheduler.pause(JobIdImpl.makeJobId(jobId)).booleanValue();
+            success = scheduler.pause(jobId).booleanValue();
         } catch (SchedulerException e) {
             error("Error while pausing job " + jobId + " : " + e.getMessage());
             return false;
@@ -550,9 +402,13 @@ public class AdminScheduler {
     }
 
     public static boolean resume(String jobId) {
+        return shell.resume_(jobId);
+    }
+
+    private boolean resume_(String jobId) {
         boolean success = false;
         try {
-            success = scheduler.resume(JobIdImpl.makeJobId(jobId)).booleanValue();
+            success = scheduler.resume(jobId).booleanValue();
         } catch (SchedulerException e) {
             error("Error while resuming job  " + jobId + " : " + e.getMessage());
             return false;
@@ -566,9 +422,13 @@ public class AdminScheduler {
     }
 
     public static boolean kill(String jobId) {
+        return shell.kill_(jobId);
+    }
+
+    private boolean kill_(String jobId) {
         boolean success = false;
         try {
-            success = scheduler.kill(JobIdImpl.makeJobId(jobId)).booleanValue();
+            success = scheduler.kill(jobId).booleanValue();
         } catch (SchedulerException e) {
             error("Error while killing job  " + jobId + " : " + e.getMessage());
             return false;
@@ -582,8 +442,12 @@ public class AdminScheduler {
     }
 
     public static void remove(String jobId) {
+        shell.remove_(jobId);
+    }
+
+    private void remove_(String jobId) {
         try {
-            scheduler.remove(JobIdImpl.makeJobId(jobId));
+            scheduler.remove(jobId);
             printf("Job " + jobId + " removed.");
         } catch (SchedulerException e) {
             error("Error while removing job  " + jobId + " : " + e.getMessage());
@@ -591,6 +455,10 @@ public class AdminScheduler {
     }
 
     public static void result(String jobId) {
+        shell.result_(jobId);
+    }
+
+    private void result_(String jobId) {
         try {
             JobResult result = scheduler.getJobResult(jobId);
 
@@ -615,6 +483,10 @@ public class AdminScheduler {
     }
 
     public static void output(String jobId) {
+        shell.output_(jobId);
+    }
+
+    private void output_(String jobId) {
         try {
             JobResult result = scheduler.getJobResult(jobId);
 
@@ -638,22 +510,25 @@ public class AdminScheduler {
         }
     }
 
-    public static boolean linkRM(String rmURL) {
-        boolean success = false;
+    public static void priority(String jobId, String newPriority) {
+        shell.priority_(jobId, newPriority);
+    }
+
+    private void priority_(String jobId, String newPriority) {
         try {
-            success = scheduler.linkResourceManager(rmURL.trim()).booleanValue();
-            if (success) {
-                printf("The new Resource Manager at " + rmURL + " has been rebind to the scheduler.");
-            } else {
-                error("Reconnect a Resource Manager is only possible when RM is dead !");
-            }
-        } catch (Exception e) {
-            error("*ERROR* : " + e.getMessage());
+            JobPriority prio = JobPriority.findPriority(newPriority);
+            scheduler.changePriority(jobId, prio);
+            printf("Job " + jobId + " priority changed to '" + prio + "' !");
+        } catch (SchedulerException e) {
+            error("Error on job " + jobId + " : " + e.getMessage());
         }
-        return success;
     }
 
     public static void exec(String commandFilePath) {
+        shell.exec_(commandFilePath);
+    }
+
+    private void exec_(String commandFilePath) {
         try {
             File f = new File(commandFilePath.trim());
             BufferedReader br = new BufferedReader(new FileReader(f));
@@ -665,29 +540,33 @@ public class AdminScheduler {
     }
 
     public static void exit() {
+        shell.exit_();
+    }
+
+    private void exit_() {
         console.printf("Exiting administrator.");
         terminated = true;
     }
 
     //***************** OTHER *******************
 
-    private static void initalize() throws IOException {
+    protected void initialize() throws IOException {
         if (!initialized) {
             ScriptEngineManager manager = new ScriptEngineManager();
             // Engine selection
             engine = manager.getEngineByName("rhino");
             initialized = true;
             //read and launch Action.js
-            BufferedReader br = new BufferedReader(new InputStreamReader(AdminScheduler.class
+            BufferedReader br = new BufferedReader(new InputStreamReader(UserShell.class
                     .getResourceAsStream(JS_INIT_FILE)));
             eval(readFileContent(br));
         }
     }
 
-    private static void eval(String cmd) {
+    protected void eval(String cmd) {
         try {
             if (!initialized) {
-                initalize();
+                initialize();
             }
             //Evaluate the command
             engine.eval(cmd);
@@ -698,10 +577,10 @@ public class AdminScheduler {
 
     private static String format(String msg) {
         msg = msg.replaceFirst("[^:]+:", "");
-        return msg.replaceFirst("[(].*", "").trim();
+        return msg.replaceFirst("[(]<.*", "").trim();
     }
 
-    private static String readFileContent(BufferedReader reader) throws IOException {
+    protected static String readFileContent(BufferedReader reader) throws IOException {
         StringBuilder sb = new StringBuilder();
         String tmp;
         while ((tmp = reader.readLine()) != null) {
@@ -712,24 +591,14 @@ public class AdminScheduler {
 
     //***************** HELP SCREEN *******************
 
-    private static String helpScreen() {
+    protected String helpScreen() {
         StringBuilder out = new StringBuilder("Scheduler administrator commands are :\n\n");
 
-        out.append(String.format(" %1$-18s\t Starts Scheduler\n", START_CMD));
-        out.append(String.format(" %1$-18s\t Stops Scheduler\n", STOP_CMD));
         out.append(String.format(
-                " %1$-18s\t pauses Scheduler, causes every jobs but running one to be paused\n", PAUSE_CMD));
-        out
-                .append(String
-                        .format(
-                                " %1$-18s\t freezes Scheduler, causes all jobs to be paused (every non-running tasks are paused)\n",
-                                FREEZE_CMD));
-        out
-                .append(String.format(" %1$-18s\t resumes Scheduler, causes all jobs to be resumed\n",
-                        RESUME_CMD));
-        out.append(String.format(" %1$-18s\t Waits for running jobs to finish and shutdown Scheduler\n",
-                SHUTDOWN_CMD));
-        out.append(String.format(" %1$-18s\t Kill every tasks and jobs and shutdown Scheduler\n", KILL_CMD));
+                " %1$-18s\t Change the priority of the given job (parameters are an int or a string representing the jobId "
+                    + "AND a string representing the new priority)\n"
+                    + " %2$-18s\t Priorities are Idle, Lowest, Low, Normal, High, Highest\n", PRIORITY_CMD,
+                " "));
         out.append(String.format(
                 " %1$-18s\t Pause the given job (parameter is an int or a string representing the jobId)\n",
                 PAUSEJOB_CMD));
@@ -759,11 +628,6 @@ public class AdminScheduler {
                         .format(
                                 " %1$-18s\t Submit a new job (parameter is a string representing the job XML descriptor URL)\n",
                                 SUBMIT_CMD));
-        out
-                .append(String
-                        .format(
-                                " %1$-18s\t Reconnect a Resource Manager (parameter is a string representing the new rmURL)\n",
-                                LINK_RM_CMD));
         out
                 .append(String
                         .format(

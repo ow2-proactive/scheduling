@@ -72,6 +72,9 @@ public enum PASchedulerProperties {
     /** Delay to wait between getting a job result and removing the job concerned */
     SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PAPropertiesType.INTEGER),
 
+    /** Name of the JMX MBean for the scheduler */
+    SCHEDULER_JMX_MBEAN_NAME("pa.scheduler.core.jmxmbeanname", PAPropertiesType.STRING),
+
     /* ***************************************************************** */
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */

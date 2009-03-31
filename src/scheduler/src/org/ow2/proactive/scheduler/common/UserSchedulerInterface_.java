@@ -105,7 +105,7 @@ public interface UserSchedulerInterface_ extends Serializable {
     public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException;
 
     /**
-     * kill the job represented by jobId.<br>
+     * Kill the job represented by jobId.<br>
      * This method will kill every running tasks of this job, and remove it from the scheduler.<br>
      * The job won't be terminated, it won't have result.
      *

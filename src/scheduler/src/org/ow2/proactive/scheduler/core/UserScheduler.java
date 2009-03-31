@@ -156,6 +156,41 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#kill(java.lang.String)
+     */
+    public BooleanWrapper kill(String jobId) throws SchedulerException {
+        return schedulerFrontend.kill(jobId);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#pause(java.lang.String)
+     */
+    public BooleanWrapper pause(String jobId) throws SchedulerException {
+        return schedulerFrontend.pause(jobId);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#remove(java.lang.String)
+     */
+    public void remove(String jobId) throws SchedulerException {
+        schedulerFrontend.remove(jobId);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#resume(java.lang.String)
+     */
+    public BooleanWrapper resume(String jobId) throws SchedulerException {
+        return schedulerFrontend.resume(jobId);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#changePriority(java.lang.String, org.ow2.proactive.scheduler.common.job.JobPriority)
+     */
+    public void changePriority(String jobId, JobPriority priority) throws SchedulerException {
+        schedulerFrontend.changePriority(jobId, priority);
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#isConnected()
      */
     public BooleanWrapper isConnected() {
