@@ -54,6 +54,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.apache.log4j.spi.LoggingEvent;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
@@ -774,11 +775,20 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     }
                 }
 
+            } catch (ActiveObjectCreationException e1) {
+                logger_dev.error("", e1);
+                //Something goes wrong with the active object creation (createLauncher)
+                logger.warn("Active object creation exception : " + e1.getMessage());
+                //so try to get back the node to the resource manager
+                try {
+                    resourceManager.freeNode(node);
+                } catch (Exception e2) {
+                }
             } catch (Exception e1) {
                 logger_dev.error("", e1);
                 //if we are here, it is that something append while launching the current task.
                 logger.warn("Current node (" + node + ") has failed : " + e1.getMessage());
-                //so try to get back the node to the resource manager
+                //so try to get back the node to the resource manager as a dead node
                 try {
                     resourceManager.freeDownNode(internalTask.getExecuterInformations().getNodeName());
                 } catch (Exception e2) {
