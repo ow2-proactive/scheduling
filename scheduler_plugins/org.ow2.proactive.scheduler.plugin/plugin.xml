@@ -52,7 +52,7 @@
             category="org.ow2.proactive.scheduler.gui"
             class="org.ow2.proactive.scheduler.gui.views.Users"
             id="org.ow2.proactive.scheduler.gui.views.Users"
-            name="Users">
+            name="Open user sessions">
       </view>
    </extension>
    <extension
