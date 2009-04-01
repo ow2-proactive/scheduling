@@ -66,14 +66,15 @@ public class TestJobFactory {
     public void run() throws Throwable {
         log("TEST jobFactory STAX");
         //test default behavior as well (null is STAX)
-        run1(null);
+        run_(null);
         log("TEST jobFactory XPATH");
         //test XPATH factory
-        run1(org.ow2.proactive.scheduler.common.job.factories.JobFactory_xpath.class.getCanonicalName());
+        run_(org.ow2.proactive.scheduler.common.job.factories.JobFactory_xpath.class.getCanonicalName());
     }
 
-    private void run1(String impl) throws Throwable {
+    private void run_(String impl) throws Throwable {
         String URLbegin = System.getProperty("pa.scheduler.home") + "/";
+        System.setProperty("jobName", "Job_TaskFlow");
         log("Test Job TASKFLOW");
         TaskFlowJob tfJob = (TaskFlowJob) JobFactory.getFactory(impl).createJob(jobTaskFlowDescriptor);
         //Check job properties
@@ -86,6 +87,7 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getRestartTaskOnError(), RestartMode.ELSEWHERE);
         Assert.assertEquals(tfJob.getType(), JobType.TASKSFLOW);
         Assert.assertEquals(tfJob.getTasks().size(), 4);
+        Assert.assertEquals(tfJob.getLogFile(), URLbegin + ".logs/" + System.getProperty("jobName") + ".log");
         //Check task 1 properties
         Assert.assertEquals(tfJob.getTask("task1").getName(), "task1");
         Assert.assertEquals(tfJob.getTask("task1").isCancelJobOnError(), false);

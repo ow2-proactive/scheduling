@@ -349,7 +349,7 @@ public class JobFactory_xpath extends JobFactory {
                 throw new RuntimeException("Job Parameter Sweeping is not yet implemented !");
         }
         // JOB NAME
-        job.setName((String) xpath.evaluate(ATTRIBUTE_ID, jobNode, XPathConstants.STRING));
+        job.setName(replace((String) xpath.evaluate(ATTRIBUTE_ID, jobNode, XPathConstants.STRING)));
         logger.debug(ATTRIBUTE_ID + " : " + job.getName());
 
         // JOB PRIORITY
@@ -380,14 +380,14 @@ public class JobFactory_xpath extends JobFactory {
         String projectName = (String) xpath.evaluate(JOB_ATTRIBUTE_PROJECTNAME, jobNode,
                 XPathConstants.STRING);
         if (!"".equals(projectName)) {
-            job.setProjectName(projectName);
+            job.setProjectName(replace(projectName));
             logger.debug(JOB_ATTRIBUTE_PROJECTNAME + " = " + projectName);
         }
 
         // JOB LOG FILE
         String logFile = xpath.evaluate(JOB_ATTRIBUTE_LOGFILE, jobNode);
         if (!"".equals(logFile)) {
-            job.setLogFile(logFile);
+            job.setLogFile(replace(logFile));
             logger.debug(JOB_ATTRIBUTE_LOGFILE + " = " + logFile);
         }
 

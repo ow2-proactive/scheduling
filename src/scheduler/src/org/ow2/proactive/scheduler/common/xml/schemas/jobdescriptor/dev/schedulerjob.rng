@@ -51,7 +51,7 @@
   <define name="jobName">
     <attribute name="name">
       <doc:documentation>Identification of this job</doc:documentation>
-      <data type="ID"/>
+      <data type="string"/>
     </attribute>
   </define>
   <define name="variables">
@@ -161,7 +161,7 @@
   <define name="projectName">
     <attribute name="projectName">
       <doc:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</doc:documentation>
-      <data type="NCName"/>
+      <data type="string"/>
     </attribute>
   </define>
   <define name="jobDescription">

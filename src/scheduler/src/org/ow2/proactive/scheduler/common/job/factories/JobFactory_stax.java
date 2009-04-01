@@ -247,6 +247,11 @@ public class JobFactory_stax extends JobFactory {
                     }
                 }
             }
+            //as the job attributes are declared before variable evaluation, 
+            //replace variables in this attributes after job creation (after variables evaluation)
+            job.setName(replace(job.getName()));
+            job.setProjectName(replace(job.getProjectName()));
+            job.setLogFile(replace(job.getLogFile()));
         } catch (Exception e) {
             throw new JobCreationException(e.getMessage(), e);
         }

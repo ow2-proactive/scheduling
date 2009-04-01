@@ -36,7 +36,7 @@
           <xs:documentation>Maximum number of execution for each task (default=1)</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="projectName" type="xs:NCName">
+      <xs:attribute name="projectName" type="xs:string">
         <xs:annotation>
           <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
         </xs:annotation>
@@ -50,7 +50,7 @@
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="jobName">
-    <xs:attribute name="name" use="required" type="xs:ID">
+    <xs:attribute name="name" use="required" type="xs:string">
       <xs:annotation>
         <xs:documentation>Identification of this job</xs:documentation>
       </xs:annotation>
@@ -183,7 +183,7 @@
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="projectName">
-    <xs:attribute name="projectName" use="required" type="xs:NCName">
+    <xs:attribute name="projectName" use="required" type="xs:string">
       <xs:annotation>
         <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
       </xs:annotation>

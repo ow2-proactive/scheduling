@@ -9,7 +9,7 @@ job = ## Definition of a job for the scheduler
     element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow | proActive ) }
 
 jobName = ## Identification of this job
-    attribute name { xsd:ID }
+    attribute name { xsd:string }
 variables = ## Definition of variables which can be reused throughout this descriptor
     element variables { variable+ }
 variable = ## Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}
@@ -43,7 +43,7 @@ infoName = ## Name of the information variable
 infoValue = ## Value of the information variable
 	attribute value {xsd:string}
 projectName = ## Name of the project related to this job. It is also used in the policy to group some jobs together
-	attribute projectName { xsd:NCName }
+	attribute projectName { xsd:string }
 jobDescription = ## Textual description of this job 
     element description { text }
 taskFlow = ## A job composed of a flow of tasks with or without dependencies 
