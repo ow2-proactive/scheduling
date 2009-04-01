@@ -43,16 +43,16 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.util.userconsole.UserShell;
+import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
 
 
 /**
- * AdminShell will help you to manage the scheduler.
+ * AdminController will help you to manage the scheduler.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class AdminShell extends UserShell {
+public class AdminController extends UserController {
 
     private static final String JS_INIT_FILE = "AdminActions.js";
 
@@ -75,7 +75,8 @@ public class AdminShell extends UserShell {
      * @param args the arguments to be passed
      */
     public static void main(String[] args) {
-        shell = new AdminShell();
+        shell = new AdminController();
+        shell.setCommandName("adminScheduler");
         shell.load(args);
     }
 
@@ -163,7 +164,7 @@ public class AdminShell extends UserShell {
     //***************** COMMAND LISTENER *******************
 
     public static boolean start() {
-        return ((AdminShell) shell).start_();
+        return ((AdminController) shell).start_();
     }
 
     private boolean start_() {
@@ -183,7 +184,7 @@ public class AdminShell extends UserShell {
     }
 
     public static boolean stop() {
-        return ((AdminShell) shell).stop_();
+        return ((AdminController) shell).stop_();
     }
 
     private boolean stop_() {
@@ -203,7 +204,7 @@ public class AdminShell extends UserShell {
     }
 
     public static boolean pause() {
-        return ((AdminShell) shell).pause_();
+        return ((AdminController) shell).pause_();
     }
 
     private boolean pause_() {
@@ -223,7 +224,7 @@ public class AdminShell extends UserShell {
     }
 
     public static boolean freeze() {
-        return ((AdminShell) shell).freeze_();
+        return ((AdminController) shell).freeze_();
     }
 
     private boolean freeze_() {
@@ -243,7 +244,7 @@ public class AdminShell extends UserShell {
     }
 
     public static boolean resume() {
-        return ((AdminShell) shell).resume_();
+        return ((AdminController) shell).resume_();
     }
 
     private boolean resume_() {
@@ -263,7 +264,7 @@ public class AdminShell extends UserShell {
     }
 
     public static boolean shutdown() {
-        return ((AdminShell) shell).shutdown_();
+        return ((AdminController) shell).shutdown_();
     }
 
     private boolean shutdown_() {
@@ -297,7 +298,7 @@ public class AdminShell extends UserShell {
     }
 
     public static boolean kill() {
-        return ((AdminShell) shell).kill_();
+        return ((AdminController) shell).kill_();
     }
 
     private boolean kill_() {
@@ -331,7 +332,7 @@ public class AdminShell extends UserShell {
     }
 
     public static boolean linkRM(String rmURL) {
-        return ((AdminShell) shell).linkRM_(rmURL);
+        return ((AdminController) shell).linkRM_(rmURL);
     }
 
     private boolean linkRM_(String rmURL) {
@@ -355,7 +356,7 @@ public class AdminShell extends UserShell {
     protected void initialize() throws IOException {
         super.initialize();
         //read and launch Action.js
-        BufferedReader br = new BufferedReader(new InputStreamReader(AdminShell.class
+        BufferedReader br = new BufferedReader(new InputStreamReader(AdminController.class
                 .getResourceAsStream(JS_INIT_FILE)));
         eval(readFileContent(br));
     }

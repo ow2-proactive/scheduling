@@ -74,13 +74,13 @@ import org.ow2.proactive.utils.console.SimpleConsole;
 
 
 /**
- * UserShell will help you to interact with the scheduler.<br>
+ * UserController will help you to interact with the scheduler.<br>
  * Use this class to submit jobs, get results, pause job, etc...
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class UserShell {
+public class UserController {
 
     private final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
     private final String JS_INIT_FILE = "UserActions.js";
@@ -99,6 +99,8 @@ public class UserShell {
     private static final String GET_OUTPUT_CMD = "output(id)";
     private static final String EXEC_CMD = "exec(commandFilePath)";
 
+    private String commandName = "userScheduler";
+
     protected UserSchedulerInterface scheduler;
     protected boolean initialized = false;
     protected boolean terminated = false;
@@ -111,7 +113,7 @@ public class UserShell {
     protected String user = null;
     protected String pwd = null;
 
-    protected static UserShell shell;
+    protected static UserController shell;
 
     /**
      * Start the Scheduler administrator
@@ -119,7 +121,7 @@ public class UserShell {
      * @param args the arguments to be passed
      */
     public static void main(String[] args) {
-        shell = new UserShell();
+        shell = new UserController();
         shell.load(args);
     }
 
@@ -226,7 +228,7 @@ public class UserShell {
             hf.setWidth(130);
             String note = "\nNOTE : if no command marked with " + control +
                 "is specified, the administrator will start in interactive mode.";
-            hf.printHelp(this.getClass().getSimpleName() + Tools.shellExtension(), "", options, note, true);
+            hf.printHelp(commandName + Tools.shellExtension(), "", options, note, true);
             System.exit(2);
         }
 
@@ -482,7 +484,7 @@ public class UserShell {
                     try {
                         printf("\t " + e.getKey() + " : " + tRes.value() + "\n");
                     } catch (Throwable e1) {
-                        error("", tRes.getException());
+                        error("\t " + e.getKey() + " : " + tRes.getException() + "\n");
                     }
                 }
             } else {
@@ -568,7 +570,7 @@ public class UserShell {
             engine = manager.getEngineByName("rhino");
             initialized = true;
             //read and launch Action.js
-            BufferedReader br = new BufferedReader(new InputStreamReader(UserShell.class
+            BufferedReader br = new BufferedReader(new InputStreamReader(UserController.class
                     .getResourceAsStream(JS_INIT_FILE)));
             eval(readFileContent(br));
         }
@@ -647,6 +649,15 @@ public class UserShell {
         out.append(String.format(" %1$-18s\t Exits Scheduler administrator\n", EXIT_CMD));
 
         return out.toString();
+    }
+
+    /**
+     * Set the commandName value to the given commandName value
+     *
+     * @param commandName the commandName to set
+     */
+    public void setCommandName(String commandName) {
+        this.commandName = commandName;
     }
 
 }

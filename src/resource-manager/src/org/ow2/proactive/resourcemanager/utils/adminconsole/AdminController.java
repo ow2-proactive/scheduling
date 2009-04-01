@@ -50,7 +50,7 @@ import org.ow2.proactive.utils.console.SimpleConsole;
  * @since ProActive Scheduling 1.0
  *
  */
-public class AdminShell {
+public class AdminController {
 
     private static final String RM_DEFAULT_URL = getHostURL("//localhost/");
     private final String JS_INIT_FILE = "AdminActions.js";
@@ -69,6 +69,8 @@ public class AdminShell {
     private static final String EXIT_CMD = "exit()";
     private static final String EXEC_CMD = "exec(commandFilePath)";
 
+    private String commandName = "adminRM";
+
     protected RMAdmin rm;
     protected boolean initialized = false;
     protected boolean terminated = false;
@@ -81,13 +83,13 @@ public class AdminShell {
     protected String user = null;
     protected String pwd = null;
 
-    protected static AdminShell shell;
+    protected static AdminController shell;
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-        shell = new AdminShell();
+        shell = new AdminController();
         shell.load(args);
     }
 
@@ -181,13 +183,13 @@ public class AdminShell {
         } catch (ParseException e) {
             displayHelp = true;
         } catch (RMException e) {
-            logger.error("Error at connection : " + e.getMessage() + "\nShutdown the administrator.\n");
+            logger.error("Error at connection : " + e.getMessage() + "\nShutdown the controller.\n");
             System.exit(1);
         } catch (LoginException e) {
-            logger.error(e.getMessage() + "\nShutdown the administrator.\n");
+            logger.error(e.getMessage() + "\nShutdown the controller.\n");
             System.exit(1);
         } catch (Exception e) {
-            logger.error("An error has occurred : " + e.getMessage() + "\nShutdown the administrator.\n", e);
+            logger.error("An error has occurred : " + e.getMessage() + "\nShutdown the controller.\n", e);
             System.exit(1);
         }
 
@@ -196,8 +198,8 @@ public class AdminShell {
             HelpFormatter hf = new HelpFormatter();
             hf.setWidth(160);
             String note = "\nNOTE : if no command marked with " + control +
-                "is specified, the administrator will start in interactive mode.";
-            hf.printHelp(this.getClass().getSimpleName() + shellExtension(), "", options, note, true);
+                "is specified, the controller will start in interactive mode.";
+            hf.printHelp(commandName + shellExtension(), "", options, note, true);
             System.exit(2);
         }
 
@@ -397,7 +399,7 @@ public class AdminShell {
     private void shutdown_(boolean preempt) {
         try {
             rm.shutdown(preempt);
-            printf("Shutdown request sent to Resource Manager, administrator will shutdown !");
+            printf("Shutdown request sent to Resource Manager, controller will shutdown !");
             terminated = true;
         } catch (ProActiveException e) {
             error("Error while shutting down the RM : " + e.getMessage());
@@ -535,7 +537,7 @@ public class AdminShell {
     }
 
     private void exit_() {
-        console.printf("Exiting administrator.");
+        console.printf("Exiting controller.");
         terminated = true;
     }
 
@@ -548,7 +550,7 @@ public class AdminShell {
             engine = manager.getEngineByName("rhino");
             initialized = true;
             //read and launch Action.js
-            BufferedReader br = new BufferedReader(new InputStreamReader(AdminShell.class
+            BufferedReader br = new BufferedReader(new InputStreamReader(AdminController.class
                     .getResourceAsStream(JS_INIT_FILE)));
             eval(readFileContent(br));
         }
@@ -583,7 +585,7 @@ public class AdminShell {
     //***************** HELP SCREEN *******************
 
     protected String helpScreen() {
-        StringBuilder out = new StringBuilder("Resource Manager administrator commands are :\n\n");
+        StringBuilder out = new StringBuilder("Resource Manager controller commands are :\n\n");
         out.append(String.format(
                 " %1$-28s\t Add node to the given node source (parameters is a string representing the node to add AND"
                     + " a string representing the node source in which to add the node)\n", ADDNODE_CMD));
@@ -613,7 +615,7 @@ public class AdminShell {
                         .format(
                                 " %1$-28s\t Execute the content of the given script file (parameter is a string representing a command-file path)\n",
                                 EXEC_CMD));
-        out.append(String.format(" %1$-28s\t Exits RM administrator\n", EXIT_CMD));
+        out.append(String.format(" %1$-28s\t Exits RM controller\n", EXIT_CMD));
 
         return out.toString();
     }
@@ -643,5 +645,14 @@ public class AdminShell {
         } else {
             return ".sh";
         }
+    }
+
+    /**
+     * Set the commandName value to the given commandName value
+     *
+     * @param commandName the commandName to set
+     */
+    public void setCommandName(String commandName) {
+        this.commandName = commandName;
     }
 }

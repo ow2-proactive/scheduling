@@ -1,33 +1,33 @@
-importClass(org.ow2.proactive.scheduler.util.adminconsole.AdminShell);
+importClass(org.ow2.proactive.scheduler.util.adminconsole.AdminController);
 
 function start(){
-    return AdminShell.start();
+    return AdminController.start();
 }
 
 function stop(){
-    return AdminShell.stop();
+    return AdminController.stop();
 }
 
 function pause(){
-    return AdminShell.pause();
+    return AdminController.pause();
 }
 
 function freeze(){
-    return AdminShell.freeze();
+    return AdminController.freeze();
 }
 
 function resume(){
-    return AdminShell.resume();
+    return AdminController.resume();
 }
 
 function shutdown(){
-    return AdminShell.shutdown();
+    return AdminController.shutdown();
 }
 
 function kill(){
-    return AdminShell.kill();
+    return AdminController.kill();
 }
 
 function linkrm(rmURL){
-	return AdminShell.linkRM(""+rmURL);
+	return AdminController.linkRM(""+rmURL);
 }

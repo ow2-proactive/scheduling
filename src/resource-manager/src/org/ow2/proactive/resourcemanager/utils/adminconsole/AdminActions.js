@@ -1,11 +1,11 @@
-importClass(org.ow2.proactive.resourcemanager.utils.adminconsole.AdminShell);
+importClass(org.ow2.proactive.resourcemanager.utils.adminconsole.AdminController);
 
 function addnode(nodeName, nodeSourceName){
 	if (nodeSourceName==undefined){
 		nodeSourceName = null;
 		println("Node Source will be the default one as it is not set");
 	}
-	return AdminShell.addnode(nodeName, nodeSourceName);
+	return AdminController.addnode(nodeName, nodeSourceName);
 }
 
 function removenode(nodeName,preemptively){
@@ -13,7 +13,7 @@ function removenode(nodeName,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-    return AdminShell.removenode(nodeName,preemptively);
+    return AdminController.removenode(nodeName,preemptively);
 }
 
 function gcmdeploy(gcmdFile, nodeSourceName){
@@ -21,11 +21,11 @@ function gcmdeploy(gcmdFile, nodeSourceName){
 		nodeSourceName = null;
 		println("Node Source will be the default one as it is not set");
 	}
-    return AdminShell.gcmdeploy(gcmdFile, nodeSourceName);
+    return AdminController.gcmdeploy(gcmdFile, nodeSourceName);
 }
 
 function createns(nodeSourceName){
-    return AdminShell.createns(nodeSourceName);
+    return AdminController.createns(nodeSourceName);
 }
 
 function removens(nodeSourceName,preemptively){
@@ -33,15 +33,15 @@ function removens(nodeSourceName,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return AdminShell.removens(nodeSourceName,preemptively);
+	return AdminController.removens(nodeSourceName,preemptively);
 }
 
 function listnodes(){
-    return AdminShell.listnodes();
+    return AdminController.listnodes();
 }
 
 function listns(){
-    return AdminShell.listns();
+    return AdminController.listns();
 }
 
 function shutdown(preemptively){
@@ -49,13 +49,13 @@ function shutdown(preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return AdminShell.shutdown(preemptively);
+	return AdminController.shutdown(preemptively);
 }
 
 function exec(commandFilePath){
-	return AdminShell.exec(commandFilePath);
+	return AdminController.exec(commandFilePath);
 }
 
 function exit(){
-	return AdminShell.exit();
+	return AdminController.exit();
 }

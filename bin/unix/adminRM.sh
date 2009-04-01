@@ -6,6 +6,6 @@ workingDir=`dirname $0`
 
 opt="-Xms128m -Xmx2048m"
 
-$JAVACMD org.ow2.proactive.resourcemanager.utils.adminconsole.AdminShell $@
+$JAVACMD org.ow2.proactive.resourcemanager.utils.adminconsole.AdminController $@
 
 echo

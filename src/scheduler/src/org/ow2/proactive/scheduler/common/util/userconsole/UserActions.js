@@ -1,45 +1,45 @@
-importClass(org.ow2.proactive.scheduler.common.util.userconsole.UserShell);
+importClass(org.ow2.proactive.scheduler.common.util.userconsole.UserController);
 
 function help(){
-	UserShell.help();
+	UserController.help();
 }
 
 function submit(xmlDescriptor){
-    return UserShell.submit(""+xmlDescriptor);
+    return UserController.submit(""+xmlDescriptor);
 }
 
 function pausejob(jobId){
-    return UserShell.pause(""+jobId);
+    return UserController.pause(""+jobId);
 }
 
 function resumejob(jobId){
-    return UserShell.resume(""+jobId);
+    return UserController.resume(""+jobId);
 }
 
 function killjob(jobId){
-    return UserShell.kill(""+jobId);
+    return UserController.kill(""+jobId);
 }
 
 function removejob(jobId){
-    UserShell.remove(""+jobId);
+    UserController.remove(""+jobId);
 }
 
 function result(jobId){
-    UserShell.result(""+jobId);
+    UserController.result(""+jobId);
 }
 
 function output(jobId){
-    UserShell.output(""+jobId);
+    UserController.output(""+jobId);
 }
 
 function priority(jobId, priority){
-    UserShell.priority(""+jobId,""+priority);
+    UserController.priority(""+jobId,""+priority);
 }
 
 function exec(commandFilePath){
-	UserShell.exec(""+commandFilePath);
+	UserController.exec(""+commandFilePath);
 }
 
 function exit(){
-	UserShell.exit();
+	UserController.exit();
 }
