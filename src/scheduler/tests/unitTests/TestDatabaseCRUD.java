@@ -99,6 +99,7 @@ public class TestDatabaseCRUD {
         //build hibernate session
         DatabaseManager.build();
         //create a job
+        System.setProperty("jobName", "Job_TaskFlow");
         tfJob = (TaskFlowJob) JobFactory.getFactory().createJob(jobTaskFlowDescriptor);
     }
 
