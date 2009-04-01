@@ -7,7 +7,9 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 
 
 /**
- * TestSchedulerEvent tests that the scheduler event ordinal have not changed.
+ * TestSchedulerEvent tests that the scheduler event ordinal have not been changed.<br>
+ * The ordinal of the SchedulerEvent class must not changed as it is used by user.
+ * Changing this ordinal may imply many bugs in client implementation that already use the API. 
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0

@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.Task;
 
@@ -55,6 +56,8 @@ import org.ow2.proactive.scheduler.common.task.Task;
 @PublicAPI
 public class TaskFlowJob extends Job {
 
+    /** Task count for unset task name */
+    private int taskCountForUnSetTaskName = 1;
     /** List of task for the task flow job */
     private Map<String, Task> tasks = new HashMap<String, Task>();
 
@@ -71,7 +74,11 @@ public class TaskFlowJob extends Job {
     }
 
     /**
-     * Add a task to this task flow job.
+     * Add a task to this task flow job.<br>
+     * The task name must not be null as it is not by default.<br>
+     * The task name must also be different for each task as it is used to identify each task result.<br>
+     * <br>
+     * If not set, the task name will be a generated one : 'task_X' (where X is the Xth added task number)
      *
      * @param task the task to add.
      * @throws UserException if a problem occurred while the task is being added.
@@ -80,14 +87,22 @@ public class TaskFlowJob extends Job {
         if (task.getName() == null) {
             throw new UserException("The name of the task must not be null !");
         }
+        if (task.getName().equals(SchedulerConstants.TASK_DEFAULT_NAME)) {
+            task.setName(SchedulerConstants.TASK_NAME_IFNOTSET + taskCountForUnSetTaskName);
+            taskCountForUnSetTaskName++;
+        }
         if (tasks.containsKey(task.getName())) {
-            throw new UserException("The name of the task is already used !");
+            throw new UserException("The name of the task is already used : " + task.getName());
         }
         tasks.put(task.getName(), task);
     }
 
     /**
      * Add a list of tasks to this task flow job.
+     * The task names must not be null as it is not by default.<br>
+     * The task names must also be different for each task as it is used to identify each task result.<br>
+     * <br>
+     * If not set, the task names will be generated : 'task_X' (where X is the Xth added task number)
      *
      * @param tasks the list of tasks to add.
      * @throws UserException if a problem occurred while the task is being added.

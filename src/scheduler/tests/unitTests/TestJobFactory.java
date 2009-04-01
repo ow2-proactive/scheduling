@@ -31,9 +31,12 @@
  */
 package unitTests;
 
+import java.util.HashMap;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.ProActiveJob;
@@ -42,6 +45,7 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
+import org.ow2.proactive.scheduler.common.task.Task;
 
 
 /**
@@ -245,6 +249,26 @@ public class TestJobFactory {
         Assert.assertEquals(paJob.getTask().getResultPreview(), "path.to.package.class");
         Assert.assertEquals(paJob.getTask().getSelectionScript(), null);
         Assert.assertEquals(paJob.getTask().isPreciousResult(), true);
+
+        log("Test generated task name");
+        TaskFlowJob job = new TaskFlowJob();
+        for (int i = 0; i < 4; i++) {
+            Task t = new NativeTask();
+            job.addTask(t);
+        }
+        Task t1, t2, t3, t4;
+        Assert.assertNull(job.getTask(SchedulerConstants.TASK_NAME_IFNOTSET + "0"));
+        Assert.assertNotNull(t1 = job.getTask(SchedulerConstants.TASK_NAME_IFNOTSET + "1"));
+        Assert.assertNotNull(t2 = job.getTask(SchedulerConstants.TASK_NAME_IFNOTSET + "2"));
+        Assert.assertNotNull(t3 = job.getTask(SchedulerConstants.TASK_NAME_IFNOTSET + "3"));
+        Assert.assertNotNull(t4 = job.getTask(SchedulerConstants.TASK_NAME_IFNOTSET + "4"));
+        Assert.assertNull(job.getTask(SchedulerConstants.TASK_NAME_IFNOTSET + "5"));
+        Assert.assertTrue(t1 != t2);
+        Assert.assertTrue(t1 != t3);
+        Assert.assertTrue(t1 != t4);
+        Assert.assertTrue(t2 != t3);
+        Assert.assertTrue(t2 != t4);
+        Assert.assertTrue(t3 != t4);
     }
 
     private void log(String s) {

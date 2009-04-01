@@ -53,6 +53,9 @@ public class SchedulerConstants {
     /** Default task name */
     public static final String TASK_DEFAULT_NAME = "NOT SET";
 
+    /** If the task name is not set, this is the generated one */
+    public static final String TASK_NAME_IFNOTSET = "task_";
+
     /** Name of the environment variable for windows home directory on the common file system. */
     public static final String WINDOWS_HOME_ENV_VAR = "WINDOWS_HOME";
 

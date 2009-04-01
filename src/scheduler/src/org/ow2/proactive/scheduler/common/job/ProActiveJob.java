@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 
 
@@ -78,8 +79,12 @@ public class ProActiveJob extends Job {
      * To set the unique task of this job.
      *
      * @param task the task to set
+     * @throws UserException if a problem occurred while the task is being added.
      */
-    public void setTask(ProActiveTask task) {
+    public void setTask(ProActiveTask task) throws UserException {
+        if (task.getName() == null) {
+            throw new UserException("The name of the task must not be null !");
+        }
         task.setPreciousResult(true);
         this.task = task;
     }
