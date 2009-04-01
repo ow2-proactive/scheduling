@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
@@ -150,7 +151,11 @@ public class AdminShell {
                 char password[] = null;
                 try {
                     password = PasswordField.getPassword(System.in, pwdMsg);
-                    pwd = String.valueOf(password);
+                    if (password == null) {
+                        pwd = "";
+                    } else {
+                        pwd = String.valueOf(password);
+                    }
                 } catch (IOException ioe) {
                     logger.error("", ioe);
                 }
@@ -175,8 +180,14 @@ public class AdminShell {
             displayHelp = true;
         } catch (ParseException e) {
             displayHelp = true;
+        } catch (RMException e) {
+            logger.error("Error at connection : " + e.getMessage() + "\nShutdown the administrator.\n");
+            System.exit(1);
+        } catch (LoginException e) {
+            logger.error(e.getMessage() + "\nShutdown the administrator.\n");
+            System.exit(1);
         } catch (Exception e) {
-            logger.error("An error has occurred : " + e.getMessage() + "\n Shutdown the administrator.\n", e);
+            logger.error("An error has occurred : " + e.getMessage() + "\nShutdown the administrator.\n", e);
             System.exit(1);
         }
 
@@ -194,7 +205,7 @@ public class AdminShell {
         System.exit(0);
     }
 
-    protected void connect() throws Exception {
+    protected void connect() throws LoginException {
         rm = auth.logAsAdmin(user, pwd);
         logger.info("\t-> Admin '" + user + "' successfully connected\n");
     }

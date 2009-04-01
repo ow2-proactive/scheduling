@@ -5,7 +5,7 @@ function addnode(nodeName, nodeSourceName){
 		nodeSourceName = null;
 		println("Node Source will be the default one as it is not set");
 	}
-	return AdminRM.addnode(nodeName, nodeSourceName);
+	return AdminShell.addnode(nodeName, nodeSourceName);
 }
 
 function removenode(nodeName,preemptively){
@@ -13,7 +13,7 @@ function removenode(nodeName,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-    return AdminRM.removenode(nodeName,preemptively);
+    return AdminShell.removenode(nodeName,preemptively);
 }
 
 function gcmdeploy(gcmdFile, nodeSourceName){
@@ -21,11 +21,11 @@ function gcmdeploy(gcmdFile, nodeSourceName){
 		nodeSourceName = null;
 		println("Node Source will be the default one as it is not set");
 	}
-    return AdminRM.gcmdeploy(gcmdFile, nodeSourceName);
+    return AdminShell.gcmdeploy(gcmdFile, nodeSourceName);
 }
 
 function createns(nodeSourceName){
-    return AdminRM.createns(nodeSourceName);
+    return AdminShell.createns(nodeSourceName);
 }
 
 function removens(nodeSourceName,preemptively){
@@ -33,15 +33,15 @@ function removens(nodeSourceName,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return AdminRM.removens(nodeSourceName,preemptively);
+	return AdminShell.removens(nodeSourceName,preemptively);
 }
 
 function listnodes(){
-    return AdminRM.listnodes();
+    return AdminShell.listnodes();
 }
 
 function listns(){
-    return AdminRM.listns();
+    return AdminShell.listns();
 }
 
 function shutdown(preemptively){
@@ -49,13 +49,13 @@ function shutdown(preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return AdminRM.shutdown(preemptively);
+	return AdminShell.shutdown(preemptively);
 }
 
 function exec(commandFilePath){
-	return AdminRM.exec(commandFilePath);
+	return AdminShell.exec(commandFilePath);
 }
 
 function exit(){
-	return AdminRM.exit();
+	return AdminShell.exit();
 }

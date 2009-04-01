@@ -35,6 +35,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
@@ -78,7 +80,7 @@ public class AdminShell extends UserShell {
     }
 
     @Override
-    protected void connect() throws Exception {
+    protected void connect() throws LoginException {
         scheduler = auth.logAsAdmin(user, pwd);
         logger.info("\t-> Admin '" + user + "' successfully connected\n");
     }

@@ -83,7 +83,7 @@ public class RMConnection extends Connection<RMAuthentication> {
         try {
             return getInstance().connect(normalize(url));
         } catch (Exception e) {
-            throw new RMException(e);
+            throw new RMException(e.getMessage());
         }
     }
 
@@ -104,7 +104,7 @@ public class RMConnection extends Connection<RMAuthentication> {
         try {
             return getInstance().waitAndConnect(normalize(url), timeout);
         } catch (Exception e) {
-            throw new RMException(e);
+            throw new RMException(e.getMessage());
         }
     }
 

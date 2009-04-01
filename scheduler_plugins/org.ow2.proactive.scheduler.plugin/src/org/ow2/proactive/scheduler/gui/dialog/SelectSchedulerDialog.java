@@ -435,10 +435,6 @@ public class SelectSchedulerDialog extends Dialog {
                 MessageDialog.openError(parent, "Error", "The login is empty !");
                 return null;
             }
-            if ((pwd == null) || pwd.trim().equals("")) {
-                MessageDialog.openError(parent, "Error", "The password is empty !");
-                return null;
-            }
             return new SelectSchedulerDialogResult(url, login, pwd, logAsAdmin);
         }
         return null;
