@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
@@ -116,6 +117,9 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                     SeparatedJobView.getRunningJobComposite().initTable();
                     SeparatedJobView.getFinishedJobComposite().initTable();
 
+                    // start log server
+                    Activator.startLoggerServer();
+
                     ActionsManager.getInstance().update();
 
                     SeparatedJobView.setVisible(true);
@@ -139,6 +143,8 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
         if (MessageDialog.openConfirm(parent.getShell(), "Confirm disconnection",
                 "Are you sure you want to disconnect from the ProActive Scheduler ?")) {
             StatusLabel.getInstance().disconnect();
+            // stop log server
+            Activator.terminateLoggerServer();
             SeparatedJobView.clearOnDisconnection(true);
         }
     }

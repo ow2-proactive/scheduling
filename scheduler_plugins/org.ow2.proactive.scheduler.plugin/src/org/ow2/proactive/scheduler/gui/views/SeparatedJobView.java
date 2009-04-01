@@ -49,6 +49,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.actions.ChangeMaximizeListAction;
 import org.ow2.proactive.scheduler.gui.actions.ChangePriorityJobAction;
 import org.ow2.proactive.scheduler.gui.actions.ChangeViewModeAction;

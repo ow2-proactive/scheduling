@@ -30,6 +30,8 @@
  */
 package org.ow2.proactive.scheduler.gui;
 
+import java.io.IOException;
+
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.osgi.framework.BundleContext;
@@ -64,10 +66,6 @@ public class Activator extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-
-        // start the log server
-        simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
-        hostname = ProActiveInet.getInstance().getHostname();
     }
 
     /*
@@ -75,10 +73,30 @@ public class Activator extends AbstractUIPlugin {
      */
     @Override
     public void stop(BundleContext context) throws Exception {
-        // FIXME cdelbe
-        simpleLoggerServer.stop();
+        terminateLoggerServer();
         plugin = null;
         super.stop(context);
+    }
+
+    /**
+     * Start a new logger server
+     * @throws IOException if the logger server cannot be started
+     */
+    public static void startLoggerServer() throws IOException {
+        // start the log server
+        simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
+        hostname = ProActiveInet.getInstance().getHostname();
+    }
+
+    /**
+     * Stop the current logger server.
+     */
+    public static void terminateLoggerServer() {
+        if (simpleLoggerServer != null) {
+            simpleLoggerServer.stop();
+        }
+        simpleLoggerServer = null;
+        hostname = null;
     }
 
     /*

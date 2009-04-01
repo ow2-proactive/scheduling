@@ -76,6 +76,7 @@ public class JobOutputAppender extends AppenderSkeleton {
      * @param jobOutput the job output
      */
     public JobOutputAppender(JobOutput jobOutput) {
+        this.name = "Appender for job output";
         this.jobOutput = jobOutput;
     }
 
@@ -99,15 +100,17 @@ public class JobOutputAppender extends AppenderSkeleton {
      */
     @Override
     protected void append(LoggingEvent event) {
-        this.eventBuffer.add(event);
-        if (this.eventBuffer.size() > BUFFER_SIZE) {
-            // additionnal flush to avoid buffer overflow
-            this.flusher.schedule(new FlusherTask(), 0);
-            this.flushScheduled = true;
-            this.flushBuffer();
-        } else if (!flushScheduled) {
-            this.flusher.schedule(new FlusherTask(), FLUSH_PERIOD);
-            this.flushScheduled = true;
+        if (!super.closed) {
+            this.eventBuffer.add(event);
+            if (this.eventBuffer.size() > BUFFER_SIZE) {
+                // additionnal flush to avoid buffer overflow
+                this.flusher.schedule(new FlusherTask(), 0);
+                this.flushScheduled = true;
+                this.flushBuffer();
+            } else if (!flushScheduled) {
+                this.flusher.schedule(new FlusherTask(), FLUSH_PERIOD);
+                this.flushScheduled = true;
+            }
         }
     }
 
@@ -164,6 +167,7 @@ public class JobOutputAppender extends AppenderSkeleton {
      */
     @Override
     public void close() {
+        super.closed = true;
         this.flusher.cancel();
     }
 

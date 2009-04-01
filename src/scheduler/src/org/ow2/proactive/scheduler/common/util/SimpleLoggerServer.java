@@ -208,6 +208,10 @@ public class SimpleLoggerServer implements Runnable {
                 while (!terminate) {
                     // read an event from the wire
                     currentEvent = (LoggingEvent) inputStream.readObject();
+                    // if the server has been terminated while waiting for event to read
+                    if (terminate) {
+                        break;
+                    }
                     // get the local logger. The name of the logger is taken to
                     // be the name contained in the event.
                     localLogger = Logger.getLogger(currentEvent.getLoggerName());

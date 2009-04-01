@@ -115,7 +115,7 @@ public class JobsOutputController {
      *            the jobId
      * @throws SchedulerException
      */
-    public void createJobOutput(JobId jobId) {
+    public void createJobOutput(JobId jobId) { //TODO cdelbe: get log from job result for finished jobs ?
         if (!showJobOutput(jobId)) {
             JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId));
             joa.setLayout(Log4JTaskLogs.getTaskLogLayout());
@@ -151,10 +151,9 @@ public class JobsOutputController {
      * Remove all output ! This method clear the console.
      */
     public void removeAllJobOutput() {
-        for (JobOutputAppender joa : appenders.values()) {
-            ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
-                    new IConsole[] { joa.getJobOutput() });
-            joa.close();
+        for (JobId jid : this.appenders.keySet()) {
+            this.removeJobOutput(jid);
         }
+
     }
 }
