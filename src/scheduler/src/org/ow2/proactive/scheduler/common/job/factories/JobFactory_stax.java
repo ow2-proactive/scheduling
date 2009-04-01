@@ -177,6 +177,7 @@ public class JobFactory_stax extends JobFactory {
      * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.lang.String)
      */
     public Job createJob(String filePath) throws JobCreationException {
+        clean();
         try {
             //Check if the file exist
             File f = new File(filePath);
@@ -199,6 +200,12 @@ public class JobFactory_stax extends JobFactory {
         } catch (Exception e) {
             throw new JobCreationException(e.getMessage(), e);
         }
+    }
+
+    private void clean() {
+        this.variables = new HashMap<String, String>();
+        this.job = null;
+        this.dependences = null;
     }
 
     /**

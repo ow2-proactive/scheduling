@@ -58,11 +58,6 @@ public abstract class JobFactory {
             "org.ow2.proactive.scheduler.common.job.factories.JobFactory_xpath" };
 
     /**
-     * Singleton Pattern
-     */
-    private static JobFactory factory = null;
-
-    /**
      * Try to instantiate the known factories.
      * Return the created instance of the jobFactory.
      * As it may instantiate built'in factories, this method rarely fails but a RuntimeException is raised if
@@ -71,20 +66,19 @@ public abstract class JobFactory {
      * @return the instance of the jobFactory.
      */
     public static JobFactory getFactory() {
+        JobFactory factory = null;
+        for (String factoryInstance : CURRENT_IMPL) {
+            try {
+                factory = (JobFactory) Class.forName(factoryInstance).newInstance();
+                break;
+            } catch (ClassNotFoundException e) {
+                logger.warn("Cannot instanciate this factory : " + factoryInstance, e);
+            } catch (Exception e) {
+                logger.warn("Error while instanciating this factory : " + factoryInstance, e);
+            }
+        }
         if (factory == null) {
-            for (String factoryInstance : CURRENT_IMPL) {
-                try {
-                    factory = (JobFactory) Class.forName(factoryInstance).newInstance();
-                    break;
-                } catch (ClassNotFoundException e) {
-                    logger.warn("Cannot instanciate this factory : " + factoryInstance, e);
-                } catch (Exception e) {
-                    logger.warn("Error while instanciating this factory : " + factoryInstance, e);
-                }
-            }
-            if (factory == null) {
-                throw new RuntimeException("Cannot instanciate any factories ! (see warning to know why)");
-            }
+            throw new RuntimeException("Cannot instanciate any factory ! (see WARN logs to know why)");
         }
         return factory;
     }
@@ -100,6 +94,7 @@ public abstract class JobFactory {
         if (impl == null) {
             return getFactory();
         }
+        JobFactory factory = null;
         try {
             factory = (JobFactory) Class.forName(impl).newInstance();
         } catch (ClassNotFoundException e) {
