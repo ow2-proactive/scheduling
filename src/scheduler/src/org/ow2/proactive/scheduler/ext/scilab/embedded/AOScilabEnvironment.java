@@ -633,7 +633,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         AOScilabEnvironment aose = (AOScilabEnvironment) PAActiveObject.newActive(AOScilabEnvironment.class
                 .getName(), new Object[] {});
         aose.join("//localhost");
-        aose.login("jl", "jl");
+        aose.login("demo", "demo");
         ArrayList<ResultsAndLogs> ret = aose.solve(new String[] { "in=2" }, "out=in*in;", null, null,
                 JobPriority.NORMAL, true);
         System.out.println(ret);

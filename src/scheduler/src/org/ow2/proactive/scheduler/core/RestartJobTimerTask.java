@@ -40,8 +40,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * RestartJobTimerTask is used to manage the timeout from which a task can be restarted after an error.
  * This timeout will increase according to a function defined in the job.
  *
- * @author jlscheef - ProActiveTeam
- * @since ProActive 4.0
+ * @author The ProActiveTeam
+ * @since ProActiveScheduling 0.9
  *
  * $Id$
  */

@@ -536,7 +536,7 @@ public class PriorityPolicy implements PolicyInterface {
 admin:admin
 user1:pwd1
 user2:pwd2
-jl:jl
+demo:demo
 				</programlisting>
 				</listitem>
 			 	<listitem><para><emphasis>config/authentication/group.cfg</emphasis>, stores users memebership. For each 
@@ -546,7 +546,7 @@ jl:jl
 			 	Default group.cfg is like this :</para>
 			 	<programlisting language="java">
 admin:admin
-jl:admin
+demo:admin
 user1:user
 user2:user
 				</programlisting>

@@ -116,8 +116,8 @@ public class SchedulerTHelper {
 
     protected static MonitorEventReceiver eventReceiver;
 
-    protected static String username = "jl";
-    protected static String password = "jl";
+    protected static String username = "demo";
+    protected static String password = "demo";
 
     /**
      * Start the scheduler using a forked JVM.

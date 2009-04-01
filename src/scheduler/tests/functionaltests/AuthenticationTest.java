@@ -58,8 +58,8 @@ import functionalTests.FunctionalTest;
  */
 public class AuthenticationTest extends FunctionalTest {
 
-    private String adminName = "jl";
-    private String adminPwd = "jl";
+    private String adminName = "demo";
+    private String adminPwd = "demo";
 
     private String userName = "user1";
     private String userPwd = "pwd1";

@@ -66,8 +66,8 @@ public class FunctionalTDefaultRM extends FunctionalTest {
     protected RMAdmin admin;
     protected RMMonitoring monitor;
 
-    private String username = "jl";
-    private String password = "jl";
+    private String username = "demo";
+    private String password = "demo";
 
     private static String functionalTestRMProperties = FunctionalTDefaultRM.class.getResource(
             "/nodestate/functionalTRMProperties.ini").getPath();
