@@ -993,6 +993,9 @@ public class JobFactory_stax extends JobFactory {
      * @throws JobCreationException if a Variable has not been found
      */
     private String replace(String str) throws JobCreationException {
+        if (str == null || "".equals(str)) {
+            return str;
+        }
         str = str.trim();
         //impl1 - do not search in System properties
         //        if (!variables.isEmpty() && variablesPattern.matcher(str).matches()) {
