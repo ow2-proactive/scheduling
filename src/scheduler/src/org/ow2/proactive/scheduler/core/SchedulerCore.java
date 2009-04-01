@@ -47,7 +47,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import org.apache.log4j.AsyncAppender;
 import org.apache.log4j.FileAppender;
@@ -112,7 +111,6 @@ import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
@@ -388,19 +386,23 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * - Create the list of taskInfo containing in the given job.
+     * - Send every changes through the job state update event.<br>
      * - Clear the task info modify status. It is used to change all status of all tasks
-     * with only one request. It has to be cleared after sending events.
-     * - Send the change to the data base.
+     * with only one request. It has to be cleared after sending events.<br>
+     * - Store the changes to the data base.
      *
      * @param currentJob the job where the task info are.
+     * @param eventType the type of event to send with the job state updated
      */
-    private void updateTaskInfosList(InternalJob currentJob) {
-        Map<TaskId, TaskStatus> tsm = ((JobInfoImpl) currentJob.getJobInfo()).getTaskStatusModify();
-        for (Entry<TaskId, TaskStatus> e : tsm.entrySet()) {
-            if (e.getValue() != TaskStatus.RUNNING) {
-                DatabaseManager.synchronize(currentJob.getHMTasks().get(e.getKey()).getTaskInfo());
-            }
+    private void updateTaskInfosList(InternalJob currentJob, SchedulerEvent eventType) {
+        logger_dev.info("Send multiple changes to front-end for job '" + currentJob.getId() + "' (event='" +
+            eventType + "')");
+        //send event to listeners.
+        try {
+            frontend.jobStateUpdated(currentJob.getOwner(), new NotificationData<JobInfo>(eventType,
+                currentJob.getJobInfo()));
+        } catch (Throwable t) {
+            //Just to prevent update method error
         }
         // don't forget to set the task status modify to null
         currentJob.setTaskStatusModify(null);
@@ -493,11 +495,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 if (job.getStatus() == JobStatus.PAUSED) {
                     job.setUnPause();
 
-                    JobInfo info = job.getJobInfo();
-                    updateTaskInfosList(job);
-                    //send event to front_end
-                    frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
-                        SchedulerEvent.JOB_RESUMED, info));
+                    //update events list and send event to the frontend
+                    updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
                 }
             }
 
@@ -747,12 +746,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             currentJob.start();
                             pendingJobs.remove(currentJob);
                             runningJobs.add(currentJob);
-                            //create tasks events list
-                            updateTaskInfosList(currentJob);
+                            //update tasks events list and send it to front-end
+                            updateTaskInfosList(currentJob, SchedulerEvent.JOB_PENDING_TO_RUNNING);
                             logger.info("Job '" + currentJob.getId() + "' started");
-                            // send job event to front-end
-                            frontend.jobStateUpdated(currentJob.getOwner(), new NotificationData<JobInfo>(
-                                SchedulerEvent.JOB_PENDING_TO_RUNNING, currentJob.getJobInfo()));
                         }
 
                         // set the different informations on task
@@ -943,7 +939,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                 //try to terminate the task
                 try {
-                    logger_dev.debug("Force terminating task '" + td.getId() + "'");
+                    logger_dev.info("Force terminating task '" + td.getId() + "'");
                     td.getExecuterInformations().getLauncher().terminate();
                 } catch (Exception e) { /* (nothing to do) */
                 }
@@ -953,7 +949,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     resourceManager.freeNodes(nodes, td.getCleaningScript());
                 } catch (Exception e) {
                     try {
-                        // try to get the node back to the IM
+                        // try to get the node back to the RM
                         resourceManager.freeNodes(td.getExecuterInformations().getNodes());
                     } catch (Exception e1) {
                         resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
@@ -1018,14 +1014,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         terminateJobHandling(job.getId());
 
-        //create tasks events list
-        updateTaskInfosList(job);
+        //update job and tasks events list and send it to front-end
+        updateTaskInfosList(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 
         logger.info("Job '" + job.getId() + "' terminated (" + jobStatus + ")");
-
-        //send event to listeners.
-        frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
-            SchedulerEvent.JOB_RUNNING_TO_FINISHED, job.getJobInfo()));
     }
 
     /**
@@ -1679,17 +1671,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         boolean change = job.setPaused();
-        JobInfo info = job.getJobInfo();
 
         if (change) {
             logger.debug("Job " + jobId + " has just been paused !");
         }
 
-        //create tasks events list
-        updateTaskInfosList(job);
-        //send event to user
-        frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(SchedulerEvent.JOB_PAUSED,
-            info));
+        //update tasks events list and send it to front-end
+        updateTaskInfosList(job, SchedulerEvent.JOB_PAUSED);
 
         return new BooleanWrapper(change);
     }
@@ -1713,17 +1701,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         boolean change = job.setUnPause();
-        JobInfo info = job.getJobInfo();
 
         if (change) {
             logger.debug("Job " + jobId + " has just been resumed !");
         }
 
-        //create tasks events list
-        updateTaskInfosList(job);
-        //send event to user
-        frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(SchedulerEvent.JOB_RESUMED,
-            info));
+        //update tasks events list and send it to front-end
+        updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
 
         return new BooleanWrapper(change);
     }
@@ -1749,8 +1733,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         endJob(job, null, "", JobStatus.KILLED);
-
-        terminateJobHandling(job.getId());
 
         return new BooleanWrapper(true);
     }

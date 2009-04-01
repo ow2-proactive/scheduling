@@ -346,12 +346,12 @@ public abstract class InternalJob extends JobState {
             descriptor.setStatus((jobStatus == JobStatus.FAILED) ? TaskStatus.FAILED : TaskStatus.FAULTY);
             //terminate this job descriptor
             getJobDescriptor().failed();
+            setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
         }
         //set the new status of the job
         setFinishedTime(System.currentTimeMillis());
         setNumberOfPendingTasks(0);
         setNumberOfRunningTasks(0);
-        setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
         setStatus(jobStatus);
 
         //creating list of status
@@ -366,7 +366,8 @@ public abstract class InternalJob extends JobState {
                 } else if (td.getStatus() == TaskStatus.WAITING_ON_ERROR ||
                     td.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
                     td.setStatus(TaskStatus.NOT_RESTARTED);
-                } else if (td.getStatus() != TaskStatus.FINISHED) {
+                } else if (td.getStatus() != TaskStatus.FINISHED && td.getStatus() != TaskStatus.FAILED &&
+                    td.getStatus() != TaskStatus.FAULTY) {
                     td.setStatus(TaskStatus.NOT_STARTED);
                 }
             }

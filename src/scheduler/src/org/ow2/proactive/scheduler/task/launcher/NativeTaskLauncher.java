@@ -146,6 +146,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
 
             //launch task
+            logger_dev.debug("Starting execution of task '" + taskId + "'");
             Serializable userResult = toBeLaunched.execute(results);
 
             //execute post-script

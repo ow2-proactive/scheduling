@@ -357,7 +357,6 @@ public abstract class TaskLauncher implements InitActive {
      * This method will terminate the task that has been launched.
      * In fact it will terminate the launcher.
      */
-    // TODO cdelbe, gsigety : RACE CONDITION BEETWEEN terminate and doTask (call to finalizeTask ) !!!
     public void terminate() {
 
         if (this.currentExecutable != null) {
