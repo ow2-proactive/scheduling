@@ -83,6 +83,7 @@ public class SelectResourceManagerDialog extends Dialog {
     private static String login = null;
     private static String pwd = null;
     private static Boolean logAsAdmin = null;
+    private static Boolean hasBeenCanceled = null;
     private static Combo urlCombo = null;
     private static Combo loginCombo = null;
     private Button adminCheck = null;
@@ -177,6 +178,7 @@ public class SelectResourceManagerDialog extends Dialog {
         okButton.setText("OK");
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
+                hasBeenCanceled = false;
                 url = urlCombo.getText();
                 login = loginCombo.getText();
                 pwd = pwdText.getText();
@@ -196,6 +198,7 @@ public class SelectResourceManagerDialog extends Dialog {
         cancelButton.setText("Cancel");
         cancelButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
+                hasBeenCanceled = true;
                 shell.close();
             }
         });
@@ -418,7 +421,7 @@ public class SelectResourceManagerDialog extends Dialog {
      */
     public static SelectResourceManagerDialogResult showDialog(Shell parent) {
         new SelectResourceManagerDialog(parent);
-        return new SelectResourceManagerDialogResult(url, login, pwd, logAsAdmin);
+        return new SelectResourceManagerDialogResult(hasBeenCanceled, url, login, pwd, logAsAdmin);
     }
 
     /**

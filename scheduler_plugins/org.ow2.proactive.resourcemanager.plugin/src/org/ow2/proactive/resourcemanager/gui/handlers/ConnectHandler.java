@@ -31,7 +31,7 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(HandlerUtil
                 .getActiveWorkbenchWindowChecked(event).getShell());
-        if (dialogResult != null) {
+        if (dialogResult != null && !dialogResult.isCanceled()) {
             try {
                 RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
                         .getPassword(), dialogResult.isLogAsAdmin());

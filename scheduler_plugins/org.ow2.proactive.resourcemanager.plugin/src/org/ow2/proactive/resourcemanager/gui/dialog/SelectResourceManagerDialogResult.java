@@ -42,12 +42,17 @@ public class SelectResourceManagerDialogResult implements Serializable {
     private String login = null;
     private String password = null;
     private Boolean logAsAdmin = false;
+    private Boolean canceled = false;
 
-    public SelectResourceManagerDialogResult(String url, String login, String password, Boolean logAsAdmin) {
-        this.url = url;
-        this.login = login;
-        this.password = password;
-        this.logAsAdmin = logAsAdmin;
+    public SelectResourceManagerDialogResult(Boolean isCanceled, String url, String login, String password,
+            Boolean logAsAdmin) {
+        this.canceled = isCanceled;
+        if (!isCanceled) {
+            this.url = url;
+            this.login = login;
+            this.password = password;
+            this.logAsAdmin = logAsAdmin;
+        }
     }
 
     public String getUrl() {
@@ -64,5 +69,9 @@ public class SelectResourceManagerDialogResult implements Serializable {
 
     public Boolean isLogAsAdmin() {
         return logAsAdmin;
+    }
+
+    public Boolean isCanceled() {
+        return canceled;
     }
 }
