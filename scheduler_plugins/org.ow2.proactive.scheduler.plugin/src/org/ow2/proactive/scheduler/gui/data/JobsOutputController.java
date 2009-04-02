@@ -55,6 +55,10 @@ public class JobsOutputController {
     /** title of the job output view */
     public static final String PREFIX_JOB_OUTPUT_TITLE = "Job #";
 
+    /** Wait for logs message */
+    public static final String INITIAL_MESSAGE = "Please wait while downloading logs..." +
+        System.getProperty("line.separator");
+
     // The shared instance
     private static JobsOutputController instance = null;
     private Map<JobId, JobOutputAppender> appenders = null;
@@ -117,7 +121,8 @@ public class JobsOutputController {
      */
     public void createJobOutput(JobId jobId) { //TODO cdelbe: get log from job result for finished jobs ?
         if (!showJobOutput(jobId)) {
-            JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId));
+            JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId,
+                INITIAL_MESSAGE));
             joa.setLayout(Log4JTaskLogs.getTaskLogLayout());
             Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
             log.setAdditivity(false);

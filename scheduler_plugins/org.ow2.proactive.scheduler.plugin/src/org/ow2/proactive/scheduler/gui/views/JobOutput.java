@@ -81,6 +81,17 @@ public class JobOutput extends MessageConsole {
         ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { this });
     }
 
+    /**
+     * The default constructor.
+     *
+     * @param name the name.
+     * @param initialMessage the initial message to be displayed in the console
+     */
+    public JobOutput(String name, String initialMessage) {
+        this(name);
+        this.info(initialMessage);
+    }
+
     // -------------------------------------------------------------------- //
     // ----------------------------- private ------------------------------ //
     // -------------------------------------------------------------------- //
