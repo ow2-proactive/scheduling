@@ -74,10 +74,14 @@ public class Log4JTaskLogs implements TaskLogs {
 
     /** Log4j context variable name for task ids */
     public static final String MDC_TASK_ID = "taskid";
+    
+    /** Log4j context variable name for task ids */
+    public static final String MDC_HOST = "host";
 
     /** Default layout for logs */
     public static Layout getTaskLogLayout() {
-        return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_TASK_ID + "}@%d{HH:mm:ss}]" + " %m %n");
+    	return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + 
+    			Log4JTaskLogs.MDC_HOST + "}-%d{HH:mm:ss}]" + " %m %n");
     }
 
     /** Logger level in which stdout must be redirected */
