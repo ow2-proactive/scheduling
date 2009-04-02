@@ -328,16 +328,6 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     }
 
     /**
-     * Free node considered as down.
-     * The given node must be its name as a string.
-     * 
-     * @param nodeName a string that represents the node name to free.
-     */
-    public void freeDownNode(String nodeName) {
-        //imcore.freeDownNode(nodeName);
-    }
-
-    /**
      * Return a state containing some informations about RM activity.
      * 
      * @return a state containing some informations about RM activity.

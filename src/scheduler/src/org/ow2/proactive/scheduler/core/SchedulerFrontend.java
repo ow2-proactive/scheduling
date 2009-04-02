@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
+import org.ow2.proactive.scheduler.common.exception.MaxJobIdReachedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.jmx.mbean.SchedulerWrapper;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -220,8 +221,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @param jobList the jobList that may appear in this front-end.
      */
     public void recover(Map<JobId, InternalJob> jobList) {
-        logger_dev.info("job list : " + jobList);
         if (jobList != null) {
+            logger_dev.info("job list : " + jobList.size());
             for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
                 UserIdentificationImpl uIdent = new UserIdentificationImpl(e.getValue().getOwner());
                 IdentifiedJob ij = new IdentifiedJob(e.getKey(), uIdent);
@@ -236,6 +237,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                         break;
                 }
             }
+        } else {
+            logger_dev.info("job list empty");
         }
         //once recovered, activate scheduler communication
         authentication.setActivated(true);
@@ -299,7 +302,29 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         logger_dev.info("Preparing and settings job submission");
         UserIdentificationImpl ident = identifications.get(id);
         //setting the job properties
-        job.setId(JobIdImpl.nextId(job.getName()));
+        try {
+            job.setId(JobIdImpl.nextId(job.getName()));
+        } catch (MaxJobIdReachedException e) {
+            scheduler.stop();
+            logger
+                    .fatal("\n****************************************************************************************************\n"
+                        + "****************************************************************************************************\n"
+                        + "**                                                                                                **\n"
+                        + "**  The maximum number of jobs that can be submitted has been reached !                           **\n"
+                        + "**  To prevent from any problems, the Scheduler has been stopped,                                 **\n"
+                        + "**  all running jobs will be terminated, no submit will be possible until restart.                **\n"
+                        + "**  Database should be archived and clean before restarting the Scheduler                         **\n"
+                        + "**  /!\\ Restarting the Scheduler without cleaning the DataBase implies some id to be duplicate    **\n"
+                        + "**  This is not a critical problem but some finished jobs could be unreachable by the Scheduler.  **\n"
+                        + "**                                                                                                **\n"
+                        + "****************************************************************************************************\n"
+                        + "****************************************************************************************************");
+            throw new MaxJobIdReachedException(
+                "The maximum number of jobs that can be submitted has been reached !\n"
+                    + "To prevent from any problems, the Scheduler has been stopped, "
+                    + "all running jobs will be terminated, no submit will be possible until restart.\n"
+                    + "Please, contact your administrator !");
+        }
         job.setOwner(ident.getUsername());
         //prepare tasks in order to be send into the core
         job.prepareTasks();

@@ -69,7 +69,8 @@ public interface AdminMethodsInterface {
 
     /**
      * For administrator only, Stop the scheduler.<br>
-     * Once done, you won't be able to submit job, and the scheduling will be stopped.
+     * Once done, you won't be able to submit job, and the scheduling will be stopped.<br>
+     * Every running jobs will be terminated.
      *
      * @return true if success, false if not.
      * @throws SchedulerException (can be due to insufficient permission)

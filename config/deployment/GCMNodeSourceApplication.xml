@@ -22,6 +22,10 @@
 					<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jython.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/common-net-1.4.1.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/common-vfs-1.0.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jsch-0.1.38.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jakarta-oro-2.0.8.jar"/>
 				</applicationClasspath>
 				<log4jProperties base="proactive" relpath="/config/log4j/defaultNode-log4j"/>
 			</configuration>

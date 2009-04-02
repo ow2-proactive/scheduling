@@ -40,6 +40,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.exception.MaxJobIdReachedException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
 
@@ -107,13 +108,19 @@ public final class JobIdImpl implements JobId {
     }
 
     /**
-     * Get the next id
+     * Get the next available Job Id
      *
      * @param readableName the human readable name of the the created jobid
      * @return the next available id.
+     * @throws MaxJobIdReachedException if the maximum id for a job has been reached.
      */
-    public static JobId nextId(String readableName) {
-        return new JobIdImpl(++currentId, readableName);
+    public static JobId nextId(String readableName) throws MaxJobIdReachedException {
+        currentId++;
+        if (currentId == Integer.MAX_VALUE) {
+            currentId = 0;
+            throw new MaxJobIdReachedException("The max value for JobId has been reached !");
+        }
+        return new JobIdImpl(currentId, readableName);
     }
 
     /**

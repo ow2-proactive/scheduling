@@ -449,7 +449,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             do {
                 service.blockingServeOldest();
 
-                while ((status == SchedulerStatus.STARTED) || (status == SchedulerStatus.PAUSED)) {
+                while ((status == SchedulerStatus.STARTED) || (status == SchedulerStatus.PAUSED) ||
+                    (status == SchedulerStatus.STOPPED)) {
                     try {
                         //block the loop until a method is invoked and serve it
                         service.blockingServeOldest(SCHEDULER_TIME_OUT);
@@ -477,11 +478,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             //scheduler functionality are reduced until now
                             status = SchedulerStatus.UNLINKED;
                             logger
-                                    .fatal("******************************\n"
-                                        + "Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
-                                        + "Scheduler is in critical state and its functionalities are reduced : \n"
-                                        + "\t-> use the linkResourceManager() method to reconnect a new one.\n"
-                                        + "******************************");
+                                    .fatal("*****************************************************************************************************************\n"
+                                        + "* Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
+                                        + "* Scheduler is in critical state and its functionalities are reduced : \n"
+                                        + "* \t-> use the linkResourceManager() method to reconnect a new one.\n"
+                                        + "*****************************************************************************************************************");
                             frontend.schedulerStateUpdated(SchedulerEvent.RM_DOWN);
                         }
                     }
@@ -507,10 +508,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             while ((runningJobs.size() + pendingJobs.size()) > 0) {
                 try {
-                    service.serveAll(filter);
-                    schedule();
                     //block the loop until a method is invoked and serve it
                     service.blockingServeOldest(SCHEDULER_TIME_OUT);
+                    service.serveAll(filter);
+                    schedule();
                 } catch (Exception e) {
                     logger.debug(" ");
                     logger_dev.error("", e);
@@ -786,7 +787,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 logger.warn("Current node (" + node + ") has failed : " + e1.getMessage());
                 //so try to get back the node to the resource manager as a dead node
                 try {
-                    resourceManager.freeDownNode(internalTask.getExecuterInformations().getNodeName());
+                    resourceManager.freeNode(node);
                 } catch (Exception e2) {
                 }
             }
@@ -810,10 +811,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     logger_dev.info("Node failed on job '" + job.getId() + "', task '" + td.getId() + "'");
 
                     try {
-                        String nodeName = td.getExecuterInformations().getNodeName();
-                        logger_dev.info("Try to free this failed node : " + nodeName);
+                        logger_dev.info("Try to free failed node set");
                         //free execution node even if it is dead
-                        resourceManager.freeDownNode(nodeName);
+                        resourceManager.freeNodes(td.getExecuterInformations().getNodes());
                     } catch (Exception e) {
                         //just save the rest of the method execution
                     }
@@ -853,7 +853,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
     /**
      * Submit a new job to the scheduler.
-     * This method will prepare the new job and get it ready for scheduling.
+     * This method will prepare the new job and get it ready for scheduling.<br>
+     * It is not possible to submit the job if the Scheduler is stopped
      *
      * @throws SchedulerException if problem occurs during job preparation
      */
@@ -952,7 +953,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         // try to get the node back to the RM
                         resourceManager.freeNodes(td.getExecuterInformations().getNodes());
                     } catch (Exception e1) {
-                        resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
                     }
                 }
 
@@ -1084,7 +1084,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
                     //free execution node even if it is dead
-                    resourceManager.freeDownNode(descriptor.getExecuterInformations().getNodeName());
+                    try {
+                        resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes());
+                    } catch (Exception e) {
+                        //save the return
+                    }
                     return;
                 }
             }
@@ -1625,7 +1629,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                 // try to get the node back to the IM
                                 resourceManager.freeNodes(td.getExecuterInformations().getNodes());
                             } catch (Exception e1) {
-                                resourceManager.freeDownNode(td.getExecuterInformations().getNodeName());
                             }
                         }
                     } catch (Exception e) {

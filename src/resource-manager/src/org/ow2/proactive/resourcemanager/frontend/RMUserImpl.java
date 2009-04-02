@@ -40,7 +40,6 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.authentication.RestrictedService;
