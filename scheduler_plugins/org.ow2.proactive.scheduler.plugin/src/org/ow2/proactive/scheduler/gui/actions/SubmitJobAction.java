@@ -72,8 +72,8 @@ public class SubmitJobAction extends SchedulerGUIAction {
     public void run() {
         FileDialog fileDialog = new FileDialog(parent.getShell(), SWT.OPEN | SWT.MULTI);
         fileDialog.setFilterExtensions(new String[] { "*.xml" });
-        if (lastDirectory != null){
-		fileDialog.setFilterPath(lastDirectory);
+        if (lastDirectory != null) {
+            fileDialog.setFilterPath(lastDirectory);
         }
         fileDialog.open();
 

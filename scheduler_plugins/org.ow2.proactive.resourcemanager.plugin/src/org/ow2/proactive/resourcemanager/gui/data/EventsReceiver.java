@@ -8,8 +8,10 @@ import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
+import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -19,8 +21,10 @@ import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
 public class EventsReceiver implements InitActive, RMEventListener {
 
+    private static final long RM_SERVER_PING_FREQUENCY = 5000;
     private RMModel model = null;
     private RMMonitoring monitor = null;
+    private Thread pinger;
 
     public EventsReceiver() {
     }
@@ -64,6 +68,38 @@ public class EventsReceiver implements InitActive, RMEventListener {
                 }
             }
         });
+        startPinger();
+    }
+
+    private void startPinger() {
+        final EventsReceiver thisStub = (EventsReceiver) PAActiveObject.getStubOnThis();
+        pinger = new Thread() {
+            @Override
+            public void run() {
+                while (!pinger.isInterrupted()) {
+                    try {
+                        Thread.sleep(RM_SERVER_PING_FREQUENCY);
+                        try {
+                            //try to ping RM server
+                            RMUser userAO = RMStore.getInstance().getRMUser();
+                            if (PAActiveObject.pingActiveObject(userAO)) {
+                                //if OK continue
+                                continue;
+                            } else {
+                                //if not, shutdown RM
+                                thisStub.rmShutDownEvent(new RMEvent(), true);
+                            }
+                        } catch (RMException e) {
+                            //if exception, considered RM as down
+                            thisStub.rmShutDownEvent(new RMEvent(), true);
+                        }
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+        };
+        pinger.start();
     }
 
     // ----------------------------------------------------------------------
@@ -125,8 +161,17 @@ public class EventsReceiver implements InitActive, RMEventListener {
         model.removeNodeSource(nodeSourceEvent);
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
+     */
     public void rmShutDownEvent(RMEvent arg0) {
-        RMStore.getInstance().shutDownActions();
+        pinger.interrupt();
+        RMStore.getInstance().shutDownActions(false);
+    }
+
+    public void rmShutDownEvent(RMEvent arg0, boolean failed) {
+        pinger.interrupt();
+        RMStore.getInstance().shutDownActions(failed);
     }
 
     //TODO add a status bar that show these states ?

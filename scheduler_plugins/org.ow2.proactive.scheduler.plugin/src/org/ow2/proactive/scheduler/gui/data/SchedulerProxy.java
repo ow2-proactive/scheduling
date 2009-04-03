@@ -37,6 +37,8 @@ import java.util.Observer;
 
 import javax.security.auth.login.LoginException;
 
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
@@ -53,8 +55,11 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
+import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 
 /**
@@ -64,14 +69,19 @@ import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
  * @since ProActive Scheduling 0.9
  */
 public class SchedulerProxy implements AdminSchedulerInterface {
+
+    private static final long SCHEDULER_SERVER_PING_FREQUENCY = 5000;
     public static final int CONNECTED = 0;
     public static final int LOGIN_OR_PASSWORD_WRONG = 1;
     public static final int COULD_NOT_CONNECT_SCHEDULER = 2;
     public static final int CONNECTION_REFUSED = 3;
     private static SchedulerProxy instance = null;
+    private SchedulerAuthenticationInterface sai;
     private UserSchedulerInterface scheduler = null;
     private String userName = null;
     private Boolean logAsAdmin = false;
+    private Thread pinger;
+    private String schedulerURL;
 
     List<SchedulerConnectionListener> observers;
 
@@ -113,16 +123,34 @@ public class SchedulerProxy implements AdminSchedulerInterface {
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#disconnect()
      */
     public void disconnect() {
-        try {
-            if (scheduler != null) {
-                scheduler.disconnect();
-                sendConnectionLostEvent();
-
-            }
-        } catch (SchedulerException e) {
-            // Nothing to do
-            // e.printStackTrace();
+        if (pinger != null) {
+            pinger.interrupt();
         }
+        if (scheduler != null) {
+            try {
+                //disconnect scheduler if it is not dead
+                //protect disconnection with a try catch
+                scheduler.disconnect();
+            } catch (Exception e) {
+                // Nothing to do
+                // e.printStackTrace();
+            }
+            sendConnectionLostEvent();
+        }
+    }
+
+    public void serverDown() {
+        pinger.interrupt();
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Scheduler server down",
+                        "Scheduler  '" + schedulerURL + "'  seems to be down, now disconnect.");
+                StatusLabel.getInstance().disconnect();
+                // stop log server
+                Activator.terminateLoggerServer();
+                SeparatedJobView.clearOnDisconnection(true);
+            }
+        });
     }
 
     /**
@@ -218,6 +246,9 @@ public class SchedulerProxy implements AdminSchedulerInterface {
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#kill()
      */
     public BooleanWrapper kill() {
+        if (pinger != null) {
+            pinger.interrupt();
+        }
         try {
             return ((AdminSchedulerInterface) scheduler).kill();
         } catch (SchedulerException e) {
@@ -266,6 +297,9 @@ public class SchedulerProxy implements AdminSchedulerInterface {
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#shutdown()
      */
     public BooleanWrapper shutdown() {
+        if (pinger != null) {
+            pinger.interrupt();
+        }
         try {
             return ((AdminSchedulerInterface) scheduler).shutdown();
         } catch (SchedulerException e) {
@@ -340,13 +374,15 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             userName = dialogResult.getLogin();
             logAsAdmin = dialogResult.isLogAsAdmin();
-            SchedulerAuthenticationInterface sai = SchedulerConnection.join(dialogResult.getUrl());
+            schedulerURL = dialogResult.getUrl();
+            sai = SchedulerConnection.join(schedulerURL);
             if (logAsAdmin) {
                 scheduler = sai.logAsAdmin(userName, dialogResult.getPassword());
             } else {
                 scheduler = sai.logAsUser(userName, dialogResult.getPassword());
             }
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
+            startPinger();
             return CONNECTED;
         } catch (SchedulerException e) {
             e.printStackTrace();
@@ -364,6 +400,36 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             logAsAdmin = false;
             return CONNECTION_REFUSED;
         }
+    }
+
+    private void startPinger() {
+        final SchedulerProxy thisStub = (SchedulerProxy) PAActiveObject.getStubOnThis();
+        pinger = new Thread() {
+            @Override
+            public void run() {
+                while (!pinger.isInterrupted()) {
+                    try {
+                        Thread.sleep(SCHEDULER_SERVER_PING_FREQUENCY);
+                        //try to ping Scheduler server
+                        if (PAActiveObject.pingActiveObject(sai)) {
+                            //if OK continue
+                            continue;
+                        } else {
+                            //if not, shutdown Scheduler
+                            try {
+                                thisStub.serverDown();
+                            } catch (Exception e) {
+                                //thisStub has already been killed, shutdown, or disconnected
+                                break;
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+        };
+        pinger.start();
     }
 
     public Boolean isItHisJob(String userName) {

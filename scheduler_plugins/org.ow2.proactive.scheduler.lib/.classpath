@@ -9,7 +9,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jython.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/script-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/script-js.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-6.1.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-util-6.1.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager.jar"/>

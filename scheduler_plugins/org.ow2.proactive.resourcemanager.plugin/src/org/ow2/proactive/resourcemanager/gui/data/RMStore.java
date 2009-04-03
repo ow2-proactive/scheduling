@@ -143,12 +143,18 @@ public class RMStore {
         return this.baseURL;
     }
 
-    public void shutDownActions() {
+    public void shutDownActions(final boolean failed) {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
+                String msg;
+                if (failed) {
+                    msg = "seems to be down";
+                } else {
+                    msg = "has been shutdown";
+                }
                 MessageDialog.openInformation(Display.getDefault().getActiveShell(), "shutdown",
-                        "Resource manager " + RMStore.getInstance().getURL() +
-                            " has been shutdown, now disconnect.");
+                        "Resource manager  '" + RMStore.getInstance().getURL() + "'  " + msg +
+                            ", now disconnect.");
                 disconnectionActions();
             }
         });
@@ -176,7 +182,12 @@ public class RMStore {
         if (StatisticsView.getStatsViewer() != null) {
             StatisticsView.getStatsViewer().setInput(null);
         }
-        loggerUser.disconnect();
+        try {
+            //disconnect user if user has not failed
+            //protect it by a try catch
+            loggerUser.disconnect();
+        } catch (Exception e) {
+        }
         loggerUser = null;
         rmMonitoring = null;
         model = null;
