@@ -568,7 +568,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                     logger.info(e.getMessage());
                 }
 
-                removeNode(nodeUrl, true, true);
+                removeNode(nodeUrl, true, false);
             }
 
             NodeSource nodeSource = this.nodeSources.get(sourceName);
@@ -683,10 +683,10 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      */
     public void removeAllNodes(String nodeSourceName, boolean preemptive) {
         for (Node node : nodeSources.get(nodeSourceName).getAliveNodes()) {
-            removeNode(node.getNodeInformation().getURL(), preemptive, true);
+            removeNode(node.getNodeInformation().getURL(), preemptive, false);
         }
         for (Node node : nodeSources.get(nodeSourceName).getDownNodes()) {
-            removeNode(node.getNodeInformation().getURL(), preemptive, true);
+            removeNode(node.getNodeInformation().getURL(), preemptive, false);
         }
     }
 

@@ -1,6 +1,9 @@
 package org.ow2.proactive.resourcemanager.nodesource.utils;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -21,7 +24,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @see org.ow2.proactive.resourcemanager.nodesource.deprecated.NodeSource
  *
  */
-public class Pinger extends RestrictedService {
+public class Pinger extends RestrictedService implements InitActive {
 
     /** stub of the NodeSource Active Object*/
     private NodeSource nodeSource;
@@ -43,6 +46,10 @@ public class Pinger extends RestrictedService {
         nodeSource = source;
         registerTrustedService(nodeSource);
         this.active = true;
+    }
+
+    public void initActivity(Body body) {
+        PAActiveObject.setImmediateService("setPingFrequency");
     }
 
     /**
@@ -124,5 +131,4 @@ public class Pinger extends RestrictedService {
     public void setPingFrequency(int frequency) {
         pingFrequency = frequency;
     }
-
 }

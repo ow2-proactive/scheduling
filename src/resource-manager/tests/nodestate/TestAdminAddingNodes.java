@@ -151,7 +151,7 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         log("Test 4");
 
         //put a large ping frequency in order to avoid down nodes detection
-        admin.setDefaultNodeSourcePingFrequency(10000);
+        admin.setDefaultNodeSourcePingFrequency(100000);
 
         //wait the end of last ping sequence 
         Thread.sleep(PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt() + 500);
