@@ -66,7 +66,7 @@ public class MatlabConfiguration implements Serializable {
      */
     private String ptolemyPath;
 
-    private String nl = System.getProperty("line.separator");
+    private static final String nl = System.getProperty("line.separator");;
 
     public MatlabConfiguration(String matlabHome, String matlabVersion, String matlabLibDirName,
             String matlabBinDir, String matlabCommandName, String ptolemyPath) {

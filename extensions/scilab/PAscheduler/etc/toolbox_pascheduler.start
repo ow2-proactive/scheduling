@@ -6,7 +6,7 @@
     warning_mode = warning('query');
     warning('off');
 
-    disp('Start Toolbox skeleton');
+    disp('Start Toolbox PAScheduler');
 
     etc_tlbx = get_absolute_file_path('toolbox_pascheduler.start');
     etc_tlbx = getshortpathname(etc_tlbx);

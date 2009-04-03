@@ -9,33 +9,47 @@ The Matlab interface to the ProActive Scheduler allows you to schedule Matlab sc
 
 The interface is compatible with Matlab 7.1 (R14.3) and later.
 
+------------- Ptolemy library -----------------
+
 You need to compile a native library called Ptolemy that will link against the native libraries of your Matlab installation.
-A few percompiled libraries are bundled with the Scheduler
+A few percompiled libraries are bundled with the Scheduler, if your architecture matches one of the following,
+you don't need to compile the ptolemy library :
 
-The scripts in this directory can be run on Linux or Cygwin(Windows)
+Linux 32bits : Matlab 7.1,7.3,7.5
+Linux 64bits : Matlab 7.5
+Windows 32bits : Matlab 7.1,7.2,7.3,7.4,7.5
 
-In order to build the libraries, first set the MATLAB environment variable to the full path of your Matlab command.
-Under Windows, this must point the the MATLAB.exe file in the MATLAB_ROOT/bin/win32 directory
+If your architecture is different, you need to run scripts bundled in SCHEDULER/extensions/matlab.
+The scripts in this directory can be run either Linux or Cygwin(under Windows)
+On Windows environment, it is mandatory to have both Cygwin (www.cygwin.com) and Mingw (www.mingw.org) installed in order to build the library.
 
-Make sure that the "javac" command from a Java JDK (and not JRE) is accessible in the Path.
-
-On Windows environment, it is mandatory to have both Cygwin and Mingw installed in order to build the library.
+In order to build the libraries :
+1a) set the MATLAB environment variable to the full path of your Matlab command.
+    Under Windows, this must point the the MATLAB.exe file in the MATLAB_ROOT/bin/win32 directory
+    Under linux, this is simply the command line name that you use for launching matlab (i.e. matlab2007b)
+1b) Make sure that the "javac" command from a Java JDK (and not JRE) is accessible in the Path.
 
 Under Cygwin you need to set the right Path and the MATLAB environment variable by System Properties > Advanced > Environment Variables (don't define them directly under Cygwin using export MATLAB=...).
 
-On the prompt, first move the the Scheduler/extensions/matlab directory and run:
 
-> ./configure
+2) You're ready to build the library. On the prompt, first move the the Scheduler/extensions/matlab directory and run:
+
+> configure
 > make
 
+
 This will copy the Ptolemy library to the Scheduler/lib directory. Please note that this library depends on two things:
-1) The Matlab version
-2) Your architecture (Linux, 32 or 64 bit, Windows 32 or 64 bit, Sun Solaris, etc...)
+a) The Matlab version
+b) Your architecture (Linux, 32 or 64 bit, Windows 32 or 64 bit, Sun Solaris, etc...)
 
-The script has been tested only on Linux 32/64 bits and Windows 32bits. It's possible that problems appear on other architectures.
+If your infrastructure is composed of heterogeneous Matlab versions and Operating systems, you need to build the library for each Matlab version and OS you intend to use.
 
-Therefore:
-1) If you want to connect ProActive to another Matlab version you'll need to provide a MATLAB variable that will point to this other version and re-launch the scripts.
-2) If you want to connect ProActive to a Matlab installed on a different architecture, you'll need to re-launch the scripts on this architecture.
+The script has been tested only on Linux 32/64 bits and Windows 32bits. It is possible that problems appear on other architectures.
+
+
+3) After you compiled the library, you need to rebuild the scheduler to allow your new native library to be bundled with it.
+For doing that, move to SCHEDULER/compile and run :
+> build deploy.all
+(On Windows environment this must be done on the windows prompt (cmd.exe) and not under the cygwin shell !)
 
 

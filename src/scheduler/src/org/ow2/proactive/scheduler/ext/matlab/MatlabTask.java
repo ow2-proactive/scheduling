@@ -31,26 +31,31 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools.LoggingThread;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
 import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
 import org.ow2.proactive.scheduler.ext.matlab.util.MatlabFinder;
+import org.ow2.proactive.scheduler.ext.matlab.util.MatlabJVMInfo;
 
+import javax.management.Notification;
+import javax.management.NotificationListener;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,10 +64,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.security.SecureRandom;
 import java.util.*;
 
 
-public class SimpleMatlab extends JavaExecutable {
+/**
+ * This class represents a Matlab-specific Task inside the Scheduler
+ * 
+ * @author The ProActive Team
+ */
+public class MatlabTask extends JavaExecutable implements NotificationListener {
 
     protected boolean debug;
 
@@ -82,6 +93,11 @@ public class SimpleMatlab extends JavaExecutable {
     protected String inputScript = null;
 
     /**
+     * Node name where this task is being executed
+     */
+    protected String nodeName = null;
+
+    /**
      *  The lines of the Matlab script
      */
     protected ArrayList<String> scriptLines = null;
@@ -89,17 +105,22 @@ public class SimpleMatlab extends JavaExecutable {
     /**
      *  The URI to which the spawned JVM(Node) is registered
      */
-    protected static String uri = null;
+    //protected static String uri = null;
+    protected static Map<String, MatlabJVMInfo> jvmInfos = new HashMap<String, MatlabJVMInfo>();
+
+    /**
+     * Tells if the shutdownhook has been set up for this runtime
+     */
+    protected static boolean shutdownhookSet = false;
 
     /**
      *  Thread which collects the JVM's stdout
      */
-    protected static LoggingThread isLogger = null;
+    //protected static LoggingThread isLogger = null;
     /**
      *  Thread which collects the JVM's stderr
      */
-    protected static LoggingThread esLogger = null;
-
+    //protected static LoggingThread esLogger = null;
     /**
      *  tool to build the JavaCommand
      */
@@ -113,8 +134,7 @@ public class SimpleMatlab extends JavaExecutable {
     /**
      *  the Active Object worker located in the spawned JVM
      */
-    protected static AOSimpleMatlab matlabWorker = null;
-
+    // protected static AOMatlabWorker matlabWorker = null;
     /**
      *  the OS where this JVM is running
      */
@@ -123,8 +143,7 @@ public class SimpleMatlab extends JavaExecutable {
     /**
      *  The process holding the spawned JVM
      */
-    protected static Process process = null;
-
+    // protected static Process process = null;
     static {
         if (host == null) {
             try {
@@ -138,7 +157,7 @@ public class SimpleMatlab extends JavaExecutable {
     /**
      * Empty Constructor
      */
-    public SimpleMatlab() {
+    public MatlabTask() {
 
     }
 
@@ -147,7 +166,7 @@ public class SimpleMatlab extends JavaExecutable {
      * @param inputScript script that will be launched and will produce an input to the main script
      * @param mainScript main script to execute
      */
-    public SimpleMatlab(String inputScript, String mainScript) {
+    public MatlabTask(String inputScript, String mainScript) {
         this.inputScript = inputScript;
         this.scriptLines = new ArrayList<String>();
         this.scriptLines.add(mainScript);
@@ -161,7 +180,13 @@ public class SimpleMatlab extends JavaExecutable {
             }
         }
         Serializable res = null;
-        if (process == null) {
+        nodeName = PAActiveObject.getNode().getNodeInformation().getName();
+        MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
+        if (jvminfo == null) {
+            jvminfo = new MatlabJVMInfo();
+            jvmInfos.put(nodeName, jvminfo);
+        }
+        if (jvminfo.getProcess() == null) {
             // First we try to find MATLAB
             if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Looking for Matlab...");
@@ -172,38 +197,49 @@ public class SimpleMatlab extends JavaExecutable {
             }
 
             // We create a custom URI as the node name
-            uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
-                    Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
-                    .toString();
+            //            uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
+            //                    Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
+            //                    .toString();
             if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
             }
 
             // We spawn a new JVM with the MATLAB library paths
-            process = startProcess(uri);
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                public void run() {
-                    process.destroy();
-                }
-            }));
+            Process p = startProcess();
+            jvminfo.setProcess(p);
+            if (!shutdownhookSet) {
+                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    public void run() {
+                        for (MatlabJVMInfo info : jvmInfos.values()) {
+                            info.getProcess().destroy();
+                        }
+                        shutdownhookSet = true;
+                    }
+                }));
+            }
 
             // We define the loggers which will write on standard output what comes from the java process
-            if (isLogger == null) {
-                isLogger = new LoggingThread(process.getInputStream(), "[" + host + "] ", false);
-            }
-            if (esLogger == null) {
-                esLogger = new LoggingThread(process.getErrorStream(), "[" + host + "] ", true);
-            }
+            LoggingThread lt1 = new LoggingThread(p.getInputStream(), "[" + host + " OUT]", false);
+            LoggingThread lt2 = new LoggingThread(p.getErrorStream(), "[" + host + " ERR]", true);
+            IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, p.getOutputStream());
+
+            jvminfo.setLogger(lt1);
+            jvminfo.setEsLogger(lt2);
+            jvminfo.setIoThread(rt1);
 
             // We start the loggers thread
 
-            Thread t1 = new Thread(isLogger, "OUT Matlab");
+            Thread t1 = new Thread(lt1, "OUT Matlab");
             t1.setDaemon(true);
             t1.start();
 
-            Thread t2 = new Thread(esLogger, "ERR Matlab");
+            Thread t2 = new Thread(lt2, "ERR Matlab");
             t2.setDaemon(true);
             t2.start();
+
+            Thread t3 = new Thread(rt1, "Redirecting I/O Matlab");
+            t3.setDaemon(true);
+            t3.start();
 
         }
 
@@ -212,7 +248,7 @@ public class SimpleMatlab extends JavaExecutable {
         }
 
         // finally we call the internal version of the execute method
-        res = executeInternal(uri, results);
+        res = executeInternal(results);
 
         if (debug) {
             System.out.println("[" + host + " MATLAB TASK] Task completed successfully");
@@ -280,95 +316,86 @@ public class SimpleMatlab extends JavaExecutable {
 
     /**
      * Deploy an Active Object on the given Node uri
-     * @param uri uri of the Node where to deploy the AO
      * @throws Throwable
      */
-    protected AOSimpleMatlab deploy(String uri, String workerClassName, Object... params) throws Throwable {
+    protected AOMatlabWorker deploy(String className) throws Throwable {
         ProActiveException ex = null;
-        AOSimpleMatlab worker = null;
+        MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
 
-        // We create an active object on the given node URI, the JVM corresponding to this node URI is starting,
-        // so we retry for 30 seconds until the JVM has started and we can create the Active Object
-        for (int i = 0; i < 30; i++) {
-            try {
-                try {
-                    worker = (AOSimpleMatlab) PAActiveObject.newActive(workerClassName, params, uri);
-                    break;
-                } catch (ProActiveException e) {
-                    ex = e;
-                }
+        if (debug) {
+            System.out.println("[" + host + " MatlabTask] Deploying Worker");
+        }
 
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        final AOMatlabWorker worker = (AOMatlabWorker) PAActiveObject.newActive(className,
+                new Object[] { matlabConfig }, jvminfo.getNode());
+
+        jvminfo.setWorker(worker);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public void run() {
+                worker.terminate();
             }
-        }
-
-        if (worker == null) {
-            System.err.println("[" + host + " MATLAB TASK] Worker couldn't be deployed.");
-            throw ex;
-        }
+        }));
 
         return worker;
     }
 
     /**
      * Internal version of the execute method
-     * @param uri a URI to which the spawned JVM is registered
      * @param results results from preceding tasks
      * @return result of the task
      * @throws Throwable
      */
-    protected Serializable executeInternal(String uri, TaskResult... results) throws Throwable {
+    protected Serializable executeInternal(TaskResult... results) throws Throwable {
 
-        if (matlabWorker == null) {
-            if (debug) {
-                System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
+        MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
+        AOMatlabWorker sw = jvminfo.getWorker();
+        if (sw == null) {
+            synchronized (jvminfo) {
+                jvminfo.wait();
+                sw = deploy(AOMatlabWorker.class.getName());
             }
-            matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabConfig);
+        }
 
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                public void run() {
-                    matlabWorker.terminate();
-                }
-            }));
-        }
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Initializing (SimpleMatlab)");
+            System.out.println("[" + host + " MatlabTask] Initializing");
         }
-        matlabWorker.init(inputScript, scriptLines, debug);
+        sw.init(inputScript, scriptLines, debug);
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
+            System.out.println("[" + host + " MatlabTask] Executing");
         }
 
         // We execute the task on the worker
-        Serializable res = matlabWorker.execute(index, results);
+        Serializable res = sw.execute(index, results);
         // We wait for the result
         res = (Serializable) PAFuture.getFutureValue(res);
 
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Received result (SimpleMatlab)");
+            System.out.println("[" + host + " MatlabTask] Received result");
         }
-        // We don't terminate the worker for subsequent calculations
-        //matlabWorker.terminate();
 
         return res;
     }
 
     /**
      * Starts the java process on the given Node uri
-     * @param uri
      * @return process
      * @throws Throwable
      */
-    private final Process startProcess(String uri) throws Throwable {
+    private final Process startProcess() throws Throwable {
         if (debug) {
-            System.out.println("[" + host + " MATLAB TASK] Starting a new JVM");
+            System.out.println("[" + host + " MatlabTask] Starting a new JVM");
         }
+        MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
         // Build java command
         javaCommandBuilder = new DummyJVMProcess();
-        // the uri to use to create the node
-        javaCommandBuilder.setParameters(uri);
+        javaCommandBuilder.setClassname(StartPARuntime.class.getName());
+        int deployid = new SecureRandom().nextInt();
+        jvminfo.setDeployID(deployid);
+        subscribeJMXRuntimeEvent();
+
+        javaCommandBuilder.setParameters("-d " + deployid + " -p " +
+            RuntimeFactory.getDefaultRuntime().getURL());
 
         // We build the process with a separate environment
         ProcessBuilder pb = new ProcessBuilder();
@@ -395,8 +422,10 @@ public class SimpleMatlab extends JavaExecutable {
 
         env.put("PATH", addPtolemyLibDirToPath(addMatlabToPath(path)));
 
-        // we set as well the java.library.path property (precaution)
-        javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"");
+        // we set as well the java.library.path property (precaution), we forward as well the RMI port in use
+
+        javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
+            " -Dproactive.rmi.port=" + Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()));
 
         if (debug) {
             System.out.println("Starting Process:");
@@ -411,6 +440,42 @@ public class SimpleMatlab extends JavaExecutable {
         pb.command(javaCommandBuilder.getJavaCommand());
 
         return pb.start();
+    }
+
+    private void subscribeJMXRuntimeEvent() {
+        MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
+        ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
+        part.addDeployment(jvminfo.getDeployID());
+        JMXNotificationManager.getInstance().subscribe(part.getMBean().getObjectName(), this);
+    }
+
+    public void handleNotification(Notification notification, Object handback) {
+        try {
+            String type = notification.getType();
+
+            if (NotificationType.GCMRuntimeRegistered.equals(type)) {
+                GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification
+                        .getUserData();
+                MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
+                if (data.getDeploymentId() != jvminfo.getDeployID()) {
+                    return;
+                }
+                synchronized (jvminfo) {
+
+                    ProActiveRuntime childRuntime = data.getChildRuntime();
+
+                    Node scilabNode = childRuntime.createLocalNode("Matlab_" + nodeName, false, null, null,
+                            null);
+                    jvminfo.setNode(scilabNode);
+                    jvminfo.notifyAll();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            notifyAll();
+        }
+
     }
 
     private String addPtolemyLibDirToPath(String path) {

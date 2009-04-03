@@ -38,7 +38,12 @@ import java.io.Serializable;
 import java.util.Map;
 
 
-public class MatlabSplitter extends SimpleMatlab {
+/**
+ * A Scheduler Task, specific to Matlab, which handles splitting of results in matlab workflows
+ *
+ * @author The ProActive Team
+ */
+public class MatlabSplitter extends MatlabTask {
 
     private static AOMatlabSplitter splitterWorker = null;
 
@@ -61,14 +66,13 @@ public class MatlabSplitter extends SimpleMatlab {
     }
 
     @Override
-    protected Serializable executeInternal(String uri, TaskResult... results) throws Throwable {
+    protected Serializable executeInternal(TaskResult... results) throws Throwable {
 
         if (splitterWorker == null) {
             if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabSplitter)");
             }
-            splitterWorker = (AOMatlabSplitter) deploy(uri, AOMatlabSplitter.class.getName(), matlabConfig
-                    .getMatlabCommandName());
+            splitterWorker = (AOMatlabSplitter) deploy(AOMatlabSplitter.class.getName());
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
                     splitterWorker.terminate();

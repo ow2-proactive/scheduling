@@ -45,7 +45,7 @@
 % *
 % * ################################################################
 % */
-function varargout = PAconnect(varargin)
+function PAconnect(varargin)
 
 if nargin > 1
     proactive = varargin{1};
@@ -113,14 +113,16 @@ set(button, 'ActionPerformedCallback', {@doAction});
 global button_handle_global_data;
 button_handle_global_data.loginFrame = loginFrame;
 button_handle_global_data.solver = solver;
-
+disp('Connection successful, please enter login/password');
 
 
 function doAction(srcObj, evd)
 % srcObj is the button object from above
 % evd is the ActionEvent object
 global button_handle_global_data;
-button_handle_global_data.loginFrame.checkLogin()
+if button_handle_global_data.loginFrame.checkLogin()
+   disp('Connected'); 
+end
 
 
 

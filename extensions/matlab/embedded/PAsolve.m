@@ -1,18 +1,20 @@
 %   PAsolve() - distribute a matlab function using parametric sweep
 %
 %   Usage:
-%       >> results = PAsolve(args, function[, debug]);
+%       >> results = PAsolve(function, args [, debug]);
 %
 %   Inputs:
+%       func - a handle to a Matlab or user-defined function
 %       args - a one-dimensional cell array of objects holding the parameters. If the cell
 %              contains X elements, then X tasks will be deployed.
-%               Nested cells and structures can be used inside the cell array.
-%               Functions, or other Matlab user-defined classes are not supported.
-%       func - a handle to a Matlab or user-defined function
+%              Nested cells and structures can be used inside the cell array.
+%              Functions, or other Matlab user-defined classes are not supported.
 %       debug - '-debug' if the computation needs to be run in debug mode
 %
 %   Ouputs:
 %       results - a cell array containing the results. The cell array will be of the same size as the input cell array.
+%
+%   Example: results = PAsolve(@factorial,{1, 2, 3, 4, 5})
 %
 %/*
 % * ################################################################
@@ -44,28 +46,15 @@
 % *
 % * ################################################################
 % */
-% PAsolve distribute a matlab task using parametric sweep
-% results = PAsolve(solver, args, func)
-% solver : a connection to the scheduler already established
-% args : a one-dimensional cell array of objects holding the parameters. If the cell
-%       contains X elements, then X tasks will be deployed. Current limitations
-%       impose that elements are numeric or character arrays only
-% func : a function handle to the task that will be executed. This function
-%       must have one single parameter of a type corresponding to the args
-%       parameter's content, and must return one single value.
-% results : a one-dimensional cell array of results.
-%
-% Example: results = PAsolve(solver, {1, 2, 3, 4, 5}, @factorial)
-% 
 function results = PAsolve(varargin)
 
 if (nargin <2) | (nargin > 3) 
     error(['wrong number of arguments: ' int2str(nargin)]);
 end
 
-args = varargin{1};
-func = varargin{2};
-if (nargin == 3) && strcmp(varargin{3},'-debug') == 1
+func = varargin{1};
+args = varargin{2};
+if (nargin == 3) && (strcmp(varargin{3},'-debug') == 1 || strcmp(varargin{3},'-d') == 1)
     debug = true;
 else
     debug = false;
@@ -138,10 +127,9 @@ end
 [pathstr, name, ext, versn] = fileparts(mfilename('fullpath'));
 url = java.net.URL(['file:' pathstr filesep 'checkMatlab' '.js']);
 % send the task list to the scheduler
-res = solver.solve(inputScripts,mainScripts,url,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug);
-% We wait for the results
-res = org.objectweb.proactive.api.PAFuture.getFutureValue(res);
-results = cell(1, res.size());
-for i=1:res.size()
-   results{i}=parse_token_output(res.get(i-1));
+resfuture = solver.solve(inputScripts,mainScripts,url,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug);
+if length(args) == 1
+  results = PAResult(resfuture);
+else
+  results = PAResultList(resfuture);
 end

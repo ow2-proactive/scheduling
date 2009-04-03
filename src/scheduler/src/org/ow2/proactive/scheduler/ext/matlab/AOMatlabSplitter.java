@@ -44,7 +44,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public class AOMatlabSplitter extends AOSimpleMatlab {
+public class AOMatlabSplitter extends AOMatlabWorker {
 
     /**
      *

@@ -37,7 +37,12 @@ import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
-public class MatlabCollector extends SimpleMatlab {
+/**
+ * A Scheduler Task, specific to Matlab, which handles gathering of results in matlab workflows
+ *
+ * @author The ProActive Team
+ */
+public class MatlabCollector extends MatlabTask {
     private static AOMatlabCollector collectorWorker = null;
 
     /**
@@ -47,14 +52,13 @@ public class MatlabCollector extends SimpleMatlab {
     }
 
     @Override
-    protected Serializable executeInternal(String uri, TaskResult... results) throws Throwable {
+    protected Serializable executeInternal(TaskResult... results) throws Throwable {
 
         if (collectorWorker == null) {
             if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabCollector)");
             }
-            collectorWorker = (AOMatlabCollector) deploy(uri, AOMatlabCollector.class.getName(), matlabConfig
-                    .getMatlabCommandName());
+            collectorWorker = (AOMatlabCollector) deploy(AOMatlabCollector.class.getName());
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
                     collectorWorker.terminate();

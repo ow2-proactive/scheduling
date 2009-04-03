@@ -64,7 +64,7 @@ import java.util.Map;
 
 
 /**
- * This active object handles the connection between Scilab and the Scheduler directly from the Scilab environment
+ * This active object handles the interaction between Scilab and the Scheduler it creates Scheduler jobs and receives results
  *
  * @author The ProActive Team
  */
@@ -320,7 +320,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
             schedulerTask.addArgument("script", mainScripts);
 
             schedulerTask.addArgument("outputs", "out");
-            schedulerTask.setExecutableClassName("org.ow2.proactive.scheduler.ext.scilab.SimpleScilab");
+            schedulerTask.setExecutableClassName("org.ow2.proactive.scheduler.ext.scilab.ScilabTask");
             if (availableScript != null) {
                 SelectionScript sscript = null;
                 try {

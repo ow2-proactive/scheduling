@@ -35,7 +35,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
                 <parameters>
                     <parameter name="index" value="0"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -52,7 +52,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
                 <parameters>
                     <parameter name="index" value="1"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -69,7 +69,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
                 <parameters>
                     <parameter name="index" value="2"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -86,7 +86,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
                 <parameters>
                     <parameter name="index" value="3"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -103,7 +103,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
                 <parameters>
                     <parameter name="index" value="4"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
@@ -120,7 +120,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
                 <parameters>
                     <parameter name="index" value="5"/>
                     <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>

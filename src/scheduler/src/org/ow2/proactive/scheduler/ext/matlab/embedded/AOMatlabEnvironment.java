@@ -306,7 +306,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             if (debugCurrentJob) {
                 schedulerTask.addArgument("debug", "true");
             }
-            schedulerTask.setExecutableClassName("org.ow2.proactive.scheduler.ext.matlab.SimpleMatlab");
+            schedulerTask.setExecutableClassName("org.ow2.proactive.scheduler.ext.matlab.MatlabTask");
             if (availableScript != null) {
                 SelectionScript sscript = null;
                 try {

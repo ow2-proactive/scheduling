@@ -1,4 +1,4 @@
-function [] = PAconnect(uri,login,passwd)
+function [] = PAconnect(uri)
 
     global ('PA_initialized', 'PA_connected')
 
@@ -6,7 +6,7 @@ function [] = PAconnect(uri,login,passwd)
         PAinit();
     end
     if ~exists('PA_connected') | PA_connected ~= 1
-        connect(uri,login,passwd);
+        connect(uri,"","");
         PA_connected = 1;
         disp(strcat(['Connection successful to ', uri]));
     else

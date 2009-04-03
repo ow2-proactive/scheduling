@@ -45,7 +45,11 @@ import java.util.List;
 import java.util.Map;
 
 
-public class AOSimpleScilab implements Serializable {
+/**
+ * An active object which handles the interaction between the ScilabTask and a local Scilab engine
+ * @author The ProActive Team
+ */
+public class AOScilabWorker implements Serializable {
 
     static String nl = System.getProperty("line.separator");
 
@@ -79,7 +83,7 @@ public class AOSimpleScilab implements Serializable {
      */
     private String functionsDefinition = null;
 
-    public AOSimpleScilab() {
+    public AOScilabWorker() {
     }
 
     /**
@@ -87,7 +91,7 @@ public class AOSimpleScilab implements Serializable {
      *
      * @param scilabConfig the configuration for scilab
      */
-    public AOSimpleScilab(ScilabConfiguration scilabConfig) throws UnknownHostException {
+    public AOScilabWorker(ScilabConfiguration scilabConfig) throws UnknownHostException {
 
         this.config = scilabConfig;
 
@@ -187,21 +191,21 @@ public class AOSimpleScilab implements Serializable {
             return getResults();
         if (inputScript != null) {
             if (debug) {
-                System.out.println("[AOSimpleScilab] Executing inputscript");
+                System.out.println("[AOScilabWorker] Executing inputscript");
             }
             ok = executeScript(inputScript, false);
             if (debug) {
-                System.out.println("[AOSimpleScilab] End of inputscript execution");
+                System.out.println("[AOScilabWorker] End of inputscript execution");
             }
         }
         if (!ok)
             return getResults();
         if (debug) {
-            System.out.println("[AOSimpleScilab] Executing mainscript");
+            System.out.println("[AOScilabWorker] Executing mainscript");
         }
         ok = executeScript(prepareScript(mainscriptLines), true);
         if (debug) {
-            System.out.println("[AOSimpleScilab] End of mainscript execution " + (ok ? "ok" : "ko"));
+            System.out.println("[AOScilabWorker] End of mainscript execution " + (ok ? "ok" : "ko"));
         }
 
         return getResults();
@@ -221,7 +225,7 @@ public class AOSimpleScilab implements Serializable {
 
     /**
      * Loads in Scilab the user-functions definitions
-     *
+     * 
      * @return success
      * @throws IOException
      */
@@ -255,13 +259,13 @@ public class AOSimpleScilab implements Serializable {
     protected ArrayList<SciData> getResults() {
 
         if (debug) {
-            System.out.println("[AOSimpleScilab] Receiving outputs");
+            System.out.println("[AOScilabWorker] Receiving outputs");
         }
         ArrayList<SciData> out = new ArrayList<SciData>();
         int i = 0;
         for (String var : outputVars) {
             if (debug) {
-                System.out.println("[AOSimpleScilab] Receiving output :" + var);
+                System.out.println("[AOScilabWorker] Receiving output :" + var);
             }
             if (Scilab.ExistVar(var)) {
                 SciData output = Scilab.receiveDataByName(var);
@@ -289,7 +293,7 @@ public class AOSimpleScilab implements Serializable {
             if (script.indexOf(31) >= 0) {
                 String[] lines = script.split("" + ((char) 31));
                 if (debug) {
-                    System.out.println("[AOSimpleScilab] Executing multi-line: " + script);
+                    System.out.println("[AOScilabWorker] Executing multi-line: " + script);
                 }
                 for (String line : lines) {
 
@@ -298,7 +302,7 @@ public class AOSimpleScilab implements Serializable {
                     if (line.startsWith("" + ((char) 30))) {
                         String modifiedLine = "execstr('" + line.substring(1) + "','errcatch','n');";
                         if (debug) {
-                            System.out.println("[AOSimpleScilab] Executing : " + modifiedLine);
+                            System.out.println("[AOScilabWorker] Executing : " + modifiedLine);
                         }
                         Scilab.Exec(modifiedLine);
                         int errorcode = Scilab.GetLastErrorCode();
@@ -308,7 +312,7 @@ public class AOSimpleScilab implements Serializable {
                         }
                     } else {
                         if (debug) {
-                            System.out.println("[AOSimpleScilab] Executing : " + line);
+                            System.out.println("[AOScilabWorker] Executing : " + line);
                         }
                         Scilab.Exec(line);
                         int errorcode = Scilab.GetLastErrorCode();
@@ -320,7 +324,7 @@ public class AOSimpleScilab implements Serializable {
                 }
             } else {
                 if (debug) {
-                    System.out.println("[AOSimpleScilab] Executing single-line: " + script);
+                    System.out.println("[AOScilabWorker] Executing single-line: " + script);
                 }
                 Scilab.Exec(script);
                 int errorcode = Scilab.GetLastErrorCode();

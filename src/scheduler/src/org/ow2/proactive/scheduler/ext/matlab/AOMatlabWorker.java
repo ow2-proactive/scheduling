@@ -45,7 +45,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public class AOSimpleMatlab implements Serializable {
+/**
+ * An active object which handles the interaction between the MatlabTask and a local Matlab engine
+ * @author The ProActive Team
+ */
+public class AOMatlabWorker implements Serializable {
 
     protected boolean debug;
 
@@ -61,14 +65,10 @@ public class AOSimpleMatlab implements Serializable {
      */
     private ArrayList<String> scriptLines = new ArrayList<String>();
 
-    public AOSimpleMatlab() {
+    public AOMatlabWorker() {
     }
 
-    /**
-     * Constructor for the Simple task
-     * @param matlabConfig the configuration for the matlab engine
-     */
-    public AOSimpleMatlab(MatlabConfiguration matlabConfig) {
+    public AOMatlabWorker(MatlabConfiguration matlabConfig) {
         MatlabEngine.setConfiguration(matlabConfig);
     }
 
@@ -115,6 +115,7 @@ public class AOSimpleMatlab implements Serializable {
             out = conn.get("out");
             if (debug) {
                 System.out.println(out);
+                System.out.flush();
             }
         } finally {
             conn.release();
@@ -149,6 +150,7 @@ public class AOSimpleMatlab implements Serializable {
         if (debug) {
             System.out.println("Executing Matlab command:");
             System.out.println(execScript);
+            System.out.flush();
         }
         conn.evalString(execScript);
         if (debug) {

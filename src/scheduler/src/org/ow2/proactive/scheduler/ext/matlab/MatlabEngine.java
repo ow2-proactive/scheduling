@@ -32,10 +32,7 @@
 package org.ow2.proactive.scheduler.ext.matlab;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.ext.matlab.util.MatlabConfiguration;
-
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.matlab.Engine;

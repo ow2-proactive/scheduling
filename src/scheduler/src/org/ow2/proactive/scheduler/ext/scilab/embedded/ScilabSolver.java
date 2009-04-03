@@ -46,20 +46,19 @@ import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 
 
+/**
+ * This class is a Java object handling the interaction between Scilab c/jni code and the ActiveObject AOScilabEnvironment
+ * 
+ * @author The ProActive Team
+ */
 public class ScilabSolver {
 
-    /**
-     * log4j logger
-     */
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.SCILAB);
 
     private static AOScilabEnvironment scilabSolver;
-    //private static native void initIDs();
 
     static {
         scilabSolver = null;
-        //	System.loadLibrary("ScilabEmbedded");
-        //	initIDs();
     }
 
     public static String[][] solve(String[] inputScripts, String functionsDefinition, String mainScript,
@@ -128,8 +127,6 @@ public class ScilabSolver {
                 e.printStackTrace();
             }
         }
-
-        //scilabSolver.login(login, passwd);
 
     }
 }

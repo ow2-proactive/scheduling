@@ -27,7 +27,7 @@
                 </script>
             </selection>
             <javaExecutable
-                class="org.ow2.proactive.scheduler.ext.scilab.SimpleScilab">
+                class="org.ow2.proactive.scheduler.ext.scilab.ScilabTask">
                 <parameters>
                     <parameter name="scriptFile"
                         value="${SCILAB_SCRIPTS}/intsin.sci" />
@@ -48,7 +48,7 @@
                 </script>
             </selection>
             <javaExecutable
-                class="org.ow2.proactive.scheduler.ext.scilab.SimpleScilab">
+                class="org.ow2.proactive.scheduler.ext.scilab.ScilabTask">
                 <parameters>
                     <parameter name="scriptFile"
                         value="${SCILAB_SCRIPTS}/intsin.sci" />
@@ -69,7 +69,7 @@
                 </script>
             </selection>
             <javaExecutable
-                class="org.ow2.proactive.scheduler.ext.scilab.SimpleScilab">
+                class="org.ow2.proactive.scheduler.ext.scilab.ScilabTask">
                 <parameters>
                     <parameter name="scriptFile"
                         value="${SCILAB_SCRIPTS}/intsin.sci" />
@@ -90,7 +90,7 @@
                 </script>
             </selection>
             <javaExecutable
-                class="org.ow2.proactive.scheduler.ext.scilab.SimpleScilab">
+                class="org.ow2.proactive.scheduler.ext.scilab.ScilabTask">
                 <parameters>
                     <parameter name="scriptFile"
                         value="${SCILAB_SCRIPTS}/intsin.sci" />
@@ -111,7 +111,7 @@
                 </script>
             </selection>
             <javaExecutable
-                class="org.ow2.proactive.scheduler.ext.scilab.SimpleScilab">
+                class="org.ow2.proactive.scheduler.ext.scilab.ScilabTask">
                 <parameters>
                     <parameter name="scriptFile"
                         value="${SCILAB_SCRIPTS}/intsin.sci" />
@@ -136,7 +136,7 @@
                 </script>
             </selection>
             <javaExecutable
-                class="org.ow2.proactive.scheduler.ext.scilab.SimpleScilab">
+                class="org.ow2.proactive.scheduler.ext.scilab.ScilabTask">
                 <parameters>
                     <parameter name="scriptFile"
                         value="${SCILAB_SCRIPTS}/merge.sci" />

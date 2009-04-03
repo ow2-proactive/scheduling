@@ -41,7 +41,7 @@ import ptolemy.data.ArrayToken;
 import ptolemy.data.Token;
 
 
-public class AOMatlabCollector extends AOSimpleMatlab {
+public class AOMatlabCollector extends AOMatlabWorker {
 
     /**
      *
