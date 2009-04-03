@@ -32,8 +32,7 @@
 package org.ow2.proactive.resourcemanager.exception;
 
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.nodesource.dynamic.DynamicNodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
 
 /**

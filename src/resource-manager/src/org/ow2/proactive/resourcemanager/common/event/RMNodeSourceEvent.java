@@ -35,8 +35,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
 
 /**
@@ -48,7 +47,6 @@ import org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource;
  *
  * A node source has to aspects in a Monitor's point of view :<BR>
  * -A name, its sourceID.<BR>
- * -A type : {@link GCMNodeSource}, ...<BR>
  * NodeSource types are defined in {@link RMConstants}.
  *
  * @see RMMonitoring
@@ -63,8 +61,8 @@ public class RMNodeSourceEvent extends RMEvent {
     /** name of the source concerned by the event. */
     private String nodeSourceName = null;
 
-    /** type of the source concerned by the event. */
-    private String nodeSourceType = null;
+    /** description of the source concerned by the event. */
+    private String nodeSourceDescription = null;
 
     /**
      * ProActive Empty constructor.
@@ -77,9 +75,9 @@ public class RMNodeSourceEvent extends RMEvent {
      * @param name of the Node Source
      * @param type type of the NodeSource
      */
-    public RMNodeSourceEvent(String name, String type) {
+    public RMNodeSourceEvent(String name, String description) {
         this.nodeSourceName = name;
-        this.nodeSourceType = type;
+        this.nodeSourceDescription = description;
     }
 
     /**
@@ -91,7 +89,7 @@ public class RMNodeSourceEvent extends RMEvent {
     public boolean equals(Object obj) {
         if (obj instanceof RMNodeSourceEvent) {
             return ((RMNodeSourceEvent) obj).nodeSourceName.equals(this.nodeSourceName) &&
-                ((RMNodeSourceEvent) obj).nodeSourceType.equals(this.nodeSourceType);
+                ((RMNodeSourceEvent) obj).nodeSourceDescription.equals(this.nodeSourceDescription);
         }
         return false;
     }
@@ -108,7 +106,7 @@ public class RMNodeSourceEvent extends RMEvent {
      * Returns the {@link NodeSource} type of the event.
      * @return node source type of the event.
      */
-    public String getSourceType() {
-        return this.nodeSourceType;
+    public String getSourceDescription() {
+        return this.nodeSourceDescription;
     }
 }

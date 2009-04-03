@@ -142,8 +142,8 @@ public interface RMUser {
      */
     public void freeNodes(NodeSet nodes);
 
-    /** Stop and remove the RMUser active object.
-     * 
+    /**
+     * Stop and remove the RMUser active object.
      */
     public void shutdown();
 

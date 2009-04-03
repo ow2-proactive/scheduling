@@ -1,0 +1,8 @@
+# Basic GCM infrastructure
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure
+
+# Customized GCM infrastructure
+# - requires one node per host
+# - is able to deploy/undeploy a single node
+# - uses GCM descriptor with "HOST" java variable contract
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure

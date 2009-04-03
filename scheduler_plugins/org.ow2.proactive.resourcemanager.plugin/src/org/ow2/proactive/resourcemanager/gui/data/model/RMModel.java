@@ -187,7 +187,7 @@ public class RMModel {
         synchronized (root) {
             source = (TreeParentElement) find(root, nodeSourceEvent.getSourceName());
             if (source == null) {
-                source = new Source(nodeSourceEvent.getSourceName(), nodeSourceEvent.getSourceType());
+                source = new Source(nodeSourceEvent.getSourceName(), nodeSourceEvent.getSourceDescription());
                 root.addChild(source);
             }
         }
@@ -304,21 +304,17 @@ public class RMModel {
     /* model queries methods							*/
     /****************************************************/
 
-    public String[] getSourcesNames(boolean dynamicToo, boolean staticToo, boolean defaultToo) {
+    public String[] getSourcesNames(boolean defaultToo) {
         TreeLeafElement[] children = root.getChildren();
         List<String> res = new ArrayList<String>();
         for (TreeLeafElement leaf : children) {
             Source src = (Source) leaf;
-            if (dynamicToo && src.isDynamic()) {
-                res.add(src.getName());
-            } else if (staticToo && src.isStatic()) {
-                if (src.isTheDefault()) {
-                    if (defaultToo) {
-                        res.add(src.getName());
-                    }
-                } else {
+            if (src.isTheDefault()) {
+                if (defaultToo) {
                     res.add(src.getName());
                 }
+            } else {
+                res.add(src.getName());
             }
         }
         String[] tmp = new String[res.size()];

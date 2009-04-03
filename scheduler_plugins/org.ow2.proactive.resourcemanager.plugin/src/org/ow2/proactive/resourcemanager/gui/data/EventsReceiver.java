@@ -162,6 +162,12 @@ public class EventsReceiver implements InitActive, RMEventListener {
     }
 
     /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceNodesAcquisitionInfoAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
+     */
+    public void nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent event) {
+    }
+
+    /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
     public void rmShutDownEvent(RMEvent arg0) {
@@ -186,4 +192,5 @@ public class EventsReceiver implements InitActive, RMEventListener {
 
     public void rmStartedEvent(RMEvent arg0) {
     }
+
 }

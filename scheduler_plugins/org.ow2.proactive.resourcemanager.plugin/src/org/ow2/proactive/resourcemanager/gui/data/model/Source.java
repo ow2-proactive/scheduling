@@ -1,6 +1,6 @@
 package org.ow2.proactive.resourcemanager.gui.data.model;
 
-import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
 
 /**
@@ -8,22 +8,22 @@ import org.ow2.proactive.resourcemanager.common.RMConstants;
  */
 public class Source extends TreeParentElement {
 
-    private String type = null;
+    private String description = null;
 
-    public Source(String name, String type) {
+    public Source(String name, String description) {
         super(name, TreeElementType.SOURCE);
-        this.type = type;
-    }
-
-    public boolean isDynamic() {
-        return false;
-    }
-
-    public boolean isStatic() {
-        return type.equals(RMConstants.GCM_NODE_SOURCE_TYPE);
+        this.description = description;
     }
 
     public boolean isTheDefault() {
-        return getName().equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+        return getName().equals(NodeSource.DEFAULT_NAME);
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String toString() {
+        return getName() + " [" + description + "]";
     }
 }

@@ -31,10 +31,9 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -43,11 +42,9 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
@@ -55,18 +52,20 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManagerFactory;
+import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
+import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
-import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
  * Implementation of the {@link RMAdmin} active object.
  * the RMAdmin active object object is designed to receive and perform
  * administrator commands :<BR>
- * -initiate creation and removal of {@link org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource} active objects.<BR>
- * -add nodes to static nodes sources ({@link org.ow2.proactive.resourcemanager.nodesource.gcm.GCMNodeSource}), by
+ * -initiate creation and removal of {@link org.ow2.proactive.resourcemanager.nodesource.deprecated.NodeSource} active objects.<BR>
+ * -add nodes to static nodes sources ({@link org.ow2.proactive.resourcemanager.nodesource.deprecated.GCMNodeSource}), by
  * a ProActive descriptor.<BR>
  * -remove nodes from the RM.<BR>
  * -shutdown the RM.<BR>
@@ -84,12 +83,6 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
 
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.ADMIN);
-
-    private final String GCMD_PROPERTY_NAME = PAResourceManagerProperties.RM_GCMD_PATH_PROPERTY_NAME
-            .getValueAsString();
-
-    private String gcmApplicationFile = PAResourceManagerProperties.RM_GCM_TEMPLATE_APPLICATION_FILE
-            .getValueAsString();
 
     /**
      * ProActive Empty constructor
@@ -115,27 +108,9 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
 
-            //test that gcmApplicationFile is an absolute path or not
-            if (!(new File(gcmApplicationFile).isAbsolute())) {
-                //file path is relative, so we complete the path with the prefix RM_Home constant
-                gcmApplicationFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator +
-                    gcmApplicationFile;
-            }
-
-            //check that GCM Application template file exists
-            if (!(new File(gcmApplicationFile).exists())) {
-                logger
-                        .info("*********  ERROR ********** Cannot find default GCMApplication template file for deployment :" +
-                            gcmApplicationFile +
-                            ", Resource Manager will be unable to deploy nodes by GCM Deployment descriptor");
-            } else if (GCMD_PROPERTY_NAME == null || "".equals(GCMD_PROPERTY_NAME)) {
-                logger.info("*********  ERROR ********** Java Property used by " + gcmApplicationFile +
-                    ", to specify GCMD deployment file is not defined," +
-                    " Resource Manager will be unable to deploy nodes by GCM Deployment descriptor.");
-            }
-
             registerTrustedService(authentication);
             registerTrustedService(rmcore);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -170,102 +145,88 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#createGCMNodesource(byte[], java.lang.String)
+     * Creates a new node source with specified name, infrastructure manages {@link InfrastructureManager}
+     * and acquisition policy {@link NodeSourcePolicy}.
+     *
+     * @param nodeSourceName the name of the node source
+     * @param infrastructureType type of the underlying infrastructure {@link InfrastructureType}
+     * @param infrastructureParameters parameters for infrastructure creation
+     * @param policyType name of the policy type. It passed as a string due to pluggable approach {@link NodeSourcePolicyFactory}
+     * @param policyParameters parameters for policy creation
+     * @return constructed NodeSource
+     * @throws RMException if any problems occurred
      */
-    public void createGCMNodesource(byte[] gcmDeploymentData, String sourceName) throws RMException {
-        if (gcmDeploymentData != null) {
-            GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
-            this.rmcore.createGCMNodesource(appl, sourceName);
-        } else {
-            this.rmcore.createGCMNodesource(null, sourceName);
-        }
+    public void createNodesource(String nodeSourceName, String infrastructureType,
+            Object[] infrastructureParameters, String policyType, Object[] policyParameters)
+            throws RMException {
+        this.rmcore.createNodesource(nodeSourceName, infrastructureType, infrastructureParameters,
+                policyType, policyParameters);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#addNodes(byte[])
+     * Adds nodes to the specified node source.
+     *
+     * @param sourceName a name of the node source
+     * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
+     * @throws RMException if any errors occurred
      */
-    public void addNodes(byte[] gcmDeploymentData) throws RMException {
-
-        GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
-        this.rmcore.addingNodesAdminRequest(appl);
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#addNodes(byte[], java.lang.String)
-     */
-    public void addNodes(byte[] gcmDeploymentData, String sourceName) throws RMException {
-        GCMApplication appl = convertGCMdeploymentDataToGCMappl(gcmDeploymentData);
-        this.rmcore.addingNodesAdminRequest(appl, sourceName);
+    public void addNodes(String sourceName, Object... parameters) throws RMException {
+        rmcore.addNodes(sourceName, parameters);
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#addNode(java.lang.String)
      */
     public void addNode(String nodeUrl) throws RMException {
-        this.rmcore.addingNodeAdminRequest(nodeUrl);
+        this.rmcore.addNode(nodeUrl);
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#addNode(java.lang.String, java.lang.String)
      */
     public void addNode(String nodeUrl, String sourceName) throws RMException {
-        this.rmcore.addingNodeAdminRequest(nodeUrl, sourceName);
+        this.rmcore.addNode(nodeUrl, sourceName);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#removeNode(java.lang.String, boolean)
+     * Removes a node from the RM.
+     *
+     * @param nodeUrl URL of the node to remove.
+     * @param preempt if true remove the node immediately without waiting while it will be freed.
      */
     public void removeNode(String nodeUrl, boolean preempt) {
-        this.rmcore.nodeRemovalAdminRequest(nodeUrl, preempt);
+        removeNode(nodeUrl, preempt, false);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#removeSource(java.lang.String, boolean)
+     * Removes a node from the RM.
+     *
+     * @param nodeUrl URL of the node to remove.
+     * @param preempt if true remove the node immediately without waiting while it will be freed.
+     * @param forever if true remove the from a dynamic node source forever. Otherwise node source
+     * is able to add this node to the RM again once it is needed. See {@link NodeSourcePolicy}.
+     */
+    public void removeNode(String nodeUrl, boolean preempt, boolean forever) {
+        this.rmcore.removeNode(nodeUrl, preempt, forever);
+    }
+
+    /**
+     * Remove a node source from the RM.
+     * All nodes handled by the node source are removed.
+     *
+     * @param sourceName name (id) of the source to remove.
+     * @param preempt if true remove the node immediately without waiting while it will be freed.
+     * @throws RMException if the node source doesn't exists
      */
     public void removeSource(String sourceName, boolean preempt) throws RMException {
-        this.rmcore.nodeSourceRemovalAdminRequest(sourceName, preempt);
+        this.rmcore.removeNodeSource(sourceName, preempt);
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#shutdown(boolean)
      */
-    public void shutdown(boolean preempt) throws ProActiveException {
-        this.rmcore.shutdown(preempt);
-    }
-
-    /**
-     * Creates a GCM application object from an Array of bytes representing a  GCM deployment xml file.
-     * Creates a temporary file, write the content of gcmDeploymentData array in the file. Then it creates 
-     * a GCM Application from the Resource manager GCM application template (corresponding to   
-     * {@link RMConstants.templateGCMApplication}) with a node provider which is gcmDeploymentData
-     * passed in parameter.
-     * @param gcmDeploymentData array of bytes representing a GCM deployment file.
-     * @return GCMApplication object ready to be deployed
-     * @throws RMException 
-     */
-    private GCMApplication convertGCMdeploymentDataToGCMappl(byte[] gcmDeploymentData) throws RMException {
-
-        GCMApplication appl = null;
-        try {
-
-            File gcmDeployment = File.createTempFile("gcmDeployment", "xml");
-            FileToBytesConverter.convertByteArrayToFile(gcmDeploymentData, gcmDeployment);
-            System.setProperty(GCMD_PROPERTY_NAME, gcmDeployment.getAbsolutePath());
-
-            appl = PAGCMDeployment.loadApplicationDescriptor(new File(gcmApplicationFile));
-
-            //delete gcmd temp file
-            gcmDeployment.delete();
-
-        } catch (FileNotFoundException e) {
-            throw new RMException(e);
-        } catch (IOException e) {
-            throw new RMException(e);
-        } catch (ProActiveException e) {
-            throw new RMException(e);
-        }
-
-        return appl;
+    public BooleanWrapper shutdown(boolean preempt) throws ProActiveException {
+        return rmcore.shutdown(preempt);
     }
 
     /**
@@ -291,4 +252,19 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
         return registerTrustedService(id);
     }
 
+    /**
+     * Gets a list of supported node source infrastructures
+     * @return a list of supported node source infrastructures
+     */
+    public ArrayList<String> getSupportedNodeSourceInfrastructures() {
+        return InfrastructureManagerFactory.getSupportedInfrastructures();
+    }
+
+    /**
+     * Gets a list of supported node source policies
+     * @return a list of supported node source policies
+     */
+    public ArrayList<String> getSupportedNodeSourcePolicies() {
+        return NodeSourcePolicyFactory.getSupportedPolicies();
+    }
 }

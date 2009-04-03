@@ -99,7 +99,7 @@ public class SchedulerTHelper {
     protected static String functionalTestSchedulerProperties = SchedulerTHelper.class.getResource(
             "config/functionalTSchedulerProperties.ini").getPath();
 
-    protected static String schedulerDefaultURL = "//Localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+    public static String schedulerDefaultURL = "//Localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     protected static final String VAR_OS = "os";
 
@@ -116,8 +116,8 @@ public class SchedulerTHelper {
 
     protected static MonitorEventReceiver eventReceiver;
 
-    protected static String username = "demo";
-    protected static String password = "demo";
+    public static String username = "demo";
+    public static String password = "demo";
 
     /**
      * Start the scheduler using a forked JVM.
@@ -140,6 +140,18 @@ public class SchedulerTHelper {
      */
     public static void startScheduler(String configuration) throws Exception {
         startScheduler(defaultDescriptor, configuration);
+    }
+
+    /**
+     * Start the scheduler using a forked JVM and
+     * deploys, with its associated empty Resource manager.
+     *
+     * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
+     * 			null to use the default one.
+     * @throws Exception if an error occurs.
+     */
+    public static void startSchedulerWithEmptyResourceManager() throws Exception {
+        startScheduler(null, null);
     }
 
     /**

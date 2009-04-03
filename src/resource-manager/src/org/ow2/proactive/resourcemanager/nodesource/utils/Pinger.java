@@ -1,11 +1,13 @@
-package org.ow2.proactive.resourcemanager.nodesource.frontend;
+package org.ow2.proactive.resourcemanager.nodesource.utils;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.authentication.RestrictedService;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -16,13 +18,14 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * This object ask periodically list of nodes managed by its NodeSource object,
  * verify if nodes are still alive, and warn the {@link NodeSource} object if a node is down by calling
  *  {@link NodeSource#detectedPingedDownNode(String)} method.
- * @see org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource
+ * @see org.ow2.proactive.resourcemanager.nodesource.deprecated.NodeSource
  *
  */
 public class Pinger extends RestrictedService {
 
     /** stub of the NodeSource Active Object*/
     private NodeSource nodeSource;
+    private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
     /** state of the thread, true Pinger "ping", false
      * pinger is stopped */
@@ -72,14 +75,14 @@ public class Pinger extends RestrictedService {
         while (this.isActive()) {
             try {
                 try {
-                    Thread.sleep(nodeSource.getPingFrequency().intValue());
+                    Thread.sleep(pingFrequency);
                 } catch (InterruptedException ex) {
                     active = false;
                 }
                 if (!this.isActive()) {
                     break;
                 }
-                for (Node node : nodeSource.getNodes()) {
+                for (Node node : nodeSource.getAliveNodes()) {
                     // check active between each ping
                     if (!this.isActive()) {
                         break;
@@ -89,18 +92,37 @@ public class Pinger extends RestrictedService {
                         node.getNumberOfActiveObjects();
                     } catch (Exception e) {
                         this.nodeSource.detectedPingedDownNode(nodeURL);
-                    } //catch
-                } //for
+                    }
+                }
             } catch (BodyTerminatedException e) {
-                // node source is terminated 
+                // node source is terminated
                 // terminate...
                 break;
             }
-        } //while !interrupted
+        }
     }
 
+    /**
+     * @see org.ow2.proactive.authentication.Loggable#getLogger()
+     */
     public Logger getLogger() {
         return ProActiveLogger.getLogger(RMLoggers.CONNECTION);
+    }
+
+    /**
+     * Gets a ping frequency
+     * @return a ping frequency
+     */
+    public IntWrapper getPingFrequency() {
+        return new IntWrapper(pingFrequency);
+    }
+
+    /**
+     * Sets a ping frequency
+     * @param a new frequency
+     */
+    public void setPingFrequency(int frequency) {
+        pingFrequency = frequency;
     }
 
 }

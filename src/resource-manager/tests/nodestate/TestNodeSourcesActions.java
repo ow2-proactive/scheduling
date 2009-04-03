@@ -34,7 +34,6 @@ package nodestate;
 import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -42,6 +41,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -83,7 +84,8 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
         String nodeSourceName = "GCM_Node_source_test1";
         RMFactory.setOsJavaProperty();
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
-        admin.createGCMNodesource(GCMDeploymentData, nodeSourceName);
+        admin.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(),
+                new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
         int pingFrequency = 5000;
         admin.setNodeSourcePingFrequency(pingFrequency, nodeSourceName);
@@ -143,7 +145,8 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
         log("Test 2");
 
         String nodeSourceName2 = "GCM_Node_source_test2";
-        admin.createGCMNodesource(GCMDeploymentData, nodeSourceName2);
+        admin.createNodesource(nodeSourceName2, GCMInfrastructure.class.getName(),
+                new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
         admin.setNodeSourcePingFrequency(pingFrequency, nodeSourceName2);
 

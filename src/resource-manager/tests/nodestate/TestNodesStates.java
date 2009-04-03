@@ -33,7 +33,6 @@ package nodestate;
 
 import static junit.framework.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.api.PAActiveObject;

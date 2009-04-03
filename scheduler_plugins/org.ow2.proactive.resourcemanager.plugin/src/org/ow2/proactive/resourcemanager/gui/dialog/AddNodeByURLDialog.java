@@ -42,9 +42,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
 
 /**
@@ -97,11 +97,11 @@ public class AddNodeByURLDialog extends Dialog {
         nsFormData.right = new FormAttachment(100, -5);
         nsFormData.width = 320;
         sourceNameCombo.setLayoutData(nsFormData);
-        sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(false, true, true));
+        sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(true));
         if ((source != null) && (!source.equals("")))
             sourceNameCombo.setText(source);
         else
-            sourceNameCombo.setText(RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+            sourceNameCombo.setText(NodeSource.DEFAULT_NAME);
 
         // label sourceName
         urlLabel.setText("Node url :");

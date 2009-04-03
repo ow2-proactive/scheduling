@@ -35,6 +35,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 
 /**
@@ -42,7 +44,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
  * Interface and methods to implements for a object that want
  * to receive (monitor) Resource manager's (RM) events.
  *
- * RM Events are defined in {@link org.ow2.proactive.resourcemanager.common.event#RMEventType}.
+ * RM Events are defined in {@link RMEventType}.
  *
  * @see org.ow2.proactive.resourcemanager.frontend.RMMonitoring
  *
@@ -69,51 +71,57 @@ public interface RMEventListener {
     public void rmStartedEvent(RMEvent event);
 
     /** new node source available in RM.
-     * @param event node source event containing new {@link org.ow2.proactive.resourcemanager.nodesource.frontend#NodeSource} properties.
+     * @param event node source event containing new {@link NodeSource} properties.
      */
     public void nodeSourceAddedEvent(RMNodeSourceEvent event);
 
     /** node removed from RM.
-     * @param event node source event containing removed {@link org.ow2.proactive.resourcemanager.nodesource.frontend#NodeSource} properties.
+     * @param event node source event containing removed {@link NodeSource} properties.
      */
     public void nodeSourceRemovedEvent(RMNodeSourceEvent event);
 
+    /**
+     * Nodes acquisition info is added to the node source.
+     * @param event node source event containing new {@link NodeSource} properties.
+     */
+    public void nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent event);
+
     /** new node available in RM.
-     * @param event node event containing new {@link org.ow2.proactive.resourcemanager.rmnode#RMNode} properties.
+     * @param event node event containing new {@link RMNode} properties.
      */
     public void nodeAddedEvent(RMNodeEvent event);
 
     /**
      * Node has ended a task.
      * becomes from busy to free state.
-     * @param event node event containing {@link org.ow2.proactive.resourcemanager.rmnode#RMNode} properties.
+     * @param event node event containing {@link RMNode} properties.
      */
     public void nodeFreeEvent(RMNodeEvent event);
 
     /**
      * Node begins to perform a task.
      * becomes from free to busy state.
-     * @param event node event containing {@link org.ow2.proactive.resourcemanager.rmnode#RMNode} properties.
+     * @param event node event containing {@link RMNode} properties.
      */
     public void nodeBusyEvent(RMNodeEvent event);
 
     /**
      * Node is busy and must be released at the end of the task.
      * becomes from busy to 'to be released' state.
-     * @param event node event containing {@link org.ow2.proactive.resourcemanager.rmnode#RMNode} properties.
+     * @param event node event containing {@link RMNode} properties.
      */
     public void nodeToReleaseEvent(RMNodeEvent event);
 
     /**
      * Node does not answer anymore to its monitor, the node is said 'down'.
      * becomes from free, busy, 'to be released' to down state.
-     * @param event node event containing {@link org.ow2.proactive.resourcemanager.rmnode#RMNode} properties.
+     * @param event node event containing {@link RMNode} properties.
      */
     public void nodeDownEvent(RMNodeEvent event);
 
     /**
      * A Node is removed from the RM.
-     * @param event node event containing the removed {@link org.ow2.proactive.resourcemanager.rmnode#RMNode} properties.
+     * @param event node event containing the removed {@link RMNode} properties.
      */
     public void nodeRemovedEvent(RMNodeEvent event);
 }

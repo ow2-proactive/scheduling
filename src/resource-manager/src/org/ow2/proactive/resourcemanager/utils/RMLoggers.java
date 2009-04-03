@@ -90,4 +90,6 @@ public interface RMLoggers {
     static final public String RMSELECTION = RESOURCEMANAGER + ".rmselection";
 
     static final public String CONSOLE = RESOURCEMANAGER + ".consol";
+
+    static final public String POLICY = RESOURCEMANAGER + ".policy";
 }

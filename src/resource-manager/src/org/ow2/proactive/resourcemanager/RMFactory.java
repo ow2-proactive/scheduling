@@ -47,9 +47,6 @@ import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -118,7 +115,6 @@ public class RMFactory {
      */
     public static void startLocal(Collection<String> localGCMDeploymentDescriptors) throws NodeException,
             ActiveObjectCreationException, AlreadyBoundException, IOException {
-
         String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
         if (rmcore == null) {
             Node nodeRM = NodeFactory.createLocalNode(RM_NODE_NAME, false, null, null, null);

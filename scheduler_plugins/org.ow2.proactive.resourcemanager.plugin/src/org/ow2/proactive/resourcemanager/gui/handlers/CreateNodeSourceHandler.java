@@ -7,7 +7,7 @@ import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.dialog.CreateStaticSourceDialog;
+import org.ow2.proactive.resourcemanager.gui.dialog.CreateSourceDialog;
 
 
 public class CreateNodeSourceHandler extends AbstractHandler implements IHandler {
@@ -29,7 +29,7 @@ public class CreateNodeSourceHandler extends AbstractHandler implements IHandler
     }
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        CreateStaticSourceDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell());
+        CreateSourceDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell());
         return null;
     }
 

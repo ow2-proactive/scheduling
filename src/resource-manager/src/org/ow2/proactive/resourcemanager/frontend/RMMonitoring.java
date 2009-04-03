@@ -34,6 +34,7 @@ package org.ow2.proactive.resourcemanager.frontend;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 
 
 /**
@@ -65,4 +66,9 @@ public interface RMMonitoring {
      * @return RMInitialState snapshot of RM's current state : nodes and node sources.
      */
     public RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events);
+
+    /**
+     * Removes a listener from RMMonitoring. Only listener itself must call this method
+     */
+    public void removeRMEventListener() throws RMException;
 }

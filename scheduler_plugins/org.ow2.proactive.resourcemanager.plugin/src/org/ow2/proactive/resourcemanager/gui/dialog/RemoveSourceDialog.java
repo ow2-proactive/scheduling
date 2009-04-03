@@ -94,7 +94,7 @@ public class RemoveSourceDialog extends Dialog {
         urlFormData.right = new FormAttachment(100, -5);
         urlFormData.width = 320;
         sourceNameCombo.setLayoutData(urlFormData);
-        sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(true, true, false));
+        sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(false));
         sourceNameCombo.select(0);
 
         // preempt check

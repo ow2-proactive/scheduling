@@ -48,6 +48,8 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 import functionalTests.FunctionalTest;
@@ -101,7 +103,8 @@ public class FunctionalTDefaultRM extends FunctionalTest {
     public void deployDefault() throws Exception {
         RMFactory.setOsJavaProperty();
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
-        admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
+        admin.createNodesource("GCM_Node_Source", GCMInfrastructure.class.getName(),
+                new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
     }
 
     /**

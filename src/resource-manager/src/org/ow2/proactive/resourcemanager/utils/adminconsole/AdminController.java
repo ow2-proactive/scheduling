@@ -35,6 +35,9 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.console.Console;
@@ -426,7 +429,7 @@ public class AdminController {
     private void listns_() {
         List<RMNodeSourceEvent> list = rm.getNodeSourcesList();
         for (RMNodeSourceEvent evt : list) {
-            printf(evt.getSourceName() + "\t" + evt.getSourceType());
+            printf(evt.getSourceName() + "\t" + evt.getSourceDescription());
         }
     }
 
@@ -466,7 +469,8 @@ public class AdminController {
 
     private void createns_(String nodeSourceName) {
         try {
-            rm.createGCMNodesource(null, nodeSourceName);
+            rm.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(), null, StaticPolicy.class
+                    .getName(), null);
             printf("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
         } catch (RMException e) {
             error("Error while removing node source '" + nodeSourceName + "' : " + e.getMessage());
@@ -490,9 +494,11 @@ public class AdminController {
         try {
             File gcmDeployFile = new File(fileName);
             if (nodeSourceName != null) {
-                rm.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile), nodeSourceName);
+                rm.addNodes(nodeSourceName, new Object[] { FileToBytesConverter
+                        .convertFileToByteArray(gcmDeployFile) });
             } else {
-                rm.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile));
+                rm.addNodes(NodeSource.DEFAULT_NAME, new Object[] { FileToBytesConverter
+                        .convertFileToByteArray(gcmDeployFile) });
             }
             printf("GCM deployment '" + fileName + "' request sent to Resource Manager");
         } catch (Exception e) {

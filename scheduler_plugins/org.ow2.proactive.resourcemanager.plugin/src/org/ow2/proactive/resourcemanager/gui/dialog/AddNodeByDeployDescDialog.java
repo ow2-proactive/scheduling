@@ -48,9 +48,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -105,11 +105,11 @@ public class AddNodeByDeployDescDialog extends Dialog {
         urlFormData.right = new FormAttachment(100, -5);
         urlFormData.width = 320;
         sourceNameCombo.setLayoutData(urlFormData);
-        sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(false, true, true));
+        sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(true));
         if ((source != null) && (!source.equals("")))
             sourceNameCombo.setText(source);
         else
-            sourceNameCombo.setText(RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+            sourceNameCombo.setText(NodeSource.DEFAULT_NAME);
 
         // label sourceName
         ddLabel.setText("GCM Deployment descriptor :");
@@ -147,14 +147,13 @@ public class AddNodeByDeployDescDialog extends Dialog {
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 if (ddText.getText().equals(""))
-                    MessageDialog
-                            .openError(shell, "Error", "You didn't choose a deployement descriptor file");
+                    MessageDialog.openError(shell, "Error", "You didn't choose a deployment descriptor file");
                 else {
                     try {
                         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
                             ddText.getText()));
-                        RMStore.getInstance().getRMAdmin().addNodes(GCMDeploymentData,
-                                sourceNameCombo.getText());
+                        RMStore.getInstance().getRMAdmin().addNodes(sourceNameCombo.getText(),
+                                new Object[] { GCMDeploymentData });
                         shell.close();
                     } catch (Exception e) {
                         MessageDialog.openError(shell, "Error", "Failed to open GCM deployment file : " +

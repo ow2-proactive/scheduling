@@ -60,6 +60,6 @@ public class SourceView extends View {
     }
 
     public String toString() {
-        return "Node source: " + element.getName();
+        return "Node source: " + element;
     }
 }

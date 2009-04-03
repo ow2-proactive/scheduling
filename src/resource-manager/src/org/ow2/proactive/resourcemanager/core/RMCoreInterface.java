@@ -32,17 +32,19 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import java.util.List;
-import java.util.Vector;
 
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
-import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager;
+import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
+import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -66,34 +68,20 @@ public interface RMCoreInterface {
     public String getId();
 
     /**
-     * Creates a GCM node source Active Object, which is a static node source,
-     * and deploys the GCMApllication descriptor
-     * @param GCMApp A GCMApplication GCMAppliication object containing virtual nodes to deploy,
-     * this parameter can be set to null.
-     * @param sourceName the name of the node source to create
-     * @throws RMException if the creation fails, notably if a node source with the same 
-     * source name is already existing. 
+     * Creates a new node source with specified name, infrastructure manages {@link InfrastructureManager}
+     * and acquisition policy {@link NodeSourcePolicy}.
+     *
+     * @param nodeSourceName the name of the node source
+     * @param infrastructureType type of the underlying infrastructure {@link InfrastructureType}
+     * @param infrastructureParameters parameters for infrastructure creation
+     * @param policyType name of the policy type. It passed as a string due to pluggable approach {@link NodeSourcePolicyFactory}
+     * @param policyParameters parameters for policy creation
+     * @return constructed NodeSource
+     * @throws RMException if any problems occurred
      */
-    public void createGCMNodesource(GCMApplication GCMApp, String sourceName) throws RMException;
-
-    /**
-     * Add nodes to a static Node Source.
-     * Ask to a static Node source to deploy a GCMApplication descriptor.
-     * nodes deployed will be added after to RMCore, by the NodeSource itself.
-     * @param GCMApp a GCMAppliication object containing virtual nodes to deploy
-     * @param sourceName name of an existing GCMNodesource
-     * @throws RMException if the new node cannot be added, notably if the adding node.
-     * attempt has been requested on a node source. 
-     */
-    public void addingNodesAdminRequest(GCMApplication GCMApp, String sourceName) throws RMException;
-
-    /**
-     * Add nodes to the default static Node Source.
-     * Ask to the default static Node source to deploy a GCMApplication descriptor.
-     * nodes deployed will be added after to RMCore, by the NodeSource itself.
-     * @param GCMApp GCMApplication object containing virtual nodes to deploy.
-     */
-    public void addingNodesAdminRequest(GCMApplication GCMApp);
+    public NodeSource createNodesource(String nodeSourceName, String infrastructureType,
+            Object[] infrastructureParameters, String policyType, Object[] policyParameters)
+            throws RMException;
 
     /**
      * Add a deployed node to the default static nodes source of the RM
@@ -101,7 +89,7 @@ public interface RMCoreInterface {
      * @throws RMException if the new node cannot be added, notably if the adding node
      * is requested on a dynamic node source.
      */
-    public void addingNodeAdminRequest(String nodeUrl) throws RMException;;
+    public void addNode(String nodeUrl) throws RMException;
 
     /**
      * Add nodes to a StaticNodeSource represented by sourceName.
@@ -111,12 +99,19 @@ public interface RMCoreInterface {
      * @throws RMException if the new node cannot be added, notably if the adding node
      * is requested on a dynamic node source. 
      */
-    public void addingNodeAdminRequest(String nodeUrl, String sourceName) throws RMException;
+    public void addNode(String nodeUrl, String sourceName) throws RMException;
+
+    /**
+     * Adds nodes to the specified node source.
+     *
+     * @param sourceName a name of the node source
+     * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
+     * @throws RMException if any errors occurred
+     */
+    public void addNodes(String sourceName, Object[] parameters) throws RMException;
 
     /**
      * Remove a node from the Core and from its node source.
-     * perform the removing request of a node
-     * asked by {@link RMAdmin} active object.<BR><BR>
      *
      * If the node is down, node is just removed from the Core, and nothing is asked to its related NodeSource,
      * because the node source has already detected the node down (it is its function), informed the RMCore,
@@ -125,11 +120,29 @@ public interface RMCoreInterface {
      * If the node is busy and the removal request is non preemptive, the node is just put in 'to release' state
      * <BR><BR>
      * @param nodeUrl URL of the node to remove.
-     * @param preempt true the node must be removed immediately, without waiting job ending if the node is busy,
-     * false the node is removed just after the job ending if the node is busy.
+     * @param preempt if true remove the node immediately without waiting while it will be freed.
+     * @param forever forever if true remove the from a dynamic node source forever. Otherwise node source
+     * is able to add this node to the RM again once it is needed. See {@link NodeSourcePolicy}
      *
      */
-    public void nodeRemovalAdminRequest(String nodeUrl, boolean preempt);
+    public void removeNode(String nodeUrl, boolean preempt, boolean forever);
+
+    /**
+     * Removes "number" of nodes from specified node source
+     *
+     * @param number nodes count to be released
+     * @param name a name of the node source
+     * @param preemptive if true remove the node immediately without waiting while it will be freed
+     */
+    public void removeNodes(int number, String nodeSourceName, boolean preemptive);
+
+    /**
+     * Removes all nodes from the specified node source.
+     *
+     * @param nodeSourceName a name of the node source
+     * @param preemptive if true remove the node immediately without waiting while it will be freed
+     */
+    public void removeAllNodes(String nodeSourceName, boolean preemptive);
 
     /**
      * Stops the RMCore.
@@ -141,16 +154,15 @@ public interface RMCoreInterface {
      * @return true if shutdown is successful. Make possible to perform synchronous call.
      *
      */
-    public Boolean shutdown(boolean preempt);
+    public BooleanWrapper shutdown(boolean preempt);
 
     /**
      * Stops and removes a NodeSource active object with their nodes from the Resource Manager
      * @param sourceName name of the NodeSource object to remove
-     * @param preempt true all the nodes must be removed immediately, without waiting job ending if nodes are busy,
-     * false nodes are removed just after the job ending if busy.
+     * @param preempt preemptive if true remove the node immediately without waiting while it will be freed.
      * @throws RMException if the node source cannot be removed, notably if the name of the node source is unknown.
      */
-    public void nodeSourceRemovalAdminRequest(String sourceName, boolean preempt) throws RMException;
+    public void removeNodeSource(String sourceName, boolean preempt) throws RMException;
 
     /**
      * Get a set of nodes that verify a selection script.
@@ -277,5 +289,4 @@ public interface RMCoreInterface {
      * @return the RMUser Active object.
      */
     public RMUser getUser();
-
 }

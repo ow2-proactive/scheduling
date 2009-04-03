@@ -1,0 +1,11 @@
+# Static nodes acquisition
+org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
+
+# Nodes acquisition for particular time slot
+org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
+
+# Releases all nodes when scheduler is idle for some time
+org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle
+
+# Acquire nodes according to the scheduler loading
+org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy

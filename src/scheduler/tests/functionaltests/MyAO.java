@@ -31,22 +31,19 @@
  */
 package functionaltests;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Collections;
 
 import org.objectweb.proactive.core.config.PAProperties;
 import org.ow2.proactive.resourcemanager.RMFactory;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
-import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -92,14 +89,15 @@ public class MyAO implements Serializable {
         }
 
         //Starting a local RM
-        RMFactory.startLocal();
-        RMAuthentication auth = RMConnection.waitAndJoin(null);
-        RMAdmin admin = auth.logAsAdmin(rmUsername, rmPassword);
-
         RMFactory.setOsJavaProperty();
-        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(GCMDPath));
-        admin.createGCMNodesource(GCMDeploymentData, "GCM_Node_Source");
-        admin.disconnect();
+        if (GCMDPath != null && GCMDPath.length() > 0) {
+            RMFactory.startLocal(Collections.singleton(GCMDPath));
+        } else {
+            RMFactory.startLocal();
+        }
+
+        // waiting the initialization
+        RMConnection.waitAndJoin(null);
 
         ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
             PAProperties.PA_RMI_PORT.getValue() + "/"));

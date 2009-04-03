@@ -68,6 +68,10 @@ public enum RMEventType {
      */
     NODESOURCE_REMOVED("nodeSourceRemovedEvent"),
     /**
+     * Nodes acquisition info is added to the node source.
+     */
+    NODESOURCE_NODES_ACQUISTION_INFO_ADDED("nodeSourceNodesAcquisitionInfoAddedEvent"),
+    /**
      * A new node has been added to Resource manager, and is ready to
      * be provided to a RM user.
      */

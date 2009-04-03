@@ -87,7 +87,13 @@ public enum PAResourceManagerProperties {
     RM_LOGIN_FILE("pa.rm.defaultloginfilename", PAPropertiesType.STRING),
 
     /** Resource Manager group file name */
-    RM_GROUP_FILE("pa.rm.defaultgroupfilename", PAPropertiesType.STRING);
+    RM_GROUP_FILE("pa.rm.defaultgroupfilename", PAPropertiesType.STRING),
+
+    /** Resource Manager node source infrastructures file*/
+    RM_NODESOURCE_INFRASTRUCTURE_FILE("pa.rm.nodesource.infrastructures", PAPropertiesType.STRING),
+
+    /** Resource Manager node source policies file*/
+    RM_NODESOURCE_POLICY_FILE("pa.rm.nodesource.policies", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

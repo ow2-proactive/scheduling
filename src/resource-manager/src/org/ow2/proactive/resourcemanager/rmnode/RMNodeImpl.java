@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -118,7 +118,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     public RMNodeImpl(Node node, String vnodeName, NodeSource nodeSource) {
         this.node = node;
         this.nodeSource = nodeSource;
-        this.nodeSourceID = nodeSource.getSourceId();
+        this.nodeSourceID = nodeSource.getName();
         this.vnodeName = vnodeName;
         this.nodeName = node.getNodeInformation().getName();
         this.nodeURL = node.getNodeInformation().getURL();

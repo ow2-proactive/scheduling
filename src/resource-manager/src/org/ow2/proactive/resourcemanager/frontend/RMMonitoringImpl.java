@@ -55,6 +55,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMWrapper;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -130,6 +131,18 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         this.RMListeners.put(id, listener);
         return rmcore.getRMInitialState();
+    }
+
+    /**
+     * Removes a listener from RMMonitoring. Only listener itself must call this method
+     */
+    public void removeRMEventListener() throws RMException {
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        if (RMListeners.containsKey(id)) {
+            RMListeners.remove(id);
+        } else {
+            throw new RMException("Listener is unknown");
+        }
     }
 
     /**
@@ -228,6 +241,15 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
         ns.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODESOURCE_REMOVED, new Class<?>[] { RMNodeSourceEvent.class }, ns);
+    }
+
+    /** Dispatch the node removed event to all listeners.
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
+     */
+    public void nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent ns) {
+        ns.setRMUrl(this.MonitoringUrl);
+        dispatch(RMEventType.NODESOURCE_NODES_ACQUISTION_INFO_ADDED,
+                new Class<?>[] { RMNodeSourceEvent.class }, ns);
     }
 
     /** Dispatch the node added event to all listeners.

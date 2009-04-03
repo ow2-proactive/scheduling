@@ -27,8 +27,7 @@ public class RemoveNodeSourceHandler extends AbstractHandler implements IHandler
     @Override
     public boolean isEnabled() {
         boolean state;
-        if (RMStore.isConnected() &&
-            RMStore.getInstance().getModel().getSourcesNames(true, true, false).length > 0) {
+        if (RMStore.isConnected() && RMStore.getInstance().getModel().getSourcesNames(false).length > 0) {
             state = true;
         } else
             state = false;
