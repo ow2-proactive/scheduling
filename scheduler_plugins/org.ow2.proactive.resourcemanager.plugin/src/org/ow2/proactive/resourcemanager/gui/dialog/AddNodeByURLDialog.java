@@ -27,6 +27,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -43,6 +44,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
@@ -129,6 +131,7 @@ public class AddNodeByURLDialog extends Dialog {
                         shell.close();
                     } catch (RMException e) {
                         e.printStackTrace();
+                        Activator.log(IStatus.ERROR, "Resource manager is unable to add the node: "+urlText.getText(), e);
                         MessageDialog.openError(shell, "Adding Node Error",
                                 "Resource manager is unable to add the node. \n\n" + e.getMessage());
                     }

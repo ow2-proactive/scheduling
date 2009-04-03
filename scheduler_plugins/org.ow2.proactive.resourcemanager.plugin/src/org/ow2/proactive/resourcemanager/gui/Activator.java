@@ -1,5 +1,7 @@
 package org.ow2.proactive.resourcemanager.gui;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -23,7 +25,7 @@ public class Activator extends AbstractUIPlugin {
      * The constructor
      */
     public Activator() {
-    }
+    	    }
 
     /**
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -60,6 +62,22 @@ public class Activator extends AbstractUIPlugin {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
-        return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    	return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
+    
+    /**
+     * Logs into the RPC's log file
+     * @param severity - the severity, see IStatus
+     * @param message
+     * @param t
+     */
+    public static void log (int severity, String message, Throwable t)
+    {
+    	  IStatus status = new Status(severity,
+          Activator.getDefault().getBundle().getSymbolicName(),
+          	      IStatus.OK, message, t);
+         Activator.getDefault().getLog().log(status);
+    	
+    }
+    
 }

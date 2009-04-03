@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -56,6 +57,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 
 
 /**
@@ -392,7 +394,8 @@ public class SelectResourceManagerDialog extends Dialog {
             // in order to find it easily for the next time
             pw.println(login);
         } catch (IOException e) {
-            e.printStackTrace();
+        	Activator.log(IStatus.ERROR, "Error when recording logins. ", e);
+        	e.printStackTrace();
             /* Do-Nothing */
         } finally {
             try {
@@ -403,6 +406,7 @@ public class SelectResourceManagerDialog extends Dialog {
                     pw.close();
                 }
             } catch (IOException e) {
+            	Activator.log(IStatus.ERROR, "Error when recording logins. ", e);
                 e.printStackTrace();
                 /* Do-Nothing */
             }

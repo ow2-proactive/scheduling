@@ -27,12 +27,14 @@
  */
 package org.ow2.proactive.resourcemanager.gui.views;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.compact.CompactViewer;
 
 
@@ -89,7 +91,7 @@ public class ResourcesCompactView extends ViewPart {
         try {
             this.getViewSite().getWorkbenchWindow().getActivePage().showView(ResourceExplorerView.ID);
         } catch (PartInitException e) {
-            e.printStackTrace();
+        	Activator.log(IStatus.ERROR, "An error occured. ", e);
         }
     }
 

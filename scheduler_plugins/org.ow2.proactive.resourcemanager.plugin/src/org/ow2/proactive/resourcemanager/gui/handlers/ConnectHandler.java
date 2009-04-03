@@ -5,9 +5,12 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialogResult;
@@ -36,9 +39,11 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                 RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
                         .getPassword(), dialogResult.isLogAsAdmin());
             } catch (Throwable t) {
-                MessageDialog.openError(Display.getDefault().getActiveShell(),
+                 MessageDialog.openError(Display.getDefault().getActiveShell(),
                         "Couldn't connect to resource manager", t.getMessage());
-                t.printStackTrace();
+                 Activator.log(IStatus.ERROR,
+                		   	      "Could not connect to the Resource Manager ", t);
+                  	t.printStackTrace();
             }
         }
         fireHandlerChanged(new HandlerEvent(this, true, false));

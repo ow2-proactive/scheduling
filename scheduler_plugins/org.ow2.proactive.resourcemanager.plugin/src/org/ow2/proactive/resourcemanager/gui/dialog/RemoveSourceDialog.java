@@ -27,6 +27,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -42,6 +43,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
@@ -118,6 +120,7 @@ public class RemoveSourceDialog extends Dialog {
                         shell.close();
                     } catch (RMException e) {
                         e.printStackTrace();
+                        Activator.log(IStatus.ERROR, "Error in node source removal: "+src, e);
                         MessageDialog.openError(shell, "Error", "Error in node source removal :\n" +
                             e.getMessage());
                     }

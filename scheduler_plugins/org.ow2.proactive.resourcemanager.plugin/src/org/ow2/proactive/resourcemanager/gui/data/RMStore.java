@@ -2,6 +2,7 @@ package org.ow2.proactive.resourcemanager.gui.data;
 
 import javax.security.auth.login.LoginException;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -14,6 +15,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
@@ -59,8 +61,7 @@ public class RMStore {
                     RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
                 auth = RMConnection.join(url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
             } catch (RMException e) {
-                e.printStackTrace();
-                throw new RMException("Resource manager does not exist on the following url: " + url);
+                throw new RMException("Resource manager does not exist on the following url: " + url,e);
             }
 
             try {
@@ -70,7 +71,7 @@ public class RMStore {
                     loggerUser = auth.logAsUser(login, password);
                 }
             } catch (LoginException e) {
-                e.printStackTrace();
+                Activator.log(IStatus.INFO, "Login exception for user "+login,e);
                 throw new RMException(e.getMessage());
             }
 
@@ -84,10 +85,12 @@ public class RMStore {
             RMStatusBarItem.getInstance().setText("connected");
         } catch (ActiveObjectCreationException e) {
             RMStatusBarItem.getInstance().setText("disconnected");
+            Activator.log(IStatus.ERROR, "Exception when creating active object", e);
             e.printStackTrace();
             throw new RMException(e.getMessage(), e);
         } catch (NodeException e) {
             RMStatusBarItem.getInstance().setText("disconnected");
+            Activator.log(IStatus.ERROR, "Node exeption", e);
             e.printStackTrace();
             throw new RMException(e.getMessage(), e);
         }

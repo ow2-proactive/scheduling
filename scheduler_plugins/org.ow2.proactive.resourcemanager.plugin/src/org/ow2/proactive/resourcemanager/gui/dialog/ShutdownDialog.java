@@ -1,5 +1,6 @@
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -14,6 +15,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.ProActiveException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
@@ -61,6 +63,7 @@ public class ShutdownDialog extends Dialog {
                     RMStore.getInstance().getRMAdmin().shutdown(!preemptCheck.getSelection());
                 } catch (ProActiveException e) {
                     // TODO Auto-generated catch block
+                	Activator.log(IStatus.ERROR, "Error when shutting down. ", e);
                     e.printStackTrace();
                 } catch (RMException e) {
                     MessageDialog.openError(parent, "Access denied", e.getMessage());
