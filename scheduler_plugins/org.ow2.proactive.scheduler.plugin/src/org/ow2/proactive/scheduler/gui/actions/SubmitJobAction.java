@@ -58,6 +58,7 @@ import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
  */
 public class SubmitJobAction extends SchedulerGUIAction {
     private Composite parent = null;
+    private String lastDirectory = null;
 
     public SubmitJobAction(Composite parent) {
         this.parent = parent;
@@ -71,10 +72,14 @@ public class SubmitJobAction extends SchedulerGUIAction {
     public void run() {
         FileDialog fileDialog = new FileDialog(parent.getShell(), SWT.OPEN | SWT.MULTI);
         fileDialog.setFilterExtensions(new String[] { "*.xml" });
+        if (lastDirectory != null){
+		fileDialog.setFilterPath(lastDirectory);
+        }
         fileDialog.open();
 
         String[] filesNames = fileDialog.getFileNames();
         String directoryPath = fileDialog.getFilterPath();
+        lastDirectory = directoryPath;
 
         //map of submitted jobs, for submission summary
         HashMap<JobId, String> submittedJobs = new HashMap<JobId, String>();
