@@ -35,12 +35,14 @@ import java.awt.Frame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.ow2.proactive.scheduler.gui.Activator;
 
 
 /**
@@ -111,7 +113,7 @@ public class ResultPreview extends ViewPart {
             this.getViewSite().getWorkbenchWindow().getActivePage().showView(this.ID);
             //create view if not created
         } catch (PartInitException e) {
-            // TODO Auto-generated catch block
+        	 Activator.log(IStatus.ERROR, "", e);
             e.printStackTrace();
         }
     }

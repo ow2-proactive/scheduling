@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -60,6 +61,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.ow2.proactive.scheduler.gui.Activator;
 
 
 /**
@@ -399,7 +401,8 @@ public class SelectSchedulerDialog extends Dialog {
             // in order to find it easily for the next time
             pw.println(login);
         } catch (IOException e) {
-            e.printStackTrace();
+        	 Activator.log(IStatus.ERROR, "An Exception occured when recording logins", e);
+        	e.printStackTrace();
             /* Do-Nothing */
         } finally {
             try {
@@ -410,7 +413,7 @@ public class SelectSchedulerDialog extends Dialog {
                     pw.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+            	 Activator.log(IStatus.ERROR, "An Exception occured when recording logins", e);
                 /* Do-Nothing */
             }
         }

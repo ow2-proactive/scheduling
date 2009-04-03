@@ -30,6 +30,7 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -132,6 +133,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                 }
             } catch (Exception t) {
                 t.printStackTrace();
+                Activator.log(IStatus.ERROR,  "Couldn't Connect to the scheduler based on:" + dialogResult.getUrl(), t);
                 MessageDialog.openError(parent.getShell(), "Couldn't connect",
                         "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl() +
                             "\n cause : " + t.getMessage());

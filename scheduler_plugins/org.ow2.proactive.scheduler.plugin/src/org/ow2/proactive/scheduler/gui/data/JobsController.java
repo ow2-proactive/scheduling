@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -56,6 +57,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite;
 import org.ow2.proactive.scheduler.gui.composite.TaskComposite;
 import org.ow2.proactive.scheduler.gui.listeners.EventJobsListener;
@@ -1043,8 +1045,10 @@ public class JobsController implements SchedulerEventListener {
             return activeView;
         } catch (NodeException e) {
             e.printStackTrace();
+            Activator.log(IStatus.ERROR,  "Error in jobs controller " ,e);
         } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
+        	Activator.log(IStatus.ERROR,  "Error in jobs controller " ,e);
+        	e.printStackTrace();
         }
         return null;
     }

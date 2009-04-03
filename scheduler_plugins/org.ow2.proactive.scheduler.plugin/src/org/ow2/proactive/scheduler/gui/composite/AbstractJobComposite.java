@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.gui.composite;
 import java.util.List;
 import java.util.Vector;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -58,6 +59,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.Colors;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
@@ -349,7 +351,8 @@ public abstract class AbstractJobComposite extends Composite {
                             IViewPart part = page.showView(JobInfo.ID);
                             part.setFocus();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                        	 Activator.log(IStatus.ERROR,  "Error when showing the view.", e);
+                        	e.printStackTrace();
                         }
                     }
 

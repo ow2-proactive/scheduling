@@ -37,6 +37,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -65,6 +66,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.common.util.Tools;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.Colors;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
@@ -281,7 +283,7 @@ public class TaskComposite extends Composite {
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ResultPreview.ID);
         } catch (PartInitException e) {
-            // TODO Auto-generated catch block
+        	 Activator.log(IStatus.ERROR,  "Error when showing the result preview " ,e);
             e.printStackTrace();
         }
     }
