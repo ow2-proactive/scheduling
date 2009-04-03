@@ -36,6 +36,7 @@ import static junit.framework.Assert.assertTrue;
 import java.io.File;
 import java.util.HashMap;
 
+import org.junit.Assert;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -227,8 +228,12 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
         nodes = admin.getAtMostNodes(new IntWrapper(3), badScript);
 
         //wait node selection
-        PAFuture.waitFor(nodes);
-        assertTrue(nodes.size() == 0);
+        try {
+            PAFuture.waitFor(nodes);
+            System.out.println("Number of found nodes " + nodes.size());
+            Assert.assertTrue(false);
+        } catch (RuntimeException e) {
+        }
         assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         log("Test 6");
@@ -240,8 +245,12 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
         nodes = admin.getAtMostNodes(new IntWrapper(3), noSelectedScript);
 
         //wait node selection
-        PAFuture.waitFor(nodes);
-        assertTrue(nodes.size() == 0);
+        try {
+            PAFuture.waitFor(nodes);
+            System.out.println("Number of found nodes " + nodes.size());
+            Assert.assertTrue(false);
+        } catch (RuntimeException e) {
+        }
         assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
     }
 }

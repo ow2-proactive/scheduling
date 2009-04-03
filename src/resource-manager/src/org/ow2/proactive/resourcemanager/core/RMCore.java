@@ -897,7 +897,12 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             while (nodesIterator.hasNext() && result.size() < nb.intValue()) {
                 scriptsExecutionResults = executeScripts(selectionScriptList, nodesIterator, nb.intValue() -
                     result.size());
-                result.addAll(processScriptResults(scriptsExecutionResults));
+                try {
+                    result.addAll(processScriptResults(scriptsExecutionResults));
+                } catch (RuntimeException e) {
+                    freeNodes(result);
+                    throw e;
+                }
             }
 
             logger.info("Number of found nodes is " + result.size());
@@ -980,8 +985,13 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                     PAFuture.waitFor(scriptResult, timeToWait);
                 } catch (ProActiveTimeoutException e) {
                     // no script result was obtained
-                    logger.info("Time out expired in waiting ends of script execution: " + e.getMessage());
                     scriptResult = null;
+                    throw new RuntimeException("Time out expired in waiting ends of script execution: " +
+                        e.getMessage());
+                }
+
+                if (scriptResult != null && scriptResult.errorOccured()) {
+                    throw new RuntimeException(scriptResult.getException());
                 }
 
                 // processing script result and updating knowledge base of 

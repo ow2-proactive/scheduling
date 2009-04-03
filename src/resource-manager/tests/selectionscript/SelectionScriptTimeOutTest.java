@@ -68,9 +68,13 @@ public class SelectionScriptTimeOutTest extends FunctionalTDefaultRM {
         NodeSet nodes = admin.getAtMostNodes(new IntWrapper(2), sScript);
 
         //wait node selection
-        PAFuture.waitFor(nodes);
+        try {
+            PAFuture.waitFor(nodes);
+            System.out.println("Number of found nodes " + nodes.size());
+            Assert.assertTrue(false);
+        } catch (RuntimeException e) {
+        }
 
-        Assert.assertEquals(0, nodes.size());
         Assert.assertEquals(defaultDescriptorNodesNb, admin.getFreeNodesNumber().intValue());
     }
 }
