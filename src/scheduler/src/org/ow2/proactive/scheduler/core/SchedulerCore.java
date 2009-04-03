@@ -478,7 +478,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             //scheduler functionality are reduced until now
                             status = SchedulerStatus.UNLINKED;
                             logger
-                                    .fatal("*****************************************************************************************************************\n"
+                                    .fatal("\n*****************************************************************************************************************\n"
                                         + "* Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n"
                                         + "* Scheduler is in critical state and its functionalities are reduced : \n"
                                         + "* \t-> use the linkResourceManager() method to reconnect a new one.\n"
@@ -491,18 +491,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             logger.info("Scheduler is shutting down...");
 
-            logger_dev.info("Unpause all jobs !");
-            for (InternalJob job : jobs.values()) {
-                if (job.getStatus() == JobStatus.PAUSED) {
-                    job.setUnPause();
+            if (pendingJobs.size() + runningJobs.size() > 0) {
+                logger_dev.info("Unpause all running and pending jobs !");
+                for (InternalJob job : jobs.values()) {
+                    //finished jobs cannot be paused, so loop on all jobs
+                    if (job.getStatus() == JobStatus.PAUSED) {
+                        job.setUnPause();
 
-                    //update events list and send event to the frontend
-                    updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
+                        //update events list and send event to the frontend
+                        updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
+                    }
                 }
-            }
 
-            //terminating jobs...
-            if ((runningJobs.size() + pendingJobs.size()) > 0) {
+                //terminating jobs...
                 logger.info("Terminating jobs...");
             }
 
@@ -513,7 +514,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     service.serveAll(filter);
                     schedule();
                 } catch (Exception e) {
-                    logger.debug(" ");
                     logger_dev.error("", e);
                 }
             }

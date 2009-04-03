@@ -226,7 +226,7 @@ public class SelectSchedulerDialog extends Dialog {
     // -------------------------------------------------------------------- //
     private static void setInitialHostName() {
         String initialHostValue = "";
-        String port = "";
+        String port = null;
         try {
             /* Get the machine's name */
             initialHostValue = URIBuilder.getHostNameorIP(InetAddress.getLocalHost());
@@ -234,6 +234,8 @@ public class SelectSchedulerDialog extends Dialog {
             port = System.getProperty("proactive.rmi.port");
         } catch (UnknownHostException e) {
             initialHostValue = "localhost";
+        }
+        if (port == null) {
             port = "1099";
         }
         urlCombo.add("rmi://" + initialHostValue + ":" + port + "/");
