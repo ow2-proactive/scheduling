@@ -214,6 +214,7 @@
 	<target name="deploy.scheduler.client" depends="deploy.scheduler" description="Generate a client side Scheduler library">
 			<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}">
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
+				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
 				<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
 	        </jar>
 	</target>
