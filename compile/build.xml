@@ -518,6 +518,7 @@
 			<include name="org/ow2/proactive/scheduler/common/exception/DependenceFailedException.java" />
 			<include name="org/ow2/proactive/scheduler/common/exception/ExecutableCreationException.java" />
 			<include name="org/ow2/proactive/scheduler/common/exception/SchedulerException.java" />
+			<include name="org/ow2/proactive/scheduler/common/exception/MaxJobIdReachedException.java" />
 			<include name="org/ow2/proactive/scheduler/common/SchedulerConstants.java" />
 			<include name="org/ow2/proactive/scheduler/common/task/RestartMode.java" />
 			<include name="org/ow2/proactive/scheduler/common/task/TaskDescriptor.java" />
