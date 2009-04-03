@@ -213,6 +213,12 @@ public abstract class TaskLauncher implements InitActive {
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.taskId.getJobId());
         l.setAdditivity(false);
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
+        try {
+            MDC.getContext().put(Log4JTaskLogs.MDC_HOST,
+                    PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
+        } catch (NodeException e) {
+            MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
+        }
         l.removeAllAppenders();
         // create an async appender for multiplexing (storage plus redirect through socketAppender)
         // int logMaxSize = PASchedulerProperties.LOGS_MAX_SIZE.getValueAsInt();
@@ -258,6 +264,12 @@ public abstract class TaskLauncher implements InitActive {
         logger_dev.debug("activate logs");
         // should reset taskId because calling thread is not active thread (immediate service)
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
+        try {
+            MDC.getContext().put(Log4JTaskLogs.MDC_HOST,
+                    PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
+        } catch (NodeException e) {
+            MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
+        }
         Appender out = new SocketAppender(host, port);
         // already logged events must be flushed
         this.logAppender.addAppender(out);

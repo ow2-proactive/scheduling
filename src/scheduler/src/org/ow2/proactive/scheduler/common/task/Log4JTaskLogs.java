@@ -81,7 +81,7 @@ public class Log4JTaskLogs implements TaskLogs {
     /** Default layout for logs */
     public static Layout getTaskLogLayout() {
         return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + Log4JTaskLogs.MDC_HOST +
-            "}-%d{HH:mm:ss}]" + " %m %n");
+            "};%d{HH:mm:ss}]" + " %m %n");
     }
 
     /** Logger level in which stdout must be redirected */
