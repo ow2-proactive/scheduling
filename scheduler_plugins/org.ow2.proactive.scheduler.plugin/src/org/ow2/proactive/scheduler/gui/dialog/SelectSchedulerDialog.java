@@ -440,6 +440,7 @@ public class SelectSchedulerDialog extends Dialog {
                 MessageDialog.openError(parent, "Error", "The login is empty !");
                 return null;
             }
+            url = url.trim();
             return new SelectSchedulerDialogResult(url, login, pwd, logAsAdmin);
         }
         return null;

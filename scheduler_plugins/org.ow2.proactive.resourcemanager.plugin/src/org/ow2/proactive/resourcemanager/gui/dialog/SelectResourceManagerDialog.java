@@ -425,6 +425,7 @@ public class SelectResourceManagerDialog extends Dialog {
      */
     public static SelectResourceManagerDialogResult showDialog(Shell parent) {
         new SelectResourceManagerDialog(parent);
+        url = url.trim();
         return new SelectResourceManagerDialogResult(hasBeenCanceled, url, login, pwd, logAsAdmin);
     }
 
