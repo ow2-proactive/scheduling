@@ -482,7 +482,7 @@ public class AdminController {
                     .getName(), null);
             printf("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
         } catch (Exception e) {
-            handleExceptionDisplay("Error while removing node source '" + nodeSourceName, e);
+            handleExceptionDisplay("Error while creating node source '" + nodeSourceName, e);
         }
     }
 
