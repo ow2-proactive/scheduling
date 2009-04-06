@@ -64,6 +64,7 @@ import org.python.core.PyList;
  */
 @PublicAPI
 public class SelectionUtils {
+    //TODO check following library usage and uncomment if used
     //import org.uwin.registry.RegException;
     //import org.uwin.registry.RegFolder; >>> use uwin-1.0.0.jar & uwin-1.0.0.dll if needed
 
@@ -77,6 +78,7 @@ public class SelectionUtils {
     public static final int MATCH = 4;
 
     private static final String winTestCuda = "deviceQueryWin.exe";
+    //TODO get cuda check on UNIX
     private static final String unixTestCuda = "deviceQueryUnix";
     private static final boolean isWindows = System.getProperty("os.name").contains("Windows");
     private static boolean isJ6 = false;
@@ -118,6 +120,7 @@ public class SelectionUtils {
      * @param params the conditions object (must be given as RubyArray (ruby), NativeArray (js) or PyList (python) )
      * @return true if every conditions match the given file.
      */
+    //TODO replace object params by our own object (extends arrayList ?)
     public static boolean checkProperties(String configFilePath, Object params) {
         Condition[] conditions = null;
 
@@ -219,11 +222,14 @@ public class SelectionUtils {
      */
     public static boolean checkHostName(String hostName) {
         try {
+            //TODO with regexp
             return InetAddress.getLocalHost().getHostName().toUpperCase().contains(hostName.toUpperCase());
         } catch (UnknownHostException e) {
             return true;
         }
     }
+
+    //TODO check IP with or without mask
 
     /**
      * Check if the given file path exist or not.
@@ -320,12 +326,8 @@ public class SelectionUtils {
             Pattern regex = Pattern.compile(propertyValue, Pattern.CASE_INSENSITIVE);
             Matcher regexMatcher = regex.matcher(vmPropValue);
             return (regexMatcher.find());
-        } catch (NullPointerException ex) {
-            //ex.printStackTrace();
-        } catch (PatternSyntaxException ex) {
-            //ex.printStackTrace();
         } catch (Exception ex) {
-            //ex.printStackTrace();
+            ex.printStackTrace();
         }
         return false;
     }
