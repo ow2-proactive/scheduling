@@ -80,7 +80,7 @@ public class Tools implements Serializable {
      * @return the duration as a formatted string.
      */
     public static String getFormattedDuration(long start, long end) {
-        if ((start == -1) || (end == -1)) {
+        if ((start < 0) || (end < 0)) {
             return "Not yet";
         }
 
@@ -132,7 +132,7 @@ public class Tools implements Serializable {
      * @return the given date as a formatted string.
      */
     public static String getFormattedDate(long time) {
-        if (time == -1) {
+        if (time < 0) {
             return "Not yet";
         }
 

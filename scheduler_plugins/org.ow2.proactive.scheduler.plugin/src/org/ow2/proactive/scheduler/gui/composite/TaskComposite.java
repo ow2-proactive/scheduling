@@ -32,6 +32,7 @@ package org.ow2.proactive.scheduler.gui.composite;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -91,9 +92,6 @@ public class TaskComposite extends Composite {
     /** the unique id and the title for the column "Description" */
     public static final String COLUMN_DESCRIPTION_TITLE = "Description";
 
-    //    /** the unique id and the title for the column "Run time limit" */
-    //    public static final String COLUMN_RUN_TIME_LIMIT_TITLE = "Run time limit";
-
     /** the unique id and the title for the column "Node failures" */
     public static final String COLUMN_NODEFAILURE_TITLE = "Node failures";
 
@@ -102,6 +100,9 @@ public class TaskComposite extends Composite {
 
     /** the unique id and the title for the column "Finished time" */
     public static final String COLUMN_FINISHED_TIME_TITLE = "Finished time";
+
+    /** the unique id and the title for the column "Duration" */
+    public static final String COLUMN_DURATION_TITLE = "Duration";
 
     /** the unique id and the title for the column "host name" */
     public static final String COLUMN_HOST_NAME_TITLE = "Host name";
@@ -115,10 +116,14 @@ public class TaskComposite extends Composite {
     /** the aborted tasks background color */
     public static final Color TASKS_ABORTED_BACKGROUND_COLOR = Colors.BROWN;
 
+    /** Add this sort as it is an additional one : 1000 has been chosen in order to have no interaction with provided sorting */
+    protected static final int SORT_BY_DURATION = 1000;
+
     /**
      * the background color of tasks that couldn't be started due to dependencies failure
      */
     public static final Color TASKS_NOT_STARTED_BACKGROUND_COLOR = Colors.DEEP_SKY_BLUE;
+
     private List<TaskState> tasks = null;
     private Label label = null;
     private Table table = null;
@@ -160,9 +165,9 @@ public class TaskComposite extends Composite {
         TableColumn tc5 = new TableColumn(table, SWT.LEFT);
         TableColumn tc6 = new TableColumn(table, SWT.LEFT);
         TableColumn tc7 = new TableColumn(table, SWT.LEFT);
-
-        //        TableColumn tc8 = new TableColumn(table, SWT.LEFT);
+        TableColumn tc8 = new TableColumn(table, SWT.LEFT);
         TableColumn tc9 = new TableColumn(table, SWT.LEFT);
+
         // addSelectionListener
         tc1.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -203,15 +208,15 @@ public class TaskComposite extends Composite {
         tc7.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
+                sort(event, SORT_BY_DURATION);
+            }
+        });
+        tc8.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
                 sort(event, TaskState.SORT_BY_EXECUTIONLEFT);
             }
         });
-        //        tc8.addSelectionListener(new SelectionAdapter() {
-        //                
-        //                public void widgetSelected(SelectionEvent event) {
-        //                    sort(event, TaskState.SORT_BY_RUN_TIME_LIMIT);
-        //                }
-        //            });
         tc9.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -225,18 +230,18 @@ public class TaskComposite extends Composite {
         tc4.setText(COLUMN_HOST_NAME_TITLE);
         tc5.setText(COLUMN_START_TIME_TITLE);
         tc6.setText(COLUMN_FINISHED_TIME_TITLE);
-        tc7.setText(COLUMN_NODEFAILURE_TITLE);
-        //        tc8.setText(COLUMN_RUN_TIME_LIMIT_TITLE);
+        tc7.setText(COLUMN_DURATION_TITLE);
+        tc8.setText(COLUMN_NODEFAILURE_TITLE);
         tc9.setText(COLUMN_DESCRIPTION_TITLE);
         // setWidth
-        tc1.setWidth(50);
-        tc2.setWidth(100);
+        tc1.setWidth(60);
+        tc2.setWidth(110);
         tc3.setWidth(100);
-        tc4.setWidth(130);
+        tc4.setWidth(150);
         tc5.setWidth(130);
         tc6.setWidth(130);
-        tc7.setWidth(50);
-        //        tc8.setWidth(130);
+        tc7.setWidth(110);
+        tc8.setWidth(100);
         tc9.setWidth(200);
         // setMoveable
         tc1.setMoveable(true);
@@ -246,7 +251,7 @@ public class TaskComposite extends Composite {
         tc5.setMoveable(true);
         tc6.setMoveable(true);
         tc7.setMoveable(true);
-        //        tc8.setMoveable(true);
+        tc8.setMoveable(true);
         tc9.setMoveable(true);
 
         table.addListener(SWT.Selection, new Listener() {
@@ -383,7 +388,7 @@ public class TaskComposite extends Composite {
     public static TaskResult getTaskResult(JobId jid, TaskId tid) {
         // TODO : NO ACCESS TO SCHED HERE ...
         // get result from scheduler
-        // je viens de faire un copier coller de ce code de JobsController...
+        // I just did a copy/past of that code form jobsController
         TaskResult tr = cachedTaskResult.get(tid);
         if (tr == null) {
             tr = SchedulerProxy.getInstance().getTaskResult(jid, tid.getReadableName());
@@ -408,11 +413,41 @@ public class TaskComposite extends Composite {
             TaskState.setSortingBy(field);
             lastSorting = field;
 
-            sort();
+            if (field == SORT_BY_DURATION) {
+                sortByDuration();
+            } else {
+                sort();
+            }
 
             table.setSortColumn((TableColumn) event.widget);
             table.setSortDirection((order == TaskState.DESC_ORDER) ? SWT.DOWN : SWT.UP);
         }
+    }
+
+    private void sortByDuration() {
+        Comparator<TaskState> comp = new Comparator<TaskState>() {
+
+            public int compare(TaskState t1, TaskState t2) {
+                try {
+                    if (t1.getFinishedTime() < 0 || t2.getFinishedTime() < 0) {
+                        return 0;
+                    } else {
+                        long t1Duration = t1.getFinishedTime() - t1.getStartTime();
+                        long t2Duration = t2.getFinishedTime() - t2.getStartTime();
+                        if (order == TaskState.ASC_ORDER) {
+                            return (int) (t1Duration - t2Duration);
+                        } else {
+                            return (int) (t2Duration - t1Duration);
+                        }
+                    }
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+
+        };
+        Collections.sort(tasks, comp);
+        refreshTable();
     }
 
     private void sort() {
@@ -431,8 +466,9 @@ public class TaskComposite extends Composite {
             int i = 0;
 
             // then add the entries
-            for (TaskState td : tasks)
+            for (TaskState td : tasks) {
                 createItem(td, i++);
+            }
 
             // Turn drawing back on
             table.setRedraw(true);
@@ -533,6 +569,9 @@ public class TaskComposite extends Composite {
                     item.setText(i, Tools.getFormattedDate(taskState.getStartTime()));
                 } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
                     item.setText(i, Tools.getFormattedDate(taskState.getFinishedTime()));
+                } else if (title.equals(COLUMN_DURATION_TITLE)) {
+                    item.setText(i, Tools.getFormattedDuration(taskState.getFinishedTime(), taskState
+                            .getStartTime()));
                 } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
                     if (taskState.getStatus() == TaskStatus.FAILED) {
                         item.setText(i, taskState.getMaxNumberOfExecutionOnFailure() + "/" +

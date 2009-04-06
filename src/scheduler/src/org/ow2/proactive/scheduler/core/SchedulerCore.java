@@ -742,7 +742,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             node.getNodeInformation().getVMInformation().getHostName());
 
                         // set the different informations on job
-                        if (currentJob.getStartTime() == -1) {
+                        if (currentJob.getStartTime() < 0) {
                             // if it is the first task of this job
                             currentJob.start();
                             pendingJobs.remove(currentJob);
