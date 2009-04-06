@@ -70,7 +70,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
 
     protected Object[] getPolicyParams() {
         return new Object[] { SchedulerTHelper.schedulerDefaultURL, SchedulerTHelper.username,
-                SchedulerTHelper.password, "true", "15000" };
+                SchedulerTHelper.password, "true", "30000" };
     }
 
     protected String getDescriptor() {
@@ -134,7 +134,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
         receiver.waitForNEvent(defaultDescriptorNodesNb);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == defaultDescriptorNodesNb);
 
-        // nodes should be removed in 15 secs after job completion
+        // nodes should be removed in 30 secs after job completion
         receiver.waitForNEvent(defaultDescriptorNodesNb);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == defaultDescriptorNodesNb);
         SchedulerTHelper.waitForFinishedJob(jobId);
