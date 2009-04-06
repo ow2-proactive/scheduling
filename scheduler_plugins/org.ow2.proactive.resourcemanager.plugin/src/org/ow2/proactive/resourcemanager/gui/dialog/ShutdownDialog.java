@@ -63,7 +63,7 @@ public class ShutdownDialog extends Dialog {
                     RMStore.getInstance().getRMAdmin().shutdown(!preemptCheck.getSelection());
                 } catch (ProActiveException e) {
                     // TODO Auto-generated catch block
-                	Activator.log(IStatus.ERROR, "Error when shutting down. ", e);
+                    Activator.log(IStatus.ERROR, "Error when shutting down. ", e);
                     e.printStackTrace();
                 } catch (RMException e) {
                     MessageDialog.openError(parent, "Access denied", e.getMessage());

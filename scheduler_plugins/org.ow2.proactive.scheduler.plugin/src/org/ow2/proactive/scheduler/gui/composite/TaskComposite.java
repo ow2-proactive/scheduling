@@ -283,7 +283,7 @@ public class TaskComposite extends Composite {
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ResultPreview.ID);
         } catch (PartInitException e) {
-        	 Activator.log(IStatus.ERROR,  "Error when showing the result preview " ,e);
+            Activator.log(IStatus.ERROR, "Error when showing the result preview ", e);
             e.printStackTrace();
         }
     }

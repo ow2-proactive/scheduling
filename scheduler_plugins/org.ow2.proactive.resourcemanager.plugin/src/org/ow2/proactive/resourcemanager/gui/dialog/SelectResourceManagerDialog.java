@@ -394,8 +394,8 @@ public class SelectResourceManagerDialog extends Dialog {
             // in order to find it easily for the next time
             pw.println(login);
         } catch (IOException e) {
-        	Activator.log(IStatus.ERROR, "Error when recording logins. ", e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "Error when recording logins. ", e);
+            e.printStackTrace();
             /* Do-Nothing */
         } finally {
             try {
@@ -406,7 +406,7 @@ public class SelectResourceManagerDialog extends Dialog {
                     pw.close();
                 }
             } catch (IOException e) {
-            	Activator.log(IStatus.ERROR, "Error when recording logins. ", e);
+                Activator.log(IStatus.ERROR, "Error when recording logins. ", e);
                 e.printStackTrace();
                 /* Do-Nothing */
             }

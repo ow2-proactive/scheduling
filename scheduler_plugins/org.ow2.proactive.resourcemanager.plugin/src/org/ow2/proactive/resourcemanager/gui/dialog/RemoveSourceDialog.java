@@ -120,7 +120,7 @@ public class RemoveSourceDialog extends Dialog {
                         shell.close();
                     } catch (RMException e) {
                         e.printStackTrace();
-                        Activator.log(IStatus.ERROR, "Error in node source removal: "+src, e);
+                        Activator.log(IStatus.ERROR, "Error in node source removal: " + src, e);
                         MessageDialog.openError(shell, "Error", "Error in node source removal :\n" +
                             e.getMessage());
                     }

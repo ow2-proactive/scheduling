@@ -61,7 +61,7 @@ public class RMStore {
                     RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
                 auth = RMConnection.join(url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
             } catch (RMException e) {
-                throw new RMException("Resource manager does not exist on the following url: " + url,e);
+                throw new RMException("Resource manager does not exist on the following url: " + url, e);
             }
 
             try {
@@ -71,7 +71,7 @@ public class RMStore {
                     loggerUser = auth.logAsUser(login, password);
                 }
             } catch (LoginException e) {
-                Activator.log(IStatus.INFO, "Login exception for user "+login,e);
+                Activator.log(IStatus.INFO, "Login exception for user " + login, e);
                 throw new RMException(e.getMessage());
             }
 

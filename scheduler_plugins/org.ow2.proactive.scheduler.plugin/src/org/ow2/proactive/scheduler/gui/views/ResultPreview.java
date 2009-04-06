@@ -113,7 +113,7 @@ public class ResultPreview extends ViewPart {
             this.getViewSite().getWorkbenchWindow().getActivePage().showView(this.ID);
             //create view if not created
         } catch (PartInitException e) {
-        	 Activator.log(IStatus.ERROR, "", e);
+            Activator.log(IStatus.ERROR, "", e);
             e.printStackTrace();
         }
     }

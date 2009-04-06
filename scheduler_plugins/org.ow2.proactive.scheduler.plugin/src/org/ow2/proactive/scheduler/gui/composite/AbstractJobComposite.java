@@ -351,8 +351,8 @@ public abstract class AbstractJobComposite extends Composite {
                             IViewPart part = page.showView(JobInfo.ID);
                             part.setFocus();
                         } catch (Exception e) {
-                        	 Activator.log(IStatus.ERROR,  "Error when showing the view.", e);
-                        	e.printStackTrace();
+                            Activator.log(IStatus.ERROR, "Error when showing the view.", e);
+                            e.printStackTrace();
                         }
                     }
 

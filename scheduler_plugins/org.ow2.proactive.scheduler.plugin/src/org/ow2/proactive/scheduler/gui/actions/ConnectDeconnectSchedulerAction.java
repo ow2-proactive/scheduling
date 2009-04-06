@@ -133,7 +133,8 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                 }
             } catch (Exception t) {
                 t.printStackTrace();
-                Activator.log(IStatus.ERROR,  "Couldn't Connect to the scheduler based on:" + dialogResult.getUrl(), t);
+                Activator.log(IStatus.ERROR, "Couldn't Connect to the scheduler based on:" +
+                    dialogResult.getUrl(), t);
                 MessageDialog.openError(parent.getShell(), "Couldn't connect",
                         "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl() +
                             "\n cause : " + t.getMessage());

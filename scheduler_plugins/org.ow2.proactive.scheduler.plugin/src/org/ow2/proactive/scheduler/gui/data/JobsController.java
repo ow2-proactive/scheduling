@@ -1045,10 +1045,10 @@ public class JobsController implements SchedulerEventListener {
             return activeView;
         } catch (NodeException e) {
             e.printStackTrace();
-            Activator.log(IStatus.ERROR,  "Error in jobs controller " ,e);
+            Activator.log(IStatus.ERROR, "Error in jobs controller ", e);
         } catch (ActiveObjectCreationException e) {
-        	Activator.log(IStatus.ERROR,  "Error in jobs controller " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "Error in jobs controller ", e);
+            e.printStackTrace();
         }
         return null;
     }

@@ -108,8 +108,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return (SchedulerState) scheduler.addSchedulerEventListener(listener, myEventsOnly, events);
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "Error in Scheduler Proxy " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
+            e.printStackTrace();
         }
         return null;
     }
@@ -135,7 +135,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
                 scheduler.disconnect();
             } catch (Exception e) {
                 // Nothing to do
-            	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error in  disconnect action" ,e);
+                Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error in  disconnect action", e);
             }
             sendConnectionLostEvent();
         }
@@ -162,8 +162,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return scheduler.getJobResult(jobId);
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error when getting job result" ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when getting job result", e);
+            e.printStackTrace();
         }
         return null;
     }
@@ -175,8 +175,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return scheduler.getTaskResult(jobId, taskName);
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error when getting task result" ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when getting task result", e);
+            e.printStackTrace();
         }
         return null;
     }
@@ -188,7 +188,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return scheduler.kill(jobId);
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on kill job " ,e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on kill job ", e);
             e.printStackTrace();
         }
         return new BooleanWrapper(false);
@@ -201,8 +201,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             scheduler.listenLog(jobId, hostname, port);
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on listen log" ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on listen log", e);
+            e.printStackTrace();
         }
     }
 
@@ -213,8 +213,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return scheduler.pause(jobId);
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on pause" ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on pause", e);
+            e.printStackTrace();
         }
         return new BooleanWrapper(false);
     }
@@ -226,8 +226,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return scheduler.resume(jobId);
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on resume event " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume event ", e);
+            e.printStackTrace();
         }
         return new BooleanWrapper(false);
     }
@@ -246,8 +246,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             scheduler.remove(jobId);
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on remove job event " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on remove job event ", e);
+            e.printStackTrace();
         }
     }
 
@@ -261,8 +261,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).kill();
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on kill event " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on kill event ", e);
+            e.printStackTrace();
         }
         return new BooleanWrapper(false);
     }
@@ -274,8 +274,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).pause();
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on pause event " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on pause event ", e);
+            e.printStackTrace();
         }
         return new BooleanWrapper(false);
     }
@@ -287,8 +287,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).freeze();
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on freeze event " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on freeze event ", e);
+            e.printStackTrace();
         }
         return new BooleanWrapper(false);
     }
@@ -300,8 +300,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).resume();
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on resume event " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume event ", e);
+            e.printStackTrace();
         }
         return new BooleanWrapper(false);
     }
@@ -316,8 +316,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).shutdown();
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on shut down event " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on shut down event ", e);
+            e.printStackTrace();
         }
         return new BooleanWrapper(false);
     }
@@ -329,8 +329,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).start();
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on start event" ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on start event", e);
+            e.printStackTrace();
         }
         return new BooleanWrapper(false);
     }
@@ -342,8 +342,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).stop();
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on stop event " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on stop event ", e);
+            e.printStackTrace();
         }
         return new BooleanWrapper(false);
     }
@@ -355,8 +355,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             scheduler.changePriority(jobId, priority);
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on change priority event " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on change priority event ", e);
+            e.printStackTrace();
         }
     }
 
@@ -402,8 +402,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             startPinger();
             return CONNECTED;
         } catch (SchedulerException e) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error when connecting to the scheduler " ,e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when connecting to the scheduler ", e);
+            e.printStackTrace();
             userName = null;
             logAsAdmin = false;
             return COULD_NOT_CONNECT_SCHEDULER;
@@ -413,8 +413,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             logAsAdmin = false;
             return LOGIN_OR_PASSWORD_WRONG;
         } catch (Throwable t) {
-        	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error when connecting to the scheduler " ,t);
-        	t.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when connecting to the scheduler ", t);
+            t.printStackTrace();
             userName = null;
             logAsAdmin = false;
             return CONNECTION_REFUSED;
@@ -480,8 +480,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             try {
                 instance = getInstanceWithException();
             } catch (Throwable t) {
-            	Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error on get instance " ,t);
-            	t.printStackTrace();
+                Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on get instance ", t);
+                t.printStackTrace();
             }
         }
         return instance;

@@ -131,7 +131,8 @@ public class AddNodeByURLDialog extends Dialog {
                         shell.close();
                     } catch (RMException e) {
                         e.printStackTrace();
-                        Activator.log(IStatus.ERROR, "Resource manager is unable to add the node: "+urlText.getText(), e);
+                        Activator.log(IStatus.ERROR, "Resource manager is unable to add the node: " +
+                            urlText.getText(), e);
                         MessageDialog.openError(shell, "Adding Node Error",
                                 "Resource manager is unable to add the node. \n\n" + e.getMessage());
                     }

@@ -39,11 +39,10 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
                 RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
                         .getPassword(), dialogResult.isLogAsAdmin());
             } catch (Throwable t) {
-                 MessageDialog.openError(Display.getDefault().getActiveShell(),
+                MessageDialog.openError(Display.getDefault().getActiveShell(),
                         "Couldn't connect to resource manager", t.getMessage());
-                 Activator.log(IStatus.ERROR,
-                		   	      "Could not connect to the Resource Manager ", t);
-                  	t.printStackTrace();
+                Activator.log(IStatus.ERROR, "Could not connect to the Resource Manager ", t);
+                t.printStackTrace();
             }
         }
         fireHandlerChanged(new HandlerEvent(this, true, false));

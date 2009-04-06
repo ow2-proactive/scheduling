@@ -135,20 +135,18 @@ public class Activator extends AbstractUIPlugin {
     public static String getPluginId() {
         return PLUGIN_ID;
     }
-    
+
     /**
      * Logs into the RPC's log file
      * @param severity - the severity, see IStatus
      * @param message
      * @param t
      */
-    public static void log (int severity, String message, Throwable t)
-    {
-    	  IStatus status = new Status(severity,
-          Activator.getDefault().getBundle().getSymbolicName(),
-          	      IStatus.OK, message, t);
-         Activator.getDefault().getLog().log(status);
-    	
+    public static void log(int severity, String message, Throwable t) {
+        IStatus status = new Status(severity, Activator.getDefault().getBundle().getSymbolicName(),
+            IStatus.OK, message, t);
+        Activator.getDefault().getLog().log(status);
+
     }
-    
+
 }

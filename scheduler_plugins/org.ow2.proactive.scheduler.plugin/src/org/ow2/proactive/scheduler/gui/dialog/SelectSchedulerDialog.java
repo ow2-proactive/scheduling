@@ -401,8 +401,8 @@ public class SelectSchedulerDialog extends Dialog {
             // in order to find it easily for the next time
             pw.println(login);
         } catch (IOException e) {
-        	 Activator.log(IStatus.ERROR, "An Exception occured when recording logins", e);
-        	e.printStackTrace();
+            Activator.log(IStatus.ERROR, "An Exception occured when recording logins", e);
+            e.printStackTrace();
             /* Do-Nothing */
         } finally {
             try {
@@ -413,7 +413,7 @@ public class SelectSchedulerDialog extends Dialog {
                     pw.close();
                 }
             } catch (IOException e) {
-            	 Activator.log(IStatus.ERROR, "An Exception occured when recording logins", e);
+                Activator.log(IStatus.ERROR, "An Exception occured when recording logins", e);
                 /* Do-Nothing */
             }
         }

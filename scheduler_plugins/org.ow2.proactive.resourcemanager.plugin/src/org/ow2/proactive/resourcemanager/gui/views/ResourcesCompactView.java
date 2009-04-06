@@ -91,7 +91,7 @@ public class ResourcesCompactView extends ViewPart {
         try {
             this.getViewSite().getWorkbenchWindow().getActivePage().showView(ResourceExplorerView.ID);
         } catch (PartInitException e) {
-        	Activator.log(IStatus.ERROR, "An error occured. ", e);
+            Activator.log(IStatus.ERROR, "An error occured. ", e);
         }
     }
 
