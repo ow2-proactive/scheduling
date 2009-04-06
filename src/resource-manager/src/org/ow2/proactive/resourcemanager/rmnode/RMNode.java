@@ -181,7 +181,7 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      * Cleaning method : remove all active objects on this node.
      */
-    public void clean();
+    public void clean() throws NodeException;
 
     /** Get the node source object that handle the node
      * @return the stub of the node source active object

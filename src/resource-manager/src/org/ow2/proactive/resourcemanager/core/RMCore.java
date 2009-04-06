@@ -395,11 +395,13 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * 
      * @param rmnode
      *            node to set
+     * @throws NodeException
      */
-    private void internalSetBusy(RMNode rmnode) {
+    private void internalSetBusy(RMNode rmnode) throws NodeException {
         assert rmnode.isFree();
         assert this.freeNodes.contains(rmnode);
         rmnode.clean();
+
         try {
             rmnode.setBusy();
         } catch (NodeException e1) {
@@ -464,9 +466,9 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         if (logger.isInfoEnabled()) {
             logger.info("Releasing node " + rmnode.getNodeURL());
         }
-        rmnode.clean();
         internalRemoveNodeFromCore(rmnode);
         try {
+            rmnode.clean();
             rmnode.getNodeSource().removeNode(rmnode.getNode(), false);
         } catch (NodeException e) {
             logger.error(e.getMessage());
@@ -517,6 +519,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
             e.printStackTrace();
+            internalSetDown(rmnode);
         }
         if (logger.isInfoEnabled()) {
             logger.info("New node added, node ID is : " + rmnode.getNodeURL() + ", node Source : " +

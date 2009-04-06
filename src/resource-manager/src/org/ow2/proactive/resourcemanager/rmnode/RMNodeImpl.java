@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -323,14 +324,15 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * Clean the node.
      * kill all active objects on the node.
+     * @throws IOException
+     * @throws NodeException
      */
-    public synchronized void clean() {
+    public synchronized void clean() throws NodeException {
         handler = null;
-
         try {
             node.killAllActiveObjects();
-        } catch (Exception e) {
-            logger.error("Error while cleaning the Node", e);
+        } catch (IOException e) {
+            throw new NodeException("Node is down");
         }
     }
 
