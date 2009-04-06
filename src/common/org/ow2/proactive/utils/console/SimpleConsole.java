@@ -161,4 +161,18 @@ public class SimpleConsole implements Console {
         return writer;
     }
 
+    /**
+     * @see org.ow2.proactive.utils.console.Console#handleError(java.lang.String, java.lang.Throwable)
+     */
+    public void handleExceptionDisplay(String msg, Throwable t) {
+        System.err.println(msg + " : " + (t.getMessage() == null ? t : t.getMessage()));
+        try {
+            if ("yes".equalsIgnoreCase(readStatement("Display stack trace ? (yes/no)" + prompt))) {
+                t.printStackTrace();
+            }
+        } catch (IOException e) {
+            System.err.println("Could not display the stack trace");
+        }
+    }
+
 }

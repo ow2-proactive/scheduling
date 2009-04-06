@@ -70,7 +70,7 @@ public class AdminController extends UserController {
     private static final String LINK_RM_CMD = "linkrm(rmURL)";
 
     /**
-     * Start the Scheduler administrator
+     * Start the Scheduler controller
      *
      * @param args the arguments to be passed
      */
@@ -171,8 +171,8 @@ public class AdminController extends UserController {
         boolean success = false;
         try {
             success = ((AdminSchedulerInterface) scheduler).start().booleanValue();
-        } catch (SchedulerException e) {
-            error("Start Scheduler is not possible : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Start Scheduler is not possible", e);
             return false;
         }
         if (success) {
@@ -191,8 +191,8 @@ public class AdminController extends UserController {
         boolean success = false;
         try {
             success = ((AdminSchedulerInterface) scheduler).stop().booleanValue();
-        } catch (SchedulerException e) {
-            error("Stop Scheduler is not possible : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Stop Scheduler is not possible", e);
             return false;
         }
         if (success) {
@@ -211,8 +211,8 @@ public class AdminController extends UserController {
         boolean success = false;
         try {
             success = ((AdminSchedulerInterface) scheduler).pause().booleanValue();
-        } catch (SchedulerException e) {
-            error("Pause Scheduler is not possible : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Pause Scheduler is not possible", e);
             return false;
         }
         if (success) {
@@ -231,8 +231,8 @@ public class AdminController extends UserController {
         boolean success = false;
         try {
             success = ((AdminSchedulerInterface) scheduler).freeze().booleanValue();
-        } catch (SchedulerException e) {
-            error("Freeze Scheduler is not possible : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Freeze Scheduler is not possible", e);
             return false;
         }
         if (success) {
@@ -251,8 +251,8 @@ public class AdminController extends UserController {
         boolean success = false;
         try {
             success = ((AdminSchedulerInterface) scheduler).resume().booleanValue();
-        } catch (SchedulerException e) {
-            error("Resume Scheduler is not possible : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Resume Scheduler is not possible", e);
             return false;
         }
         if (success) {
@@ -292,7 +292,7 @@ public class AdminController extends UserController {
                 printf("Shutdown aborted !");
             }
         } catch (Exception e) {
-            error("*ERROR* : " + e.getMessage());
+            handleExceptionDisplay("*ERROR*", e);
         }
         return success;
     }
@@ -326,7 +326,7 @@ public class AdminController extends UserController {
                 printf("Kill aborted !");
             }
         } catch (Exception e) {
-            error("*ERROR* : " + e.getMessage());
+            handleExceptionDisplay("*ERROR*", e);
         }
         return success;
     }
@@ -340,12 +340,12 @@ public class AdminController extends UserController {
         try {
             success = ((AdminSchedulerInterface) scheduler).linkResourceManager(rmURL.trim()).booleanValue();
             if (success) {
-                printf("The new Resource Manager at " + rmURL + " has been rebind to the scheduler.");
+                printf("The new Resource Manager at " + rmURL + " has been rebound to the scheduler.");
             } else {
                 error("Reconnect a Resource Manager is only possible when RM is dead !");
             }
         } catch (Exception e) {
-            error("*ERROR* : " + e.getMessage());
+            handleExceptionDisplay("*ERROR*", e);
         }
         return success;
     }

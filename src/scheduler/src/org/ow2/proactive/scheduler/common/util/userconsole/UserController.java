@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.AlreadySelectedException;
@@ -116,7 +117,7 @@ public class UserController {
     protected static UserController shell;
 
     /**
-     * Start the Scheduler administrator
+     * Start the Scheduler controller
      *
      * @param args the arguments to be passed
      */
@@ -212,13 +213,13 @@ public class UserController {
         } catch (ParseException e) {
             displayHelp = true;
         } catch (LoginException e) {
-            logger.error(e.getMessage() + "\nShutdown the administrator.\n");
+            logger.error(e.getMessage() + "\nShutdown the controller.\n");
             System.exit(1);
         } catch (SchedulerException e) {
-            logger.error(e.getMessage() + "\nShutdown the administrator.\n");
+            logger.error(e.getMessage() + "\nShutdown the controller.\n");
             System.exit(1);
         } catch (Exception e) {
-            logger.error("An error has occurred : " + e.getMessage() + "\nShutdown the administrator.\n", e);
+            logger.error("An error has occurred : " + e.getMessage() + "\nShutdown the controller.\n", e);
             System.exit(1);
         }
 
@@ -227,7 +228,7 @@ public class UserController {
             HelpFormatter hf = new HelpFormatter();
             hf.setWidth(130);
             String note = "\nNOTE : if no command marked with " + control +
-                "is specified, the administrator will start in interactive mode.";
+                "is specified, the controller will start in interactive mode.";
             hf.printHelp(commandName + Tools.shellExtension(), "", options, note, true);
             System.exit(2);
         }
@@ -354,6 +355,15 @@ public class UserController {
 
     //***************** COMMAND LISTENER *******************
 
+    protected void handleExceptionDisplay(String msg, Throwable t) {
+        if (intercativeMode) {
+            console.handleExceptionDisplay(msg, t);
+        } else {
+            System.err.printf(msg);
+            t.printStackTrace();
+        }
+    }
+
     protected void printf(String format, Object... args) {
         if (intercativeMode) {
             console.printf(format, args);
@@ -389,7 +399,7 @@ public class UserController {
             printf("Job successfully submitted ! (id=" + id.value() + ")");
             return id.value();
         } catch (Exception e) {
-            error("Error on job Submission (url=" + xmlDescriptor + ")" + " : " + e.getMessage());
+            handleExceptionDisplay("Error on job Submission (url=" + xmlDescriptor + ")", e);
         }
         return "";
     }
@@ -402,8 +412,8 @@ public class UserController {
         boolean success = false;
         try {
             success = scheduler.pause(jobId).booleanValue();
-        } catch (SchedulerException e) {
-            error("Error while pausing job " + jobId + " : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while pausing job " + jobId, e);
             return false;
         }
         if (success) {
@@ -422,8 +432,8 @@ public class UserController {
         boolean success = false;
         try {
             success = scheduler.resume(jobId).booleanValue();
-        } catch (SchedulerException e) {
-            error("Error while resuming job  " + jobId + " : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while resuming job  " + jobId, e);
             return false;
         }
         if (success) {
@@ -442,8 +452,8 @@ public class UserController {
         boolean success = false;
         try {
             success = scheduler.kill(jobId).booleanValue();
-        } catch (SchedulerException e) {
-            error("Error while killing job  " + jobId + " : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while killing job  " + jobId, e);
             return false;
         }
         if (success) {
@@ -462,8 +472,8 @@ public class UserController {
         try {
             scheduler.remove(jobId);
             printf("Job " + jobId + " removed.");
-        } catch (SchedulerException e) {
-            error("Error while removing job  " + jobId + " : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while removing job  " + jobId, e);
         }
     }
 
@@ -490,8 +500,8 @@ public class UserController {
             } else {
                 printf("Job " + jobId + " is not finished or unknown !");
             }
-        } catch (SchedulerException e) {
-            error("Error on job " + jobId + " : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on job " + jobId, e);
         }
     }
 
@@ -518,8 +528,8 @@ public class UserController {
             } else {
                 printf("Job " + jobId + " is not finished or unknown !");
             }
-        } catch (SchedulerException e) {
-            error("Error on job " + jobId + " : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on job " + jobId, e);
         }
     }
 
@@ -532,8 +542,8 @@ public class UserController {
             JobPriority prio = JobPriority.findPriority(newPriority);
             scheduler.changePriority(jobId, prio);
             printf("Job " + jobId + " priority changed to '" + prio + "' !");
-        } catch (SchedulerException e) {
-            error("Error on job " + jobId + " : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on job " + jobId, e);
         }
     }
 
@@ -548,7 +558,7 @@ public class UserController {
             eval(readFileContent(br));
             br.close();
         } catch (Exception e) {
-            error("*ERROR* : " + e.getMessage());
+            handleExceptionDisplay("*ERROR*", e);
         }
     }
 
@@ -557,7 +567,7 @@ public class UserController {
     }
 
     private void exit_() {
-        console.printf("Exiting administrator.");
+        console.printf("Exiting controller.");
         terminated = true;
     }
 
@@ -583,8 +593,10 @@ public class UserController {
             }
             //Evaluate the command
             engine.eval(cmd);
-        } catch (Exception e) {
+        } catch (ScriptException e) {
             console.error("*SYNTAX ERROR* - " + format(e.getMessage()));
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while evaluating command", e);
         }
     }
 
@@ -605,7 +617,7 @@ public class UserController {
     //***************** HELP SCREEN *******************
 
     protected String helpScreen() {
-        StringBuilder out = new StringBuilder("Scheduler administrator commands are :\n\n");
+        StringBuilder out = new StringBuilder("Scheduler controller commands are :\n\n");
 
         out.append(String.format(
                 " %1$-18s\t Change the priority of the given job (parameters are an int or a string representing the jobId "
@@ -646,7 +658,7 @@ public class UserController {
                         .format(
                                 " %1$-18s\t Execute the content of the given script file (parameter is a string representing a command-file path)\n",
                                 EXEC_CMD));
-        out.append(String.format(" %1$-18s\t Exits Scheduler administrator\n", EXIT_CMD));
+        out.append(String.format(" %1$-18s\t Exits Scheduler controller\n", EXIT_CMD));
 
         return out.toString();
     }

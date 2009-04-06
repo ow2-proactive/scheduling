@@ -115,4 +115,15 @@ public interface Console {
      */
     public String readStatement(String prompt) throws IOException;
 
+    /**
+     * This method can be used to display exception.<br>
+     * It will first print the given message following by the exception message if exist, otherwise the exception itself.<br>
+     * Next it will prompt to ask if stack trace must be printed or not.<br>
+     * If user answer 'yes', the stack trace will be displayed on the console.
+     *
+     * @param msg the message to display first
+     * @param t the exception (stack trace) to eventually add to the message
+     */
+    public void handleExceptionDisplay(String msg, Throwable t);
+
 }

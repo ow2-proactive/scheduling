@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.AlreadySelectedException;
@@ -25,7 +26,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
@@ -61,8 +61,8 @@ public class AdminController {
     public static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
     protected static final String control = "<ctl> ";
 
-    private static final String ADDNODE_CMD = "addnode(nodeName, nsName)";
-    private static final String REMOVENODE_CMD = "removenode(nodeName,preempt)";
+    private static final String ADDNODE_CMD = "addnode(nodeURL, nsName)";
+    private static final String REMOVENODE_CMD = "removenode(nodeURL,preempt)";
     private static final String GCMDEPLOY_CMD = "gcmdeploy(gcmdFile,nsName)";
     private static final String CREATENS_CMD = "createns(nsName)";
     private static final String REMOVENS_CMD = "removens(nsName,preempt)";
@@ -371,6 +371,15 @@ public class AdminController {
 
     //***************** COMMAND LISTENER *******************
 
+    protected void handleExceptionDisplay(String msg, Throwable t) {
+        if (intercativeMode) {
+            console.handleExceptionDisplay(msg, t);
+        } else {
+            System.err.printf(msg);
+            t.printStackTrace();
+        }
+    }
+
     protected void printf(String format, Object... args) {
         if (intercativeMode) {
             console.printf(format, args);
@@ -404,8 +413,8 @@ public class AdminController {
             rm.shutdown(preempt);
             printf("Shutdown request sent to Resource Manager, controller will shutdown !");
             terminated = true;
-        } catch (ProActiveException e) {
-            error("Error while shutting down the RM : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while shutting down the RM", e);
         }
     }
 
@@ -417,8 +426,8 @@ public class AdminController {
         try {
             rm.removeSource(nodeSourceName, preempt);
             printf("Node source '" + nodeSourceName + "' removal request sent to Resource Manager");
-        } catch (RMException e) {
-            error("Error while removing node source '" + nodeSourceName + "' : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while removing node source '" + nodeSourceName, e);
         }
     }
 
@@ -472,8 +481,8 @@ public class AdminController {
             rm.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(), null, StaticPolicy.class
                     .getName(), null);
             printf("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
-        } catch (RMException e) {
-            error("Error while removing node source '" + nodeSourceName + "' : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while removing node source '" + nodeSourceName, e);
         }
     }
 
@@ -502,7 +511,7 @@ public class AdminController {
             }
             printf("GCM deployment '" + fileName + "' request sent to Resource Manager");
         } catch (Exception e) {
-            error("Error while load GCMD file '" + fileName + "' : " + e.getMessage());
+            handleExceptionDisplay("Error while load GCMD file '" + fileName, e);
         }
     }
 
@@ -518,8 +527,8 @@ public class AdminController {
                 rm.addNode(nodeName);
             }
             printf("Adding node '" + nodeName + "' request sent to Resource Manager");
-        } catch (RMException e) {
-            error("Error while adding node '" + nodeName + "' : " + e.getMessage());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while adding node '" + nodeName + "'", e);
         }
     }
 
@@ -534,7 +543,7 @@ public class AdminController {
             eval(readFileContent(br));
             br.close();
         } catch (Exception e) {
-            error("*ERROR* : " + e.getMessage());
+            handleExceptionDisplay("*ERROR*", e);
         }
     }
 
@@ -569,8 +578,10 @@ public class AdminController {
             }
             //Evaluate the command
             engine.eval(cmd);
-        } catch (Exception e) {
+        } catch (ScriptException e) {
             console.error("*SYNTAX ERROR* - " + format(e.getMessage()));
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while evaluating command", e);
         }
     }
 
@@ -593,7 +604,7 @@ public class AdminController {
     protected String helpScreen() {
         StringBuilder out = new StringBuilder("Resource Manager controller commands are :\n\n");
         out.append(String.format(
-                " %1$-28s\t Add node to the given node source (parameters is a string representing the node to add AND"
+                " %1$-28s\t Add node to the given node source (parameters is a string representing the node URL to add AND"
                     + " a string representing the node source in which to add the node)\n", ADDNODE_CMD));
         out.append(String.format(
                 " %1$-28s\t Remove the given node (parameter is a string representing the node URL,"

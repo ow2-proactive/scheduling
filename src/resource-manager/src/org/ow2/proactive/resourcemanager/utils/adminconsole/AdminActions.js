@@ -1,19 +1,19 @@
 importClass(org.ow2.proactive.resourcemanager.utils.adminconsole.AdminController);
 
-function addnode(nodeName, nodeSourceName){
+function addnode(nodeURL, nodeSourceName){
 	if (nodeSourceName==undefined){
 		nodeSourceName = null;
 		println("Node Source will be the default one as it is not set");
 	}
-	return AdminController.addnode(nodeName, nodeSourceName);
+	return AdminController.addnode(nodeURL, nodeSourceName);
 }
 
-function removenode(nodeName,preemptively){
+function removenode(nodeURL,preemptively){
 	if (preemptively == undefined){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-    return AdminController.removenode(nodeName,preemptively);
+    return AdminController.removenode(nodeURL,preemptively);
 }
 
 function gcmdeploy(gcmdFile, nodeSourceName){
