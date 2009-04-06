@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.runtime.StartRuntime;
+import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -230,7 +230,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     private void setRuntime(StringBuffer command, String nodeURL) {
-        command.append(" " + StartRuntime.class.getName() + " ");
+        command.append(" " + StartPARuntime.class.getName() + " ");
         command.append(" -p " + nodeURL + " ");
         command.append(" -c 1 ");
         command.append(" -d " + getDeploymentId() + " ");
