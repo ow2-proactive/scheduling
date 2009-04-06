@@ -1789,10 +1789,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL.trim()));
             //re-link the RM
             resourceManager = imp;
-            status = SchedulerStatus.FROZEN;
             logger
                     .info("New resource manager has been linked to the scheduler.\n\t-> Resume to continue the scheduling.");
             frontend.schedulerStateUpdated(SchedulerEvent.RM_UP);
+            //restart the scheduler
+            status = SchedulerStatus.STARTED;
+            frontend.schedulerStateUpdated(SchedulerEvent.STARTED);
             return new BooleanWrapper(true);
         } catch (Exception e) {
             throw new SchedulerException("Error while connecting the new Resource Manager !", e);

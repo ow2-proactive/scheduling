@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -278,6 +279,12 @@ public class JobsController implements SchedulerEventListener {
                 break;
             case KILLED:
                 schedulerKilledEvent();
+                break;
+            case RM_DOWN:
+                schedulerRMDownEvent();
+                break;
+            case RM_UP:
+                schedulerRMUpEvent();
                 break;
         }
     }
@@ -692,6 +699,26 @@ public class JobsController implements SchedulerEventListener {
 
         // call method on listeners
         schedulerKilledEventInternal();
+    }
+
+    private void schedulerRMDownEvent() {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openInformation(SeparatedJobView.getSchedulerShell(), "Resource Manager Down",
+                        "Resource Manager has failed, the Scheduler has been frozen.\n"
+                            + "The Scheduler is now waiting for a new RM, please contact your administrator");
+            }
+        });
+    }
+
+    private void schedulerRMUpEvent() {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openInformation(SeparatedJobView.getSchedulerShell(), "Resource Manager Up",
+                        "A new Resource Manager has been plugged to the Scheduler.\n"
+                            + "Scheduling process has been restarted");
+            }
+        });
     }
 
     private void jobPausedEvent(JobInfo info) {

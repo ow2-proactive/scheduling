@@ -145,7 +145,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         pinger.interrupt();
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Scheduler server down",
+                MessageDialog.openInformation(SeparatedJobView.getSchedulerShell(), "Scheduler server down",
                         "Scheduler  '" + schedulerURL + "'  seems to be down, now disconnect.");
                 StatusLabel.getInstance().disconnect();
                 // stop log server

@@ -9,7 +9,9 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
@@ -31,6 +33,8 @@ public class ResourceExplorerView extends ViewPart {
     private static RMTreeViewer treeViewer = null;
     private static Action expandAllAction = null;
     private static Action collapseAllAction = null;
+
+    private static Shell rmShell = null;
 
     private DrillDownAdapter drillDownAdapter = null;
     private Composite parent = null;
@@ -71,6 +75,15 @@ public class ResourceExplorerView extends ViewPart {
             init();
             treeViewer.expandAll();
         }
+
+        if (rmShell == null) {
+            rmShell = Display.getDefault().getShells()[1];
+        }
+        System.out.println(rmShell);
+    }
+
+    public static Shell getRMShell() {
+        return rmShell;
     }
 
     private void makeActions() {

@@ -42,6 +42,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
@@ -49,7 +50,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
-import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.actions.ChangeMaximizeListAction;
 import org.ow2.proactive.scheduler.gui.actions.ChangePriorityJobAction;
 import org.ow2.proactive.scheduler.gui.actions.ChangeViewModeAction;
@@ -125,6 +125,8 @@ public class SeparatedJobView extends ViewPart {
     private static IMenuManager subMenu = null;
     private static IMenuManager subMenuJob = null;
     private static IMenuManager subMenuPriority = null;
+
+    private static Shell schedulerShell = null;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -410,6 +412,14 @@ public class SeparatedJobView extends ViewPart {
         hookContextMenu(parent);
         contributeToActionBars();
         setVisible(false);
+
+        if (schedulerShell == null) {
+            schedulerShell = Display.getDefault().getShells()[1];
+        }
+    }
+
+    public static Shell getSchedulerShell() {
+        return schedulerShell;
     }
 
     /*

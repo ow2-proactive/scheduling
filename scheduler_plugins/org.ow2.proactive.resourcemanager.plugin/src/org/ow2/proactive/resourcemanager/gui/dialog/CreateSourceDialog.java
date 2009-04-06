@@ -48,6 +48,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.ConfigurablePanel;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.NodeSourceName;
+import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 
 
 /**
@@ -102,7 +103,7 @@ public class CreateSourceDialog extends Dialog {
                         if (e.getCause() != null) {
                             message = e.getCause().getMessage();
                         }
-                        MessageDialog.openError(Display.getDefault().getActiveShell(),
+                        MessageDialog.openError(ResourceExplorerView.getRMShell(),
                                 "Cannot create nodesource", message);
                     }
                 }
@@ -202,8 +203,7 @@ public class CreateSourceDialog extends Dialog {
             if (e.getCause() != null) {
                 message = e.getCause().getMessage();
             }
-            MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot create nodesource",
-                    message);
+            MessageDialog.openError(ResourceExplorerView.getRMShell(), "Cannot create nodesource", message);
         }
     }
 

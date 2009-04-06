@@ -200,8 +200,8 @@ public class AdminController {
             logger.info("");
             HelpFormatter hf = new HelpFormatter();
             hf.setWidth(160);
-            String note = "\nNOTE : if no command marked with " + control +
-                "is specified, the controller will start in interactive mode.";
+            String note = "\nNOTE : if no " + control +
+                " command is specified, the controller will start in interactive mode.";
             hf.printHelp(commandName + shellExtension(), "", options, note, true);
             System.exit(2);
         }

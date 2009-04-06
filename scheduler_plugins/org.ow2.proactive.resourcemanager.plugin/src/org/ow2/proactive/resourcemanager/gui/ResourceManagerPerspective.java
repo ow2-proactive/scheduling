@@ -78,7 +78,6 @@ public class ResourceManagerPerspective implements IPerspectiveFactory {
         IFolderLayout subleftFolder = layout.createFolder(ID_LEFT_FOLDER, IPageLayout.BOTTOM, 0.3f,
                 editorArea);
         subleftFolder.addView(StatisticsView.ID);
-
         //
         //        IFolderLayout subsubleftFolder = layout.createFolder(ID_BOTTOM_FOLDER, IPageLayout.RIGHT, 0.5f,
         //                ID_LEFT_FOLDER);

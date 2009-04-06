@@ -54,8 +54,8 @@ public class StatusLabel implements EventSchedulerListener {
     public static final Color STARTED_COLOR = Colors.BLACK;
     public static final String STOPPED_TEXT = "STOPPED";
     public static final Color STOPPED_COLOR = Colors.BLACK;
-    public static final String FREEZED_TEXT = "FREEZED";
-    public static final Color FREEZED_COLOR = Colors.BLACK;
+    public static final String FROZEN_TEXT = "FROZEN";
+    public static final Color FROZEN_COLOR = Colors.BLACK;
     public static final String PAUSED_TEXT = "PAUSED";
     public static final Color PAUSED_COLOR = Colors.BLACK;
     public static final String RESUMED_TEXT = "RESUMED";
@@ -89,7 +89,7 @@ public class StatusLabel implements EventSchedulerListener {
     }
 
     public void freezeEvent() {
-        setText(FREEZED_TEXT, FREEZED_COLOR);
+        setText(FROZEN_TEXT, FROZEN_COLOR);
     }
 
     public void killedEvent() {
