@@ -67,8 +67,7 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTDefaultRM {
     }
 
     protected void init() throws Exception {
-        String oneNodeescriptor = FunctionalTDefaultRM.class.getResource(
-                "/nodesource/GCMNodeSourceDeployment.xml").getPath();
+        String oneNodeescriptor = FunctionalTDefaultRM.class.getResource("/nodesource/1node.xml").getPath();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
     }
 
