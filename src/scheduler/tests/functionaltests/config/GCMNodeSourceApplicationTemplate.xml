@@ -11,6 +11,8 @@
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 	<configuration>
+		<jvmarg value="-Dproactive.test=true"/>
+		<jvmarg value="-Dproactive.http.jetty.xml=${proactive.home}/classes/resource-managerTests/nodestate/jetty.xml"/>	
 		<applicationClasspath>
 				<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>

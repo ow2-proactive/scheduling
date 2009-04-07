@@ -49,6 +49,11 @@ log4j.logger.proactive.resourceManager.rmlauncher=INFO,CONSOLE
 log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
 log4j.logger.proactive.resourceManager.policy=INFO
 
+#GCM deployment loggers in RMDEvFileAppender
+log4j.logger.proactive.deployment = INFO,RMDevFileAppender
+log4j.logger.proactive.deployment.log = INFO,RMDevFileAppender
+log4j.logger.proactive.deployment.process = INFO,RMDevFileAppender
+
 # Hibernate logger
 log4j.additivity.org.hibernate=false
 log4j.logger.org.hibernate=INFO,SchedulerDevHibFileAppender
