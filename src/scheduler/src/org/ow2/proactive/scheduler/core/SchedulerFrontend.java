@@ -870,7 +870,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             ServerConnector connector = new ServerConnector("ServerFrontend");
             connector.start();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger_dev.debug("", e);
         }
     }
 

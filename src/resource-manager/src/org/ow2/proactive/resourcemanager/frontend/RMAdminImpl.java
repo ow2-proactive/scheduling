@@ -112,7 +112,7 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
             registerTrustedService(rmcore);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.debug("", e);
         }
     }
 

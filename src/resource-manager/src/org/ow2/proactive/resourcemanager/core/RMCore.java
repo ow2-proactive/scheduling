@@ -85,6 +85,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.ScriptWithResult;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -384,7 +385,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
             internalSetDown(rmnode);
-            e.printStackTrace();
+            logger.debug("", e);
         }
     }
 
@@ -406,7 +407,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             rmnode.setBusy();
         } catch (NodeException e1) {
             // A down node shouldn't be busied...
-            e1.printStackTrace();
+            logger.debug("", e1);
         }
         this.freeNodes.remove(rmnode);
         // create the event
@@ -431,7 +432,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             rmnode.setToRelease();
         } catch (NodeException e1) {
             // A down node shouldn't be busied...
-            e1.printStackTrace();
+            logger.debug("", e1);
         }
         // create the event
         this.monitoring.nodeToReleaseEvent(rmnode.getNodeEvent());
@@ -518,8 +519,8 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             this.monitoring.nodeAddedEvent(rmnode.getNodeEvent());
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
-            e.printStackTrace();
             internalSetDown(rmnode);
+            logger.debug("", e);
         }
         if (logger.isInfoEnabled()) {
             logger.info("New node added, node ID is : " + rmnode.getNodeURL() + ", node Source : " +
@@ -625,7 +626,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                 try {
                     rmnode.getNodeSource().removeNode(rmnode.getNode(), forever);
                 } catch (NodeException e) {
-                    e.printStackTrace();
+                    logger.debug("", e);
                 }
             } else if (rmnode.isBusy()) {
                 internalSetToRelease(rmnode);
@@ -902,7 +903,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                     result.size());
                 try {
                     result.addAll(processScriptResults(scriptsExecutionResults));
-                } catch (RuntimeException e) {
+                } catch (ScriptException e) {
                     freeNodes(result);
                     throw e;
                 }
@@ -989,12 +990,12 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                 } catch (ProActiveTimeoutException e) {
                     // no script result was obtained
                     scriptResult = null;
-                    throw new RuntimeException("Time out expired in waiting ends of script execution: " +
+                    throw new ScriptException("Time out expired in waiting ends of script execution: " +
                         e.getMessage());
                 }
 
                 if (scriptResult != null && scriptResult.errorOccured()) {
-                    throw new RuntimeException(scriptResult.getException());
+                    throw new ScriptException(scriptResult.getException());
                 }
 
                 // processing script result and updating knowledge base of 
@@ -1117,7 +1118,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                 Thread.sleep(2000);
                 this.nodeRM.getProActiveRuntime().killRT(true);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.debug("", e);
             }
         }
     }

@@ -115,7 +115,7 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
             registerTrustedService(authentication);
             registerTrustedService(rmcore);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.debug("", e);
         }
     }
 

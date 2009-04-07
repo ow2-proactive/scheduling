@@ -48,9 +48,9 @@ import org.ow2.proactive.scheduler.gui.listeners.EventSchedulerListener;
 public class StatusLabel implements EventSchedulerListener {
     public static final int FONT_SIZE = 10;
     public static final int FONT_STYLE = SWT.BOLD;
-    public static final String INITIAL_TEXT = "right click -> connect to scheduler...";
+    public static final String INITIAL_TEXT = "right click -> connect to Scheduler...";
     public static final Color INITIAL_COLOR = Colors.BLACK;
-    public static final String STARTED_TEXT = "STARTED";
+    public static final String STARTED_TEXT = "";
     public static final Color STARTED_COLOR = Colors.BLACK;
     public static final String STOPPED_TEXT = "STOPPED";
     public static final Color STOPPED_COLOR = Colors.BLACK;
@@ -58,7 +58,7 @@ public class StatusLabel implements EventSchedulerListener {
     public static final Color FROZEN_COLOR = Colors.BLACK;
     public static final String PAUSED_TEXT = "PAUSED";
     public static final Color PAUSED_COLOR = Colors.BLACK;
-    public static final String RESUMED_TEXT = "RESUMED";
+    public static final String RESUMED_TEXT = "";
     public static final Color RESUMED_COLOR = Colors.BLACK;
     public static final String SHUTTING_DOWN_TEXT = "SHUTTING DOWN";
     public static final Color SHUTTING_DOWN_COLOR = Colors.BLACK;

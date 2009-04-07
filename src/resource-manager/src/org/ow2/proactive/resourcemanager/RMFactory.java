@@ -139,13 +139,13 @@ public class RMFactory {
         try {
             startLocal();
         } catch (NodeException e) {
-            e.printStackTrace();
+            logger.debug("", e);
         } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
+            logger.debug("", e);
         } catch (AlreadyBoundException e) {
-            e.printStackTrace();
+            logger.debug("", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.debug("", e);
         }
     }
 

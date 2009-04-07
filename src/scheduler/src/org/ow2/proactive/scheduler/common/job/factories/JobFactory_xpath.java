@@ -206,7 +206,7 @@ public class JobFactory_xpath extends JobFactory {
             Node rootNode = transformVariablesAndGetDOM(new FileInputStream(f));
             job = createJob(rootNode);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("", e);
             throw new JobCreationException("Exception occured during Job creation", e);
 
         }
@@ -263,7 +263,7 @@ public class JobFactory_xpath extends JobFactory {
         try {
             transformer = tfactory.newTransformer(stylesheetSource);
         } catch (TransformerConfigurationException e1) {
-            e1.printStackTrace();
+            logger.debug("", e1);
         }
         DOMResult result = new DOMResult();
 
@@ -816,7 +816,7 @@ public class JobFactory_xpath extends JobFactory {
                 try {
                     return new SimpleScript(script, engine);
                 } catch (InvalidScriptException e) {
-                    e.printStackTrace();
+                    logger.debug("", e);
                 }
             }
         }

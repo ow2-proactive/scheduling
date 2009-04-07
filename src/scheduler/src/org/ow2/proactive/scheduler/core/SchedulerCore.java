@@ -123,6 +123,7 @@ import org.ow2.proactive.scheduler.task.launcher.ProActiveTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
+import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -628,12 +629,36 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             if (nbNodesToAskFor > 0) {
                 logger.debug("Asking for " + nbNodesToAskFor + " node(s) with" +
-                    ((ss == null) ? "out " : " ") + "verif script");
+                    ((ss == null) ? "out " : " ") + "selection script");
 
-                //nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss);
-                nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss, ns);
+                try {
+                    nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss, ns);
+                    //the following line is used to unwrap the future, warning when moving or removing
+                    //it may also throw a ScriptException which is a RuntimeException
+                    logger.debug("Got " + nodeSet.size() + " node(s)");
+                } catch (ScriptException e) {
+                    Throwable t = e;
+                    while (t.getCause() != null) {
+                        t = t.getCause();
+                    }
+                    logger_dev.info("Selection script throws an exception : " + t);
+                    //simulate job starting if needed
+                    // set the different informations on job
+                    if (currentJob.getStartTime() < 0) {
+                        // if it is the first task of this job
+                        currentJob.start();
+                        pendingJobs.remove(currentJob);
+                        runningJobs.add(currentJob);
+                        //update tasks events list and send it to front-end
+                        updateTaskInfosList(currentJob, SchedulerEvent.JOB_PENDING_TO_RUNNING);
+                        logger.info("Job '" + currentJob.getId() + "' started");
+                    }
+                    //selection script has failed : end the job
+                    endJob(currentJob, internalTask, "Selection script has failed : " + t, JobStatus.CANCELED);
+                    //leave the method to recreate lists of tasks to start
+                    return;
+                }
 
-                logger.debug("Got " + nodeSet.size() + " node(s)");
             }
             if (nbNodesToAskFor <= 0 || nodeSet.size() == 0) {
                 //if RM returns 0 nodes, i.e. no nodes satisfy selection script (or no nodes at all)
@@ -984,11 +1009,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 finishedJobs.add(job);
             }
         } else {
-            //failed the job
+            //if not killed
             job.failed(task.getId(), jobStatus);
 
-            //store the exception into jobResult
-            if (jobStatus == JobStatus.FAILED) {
+            //store the exception into jobResult / To prevent from empty task result (when job canceled), create one
+            boolean noResult = (jobStatus == JobStatus.CANCELED && taskResult == null);
+            if (jobStatus == JobStatus.FAILED || noResult) {
                 taskResult = new TaskResultImpl(task.getId(), new Exception(errorMsg), new SimpleTaskLogs("",
                     errorMsg));
                 ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
@@ -1003,13 +1029,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             DatabaseManager.update(job.getJobResult());
             //unload the result to improve memory usage
             DatabaseManager.unload(taskResult);
-            //move the job
+            //move the job from running to finished
             runningJobs.remove(job);
             finishedJobs.add(job);
 
-            //send task event
-            frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED, task.getTaskInfo()));
+            if (!noResult) {
+                //send task event if their was a result
+                frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+                    SchedulerEvent.TASK_RUNNING_TO_FINISHED, task.getTaskInfo()));
+            }
         }
 
         terminateJobHandling(job.getId());

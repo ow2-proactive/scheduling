@@ -114,7 +114,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.debug("", e);
         }
     }
 
@@ -159,7 +159,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             rMName = new ObjectName("RMFrontend:name=RMBean");
             mbs.registerMBean(rMBean, rMName);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("", e);
         }
     }
 
@@ -184,9 +184,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                 }
             }
         } catch (SecurityException e) {
-            e.printStackTrace();
+            logger.debug("", e);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.debug("", e);
         }
     }
 

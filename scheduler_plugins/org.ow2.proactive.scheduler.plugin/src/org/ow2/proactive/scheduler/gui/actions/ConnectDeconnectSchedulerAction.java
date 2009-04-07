@@ -125,19 +125,16 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
 
                     SeparatedJobView.setVisible(true);
                 } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
-                    MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                            "The login and/or the password are wrong !");
-                } else {
-                    MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                            "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl());
+                    MessageDialog.openError(parent.getShell(), "Could not connect",
+                            "Incorrect username or password !");
                 }
-            } catch (Exception t) {
+            } catch (Throwable t) {
                 t.printStackTrace();
-                Activator.log(IStatus.ERROR, "Couldn't Connect to the scheduler based on:" +
+                Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" +
                     dialogResult.getUrl(), t);
                 MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                        "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl() +
-                            "\n cause : " + t.getMessage());
+                        "Could not connect to the scheduler based on : " + dialogResult.getUrl() +
+                            "\n\nCause\n : " + t.getMessage());
             }
         }
     }

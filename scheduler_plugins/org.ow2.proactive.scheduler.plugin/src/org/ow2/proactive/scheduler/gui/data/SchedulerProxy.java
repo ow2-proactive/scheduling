@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -74,8 +75,6 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     private static final long SCHEDULER_SERVER_PING_FREQUENCY = 5000;
     public static final int CONNECTED = 0;
     public static final int LOGIN_OR_PASSWORD_WRONG = 1;
-    public static final int COULD_NOT_CONNECT_SCHEDULER = 2;
-    public static final int CONNECTION_REFUSED = 3;
     private static SchedulerProxy instance = null;
     private SchedulerAuthenticationInterface sai;
     private UserSchedulerInterface scheduler = null;
@@ -387,7 +386,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
-    public int connectToScheduler(SelectSchedulerDialogResult dialogResult) {
+    public int connectToScheduler(SelectSchedulerDialogResult dialogResult) throws Throwable {
         try {
             userName = dialogResult.getLogin();
             logAsAdmin = dialogResult.isLogAsAdmin();
@@ -401,28 +400,22 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
             startPinger();
             return CONNECTED;
-        } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when connecting to the scheduler ", e);
-            e.printStackTrace();
-            userName = null;
-            logAsAdmin = false;
-            return COULD_NOT_CONNECT_SCHEDULER;
         } catch (LoginException e) {
+            e.printStackTrace();
             // exception is handled by the GUI
             userName = null;
             logAsAdmin = false;
             return LOGIN_OR_PASSWORD_WRONG;
         } catch (Throwable t) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when connecting to the scheduler ", t);
-            t.printStackTrace();
+            Activator.log(IStatus.ERROR, "- Error when connecting to the scheduler ", t);
             userName = null;
             logAsAdmin = false;
-            return CONNECTION_REFUSED;
+            throw t;
         }
     }
 
     private void startPinger() {
-        final SchedulerProxy thisStub = (SchedulerProxy) PAActiveObject.getStubOnThis();
+        //final SchedulerProxy thisStub = (SchedulerProxy) PAActiveObject.getStubOnThis();
         pinger = new Thread() {
             @Override
             public void run() {
@@ -436,7 +429,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
                         } else {
                             //if not, shutdown Scheduler
                             try {
-                                thisStub.serverDown();
+                                serverDown();
                             } catch (Exception e) {
                                 //thisStub has already been killed, shutdown, or disconnected
                                 break;
@@ -546,6 +539,11 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     public BooleanWrapper resume(String arg0) throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public SchedulerStatus getStatus() {
         // TODO Auto-generated method stub
         return null;
     }

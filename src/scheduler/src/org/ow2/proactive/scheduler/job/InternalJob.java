@@ -342,11 +342,13 @@ public abstract class InternalJob extends JobState {
         logger_dev.debug(" ");
         if (jobStatus != JobStatus.KILLED) {
             InternalTask descriptor = tasks.get(taskId);
-            descriptor.setFinishedTime(System.currentTimeMillis());
+            if (descriptor.getStartTime() > 0) {
+                descriptor.setFinishedTime(System.currentTimeMillis());
+                setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
+            }
             descriptor.setStatus((jobStatus == JobStatus.FAILED) ? TaskStatus.FAILED : TaskStatus.FAULTY);
             //terminate this job descriptor
             getJobDescriptor().failed();
-            setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
         }
         //set the new status of the job
         setFinishedTime(System.currentTimeMillis());

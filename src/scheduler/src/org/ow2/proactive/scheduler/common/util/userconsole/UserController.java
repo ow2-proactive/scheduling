@@ -404,7 +404,7 @@ public class UserController {
             console.handleExceptionDisplay(msg, t);
         } else {
             System.err.printf(msg);
-            t.printStackTrace();
+            logger.info("", t);
         }
     }
 
