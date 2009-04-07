@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.List;
 
+import javax.management.MBeanInfo;
+import javax.management.ObjectName;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -27,6 +29,9 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.client.ClientConnector;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -41,6 +46,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.console.Console;
+import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive.utils.console.SimpleConsole;
 
 
@@ -70,6 +76,7 @@ public class AdminController {
     private static final String LISTNS_CMD = "listns()";
     private static final String SHUTDOWN_CMD = "shutdown(preempt)";
     private static final String EXIT_CMD = "exit()";
+    private static final String JMXINFO_CMD = "jmxinfo()";
     private static final String EXEC_CMD = "exec(commandFilePath)";
 
     private String commandName = "adminRM";
@@ -80,6 +87,8 @@ public class AdminController {
     protected boolean intercativeMode = false;
     protected ScriptEngine engine;
     protected Console console = new SimpleConsole();
+
+    protected MBeanInfoViewer mbeanInfoViewer;
 
     protected RMAuthentication auth = null;
     protected CommandLine cmd = null;
@@ -167,6 +176,8 @@ public class AdminController {
 
                 //connect to the scheduler
                 connect();
+                //connect JMX service
+                connectJMXClient(URIBuilder.getHostNameFromUrl(url));
                 //start the command line or the interactive mode
                 start();
 
@@ -213,6 +224,26 @@ public class AdminController {
     protected void connect() throws LoginException {
         rm = auth.logAsAdmin(user, pwd);
         logger.info("\t-> Admin '" + user + "' successfully connected\n");
+    }
+
+    private void connectJMXClient(String url) {
+        if (!url.startsWith("//")) {
+            url = "//" + url;
+        }
+        if (!url.endsWith("/")) {
+            url = url + "/";
+        }
+        //connect the JMX client
+        ClientConnector connectorClient = new ClientConnector(url, "ServerMonitoring");
+        try {
+            connectorClient.connect();
+            ProActiveConnection connection = connectorClient.getConnection();
+            ObjectName mbeanName = new ObjectName("RMFrontend:name=RMBean");
+            MBeanInfo info = connection.getMBeanInfo(mbeanName);
+            mbeanInfoViewer = new MBeanInfoViewer(connection, mbeanName, info);
+        } catch (Exception e) {
+            logger.error("Scheduler MBean not found using : RMFrontend:name=RMBean");
+        }
     }
 
     private void start() throws Exception {
@@ -269,6 +300,12 @@ public class AdminController {
         Option shutdownOpt = new Option("s", "shutdown", false, control + "Shutdown Resource Manager");
         shutdownOpt.setRequired(false);
         actionGroup.addOption(shutdownOpt);
+
+        Option jmx = new Option("jmxinfo", false, control +
+            "Display some statistics provided by the Scheduler MBean");
+        jmx.setRequired(false);
+        jmx.setArgs(0);
+        actionGroup.addOption(jmx);
 
         options.addOptionGroup(actionGroup);
 
@@ -362,6 +399,8 @@ public class AdminController {
             }
         } else if (cmd.hasOption("shutdown")) {
             shutdown(cmd.hasOption("f"));
+        } else if (cmd.hasOption("jmxinfo")) {
+            JMXinfo();
         } else {
             intercativeMode = true;
             return intercativeMode;
@@ -532,6 +571,18 @@ public class AdminController {
         }
     }
 
+    public static void JMXinfo() {
+        shell.JMXinfo_();
+    }
+
+    private void JMXinfo_() {
+        try {
+            printf(mbeanInfoViewer.getInfo());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
+
     public static void exec(String commandFilePath) {
         shell.exec_(commandFilePath);
     }
@@ -627,6 +678,8 @@ public class AdminController {
         out.append(String.format(
                 " %1$-28s\t Shutdown the Resource Manager (RM shutdown immediately if parameter is true)\n",
                 SHUTDOWN_CMD));
+        out.append(String.format(" %1$-28s\t Display some statistics provided by the Scheduler MBean\n",
+                JMXINFO_CMD));
         out
                 .append(String
                         .format(

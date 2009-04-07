@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map.Entry;
 
-import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.ObjectName;
 import javax.script.ScriptEngine;
@@ -78,6 +77,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.utils.console.Console;
+import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive.utils.console.SimpleConsole;
 
 
@@ -105,8 +105,8 @@ public class UserController {
     private static final String SUBMIT_CMD = "submit(XMLdescriptor)";
     private static final String GET_RESULT_CMD = "result(id)";
     private static final String GET_OUTPUT_CMD = "output(id)";
-    private static final String EXEC_CMD = "exec(commandFilePath)";
     private static final String JMXINFO_CMD = "jmxinfo()";
+    private static final String EXEC_CMD = "exec(commandFilePath)";
 
     private String commandName = "userScheduler";
 
@@ -709,13 +709,13 @@ public class UserController {
                         .format(
                                 " %1$-18s\t Submit a new job (parameter is a string representing the job XML descriptor URL)\n",
                                 SUBMIT_CMD));
+        out.append(String.format(" %1$-18s\t Display some statistics provided by the Scheduler MBean\n",
+                JMXINFO_CMD));
         out
                 .append(String
                         .format(
                                 " %1$-18s\t Execute the content of the given script file (parameter is a string representing a command-file path)\n",
                                 EXEC_CMD));
-        out.append(String.format(" %1$-18s\t Display some statistics provided by the Scheduler MBean\n",
-                JMXINFO_CMD));
         out.append(String.format(" %1$-18s\t Exits Scheduler controller\n", EXIT_CMD));
 
         return out.toString();
@@ -728,45 +728,6 @@ public class UserController {
      */
     public void setCommandName(String commandName) {
         this.commandName = commandName;
-    }
-
-    class MBeanInfoViewer {
-
-        private ProActiveConnection connection;
-        private ObjectName mbeanName;
-        private MBeanInfo info;
-
-        /**
-         * Create a new instance of MBeanInfoViewer
-         *
-         * @param connection
-         * @param mbeanName
-         * @param info
-         */
-        public MBeanInfoViewer(ProActiveConnection connection, ObjectName mbeanName, MBeanInfo info) {
-            super();
-            this.connection = connection;
-            this.mbeanName = mbeanName;
-            this.info = info;
-        }
-
-        /**
-         * Return the informations about the Scheduler MBean as a formatted string
-         *
-         * @return the informations about the Scheduler MBean as a formatted string
-         */
-        public String getInfo() {
-            try {
-                StringBuilder out = new StringBuilder();
-                for (MBeanAttributeInfo attr : info.getAttributes()) {
-                    out.append(String.format("  %1$-32s" +
-                        connection.getAttribute(mbeanName, attr.getName()) + "\n", attr.getName()));
-                }
-                return out.toString();
-            } catch (Exception e) {
-                throw new RuntimeException("Cannot retrieve JMX informations from SchedulerMBean");
-            }
-        }
     }
 
 }

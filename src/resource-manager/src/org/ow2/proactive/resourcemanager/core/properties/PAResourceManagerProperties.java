@@ -89,6 +89,9 @@ public enum PAResourceManagerProperties {
     /** Resource Manager group file name */
     RM_GROUP_FILE("pa.rm.defaultgroupfilename", PAPropertiesType.STRING),
 
+    /** Name of the JMX MBean for the RM */
+    RM_JMX_MBEAN_NAME("pa.rm.core.jmxmbeanname", PAPropertiesType.STRING),
+
     /** Resource Manager node source infrastructures file*/
     RM_NODESOURCE_INFRASTRUCTURE_FILE("pa.rm.nodesource.infrastructures", PAPropertiesType.STRING),
 

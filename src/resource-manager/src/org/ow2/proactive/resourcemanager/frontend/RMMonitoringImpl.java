@@ -45,6 +45,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
@@ -55,6 +56,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMWrapper;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
@@ -76,6 +78,9 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  */
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive {
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);
+
+    private static final String RM_BEAN_NAME = PAResourceManagerProperties.RM_JMX_MBEAN_NAME
+            .getValueAsString();
 
     // Attributes
     private RMCoreInterface rmcore;
@@ -103,7 +108,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         RMListeners = new HashMap<UniqueID, RMEventListener>();
         this.rmcore = rmcore;
         // Register the Resource Manager MBean
-        this.registerMBean();
+        registerMBean();
     }
 
     /**
@@ -156,8 +161,10 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         ObjectName rMName = null;
         try {
             // Uniquely identify the MBeans and register them with the platform MBeanServer 
-            rMName = new ObjectName("RMFrontend:name=RMBean");
+            rMName = new ObjectName(RM_BEAN_NAME);
             mbs.registerMBean(rMBean, rMName);
+            ServerConnector connector = new ServerConnector("ServerMonitoring");
+            connector.start();
         } catch (Exception e) {
             logger.debug("", e);
         }
