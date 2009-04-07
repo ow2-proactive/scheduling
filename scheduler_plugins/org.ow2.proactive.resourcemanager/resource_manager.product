@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.4"?>
+<?pde version="3.1"?>
 
 <product name="ProActive Resource Manager" id="org.ow2.proactive.resourcemanager.resourcemanager" application="org.ow2.proactive.resourcemanager.application" useFeatures="false">
 
@@ -10,12 +10,12 @@
       </text>
    </aboutInfo>
 
-   <configIni use="default">
-   </configIni>
+   <configIni use="default"/>
 
    <launcherArgs>
       <vmArgs>-Xmx512M -Xms512M
--Dproactive.net.nolocal=true</vmArgs>
+-Dproactive.net.nolocal=true
+-Dlog4j.configuration=file:proactive-log4j</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.ow2.proactive.resourcemanager/icons/alt_window_16.gif" i32="/org.ow2.proactive.resourcemanager/icons/alt_window_32.gif"/>
