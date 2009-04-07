@@ -5,7 +5,7 @@
 # The root logger logs in the test.log file
 
 log4j.rootLogger=INFO,FILE
- 
+
 # If INFO is enabled Jetty is too verbose at startup
 log4j.logger.org.mortbay = WARN
 
@@ -102,9 +102,9 @@ log4j.logger.org.mortbay = WARN
 #   - %n the platform dependent line separator character or characters
 #   - %p the priority of the logging event
 #   - %t the name of the thread that generated the logging event
-#   - %X{hostname}         the hostname 
-#   - %X{id@hostname}      the VMID and the hostname 
-#   - %X{shortid@hostname} the short VMID and the hostname (a collision can occur between two shortids, you should use id@hostname) 
+#   - %X{hostname}         the hostname
+#   - %X{id@hostname}      the VMID and the hostname
+#   - %X{shortid@hostname} the short VMID and the hostname (a collision can occur between two shortids, you should use id@hostname)
 #   - %X{runtime}          the ProActive runtime url (does not work very well since a different MDC is associated to each thread)
 
 
@@ -120,6 +120,4 @@ log4j.appender.FILE.File=proactive.log
 log4j.appender.FILE.Append=true
 log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
 log4j.appender.FILE.layout.ConversionPattern=%d %5p [%t]: %m%n
-
-
 

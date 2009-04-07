@@ -38,6 +38,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map.Entry;
 
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanInfo;
+import javax.management.ObjectName;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -56,6 +59,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.client.ClientConnector;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -99,6 +105,7 @@ public class UserController {
     private static final String GET_RESULT_CMD = "result(id)";
     private static final String GET_OUTPUT_CMD = "output(id)";
     private static final String EXEC_CMD = "exec(commandFilePath)";
+    private static final String JMXINFO_CMD = "jmxinfo()";
 
     private String commandName = "userScheduler";
 
@@ -108,6 +115,8 @@ public class UserController {
     protected boolean intercativeMode = false;
     protected ScriptEngine engine;
     protected Console console = new SimpleConsole();
+
+    protected MBeanInfoViewer mbeanInfoViewer;
 
     protected SchedulerAuthenticationInterface auth = null;
     protected CommandLine cmd = null;
@@ -194,9 +203,10 @@ public class UserController {
 
                 //connect to the scheduler
                 connect();
+                //connect JMX service
+                connectJMXClient(URIBuilder.getHostNameFromUrl(url));
                 //start the command line or the interactive mode
                 start();
-
             }
         } catch (MissingArgumentException e) {
             logger.error(e.getLocalizedMessage());
@@ -228,7 +238,7 @@ public class UserController {
             HelpFormatter hf = new HelpFormatter();
             hf.setWidth(130);
             String note = "\nNOTE : if no " + control +
-                " command is specified, the controller will start in interactive mode.";
+                "command is specified, the controller will start in interactive mode.";
             hf.printHelp(commandName + Tools.shellExtension(), "", options, note, true);
             System.exit(2);
         }
@@ -240,6 +250,26 @@ public class UserController {
     protected void connect() throws LoginException {
         scheduler = auth.logAsUser(user, pwd);
         logger.info("\t-> User '" + user + "' successfully connected\n");
+    }
+
+    private void connectJMXClient(String url) {
+        if (!url.startsWith("//")) {
+            url = "//" + url;
+        }
+        if (!url.endsWith("/")) {
+            url = url + "/";
+        }
+        //connect the JMX client
+        ClientConnector connectorClient = new ClientConnector(url, "ServerFrontend");
+        try {
+            connectorClient.connect();
+            ProActiveConnection connection = connectorClient.getConnection();
+            ObjectName mbeanName = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean");
+            MBeanInfo info = connection.getMBeanInfo(mbeanName);
+            mbeanInfoViewer = new MBeanInfoViewer(connection, mbeanName, info);
+        } catch (Exception e) {
+            logger.error("Scheduler MBean not found using : SchedulerFrontend:name=SchedulerWrapperMBean");
+        }
     }
 
     private void start() throws Exception {
@@ -301,6 +331,12 @@ public class UserController {
         opt.setArgs(2);
         actionGroup.addOption(opt);
 
+        opt = new Option("jmxinfo", false, control +
+            "Display some statistics provided by the Scheduler MBean");
+        opt.setRequired(false);
+        opt.setArgs(0);
+        actionGroup.addOption(opt);
+
         options.addOptionGroup(actionGroup);
 
         return actionGroup;
@@ -346,6 +382,8 @@ public class UserController {
                 printf("Missing arguments for job priority. Arguments must be <jobId> <newPriority>\n\t"
                     + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
+        } else if (cmd.hasOption("jmxinfo")) {
+            JMXinfo();
         } else {
             intercativeMode = true;
             return intercativeMode;
@@ -547,6 +585,18 @@ public class UserController {
         }
     }
 
+    public static void JMXinfo() {
+        shell.JMXinfo_();
+    }
+
+    private void JMXinfo_() {
+        try {
+            printf(mbeanInfoViewer.getInfo());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
+
     public static void exec(String commandFilePath) {
         shell.exec_(commandFilePath);
     }
@@ -658,6 +708,8 @@ public class UserController {
                         .format(
                                 " %1$-18s\t Execute the content of the given script file (parameter is a string representing a command-file path)\n",
                                 EXEC_CMD));
+        out.append(String.format(" %1$-18s\t Display some statistics provided by the Scheduler MBean\n",
+                JMXINFO_CMD));
         out.append(String.format(" %1$-18s\t Exits Scheduler controller\n", EXIT_CMD));
 
         return out.toString();
@@ -670,6 +722,45 @@ public class UserController {
      */
     public void setCommandName(String commandName) {
         this.commandName = commandName;
+    }
+
+    class MBeanInfoViewer {
+
+        private ProActiveConnection connection;
+        private ObjectName mbeanName;
+        private MBeanInfo info;
+
+        /**
+         * Create a new instance of MBeanInfoViewer
+         *
+         * @param connection
+         * @param mbeanName
+         * @param info
+         */
+        public MBeanInfoViewer(ProActiveConnection connection, ObjectName mbeanName, MBeanInfo info) {
+            super();
+            this.connection = connection;
+            this.mbeanName = mbeanName;
+            this.info = info;
+        }
+
+        /**
+         * Return the informations about the Scheduler MBean as a formatted string
+         *
+         * @return the informations about the Scheduler MBean as a formatted string
+         */
+        public String getInfo() {
+            try {
+                StringBuilder out = new StringBuilder();
+                for (MBeanAttributeInfo attr : info.getAttributes()) {
+                    out.append(String.format("  %1$-32s" +
+                        connection.getAttribute(mbeanName, attr.getName()) + "\n", attr.getName()));
+                }
+                return out.toString();
+            } catch (Exception e) {
+                throw new RuntimeException("Cannot retrieve JMX informations from SchedulerMBean");
+            }
+        }
     }
 
 }

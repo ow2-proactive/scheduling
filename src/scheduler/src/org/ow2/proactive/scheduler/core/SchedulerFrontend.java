@@ -48,6 +48,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -858,6 +859,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             // Uniquely identify the MBeans and register them with the platform MBeanServer 
             schedulerName = new ObjectName(SCHEDULER_BEAN_NAME);
             mbs.registerMBean(schedulerBean, schedulerName);
+            ServerConnector connector = new ServerConnector("ServerFrontend");
+            connector.start();
         } catch (Exception e) {
             e.printStackTrace();
         }

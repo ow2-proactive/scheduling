@@ -36,6 +36,10 @@ function priority(jobId, priority){
     UserController.priority(""+jobId,""+priority);
 }
 
+function jmxinfo(){
+    UserController.JMXinfo();
+}
+
 function exec(commandFilePath){
 	UserController.exec(""+commandFilePath);
 }
