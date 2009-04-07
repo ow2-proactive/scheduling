@@ -57,8 +57,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
 
     protected void init() throws Exception {
         // using localhost deployment for customized infrastructure
-        String oneNodeescriptor = FunctionalTDefaultRM.class.getResource(
-                "/nodesource/GCMNodeSourceDeployment.xml").getPath();
+        String oneNodeescriptor = FunctionalTDefaultRM.class.getResource("/nodesource/1node.xml").getPath();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
         String hostList = FunctionalTDefaultRM.class.getResource("/nodesource/hostslist").getPath();
         hostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostList)));

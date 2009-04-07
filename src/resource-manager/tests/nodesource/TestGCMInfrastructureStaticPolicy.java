@@ -60,6 +60,10 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTDefaultRM {
     protected byte[] GCMDeploymentData;
     protected RMEventReceiver receiver;
 
+    protected static String defaultDescriptor = TestGCMInfrastructureStaticPolicy.class.getResource(
+            "/nodesource/3nodes.xml").getPath();
+    protected int defaultDescriptorNodesNb = 3;
+
     protected void createEmptyNodeSource(String sourceName) throws Exception {
         admin.createNodesource(sourceName, GCMInfrastructure.class.getName(), null, StaticPolicy.class
                 .getName(), null);

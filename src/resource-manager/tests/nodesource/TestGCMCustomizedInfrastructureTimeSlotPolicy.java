@@ -36,7 +36,6 @@ import static junit.framework.Assert.assertTrue;
 import java.net.InetAddress;
 
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 
 
