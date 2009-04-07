@@ -50,8 +50,8 @@ import org.ow2.proactive.scheduler.common.util.Tools;
  * @since ProActive Scheduling 1.0
  */
 public class SchedulerWrapper implements SchedulerWrapperMBean {
-    /** Scheduler current state */
-    private SchedulerStatus schedulerState = SchedulerStatus.STOPPED;
+    /** Scheduler current status */
+    private SchedulerStatus schedulerStatus = SchedulerStatus.STOPPED;
 
     /** Variables representing the attributes of the SchedulerWrapperMBean */
     private int totalNumberOfJobs = 0;
@@ -119,30 +119,30 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     public void schedulerStateUpdated(SchedulerEvent eventType) {
         switch (eventType) {
             case STARTED:
-                this.schedulerState = SchedulerStatus.STARTED;
+                this.schedulerStatus = SchedulerStatus.STARTED;
                 // Set the scheduler started time
                 setSchedulerStartedTime(System.currentTimeMillis());
                 break;
             case STOPPED:
-                this.schedulerState = SchedulerStatus.STOPPED;
+                this.schedulerStatus = SchedulerStatus.STOPPED;
                 break;
             case PAUSED:
-                this.schedulerState = SchedulerStatus.PAUSED;
+                this.schedulerStatus = SchedulerStatus.PAUSED;
                 break;
             case FROZEN:
-                this.schedulerState = SchedulerStatus.FROZEN;
+                this.schedulerStatus = SchedulerStatus.FROZEN;
                 break;
             case RESUMED:
-                this.schedulerState = SchedulerStatus.STARTED;
+                this.schedulerStatus = SchedulerStatus.STARTED;
                 break;
             case SHUTTING_DOWN:
-                this.schedulerState = SchedulerStatus.SHUTTING_DOWN;
+                this.schedulerStatus = SchedulerStatus.SHUTTING_DOWN;
                 break;
             case SHUTDOWN:
-                this.schedulerState = SchedulerStatus.STOPPED;
+                this.schedulerStatus = SchedulerStatus.STOPPED;
                 break;
             case KILLED:
-                this.schedulerState = SchedulerStatus.KILLED;
+                this.schedulerStatus = SchedulerStatus.KILLED;
                 break;
         }
     }
@@ -401,10 +401,17 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     }
 
     /**
-     * @return current state of the Scheduler
+     * @return current status of the Scheduler
      */
-    public String getSchedulerState() {
-        return this.schedulerState.toString();
+    public String getSchedulerStatus() {
+        return this.schedulerStatus.toString();
+    }
+
+    /**
+     * @return current status of the Scheduler
+     */
+    public SchedulerStatus getSchedulerStatus_() {
+        return this.schedulerStatus;
     }
 
     /**

@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.exception.MaxJobIdReachedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -486,6 +487,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         }
 
         scheduler.listenLog(jobId, hostname, port);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStatus()
+     */
+    public SchedulerStatus getStatus() {
+        return schedulerBean.getSchedulerStatus_();
     }
 
     /**

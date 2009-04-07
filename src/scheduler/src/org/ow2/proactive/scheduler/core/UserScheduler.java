@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -103,6 +104,13 @@ public class UserScheduler implements UserSchedulerInterface {
      */
     public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
         schedulerFrontend.listenLog(jobId, hostname, port);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStatus()
+     */
+    public SchedulerStatus getStatus() {
+        return schedulerFrontend.getStatus();
     }
 
     /**

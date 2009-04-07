@@ -66,6 +66,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -344,11 +345,16 @@ public class UserController {
 
     private void startCommandListener() throws Exception {
         initialize();
-        console.start(" > ");
+        console.start(" " + scheduler.getStatus() + " > ");
         console.printf("Type command here (type '?' or help() to see the list of commands)\n");
         String stmt;
         while (!terminated) {
-            stmt = console.readStatement();
+            SchedulerStatus status = scheduler.getStatus();
+            String prompt = "";
+            if (status != SchedulerStatus.STARTED) {
+                prompt = status.toString();
+            }
+            stmt = console.readStatement(" " + prompt + " > ");
             if (stmt.equals("?")) {
                 console.printf("\n" + helpScreen());
             } else {

@@ -48,7 +48,7 @@ public interface SchedulerWrapperMBean {
      *
      * @return The state of the scheduler.
      */
-    public String getSchedulerState();
+    public String getSchedulerStatus();
 
     /**
      * Returns the number of users connected to the scheduler.

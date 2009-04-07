@@ -164,6 +164,13 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
     public void changePriority(String jobId, JobPriority priority) throws SchedulerException;
 
     /**
+     * Get the current status of the Scheduler
+     *
+     * @return the current status of the Scheduler
+     */
+    public SchedulerStatus getStatus();
+
+    /**
      * Add a scheduler event Listener. this listener provides method to notice of
      * new coming job, started task, finished task, running job, finished job, etc...<br>
      * <p>
