@@ -152,8 +152,7 @@ public class GCMInfrastructure extends InfrastructureManager {
      * Not supported by this infrastructure manager.
      */
     public void acquireNode() {
-        logger.error("NodeSource " + nodeSource.getName() +
-            ": acquireNode() is not a valid operation for GCM infrastructure");
+        logger.error("acquireNode() is not a valid operation for GCM infrastructure");
     }
 
     /**
@@ -169,7 +168,7 @@ public class GCMInfrastructure extends InfrastructureManager {
                     deployGCMD(convertGCMdeploymentDataToGCMappl(dd.data, null));
                     dd.deployed = true;
                 } catch (Exception e) {
-                    logger.error("NodeSource " + nodeSource.getName() + e.getMessage());
+                    logger.error(e.getMessage());
                 }
             } else {
                 logger.debug("Nodes have already been deployed");

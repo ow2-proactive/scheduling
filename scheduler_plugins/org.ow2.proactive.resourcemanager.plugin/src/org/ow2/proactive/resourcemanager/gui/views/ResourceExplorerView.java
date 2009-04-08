@@ -77,7 +77,7 @@ public class ResourceExplorerView extends ViewPart {
         }
 
         if (rmShell == null) {
-            rmShell = Display.getDefault().getShells()[1];
+            rmShell = Display.getDefault().getActiveShell();
         }
         System.out.println(rmShell);
     }

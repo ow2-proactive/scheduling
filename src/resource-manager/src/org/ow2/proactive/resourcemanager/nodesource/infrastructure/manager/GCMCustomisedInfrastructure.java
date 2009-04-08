@@ -104,7 +104,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
                     deployGCMD(convertGCMdeploymentDataToGCMappl(dd.data, host));
                     dd.deployed = true;
                 } catch (Exception e) {
-                    logger.error("NodeSource " + nodeSource.getName() + e.getMessage());
+                    logger.error(e.getMessage());
                 }
             } else {
                 logger.debug("Nodes have already been deployed");
