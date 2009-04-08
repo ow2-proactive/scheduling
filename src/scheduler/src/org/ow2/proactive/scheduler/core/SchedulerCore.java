@@ -462,13 +462,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     } catch (Exception e) {
                         //this point is reached in case of big problem, sometimes unknown
                         logger
-                                .fatal("\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
+                                .error(
+                                        "\nSchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !",
+                                        e);
                         //trying to check if RM is alive
                         try {
-                            logger_dev.error("Check if Resource Manager is alive", e);
+                            logger_dev.error("Check if Resource Manager is alive");
                             resourceManager.isAlive();
                         } catch (Exception rme) {
-                            logger_dev.error("Resource Manager seems to be dead", e);
+                            logger_dev.error("Resource Manager seems to be dead", rme);
                             try {
                                 //try to shutdown the proxy
                                 resourceManager.shutdownProxy();
