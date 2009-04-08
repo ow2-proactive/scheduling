@@ -108,9 +108,6 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
 
-            PAActiveObject.setImmediateService("addNode", new Class[] { String.class });
-            PAActiveObject.setImmediateService("addNode", new Class[] { String.class, String.class });
-
             registerTrustedService(authentication);
             registerTrustedService(rmcore);
 

@@ -299,8 +299,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
 
             // callback from started nodes
             setPublicMethod("addNode");
-            PAActiveObject.setImmediateService("addNode", new Class[] { String.class });
-            PAActiveObject.setImmediateService("addNode", new Class[] { String.class, String.class });
 
             if (logger.isDebugEnabled()) {
                 logger.debug("instantiation of the node source " + NodeSource.DEFAULT_NAME);
