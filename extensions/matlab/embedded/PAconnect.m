@@ -113,7 +113,11 @@ set(button, 'ActionPerformedCallback', {@doAction});
 global button_handle_global_data;
 button_handle_global_data.loginFrame = loginFrame;
 button_handle_global_data.solver = solver;
+button_handle_global_data.ok = false;
 disp('Connection successful, please enter login/password');
+while ~button_handle_global_data.ok
+    pause(0.1);
+end
 
 
 function doAction(srcObj, evd)
@@ -122,6 +126,7 @@ function doAction(srcObj, evd)
 global button_handle_global_data;
 if button_handle_global_data.loginFrame.checkLogin()
    disp('Connected'); 
+   button_handle_global_data.ok = true;
 end
 
 

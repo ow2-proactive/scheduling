@@ -561,7 +561,17 @@
 			<include name="org/ow2/proactive/scheduler/examples/DenoisePreview.java" />
 			<include name="org/ow2/proactive/scheduler/examples/AbortJob.java" />
 			<include name="org/ow2/proactive/scheduler/examples/Worker.java" />
+            <include name="org/ow2/proactive/scheduler/ext/**/*.java"/>
+            <include name="org/ow2/proactive/scheduler/util/Shell.java"/>
+            <include name="org/ow2/proactive/scheduler/util/LinuxShellExecuter.java"/>
 		</javac>
+
+        <copy toDir="${cl.scheduler.worker.dir}">
+			<fileset dir="${src.scheduler.dir}">
+				<include name="org/ow2/proactive/scheduler/ext/**/*.sh"/>
+                <include name="org/ow2/proactive/scheduler/ext/**/*.bat"/>
+			</fileset>
+		</copy>
 
 		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}">
 			<fileset dir="${cl.scheduler.worker.dir}" includes="**" />
