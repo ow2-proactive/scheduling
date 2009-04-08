@@ -40,18 +40,14 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.jruby.RubyArray;
-import org.jruby.javasupport.JavaUtil;
-import org.jruby.runtime.builtin.IRubyObject;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.python.core.PyList;
 
 
 /**
@@ -64,9 +60,6 @@ import org.python.core.PyList;
  */
 @PublicAPI
 public class SelectionUtils {
-    //TODO check following library usage and uncomment if used
-    //import org.uwin.registry.RegException;
-    //import org.uwin.registry.RegFolder; >>> use uwin-1.0.0.jar & uwin-1.0.0.dll if needed
 
     /** Less than operator */
     public static final int LESS_THAN = 1;
@@ -75,70 +68,23 @@ public class SelectionUtils {
     /** Equal than operator */
     public static final int EQUAL = 3;
     /** Pattern matching operator */
-    public static final int MATCH = 4;
+    public static final int CONTAINS = 4;
 
     private static final String winTestCuda = "deviceQueryWin.exe";
     //TODO get cuda check on UNIX
     private static final String unixTestCuda = "deviceQueryUnix";
     private static final boolean isWindows = System.getProperty("os.name").contains("Windows");
-    private static boolean isJ6 = false;
-
-    /**
-     * Hack to manage different package name for NativeArray, NativeJavaObject and Scriptable classes
-     * Java 6 or later package : sun.org.mozilla.javascript.internal
-     * Java 5 or earlier package : org.mozilla.javascript
-     */
-    private static Class<?> nativeArray;
-    private static Class<?> nativeJavaObject;
-    private static Class<?> scriptable;
-
-    static {
-        String packageNameJ6 = "sun.org.mozilla.javascript.internal.";
-        String packageNameJ5 = "org.mozilla.javascript.";
-        try {
-            nativeArray = Class.forName(packageNameJ6 + "NativeArray");
-            nativeJavaObject = Class.forName(packageNameJ6 + "NativeJavaObject");
-            scriptable = Class.forName(packageNameJ6 + "Scriptable");
-            isJ6 = true;
-        } catch (ClassNotFoundException e) {
-            try {
-                nativeArray = Class.forName(packageNameJ5 + "NativeArray");
-                nativeJavaObject = Class.forName(packageNameJ5 + "NativeJavaObject");
-                scriptable = Class.forName(packageNameJ5 + "Scriptable");
-            } catch (ClassNotFoundException e1) {
-                //it won't works with javascript engine
-                e1.printStackTrace();
-            }
-        }
-    }
+    private static boolean isJ6 = !System.getProperty("java.version").contains("1.5");
 
     /**
      * Check all given conditions in the given configuration file path.<br>
      * This method returns true if (and only if) every conditions match the given file.
      *
      * @param configFilePath configuration path
-     * @param params the conditions object (must be given as RubyArray (ruby), NativeArray (js) or PyList (python) )
+     * @param params the conditions object (which is a collection of condition objects )
      * @return true if every conditions match the given file.
      */
-    //TODO replace object params by our own object (extends arrayList ?)
-    public static boolean checkProperties(String configFilePath, Object params) {
-        Condition[] conditions = null;
-
-        //convert into the proper array
-        if (params instanceof RubyArray) {
-            conditions = convertRubyArrayToConditionArray((RubyArray) params);
-        } else if (nativeArray.isInstance(params)) {
-            conditions = convertNativeArrayToConditionArray(nativeArray.cast(params));
-        } else if (params instanceof PyList) {
-            conditions = convertPyListToConditionArray((PyList) params);
-        } else {
-            System.err.println("Unmanaged conditions parameter : " + params +
-                ". It must be a script language array.");
-            return false;
-        }
-
-        boolean ok = true;
-
+    public static boolean checkProperties(String configFilePath, Conditions conditions) {
         //open properties file
         Properties properties = new Properties();
         try {
@@ -148,17 +94,16 @@ public class SelectionUtils {
             //Check properties for each condition
             for (Condition condition : conditions) {
                 if (!checkProperty(properties, condition)) {
-                    ok = false;
-                    break;
+                    return false;
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            ok = false;
+            return false;
         }
 
         //All conditions have been validated if ok == true
-        return ok;
+        return true;
     }
 
     /**
@@ -181,7 +126,7 @@ public class SelectionUtils {
                             .getValue()));
                 case EQUAL:
                     return props.getProperty(key).equals(condition.getValue());
-                case MATCH:
+                case CONTAINS:
                     return props.getProperty(key).contains(condition.getValue());
                 default:
                     System.out.println("Invalid operator, please use INFERIOR, SUPERIOR, MATCH or EQUAL");
@@ -221,15 +166,65 @@ public class SelectionUtils {
      * @return true if the given host is equals (ignore case) to the physic host name
      */
     public static boolean checkHostName(String hostName) {
+        if (hostName == null) {
+            System.err.println("Given OS name was NULL");
+            return false;
+        }
         try {
-            //TODO with regexp
-            return InetAddress.getLocalHost().getHostName().toUpperCase().contains(hostName.toUpperCase());
-        } catch (UnknownHostException e) {
-            return true;
+            String localHost = InetAddress.getLocalHost().getHostName();
+            Pattern regex = Pattern.compile(hostName, Pattern.CASE_INSENSITIVE);
+            Matcher regexMatcher = regex.matcher(localHost);
+            return (regexMatcher.find());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
         }
     }
 
-    //TODO check IP with or without mask
+    /**
+     * Check if the host matches the given IP address.<br>
+     * The IP can be given as x.x.x.x or using the token * to match a network for example. (ie x.x.x.*)
+     *
+     * @param network the network to match
+     * @return true if the IP address matches the network
+     */
+    public static boolean checkIp(String network) {
+        String[] networkClasses = network.trim().split("\\.");
+        try {
+            Enumeration<NetworkInterface> networks = NetworkInterface.getNetworkInterfaces();
+            for (NetworkInterface netint : Collections.list(networks)) {
+                Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+                for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+                    // Check if inetAddress is from particular address
+                    try {
+                        String ip = inetAddress.getHostAddress();
+                        String[] ipClasses = ip.trim().split("\\.");
+
+                        // Check foreach network class
+                        boolean res = true;
+                        for (int i = 0; i < ipClasses.length; i++) {
+                            networkClasses[i] = networkClasses[i].replaceAll("\\*", ".*");
+                            Pattern regex = Pattern.compile(networkClasses[i], Pattern.CASE_INSENSITIVE);
+                            Matcher regexMatcher = regex.matcher(ipClasses[i]);
+                            if (!regexMatcher.find()) {
+                                res = false;
+                            }
+                        }
+                        // Match found
+                        if (res == true) {
+                            return true;
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+            }
+        } catch (SocketException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
 
     /**
      * Check if the given file path exist or not.
@@ -417,33 +412,6 @@ public class SelectionUtils {
         return false;
     }
 
-    //    /**
-    //     * Check if a Windows key registry exist
-    //     * Exemple: HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor
-    //     *
-    //     * @param path the path of the registry key which is required
-    //     * @return true if key registry exist
-    //     */
-    //    public static boolean checkKeyRegistry(String path) {
-    //        if (path == null){
-    //        	System.err.println("Given path was NULL.");
-    //            return false;
-    //        }
-    //        if (!isWindows){
-    //    		System.err.println("Error trying to check key registry : the system must be under Windows.");
-    //    		return false;
-    //    	}
-    //
-    //        try {
-    //            new RegFolder(path, false);
-    //            return true;
-    //        } catch (RegException ex) {
-    //            return false;
-    //        }
-    //
-    //        return false;
-    //    }
-
     /**
      * Check if a wireless network interface exist
      *
@@ -508,56 +476,4 @@ public class SelectionUtils {
         return checkFreeSpaceDiskAvailable(space, System.getProperty("java.io.tmpdir"));
     }
 
-    /**
-     * Convert ruby array into java array
-     *
-     * @param params the ruby array to convert
-     */
-    private static Condition[] convertRubyArrayToConditionArray(RubyArray params) {
-        Condition[] conditions = new Condition[params.getLength()];
-        for (int i = 0; i < params.getLength(); i++) {
-            IRubyObject obj = params.entry(i);
-            Condition converted_result = (Condition) (JavaUtil.convertRubyToJava(obj));
-            conditions[i] = converted_result;
-        }
-
-        return conditions;
-    }
-
-    /**
-     * Convert javaScript array into java array
-     *
-     * @param nativeArray the javaScript array to convert
-     */
-    private static Condition[] convertNativeArrayToConditionArray(Object natArray) {
-        try {
-            //kind of awful code due to different package name between script API in J5 and J6
-            Method get = nativeArray.getMethod("get", int.class, scriptable);
-            Method unwrap = nativeJavaObject.getMethod("unwrap");
-            int l = ((Long) nativeArray.getMethod("getLength").invoke(natArray)).intValue();
-            Condition[] conditions = new Condition[l];
-            for (int i = 0; i < l; i++) {
-                conditions[i] = (Condition) unwrap.invoke(get.invoke(natArray, i, natArray));
-            }
-            return conditions;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Convert python array into java array
-     *
-     * @param pyList the python array to convert
-     */
-    private static Condition[] convertPyListToConditionArray(PyList pyList) {
-        Condition[] conditions = new Condition[pyList.__len__()];
-
-        for (int i = 0; i < pyList.__len__(); i++) {
-            conditions[i] = (Condition) pyList.get(i);
-        }
-
-        return conditions;
-    }
 }

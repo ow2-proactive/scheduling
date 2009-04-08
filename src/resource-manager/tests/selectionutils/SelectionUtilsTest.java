@@ -111,52 +111,6 @@ public class SelectionUtilsTest {
         Assert.assertFalse(SelectionUtils.checkExec(null));
         Assert.assertFalse(SelectionUtils.checkExec(""));
         Assert.assertTrue(SelectionUtils.checkExec(nameOfExistingFile));
-
-        //		System.out.println("*** checkKeyRegistry ***********************************");
-        //
-        //		System.out.println("Test: checkKeyRegistry(null).\nMust return\tfalse");
-        //		System.out.println("Return value \t" + SelectionUtils.checkKeyRegistry(null) + "\n");
-        //
-        //		System.out.println("Test: checkKeyRegistry(\"\").\nMust return\tfalse");
-        //		System.out.println("Return value \t" + SelectionUtils.checkKeyRegistry("") + "\n");
-        //
-        //		System.out.println("Under Windows:");
-        //		System.out.println("Test: checkKeyRegistry(\"HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\").\nMust return\ttrue");
-        //		System.out.println("Return value \t" + SelectionUtils.checkKeyRegistry("HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor") + "\n");
-        //
-        //		System.out.println("Not under Windows:");
-        //		System.out.println("Test: checkKeyRegistry(\"HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\").\nMust return\tfalse");
-        //		System.out.println("Return value \t" + SelectionUtils.checkKeyRegistry("HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor") + "\n");
-
-        //		System.out.println("*** checkFreeSpaceDiskAvailable ************************");
-        //		long size = 0;
-        //    	try
-        //    	{
-        //	        File file = new File(".");
-        //	        size = file.getFreeSpace();
-        //
-        //    	}
-        //    	catch(NullPointerException ex)
-        //    	{
-        //    		ex.printStackTrace();
-        //    	}
-        //
-        //
-        //		System.out.println("Test: checkFreeSpaceDiskAvailable(null,null).\nMust return\tfalse");
-        //		System.out.println("Return value \t" + SelectionUtils.checkFreeSpaceDiskAvailable(null,null) + "\n");
-        //
-        //		System.out.println("Test: checkFreeSpaceDiskAvailable("+size+",\"\").\nMust return\tfalse");
-        //		System.out.println("Return value \t" + SelectionUtils.checkFreeSpaceDiskAvailable(size,"") + "\n");
-        //
-        //
-        //		System.out.println("Test: checkFreeSpaceDiskAvailable("+ (size - 100)+",\".\").\nMust return\ttrue");
-        //		System.out.println("Return value \t" + SelectionUtils.checkFreeSpaceDiskAvailable((size - 100),".") + "\n");
-        //
-        //		System.out.println("Test: checkFreeSpaceDiskAvailable("+ size+",\".\").\nMust return\ttrue");
-        //		System.out.println("Return value \t" + SelectionUtils.checkFreeSpaceDiskAvailable(size,".") + "\n");
-        //
-        //		System.out.println("Test: checkFreeSpaceDiskAvailable("+ (size + 100)+",\".\").\nMust return\tfalse");
-        //		System.out.println("Return value \t" + SelectionUtils.checkFreeSpaceDiskAvailable((size + 100),".") + "\n");
     }
 
     private void log(String s) {
