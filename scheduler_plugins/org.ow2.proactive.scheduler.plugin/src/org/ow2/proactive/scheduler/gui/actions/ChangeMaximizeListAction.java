@@ -46,7 +46,7 @@ public class ChangeMaximizeListAction extends Action implements IMenuCreator {
 
     public ChangeMaximizeListAction() {
         setText("Maximize list");
-        setToolTipText("To maximize a job list");
+        setToolTipText("Maximize a job list");
         setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/maximize.gif"));
         setMenuCreator(this);
     }

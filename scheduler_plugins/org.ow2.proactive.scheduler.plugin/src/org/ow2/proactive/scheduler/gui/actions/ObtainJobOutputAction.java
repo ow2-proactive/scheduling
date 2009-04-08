@@ -46,7 +46,7 @@ public class ObtainJobOutputAction extends SchedulerGUIAction {
 
     public ObtainJobOutputAction() {
         this.setText("Get job output");
-        this.setToolTipText("To get the job output");
+        this.setToolTipText("Get the job output");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_output.gif"));
         this.setEnabled(false);
     }

@@ -51,7 +51,7 @@ public class KillRemoveJobAction extends SchedulerGUIAction {
     public KillRemoveJobAction(Shell shell) {
         this.shell = shell;
         this.setText("Kill job");
-        this.setToolTipText("To kill a job (this will remove this job from the scheduler)");
+        this.setToolTipText("Kill selected job (this will remove this job from the scheduler)");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_kill.gif"));
         this.setEnabled(false);
     }
@@ -79,14 +79,14 @@ public class KillRemoveJobAction extends SchedulerGUIAction {
         killMode = false;
 
         this.setText("Remove Job");
-        this.setToolTipText("To remove definitely a job from the scheduler");
+        this.setToolTipText("Remove definitely a job from the scheduler");
     }
 
     public void setKillMode() {
         killMode = true;
 
         this.setText("Kill job");
-        this.setToolTipText("To kill a job (this will remove this job from the scheduler)");
+        this.setToolTipText("Kill selected job (this will remove this job from the scheduler)");
     }
 
     @Override

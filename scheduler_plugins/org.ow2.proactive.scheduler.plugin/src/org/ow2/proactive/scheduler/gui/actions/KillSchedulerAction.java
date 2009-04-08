@@ -46,7 +46,7 @@ public class KillSchedulerAction extends SchedulerGUIAction {
     public KillSchedulerAction(Shell shell) {
         this.shell = shell;
         this.setText("Kill scheduler");
-        this.setToolTipText("To kill the scheduler (this kill immediately the scheduler)");
+        this.setToolTipText("Kill the scheduler (this kill immediately the scheduler)");
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_kill.png"));
         this.setEnabled(false);
     }

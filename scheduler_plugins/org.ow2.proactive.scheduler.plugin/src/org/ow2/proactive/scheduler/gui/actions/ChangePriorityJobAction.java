@@ -48,7 +48,7 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
 
     public ChangePriorityJobAction() {
         setText("Change job priority");
-        setToolTipText("To change a job priority");
+        setToolTipText("Change job priority");
         setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_priority.png"));
         setMenuCreator(this);
     }

@@ -42,7 +42,7 @@ public class ResumeSchedulerAction extends SchedulerGUIAction {
 
     public ResumeSchedulerAction() {
         this.setText("Resume scheduler");
-        this.setToolTipText("To resume the scheduler");
+        this.setToolTipText("Resume the scheduler");
         this
                 .setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
                         "icons/scheduler_resume.png"));

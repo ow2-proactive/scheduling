@@ -67,17 +67,17 @@ public class PauseResumeJobAction extends SchedulerGUIAction {
 
     private void setPauseMode() {
         this.setText("Pause job");
-        this.setToolTipText("To pause this job (this will finish all running tasks)");
+        this.setToolTipText("Pause this job (this will finish all running tasks)");
     }
 
     private void setResumeMode() {
         this.setText("Resume job");
-        this.setToolTipText("To resume this job (this will restart all paused tasks)");
+        this.setToolTipText("Resume this job (this will restart all paused tasks)");
     }
 
     private void setPauseResumeMode() {
         this.setText("Pause/Resume job");
-        this.setToolTipText("To pause or resume a job");
+        this.setToolTipText("Pause or resume a job");
         this
                 .setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
                         "icons/job_pause_resume.gif"));

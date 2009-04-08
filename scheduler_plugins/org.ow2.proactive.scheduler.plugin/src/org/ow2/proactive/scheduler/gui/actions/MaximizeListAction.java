@@ -56,7 +56,7 @@ public class MaximizeListAction extends SchedulerGUIAction {
         this.control = control;
         this.mode = mode;
         this.setText(modeToString());
-        this.setToolTipText("To maximize the " + modeToString() + " jobs list");
+        this.setToolTipText("Maximize the " + modeToString() + " jobs list");
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 

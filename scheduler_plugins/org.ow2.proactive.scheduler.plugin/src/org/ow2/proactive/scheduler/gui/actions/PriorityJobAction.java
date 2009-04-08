@@ -51,7 +51,7 @@ public class PriorityJobAction extends SchedulerGUIAction {
     private PriorityJobAction(JobPriority priority) {
         this.priority = priority;
         this.setText(priority.toString());
-        this.setToolTipText("To set the job priority to \"" + priority.toString().toLowerCase() + "\"");
+        this.setToolTipText("Set the job priority to \"" + priority.toString().toLowerCase() + "\"");
         this.setEnabled(false);
     }
 
