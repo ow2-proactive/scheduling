@@ -52,9 +52,9 @@ function shutdown(preemptively){
 	return AdminController.shutdown(preemptively);
 }
 
-function jmxinfo(){
-	return AdminController.JMXinfo();
-}
+//function jmxinfo(){
+//	return AdminController.JMXinfo();
+//}
 
 function exec(commandFilePath){
 	return AdminController.exec(commandFilePath);

@@ -60,7 +60,6 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -205,7 +204,7 @@ public class UserController {
                 //connect to the scheduler
                 connect();
                 //connect JMX service
-                connectJMXClient(URIBuilder.getHostNameFromUrl(url));
+                //connectJMXClient(URIBuilder.getHostNameFromUrl(url));
                 //start the command line or the interactive mode
                 start();
             }
@@ -332,11 +331,11 @@ public class UserController {
         opt.setArgs(2);
         actionGroup.addOption(opt);
 
-        opt = new Option("jmxinfo", false, control +
-            "Display some statistics provided by the Scheduler MBean");
-        opt.setRequired(false);
-        opt.setArgs(0);
-        actionGroup.addOption(opt);
+        //        opt = new Option("jmxinfo", false, control +
+        //            "Display some statistics provided by the Scheduler MBean");
+        //        opt.setRequired(false);
+        //        opt.setArgs(0);
+        //        actionGroup.addOption(opt);
 
         options.addOptionGroup(actionGroup);
 
@@ -388,9 +387,9 @@ public class UserController {
                 printf("Missing arguments for job priority. Arguments must be <jobId> <newPriority>\n\t"
                     + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
-        } else if (cmd.hasOption("jmxinfo")) {
-            JMXinfo();
-        } else {
+        } /*else if (cmd.hasOption("jmxinfo")) {
+                   JMXinfo();
+               } */else {
             intercativeMode = true;
             return intercativeMode;
         }
@@ -709,8 +708,8 @@ public class UserController {
                         .format(
                                 " %1$-18s\t Submit a new job (parameter is a string representing the job XML descriptor URL)\n",
                                 SUBMIT_CMD));
-        out.append(String.format(" %1$-18s\t Display some statistics provided by the Scheduler MBean\n",
-                JMXINFO_CMD));
+        //        out.append(String.format(" %1$-18s\t Display some statistics provided by the Scheduler MBean\n",
+        //                JMXINFO_CMD));
         out
                 .append(String
                         .format(

@@ -31,13 +31,11 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
@@ -178,7 +176,7 @@ public class AdminController {
                 //connect to the scheduler
                 connect();
                 //connect JMX service
-                connectJMXClient(URIBuilder.getHostNameFromUrl(url));
+                //connectJMXClient(URIBuilder.getHostNameFromUrl(url));
                 //start the command line or the interactive mode
                 start();
 
@@ -302,11 +300,11 @@ public class AdminController {
         shutdownOpt.setRequired(false);
         actionGroup.addOption(shutdownOpt);
 
-        Option jmx = new Option("jmxinfo", false, control +
-            "Display some statistics provided by the Scheduler MBean");
-        jmx.setRequired(false);
-        jmx.setArgs(0);
-        actionGroup.addOption(jmx);
+        //        Option jmx = new Option("jmxinfo", false, control +
+        //            "Display some statistics provided by the Scheduler MBean");
+        //        jmx.setRequired(false);
+        //        jmx.setArgs(0);
+        //        actionGroup.addOption(jmx);
 
         options.addOptionGroup(actionGroup);
 
@@ -400,9 +398,9 @@ public class AdminController {
             }
         } else if (cmd.hasOption("shutdown")) {
             shutdown(cmd.hasOption("f"));
-        } else if (cmd.hasOption("jmxinfo")) {
-            JMXinfo();
-        } else {
+        } /*else if (cmd.hasOption("jmxinfo")) {
+                   JMXinfo();
+               }*/else {
             intercativeMode = true;
             return intercativeMode;
         }
@@ -679,8 +677,8 @@ public class AdminController {
         out.append(String.format(
                 " %1$-28s\t Shutdown the Resource Manager (RM shutdown immediately if parameter is true)\n",
                 SHUTDOWN_CMD));
-        out.append(String.format(" %1$-28s\t Display some statistics provided by the Scheduler MBean\n",
-                JMXINFO_CMD));
+        //        out.append(String.format(" %1$-28s\t Display some statistics provided by the Scheduler MBean\n",
+        //                JMXINFO_CMD));
         out
                 .append(String
                         .format(
