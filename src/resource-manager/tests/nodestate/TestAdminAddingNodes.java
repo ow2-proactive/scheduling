@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -251,5 +252,16 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         assertTrue(admin.getTotalNodesNumber().intValue() == 1);
         assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
+        log("Test 7");
+        //add the same node twice and check that RM will not kill the node. If it does
+        //second attempt will fail
+        try {
+            admin.addNode(node2URL);
+            admin.addNode(node2URL);
+        } catch (RMException e) {
+            assertTrue(false);
+        }
+        Thread.sleep(3000);
+        assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 0);
     }
 }

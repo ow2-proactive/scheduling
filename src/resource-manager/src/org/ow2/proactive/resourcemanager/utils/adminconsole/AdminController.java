@@ -399,8 +399,8 @@ public class AdminController {
         } else if (cmd.hasOption("shutdown")) {
             shutdown(cmd.hasOption("f"));
         } /*else if (cmd.hasOption("jmxinfo")) {
-                   JMXinfo();
-               }*/else {
+                          JMXinfo();
+                      }*/else {
             intercativeMode = true;
             return intercativeMode;
         }

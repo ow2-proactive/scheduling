@@ -388,8 +388,8 @@ public class UserController {
                     + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
         } /*else if (cmd.hasOption("jmxinfo")) {
-                   JMXinfo();
-               } */else {
+                          JMXinfo();
+                      } */else {
             intercativeMode = true;
             return intercativeMode;
         }

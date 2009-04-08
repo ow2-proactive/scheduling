@@ -191,14 +191,11 @@ public class GCMInfrastructure extends InfrastructureManager {
             }
 
             logger.info("Terminating the node " + node.getNodeInformation().getName());
-            node.getProActiveRuntime().killNode(node.getNodeInformation().getName());
-            if (node.getProActiveRuntime().getLocalNodeNames().length == 0) {
-                try {
-                    logger.info("Terminating the runtime " + node.getProActiveRuntime().getURL());
-                    node.getProActiveRuntime().killRT(false);
-                } catch (Exception e) {
-                    //do nothing, no exception treatment for node just killed before
-                }
+            try {
+                logger.info("Terminating the runtime " + node.getProActiveRuntime().getURL());
+                node.getProActiveRuntime().killRT(false);
+            } catch (Exception e) {
+                //do nothing, no exception treatment for node just killed before
             }
             nodesCount--;
 

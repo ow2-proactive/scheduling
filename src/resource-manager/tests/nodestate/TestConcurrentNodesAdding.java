@@ -44,10 +44,10 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
- * Tests adds 50 nodes by GCM deployment descriptor and
+ * Tests adds 10 nodes by GCM deployment descriptor and
  * in parallel starts adding/removing existing nodes.
  *
- * Expected result is 50 available nodes at the end and no deadlocks.
+ * Expected result is 10 available nodes at the end and no deadlocks.
  *
  * @author ProActive team
  *
