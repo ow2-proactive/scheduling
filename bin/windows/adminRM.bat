@@ -2,7 +2,7 @@
 echo.
 
 SETLOCAL ENABLEDELAYEDEXPANSION
-call init.bat client
+call init.bat log4j-client
 
 %JAVA_CMD% org.ow2.proactive.resourcemanager.utils.adminconsole.AdminController %*
 

@@ -2,7 +2,7 @@
 
 CLASSPATH=.
 workingDir=`dirname $0`
-. $workingDir/env.sh
+. $workingDir/env.sh scheduler-log4j-server
 
 yjp=-agentlib:yjpagent
 opt="-Xms128m -Xmx2048m"

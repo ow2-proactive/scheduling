@@ -20,7 +20,7 @@ goto doit
 
 :doit
 SETLOCAL ENABLEDELAYEDEXPANSION
-call init.bat client
+call init.bat log4j-client
 %JAVA_CMD%  org.objectweb.proactive.core.node.StartNode %*
 ENDLOCAL
 

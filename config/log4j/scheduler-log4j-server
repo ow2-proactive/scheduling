@@ -36,18 +36,18 @@ log4j.logger.proactive.scheduler.dev.admin.consol=INFO,CONSOLE
 #log4j.logger.proactive.scheduler.dev.admin.scilab=DEBUG
 
 # avoid displaying additivity of the inherit loggers
-log4j.additivity.proactive.resourceManager=false
+#log4j.additivity.proactive.resourceManager=false
 # define RESOURCE MANAGER loggers
-log4j.logger.proactive.resourceManager=INFO,RMDevFileAppender
-log4j.logger.proactive.resourceManager.core=INFO
-log4j.logger.proactive.resourceManager.user=INFO
-log4j.logger.proactive.resourceManager.monitoring=INFO
-log4j.logger.proactive.resourceManager.nodeSource=INFO
-log4j.logger.proactive.resourceManager.rmnode=INFO
-log4j.logger.proactive.resourceManager.rmfactory=INFO
-log4j.logger.proactive.resourceManager.rmlauncher=INFO,CONSOLE
-log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
-log4j.logger.proactive.resourceManager.policy=INFO
+#log4j.logger.proactive.resourceManager=INFO,RMDevFileAppender
+#log4j.logger.proactive.resourceManager.core=INFO
+#log4j.logger.proactive.resourceManager.user=INFO
+#log4j.logger.proactive.resourceManager.monitoring=INFO
+#log4j.logger.proactive.resourceManager.nodeSource=INFO
+#log4j.logger.proactive.resourceManager.rmnode=INFO
+#log4j.logger.proactive.resourceManager.rmfactory=INFO
+#log4j.logger.proactive.resourceManager.rmlauncher=INFO,CONSOLE
+#log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
+#log4j.logger.proactive.resourceManager.policy=INFO
 
 #GCM deployment loggers in RMDEvFileAppender
 log4j.logger.proactive.deployment = INFO,RMDevFileAppender
@@ -75,12 +75,12 @@ log4j.appender.SchedulerDevFileAppender.layout=org.apache.log4j.PatternLayout
 log4j.appender.SchedulerDevFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] [SCHED.%C{1}.%M] %m%n
 
 # File appender for verbose developer logging level (FILE3)
-log4j.appender.RMDevFileAppender=org.apache.log4j.RollingFileAppender
-log4j.appender.RMDevFileAppender.File=../../.logs/RM.log
-log4j.appender.RMDevFileAppender.MaxFileSize=10MB
-log4j.appender.RMDevFileAppender.MaxBackupIndex=5
-log4j.appender.RMDevFileAppender.layout=org.apache.log4j.PatternLayout
-log4j.appender.RMDevFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] [RM.%C{1}.%M] %m%n
+#log4j.appender.RMDevFileAppender=org.apache.log4j.RollingFileAppender
+#log4j.appender.RMDevFileAppender.File=../../.logs/RM.log
+#log4j.appender.RMDevFileAppender.MaxFileSize=10MB
+#log4j.appender.RMDevFileAppender.MaxBackupIndex=5
+#log4j.appender.RMDevFileAppender.layout=org.apache.log4j.PatternLayout
+#log4j.appender.RMDevFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] [RM.%C{1}.%M] %m%n
 
 #File appender for hibernate verbose developer logging level (FILE4)
 log4j.appender.SchedulerDevHibFileAppender=org.apache.log4j.RollingFileAppender
@@ -104,9 +104,9 @@ log4j.appender.schedulerAppenderDEBUG.layout=org.apache.log4j.PatternLayout
 log4j.appender.schedulerAppenderDEBUG.layout.ConversionPattern=[%-5p] [SCHEDULER.%C{1}.%M] %m%n
 
 # RM Appender configuration (CONSOLE)
-log4j.appender.resourceManagerAppender=org.apache.log4j.ConsoleAppender
-log4j.appender.resourceManagerAppender.layout=org.apache.log4j.PatternLayout
-log4j.appender.resourceManagerAppender.layout.ConversionPattern=[%-5p] [RESOURCE_MANAGER.%C{1}] %m%n
+#log4j.appender.resourceManagerAppender=org.apache.log4j.ConsoleAppender
+#log4j.appender.resourceManagerAppender.layout=org.apache.log4j.PatternLayout
+#log4j.appender.resourceManagerAppender.layout.ConversionPattern=[%-5p] [RESOURCE_MANAGER.%C{1}] %m%n
 
 # HIBERNATE Appender configuration (CONSOLE)
 log4j.appender.hibernate=org.apache.log4j.ConsoleAppender

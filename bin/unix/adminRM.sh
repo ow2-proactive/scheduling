@@ -2,7 +2,7 @@
 
 CLASSPATH=.
 workingDir=`dirname $0`
-. $workingDir/env.sh client
+. $workingDir/env.sh log4j-client
 
 opt="-Xms128m -Xmx2048m"
 
