@@ -387,9 +387,11 @@ public class UserController {
                 printf("Missing arguments for job priority. Arguments must be <jobId> <newPriority>\n\t"
                     + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
-        } /*else if (cmd.hasOption("jmxinfo")) {
-                          JMXinfo();
-                      } */else {
+        }
+        //        else if (cmd.hasOption("jmxinfo")) {
+        //            JMXinfo();
+        //        } 
+        else {
             intercativeMode = true;
             return intercativeMode;
         }

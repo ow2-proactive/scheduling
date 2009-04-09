@@ -155,6 +155,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
             .getValueAsInt() * 1000;
 
+    /** Number of time to retry an active object creation if it fails to create */
+    private static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
+
     /** Host name of the scheduler for logger system. */
     private String host = null;
 
@@ -550,6 +553,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * Schedule computing method
      */
     private void schedule() {
+        //Number of time to retry an active object creation before leaving scheduling loop
+        int activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
+
         //get job Descriptor list with eligible jobs (running and pending)
         ArrayList<JobDescriptor> jobDescriptorList = new ArrayList<JobDescriptor>();
 
@@ -580,6 +586,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
+            //number of nodes to ask for
             int nbNodesToAskFor = 0;
             RMState rmState = resourceManager.getRMState();
             policy.RMState = rmState;
@@ -700,6 +707,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         (nodeSet.size() >= internalTask.getNumberOfNodesNeeded())) {
                         nodeSet.remove(0);
                         launcher = internalTask.createLauncher(node);
+                        activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
                         this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
                                 launcher);
                         NodeSet nodes = new NodeSet();
@@ -723,6 +731,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     } else if (currentJob.getType() != JobType.PROACTIVE) {
                         nodeSet.remove(0);
                         launcher = internalTask.createLauncher(node);
+                        activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
                         this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
                                 launcher);
                         // activate loggers for this task if needed
@@ -807,6 +816,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 try {
                     resourceManager.freeNode(node);
                 } catch (Exception e2) {
+                }
+                if (--activeObjectCreationRetryTimeNumber == 0) {
+                    return;
                 }
             } catch (Exception e1) {
                 logger_dev.error("", e1);
