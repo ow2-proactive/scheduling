@@ -73,7 +73,7 @@ public class RMModel {
                 }
             }
 
-            newNode = new Node(nodeEvent.getNodeUrl(), nodeEvent.getState());
+            newNode = new Node(nodeEvent.getNodeUrl(), nodeEvent.getNodeState());
             vm.addChild(newNode);
 
             if (parentToRefresh == null) {
@@ -82,7 +82,7 @@ public class RMModel {
             }
         }
 
-        switch (nodeEvent.getState()) {
+        switch (nodeEvent.getNodeState()) {
             case FREE:
                 this.freeNodesNumber++;
                 break;
@@ -122,7 +122,7 @@ public class RMModel {
                 }
             }
         }
-        switch (nodeEvent.getState()) {
+        switch (nodeEvent.getNodeState()) {
             case FREE:
                 this.freeNodesNumber--;
                 break;
@@ -149,7 +149,7 @@ public class RMModel {
             TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
             node = (Node) find(vm, nodeEvent.getNodeUrl());
             previousState = node.getState();
-            node.setState(nodeEvent.getState());
+            node.setState(nodeEvent.getNodeState());
         }
         switch (previousState) {
             case FREE:
@@ -162,7 +162,7 @@ public class RMModel {
             case TO_BE_RELEASED:
                 this.busyNodesNumber--;
         }
-        switch (nodeEvent.getState()) {
+        switch (nodeEvent.getNodeState()) {
             case FREE:
                 this.freeNodesNumber++;
                 break;

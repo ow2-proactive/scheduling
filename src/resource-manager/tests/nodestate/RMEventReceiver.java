@@ -42,6 +42,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.MutableInteger;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
@@ -262,82 +263,58 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeBusyEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
-    public void nodeBusyEvent(RMNodeEvent n) {
-        busyNodes.add(n.getNodeUrl());
+    public void nodeEvent(RMNodeEvent event) {
+        switch (event.getEventType()) {
+            case NODE_ADDED:
+                this.addedNodes.add(event.getNodeUrl());
+                break;
+            case NODE_REMOVED:
+                removedNodes.add(event.getNodeUrl());
+                break;
+            case NODE_STATE_CHANGED:
+                switch (event.getNodeState()) {
+                    case BUSY:
+                        busyNodes.add(event.getNodeUrl());
+                        break;
+                    case DOWN:
+                        downNodes.add(event.getNodeUrl());
+                        break;
+                    case TO_BE_RELEASED:
+                        toBeReleasedNodes.add(event.getNodeUrl());
+                        break;
+                    case FREE:
+                        freeNodes.add(event.getNodeUrl());
+                        break;
+                }
+        }
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeDownEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
-    public void nodeDownEvent(RMNodeEvent n) {
-        downNodes.add(n.getNodeUrl());
+    public void nodeSourceEvent(RMNodeSourceEvent event) {
+        switch (event.getEventType()) {
+            case NODESOURCE_CREATED:
+                nodeSourcesCreated.add(event.getSourceName());
+                break;
+            case NODESOURCE_REMOVED:
+                nodeSourcesRemoved.add(event.getSourceName());
+                break;
+            case NODESOURCE_NODES_ACQUISTION_INFO_ADDED:
+                break;
+        }
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeToReleaseEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
-    public void nodeToReleaseEvent(RMNodeEvent n) {
-        toBeReleasedNodes.add(n.getNodeUrl());
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeRemovedEvent(RMNodeEvent n) {
-        removedNodes.add(n.getNodeUrl());
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeFreeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeFreeEvent(RMNodeEvent n) {
-        freeNodes.add(n.getNodeUrl());
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeAddedEvent(RMNodeEvent n) {
-        this.addedNodes.add(n.getNodeUrl());
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceAddedEvent(RMNodeSourceEvent ns) {
-        nodeSourcesCreated.add(ns.getSourceName());
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
-        nodeSourcesRemoved.add(ns.getSourceName());
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent)
-     */
-    public void nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
-     */
-    public void rmShutDownEvent(RMEvent evt) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShuttingDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
-     */
-    public void rmShuttingDownEvent(RMEvent evt) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmStartedEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
-     */
-    public void rmStartedEvent(RMEvent evt) {
+    public void rmEvent(RMEvent event) {
+        switch (event.getEventType()) {
+            case STARTED:
+            case SHUTTING_DOWN:
+            case SHUTDOWN:
+        }
     }
 }

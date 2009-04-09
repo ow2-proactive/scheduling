@@ -62,6 +62,7 @@ import org.ow2.proactive.authentication.RestrictedService;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -329,7 +330,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             });
 
             // Creating RM started event
-            this.monitoring.rmStartedEvent(new RMEvent());
+            this.monitoring.rmEvent(new RMEvent(RMEventType.STARTED));
 
             ProActiveLogger.getLogger(RMLoggers.CONSOLE).info(
                     "Resource Manager successfully created on " +
@@ -380,7 +381,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             this.freeNodes.add(rmnode);
 
             // create the event
-            this.monitoring.nodeFreeEvent(rmnode.getNodeEvent());
+            this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
             internalSetDown(rmnode);
@@ -410,7 +411,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         }
         this.freeNodes.remove(rmnode);
         // create the event
-        this.monitoring.nodeBusyEvent(rmnode.getNodeEvent());
+        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
     }
 
     /**
@@ -434,7 +435,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             logger.debug("", e1);
         }
         // create the event
-        this.monitoring.nodeToReleaseEvent(rmnode.getNodeEvent());
+        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
     }
 
     /**
@@ -451,7 +452,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         }
         rmnode.setDown();
         // create the event
-        this.monitoring.nodeDownEvent(rmnode.getNodeEvent());
+        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
     }
 
     /**
@@ -490,7 +491,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         }
         this.allNodes.remove(rmnode.getNodeURL());
         // create the event
-        this.monitoring.nodeRemovedEvent(rmnode.getNodeEvent());
+        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_REMOVED));
     }
 
     /**
@@ -515,7 +516,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             this.freeNodes.add(rmnode);
             this.allNodes.put(rmnode.getNodeURL(), rmnode);
             // create the event
-            this.monitoring.nodeAddedEvent(rmnode.getNodeEvent());
+            this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED));
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
             internalSetDown(rmnode);
@@ -598,7 +599,8 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             throw new RMException("Incorrect node source name " + sourceName);
         }
         ns.addNodes(parameters);
-        this.monitoring.nodeSourceNodesAcquisitionInfoAddedEvent(ns.getSourceEvent());
+        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(ns,
+            RMEventType.NODESOURCE_NODES_ACQUISTION_INFO_ADDED));
     }
 
     /**
@@ -752,7 +754,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      */
     public BooleanWrapper shutdown(boolean preempt) {
         logger.info("RMCore shutdown request");
-        this.monitoring.rmShuttingDownEvent(new RMEvent());
+        this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
 
         List<BooleanWrapper> shutdownStatus = new LinkedList<BooleanWrapper>();
@@ -1030,12 +1032,12 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     public RMInitialState getRMInitialState() {
         ArrayList<RMNodeEvent> nodesList = new ArrayList<RMNodeEvent>();
         for (RMNode rmnode : this.allNodes.values()) {
-            nodesList.add(rmnode.getNodeEvent());
+            nodesList.add(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED)); //TODO change event type
         }
 
         ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<RMNodeSourceEvent>();
         for (NodeSource s : this.nodeSources.values()) {
-            nodeSourcesList.add(s.getSourceEvent());
+            nodeSourcesList.add(new RMNodeSourceEvent(s, RMEventType.NODESOURCE_CREATED)); //TODO change event type
         }
 
         return new RMInitialState(nodesList, nodeSourcesList);
@@ -1077,7 +1079,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     public void nodeSourceRegister(NodeSource source, String sourceId) {
         this.nodeSources.put(sourceId, source);
         // create the event
-        this.monitoring.nodeSourceAddedEvent(source.getSourceEvent());
+        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(source, RMEventType.NODESOURCE_CREATED));
         registerTrustedService(source);
     }
 
@@ -1092,7 +1094,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             logger.info("Node Source removed : " + sourceId);
         }
         // create the event
-        this.monitoring.nodeSourceRemovedEvent(evt);
+        this.monitoring.nodeSourceEvent(evt);
         unregisterTrustedService(nodeSource);
 
         if ((this.nodeSources.size() == 0) && this.toShutDown) {

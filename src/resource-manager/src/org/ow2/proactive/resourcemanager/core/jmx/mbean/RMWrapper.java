@@ -68,14 +68,36 @@ public class RMWrapper implements RMWrapperMBean {
     private long previousTimeStamp;
 
     /**
-     * Methods to manage the events of the Resource Manager
-     * 
-     * This is a canonical event to calculate the Key Performance Indicator 
-     * about the average busy percentage time of a node
+     * Method to manage node events of the Resource Manager
      * 
      * @param event
      */
-    public void nodeAddedEvent(RMNodeEvent event) {
+    public void nodeEvent(RMNodeEvent event) {
+        switch (event.getEventType()) {
+            case NODE_ADDED:
+                nodeAdded();
+                break;
+            case NODE_STATE_CHANGED:
+                switch (event.getNodeState()) {
+                    case BUSY:
+                        nodeBusy();
+                        break;
+                    case DOWN:
+                        nodeDown(event.getNodeState() == NodeState.BUSY);
+                        break;
+                    case FREE:
+                        nodeFree();
+                        break;
+                }
+                break;
+            case NODE_REMOVED:
+                nodeRemovedEvent(event.getNodeState() == NodeState.BUSY,
+                        event.getNodeState() == NodeState.FREE);
+                break;
+        }
+    }
+
+    private void nodeAdded() {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -95,7 +117,7 @@ public class RMWrapper implements RMWrapperMBean {
      *
      * @param event
      */
-    public void nodeBusyEvent(RMNodeEvent event) {
+    private void nodeBusy() {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -114,7 +136,7 @@ public class RMWrapper implements RMWrapperMBean {
      *
      * @param event
      */
-    public void nodeDownEvent(RMNodeEvent event) {
+    private void nodeDown(boolean busy) {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -123,7 +145,7 @@ public class RMWrapper implements RMWrapperMBean {
         this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
         this.previousTimeStamp = System.currentTimeMillis();
         // Update fields
-        if (event.getState().equals(NodeState.BUSY)) {
+        if (busy) {
             this.numberOfBusyNodes--;
             this.numberOfDownNodes++;
         } else {
@@ -139,7 +161,7 @@ public class RMWrapper implements RMWrapperMBean {
      *
      * @param event
      */
-    public void nodeFreeEvent(RMNodeEvent event) {
+    private void nodeFree() {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -158,7 +180,7 @@ public class RMWrapper implements RMWrapperMBean {
      *
      * @param event
      */
-    public void nodeRemovedEvent(RMNodeEvent event) {
+    private void nodeRemovedEvent(boolean busy, boolean free) {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -169,9 +191,9 @@ public class RMWrapper implements RMWrapperMBean {
         // Update fields
         this.totalNumberOfNodes--;
         //Check the state of the removed node
-        if (event.getState().equals(NodeState.BUSY)) {
+        if (busy) {
             this.numberOfBusyNodes--;
-        } else if (event.getState().equals(NodeState.FREE)) {
+        } else if (free) {
             this.numberOfFreeNodes--;
         } else {
             //If the node is not busy, nor free, it is down
@@ -179,25 +201,18 @@ public class RMWrapper implements RMWrapperMBean {
         }
     }
 
-    /**
-     * @param event
-     */
-    public void rmShutDownEvent(RMEvent event) {
-        rMState = "STOPPED";
-    }
-
-    /**
-     * @param event
-     */
-    public void rmShuttingDownEvent(RMEvent event) {
-        rMState = "SHUTTING_DOWN";
-    }
-
-    /**
-     * @param event
-     */
-    public void rmStartedEvent(RMEvent event) {
-        rMState = "STARTED";
+    public void rmEvent(RMEvent event) {
+        switch (event.getEventType()) {
+            case STARTED:
+                rMState = "STARTED";
+                break;
+            case SHUTTING_DOWN:
+                rMState = "SHUTTING_DOWN";
+                break;
+            case SHUTDOWN:
+                rMState = "STOPPED";
+                break;
+        }
     }
 
     /**

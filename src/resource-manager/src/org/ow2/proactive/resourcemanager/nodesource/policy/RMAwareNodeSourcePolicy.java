@@ -85,75 +85,25 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
-    public void nodeAddedEvent(RMNodeEvent event) {
+    public void rmEvent(RMEvent event) {
+        switch (event.getEventType()) {
+            case SHUTTING_DOWN:
+                rmShuttingDown = true;
+                break;
+        }
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeBusyEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
-    public void nodeBusyEvent(RMNodeEvent event) {
+    public void nodeSourceEvent(RMNodeSourceEvent event) {
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeDownEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
-    public void nodeDownEvent(RMNodeEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeFreeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeFreeEvent(RMNodeEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeRemovedEvent(RMNodeEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceAddedEvent(RMNodeSourceEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceRemovedEvent(RMNodeSourceEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceNodesAcquisitionInfoAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeToReleaseEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeToReleaseEvent(RMNodeEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
-     */
-    public void rmShutDownEvent(RMEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShuttingDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
-     */
-    public void rmShuttingDownEvent(RMEvent event) {
-        rmShuttingDown = true;
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmStartedEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
-     */
-    public void rmStartedEvent(RMEvent event) {
+    public void nodeEvent(RMNodeEvent event) {
     }
 }

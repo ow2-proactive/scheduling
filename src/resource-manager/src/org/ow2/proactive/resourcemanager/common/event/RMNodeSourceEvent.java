@@ -72,12 +72,11 @@ public class RMNodeSourceEvent extends RMEvent {
 
     /**
      * Creates an RMNodesourceEvent object.
-     * @param name of the Node Source
-     * @param type type of the NodeSource
      */
-    public RMNodeSourceEvent(String name, String description) {
-        this.nodeSourceName = name;
-        this.nodeSourceDescription = description;
+    public RMNodeSourceEvent(NodeSource source, RMEventType type) {
+        this.nodeSourceName = source.getName();
+        this.nodeSourceDescription = source.getDescription();
+        this.type = type;
     }
 
     /**

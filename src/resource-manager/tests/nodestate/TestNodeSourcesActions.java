@@ -70,9 +70,8 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
     @org.junit.Test
     public void action() throws Exception {
 
-        RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODE_BUSY, RMEventType.NODE_DOWN,
-                RMEventType.NODE_FREE, RMEventType.NODE_REMOVED, RMEventType.NODE_TO_RELEASE,
-                RMEventType.NODESOURCE_CREATED, RMEventType.NODESOURCE_REMOVED };
+        RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODE_STATE_CHANGED,
+                RMEventType.NODE_REMOVED, RMEventType.NODESOURCE_CREATED, RMEventType.NODESOURCE_REMOVED };
 
         RMEventReceiver receiver = (RMEventReceiver) PAActiveObject.newActive(
                 RMEventReceiver.class.getName(), new Object[] { monitor, eventsList });

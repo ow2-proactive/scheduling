@@ -104,93 +104,69 @@ public class EventsReceiver implements InitActive, RMEventListener {
 
     // ----------------------------------------------------------------------
     // methods implemented from RMEvent listener
-    // ----------------------------------------------------------------------   
+    // ----------------------------------------------------------------------
     /**
-     * @see org.ow2.proactive.resourcemanager.gui.interfaces.RMNodeEventListener#nodeAddedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
-    public void nodeAddedEvent(RMNodeEvent nodeEvent) {
-        model.addNode(nodeEvent);
+    public void nodeEvent(RMNodeEvent event) {
+        switch (event.getEventType()) {
+            case NODE_ADDED:
+                model.addNode(event);
+                break;
+            case NODE_REMOVED:
+                model.removeNode(event);
+                break;
+            case NODE_STATE_CHANGED:
+                switch (event.getNodeState()) {
+                    case BUSY:
+                    case DOWN:
+                    case TO_BE_RELEASED:
+                    case FREE:
+                        model.changeNodeState(event);
+                        break;
+                }
+        }
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.gui.interfaces.RMNodeEventListener#nodeRemovedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
-    public void nodeRemovedEvent(RMNodeEvent nodeEvent) {
-        model.removeNode(nodeEvent);
+    public void nodeSourceEvent(RMNodeSourceEvent event) {
+        switch (event.getEventType()) {
+            case NODESOURCE_CREATED:
+                model.addNodeSource(event);
+                break;
+            case NODESOURCE_REMOVED:
+                model.removeNodeSource(event);
+                break;
+            case NODESOURCE_NODES_ACQUISTION_INFO_ADDED:
+                break;
+        }
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.gui.interfaces.RMNodeEventListener#nodeBusyEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
-    public void nodeBusyEvent(RMNodeEvent nodeEvent) {
-        model.changeNodeState(nodeEvent);
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.gui.interfaces.RMNodeEventListener#nodeDownEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
-     */
-    public void nodeDownEvent(RMNodeEvent nodeEvent) {
-        model.changeNodeState(nodeEvent);
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.gui.interfaces.RMNodeEventListener#nodeFreeEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
-     */
-    public void nodeFreeEvent(RMNodeEvent nodeEvent) {
-        model.changeNodeState(nodeEvent);
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.gui.interfaces.RMNodeEventListener#nodeToReleaseEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
-     */
-    public void nodeToReleaseEvent(RMNodeEvent nodeEvent) {
-        model.changeNodeState(nodeEvent);
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.gui.interfaces.RMNodeEventListener#nodeSourceAddedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeSourceEvent)
-     */
-    public void nodeSourceAddedEvent(RMNodeSourceEvent nodeSourceEvent) {
-        model.addNodeSource(nodeSourceEvent);
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.gui.interfaces.RMNodeEventListener#nodeSourceRemovedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeSourceEvent)
-     */
-    public void nodeSourceRemovedEvent(RMNodeSourceEvent nodeSourceEvent) {
-        model.removeNodeSource(nodeSourceEvent);
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceNodesAcquisitionInfoAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent event) {
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
-     */
-    public void rmShutDownEvent(RMEvent arg0) {
-        pinger.interrupt();
-        RMStore.getInstance().shutDownActions(false);
+    public void rmEvent(RMEvent event) {
+        switch (event.getEventType()) {
+            case STARTED:
+                break;
+            case SHUTTING_DOWN:
+                Display.getDefault().syncExec(new Runnable() {
+                    public void run() {
+                        RMStatusBarItem.getInstance().setText("RM shutting down");
+                    }
+                });
+                break;
+            case SHUTDOWN:
+                pinger.interrupt();
+                RMStore.getInstance().shutDownActions(false);
+                break;
+        }
     }
 
     public void rmShutDownEvent(RMEvent arg0, boolean failed) {
         pinger.interrupt();
         RMStore.getInstance().shutDownActions(failed);
     }
-
-    //TODO add a status bar that show these states ?
-
-    public void rmShuttingDownEvent(RMEvent arg0) {
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                RMStatusBarItem.getInstance().setText("RM shutting down");
-            }
-        });
-    }
-
-    public void rmStartedEvent(RMEvent arg0) {
-    }
-
 }

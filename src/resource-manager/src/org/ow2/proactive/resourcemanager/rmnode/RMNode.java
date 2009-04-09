@@ -36,7 +36,7 @@ import java.util.HashMap;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -195,8 +195,8 @@ public interface RMNode extends Comparable<RMNode> {
     public void setNodeSource(NodeSource nodeSource);
 
     /**
-     *  Builds the RMNodeEvent object for the RMNode
-     *  @return the RMNodeEvent object related to the node.
+     * Returns the node state
+     * @return the node state
      */
-    public RMNodeEvent getNodeEvent();
+    public NodeState getState();
 }

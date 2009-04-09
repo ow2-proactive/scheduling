@@ -58,70 +58,15 @@ public interface RMEventListener {
     /** RM is shutting down
      * @param event object representing the event.
      */
-    public void rmShutDownEvent(RMEvent event);
-
-    /** RM has been stopped
-     * @param event object representing the event.
-     */
-    public void rmShuttingDownEvent(RMEvent event);
-
-    /** RM has started
-     * @param event object representing the event.
-     */
-    public void rmStartedEvent(RMEvent event);
+    public void rmEvent(RMEvent event);
 
     /** new node source available in RM.
      * @param event node source event containing new {@link NodeSource} properties.
      */
-    public void nodeSourceAddedEvent(RMNodeSourceEvent event);
-
-    /** node removed from RM.
-     * @param event node source event containing removed {@link NodeSource} properties.
-     */
-    public void nodeSourceRemovedEvent(RMNodeSourceEvent event);
-
-    /**
-     * Nodes acquisition info is added to the node source.
-     * @param event node source event containing new {@link NodeSource} properties.
-     */
-    public void nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent event);
+    public void nodeSourceEvent(RMNodeSourceEvent event);
 
     /** new node available in RM.
      * @param event node event containing new {@link RMNode} properties.
      */
-    public void nodeAddedEvent(RMNodeEvent event);
-
-    /**
-     * Node has ended a task.
-     * becomes from busy to free state.
-     * @param event node event containing {@link RMNode} properties.
-     */
-    public void nodeFreeEvent(RMNodeEvent event);
-
-    /**
-     * Node begins to perform a task.
-     * becomes from free to busy state.
-     * @param event node event containing {@link RMNode} properties.
-     */
-    public void nodeBusyEvent(RMNodeEvent event);
-
-    /**
-     * Node is busy and must be released at the end of the task.
-     * becomes from busy to 'to be released' state.
-     * @param event node event containing {@link RMNode} properties.
-     */
-    public void nodeToReleaseEvent(RMNodeEvent event);
-
-    /**
-     * Node does not answer anymore to its monitor, the node is said 'down'.
-     * becomes from free, busy, 'to be released' to down state.
-     * @param event node event containing {@link RMNode} properties.
-     */
-    public void nodeDownEvent(RMNodeEvent event);
-
-    /**
-     * A Node is removed from the RM.
-     * @param event node event containing the removed {@link RMNode} properties.
-     */
-    public void nodeRemovedEvent(RMNodeEvent event);
+    public void nodeEvent(RMNodeEvent event);
 }

@@ -85,10 +85,14 @@ public class StaticPolicy extends RMAwareNodeSourcePolicy {
     }
 
     /**
-     * Reacts on new nodes acquisition info and requests to acquire all nodes.
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
-    public void nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent event) {
-        acquireAllNodes();
+    public void nodeSourceEvent(RMNodeSourceEvent event) {
+        switch (event.getEventType()) {
+            case NODESOURCE_NODES_ACQUISTION_INFO_ADDED:
+                acquireAllNodes();
+                break;
+        }
     }
 
     /**

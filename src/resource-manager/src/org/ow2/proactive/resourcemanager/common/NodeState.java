@@ -67,6 +67,7 @@ public enum NodeState {
      * 
      */
     TO_BE_RELEASED(3);
+
     private int state;
 
     /**

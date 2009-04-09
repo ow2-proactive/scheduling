@@ -47,6 +47,7 @@ public class RMEvent implements Serializable {
 
     /** Resource manager URL */
     private String RMUrl = null;
+    protected RMEventType type;
 
     /**
      * ProActive empty constructor
@@ -56,10 +57,9 @@ public class RMEvent implements Serializable {
 
     /**
      * Creates the node event object.
-     * @param url URL of the node.
      */
-    public RMEvent(String url) {
-        this.RMUrl = url;
+    public RMEvent(RMEventType type) {
+        this.type = type;
     }
 
     /**
@@ -76,5 +76,9 @@ public class RMEvent implements Serializable {
      */
     public void setRMUrl(String RMURL) {
         this.RMUrl = RMURL;
+    }
+
+    public RMEventType getEventType() {
+        return type;
     }
 }

@@ -33,9 +33,7 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -168,33 +166,6 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     }
 
     /**
-     * Dispatch events thrown by the RMCore to all known monitors of the RM.
-     * @param methodName method name corresponding to the event.
-     * @param types Object types associated with the method call.
-     * @param params Object associated with the method call.
-     */
-    private void dispatch(RMEventType methodName, Class<?>[] types, Object... params) {
-        try {
-            Method method = RMEventListener.class.getMethod(methodName.toString(), types);
-
-            Iterator<UniqueID> iter = this.RMListeners.keySet().iterator();
-            while (iter.hasNext()) {
-                UniqueID id = iter.next();
-                try {
-                    method.invoke(RMListeners.get(id), params);
-                } catch (Exception e) {
-                    iter.remove();
-                    logger.error("RM has detected that a listener is not connected anymore !");
-                }
-            }
-        } catch (SecurityException e) {
-            logger.debug("", e);
-        } catch (NoSuchMethodException e) {
-            logger.debug("", e);
-        }
-    }
-
-    /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMMonitoring#isAlive()
      */
     public boolean isAlive() {
@@ -203,117 +174,44 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     /** inherited from RMEventListener methods
      */
-
-    /** Dispatch the shutdown event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShutDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
-    public void rmShutDownEvent(RMEvent evt) {
-        rMBean.rmShutDownEvent(evt);
-        evt.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.SHUTDOWN, new Class<?>[] { RMEvent.class }, evt);
+    public void nodeEvent(RMNodeEvent event) {
+        event.setRMUrl(this.MonitoringUrl);
+        rMBean.nodeEvent(event);
+        for (RMEventListener listener : RMListeners.values()) {
+            listener.nodeEvent(event);
+        }
     }
 
-    /** Dispatch the shutting down event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmShuttingDownEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
-    public void rmShuttingDownEvent(RMEvent evt) {
-        rMBean.rmShuttingDownEvent(evt);
-        evt.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.SHUTTING_DOWN, new Class<?>[] { RMEvent.class }, evt);
+    public void nodeSourceEvent(RMNodeSourceEvent event) {
+        event.setRMUrl(this.MonitoringUrl);
+        for (RMEventListener listener : RMListeners.values()) {
+            listener.nodeSourceEvent(event);
+        }
     }
 
-    /** Dispatch the RM started event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmStartedEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
-    public void rmStartedEvent(RMEvent evt) {
-        rMBean.rmStartedEvent(evt);
-        evt.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.STARTED, new Class<?>[] { RMEvent.class }, evt);
+    public void rmEvent(RMEvent event) {
+        event.setRMUrl(this.MonitoringUrl);
+        rMBean.rmEvent(event);
+        for (RMEventListener listener : RMListeners.values()) {
+            listener.rmEvent(event);
+        }
     }
 
-    /** Dispatch the node added event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceAddedEvent(RMNodeSourceEvent ns) {
-        ns.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODESOURCE_CREATED, new Class<?>[] { RMNodeSourceEvent.class }, ns);
-    }
-
-    /** Dispatch the node removed event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
-        ns.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODESOURCE_REMOVED, new Class<?>[] { RMNodeSourceEvent.class }, ns);
-    }
-
-    /** Dispatch the node removed event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceNodesAcquisitionInfoAddedEvent(RMNodeSourceEvent ns) {
-        ns.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODESOURCE_NODES_ACQUISTION_INFO_ADDED,
-                new Class<?>[] { RMNodeSourceEvent.class }, ns);
-    }
-
-    /** Dispatch the node added event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeAddedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeAddedEvent(RMNodeEvent n) {
-        rMBean.nodeAddedEvent(n);
-        n.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODE_ADDED, new Class<?>[] { RMNodeEvent.class }, n);
-    }
-
-    /** Dispatch the node freed event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeFreeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeFreeEvent(RMNodeEvent n) {
-        rMBean.nodeFreeEvent(n);
-        n.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODE_FREE, new Class<?>[] { RMNodeEvent.class }, n);
-    }
-
-    /** Dispatch the node busy event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeBusyEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeBusyEvent(RMNodeEvent n) {
-        rMBean.nodeBusyEvent(n);
-        n.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODE_BUSY, new Class<?>[] { RMNodeEvent.class }, n);
-    }
-
-    /** Dispatch the node to release event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeToReleaseEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeToReleaseEvent(RMNodeEvent n) {
-        n.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODE_TO_RELEASE, new Class<?>[] { RMNodeEvent.class }, n);
-    }
-
-    /** Dispatch the node down event to all listeners.
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeDownEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeDownEvent(RMNodeEvent n) {
-        rMBean.nodeBusyEvent(n);
-        n.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODE_DOWN, new Class<?>[] { RMNodeEvent.class }, n);
-    }
-
-    /** Dispatch the node removed event to all listeners
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeRemovedEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
-     */
-    public void nodeRemovedEvent(RMNodeEvent n) {
-        rMBean.nodeRemovedEvent(n);
-        n.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODE_REMOVED, new Class<?>[] { RMNodeEvent.class }, n);
-    }
-
-    /** Stop and remove monitoring active object
+    /** 
+     * Stop and remove monitoring active object
      */
     public void shutdown() {
         //throwing shutdown event
-        rmShutDownEvent(new RMEvent());
+        rmEvent(new RMEvent(RMEventType.SHUTDOWN));
         PAActiveObject.terminateActiveObject(false);
     }
 

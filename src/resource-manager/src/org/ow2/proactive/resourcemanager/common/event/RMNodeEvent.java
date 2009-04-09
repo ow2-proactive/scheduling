@@ -80,7 +80,7 @@ public class RMNodeEvent extends RMEvent {
     /** Java virtual machine name of the node */
     private String VMName = null;
 
-    /** State of the node */
+    /** State of the associated node */
     private NodeState nodeState;
 
     /**
@@ -91,23 +91,16 @@ public class RMNodeEvent extends RMEvent {
 
     /**
      * Creates the node event object.
-     * @param url URL of the node.
-     * @param nodeSource name of the node source.
-     * @param PADName {@link ProActiveDescriptor} name of the node.
-     * @param VnName  {@link VirtualNode} name of the node.
-     * @param hostname Host name of the node.
-     * @param vm Java virtual machine name of the node.
-     * @param state state of the node.
      */
-    public RMNodeEvent(String url, String nodeSource, String PADName, String VnName, String hostname,
-            String vm, NodeState state) {
-        this.nodeUrl = url;
-        this.nodeSource = nodeSource;
-        this.PADName = PADName;
-        this.VnName = VnName;
-        this.hostName = hostname;
-        this.VMName = vm;
-        nodeState = state;
+    public RMNodeEvent(RMNode rmnode, RMEventType type) {
+        this.nodeUrl = rmnode.getNodeURL();
+        this.nodeSource = rmnode.getNodeSourceId();
+        this.PADName = "";
+        this.VnName = rmnode.getVNodeName();
+        this.hostName = rmnode.getHostName();
+        this.VMName = rmnode.getDescriptorVMName();
+        this.nodeState = rmnode.getState();
+        this.type = type;
     }
 
     /**
@@ -172,10 +165,10 @@ public class RMNodeEvent extends RMEvent {
     }
 
     /**
-     * Returns node state.
+     * Returns the state of the node related to this event.
      * @return state of the node.
      */
-    public NodeState getState() {
-        return this.nodeState;
+    public NodeState getNodeState() {
+        return nodeState;
     }
 }

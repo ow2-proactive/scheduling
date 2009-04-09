@@ -68,7 +68,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         System.out.println(admin.isAlive());
 
         RMEventType[] eventsList = { RMEventType.NODE_ADDED, RMEventType.NODE_REMOVED,
-                RMEventType.NODESOURCE_CREATED, RMEventType.NODE_BUSY, RMEventType.NODE_FREE, };
+                RMEventType.NODESOURCE_CREATED, RMEventType.NODE_STATE_CHANGED };
 
         RMEventReceiver receiver = (RMEventReceiver) PAActiveObject.newActive(
                 RMEventReceiver.class.getName(), new Object[] { monitor, eventsList });

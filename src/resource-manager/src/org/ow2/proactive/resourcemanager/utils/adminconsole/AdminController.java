@@ -493,7 +493,7 @@ public class AdminController {
         } else {
             for (RMNodeEvent evt : list) {
                 String state = null;
-                switch (evt.getState()) {
+                switch (evt.getNodeState()) {
                     case DOWN:
                         state = "DOWN";
                         break;

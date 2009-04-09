@@ -49,70 +49,39 @@ public enum RMEventType {
     /**
      * Resource manager has been shutdown
      */
-    SHUTDOWN("rmShutDownEvent"),
+    SHUTDOWN,
     /**
      * Resource manager cessation as been asked, so Resource manager performs 
      * shutting down operations.  
      */
-    SHUTTING_DOWN("rmShuttingDownEvent"),
+    SHUTTING_DOWN,
     /**
      * Resource manager has been launched. 
      */
-    STARTED("rmStartedEvent"),
+    STARTED,
     /**
      * A new node source has been created in Resource manager.
      */
-    NODESOURCE_CREATED("nodeSourceAddedEvent"),
+    NODESOURCE_CREATED,
     /**
      * A node source has been removed removed from resource manager.
      */
-    NODESOURCE_REMOVED("nodeSourceRemovedEvent"),
+    NODESOURCE_REMOVED,
     /**
      * Nodes acquisition info is added to the node source.
      */
-    NODESOURCE_NODES_ACQUISTION_INFO_ADDED("nodeSourceNodesAcquisitionInfoAddedEvent"),
+    NODESOURCE_NODES_ACQUISTION_INFO_ADDED,
     /**
      * A new node has been added to Resource manager, and is ready to
      * be provided to a RM user.
      */
-    NODE_ADDED("nodeAddedEvent"),
+    NODE_ADDED,
     /**
-     * A node is becoming free.
+     * Node state has been changes 
      */
-    NODE_FREE("nodeFreeEvent"),
-    /**
-     * A node has been provided to a RM user, so it becomes busy. 
-     */
-    NODE_BUSY("nodeBusyEvent"),
-    /**
-    * A busy node has to be removed from Resource manager after an RM user
-    * give back it, so the node is put to 'to release' state.
-    */
-    NODE_TO_RELEASE("nodeToReleaseEvent"),
-    /**
-     * A node becomes unreachable, because he is probably fallen,
-     * so it becomes down. 
-     */
-    NODE_DOWN("nodeDownEvent"),
+    NODE_STATE_CHANGED,
     /**
      * A node has been removed from Resource manager
      */
-    NODE_REMOVED("nodeRemovedEvent");
-    private String methodName;
-
-    /**
-     * Default constructor.
-     * @param method method to call as a string.
-     */
-    RMEventType(String method) {
-        methodName = method;
-    }
-
-    /**
-     * @see java.lang.Enum#toString()
-     */
-    @Override
-    public String toString() {
-        return methodName;
-    }
+    NODE_REMOVED;
 }

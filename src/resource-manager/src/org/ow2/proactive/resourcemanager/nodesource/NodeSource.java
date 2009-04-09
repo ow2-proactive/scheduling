@@ -14,6 +14,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
@@ -227,23 +228,10 @@ public class NodeSource implements InitActive {
     }
 
     /**
-     * Returns the event object representing the NodeSource. <BR>
-     * Called by {@link org.ow2.proactive.resourcemanager.core.RMCore}.<BR>
-     * Create a {@link RMNodeSourceEvent} object representing the NodeSource
-     * State.
-     *
-     * @return {@link RMNodeSourceEvent} object contains properties of the
-     *         NodeSource.
-     */
-    public RMNodeSourceEvent getSourceEvent() {
-        return new RMNodeSourceEvent(name, getDescription());
-    }
-
-    /**
      * Creates a node source string representation
      * @return string representation of the node source
      */
-    private String getDescription() {
+    public String getDescription() {
         return "Infrastructure:" + infrastructureManager + ", Policy: " + nodeSourcePolicy;
     }
 
@@ -270,7 +258,7 @@ public class NodeSource implements InitActive {
         logger.info("[" + name + "] Shutdown finalization");
         PAFuture.waitFor(nodeSourcePolicy.disactivate());
         pinger.shutdown();
-        rmcore.nodeSourceUnregister(name, this.getSourceEvent());
+        rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this, RMEventType.NODESOURCE_REMOVED));
         // object should be terminated NON preemptively
         // pinger thread can wait for last results (getNodes)
         PAActiveObject.terminateActiveObject(false);
