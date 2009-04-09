@@ -35,6 +35,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.rmi.dgc.VMID;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -191,11 +193,13 @@ public class GCMInfrastructure extends InfrastructureManager {
             }
 
             logger.info("Terminating the node " + node.getNodeInformation().getName());
-            try {
-                logger.info("Terminating the runtime " + node.getProActiveRuntime().getURL());
-                node.getProActiveRuntime().killRT(false);
-            } catch (Exception e) {
-                //do nothing, no exception treatment for node just killed before
+            if (!isThereNodesInSameJVM(node)) {
+                try {
+                    logger.info("Terminating the runtime " + node.getProActiveRuntime().getURL());
+                    node.getProActiveRuntime().killRT(false);
+                } catch (Exception e) {
+                    //do nothing, no exception treatment for node just killed before
+                }
             }
             nodesCount--;
 
@@ -303,6 +307,25 @@ public class GCMInfrastructure extends InfrastructureManager {
      */
     public String getDescription() {
         return "Infrastructure described in GCM deployment descriptor";
+    }
+
+    /**
+     * Check if there are any other nodes handled by the NodeSource in the same JVM of the node
+     * passed in parameter.
+     * @param node Node to check if there any other node of the NodeSource in the same JVM
+     * @return true there is another node in the node's JVM handled by the nodeSource, false otherwise.
+     */
+    public boolean isThereNodesInSameJVM(Node node) {
+        VMID nodeID = node.getVMInformation().getVMID();
+        String nodeToTestUrl = node.getNodeInformation().getURL();
+        Collection<Node> nodesList = nodeSource.getAliveNodes();
+        for (Node n : nodesList) {
+            if (!n.getNodeInformation().getURL().equals(nodeToTestUrl) &&
+                n.getVMInformation().getVMID().equals(nodeID)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

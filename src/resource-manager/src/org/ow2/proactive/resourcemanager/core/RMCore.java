@@ -469,7 +469,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         internalRemoveNodeFromCore(rmnode);
         try {
             rmnode.clean();
-            rmnode.getNodeSource().removeNode(rmnode.getNode(), false);
+            rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), false);
         } catch (NodeException e) {
             logger.error(e.getMessage());
         }
@@ -613,20 +613,9 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         if (this.allNodes.containsKey(nodeUrl)) {
             RMNode rmnode = this.allNodes.get(nodeUrl);
 
-            // if node already down, just removing from down list and global
-            // list
-            // Node sources have already removed the node because they have
-            // detected the node down
-            if (rmnode.isDown()) {
-                assert rmnode.isDown();
-                this.internalRemoveNodeFromCore(rmnode);
-            } else if (preempt || rmnode.isFree()) {
+            if (rmnode.isDown() || preempt || rmnode.isFree()) {
                 internalRemoveNodeFromCore(rmnode);
-                try {
-                    rmnode.getNodeSource().removeNode(rmnode.getNode(), forever);
-                } catch (NodeException e) {
-                    logger.debug("", e);
-                }
+                rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), forever);
             } else if (rmnode.isBusy()) {
                 internalSetToRelease(rmnode);
             }

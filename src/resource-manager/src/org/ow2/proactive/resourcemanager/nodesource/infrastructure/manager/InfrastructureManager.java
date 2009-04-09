@@ -56,7 +56,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 public abstract class InfrastructureManager implements Serializable {
 
     /** manager's node source */
-    private NodeSource nodeSource;
+    protected NodeSource nodeSource;
 
     /**
      * Adds information required to deploy nodes in the future.

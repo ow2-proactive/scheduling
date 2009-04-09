@@ -84,7 +84,7 @@ public class NodeSource implements InitActive {
      * @param body active object body
      */
     public void initActivity(Body body) {
-        infrastructureManager.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
+        infrastructureManager.setNodeSource(this);
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
         try {
             pinger = (Pinger) PAActiveObject.newActive(Pinger.class.getName(), new Object[] { PAActiveObject
@@ -152,28 +152,39 @@ public class NodeSource implements InitActive {
     }
 
     /**
-     * Releases the node from resource manager.
+     * Removes the node from the node source.
      *
-     * @param node to be released
+     * @param nodeUrl the url of the node to be released
      * @param forever if true removes the node from underlying infrastructure forever without
      * an ability to re-acquire node in the future
      */
-    public void removeNode(Node node, boolean forever) {
-
-        String nodeUrl = node.getNodeInformation().getURL();
-        if (logger.isInfoEnabled()) {
-            logger.info("[" + name + "] removing Node : " + nodeUrl);
-        }
+    public void removeNode(String nodeUrl, boolean forever) {
 
         //verifying if node is already in the list,
         //node could have fallen between remove request and the confirm
         if (this.nodes.containsKey(nodeUrl)) {
-            //for a static GCM node Source the runtime is always killed
-            nodes.remove(nodeUrl);
+            logger.info("[" + name + "] removing node : " + nodeUrl);
+            Node node = nodes.remove(nodeUrl);
             try {
                 infrastructureManager.removeNode(node, forever);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage());
+            }
+        } else {
+            Node downNode = null;
+            for (Node dn : downNodes) {
+                if (dn.getNodeInformation().getURL().equals(nodeUrl)) {
+                    downNode = dn;
+                    break;
+                }
+            }
+
+            if (downNode != null) {
+                logger.info("[" + name + "] removing down node : " + nodeUrl);
+                downNodes.remove(downNode);
+            } else {
+                logger.error("[" + name + "] removing node : " + nodeUrl +
+                    " which is not belong to this node source");
             }
         }
 
