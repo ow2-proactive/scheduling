@@ -30,17 +30,17 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.logforwarder.providers;
+package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 
 import java.net.URI;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.ow2.proactive.scheduler.common.util.SimpleLoggerServer;
-import org.ow2.proactive.scheduler.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.util.SimpleLoggerServer;
 
 
 /**
@@ -57,7 +57,7 @@ public class SocketBasedForwardingProvider implements LogForwardingProvider {
     private SimpleLoggerServer sls;
 
     /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#createServer()
+     * @see org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider#createServer()
      */
     public URI createServer() throws LogForwardingException {
         try {
@@ -70,14 +70,14 @@ public class SocketBasedForwardingProvider implements LogForwardingProvider {
     }
 
     /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#destroyServer()
+     * @see org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider#destroyServer()
      */
     public void terminateServer() {
         this.sls.stop();
     }
 
     /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#createAppenderProvider(java.net.URI)
+     * @see org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider#createAppenderProvider(java.net.URI)
      */
     public AppenderProvider createAppenderProvider(URI serverURI) {
         return new SocketAppenderProvider(serverURI.getHost(), serverURI.getPort());
@@ -102,7 +102,7 @@ public class SocketBasedForwardingProvider implements LogForwardingProvider {
         }
 
         /* (non-Javadoc)
-         * @see org.ow2.proactive.scheduler.util.logforwarder.AppenderProvider#getAppender()
+         * @see org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider#getAppender()
          */
         public Appender getAppender() {
             return new SocketAppender(this.hostname, this.port);

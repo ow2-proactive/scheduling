@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.logforwarder.util;
+package org.ow2.proactive.scheduler.common.util.logforwarder.util;
 
 import java.io.IOException;
 import java.io.OutputStream;

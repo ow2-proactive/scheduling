@@ -39,6 +39,8 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 
 
 /**
@@ -98,11 +100,10 @@ public interface UserSchedulerInterface_ extends Serializable {
      * A user can only listen to HIS jobs.
      *
      * @param jobId the id of the job to listen to.
-     * @param hostname the host name where to send the log.
-     * @param port the port number on which the log will be sent.
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+	 * @param appenderProvider a provider for an appender that must be connected on a log server on the caller side (see {@link LogForwardingService})
+     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right), or if the appender cannot be created.
      */
-    public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException;
+    public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException;
 
     /**
      * Kill the job represented by jobId.<br>

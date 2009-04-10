@@ -1,4 +1,4 @@
-package org.ow2.proactive.scheduler.util.logforwarder.appenders;
+package org.ow2.proactive.scheduler.common.util.logforwarder.appenders;
 
 import java.io.IOException;
 import java.net.InetAddress;

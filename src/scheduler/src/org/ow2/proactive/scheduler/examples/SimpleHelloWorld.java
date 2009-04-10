@@ -50,7 +50,9 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.common.util.SimpleLoggerServer;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
+import org.ow2.proactive.scheduler.common.util.logforwarder.util.SimpleLoggerServer;
 
 
 /**
@@ -123,15 +125,13 @@ public class SimpleHelloWorld {
             System.out.println("Getting job output...");
             try {
                 // it will launch a listener that will listen connection on any free port
-                simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
+		LogForwardingService lfs = new LogForwardingService("org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider");
+		lfs.initialize();
                 // next, this method will forward task output on the previous loggerServer
-                scheduler.listenLog(jobId, ProActiveInet.getInstance().getHostname(), simpleLoggerServer
-                        .getPort());
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                scheduler.listenLog(jobId, lfs.getAppenderProvider());
+            } catch (LogForwardingException e) {
+				e.printStackTrace();
+			}
 
             //******************** GET JOB RESULT ***********************
             // it is better to get the result when the job is terminated.

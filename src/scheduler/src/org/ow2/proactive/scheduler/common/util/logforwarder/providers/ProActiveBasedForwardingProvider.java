@@ -30,25 +30,21 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.logforwarder.providers;
+package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.log4j.Appender;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.remote.ProActiveAppender;
 import org.objectweb.proactive.core.util.log.remote.ProActiveLogCollector;
 import org.objectweb.proactive.core.util.log.remote.ProActiveLogCollectorDeployer;
 import org.objectweb.proactive.core.util.log.remote.ThrottlingProvider;
-import org.ow2.proactive.scheduler.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider;
-
-import sun.rmi.runtime.NewThreadAction;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
 
 
 /**
@@ -62,7 +58,7 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
     private ProActiveLogCollectorDeployer collectorDeployer;
 
     /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#createAppenderProvider(java.net.URI)
+     * @see org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider#createAppenderProvider(java.net.URI)
      */
     public AppenderProvider createAppenderProvider(URI serverURI) throws LogForwardingException {
         try {
@@ -73,7 +69,7 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
     }
 
     /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#createServer()
+     * @see org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider#createServer()
      */
     public URI createServer() throws LogForwardingException {
         try {
@@ -85,7 +81,7 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
     }
 
     /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#destroyServer()
+     * @see org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider#destroyServer()
      */
     public void terminateServer() throws LogForwardingException {
         try {

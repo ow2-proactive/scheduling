@@ -30,7 +30,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.logforwarder;
+package org.ow2.proactive.scheduler.common.util.logforwarder;
 
 import java.net.URI;
 

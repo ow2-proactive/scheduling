@@ -35,9 +35,8 @@ import java.io.IOException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.util.ProActiveInet;
 import org.osgi.framework.BundleContext;
-import org.ow2.proactive.scheduler.common.util.SimpleLoggerServer;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 
 
 /**
@@ -52,8 +51,7 @@ public class Activator extends AbstractUIPlugin {
 
     // The shared instance
     private static Activator plugin;
-    private static String hostname = null;
-    private static SimpleLoggerServer simpleLoggerServer = null;
+    public static LogForwardingService lfs = null;
 
     /*
      * The constructor
@@ -86,19 +84,18 @@ public class Activator extends AbstractUIPlugin {
      */
     public static void startLoggerServer() throws IOException {
         // start the log server
-        simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
-        hostname = ProActiveInet.getInstance().getHostname();
+        lfs = new LogForwardingService("org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider");
+        lfs.initialize();
     }
 
     /**
      * Stop the current logger server.
      */
     public static void terminateLoggerServer() {
-        if (simpleLoggerServer != null) {
-            simpleLoggerServer.stop();
+        if (lsf != null) {
+            lsf.terminate();
         }
-        simpleLoggerServer = null;
-        hostname = null;
+        lsf = null;
     }
 
     /*
@@ -110,27 +107,6 @@ public class Activator extends AbstractUIPlugin {
         return plugin;
     }
 
-    /*
-     * Returns the hostname
-     * 
-     * @return the hostname
-     */
-    public static String getHostname() {
-        return hostname;
-    }
-
-    /*
-     * Return the port on which logs are listened.
-     * 
-     * @return the port on which logs are listened.
-     */
-    public static int getListenPortNumber() {
-        if (simpleLoggerServer != null) {
-            return simpleLoggerServer.getPort();
-        } else {
-            throw new RuntimeException("Logger server is not created yet");
-        }
-    }
 
     public static String getPluginId() {
         return PLUGIN_ID;

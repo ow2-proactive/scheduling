@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 
 
 /**
@@ -100,10 +101,10 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
      */
-    public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
-        schedulerFrontend.listenLog(jobId, hostname, port);
+    public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException {
+        schedulerFrontend.listenLog(jobId, appenderProvider);
     }
 
     /**

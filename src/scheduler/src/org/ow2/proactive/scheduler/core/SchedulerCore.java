@@ -48,10 +48,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.AsyncAppender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.net.SocketAppender;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -100,6 +100,9 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.core.db.Condition;
 import org.ow2.proactive.scheduler.core.db.ConditionComparator;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
@@ -156,10 +159,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Number of time to retry an active object creation if it fails to create */
     private static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
 
-    /** Host name of the scheduler for logger system. */
-    //    private String host = null;
-    /** Selected port for connection logger system */
-    //    private int port;
     /** Log forwarding service for nodes */
     private LogForwardingService lfs;
 
@@ -195,6 +194,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
     /** Timer used for remove result method (transient because Timer is not serializable)*/
     private transient Timer timer = new Timer();
+
+    /** Log forwarding service for nodes */
+    private LogForwardingService lfs;
 
     /** Jobs that must be logged into the corresponding appenders */
     private Hashtable<JobId, AsyncAppender> jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
@@ -330,9 +332,16 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             this.frontend = frontend;
             this.currentJobToSubmit = jobSubmitLink;
             //loggers
-            this.lfs = new LogForwardingService();
-            this.lfs.initialize();
-            logger_dev.info("Initialized log forwarding service at " + this.lfs.getLogServerURI());
+            String providerClassname = PASchedulerProperties.LOGS_FORWARDING_PROVIDER.getValueAsString();
+            if (providerClassname==null || providerClassname.equals("")) {
+                logger.error("LogForwardingProvider property is not properly set.");
+                throw new RuntimeException("LogForwardingProvider property is not properly set.");
+            } else {
+		this.lfs = new LogForwardingService(providerClassname);
+		this.lfs.initialize();
+                logger_dev.info("Initialized log forwarding service at " + this.lfs.getServerURI());
+            }
+
             this.policy = (Policy) Class.forName(policyFullName).newInstance();
             logger_dev.info("Instanciated policy : " + policyFullName);
             logger.info("Scheduler Core ready !");
@@ -1335,10 +1344,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
      */
-    public void listenLog(JobId jobId, String hostname, int logPort) {
-        logger_dev.info("listen logs of job '" + jobId + "'");
-        AsyncAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
-        Logger l = null;
+    public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException {
+	logger_dev.info("listen logs of job '" + jobId + "'");
+	AsyncAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
+	Logger l = null;
+	// create the appender to the remote listener
+	Appender appender=null;
+		try {
+			appender = appenderProvider.getAppender();
+		} catch (LogForwardingException e1) {
+			 logger.error("Cannot create an appender for job " + jobId, e1);
+             logger_dev.error("", e1);
+             throw new SchedulerException("Cannot create an appender for job " + jobId, e1);
+		}
         if (bufferForJobId == null) {
             // can be not null if a log file has been defined for this job
             // or created by previous call to listenLog
@@ -1349,9 +1367,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             l.setAdditivity(false);
             l.addAppender(bufferForJobId);
         }
-        SocketAppender socketToListener = new SocketAppender(hostname, logPort);
-        // should add the socket appender before activating logs on running tasks !
-        bufferForJobId.addAppender(socketToListener);
+        // should add the appender before activating logs on running tasks !
+        bufferForJobId.addAppender(appender);
         InternalJob target = this.jobs.get(jobId);
         if ((target != null) && !this.pendingJobs.contains(target)) {
             // this jobs contains running and finished tasks
@@ -1379,7 +1396,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 if (logs instanceof Log4JTaskLogs) {
                     for (LoggingEvent le : ((Log4JTaskLogs) logs).getAllEvents()) {
                         // write into socket appender directly to avoid double lines on other listeners
-                        socketToListener.doAppend(le);
+                        appender.doAppend(le);
                     }
                 } else {
                     l.info(logs.getStdoutLogs(false));
@@ -1695,6 +1712,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         jobsToBeLogged.clear();
         jobsToBeLoggedinAFile.clear();
         currentlyRunningTasks.clear();
+        logger_dev.info("Terminating logging service...");
+        if (this.lfs!=null){
+		try {
+			this.lfs.terminate();
+		} catch (LogForwardingException e) {
+			logger.error("Cannot terminate logging service : "+e.getMessage());
+			logger_dev.error("",e);
+		}
+        }
         //finally : shutdown
         status = SchedulerStatus.KILLED;
         logger.info("Scheduler has just been killed !");

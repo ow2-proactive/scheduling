@@ -77,6 +77,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
@@ -96,6 +97,14 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
+ */
+/**
+ * @author cdelbe
+ *
+ */
+/**
+ * @author cdelbe
+ *
  */
 public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, AdminSchedulerInterface {
 
@@ -460,10 +469,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         scheduler.remove(jobId);
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
+
+    /* (non-Javadoc)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
      */
-    public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
+    public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
@@ -485,7 +495,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throw new SchedulerException(msg);
         }
 
-        scheduler.listenLog(jobId, hostname, port);
+        scheduler.listenLog(jobId, appenderProvider);
     }
 
     /**

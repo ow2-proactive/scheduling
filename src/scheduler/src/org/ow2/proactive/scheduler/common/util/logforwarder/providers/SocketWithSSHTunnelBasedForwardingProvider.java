@@ -30,16 +30,16 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.logforwarder.providers;
+package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 
 import java.io.IOException;
 import java.net.URI;
 
 import org.apache.log4j.Appender;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.ow2.proactive.scheduler.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.util.logforwarder.appenders.SocketAppenderWithSSHTunneling;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.SocketAppenderWithSSHTunneling;
 
 
 /**
@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.util.logforwarder.appenders.SocketAppenderWit
 public class SocketWithSSHTunnelBasedForwardingProvider extends SocketBasedForwardingProvider {
 
     /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#createAppenderProvider(java.net.URI)
+     * @see org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider#createAppenderProvider(java.net.URI)
      */
     public AppenderProvider createAppenderProvider(URI serverURI) {
         // use ProActive defined ssh port if any
@@ -81,7 +81,7 @@ public class SocketWithSSHTunnelBasedForwardingProvider extends SocketBasedForwa
         }
 
         /* (non-Javadoc)
-         * @see org.ow2.proactive.scheduler.util.logforwarder.AppenderProvider#getAppender()
+         * @see org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider#getAppender()
          */
         public Appender getAppender() throws LogForwardingException {
             // resolve username locally: use ProActive defined username, or current username if any

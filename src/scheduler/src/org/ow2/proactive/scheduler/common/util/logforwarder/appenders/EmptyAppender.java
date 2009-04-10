@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -22,34 +22,36 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.logforwarder;
+package org.ow2.proactive.scheduler.common.util.logforwarder.appenders;
 
-/**
- * LogForwardingService related Exception.
- */
-public class LogForwardingException extends Exception {
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.spi.LoggingEvent;
 
-    public LogForwardingException() {
+
+public class EmptyAppender extends AppenderSkeleton {
+    public static EmptyAppender SINK = new EmptyAppender();
+
+    // singleton
+    private EmptyAppender() {
     }
 
-    public LogForwardingException(String message) {
-        super(message);
+    @Override
+    protected void append(LoggingEvent event) {
     }
 
-    public LogForwardingException(Throwable cause) {
-        super(cause);
+    @Override
+    public void close() {
     }
 
-    public LogForwardingException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    public boolean requiresLayout() {
+        return false;
     }
-
 }

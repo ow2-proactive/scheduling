@@ -59,6 +59,7 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
@@ -194,11 +195,11 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, AppenderProvider appenderProvider)
      */
-    public void listenLog(JobId jobId, String hostname, int port) {
+    public void listenLog(JobId jobId, AppenderProvider appenderProvider) {
         try {
-            scheduler.listenLog(jobId, hostname, port);
+            scheduler.listenLog(jobId, appenderProvider);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on listen log", e);
             e.printStackTrace();
