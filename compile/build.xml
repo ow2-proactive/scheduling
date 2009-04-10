@@ -499,9 +499,6 @@
 				<include name="org/ow2/proactive/scheduler/util/process/CaseInsensitiveComparator.java" />
 				<include name="org/ow2/proactive/scheduler/util/process/ThreadReader.java" />
 				<include name="org/ow2/proactive/scheduler/util/process/ProcessTreeKiller.java" />
-				<include name="org/ow2/proactive/scheduler/util/logforwarder/LoggingOutputStream.java" />
-				<include name="org/ow2/proactive/scheduler/util/logforwarder/AsyncAppenderWithStorage.java" />
-				<include name="org/ow2/proactive/scheduler/util/logforwarder/EmptyAppender.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/AsyncAppenderWithStorage.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/EmptyAppender.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/SocketAppenderWithSSHTunneling.java" />
