@@ -70,6 +70,7 @@ import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
 
 
 /**
@@ -380,19 +381,22 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * Return the classloader for the given jobclasspath if any, default classloader otherwise
-     * @return the classloader for the given jobclasspath if any, default classloader otherwise
-     * @throws IOException if the jobclasspath classloader cannot be created
+     * Return the classloader for the given jobclasspath if any.
+     * @return on worker node, the taskClassLoader. On client side, an URL classloader created from the jobclasspath,
+     * or the current contextClassLoader if no jobclasspath is set.
+     * @throws IOException if the classloader cannot be created.
      */
-    private ClassLoader getTaskClassLoader() throws IOException { // TODO cdelbe : singleton ?
-        if (this.jobClasspath != null) {
+    private ClassLoader getTaskClassLoader() throws IOException {
+        ClassLoader currentCCL = Thread.currentThread().getContextClassLoader();
+        if (!(currentCCL instanceof TaskClassLoader) && (this.jobClasspath != null)) {
+            //we are not on a worker and jcp is set...
             URL[] urls = new URL[this.jobClasspath.length];
             for (int i = 0; i < this.jobClasspath.length; i++) {
-                urls[i] = new File(this.jobClasspath[i]).toURL();
+                urls[i] = new File(this.jobClasspath[i]).toURI().toURL();
             }
-            return new URLClassLoader(urls, this.getClass().getClassLoader());
+            return new URLClassLoader(urls, currentCCL);
         } else {
-            return this.getClass().getClassLoader();
+            return currentCCL;
         }
     }
 

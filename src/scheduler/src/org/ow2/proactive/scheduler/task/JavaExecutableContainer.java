@@ -117,6 +117,8 @@ public class JavaExecutableContainer implements ExecutableContainer {
             try {
                 TaskClassLoader tcl = new TaskClassLoader(ClassLoader.getSystemClassLoader(),
                     this.classServer);
+                // the tcl becomes the context classloader
+                Thread.currentThread().setContextClassLoader(tcl);
                 Class<?> userExecutableClass = tcl.loadClass(this.userExecutableClassName);
                 userExecutable = (JavaExecutable) userExecutableClass.newInstance();
                 Map<String, String> tmp = new HashMap<String, String>();

@@ -85,6 +85,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 this.executePreScript(getNodes().get(0));
             }
 
+            // create the executable (will set the context class loader to the taskclassserver)
             currentExecutable = executableContainer.getExecutable();
             //init task
             currentExecutable.init();
