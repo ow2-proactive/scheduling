@@ -443,4 +443,20 @@ public class TaskResultImpl implements TaskResult {
         return jobClasspath;
     }
 
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        try {
+            if (hadException()) {
+                return getException().toString();
+            } else {
+                return value().toString();
+            }
+        } catch (Throwable t) {
+            return "Result not available";
+        }
+    }
+
 }

@@ -266,8 +266,7 @@ public class DatabaseManager {
         //the goal is take advantage of polymorphism, so don't check if the class is an entity
         //A given class may return its object and every sub-object of this class.
         //checkIsEntity(egClass);
-        logger_dev.info("Trying to recover this class " + egClass + " using " + conditions.length +
-            " conditions");
+        logger_dev.info("Trying to recover " + egClass + " using " + conditions.length + " conditions");
         Session session = DatabaseManager.getSessionFactory().openSession();
         try {
             logger_dev.info("Creating query...");

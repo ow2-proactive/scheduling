@@ -1234,6 +1234,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     .isPreciousResult());
             logger_dev.info("TaskResult added to job '" + job.getId() + "' - task name is '" +
                 descriptor.getName() + "'");
+
             //and update database
             DatabaseManager.synchronize(job.getJobInfo());
             DatabaseManager.synchronize(descriptor.getTaskInfo());
@@ -1470,8 +1471,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //extract full taskResult from DB
         //use the previous result to get the task Id matching the given name.
         //extract full copy from DB to avoid load, unload operation
-        result = DatabaseManager.recover(result.getClass(),
-                new Condition("id", ConditionComparator.EQUALS_TO, result.getTaskId())).get(0);
+        //Hibernate hold every taskResults even the faulty one, can be interesting to have history
+        //So get the result of the task is getting the last one.
+        List<? extends TaskResult> results = DatabaseManager.recover(result.getClass(), new Condition("id",
+            ConditionComparator.EQUALS_TO, result.getTaskId()));
+        result = results.get(results.size() - 1);
 
         if ((result != null)) {
             logger_dev.info("Get '" + taskName + "' task result for job '" + jobId + "'");

@@ -397,7 +397,7 @@ public class TaskComposite extends Composite {
         return tr;
     }
 
-    private static void deleteTaskResultCache() {
+    public static void deleteTaskResultCache() {
         cachedTaskResult.clear();
     }
 
@@ -472,9 +472,6 @@ public class TaskComposite extends Composite {
 
             // Turn drawing back on
             table.setRedraw(true);
-
-            // delete taskresult cache
-            deleteTaskResultCache();
 
         }
     }

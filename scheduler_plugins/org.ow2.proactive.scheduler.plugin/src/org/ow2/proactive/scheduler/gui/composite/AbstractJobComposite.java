@@ -316,6 +316,8 @@ public abstract class AbstractJobComposite extends Composite {
         TableManager.getInstance().add(table);
 
         table.addListener(SWT.Selection, new Listener() {
+            private JobId lastSelected;
+
             public void handleEvent(Event event) {
                 Widget widget = event.item;
 
@@ -336,12 +338,19 @@ public abstract class AbstractJobComposite extends Composite {
                     // update its informations
                     JobInfo jobInfo = JobInfo.getInstance();
                     if (jobInfo != null) {
-                        if (jobsId.isEmpty())
+                        if (jobsId.isEmpty()) {
                             jobInfo.clear();
-                        else if (jobsId.size() == 1)
-                            jobInfo.updateInfos(job);
-                        else
-                            jobInfo.updateInfos(JobsController.getLocalView().getJobsByIds(jobsId));
+                        } else {
+                            if (jobsId.size() == 1) {
+                                jobInfo.updateInfos(job);
+                            } else {
+                                jobInfo.updateInfos(JobsController.getLocalView().getJobsByIds(jobsId));
+                            }
+                            if (lastSelected == null || !jobId.equals(lastSelected)) {
+                                lastSelected = jobId;
+                                TaskComposite.deleteTaskResultCache();
+                            }
+                        }
 
                         // set Focus on job info
                         IWorkbench iworkbench = PlatformUI.getWorkbench();
