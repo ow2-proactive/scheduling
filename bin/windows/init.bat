@@ -27,14 +27,15 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\classes\common;%PA_SCHEDULER%\classes\resource-manager;%PA_SCHEDULER%\classes\scheduler
 	SET JARS=%PA_SCHEDULER%\lib\
 	FOR %%j IN ("%PA_SCHEDULER%\lib\*.jar") DO SET JARS=!JARS!;%%j
-	rem Use jar index to avoid 'command too long'	
+	rem Use jar index to avoid 'command too long'
 	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar 
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 	rem hibernate libs
 	FOR %%j IN ("%PA_SCHEDULER%\lib\hibernate\annotation\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\lib\hibernate\core\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
-	SET JAR=
+	rem unset JARS variable if set
+	SET JARS=
 	rem Jars needed by the scheduler
 	FOR %%j IN ("%PA_SCHEDULER%\dist\lib\*.jar") DO SET JARS=!JARS!;%%j
 )

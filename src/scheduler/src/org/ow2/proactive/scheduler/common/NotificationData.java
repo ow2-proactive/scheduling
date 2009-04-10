@@ -33,8 +33,6 @@ package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
 
-import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
-
 
 /**
  * NotificationData is used by the Scheduler Core to notify the front-end of any changes.
