@@ -160,7 +160,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     //    private String host = null;
     /** Selected port for connection logger system */
     //    private int port;
-
+    /** Log forwarding service for nodes */
     private LogForwardingService lfs;
 
     /** Implementation of Resource Manager */
@@ -329,23 +329,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             this.resourceManager = imp;
             this.frontend = frontend;
             this.currentJobToSubmit = jobSubmitLink;
-            //logger
+            //loggers
             this.lfs = new LogForwardingService();
             this.lfs.initialize();
-
-            //            try {
-            //                // redirect event only into JobLogs
-            //                SimpleLoggerServer slf = SimpleLoggerServer.createLoggerServer();
-            //                this.port = slf.getPort();
-            //                logger_dev.info("Create logger server on port " + this.port);
-            //            } catch (IOException e) {
-            //                logger.error("Cannot create logger server : " + e.getMessage());
-            //                logger_dev.error("", e);
-            //                throw new RuntimeException(e);
-            //            }
-
-            logger_dev.info("Instanciating policy : " + policyFullName);
+            logger_dev.info("Initialized log forwarding service at " + this.lfs.getLogServerURI());
             this.policy = (Policy) Class.forName(policyFullName).newInstance();
+            logger_dev.info("Instanciated policy : " + policyFullName);
             logger.info("Scheduler Core ready !");
         } catch (InstantiationException e) {
             logger.error("The policy class cannot be found : " + e.getMessage());
@@ -358,6 +347,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         } catch (ClassNotFoundException e) {
             logger.error("The class definition cannot be found, it might be due to case sentivity : " +
                 e.getMessage());
+            logger_dev.error("", e);
+            throw new RuntimeException(e);
+        } catch (LogForwardingException e) {
+            logger.error("Cannot initialize the logs forwarding service due to " + e.getMessage());
             logger_dev.error("", e);
             throw new RuntimeException(e);
         }
@@ -1382,7 +1375,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     logs = tr.getOutput();
                 }
 
-                // TODO cdelbe : ok, cmathieu, I know it's ugly. I'll fix it asap. Need more genericity for logging mechanism.
+                // TODO cdelbe Need more genericity for logging mechanism ?
                 if (logs instanceof Log4JTaskLogs) {
                     for (LoggingEvent le : ((Log4JTaskLogs) logs).getAllEvents()) {
                         // write into socket appender directly to avoid double lines on other listeners
@@ -1396,8 +1389,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             // for running tasks
             if (curRunning != null) {
                 for (TaskId tid : curRunning.keySet()) {
-                    TaskLauncher tl = curRunning.get(tid);
-                    tl.activateLogs(this.lfs.getAppenderProvider());
+                    try {
+                        TaskLauncher tl = curRunning.get(tid);
+                        tl.activateLogs(this.lfs.getAppenderProvider());
+                    } catch (LogForwardingException e) {
+                        logger.error("Cannot create an appender provider for task " + tid, e);
+                        logger_dev.error("", e);
+                    }
                 }
             }
         }
@@ -1411,7 +1409,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
 
         if (job == null) {
-            throw new SchedulerException("The job does not exist !");
+            throw new SchedulerException("The job " + jobId + " does not exist !");
         }
 
         logger_dev.info("Trying to get JobResult of job '" + jobId + "'");

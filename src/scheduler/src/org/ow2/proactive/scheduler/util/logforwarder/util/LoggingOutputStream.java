@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.logforwarder;
+package org.ow2.proactive.scheduler.util.logforwarder.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -39,7 +39,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 
-// COPYRIGHT ???
 /**
  * An OutputStream that flushes out to a Category.
  * @author Jim Moore

@@ -32,80 +32,70 @@
  */
 package org.ow2.proactive.scheduler.util.logforwarder.providers;
 
+import java.io.IOException;
 import java.net.URI;
 
 import org.apache.log4j.Appender;
-import org.apache.log4j.net.SocketAppender;
-import org.objectweb.proactive.core.util.ProActiveInet;
-import org.ow2.proactive.scheduler.common.util.SimpleLoggerServer;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.ow2.proactive.scheduler.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider;
+import org.ow2.proactive.scheduler.util.logforwarder.appenders.SocketAppenderWithSSHTunneling;
 
 
 /**
- * Socket based log forwarding service.
+ * SSH-tunneled socket based log forwarding service.
+ * @see SocketBasedForwardingProvider
+ * @see SocketAppenderWithSSHTunneling
  */
-public class SocketBasedForwardingProvider implements LogForwardingProvider {
-
-    /**
-     * Prefix for direct socket (i.e. "no protocol") connexion.
-     */
-    public static final String RAW_PROTOCOL_PREFIX = "raw";
-
-    // remote server
-    private SimpleLoggerServer sls;
-
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#createServer()
-     */
-    public URI createServer() throws LogForwardingException {
-        try {
-            this.sls = SimpleLoggerServer.createLoggerServer();
-            return new URI(RAW_PROTOCOL_PREFIX, "//" +
-                ProActiveInet.getInstance().getInetAddress().getHostName() + ":" + sls.getPort(), "");
-        } catch (Exception e) {
-            throw new LogForwardingException("Cannot create log server.", e);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#destroyServer()
-     */
-    public void terminateServer() {
-        this.sls.stop();
-    }
+public class SocketWithSSHTunnelBasedForwardingProvider extends SocketBasedForwardingProvider {
 
     /* (non-Javadoc)
      * @see org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider#createAppenderProvider(java.net.URI)
      */
     public AppenderProvider createAppenderProvider(URI serverURI) {
-        return new SocketAppenderProvider(serverURI.getHost(), serverURI.getPort());
+        // use ProActive defined ssh port if any
+        if (PAProperties.PA_SSH_PORT.isSet()) {
+            return new SocketSSHAppenderProvider(serverURI.getHost(), serverURI.getPort(),
+                PAProperties.PA_SSH_PORT.getValueAsInt());
+        } else {
+            return new SocketSSHAppenderProvider(serverURI.getHost(), serverURI.getPort(), 22);
+        }
     }
 
     /**
-     * A simple container for a log4j SocketAppender.
+     * A simple container for a log4j SocketAppenderWithSSHTunneling.
      */
-    public static class SocketAppenderProvider implements AppenderProvider {
+    public static class SocketSSHAppenderProvider implements AppenderProvider {
 
         private String hostname;
         private int port;
+        private int remoteSSHPort;
 
         /**
-         * Create a provider for SocketAppender.
-         * @param hostname the target host.
-         * @param port the port open on the target host.
+         * Create a provider for SocketAppenderWithSSHTunneling.
          */
-        SocketAppenderProvider(String hostname, int port) {
+        SocketSSHAppenderProvider(String hostname, int port, int remoteSSHPort) {
             this.hostname = hostname;
             this.port = port;
+            this.remoteSSHPort = remoteSSHPort;
         }
 
         /* (non-Javadoc)
          * @see org.ow2.proactive.scheduler.util.logforwarder.AppenderProvider#getAppender()
          */
-        public Appender getAppender() {
-            return new SocketAppender(this.hostname, this.port);
+        public Appender getAppender() throws LogForwardingException {
+            // resolve username locally: use ProActive defined username, or current username if any
+            String sshUserName = PAProperties.PA_SSH_USERNAME.getValue();
+            if ((sshUserName == null) || sshUserName.equals("")) {
+                sshUserName = System.getProperty("user.name");
+            }
+            try {
+                return new SocketAppenderWithSSHTunneling(sshUserName, this.hostname, this.port,
+                    this.remoteSSHPort);
+            } catch (IOException e) {
+                throw new LogForwardingException("Cannot create a SSH-tunneled appender to " + this.hostname +
+                    ":" + this.port, e);
+            }
         }
 
     }

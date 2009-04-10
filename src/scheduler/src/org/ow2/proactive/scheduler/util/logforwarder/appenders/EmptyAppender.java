@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -22,33 +22,36 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.logforwarder;
+package org.ow2.proactive.scheduler.util.logforwarder.appenders;
 
-import java.io.Serializable;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.spi.LoggingEvent;
 
-import org.apache.log4j.Appender;
 
+public class EmptyAppender extends AppenderSkeleton {
+    public static EmptyAppender SINK = new EmptyAppender();
 
-/**
- * An appender provider is a container that can be sent over the network and that contains a log appender.
- * Actual creation and activation of the contained appender should be performed by the getAppender() method
- * on receiver side.
- */
-public interface AppenderProvider extends Serializable {
+    // singleton
+    private EmptyAppender() {
+    }
 
-    /**
-     * Create and return the contained appender. Note that several call to getAppender() return the same appender instance is not specified.
-     * @return an instance of the contained log appender.
-     * @throws LogForwardingException if the appender cannot be created or activated.
-     */
-    public Appender getAppender() throws LogForwardingException;
+    @Override
+    protected void append(LoggingEvent event) {
+    }
 
+    @Override
+    public void close() {
+    }
+
+    @Override
+    public boolean requiresLayout() {
+        return false;
+    }
 }

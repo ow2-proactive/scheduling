@@ -1,15 +1,46 @@
-/**
+/*
+ * ################################################################
  *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.util.logforwarder;
 
 import java.net.URI;
 
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.python.modules.synchronize;
 
 
 /**
  * This class provides server and appenders for log forwarding.
+ * Forwarding method/protocol (direct socket, ssh-tunneled sockets or ProActive) is specified by the LogForwarding provider.
  * @see LogForwardingProvider
  */
 public final class LogForwardingService {
@@ -23,15 +54,19 @@ public final class LogForwardingService {
     private LogForwardingProvider provider;
 
     /**
-     * Create the server side
+     * Instantiate the LogForwardingProvider specified by pa.scheduler.logs.provider property,
+     * and create and start the log server.
+     * AppenderProvider to this server are available after the call to initialize().
+     * @throws LogForwardingException if the LogForwardingProvider cannot be instantiated, or if the log server cannot be created.
+     * @throws IllegalStateException if the LogForwardingService is already initialized.
      */
-    public final void initialize() {
+    public final synchronized void initialize() throws LogForwardingException {
         try {
             if (!initialized) {
                 // load the provider
                 String providerClassname = PASchedulerProperties.LOGS_FORWARDING_PROVIDER.getValueAsString();
                 if (providerClassname == null || providerClassname == "") {
-                    // TODO ?
+                    throw new LogForwardingException("LogForwardingProvider class is not defined.");
                 } else {
                     Class<? extends LogForwardingProvider> providerClass = (Class<? extends LogForwardingProvider>) Class
                             .forName(providerClassname);
@@ -43,32 +78,42 @@ public final class LogForwardingService {
                 throw new IllegalStateException("The service has already been initialized.");
             }
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new LogForwardingException("LogForwardingProvider class cannot be found.", e);
         } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new LogForwardingException("LogForwardingProvider cannot be instanciated.", e);
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new LogForwardingException("LogForwardingProvider cannot be instanciated.", e);
         } catch (ClassCastException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new LogForwardingException(
+                "Class defined as LogForwardingProvider is not a LogForwardingProvider.", e);
         }
     }
 
     /**
-     * Create an appender to the server
-     * @throws
-     * @return
+     * Create an appender provider that contains an appender to the server created by initialize() method.
+     * @throws LogForwardingException if the appender provider cannot be created.
+     * @throws IllegalStateException if the LogForwardingService is not initialized.
+     * @return an appender provider that contains an appender to the server created by initialize() method.
      */
-    public final AppenderProvider getAppenderProvider() {
+    public final synchronized AppenderProvider getAppenderProvider() throws LogForwardingException {
         if (initialized) {
-            System.out.println("LogForwardingService.getAppenderProvider() : " + this.serverConnection);
             return provider.createAppenderProvider(this.serverConnection);
         } else {
             throw new IllegalStateException(
                 "The service has not been initialized. Cannot create appender provider.");
+        }
+    }
+
+    /**
+     * Return the URI on which the log server is bound.
+     * @return the URI on which the log server is bound.
+     * @throws IllegalStateException if the LogForwardingService is not initialized.
+     */
+    public final synchronized URI getLogServerURI() {
+        if (initialized) {
+            return this.serverConnection;
+        } else {
+            throw new IllegalStateException("The service has not been initialized.");
         }
     }
 

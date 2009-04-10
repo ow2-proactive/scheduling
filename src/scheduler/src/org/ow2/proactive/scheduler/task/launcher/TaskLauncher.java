@@ -59,9 +59,10 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider;
-import org.ow2.proactive.scheduler.util.logforwarder.AsyncAppenderWithStorage;
-import org.ow2.proactive.scheduler.util.logforwarder.LoggingOutputStream;
+import org.ow2.proactive.scheduler.util.logforwarder.appenders.AsyncAppenderWithStorage;
+import org.ow2.proactive.scheduler.util.logforwarder.util.LoggingOutputStream;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -260,17 +261,19 @@ public abstract class TaskLauncher implements InitActive {
 
     /**
      * Activate the logs on this host and port.
-     *
-     * @param host the host on which to activate the log.
-     * @param port the port on which to activate the log.
+     * @param logSink the provider for the appender to write in.
      */
     @SuppressWarnings("unchecked")
     public void activateLogs(AppenderProvider logSink) {
-        logger_dev.debug("activate logs");
+        logger_dev.debug("Activating logs for task " + this.taskId);
         // should reset taskId because calling thread is not active thread (immediate service)
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
-        // already logged events must be flushed
-        this.logAppender.addAppender(logSink.getAppender());
+        try {
+            Appender a = logSink.getAppender();
+            this.logAppender.addAppender(a);
+        } catch (LogForwardingException e) {
+            logger_dev.error("Cannot create log appender.", e);
+        }
     }
 
     /**
