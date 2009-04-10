@@ -155,7 +155,7 @@ public class RMStore {
                 } else {
                     msg = "has been shutdown";
                 }
-                MessageDialog.openInformation(ResourceExplorerView.getRMShell(), "shutdown",
+                MessageDialog.openInformation(Display.getDefault().getActiveShell(), "shutdown",
                         "Resource manager  '" + RMStore.getInstance().getURL() + "'  " + msg +
                             ", now disconnect.");
                 disconnectionActions();
