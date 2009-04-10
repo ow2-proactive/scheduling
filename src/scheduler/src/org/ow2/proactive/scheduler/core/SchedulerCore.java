@@ -159,9 +159,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Number of time to retry an active object creation if it fails to create */
     private static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
 
-    /** Log forwarding service for nodes */
-    private LogForwardingService lfs;
-
     /** Implementation of Resource Manager */
     private ResourceManagerProxy resourceManager;
 
@@ -1372,8 +1369,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         InternalJob target = this.jobs.get(jobId);
         if ((target != null) && !this.pendingJobs.contains(target)) {
             // this jobs contains running and finished tasks
-            // for running tasks, activate loggers on taskLauncher side
-            Hashtable<TaskId, TaskLauncher> curRunning = this.currentlyRunningTasks.get(jobId);
+
             // for finished tasks, add logs events "manually"
             Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
             for (TaskResult tr : allRes) {
@@ -1403,6 +1399,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     l.error(logs.getStderrLogs(false));
                 }
             }
+
+            // for running tasks, activate loggers on taskLauncher side
+            Hashtable<TaskId, TaskLauncher> curRunning = this.currentlyRunningTasks.get(jobId);
             // for running tasks
             if (curRunning != null) {
                 for (TaskId tid : curRunning.keySet()) {

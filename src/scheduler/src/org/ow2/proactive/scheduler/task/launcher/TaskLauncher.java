@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.task.launcher;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -41,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.net.SocketAppender;
+import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -122,13 +124,15 @@ public abstract class TaskLauncher implements InitActive {
     protected transient PrintStream redirectedStderr;
     // default appender for log storage
     protected transient AsyncAppenderWithStorage logAppender;
-    // additional appender for runtime log forwarding
-    // protected transient ?? remoteAppender;
 
     // not null if an executable is currently executed
     protected Executable currentExecutable;
     // true if the executable has been stopped before its normal termination
     protected boolean hasBeenKilled;
+    // true if finalizeLoggers has been called
+    private final AtomicBoolean loggersFinalized = new AtomicBoolean(false);
+    // true if loggers are currently activated
+    private final AtomicBoolean loggersActivated = new AtomicBoolean(false);
 
     /** Maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     protected long wallTime = 0;
@@ -212,7 +216,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     @SuppressWarnings("unchecked")
     protected void initLoggers() {
-        logger_dev.debug("Init loggers");
+        logger_dev.info("Init loggers");
         // error about log should not be logged
         LogLog.setQuietMode(true);
         // create logger
@@ -265,20 +269,43 @@ public abstract class TaskLauncher implements InitActive {
      */
     @SuppressWarnings("unchecked")
     public void activateLogs(AppenderProvider logSink) {
-        logger_dev.debug("Activating logs for task " + this.taskId);
-        // should reset taskId because calling thread is not active thread (immediate service)
-        MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
-        try {
-            MDC.getContext().put(Log4JTaskLogs.MDC_HOST,
-                    PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
-        } catch (NodeException e) {
-            MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
-        }
-        try {
-            Appender a = logSink.getAppender();
-            this.logAppender.addAppender(a);
-        } catch (LogForwardingException e) {
-            logger_dev.error("Cannot create log appender.", e);
+        synchronized (this.loggersFinalized) {
+            logger_dev.info("Activating logs for task " + this.taskId);
+            if (this.loggersActivated.get()) {
+                logger_dev.info("Logs for task " + this.taskId + " are already activated");
+                return;
+            }
+            this.loggersActivated.set(true);
+            // should reset taskId because calling thread is not active thread (immediate service)
+            MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
+            try {
+                MDC.getContext().put(Log4JTaskLogs.MDC_HOST,
+                        PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
+            } catch (NodeException e) {
+                MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
+            }
+            // create appender
+            Appender a = null;
+            try {
+                a = logSink.getAppender();
+            } catch (LogForwardingException e) {
+                logger_dev.error("Cannot create log appender.", e);
+                return;
+            }
+            // fill appender
+            if (!this.loggersFinalized.get()) {
+                this.logAppender.addAppender(a);
+            } else {
+                logger_dev.info("Logs for task " + this.taskId + " are closed. Flushing buffer...");
+                // Everything is closed: reopen and close...
+                for (LoggingEvent e : this.logAppender.getStorage()) {
+                    a.doAppend(e);
+                }
+                a.close();
+                this.loggersActivated.set(false);
+                return;
+            }
+            logger_dev.info("Activated logs for task " + this.taskId);
         }
     }
 
@@ -286,13 +313,17 @@ public abstract class TaskLauncher implements InitActive {
      * Close scheduler task logger and reset stdout/err
      */
     protected void finalizeLoggers() {
-        //Unhandle loggers
-        this.flushStreams();
-        this.logAppender.close();
-        //FIXME : want to close only the task logger !
-        //LogManager.shutdown();
-        System.setOut(System.out);
-        System.setErr(System.err);
+        synchronized (this.loggersFinalized) {
+            logger_dev.info("Terminating loggers for task " + this.taskId + "...");
+            this.loggersFinalized.set(true);
+            this.loggersActivated.set(false);
+            //Unhandle loggers
+            this.flushStreams();
+            this.logAppender.close();
+            System.setOut(System.out);
+            System.setErr(System.err);
+            logger_dev.info("Terminated loggers for task " + this.taskId);
+        }
     }
 
     /**

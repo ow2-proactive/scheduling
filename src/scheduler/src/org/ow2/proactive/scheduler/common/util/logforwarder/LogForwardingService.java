@@ -34,9 +34,6 @@ package org.ow2.proactive.scheduler.common.util.logforwarder;
 
 import java.net.URI;
 
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.python.modules.synchronize;
-
 
 /**
  * This class provides server and appenders for log forwarding.

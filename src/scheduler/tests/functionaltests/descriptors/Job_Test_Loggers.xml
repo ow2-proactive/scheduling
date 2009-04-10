@@ -15,7 +15,7 @@
 			<javaExecutable class="functionaltests.executables.Logging">
 				<parameters>
 					<parameter name="lines" value="2" />
-					<parameter name="sleep" value="1" />
+					<parameter name="sleep" value="2" />
 					<parameter name="stream" value="out" />
 				</parameters>
 			</javaExecutable>
