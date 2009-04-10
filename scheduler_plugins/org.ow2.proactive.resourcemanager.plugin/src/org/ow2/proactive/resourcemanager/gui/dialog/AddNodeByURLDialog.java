@@ -129,12 +129,19 @@ public class AddNodeByURLDialog extends Dialog {
                         RMStore.getInstance().getRMAdmin().addNode(urlText.getText(),
                                 sourceNameCombo.getText());
                         shell.close();
-                    } catch (RMException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
+                        String message = e.getMessage();
+
+                        if (e.getCause() != null) {
+                            message = e.getCause().getMessage();
+                        }
+
                         Activator.log(IStatus.ERROR, "Resource manager is unable to add the node: " +
                             urlText.getText(), e);
                         MessageDialog.openError(shell, "Adding Node Error",
-                                "Resource manager is unable to add the node. \n\n" + e.getMessage());
+                                "Resource manager is unable to add the node. \n\n" + message);
+                        shell.close();
                     }
                 }
             }
