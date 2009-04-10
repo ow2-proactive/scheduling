@@ -1440,6 +1440,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
         }
 
+        if (result != null) {
+            ((JobResultImpl) result).setJobInfo(job.getJobInfo());
+        }
         return result;
     }
 

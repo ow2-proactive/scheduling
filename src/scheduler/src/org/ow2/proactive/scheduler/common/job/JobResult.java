@@ -51,6 +51,12 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+/**
+ * JobResult...
+ *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 1.0
+ */
 @PublicAPI
 public interface JobResult extends Serializable {
 
@@ -67,6 +73,13 @@ public interface JobResult extends Serializable {
      * @return the name of the job that has generate this result.
      */
     public String getName();
+
+    /**
+     * Return the information of the corresponding job
+     *
+     * @return the information of the corresponding job
+     */
+    public JobInfo getJobInfo();
 
     /**
      * Return every task results of this job as a mapping between

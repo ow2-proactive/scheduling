@@ -53,6 +53,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -100,6 +101,10 @@ public class JobResultImpl implements JobResult {
     @JoinColumn(name = "PRECIOUS_RESULTS")
     private Map<String, TaskResult> preciousResults = null;
 
+    /** Info of the job at the end */
+    @Transient
+    private JobInfo jobInfo;
+
     /**
      * ProActive empty constructor
      */
@@ -129,6 +134,22 @@ public class JobResultImpl implements JobResult {
      */
     public String getName() {
         return getJobId().getReadableName();
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.JobResult#getJobInfo()
+     */
+    public JobInfo getJobInfo() {
+        return jobInfo;
+    }
+
+    /**
+     * Set the job info for this result
+     *
+     * @param jobInfo the current job info to set
+     */
+    public void setJobInfo(JobInfo jobInfo) {
+        this.jobInfo = jobInfo;
     }
 
     /**
