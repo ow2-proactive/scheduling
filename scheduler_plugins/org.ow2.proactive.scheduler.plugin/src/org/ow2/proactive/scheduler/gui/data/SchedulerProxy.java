@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
@@ -149,7 +150,12 @@ public class SchedulerProxy implements AdminSchedulerInterface {
                         "Scheduler  '" + schedulerURL + "'  seems to be down, now disconnect.");
                 StatusLabel.getInstance().disconnect();
                 // stop log server
-                Activator.terminateLoggerServer();
+                try {
+					Activator.terminateLoggerServer();
+				} catch (LogForwardingException e) {
+					Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error while terminating the logger server" ,e);
+					e.printStackTrace();
+				}
                 SeparatedJobView.clearOnDisconnection(true);
             }
         });
