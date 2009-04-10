@@ -34,10 +34,12 @@ package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Appender;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.remote.ProActiveAppender;
 import org.objectweb.proactive.core.util.log.remote.ProActiveLogCollector;
 import org.objectweb.proactive.core.util.log.remote.ProActiveLogCollectorDeployer;
@@ -57,6 +59,12 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
     // log collector deployer
     private ProActiveLogCollectorDeployer collectorDeployer;
 
+    // used for unique collector name
+    private static final AtomicInteger collectorCounter = new AtomicInteger(0);
+
+    // bind name
+    public static final String COLLECTOR_BIND_NAME = "proactive_lfs_collector";
+
     /* (non-Javadoc)
      * @see org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider#createAppenderProvider(java.net.URI)
      */
@@ -73,7 +81,9 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
      */
     public URI createServer() throws LogForwardingException {
         try {
-            collectorDeployer = new ProActiveLogCollectorDeployer("scheduler_collector");
+            collectorDeployer = new ProActiveLogCollectorDeployer(ProActiveRuntimeImpl.getProActiveRuntime()
+                    .getVMInformation().getName() +
+                COLLECTOR_BIND_NAME + collectorCounter.addAndGet(1));
             return new URI(collectorDeployer.getCollectorURL());
         } catch (URISyntaxException e) {
             throw new LogForwardingException("Cannot create ProActive log collector.", e);
@@ -107,6 +117,7 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
         }
 
         public Appender getAppender() throws LogForwardingException {
+            Thread.dumpStack();
             try {
                 ProActiveLogCollector remoteCollector = (ProActiveLogCollector) PARemoteObject
                         .lookup(remoteCollectorURI);
