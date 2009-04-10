@@ -151,11 +151,12 @@ public class SchedulerProxy implements AdminSchedulerInterface {
                 StatusLabel.getInstance().disconnect();
                 // stop log server
                 try {
-					Activator.terminateLoggerServer();
-				} catch (LogForwardingException e) {
-					Activator.log(IStatus.ERROR,  "- Scheduler Proxy: Error while terminating the logger server" ,e);
-					e.printStackTrace();
-				}
+                    Activator.terminateLoggerServer();
+                } catch (LogForwardingException e) {
+                    Activator.log(IStatus.ERROR,
+                            "- Scheduler Proxy: Error while terminating the logger server", e);
+                    e.printStackTrace();
+                }
                 SeparatedJobView.clearOnDisconnection(true);
             }
         });

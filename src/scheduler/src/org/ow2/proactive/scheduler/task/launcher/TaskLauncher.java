@@ -269,6 +269,12 @@ public abstract class TaskLauncher implements InitActive {
         // should reset taskId because calling thread is not active thread (immediate service)
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
         try {
+            MDC.getContext().put(Log4JTaskLogs.MDC_HOST,
+                    PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
+        } catch (NodeException e) {
+            MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
+        }
+        try {
             Appender a = logSink.getAppender();
             this.logAppender.addAppender(a);
         } catch (LogForwardingException e) {
