@@ -117,7 +117,6 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
         }
 
         public Appender getAppender() throws LogForwardingException {
-            Thread.dumpStack();
             try {
                 ProActiveLogCollector remoteCollector = (ProActiveLogCollector) PARemoteObject
                         .lookup(remoteCollectorURI);
