@@ -38,7 +38,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -231,10 +233,13 @@ public class TaskClassServer {
                 }
             } catch (IOException e) {
                 logger_dev.error("", e);
-                throw new ClassNotFoundException("Class " + classname + " has not be found in " +
+                throw new ClassNotFoundException("Class " + classname + " has not been found in " +
                     classpath.getAbsolutePath() + ". Caused by " + e);
             }
         }
+        // TODO cdelbe : return null or throw an exception. Should return null only...
+        logger_dev.debug("Class " + classname + " has " + (cb == null ? "not" : "") + " been found in " +
+            classpath.getAbsolutePath());
         return cb;
     }
 
@@ -281,7 +286,8 @@ public class TaskClassServer {
      */
     private byte[] lookIntoJarFile(String classname, JarFile file) throws IOException {
         byte result[] = null;
-        ZipEntry entry = file.getEntry(convertNameToPath(classname));
+        String path = convertNameToPath(classname);
+        ZipEntry entry = file.getEntry(path);
         if (entry != null) {
             InputStream inStream = file.getInputStream(entry);
             result = new byte[inStream.available()];
@@ -289,6 +295,7 @@ public class TaskClassServer {
             inStream.close();
             return result;
         } else {
+            logger_dev.debug("Entry " + path + " has not been found in jar " + file.getName());
             return null;
         }
     }

@@ -143,6 +143,7 @@ public class JarUtils {
 
         // Jar file is ready
         for (String pathElement : directoriesAndFiles) {
+            pathElement = removeConsecutiveFileSeparator(pathElement);
             File fileElement = new File(pathElement);
             if (fileElement.isFile()) {
                 // add jar files at the root of the global jar file !
@@ -179,6 +180,29 @@ public class JarUtils {
             }
         }
         return manifest;
+    }
+
+    /**
+     * Remove consecutive occurrences of file separator character in s
+     * @param s the string to parse.
+     * @return s without consecutive occurrences of file separator character
+     */
+    private static String removeConsecutiveFileSeparator(String s) {
+        StringBuffer res = new StringBuffer();
+        boolean previousWasFileSep = false;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == File.separatorChar) {
+                if (!previousWasFileSep) {
+                    res.append(c);
+                    previousWasFileSep = true;
+                }
+            } else {
+                previousWasFileSep = false;
+                res.append(c);
+            }
+        }
+        return res.toString();
     }
 
     /**
