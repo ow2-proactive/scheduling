@@ -123,21 +123,21 @@ public class JobsOutputController {
     public void createJobOutput(JobId jobId) { //TODO cdelbe: get log from job result for finished jobs ?
         if (!showJobOutput(jobId)) {
             try {
-				JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId,
-		                INITIAL_MESSAGE));
-				joa.setLayout(Log4JTaskLogs.getTaskLogLayout());
-				Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
-				log.setAdditivity(false);
-				log.setLevel(Level.ALL);
-				log.removeAllAppenders();
-				log.addAppender(joa);
-				appenders.put(jobId, joa);
-				SchedulerProxy.getInstance().listenLog(jobId, Activator.lfs.getAppenderProvider());
-				showJobOutput(jobId);
-			} catch (LogForwardingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+                JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId,
+                    INITIAL_MESSAGE));
+                joa.setLayout(Log4JTaskLogs.getTaskLogLayout());
+                Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+                log.setAdditivity(false);
+                log.setLevel(Level.ALL);
+                log.removeAllAppenders();
+                log.addAppender(joa);
+                appenders.put(jobId, joa);
+                SchedulerProxy.getInstance().listenLog(jobId, Activator.lfs.getAppenderProvider());
+                showJobOutput(jobId);
+            } catch (LogForwardingException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 

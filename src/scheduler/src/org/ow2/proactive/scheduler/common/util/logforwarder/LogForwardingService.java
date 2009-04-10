@@ -54,15 +54,13 @@ public final class LogForwardingService {
     private String providerClassname;
     private LogForwardingProvider provider;
 
-
     /**
      * Create a new LogForwardingService, based on the provider providerClassname.
      * @param providerClassname the classname of the provider that will be used (see {@link LogForwardingProvider}).
      */
-    public LogForwardingService(String providerClassname){
-	this.providerClassname = providerClassname;
+    public LogForwardingService(String providerClassname) {
+        this.providerClassname = providerClassname;
     }
-
 
     /**
      * Instantiate the LogForwardingProvider specified by providerClassname value,
@@ -72,27 +70,27 @@ public final class LogForwardingService {
      * @throws IllegalStateException if the LogForwardingService is already initialized.
      */
     public final synchronized void initialize() throws LogForwardingException {
-	try {
-		if (!initialized) {
-			// load the provider
-			Class<? extends LogForwardingProvider> providerClass = (Class<? extends LogForwardingProvider>) Class
-			.forName(providerClassname);
-			this.provider = providerClass.newInstance();
-			this.serverConnection = provider.createServer();
-			this.initialized = true;
-		} else {
-			throw new IllegalStateException("The service has already been initialized.");
-		}
-	} catch (ClassNotFoundException e) {
-		throw new LogForwardingException("LogForwardingProvider class cannot be found.", e);
-	} catch (InstantiationException e) {
-		throw new LogForwardingException("LogForwardingProvider cannot be instanciated.", e);
-	} catch (IllegalAccessException e) {
-		throw new LogForwardingException("LogForwardingProvider cannot be instanciated.", e);
-	} catch (ClassCastException e) {
-		throw new LogForwardingException(
-				"Class defined as LogForwardingProvider is not a LogForwardingProvider.", e);
-	}
+        try {
+            if (!initialized) {
+                // load the provider
+                Class<? extends LogForwardingProvider> providerClass = (Class<? extends LogForwardingProvider>) Class
+                        .forName(providerClassname);
+                this.provider = providerClass.newInstance();
+                this.serverConnection = provider.createServer();
+                this.initialized = true;
+            } else {
+                throw new IllegalStateException("The service has already been initialized.");
+            }
+        } catch (ClassNotFoundException e) {
+            throw new LogForwardingException("LogForwardingProvider class cannot be found.", e);
+        } catch (InstantiationException e) {
+            throw new LogForwardingException("LogForwardingProvider cannot be instanciated.", e);
+        } catch (IllegalAccessException e) {
+            throw new LogForwardingException("LogForwardingProvider cannot be instanciated.", e);
+        } catch (ClassCastException e) {
+            throw new LogForwardingException(
+                "Class defined as LogForwardingProvider is not a LogForwardingProvider.", e);
+        }
     }
 
     /**
@@ -101,11 +99,11 @@ public final class LogForwardingService {
      * @throws LogForwardingException if the log server started by the LogForwardingProvider cannot be terminated.
      */
     public final synchronized void terminate() throws LogForwardingException {
-	this.serverConnection = null;
-	this.initialized = false;
-	this.provider.terminateServer();
-	this.provider = null;
-	this.providerClassname = null;
+        this.serverConnection = null;
+        this.initialized = false;
+        this.provider.terminateServer();
+        this.provider = null;
+        this.providerClassname = null;
     }
 
     /**

@@ -469,7 +469,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         scheduler.remove(jobId);
     }
 
-
     /* (non-Javadoc)
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
      */

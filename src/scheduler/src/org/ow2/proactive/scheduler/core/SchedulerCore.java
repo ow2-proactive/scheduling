@@ -333,12 +333,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             this.currentJobToSubmit = jobSubmitLink;
             //loggers
             String providerClassname = PASchedulerProperties.LOGS_FORWARDING_PROVIDER.getValueAsString();
-            if (providerClassname==null || providerClassname.equals("")) {
+            if (providerClassname == null || providerClassname.equals("")) {
                 logger.error("LogForwardingProvider property is not properly set.");
                 throw new RuntimeException("LogForwardingProvider property is not properly set.");
             } else {
-		this.lfs = new LogForwardingService(providerClassname);
-		this.lfs.initialize();
+                this.lfs = new LogForwardingService(providerClassname);
+                this.lfs.initialize();
                 logger_dev.info("Initialized log forwarding service at " + this.lfs.getServerURI());
             }
 
@@ -1345,18 +1345,18 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException {
-	logger_dev.info("listen logs of job '" + jobId + "'");
-	AsyncAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
-	Logger l = null;
-	// create the appender to the remote listener
-	Appender appender=null;
-		try {
-			appender = appenderProvider.getAppender();
-		} catch (LogForwardingException e1) {
-			 logger.error("Cannot create an appender for job " + jobId, e1);
-             logger_dev.error("", e1);
-             throw new SchedulerException("Cannot create an appender for job " + jobId, e1);
-		}
+        logger_dev.info("listen logs of job '" + jobId + "'");
+        AsyncAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
+        Logger l = null;
+        // create the appender to the remote listener
+        Appender appender = null;
+        try {
+            appender = appenderProvider.getAppender();
+        } catch (LogForwardingException e1) {
+            logger.error("Cannot create an appender for job " + jobId, e1);
+            logger_dev.error("", e1);
+            throw new SchedulerException("Cannot create an appender for job " + jobId, e1);
+        }
         if (bufferForJobId == null) {
             // can be not null if a log file has been defined for this job
             // or created by previous call to listenLog
@@ -1713,13 +1713,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         jobsToBeLoggedinAFile.clear();
         currentlyRunningTasks.clear();
         logger_dev.info("Terminating logging service...");
-        if (this.lfs!=null){
-		try {
-			this.lfs.terminate();
-		} catch (LogForwardingException e) {
-			logger.error("Cannot terminate logging service : "+e.getMessage());
-			logger_dev.error("",e);
-		}
+        if (this.lfs != null) {
+            try {
+                this.lfs.terminate();
+            } catch (LogForwardingException e) {
+                logger.error("Cannot terminate logging service : " + e.getMessage());
+                logger_dev.error("", e);
+            }
         }
         //finally : shutdown
         status = SchedulerStatus.KILLED;

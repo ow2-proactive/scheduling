@@ -125,13 +125,14 @@ public class SimpleHelloWorld {
             System.out.println("Getting job output...");
             try {
                 // it will launch a listener that will listen connection on any free port
-		LogForwardingService lfs = new LogForwardingService("org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider");
-		lfs.initialize();
+                LogForwardingService lfs = new LogForwardingService(
+                    "org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider");
+                lfs.initialize();
                 // next, this method will forward task output on the previous loggerServer
                 scheduler.listenLog(jobId, lfs.getAppenderProvider());
             } catch (LogForwardingException e) {
-				e.printStackTrace();
-			}
+                e.printStackTrace();
+            }
 
             //******************** GET JOB RESULT ***********************
             // it is better to get the result when the job is terminated.

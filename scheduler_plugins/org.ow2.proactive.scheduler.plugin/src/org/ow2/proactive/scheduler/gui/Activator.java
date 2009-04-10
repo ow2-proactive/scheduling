@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 
 
@@ -48,6 +49,9 @@ public class Activator extends AbstractUIPlugin {
 
     /*  The plug-in ID */
     public static final String PLUGIN_ID = "Scheduler_Plugin";
+
+    /* The name of the property that sets the log service provider */
+    public static final String LOGSERVICE_CLASS_PROPERTY = "pa.scheduler.logs.provider";
 
     // The shared instance
     private static Activator plugin;
@@ -80,22 +84,28 @@ public class Activator extends AbstractUIPlugin {
 
     /**
      * Start a new logger server
-     * @throws IOException if the logger server cannot be started
+     * @throws LogForwardingException if the logger server cannot be started
      */
-    public static void startLoggerServer() throws IOException {
+    public static void startLoggerServer() throws LogForwardingException {
         // start the log server
-        lfs = new LogForwardingService("org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider");
-        lfs.initialize();
+        String logProviderClass = System.getProperty(LOGSERVICE_CLASS_PROPERTY);
+        if (logProviderClass != null && !logProviderClass.equals("")) {
+            lfs = new LogForwardingService(logProviderClass);
+            lfs.initialize();
+        } else {
+            throw new LogForwardingException("Cannot find " + LOGSERVICE_CLASS_PROPERTY + " property");
+        }
     }
 
     /**
      * Stop the current logger server.
+     * @throws LogForwardingException if the logger server cannot be stopped
      */
-    public static void terminateLoggerServer() {
-        if (lsf != null) {
-            lsf.terminate();
+    public static void terminateLoggerServer() throws LogForwardingException {
+        if (lfs != null) {
+            lfs.terminate();
         }
-        lsf = null;
+        lfs = null;
     }
 
     /*
@@ -106,7 +116,6 @@ public class Activator extends AbstractUIPlugin {
     public static Activator getDefault() {
         return plugin;
     }
-
 
     public static String getPluginId() {
         return PLUGIN_ID;

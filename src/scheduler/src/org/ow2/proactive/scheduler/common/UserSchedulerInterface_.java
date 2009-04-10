@@ -100,7 +100,7 @@ public interface UserSchedulerInterface_ extends Serializable {
      * A user can only listen to HIS jobs.
      *
      * @param jobId the id of the job to listen to.
-	 * @param appenderProvider a provider for an appender that must be connected on a log server on the caller side (see {@link LogForwardingService})
+     * @param appenderProvider a provider for an appender that must be connected on a log server on the caller side (see {@link LogForwardingService})
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right), or if the appender cannot be created.
      */
     public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException;
