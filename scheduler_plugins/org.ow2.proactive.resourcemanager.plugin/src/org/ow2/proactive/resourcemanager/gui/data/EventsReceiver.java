@@ -72,27 +72,22 @@ public class EventsReceiver implements InitActive, RMEventListener {
     }
 
     private void startPinger() {
-        final EventsReceiver thisStub = (EventsReceiver) PAActiveObject.getStubOnThis();
         pinger = new Thread() {
-            @Override
             public void run() {
                 while (!pinger.isInterrupted()) {
                     try {
-                        Thread.sleep(RM_SERVER_PING_FREQUENCY);
                         try {
                             //try to ping RM server
                             RMUser userAO = RMStore.getInstance().getRMUser();
-                            if (PAActiveObject.pingActiveObject(userAO)) {
-                                //if OK continue
-                                continue;
-                            } else {
-                                //if not, shutdown RM
-                                thisStub.rmShutDownEvent(new RMEvent(), true);
+                            if (!PAActiveObject.pingActiveObject(userAO)) {
+                                throw new RMException("RM seems to be down");
                             }
                         } catch (RMException e) {
                             //if exception, considered RM as down
-                            thisStub.rmShutDownEvent(new RMEvent(), true);
+                            rmShutDownEvent(true);
+                            break;
                         }
+                        Thread.sleep(RM_SERVER_PING_FREQUENCY);
                     } catch (InterruptedException e) {
                         break;
                     }
@@ -159,14 +154,15 @@ public class EventsReceiver implements InitActive, RMEventListener {
                 });
                 break;
             case SHUTDOWN:
-                pinger.interrupt();
-                RMStore.getInstance().shutDownActions(false);
+                rmShutDownEvent(false);
                 break;
         }
     }
 
-    public void rmShutDownEvent(RMEvent arg0, boolean failed) {
-        pinger.interrupt();
-        RMStore.getInstance().shutDownActions(failed);
+    public synchronized void rmShutDownEvent(boolean failed) {
+        if (RMStore.getInstance().getModel() != null) {
+            pinger.interrupt();
+            RMStore.getInstance().shutDownActions(failed);
+        }
     }
 }
