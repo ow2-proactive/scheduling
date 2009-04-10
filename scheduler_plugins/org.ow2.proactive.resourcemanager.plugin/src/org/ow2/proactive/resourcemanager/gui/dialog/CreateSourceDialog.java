@@ -103,7 +103,7 @@ public class CreateSourceDialog extends Dialog {
                         if (e.getCause() != null) {
                             message = e.getCause().getMessage();
                         }
-                        MessageDialog.openError(ResourceExplorerView.getRMShell(),
+                        MessageDialog.openError(Display.getDefault().getActiveShell(),
                                 "Cannot create nodesource", message);
                     }
                 }
@@ -203,7 +203,7 @@ public class CreateSourceDialog extends Dialog {
             if (e.getCause() != null) {
                 message = e.getCause().getMessage();
             }
-            MessageDialog.openError(ResourceExplorerView.getRMShell(), "Cannot create nodesource", message);
+            MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot create nodesource", message);
         }
     }
 
