@@ -58,6 +58,8 @@ import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.scheduler.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.util.logforwarder.LogForwardingProvider;
 import org.ow2.proactive.scheduler.util.logforwarder.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.util.logforwarder.LoggingOutputStream;
 import org.ow2.proactive.scripting.Script;
@@ -117,7 +119,10 @@ public abstract class TaskLauncher implements InitActive {
     // handle streams
     protected transient PrintStream redirectedStdout;
     protected transient PrintStream redirectedStderr;
+    // default appender for log storage
     protected transient AsyncAppenderWithStorage logAppender;
+    // additional appender for runtime log forwarding
+    // protected transient ?? remoteAppender;
 
     // not null if an executable is currently executed
     protected Executable currentExecutable;
@@ -260,19 +265,12 @@ public abstract class TaskLauncher implements InitActive {
      * @param port the port on which to activate the log.
      */
     @SuppressWarnings("unchecked")
-    public void activateLogs(String host, int port) {
+    public void activateLogs(AppenderProvider logSink) {
         logger_dev.debug("activate logs");
         // should reset taskId because calling thread is not active thread (immediate service)
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.getReadableName());
-        try {
-            MDC.getContext().put(Log4JTaskLogs.MDC_HOST,
-                    PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
-        } catch (NodeException e) {
-            MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
-        }
-        Appender out = new SocketAppender(host, port);
         // already logged events must be flushed
-        this.logAppender.addAppender(out);
+        this.logAppender.addAppender(logSink.getAppender());
     }
 
     /**

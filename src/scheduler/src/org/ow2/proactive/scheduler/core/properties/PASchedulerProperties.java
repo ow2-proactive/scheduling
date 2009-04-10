@@ -130,8 +130,8 @@ public enum PASchedulerProperties {
     /* ************************* LOGS PROPERTIES *********************** */
     /* ***************************************************************** */
 
-    /** Log forwarder default listening port */
-    LOGS_LISTEN_PORT("pa.scheduler.logs.listenport", PAPropertiesType.INTEGER),
+    /** Log forwarder provider */
+    LOGS_FORWARDING_PROVIDER("pa.scheduler.logs.provider", PAPropertiesType.STRING),
 
     //    /** Log max size (in lines per tasks) */
     //    LOGS_MAX_SIZE("pa.scheduler.logs.maxsize", PAPropertiesType.INTEGER),

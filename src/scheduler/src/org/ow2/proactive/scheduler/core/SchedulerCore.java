@@ -68,7 +68,6 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
-import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -100,7 +99,6 @@ import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.common.util.SimpleLoggerServer;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.core.db.Condition;
 import org.ow2.proactive.scheduler.core.db.ConditionComparator;
@@ -159,10 +157,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
 
     /** Host name of the scheduler for logger system. */
-    private String host = null;
-
+    //    private String host = null;
     /** Selected port for connection logger system */
-    private int port;
+    //    private int port;
+
+    private LogForwardingService lfs;
 
     /** Implementation of Resource Manager */
     private ResourceManagerProxy resourceManager;
@@ -331,18 +330,20 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             this.frontend = frontend;
             this.currentJobToSubmit = jobSubmitLink;
             //logger
-            host = ProActiveInet.getInstance().getInetAddress().getHostName();
+            this.lfs = new LogForwardingService();
+            this.lfs.initialize();
 
-            try {
-                logger_dev.info("Create logger server on port " + this.port);
-                // redirect event only into JobLogs
-                SimpleLoggerServer slf = SimpleLoggerServer.createLoggerServer();
-                this.port = slf.getPort();
-            } catch (IOException e) {
-                logger.error("Cannot create logger server : " + e.getMessage());
-                logger_dev.error("", e);
-                throw new RuntimeException(e);
-            }
+            //            try {
+            //                // redirect event only into JobLogs
+            //                SimpleLoggerServer slf = SimpleLoggerServer.createLoggerServer();
+            //                this.port = slf.getPort();
+            //                logger_dev.info("Create logger server on port " + this.port);
+            //            } catch (IOException e) {
+            //                logger.error("Cannot create logger server : " + e.getMessage());
+            //                logger_dev.error("", e);
+            //                throw new RuntimeException(e);
+            //            }
+
             logger_dev.info("Instanciating policy : " + policyFullName);
             this.policy = (Policy) Class.forName(policyFullName).newInstance();
             logger.info("Scheduler Core ready !");
@@ -720,7 +721,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         // activate loggers for this task if needed
                         if (this.jobsToBeLogged.containsKey(currentJob.getId()) ||
                             this.jobsToBeLoggedinAFile.containsKey(currentJob.getId())) {
-                            launcher.activateLogs(host, port);
+                            launcher.activateLogs(this.lfs.getAppenderProvider());
                         }
                         logger_dev.info("Starting deployment of task '" + internalTask.getName() +
                             "' for job '" + currentJob.getId() + "'");
@@ -737,7 +738,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         // activate loggers for this task if needed
                         if (this.jobsToBeLogged.containsKey(currentJob.getId()) ||
                             this.jobsToBeLoggedinAFile.containsKey(currentJob.getId())) {
-                            launcher.activateLogs(host, port);
+                            launcher.activateLogs(this.lfs.getAppenderProvider());
                         }
 
                         //if job is TASKSFLOW, preparing the list of parameters for this task.
@@ -823,8 +824,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             } catch (Exception e1) {
                 logger_dev.error("", e1);
                 //if we are here, it is that something append while launching the current task.
-                logger.warn("Current node (" + node + ") has failed : " + e1.getMessage());
-                //so try to get back the node to the resource manager as a dead node
+                logger.warn("Current node (" + node + ") has failed : " + e1.getMessage(), e1);
+                //so try to get back the node to the resource manager
                 try {
                     resourceManager.freeNode(node);
                 } catch (Exception e2) {
@@ -1396,7 +1397,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             if (curRunning != null) {
                 for (TaskId tid : curRunning.keySet()) {
                     TaskLauncher tl = curRunning.get(tid);
-                    tl.activateLogs(this.host, this.port);
+                    tl.activateLogs(this.lfs.getAppenderProvider());
                 }
             }
         }
