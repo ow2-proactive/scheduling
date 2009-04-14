@@ -25,7 +25,7 @@ public class TestLoggers extends FunctionalTest {
     private static String jobDescriptor = TestLoggers.class.getResource(
             "/functionaltests/descriptors/Job_Test_Loggers.xml").getPath();
 
-    private final static int TEST_TIMEOUT = 13000;
+    private final static int TEST_TIMEOUT = 21000;
 
     /**
      * Tests start here.
