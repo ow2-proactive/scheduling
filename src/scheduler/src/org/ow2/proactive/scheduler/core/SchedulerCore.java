@@ -421,8 +421,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      */
     public void runActivity(Body body) {
 
-        //Start DB and rebuild the scheduler if needed.
-        recover();
+        try {
+            //Start DB and rebuild the scheduler if needed.
+            recover();
+        } catch (Exception e) {
+            ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Hibernate ", e);
+            kill();
+            return;
+        }
 
         //Scheduler started
         ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info(
@@ -1880,17 +1886,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * The steps to recover the core are visible below.
      */
     private void recover() {
-        try {
-            //Start Hibernate
-            logger.info("Starting Hibernate...");
-            DatabaseManager.build();
-            logger.info("Hibernate successfully started !");
-        } catch (Exception e) {
-            //if the database doesn't exist
-            logger.error(e);
-            kill();
-            return;
-        }
+        //Start Hibernate
+        logger.info("Starting Hibernate...");
+        DatabaseManager.build();
+        logger.info("Hibernate successfully started !");
 
         //create condition of recovering : recover only non-removed job
         //Condition condition = new Condition("jobInfo.removedTime", ConditionComparator.LESS_EQUALS_THAN,(long) 0);
