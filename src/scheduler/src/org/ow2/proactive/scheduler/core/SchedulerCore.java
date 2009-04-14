@@ -296,17 +296,21 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * Terminate some job handling at the end of a job
      */
     private void terminateJobHandling(JobId jid) {
-        //remove loggers
-        logger_dev.info("Cleaning loggers for Job '" + jid + "'");
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jid);
-        l.removeAllAppenders();
-        this.jobsToBeLogged.remove(jid);
-        this.jobsToBeLoggedinAFile.remove(jid);
-        // remove current running tasks
-        // TODO cdelbe : When a job can be removed on failure ??
-        // Other tasks' logs should remain available...
-        this.currentlyRunningTasks.remove(jid);
-        removeTaskClassServer(jid);
+        try {
+            //remove loggers
+            logger_dev.info("Cleaning loggers for Job '" + jid + "'");
+            Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jid);
+            l.removeAllAppenders();
+            this.jobsToBeLogged.remove(jid);
+            this.jobsToBeLoggedinAFile.remove(jid);
+            // remove current running tasks
+            // TODO cdelbe : When a job can be removed on failure ??
+            // Other tasks' logs should remain available...
+            this.currentlyRunningTasks.remove(jid);
+            removeTaskClassServer(jid);
+        } catch (Throwable t) {
+            logger_dev.warn("", t);
+        }
     }
 
     /**
