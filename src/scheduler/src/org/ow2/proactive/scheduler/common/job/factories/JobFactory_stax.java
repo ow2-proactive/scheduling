@@ -1022,6 +1022,7 @@ public class JobFactory_stax extends JobFactory {
                     throw new JobCreationException("Variable '" + s + "' not found in the definition (${" +
                         s + "})");
                 }
+                replacement = replacement.replaceAll("\\\\", "\\\\\\\\");
                 str = str.replaceFirst("\\$\\{" + s + "\\}", replacement);
             }
         }
