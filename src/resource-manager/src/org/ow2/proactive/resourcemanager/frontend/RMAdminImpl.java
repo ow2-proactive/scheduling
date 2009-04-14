@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,8 +110,9 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
             registerTrustedService(authentication);
             registerTrustedService(rmcore);
 
-        } catch (IOException e) {
-            logger.debug("", e);
+        } catch (ProActiveException e) {
+            logger.debug("Cannot register RMAdmin. Aborting...", e);
+            PAActiveObject.terminateActiveObject(true);
         }
     }
 

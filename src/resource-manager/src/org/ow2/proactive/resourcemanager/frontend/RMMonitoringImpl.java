@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 
@@ -42,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
@@ -113,8 +113,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
-        } catch (IOException e) {
-            logger.debug("", e);
+        } catch (ProActiveException e) {
+            logger.debug("Cannot register RMMonitoring. Aborting...", e);
+            PAActiveObject.terminateActiveObject(true);
         }
     }
 

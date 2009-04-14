@@ -31,16 +31,14 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
-import java.io.IOException;
-
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
@@ -120,8 +118,9 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
-        } catch (IOException e) {
+        } catch (ProActiveException e) {
             e.printStackTrace();
+            PAActiveObject.terminateActiveObject(true);
         }
     }
 

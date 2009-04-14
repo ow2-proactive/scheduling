@@ -31,13 +31,13 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -114,8 +114,9 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
 
             registerTrustedService(authentication);
             registerTrustedService(rmcore);
-        } catch (IOException e) {
-            logger.debug("", e);
+        } catch (ProActiveException e) {
+            logger.debug("Cannot register RMUser. Aborting...", e);
+            PAActiveObject.terminateActiveObject(true);
         }
     }
 

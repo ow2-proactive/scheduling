@@ -87,6 +87,8 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
             return new URI(collectorDeployer.getCollectorURL());
         } catch (URISyntaxException e) {
             throw new LogForwardingException("Cannot create ProActive log collector.", e);
+        } catch (ProActiveException e) {
+            throw new LogForwardingException("Cannot create ProActive log collector.", e);
         }
     }
 
