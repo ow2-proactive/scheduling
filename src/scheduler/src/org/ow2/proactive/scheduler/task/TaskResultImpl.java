@@ -383,19 +383,26 @@ public class TaskResultImpl implements TaskResult {
     /**
      * Return the classloader for the given jobclasspath if any.
      * @return on worker node, the taskClassLoader. On client side, an URL classloader created from the jobclasspath,
-     * or the current contextClassLoader if no jobclasspath is set.
+     * or the ClassLoader that has loaded the current class if no jobclasspath is set.
      * @throws IOException if the classloader cannot be created.
      */
     private ClassLoader getTaskClassLoader() throws IOException {
         ClassLoader currentCCL = Thread.currentThread().getContextClassLoader();
-        if (!(currentCCL instanceof TaskClassLoader) && (this.jobClasspath != null)) {
-            //we are not on a worker and jcp is set...
-            URL[] urls = new URL[this.jobClasspath.length];
-            for (int i = 0; i < this.jobClasspath.length; i++) {
-                urls[i] = new File(this.jobClasspath[i]).toURI().toURL();
+        if (!(currentCCL instanceof TaskClassLoader)) {
+            ClassLoader thisClassLoader = this.getClass().getClassLoader();
+            if (this.jobClasspath != null) {
+                //we are not on a worker and jcp is set...
+                URL[] urls = new URL[this.jobClasspath.length];
+                for (int i = 0; i < this.jobClasspath.length; i++) {
+                    urls[i] = new File(this.jobClasspath[i]).toURI().toURL();
+                }
+                return new URLClassLoader(urls, thisClassLoader);
+            } else {
+                //we are not on a worker and jcp is set...
+                return thisClassLoader;
             }
-            return new URLClassLoader(urls, currentCCL);
         } else {
+            //we are on a worker, use taskclassloader
             return currentCCL;
         }
     }
