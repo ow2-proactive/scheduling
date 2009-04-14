@@ -132,3 +132,5 @@ sed -i "s/{version}/$VERSION/" README.txt
 cd ${TMP}
 tar cvfz $RELEASE_BASENAME-${VERSION}.tar.gz $RELEASE_BASENAME-${VERSION}
 zip -r   $RELEASE_BASENAME-${VERSION}.zip    $RELEASE_BASENAME-${VERSION}
+
+echo WARNING : Update log4j configuration file to display only WARN level for SchedulerDev loggers
