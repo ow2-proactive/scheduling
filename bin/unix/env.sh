@@ -35,9 +35,6 @@ then
     for i in $PA_SCHEDULER/lib/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
-#    for i in $PA_SCHEDULER/lib/ProActive/*.jar ; do
-#      CLASSPATH=$CLASSPATH:$i
-#    done
 # Use jar index in proactive to point on other lib required by ProActive.jar
 	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/lib/ProActive/ProActive.jar
     for i in $PA_SCHEDULER/lib/common/*.jar ; do

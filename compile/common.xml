@@ -155,4 +155,9 @@
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 	</path>
 
+	<fileset id="jar.index.fileset" dir="${lib.dir}">
+		<include name="common/**/*.jar" />
+		<include name="hibernate/**/*.jar" />
+	</fileset>
+
 </project>

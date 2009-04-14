@@ -28,16 +28,21 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	SET JARS=%PA_SCHEDULER%\lib\
 	FOR %%j IN ("%PA_SCHEDULER%\lib\*.jar") DO SET JARS=!JARS!;%%j
 	rem Use jar index to avoid 'command too long'
-	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar 
+	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 	rem hibernate libs
 	FOR %%j IN ("%PA_SCHEDULER%\lib\hibernate\annotation\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\lib\hibernate\core\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
-	rem unset JARS variable if set
-	SET JARS=
-	rem Jars needed by the scheduler
-	FOR %%j IN ("%PA_SCHEDULER%\dist\lib\*.jar") DO SET JARS=!JARS!;%%j
+	rem fill with ProActive.jar
+	SET JARS=%PA_SCHEDULER%\dist\lib\ProActive.jar
+	rem fill with Scheduler jars
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-core.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-client.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-worker.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_SRM-common.jar
+	rem Scheduler jars contains JAR-INDEX that point the jars needed by the scheduler,
+	rem so no need to put them in the classpath
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%

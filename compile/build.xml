@@ -194,28 +194,40 @@
     </target>
 	
 	<target name="deploy.common" depends="-deployCopy, compile.common" description="Populate Common dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/${scheduler.common.jar}">
+		<jar destfile="${deploy.lib.dir}/${scheduler.common.jar}" index="true">
 			<fileset dir="${cl.common.dir}" includes="**" />
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
         </jar>
 	</target>
 
 	<target name="deploy.rm" depends="-deployCopy, compile.rm, deploy.common" description="Populate Resourcemanager dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/${scheduler.rm.jar}">
+		<jar destfile="${deploy.lib.dir}/${scheduler.rm.jar}" index="true">
 			<fileset dir="${cl.rm.dir}" includes="**" />
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
         </jar>
 	</target>
 
 	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler"  description="Populate Scheduler and Resource Manager dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/${scheduler.core.jar}">
+		<jar destfile="${deploy.lib.dir}/${scheduler.core.jar}" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
         </jar>
 	</target>
 
 	<target name="deploy.scheduler.client" depends="deploy.scheduler" description="Generate a client side Scheduler library">
-			<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}">
+			<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" index="true">
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
 				<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
+				<indexjars>
+					<fileset refid="jar.index.fileset" />
+				</indexjars>
 	        </jar>
 	</target>
 
@@ -596,8 +608,11 @@
 						classpathref="scheduler.libs.worker" >
 		</javac>
 
-		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}">
-			<fileset dir="${cl.scheduler.worker.dir}" includes="**" />
+		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}" index="true">
+			<fileset dir="${cl.scheduler.worker.dir}" includes="**"/>
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
         </jar>
 
 		<delete dir="${worker.dir.tmp}" />

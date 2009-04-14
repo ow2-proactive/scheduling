@@ -196,13 +196,14 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     }
 
     private void setJavaCommand(StringBuffer command) {
+        String java_home;
         if (forkEnvironment != null && forkEnvironment.getJavaHome() != null &&
             !"".equals(forkEnvironment.getJavaHome())) {
-            command.append(forkEnvironment.getJavaHome() + File.separatorChar + "bin" + File.separatorChar +
-                "java ");
+            java_home = forkEnvironment.getJavaHome();
         } else {
-            command.append(" java ");
+            java_home = System.getProperty("java.home");
         }
+        command.append(java_home + File.separatorChar + "bin" + File.separatorChar + "java ");
     }
 
     private void setJVMParameters(StringBuffer command) {
