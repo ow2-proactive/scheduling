@@ -18,19 +18,20 @@
 				<jvmarg value="-Dproactive.test=true" />
 				<jvmarg value="${jvmargDefinedByTest}" />
 				<applicationClasspath>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_tests.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-core.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/clover.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/" />
-					<pathElement base="proactive" relpath="/dist/lib/script-api.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/script-js.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/js.jar" />
+					<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
+					<!-- Script engines must be explicitly in application classpath -->
+					<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
 					<pathElement base="proactive" relpath="/classes/schedulerTests/"/>
 					<pathElement base="proactive" relpath="/classes/resource-managerTests/"/>
 
-					<pathElement base="proactive" relpath="lib/common/relaxngDatatype.jar" />
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_tests.jar" />
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar" />
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-core.jar" />
+
+					<!-- <pathElement base="proactive" relpath="lib/common/relaxngDatatype.jar" />
 					<pathElement base="proactive" relpath="lib/common/jsr173_1.0_api.jar" />
 					<pathElement base="proactive" relpath="lib/common/xsdlib.jar" />
 					<pathElement base="proactive" relpath="lib/common/derby.jar" />
@@ -47,9 +48,7 @@
 					<pathElement base="proactive" relpath="lib/hibernate/core/jta-1.1.jar" />
 					<pathElement base="proactive" relpath="lib/hibernate/core/slf4j-log4j12-1.5.6.jar" />
 					<pathElement base="proactive" relpath="lib/hibernate/core/antlr-2.7.6.jar" />
-					<pathElement base="proactive" relpath="lib/hibernate/core/dom4j-1.6.1.jar" />
-
-
+					<pathElement base="proactive" relpath="lib/hibernate/core/dom4j-1.6.1.jar" /> -->
 				</applicationClasspath>
 			</configuration>
 			<virtualNode id="VN" />

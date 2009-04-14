@@ -32,15 +32,10 @@ then
     CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/common
     CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/resource-manager
     CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/scheduler
-    for i in $PA_SCHEDULER/lib/*.jar ; do
-      CLASSPATH=$CLASSPATH:$i
-    done
-# Use jar index in proactive to point on other lib required by ProActive.jar
+	# Use jar index in proactive to point on other lib required by ProActive.jar
 	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/lib/ProActive/ProActive.jar
+	# Scheduler libraries
     for i in $PA_SCHEDULER/lib/common/*.jar ; do
-      CLASSPATH=$CLASSPATH:$i
-    done
-    for i in $PA_SCHEDULER/lib/common/script/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
     for i in $PA_SCHEDULER/lib/common/script/*.jar ; do
@@ -54,9 +49,19 @@ then
       CLASSPATH=$CLASSPATH:$i
     done
 else 
-    for i in $PA_SCHEDULER/dist/lib/*.jar ; do
-      CLASSPATH=$CLASSPATH:$i
-    done
+	# Script engines must be added to classpath to be found
+	# it must also placed before jars containing jar-index
+    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/script-js.jar
+    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/jruby-engine.jar
+    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/jython-engine.jar
+    # fill with ProActive.jar : use jar index for ProActive dependencies
+    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive.jar
+    # fill with Scheduler jars : use jar index for Scheduler dependencies
+	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_SRM-common.jar
+	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_ResourceManager.jar
+	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar
+	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_Scheduler-client.jar
+	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_Scheduler-worker.jar
 fi
 
 export CLASSPATH

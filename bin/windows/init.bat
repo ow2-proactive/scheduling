@@ -25,24 +25,29 @@ IF DEFINED CLASSPATHEXT (
 rem Check if classes exists and is not empty
 IF EXIST "%PA_SCHEDULER%\classes\scheduler" ( 
 	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\classes\common;%PA_SCHEDULER%\classes\resource-manager;%PA_SCHEDULER%\classes\scheduler
-	SET JARS=%PA_SCHEDULER%\lib\
-	FOR %%j IN ("%PA_SCHEDULER%\lib\*.jar") DO SET JARS=!JARS!;%%j
-	rem Use jar index to avoid 'command too long'
+	SET JARS=
+	rem ProActive.jar : Use jar index to avoid 'command too long'
 	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar
+	rem Scheduler libraries
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
+	FOR %%j IN ("%PA_SCHEDULER%\lib\common\script\*.jar") DO SET JARS=!JARS!;%%j
 	rem hibernate libs
 	FOR %%j IN ("%PA_SCHEDULER%\lib\hibernate\annotation\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\lib\hibernate\core\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
-	rem fill with ProActive.jar
+	rem Script engines must be added to classpath to be found
+	rem it must also placed before jars containing jar-index
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\script-js.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby-engine.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jython-engine.jar
+	rem fill with ProActive.jar : use jar index for proActive dependencies
 	SET JARS=%PA_SCHEDULER%\dist\lib\ProActive.jar
-	rem fill with Scheduler jars
+	rem fill with Scheduler jars : use jar index for Scheduler dependencies
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_SRM-common.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_ResourceManager.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-core.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-client.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-worker.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_SRM-common.jar
-	rem Scheduler jars contains JAR-INDEX that point the jars needed by the scheduler,
-	rem so no need to put them in the classpath
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%

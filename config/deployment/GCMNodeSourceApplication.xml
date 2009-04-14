@@ -12,20 +12,18 @@
 		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
 				<applicationClasspath>
+					<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
+					<!-- Script engines must be explicitly in application classpath -->
+					<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/script-api.jar"/>
+					<!-- <pathElement base="proactive" relpath="/dist/lib/script-api.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/js.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/jython.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/common-net-1.4.1.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/common-vfs-1.0.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/jsch-0.1.38.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/jakarta-oro-2.0.8.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jython.jar"/> -->
 				</applicationClasspath>
 				<log4jProperties base="proactive" relpath="/config/log4j/defaultNode-log4j"/>
 			</configuration>

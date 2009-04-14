@@ -14,17 +14,18 @@
 		<jvmarg value="-Dproactive.test=true"/>
 		<jvmarg value="-Dproactive.http.jetty.xml=${proactive.home}/classes/resource-managerTests/nodestate/jetty.xml"/>	
 		<applicationClasspath>
-				<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/script-api.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/js.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/jython.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/clover.jar"/>
+			<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
+			<!-- Script engines must be explicitly in application classpath -->
+			<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
+			<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
+			<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
+			<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
+			<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
+			<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>
+			<!-- <pathElement base="proactive" relpath="/dist/lib/script-api.jar"/>
+			<pathElement base="proactive" relpath="/dist/lib/js.jar"/>
+			<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>
+			<pathElement base="proactive" relpath="/dist/lib/jython.jar"/> -->
 		</applicationClasspath>
 	</configuration>
 			<virtualNode id="Workers">

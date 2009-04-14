@@ -283,7 +283,7 @@ public class UserController {
         OptionGroup actionGroup = new OptionGroup();
 
         Option opt = new Option("submit", true, control + "Submit the given job");
-        opt.setArgName("jobId");
+        opt.setArgName("XMLDescriptor");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
@@ -344,7 +344,7 @@ public class UserController {
 
     private void startCommandListener() throws Exception {
         initialize();
-        console.start(" " + scheduler.getStatus() + " > ");
+        console.start(" > ");
         console.printf("Type command here (type '?' or help() to see the list of commands)\n");
         String stmt;
         while (!terminated) {
@@ -404,7 +404,7 @@ public class UserController {
         if (intercativeMode) {
             console.handleExceptionDisplay(msg, t);
         } else {
-            System.err.printf(msg);
+            System.err.printf(msg + "\n");
             logger.info("", t);
         }
     }
@@ -413,7 +413,7 @@ public class UserController {
         if (intercativeMode) {
             console.printf(format, args);
         } else {
-            System.out.printf(format, args);
+            System.out.printf(format + "\n", args);
         }
     }
 
@@ -421,7 +421,7 @@ public class UserController {
         if (intercativeMode) {
             console.error(format, args);
         } else {
-            System.err.printf(format, args);
+            System.err.printf(format + "\n", args);
         }
     }
 
@@ -537,9 +537,10 @@ public class UserController {
                     TaskResult tRes = e.getValue();
 
                     try {
-                        printf("\t " + e.getKey() + " : " + tRes.value() + "\n");
+                        printf("\t " + e.getKey() + " : " + tRes.value());
                     } catch (Throwable e1) {
-                        error("\t " + e.getKey() + " : " + tRes.getException() + "\n");
+                        handleExceptionDisplay("\t " + e.getKey() + " : " + tRes.getException().getMessage(),
+                                e1);
                     }
                 }
             } else {
@@ -565,7 +566,7 @@ public class UserController {
                     TaskResult tRes = e.getValue();
 
                     try {
-                        printf(e.getKey() + " : \n" + tRes.getOutput().getAllLogs(false) + "\n");
+                        printf(e.getKey() + " : \n" + tRes.getOutput().getAllLogs(false));
                     } catch (Throwable e1) {
                         error("", tRes.getException());
                     }

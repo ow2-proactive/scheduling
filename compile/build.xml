@@ -212,7 +212,7 @@
 	</target>
 
 	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler"  description="Populate Scheduler and Resource Manager dist/ with all needed files">
-		<jar destfile="${deploy.lib.dir}/${scheduler.core.jar}" index="true">
+		<jar destfile="${deploy.lib.dir}/${scheduler.core.jar}" manifest="${basedir}/Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
@@ -221,14 +221,14 @@
 	</target>
 
 	<target name="deploy.scheduler.client" depends="deploy.scheduler" description="Generate a client side Scheduler library">
-			<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" index="true">
-				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
-				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
-				<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
-				<indexjars>
-					<fileset refid="jar.index.fileset" />
-				</indexjars>
-	        </jar>
+		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/Manifest-base.mf" index="true">
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
+			<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
+        </jar>
 	</target>
 
 	<target name="deploy.all" depends="deploy.common, deploy.scheduler, deploy.rm, deploy.scheduler.client, deploy.scheduler.worker" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
@@ -511,6 +511,7 @@
 				<include name="org/ow2/proactive/scheduler/util/process/CaseInsensitiveComparator.java" />
 				<include name="org/ow2/proactive/scheduler/util/process/ThreadReader.java" />
 				<include name="org/ow2/proactive/scheduler/util/process/ProcessTreeKiller.java" />
+				<include name="org/ow2/proactive/scheduler/common/Main.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/AsyncAppenderWithStorage.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/EmptyAppender.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/SocketAppenderWithSSHTunneling.java" />
@@ -608,7 +609,7 @@
 						classpathref="scheduler.libs.worker" >
 		</javac>
 
-		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}" index="true">
+		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}"  manifest="${basedir}/Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.worker.dir}" includes="**"/>
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
