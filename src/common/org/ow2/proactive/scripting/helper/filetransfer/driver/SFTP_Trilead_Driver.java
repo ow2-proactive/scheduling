@@ -46,8 +46,6 @@ import org.ow2.proactive.scripting.helper.filetransfer.exceptions.NotConnectedEx
 import org.ow2.proactive.scripting.helper.filetransfer.initializer.FileTransfertInitializer;
 import org.ow2.proactive.scripting.helper.filetransfer.initializer.FileTransfertInitializerSCP;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SFTPException;
 import com.trilead.ssh2.SFTPv3Client;
@@ -85,13 +83,22 @@ public class SFTP_Trilead_Driver implements FileTransfertDriver {
     }
 
     private void connect() throws IOException, AuthentificationFailedException {
-        conn = new Connection(host, port);
-        conn.connect();
-        if (!conn.authenticateWithPassword(user, pass)) {
-            throw new AuthentificationFailedException("username and pasword do not match");
+        try {
+            debug("Athentificating with keys. User:  " + user + " host: " + host + " port: " + port);
+            conn = ConnectionTools.authentificateWithKeys(user, host, port);
+            debug("Authentification completed. ");
+        } catch (Exception e) {
+            debug("Could not authentificate with private/public key, trying user/password");
+            conn = new Connection(host, port);
+            conn.connect(null, 4000, 8000);
+            //con.connect();
+            //authentificate
+            if (!conn.authenticateWithPassword(user, pass)) {
+                throw new AuthentificationFailedException("Authentification failed");
+            } else
+                debug("Authentificated with user/password");
         }
         sc = new SFTPv3Client(conn);
-
         debug("connected to the remote host " + host + ":" + port);
 
     }
@@ -172,12 +179,12 @@ public class SFTP_Trilead_Driver implements FileTransfertDriver {
 
     public void getFolder(String remoteFolderPath, String localFolderPath) throws Exception {
         // TODO Auto-generated method stub
-        throw new NotImplementedException();
+        throw new Exception("This method is not implemented by the " + this.getClass() + " driver.");
     }
 
     public void putFolder(String localFolderPath, String remoteFolderPath) throws Exception {
         // TODO Auto-generated method stub
-        throw new NotImplementedException();
+        throw new Exception("This method is not implemented by the " + this.getClass() + " driver.");
     }
 
     public void getFiles(List<String> files, String localFolder) throws Exception {

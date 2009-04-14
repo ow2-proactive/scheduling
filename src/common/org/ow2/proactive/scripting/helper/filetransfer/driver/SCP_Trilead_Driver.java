@@ -40,8 +40,6 @@ import org.ow2.proactive.scripting.helper.filetransfer.exceptions.Authentificati
 import org.ow2.proactive.scripting.helper.filetransfer.initializer.FileTransfertInitializer;
 import org.ow2.proactive.scripting.helper.filetransfer.initializer.FileTransfertInitializerSCP;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SCPClient;
 import com.trilead.ssh2.Session;
@@ -72,17 +70,28 @@ public class SCP_Trilead_Driver implements FileTransfertDriver {
         port = connexionParamaters.getPort();
     }
 
+    /** Tries to connect through ssh keys
+     *  If it fails it will try to connect via user/password
+     *  AuthentificationFailedException is thrown if both ssh keys authentification and user/password attempts fail 
+     * @throws IOException
+     * @throws AuthentificationFailedException 
+     */
     public void connect() throws IOException, AuthentificationFailedException {
         //open a connection on the host
-        con = new Connection(host, port);
-        con.connect(null, 4000, 8000);
-        //con.connect();
-        //authentificate
-        if (!con.authenticateWithPassword(user, pass)) {
-            throw new AuthentificationFailedException("username and pasword do not match");
+        try {
+            con = ConnectionTools.authentificateWithKeys(user, host, port);
+        } catch (Exception e) {
+            debug("Could not authentificate with private/public key, trying user/password");
+            con = new Connection(host, port);
+            con.connect(null, 4000, 8000);
+            //con.connect();
+            //authentificate
+            if (!con.authenticateWithPassword(user, pass)) {
+                throw new AuthentificationFailedException("Authentification failed");
+            } else
+                debug("Authentificated with user/password");
         }
         scpClient = con.createSCPClient();
-
     }
 
     public void disconnect() {
@@ -116,7 +125,7 @@ public class SCP_Trilead_Driver implements FileTransfertDriver {
     }
 
     public ArrayList<String> list(String remoteFolder) throws Exception {
-        throw new NotImplementedException();
+        throw new Exception("This method is not implemented by the " + this.getClass() + " driver.");
     }
 
     public void putFile(String localFilePath, String remoteFolder) throws Exception {
@@ -131,22 +140,10 @@ public class SCP_Trilead_Driver implements FileTransfertDriver {
      * Throws an exception if the remote folder does not exist
      */
     public void putFiles(List files, String remoteFolder) throws Exception {
-
+        //TODO: test this for windows as remote system
         connect();
         Session s = con.openSession();
         s.execCommand("mkdir " + remoteFolder);
-
-        //		InputStream stdout = new StreamGobbler(s.getStdout());
-        //
-        //		BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
-        //		String line = br.readLine();
-        //
-        //		while (line!=null)
-        //		{
-        //			System.out.println(line);
-        //			line = br.readLine();
-        //
-        //		}
         s.close();
         debug("putting files " + files + " to remote folder " + remoteFolder);
         scpClient.put((String[]) files.toArray(new String[0]), remoteFolder);

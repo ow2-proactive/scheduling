@@ -50,8 +50,6 @@ import org.apache.commons.vfs.provider.sftp.SftpFileSystemConfigBuilder;
 import org.ow2.proactive.scripting.helper.filetransfer.initializer.FileTransfertInitializer;
 import org.ow2.proactive.scripting.helper.filetransfer.initializer.FileTransfertInitializerSCP;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 
 /**
  * Simple implementation of SFTP protocol based on Apache VFS
@@ -212,12 +210,12 @@ public class SFTP_VFS_Driver implements FileTransfertDriver {
 
     public void getFolder(String remoteFolderPath, String localFolderPath) throws Exception {
         // TODO Auto-generated method stub
-        throw new NotImplementedException();
+        throw new Exception("This method is not implemented by the " + this.getClass() + " driver.");
     }
 
     public void putFolder(String localFolderPath, String remoteFolderPath) throws Exception {
         // TODO Auto-generated method stub
-        throw new NotImplementedException();
+        throw new Exception("This method is not implemented by the " + this.getClass() + " driver.");
     }
 
     public void getFiles(List<String> files, String localFolder) throws Exception {
