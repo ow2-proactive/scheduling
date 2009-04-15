@@ -14,15 +14,12 @@
 		<jvmarg value="-Dproactive.test=true"/>
 		<jvmarg value="-Dproactive.http.jetty.xml=${proactive.home}/classes/resource-managerTests/nodestate/jetty.xml"/>	
 		<applicationClasspath>
+				<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
+				<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
+				<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-core.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/commons-cli-1.1.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/script-api.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/js.jar"/>
-				<pathElement base="proactive" relpath="/dist/lib/clover.jar"/>
-
+				<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>
 		</applicationClasspath>
 	</configuration>			
 			<virtualNode id="Workers">
