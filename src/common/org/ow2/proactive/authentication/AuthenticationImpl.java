@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.authentication;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,11 +67,19 @@ public abstract class AuthenticationImpl implements Authentication {
         URL jaasConfig = AuthenticationImpl.class.getResource("jaas.config");
 
         if (jaasConfig == null) {
-            throw new RuntimeException(
-                "The file 'jaas.config' has not been found and have to be at the following directory :\n"
-                    + "\tclasses/Extensions/org.objectweb.proactive.extensions.security.loginmodule/");
+            throw new RuntimeException("The file 'jaas.config' has not been found");
         }
-        System.setProperty("java.security.auth.login.config", jaasConfig.toString());
+        try {
+            // is used when jaas.config is in classes directory
+            String jaasConfigPath = jaasConfig.toURI().getPath();
+            if (jaasConfigPath == null) {
+                // is used when jaas.config is inside jar file
+                jaasConfigPath = jaasConfig.toString();
+            }
+            System.setProperty("java.security.auth.login.config", jaasConfig.toURI().toString());
+        } catch (URISyntaxException e) {
+            getLogger().error(e.getMessage(), e);
+        }
     }
 
     /**

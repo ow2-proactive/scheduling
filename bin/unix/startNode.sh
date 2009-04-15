@@ -16,7 +16,7 @@ fi
 
 workingDir=`dirname $0`
 . $workingDir/env.sh log4j-client
-$JAVACMD org.objectweb.proactive.core.node.StartNode "$@"
+eval $JAVACMD org.objectweb.proactive.core.node.StartNode "$@"
 
 echo
 echo ---------------------------------------------------------

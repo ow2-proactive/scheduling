@@ -23,45 +23,26 @@ fi
 
 PA_SCHEDULER=$(cd $workingDir/../.././ || (echo "Broken Scheduler/Resource Manager installation" ; exit 1) && echo $PWD)
 
+print_jars() {
+        find "$1" -name "*.jar" | while read jar; do
+            printf "%s:" "$jar"
+        done
+}
+
 # ----
 # Set up the classpath using classes dir or jar files
 #
  # Check if classes exists and is not empty
-if [ -d $PA_SCHEDULER/classes/scheduler ]
+if [ -d "$PA_SCHEDULER/classes/scheduler" ]
 then
-    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/common
-    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/resource-manager
-    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/classes/scheduler
-	# Use jar index in proactive to point on other lib required by ProActive.jar
-	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/lib/ProActive/ProActive.jar
-	# Scheduler libraries
-    for i in $PA_SCHEDULER/lib/common/*.jar ; do
-      CLASSPATH=$CLASSPATH:$i
-    done
-    for i in $PA_SCHEDULER/lib/common/script/*.jar ; do
-      CLASSPATH=$CLASSPATH:$i
-    done
-    #hibernate libs
-    for i in $PA_SCHEDULER/lib/hibernate/annotation/*.jar ; do
-      CLASSPATH=$CLASSPATH:$i
-    done
-    for i in $PA_SCHEDULER/lib/hibernate/core/*.jar ; do
-      CLASSPATH=$CLASSPATH:$i
-    done
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/classes/common"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/classes/resource-manager"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/classes/scheduler"
+    CP=`print_jars "$PA_SCHEDULER/lib/"`
+    CLASSPATH=$CLASSPATH:$CP
 else 
-	# Script engines must be added to classpath to be found
-	# it must also placed before jars containing jar-index
-    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/script-js.jar
-    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/jruby-engine.jar
-    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/jython-engine.jar
-    # fill with ProActive.jar : use jar index for ProActive dependencies
-    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive.jar
-    # fill with Scheduler jars : use jar index for Scheduler dependencies
-	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_SRM-common.jar
-	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_ResourceManager.jar
-	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar
-	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_Scheduler-client.jar
-	CLASSPATH=$CLASSPATH:$PA_SCHEDULER/dist/lib/ProActive_Scheduler-worker.jar
+    CP=`print_jars "$PA_SCHEDULER/dist/lib/"`
+    CLASSPATH=$CLASSPATH:$CP
 fi
 
 export CLASSPATH
@@ -74,7 +55,7 @@ else
 	LOG4J_FILE=file:${PA_SCHEDULER}/config/log4j/$1
 fi
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Dproactive.configuration=$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml -Djava.security.policy=$PA_SCHEDULER/config/scheduler.java.policy -Dlog4j.configuration=$LOG4J_FILE -Dproactive.home=$PA_SCHEDULER -Dpa.scheduler.home=$PA_SCHEDULER -Dpa.rm.home=$PA_SCHEDULER"
+JAVACMD="$JAVA_HOME/bin/java -Djava.security.manager -Dproactive.configuration=\"$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml\" -Djava.security.policy=\"$PA_SCHEDULER/config/scheduler.java.policy\" -Dlog4j.configuration=\"$LOG4J_FILE\" -Dproactive.home=\"$PA_SCHEDULER\" -Dpa.scheduler.home=\"$PA_SCHEDULER\" -Dpa.rm.home=\"$PA_SCHEDULER\""
 
 #echo $JAVACMD
 
