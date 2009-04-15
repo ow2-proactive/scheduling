@@ -68,6 +68,9 @@ public class JobOutput extends MessageConsole {
     /** The color for the trace log level */
     public static final Color TRACE_COLOR = Colors.BLACK;
 
+    // the default stream to write in
+    private MessageConsoleStream defaultStream;
+
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
@@ -79,6 +82,7 @@ public class JobOutput extends MessageConsole {
     public JobOutput(String name) {
         super(name, null);
         ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { this });
+        this.defaultStream = newMessageStream();
     }
 
     /**
@@ -107,9 +111,8 @@ public class JobOutput extends MessageConsole {
         // Print the message in the UI Thread in async mode
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                MessageConsoleStream stream = newMessageStream();
-                stream.setColor(col);
-                stream.print(mess);
+                defaultStream.setColor(col);
+                defaultStream.print(mess);
             }
         });
     }
