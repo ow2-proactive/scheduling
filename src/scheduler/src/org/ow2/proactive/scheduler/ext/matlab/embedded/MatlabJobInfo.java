@@ -24,10 +24,17 @@ public class MatlabJobInfo implements Serializable {
 
     private boolean jobFinished;
 
-    public MatlabJobInfo() {
+    private boolean debugCurrentJob;
+
+    public boolean isDebugCurrentJob() {
+        return debugCurrentJob;
+    }
+
+    public MatlabJobInfo(boolean debug) {
         // convenience notation, the job is probably not running yet, we are only interested in the other states not pending/running
         this.status = JobStatus.RUNNING;
         this.jobFinished = false;
+        this.debugCurrentJob = debug;
     }
 
     public boolean isJobFinished() {

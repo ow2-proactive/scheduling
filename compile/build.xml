@@ -222,20 +222,20 @@
 
 	<target name="deploy.scheduler.client" depends="deploy.scheduler" description="Generate a client side Scheduler library">
 		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/Manifest-base.mf" index="true">
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
-			<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
+				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
+				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
+				<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
-        </jar>
+	        </jar>
 	</target>
 
 	<target name="deploy.all" depends="deploy.common, deploy.scheduler, deploy.rm, deploy.scheduler.client, deploy.scheduler.worker" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
 
-	
+
 	<!-- ************
-		ing		
+		ing
 	-->
 
 	<macrodef name="junitMacro">
@@ -263,7 +263,7 @@
 					Remote Debug:
 					<jvmarg value="-Xdebug" />
 					<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000" />
-					
+
 					Yourkit (don't forget to set your LD_LIBRARY_PATH):
 					<jvmarg value="-agentlib:yjpagent" />
 				-->
@@ -282,12 +282,12 @@
 		<junitMacro testsuite="rm.testsuite"/>
 	</target>
 
-	<target name="junit.scheduler" depends="deploy.scheduler.worker" description="Run scheduler's tests">		
+	<target name="junit.scheduler" depends="deploy.scheduler.worker" description="Run scheduler's tests">
 		<junitMacro testsuite="scheduler.testsuite"/>
 	</target>
 
 	<target name="junit.all" depends="junit.rm, junit.scheduler" description="Run all tests"/>
-	
+
 	<target name="with.clover">
 		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar" />
 		<clover-setup initString="${compile.dir}/ProActiveCoverage.db" />
@@ -340,7 +340,7 @@
 				<pathelement location="${ant.home}/lib/clover.jar" />
 			</additionalClassPath>
 		</junitMacro>
-	</target>	
+	</target>
 
 	<macrodef name="eclipse_format_m">
 		<attribute name="loglevel" default="WARN" />
@@ -381,7 +381,7 @@
 	</target>
 
 	<!-- ************
-		Misc		
+		Misc
 	-->
 
 	<target name="clean" description="Remove all generated files">
@@ -469,9 +469,9 @@
 		</delete>
 		<move file="${schemas.dir}/temp.xsd" tofile="${schemas.dir}/${export.schema.name}.xsd" />
 	</target>
-	
+
 	<import file="../doc/scheduler.xml" optional="true"/>
-	
+
 	<!-- last scheduler target for worker library -->
 	<target name="deploy.scheduler.worker" depends="deploy.scheduler" description="Generate a worker side Scheduler library">
 		<mkdir dir="${cl.scheduler.worker.dir}"/>
@@ -600,7 +600,7 @@
                 <include name="org/ow2/proactive/scheduler/ext/**/*.bat"/>
 			</fileset>
 		</copy>
-		
+
 		<javac  srcdir="${worker.dir.tmp}"
 						destdir="${cl.scheduler.worker.dir}"
 						deprecation="on"
@@ -609,9 +609,16 @@
 						classpathref="scheduler.libs.worker" >
 		</javac>
 
+        <copy toDir="${cl.scheduler.worker.dir}">
+			<fileset dir="${worker.dir.tmp}">
+				<include name="org/ow2/proactive/scheduler/ext/**/*.sh"/>
+                <include name="org/ow2/proactive/scheduler/ext/**/*.bat"/>
+			</fileset>
+		</copy>
+
 		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}"  manifest="${basedir}/Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.worker.dir}" includes="**"/>
-			<indexjars>
+            <indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
         </jar>

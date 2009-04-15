@@ -1,17 +1,19 @@
 %   PAconnect() - connects to the ProActive scheduler
 %
 %   Usage:
-%       >> PAconnect(url);
-%       >> PAconnect('//eon1')
+%       >> res = PAconnect(url);
+%       >> res = PAconnect('//eon1')
 %
-%       >> PAconnect(proactive, url);
-%       >> PAconnect('my_path_to-proactive', '//eon1')
+%       >> res = PAconnect(proactive, url);
+%       >> res = PAconnect('my_path_to-proactive', '//eon1')
 %
 %   Inputs:
 %       proactive - path to the proactive installation directory,
 %                   if this parameter is not specified, the proactive directory
 %                   needs to be selected manually.
 %       url - url of the scheduler
+%       res - cell array which is not empty when jobs were submitted before the previous Matlab session closed
+%             and results were not retrieved then. The array will contain the results not retrieved before. 
 % 
 %   Ouputs: none
 %
@@ -45,7 +47,7 @@
 % *
 % * ################################################################
 % */
-function PAconnect(varargin)
+function oldres = PAconnect(varargin)
 
 if nargin > 1
     proactive = varargin{1};
@@ -60,9 +62,6 @@ if ~isa(url, 'char')
     error('url parameter should be a character array containing the scheduler url');
 end
 
-if (nargout > 0) 
-    error('two many output arguments');
-end
 
 % Verify that proactive is already on the path or not
 p = javaclasspath('-all');
@@ -117,6 +116,13 @@ button_handle_global_data.ok = false;
 disp('Connection successful, please enter login/password');
 while ~button_handle_global_data.ok
     pause(0.1);
+end
+
+listresults = solver.getPreviousJobResults();
+oldres = cell(1,listresults.size());
+for i=0:(listresults.size()-1)
+    futureornot = listresults.get(i);
+    oldres{i+1} = PAResultList(futureornot);
 end
 
 
