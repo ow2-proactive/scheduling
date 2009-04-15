@@ -1353,8 +1353,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      */
     public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException {
         logger_dev.info("listen logs of job '" + jobId + "'");
-        AsyncAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
-        Logger l = null;
+        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+
         // create the appender to the remote listener
         Appender appender = null;
         try {
@@ -1364,50 +1364,43 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             logger_dev.error("", e1);
             throw new SchedulerException("Cannot create an appender for job " + jobId, e1);
         }
-        if (bufferForJobId == null) {
-            // can be not null if a log file has been defined for this job
-            // or created by previous call to listenLog
-            bufferForJobId = new AsyncAppender();
-            bufferForJobId.setName(Log4JTaskLogs.JOB_APPENDER_NAME);
-            this.jobsToBeLogged.put(jobId, bufferForJobId);
-            l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+
+        // targeted job
+        InternalJob target = this.jobs.get(jobId);
+
+        // get or create appender for the targeted job
+        AsyncAppender jobAppender = this.jobsToBeLogged.get(jobId);
+        if (jobAppender == null) {
+            jobAppender = new AsyncAppender();
+            jobAppender.setName(Log4JTaskLogs.JOB_APPENDER_NAME);
+            this.jobsToBeLogged.put(jobId, jobAppender);
             l.setAdditivity(false);
-            l.addAppender(bufferForJobId);
+            l.addAppender(jobAppender);
         }
         // should add the appender before activating logs on running tasks !
-        bufferForJobId.addAppender(appender);
-        InternalJob target = this.jobs.get(jobId);
-        if ((target != null) && !this.pendingJobs.contains(target)) {
+        jobAppender.addAppender(appender);
+
+        // handle finished jobs
+        if ((target != null) && this.finishedJobs.contains(target)) {
+            logger_dev.info("listen logs of job '" + jobId + "' : job is already finished");
+            // for finished tasks, add logs events "manually"
+            Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
+            for (TaskResult tr : allRes) {
+                this.flushTaskLogs(tr, l, appender);
+            }
+            // as the job is finished, close appenders
+            logger_dev.info("Cleaning loggers for already finished job '" + jobId + "'");
+            l.removeAllAppenders(); // close appenders...
+            this.jobsToBeLogged.remove(jobId);
+
+            // job is not finished, tasks are running
+        } else if ((target != null) && !this.pendingJobs.contains(target)) {
             // this jobs contains running and finished tasks
 
             // for finished tasks, add logs events "manually"
             Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
             for (TaskResult tr : allRes) {
-                // if taskResult is not awaited, task is terminated
-                TaskLogs logs = null;
-                // try to look in the DB
-                DatabaseManager.load(tr);
-
-                logs = tr.getOutput();
-
-                // avoid race condition if any...
-                if (logs == null) {
-                    // the logs has been deleted and stored in the DB during the previous getOutput
-                    // should not be null now !
-                    DatabaseManager.load(tr);
-                    logs = tr.getOutput();
-                }
-
-                // TODO cdelbe Need more genericity for logging mechanism ?
-                if (logs instanceof Log4JTaskLogs) {
-                    for (LoggingEvent le : ((Log4JTaskLogs) logs).getAllEvents()) {
-                        // write into socket appender directly to avoid double lines on other listeners
-                        appender.doAppend(le);
-                    }
-                } else {
-                    l.info(logs.getStdoutLogs(false));
-                    l.error(logs.getStderrLogs(false));
-                }
+                this.flushTaskLogs(tr, l, appender);
             }
 
             // for running tasks, activate loggers on taskLauncher side
@@ -1424,6 +1417,31 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     }
                 }
             }
+        }
+        // nothing to do for pending jobs (bufferFoJobId is not null)
+    }
+
+    private void flushTaskLogs(TaskResult tr, Logger l, Appender a) {
+        // if taskResult is not awaited, task is terminated
+        TaskLogs logs = null;
+        // try to look in the DB
+        DatabaseManager.load(tr);
+        logs = tr.getOutput();
+        // avoid race condition if any...
+        if (logs == null) {
+            // the logs has been deleted and stored in the DB during the previous getOutput
+            // should not be null now !
+            DatabaseManager.load(tr);
+            logs = tr.getOutput();
+        }
+        if (logs instanceof Log4JTaskLogs) {
+            for (LoggingEvent le : ((Log4JTaskLogs) logs).getAllEvents()) {
+                // write into socket appender directly to avoid double lines on other listeners
+                a.doAppend(le);
+            }
+        } else {
+            l.info(logs.getStdoutLogs(false));
+            l.error(logs.getStderrLogs(false));
         }
     }
 
