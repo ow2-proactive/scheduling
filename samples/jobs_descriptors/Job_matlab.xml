@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:dev" name="Matlab_job" priority="normal" logFile="${HOME}/matlab_job.log" >
+    xmlns="urn:proactive:jobdescriptor:dev" name="Matlab_job" priority="normal" logFile="matlab_job.log" >
     <variables>
-        <variable name="PROACTIVE_HOME"
-            value="/home/user/ProActive" />
+        <variable name="SCHEDULER_HOME"
+            value="/home/user/Scheduler" /> <!-- CHANGE ME -->
         <variable name="MATLAB_SCRIPTS"
-            value="${PROACTIVE_HOME}/scripts/unix/matlab/examples" />
+            value="${SCHEDULER_HOME}/extensions/matlab/examples" />
     </variables>
     <description>A simple Matlab taskflow, which computes the sum of a randomly-generated array</description>
     <taskFlow>

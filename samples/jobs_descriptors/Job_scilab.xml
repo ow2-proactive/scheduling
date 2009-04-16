@@ -3,12 +3,12 @@
 <job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
     xmlns="urn:proactive:jobdescriptor:dev" name="Scilab_job"
-    priority="normal" logFile="${HOME}/scilab_job.log">
+    priority="normal" logFile="scilab_job.log">
     <variables>
-        <variable name="PROACTIVE_HOME"
-            value="/home/user/ProActive" />
+        <variable name="SCHEDULER_HOME"
+            value="/home/user/Scheduler" /> <!-- CHANGE ME -->
         <variable name="SCILAB_SCRIPTS"
-            value="${PROACTIVE_HOME}/scripts/unix/scilab/examples" />
+            value="${SCHEDULER_HOME}/extensions/scilab/examples" />
     </variables>
     <description>
         A simple Scilab batch job, which computes the numerical
