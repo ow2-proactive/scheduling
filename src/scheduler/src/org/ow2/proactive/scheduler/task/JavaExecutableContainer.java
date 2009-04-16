@@ -115,8 +115,7 @@ public class JavaExecutableContainer implements ExecutableContainer {
         if (this.userExecutable == null) {
             // Instanciate the actual executable
             try {
-                TaskClassLoader tcl = new TaskClassLoader(ClassLoader.getSystemClassLoader(),
-                    this.classServer);
+                TaskClassLoader tcl = new TaskClassLoader(this.getClass().getClassLoader(), this.classServer);
                 // the tcl becomes the context classloader
                 Thread.currentThread().setContextClassLoader(tcl);
                 Class<?> userExecutableClass = tcl.loadClass(this.userExecutableClassName);
