@@ -635,7 +635,7 @@ public class UserController {
         if (!initialized) {
             ScriptEngineManager manager = new ScriptEngineManager();
             // Engine selection
-            engine = manager.getEngineByName("rhino");
+            engine = manager.getEngineByExtension("js");
             initialized = true;
             //read and launch Action.js
             BufferedReader br = new BufferedReader(new InputStreamReader(UserController.class
