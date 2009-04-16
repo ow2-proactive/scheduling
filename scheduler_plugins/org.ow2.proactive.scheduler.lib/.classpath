@@ -34,7 +34,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/colt.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-discovery.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/concurrent.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cryptix.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cryptix32.jar"/>
@@ -91,7 +90,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/tablelayout.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/trilead-ssh2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/winp-1.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/wsdl4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xsdlib.jar"/>
