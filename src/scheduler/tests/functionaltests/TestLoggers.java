@@ -54,7 +54,7 @@ public class TestLoggers extends FunctionalTest {
     private static String jobDescriptor = TestLoggers.class.getResource(
             "/functionaltests/descriptors/Job_Test_Loggers.xml").getPath();
 
-    private final static int TEST_TIMEOUT = 21000;
+    private final static int TEST_TIMEOUT = 10000;
 
     /**
      * Tests start here.
@@ -74,32 +74,32 @@ public class TestLoggers extends FunctionalTest {
 
         JobId id1 = SchedulerTHelper.submitJob(jobDescriptor);
         JobId id2 = SchedulerTHelper.submitJob(jobDescriptor);
-        JobId id3 = SchedulerTHelper.submitJob(jobDescriptor);
+        //JobId id3 = SchedulerTHelper.submitJob(jobDescriptor);
         Logger l1 = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id1);
         Logger l2 = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id2);
-        Logger l3 = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id3);
+        //Logger l3 = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id3);
 
         l1.setAdditivity(false);
         l1.removeAllAppenders();
         l2.setAdditivity(false);
         l2.removeAllAppenders();
-        l3.setAdditivity(false);
-        l3.removeAllAppenders();
+        //l3.setAdditivity(false);
+        //l3.removeAllAppenders();
 
         AppenderTester test1 = new AppenderTester();
         AppenderTester test2 = new AppenderTester();
-        AppenderTester test3 = new AppenderTester();
+        //AppenderTester test3 = new AppenderTester();
         l1.addAppender(test1);
         l2.addAppender(test2);
-        l3.addAppender(test3);
+        //l3.addAppender(test3);
 
         SchedulerTHelper.getUserInterface().listenLog(id1, lfsPA.getAppenderProvider());
         SchedulerTHelper.getUserInterface().listenLog(id2, lfsSocket.getAppenderProvider());
-        SchedulerTHelper.getUserInterface().listenLog(id3, lfsPA.getAppenderProvider());
+        //SchedulerTHelper.getUserInterface().listenLog(id3, lfsPA.getAppenderProvider());
 
         SchedulerTHelper.waitForEventJobFinished(id1);
         SchedulerTHelper.waitForEventJobFinished(id2);
-        SchedulerTHelper.waitForEventJobFinished(id3);
+        //SchedulerTHelper.waitForEventJobFinished(id3);
 
         // waiting for the end of the job is not enough ... :(
         // listenLog is asynchronous, i.e. "eventually" semantic
@@ -109,8 +109,8 @@ public class TestLoggers extends FunctionalTest {
         Assert.assertEquals(2, test1.getNumberOfAppendedLogs());
         Assert.assertTrue(test2.receivedOnlyAwaitedEvents());
         Assert.assertEquals(2, test2.getNumberOfAppendedLogs());
-        Assert.assertTrue(test3.receivedOnlyAwaitedEvents());
-        Assert.assertEquals(2, test3.getNumberOfAppendedLogs());
+        //Assert.assertTrue(test3.receivedOnlyAwaitedEvents());
+        //Assert.assertEquals(2, test3.getNumberOfAppendedLogs());
 
         lfsPA.terminate();
         lfsSocket.terminate();
