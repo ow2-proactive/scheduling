@@ -41,8 +41,19 @@ then
     CP=`print_jars "$PA_SCHEDULER/lib/"`
     CLASSPATH=$CLASSPATH:$CP
 else 
-    CP=`print_jars "$PA_SCHEDULER/dist/lib/"`
-    CLASSPATH=$CLASSPATH:$CP
+    # Script engines must be added to classpath to be found
+    # it must also placed before jars containing jar-index
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/script-js.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jruby-engine.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jython-engine.jar"
+    # fill with ProActive.jar : use jar index for ProActive dependencies
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive.jar"
+    # fill with Scheduler jars : use jar index for Scheduler dependencies
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_SRM-common.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_ResourceManager.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-client.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-worker.jar"
 fi
 
 export CLASSPATH
