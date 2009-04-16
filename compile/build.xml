@@ -627,4 +627,21 @@
 		<delete dir="${cl.scheduler.worker.dir}" />
 	</target>
 
+	<target name="update_copyright_and_version" description="Update Copyright and Version in every text files">
+		<java classname="sources.UpdateCopyrightAndVersion" fork="false">
+			<classpath path="${lib.dir}/ProActive/ProActive_utils.jar" />
+			<!--  base dir -->
+			<arg value="${base.dir}" />
+			<!--  exclude dirs -->
+			<arg value="${docs.dir}" />
+			<arg value="${dist.dir}" />
+			<arg value="${classes.dir}" />
+			<arg value="${test.classes.dir}" />
+			<arg value="${lib.dir}" />
+			<arg value="${dev.dir}" />
+			<arg value="${extra.format.dir}"/>
+		<sysproperty key="copyright.update" value="${copyright.update}"/>
+		</java>
+	</target>
+
 </project>
