@@ -40,7 +40,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/colt.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-collections-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-discovery.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cryptix.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cryptix32.jar"/>
@@ -75,7 +74,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/ProActive.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ptolemy.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/puretls.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/rngpack-1.1a.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/saaj-api.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/saxon8.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/saxon8-dom.jar"/>
@@ -93,7 +91,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/tablelayout.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/trilead-ssh2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/winp-1.5.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/wsdl4j.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xml-apis.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
@@ -108,5 +105,16 @@
 	<classpathentry kind="lib" path="lib/common/script/script-api.jar"/>
 	<classpathentry kind="lib" path="lib/common/script/jruby.jar"/>
 	<classpathentry kind="lib" path="lib/common/script/jython.jar"/>
+	<classpathentry kind="lib" path="lib/common/rngpack-1.1a.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/jetty-6.1.11.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/jetty-util-6.1.11.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/ProActive_examples.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/ProActive_utils.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/servlet-api-2.5-6.1.11.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/slf4j-api-1.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/slf4j-log4j12-1.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/ssj.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/wsdl4j-1.5.1.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
