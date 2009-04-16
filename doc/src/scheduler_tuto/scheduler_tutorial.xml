@@ -904,11 +904,42 @@ for(i=0; i&lt;args.length;i++)
         }
 }
 			</programlisting>
+		
 		<para>
 		So create in your [working_dir] 1.tmp and 2.tmp, and execute the job.
 		You will see that 1.tmp is removed just  before task starting, and 2.tmp is removed at task's end.
 		</para>					
 		</section>
+	 
+
+		<section xml:id="fthelpers"><info><title>File Transfer Helpers to be used from scripts</title></info>
+		<para>
+		The package <emphasis role="bold">org.ow2.proactive.scripting.helper.filetransfer</emphasis> provides several file transfer drivers that 
+		can be used in the pre and post scripts. SCP, SFTP and FTP protocols are implemented.    
+		One must only specify, in the script code, the protocol to be used and, optionally, the implementation 
+		(if several implementations are available for the given protocol).
+		</para>
+		<para>
+		Here's an example of a script that copies a set of files from a remote host to a local folder. 
+		</para>
+		<para>			 
+		<emphasis role="bold">file : </emphasis>getFiles.js
+		</para>	
+		<programlisting language="java">
+		      <textobject>
+				     <textdata fileref="scheduler_tuto/fthelpers/getFiles.js"/>
+		     </textobject>
+	    </programlisting>
+
+		<para> 
+		 The commented lines in the "Define Driver to be used for file transfer" section in the script shows how one can 
+		 choose between different protocols and implementations. 
+		</para>
+		<para>
+		 This script, as welll as a putFiles.js script can be found in the samples/scripts/filetransfer folder of the Scheduler Project. 
+		</para>
+		</section>
+		
 </section>
 <section xml:id="command_generator"><info><title>Command generator Script</title></info>
 	
