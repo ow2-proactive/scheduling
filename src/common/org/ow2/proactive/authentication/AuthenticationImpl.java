@@ -76,7 +76,7 @@ public abstract class AuthenticationImpl implements Authentication {
                 // is used when jaas.config is inside jar file
                 jaasConfigPath = jaasConfig.toString();
             }
-            System.setProperty("java.security.auth.login.config", jaasConfig.toURI().toString());
+            System.setProperty("java.security.auth.login.config", jaasConfigPath);
         } catch (URISyntaxException e) {
             getLogger().error(e.getMessage(), e);
         }
