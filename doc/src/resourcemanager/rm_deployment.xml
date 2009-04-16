@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_deployment"><info><title>Launch Resource Manager and deploy computing nodes</title></info>
 			<para>
-					In this part is explained how to launch Resource Manager, and how to deploy new
+					In this part is explained how to launch Resource Manager, how to deploy new
 					ProActive nodes and add them to the Resource Manager. Basically Resource Manager deploys computing nodes by using GCM deployment
-					Standard implemented in ProActive. This standard provides a way to specify in XML descriptors whole deployment
+					standard implemented in ProActive. This standard provides a way to specify in XML descriptors whole deployment
 					of a distributed application. Resource Manager uses this standard to deploy computing nodes and aggregate them in a pool
 					of computing nodes.
 			</para>
 			<section xml:id="RM_start"><info><title>Launch the Resource Manager</title></info>
 				<para>  
 					To start the Resource Manager, run run the <emphasis>startRM.[sh|bat]</emphasis>
-					script in 'bin/[os]/' directory. Without arguments, Resource Manager will start and create 4
-					ProActive nodes on the local host. You can specify some arguments :
+					script in 'bin/[os]/' directory. By default Resource Manager will be started empty (without computing nodes).
+					You can specify some arguments :
 					<itemizedlist>
-						<listitem> <para><emphasis>-n</emphasis> or <emphasis>--nodeploy</emphasis>, 
-						to Start Resource manager without deploying 4 local nodes</para> 
+						<listitem> <para><emphasis>-ln</emphasis> or <emphasis>--localNodes</emphasis>,
+						to start Resource manager with deploying 4 local nodes</para>
 						</listitem>
 						<listitem> <para><emphasis>-d</emphasis> or <emphasis>--deploy</emphasis>, followed by a list
 						of GCM deployment files (GCMD, see below for GCM utilization), Resource Manager starts deploys
@@ -27,65 +27,60 @@
 			</section>
 			<section xml:id="RM_GCM"><info><title>Define GCM Deployment files</title></info>
 				<para>
-				    ProActive Resource Manager relies on GCM Deployment standard to deploy Computing nodes. GCM deployment 
-				    is powerful tool for deployment distributed applications. Basically we write GCM deployment files, which are XML files and
-				    we ask to a ProActive application to parse GCM files and deploy the distributed application as specified in it. You can find a full documentation
-				    of GCM deployment mechanism in ProActive manual, chapter 19 :<emphasis>ProActive GCM Deployment</emphasis>.   
+				    ProActive Resource Manager relies on GCM Deployment standard to deploy computing nodes.
+					GCM standard implies that an application could be deployed anywhere without changing the source code.
+					For instance, we must be able to use various protocols, rsh, ssh, Globus, LSF, etc., for the creation
+					of the JVMs needed by the application (see details in ProActive manual, chapter 19 :<emphasis>ProActive GCM Deployment</emphasis>)
 				    We will present here main concepts of GCM deployment mechanism, how to write GCM Deployment descriptors,
-				    and how to use it with Resource manager.  
+				    and how to use it with Resource manager.
 				</para>
 				<para>
-					There are many ways to add Nodes to Resource Manager with GCM deployment. Here are just described few examples. 
-					You can acquire already deployed nodes, using rsh protocol, deploy nodes on Microsoft CCS cluster, and some other platforms/protocols.
-					You can use bridges in GCMD if remote hosts are not directly reachable in your LAN.
+					There are many ways to add nodes to Resource Manager with GCM deployment.
+					You can acquire already deployed nodes using various protocols, deploy nodes on Microsoft CCS cluster,
+					and some other platforms/protocols. You can use bridges in GCMD if remote hosts are not directly
+					reachable in your LAN.
 				</para>
-				
 				
 				<section xml:id="RM_GCM_concepts"><info><title>Main concepts</title></info>
 					<section xml:id="RM_GCMA_GCMD"><info><title>GCM Application descriptor and GCM Deployment descriptor</title></info>	
 						<para>
-							GCM Deployment mechanism is made of two XML files :
+							GCM Deployment procedure is described in two XML files :
 								<itemizedlist>
 									<listitem>
 									<para>
-										<emphasis> GCM Application Descriptor</emphasis> (GCMA) that describes what is the application to deploy. Application
-										to deploy can be a native C/C++ application, a Java application. Any batch application can be deployed with GCM.
+										<emphasis> GCM Application Descriptor</emphasis> (GCMA) defines the application to deploy. It
+										 can be a native C/C++ application, a Java application. Any batch application can be deployed with GCM.
 										</para>   
 									</listitem>
 									<listitem>
 									<para>
-										<emphasis> GCM Deployment Descriptor</emphasis> (GCMD) that describes where and how the application will be launched (deployed).
-										We define in this file host names of computers that will run the application, the way (protocol) to access to these computers (ssh, rsh...),
-										protocol-specific parameters to access to the host, file path to access to specified libraries regarding the host...
+										<emphasis> GCM Deployment Descriptor</emphasis> (GCMD) describes where and how the application will be launched (deployed).
+										This part defines host names that will run the application, the way (protocol) to access to these computers (ssh, rsh...),
+										protocol-specific parameters to access to the host, file path to access to specified libraries regarding the host, etc.
 										</para>    
 									</listitem>
 								</itemizedlist>
 						</para>
 						<para>
-						The definition of deployment in two XML files could seem tricky, but we can see the mechanism as this : a GCM Application descriptor for 'what to deploy'
-						and GCM deployment descriptor for where and how to deploy. In our case of deployment for ProActive Resource Manager, we have already an answer
-						for the 'what' ; We want to deploy ProActive nodes. So definition of the GCMA is already done. 
-						The part that you have to define is also the definition of GCM deployment descriptor, regarding to your computers infrastructure. 
+						In the case of resource manager GCMA is always a Proactive node. The only part administrator has to define is
+						GCM deployment descriptor which contains a description of computers infrastructure.
 						</para>
 					</section>
 					<section xml:id="RM_virtual_nodes"><info><title>Virtual Node</title></info>
 						<para>
-						GCM deployment and ProActve is built around concept of virtual nodes. The idea is to avoid to define in the application itself what
-						computing resources will be deployed/acquired, and how. For a ProActive application which is aimed to work on a set of several computers (nodes), 
-						we define in the application a set of nodes, this set of nodes is called a "virtual Node", and nothing else.
-						Specification of remote computers is not done inside the application. 
-						Then application, at runtime, uses the GCM deployment mechanism to perform a deployment, and map its virtual node
-						in real nodes. //TODO : no part in ProActive manual that present virtual node concept ?         
+						GCM deployment and ProActve is built around concept of virtual nodes which is
+						an application level abstraction. At runtime a virtual node will be mapped into one or several real nodes
+						but an application do not really need to know that. The mapping is performed according to GCM deployment descriptor.
 						</para>
 					</section>
 				</section>
 				<section xml:id="RM_GCMA"><info><title>Use default GCM Application descriptor</title></info>
 					<para>
 					As said before, the application to deploy by Resource Manager on remote computers is a ProActive node,
-					i.e. a Java virtual machine with a ProActive Node (a ProActive node is a kind of container of a ProActive application),
-					that will be provided to a scheduler to deploy a task on it. 
-					So we don't need to write several GCM Application descriptors, just one that will be used by all GCM deployment descriptors.
-					Resource Manager uses by default a sufficient GCM Application descriptor. This GCMA is named <emphasis>GCMNodeSourceApplication.xml</emphasis>,
+					i.e. a Java virtual machine with a ProActive Node (a ProActive node is a kind of container for ProActive applications),
+					that will be provided to a scheduler to deploy tasks on it.
+					So GCM Application descriptor is always the same and there is no need to change it.
+					This GCMA is named <emphasis>GCMNodeSourceApplication.xml</emphasis>,
 					stored in <emphasis>config/deployment</emphasis> directory. It is not mandatory to explore deeply the GCMA definition,
 					for using GCM deployment with ProActive Resource manager.
 					</para>

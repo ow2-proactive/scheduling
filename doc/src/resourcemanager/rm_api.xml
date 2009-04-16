@@ -44,7 +44,8 @@ admin.shutdown(true); //perform preemptive shutdown	</programlisting>
 	<section xml:id="RM_API_GCMD"><info><title>Deploy GCM deployment descriptors</title></info>
 		<para>
 		RMFactory provides a way to specify a list of deployment descriptors which will be deployed once Resource Manager is started.
-		Here are an example of starting the Resource Manager with 4 nodes
+		Here are an example of starting the Resource Manager with 4 nodes. In this case node source with GCM infrastructure manager and
+		static node acquisition policy will be created.
 		</para>
 		<programlisting language="java">
 String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config/deployment/Local4JVMDeployment.xml";
@@ -62,7 +63,7 @@ File GCMDFile = new File("GCMDeployment.xml");
 byte[] GCMDContent = FileToBytesConverter.convertFileToByteArray(GCMDFile);
        
 //launch deployment defined in GCMD
-admin.addNodes(GCMDContent);	</programlisting>
+admin.addNodes(sourceName, new Object[] { GCMDContent });</programlisting>
 		<para>
 		Here we ask to RMAdmin to perform deployment by passing to it a byte array containing a GCMD. We can't pass
 		directly the File object to RMAdmin, because RMAdmin active object can run on another JVM, a JVM different
@@ -80,7 +81,7 @@ admin.addNode("rmi://host_1/comptingNode"); //add a node identified with an URL
 	</section>
 	<section xml:id="RM_API_remove_node"><info><title>Remove a node from RM</title></info>
 	<para>
-	You can remove a node from Resource Manager, with the code :
+	You can remove a node from Resource Manager with the code :
 	</para>
 	<programlisting language="java">
 admin.removeNode("rmi://nodeToRemove", true); 
@@ -93,33 +94,34 @@ admin.removeNode("rmi://nodeToRemove", true);
 		Then after removal is performed.
 	</para>
 	</section>
-	<section xml:id="RM_API_P2P_node_source"><info><title>Acquire nodes from peer to peer infrastructure</title></info>
+	<section xml:id="RM_API_custom_node_source"><info><title>Create custom node source</title></info>
 		<para>
-		It is also possible to connect Resource Manager to an existing ProActive peer to peer (P2P) infrastructure.
-		ProActive P2P infrastructure is a self-organized network of computing resources.
-		When the infrastructure is running you have nothing to do to keep it up.
-		You can find more information about creation and management of Peer to peer infrastructure in 
-		ProActive Manual Chapter 50 : <emphasis>Installing and Using the P2P Infrastructure</emphasis>.
-		Resource Manager provides a specific dynamic Node Source That performs acquisition/release of ProsActive
-		nodes from a peer to peer infrastructure. RMAdmin presents a way to Launch the peer to peer Node Source :
+		You can create different node sources using admin interface of RM.
+		Lets take a look at the example how to create the most complex node source.
 		</para>
 		<programlisting language="java">
-Vector&lt;String&gt; v = new Vector&lt;String&gt;();
-v.add("//remotePeers");
-
-admin.createDynamicNodeSource("P2P", 20, 10000, 50000, v);	
+// creating infrastructure manager parameters
+Object[] imParameters = new Object[] { hostsList, GCMDeploymentData };
+// creating policy parameters
+Object[] policyParameters = new Object[] {
+           schedulerURL, // scheduler url
+           username, // scheduler user name
+           password, // scheduler user password
+           "true", // preemptive removal
+           "0", // min modes
+           "1", // max modes
+           "1", // nodes per task
+           "1000" // releasing period
+};
+admin.createNodesource("Scheduler loading node source", GCMCustomisedInfrastructure.class.getName(), imParameters,
+	SchedulerLoadingPolicy.class.getName(), policyParameters);
 		</programlisting>
 		<para>
-		First we construct a Vector containing a list of remote peers URLs, i.e. list of hosts where a peer to peer service
-		is running. This list is used to perform the bootstrapping on peer to peer infrastructure.
-		Then we ask to RMAdmin to create the Dynamic Node Source with method 
-		<literal> createDynamicNodeSource("P2P", 20, 10000, 50000, v);</literal>. First parameter is String that define Node
-		Source's name. Second parameter is the number of nodes to acquire, 
-		third parameter is the nice time in ms (time to wait after a node release, before getting another node),
-		fourth parameter is the Time to release in ms
-		(TTR, keeping duration of an acquired node), and last parameter is a Vector of String representing peer URLs. 
-		So this function launches a peer to peer Service on RM's JVM and try acquire permanently the specified number of
-		number of nodes. 
+		Here we created the node source with GCM customized infrastructure manager and scheduler loading policy.
+		In order to create the infrastructure manager we preliminary loaded host list and GCM deployment template files and transformed their
+		content to bytes array. Then we defined parameters of infrastructure manager and node source policy and used
+		<literal> admin.createNodesource(...)</literal> method to create new node source. It is implied that scheduler is running somewhere at the
+		moment of the node source creation.
 		</para>
 	</section>
 	<section xml:id="RM_API_user"><info><title>Use Resource Manager as a nodes provider for your application</title></info>
