@@ -9,7 +9,7 @@ importPackage(org.ow2.proactive.scripting.helper.filetransfer.initializer);
 
 //set this to true if yo want to have your logs in a file on the remote machine
 var logToFile = false;
-//set this to true to ienable debug mode
+//set this to true to enable debug mode
 var mode_debug= false;
 
 var task_id=System.getProperty("pas.task.id");
@@ -27,7 +27,7 @@ log("logs file at "+System.getProperty("java.io.tmpdir")+File.separator+logsFile
   //-------------- Script ARGS --------------------------
      if (args.length<5)
       {
-        log("Script usage: host username password working_dir_on_node file1 [file2] ... [filen]");
+        log("Script usage: host username password destination_folder_on_node file1 [file2] ... [filen]");
         log("Not enough parameters. Script cannot be executed");
         throw new Exception ("Not enough parameters.");
       }
@@ -35,16 +35,18 @@ log("logs file at "+System.getProperty("java.io.tmpdir")+File.separator+logsFile
 
 		//host where the file is to be copied from
 		var host = args[0];
-		debug("host="+host);
+		debug("remote host="+host);
 
 		//identification to the remote host
 		var username=args[1];
 		debug("user="+username);
 		var password=args[2];
 		debug("password="+password);
-		//tmp/working folder on node
+		//for the scp implementation- the driver will first try to connect through ssh keys
+		//and will use the password only if the connection fails. 
+		
 		var working_dir_on_node = args[3];
-		debug("local folder: "+working_dir_on_node);
+		debug("destination folder on the compute node: "+working_dir_on_node);
 
 		debug("Files to copy: ");
 		var files = new LinkedList();
@@ -55,8 +57,6 @@ log("logs file at "+System.getProperty("java.io.tmpdir")+File.separator+logsFile
 			files.add(args[k]);
 			debug(args[k]);
 			}
-
-
 
 
 		//how long will it take?
@@ -81,7 +81,7 @@ log("logs file at "+System.getProperty("java.io.tmpdir")+File.separator+logsFile
 
 
 	//----(SCP Protocol) Use this code for in order to use SCP_Trilead_Driver to copy the files ----
-	//(By default, the initializaer will use SCP_Trilead_Driver to init the connection)
+	//(By default, the initializer will use SCP_Trilead_Driver to init the connection)
 	var ftInit= new FileTransfertInitializerSCP(host, username, password);
 
     // ----------- OR ----------------
@@ -120,7 +120,7 @@ log("logs file at "+System.getProperty("java.io.tmpdir")+File.separator+logsFile
 
 function log(msg)
 {
-	msg="(getScript) "+msg;
+		msg="(getFiles.js) "+msg;
 		 if (logToFile)
 			  {
 				   ScriptLoggerHelper.logToFile(logsFile,"\n"+msg+"\n");
@@ -134,7 +134,7 @@ function debug(msg)
 {
        if (mode_debug)
        {
-	log ("DEBUG: "+msg);
+		log ("DEBUG: "+msg);
        }
 }
 
