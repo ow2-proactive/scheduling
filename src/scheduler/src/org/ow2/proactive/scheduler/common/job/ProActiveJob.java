@@ -52,6 +52,10 @@ import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 @PublicAPI
 public class ProActiveJob extends Job {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     private ProActiveTask task = null;
 
     /** ProActive Empty Constructor */

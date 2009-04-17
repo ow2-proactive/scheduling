@@ -73,6 +73,11 @@ import org.ow2.proactive.scripting.SelectionScript;
  */
 public class RMNodeImpl implements RMNode, Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
     /** associated logger */
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMNODE);
 

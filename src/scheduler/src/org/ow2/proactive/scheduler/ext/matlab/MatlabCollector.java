@@ -43,6 +43,10 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
  * @author The ProActive Team
  */
 public class MatlabCollector extends MatlabTask {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     private static AOMatlabCollector collectorWorker = null;
 
     /**

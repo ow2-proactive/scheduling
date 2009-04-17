@@ -41,6 +41,10 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 public class Logging extends JavaExecutable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     public static final String MSG = "LoG";
     public static final String RESULT = "ReSuLt";
 

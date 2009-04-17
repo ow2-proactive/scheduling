@@ -89,6 +89,11 @@ import org.ow2.proactive.utils.NodeSet;
 @Proxy(lazy = false)
 public abstract class InternalTask extends TaskState {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
     /** Parents list : null if no dependences */
     @ManyToAny(metaColumn = @Column(name = "ITASK_TYPE", length = 5))
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {

@@ -54,6 +54,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 @PublicAPI
 public abstract class Executable implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
     /** Executable state. True if the executable has been killed */
     private boolean killed = false;
 

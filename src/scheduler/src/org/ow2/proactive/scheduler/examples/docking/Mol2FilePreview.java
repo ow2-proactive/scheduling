@@ -46,6 +46,10 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleText
  */
 public class Mol2FilePreview extends ResultPreview {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     private static final String MATCH_PATTERN = "Produced output file : ";
 
     /**

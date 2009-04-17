@@ -50,6 +50,10 @@ import org.objectweb.proactive.api.PAActiveObject;
  */
 public abstract class AuthenticationImpl implements Authentication {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     /** Activation is used to control authentication during scheduling initialization */
     private boolean activated = false;
 

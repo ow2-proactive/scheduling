@@ -54,7 +54,6 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -79,6 +78,11 @@ import ptolemy.data.Token;
  * @author The ProActive Team
  */
 public class AOMatlabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
 
     /**
      * URL to the scheduler
@@ -686,6 +690,11 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      *         Internal class for filtering requests in the queue
      */
     protected class FindNotWaitFilter implements RequestFilter {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 10L;
 
         /**
          * Creates the filter

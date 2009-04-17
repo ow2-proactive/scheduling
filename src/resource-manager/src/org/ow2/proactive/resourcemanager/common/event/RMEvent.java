@@ -45,6 +45,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class RMEvent implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     /** Resource manager URL */
     private String RMUrl = null;
     protected RMEventType type;

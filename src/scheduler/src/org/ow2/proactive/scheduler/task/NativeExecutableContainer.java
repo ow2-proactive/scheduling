@@ -58,6 +58,11 @@ import org.ow2.proactive.scripting.GenerationScript;
 @AccessType("field")
 @Proxy(lazy = false)
 public class NativeExecutableContainer implements ExecutableContainer {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

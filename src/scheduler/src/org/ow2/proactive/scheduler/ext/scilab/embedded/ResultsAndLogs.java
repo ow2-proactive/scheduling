@@ -43,6 +43,10 @@ import java.io.Serializable;
  */
 public class ResultsAndLogs implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     private SciData result;
     private String logs;
     private Throwable exception;

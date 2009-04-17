@@ -49,6 +49,10 @@ public class AOMatlabSplitter extends AOMatlabWorker {
     /**
      *
      */
+    private static final long serialVersionUID = 10L;
+    /**
+     *
+     */
     private int numberOfChildren;
 
     public AOMatlabSplitter() {
