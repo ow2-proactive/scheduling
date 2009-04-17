@@ -48,6 +48,11 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  */
 public class SchedulerExecutableAdapter extends JavaExecutable implements WorkerMemory {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
     private TaskIntern<Serializable> task;
 
     private static Map<String, Object> memory = new HashMap<String, Object>();

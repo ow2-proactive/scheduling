@@ -36,9 +36,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import org.apache.log4j.net.SocketAppender;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.ssh.SSHConnection;
-import org.ow2.proactive.scripting.helper.filetransfer.ScriptLoggerHelper;
 
 
 /*

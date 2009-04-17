@@ -83,6 +83,11 @@ import org.ow2.proactive.scripting.SimpleScript;
 @Proxy(lazy = false)
 public abstract class Task extends CommonAttribute {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
     /** Number of nodes asked by the user. */
     @Column(name = "NODES_NEEDED")
     protected int numberOfNodesNeeded = 1;

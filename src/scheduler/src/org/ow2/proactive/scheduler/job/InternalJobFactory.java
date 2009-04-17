@@ -69,6 +69,10 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class InternalJobFactory implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FACTORY);
 
     /**

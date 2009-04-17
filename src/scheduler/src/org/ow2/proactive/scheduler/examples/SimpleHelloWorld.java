@@ -31,10 +31,7 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.UnknownHostException;
-
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -166,6 +163,11 @@ public class SimpleHelloWorld {
     }
 
     private class InternalExec extends JavaExecutable {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 10L;
+
         @Override
         public Serializable execute(TaskResult... results) {
             System.out.println("Hello World !");

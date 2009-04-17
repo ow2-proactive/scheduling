@@ -46,6 +46,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class ScriptHandler implements Serializable {
 
     /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
+    /**
      * ProActive Constructor
      */
     public ScriptHandler() {

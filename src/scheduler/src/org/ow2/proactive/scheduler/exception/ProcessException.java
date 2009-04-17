@@ -42,6 +42,11 @@ package org.ow2.proactive.scheduler.exception;
 public class ProcessException extends RuntimeException {
 
     /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
+    /**
      * Attaches a message to the Exception
      * @param msg message attached
      */

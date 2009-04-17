@@ -37,6 +37,11 @@ import java.io.Serializable;
 public class MatlabConfiguration implements Serializable {
 
     /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
+    /**
      * The home dir of Matlab on this machine
      */
     private String matlabHome = null;

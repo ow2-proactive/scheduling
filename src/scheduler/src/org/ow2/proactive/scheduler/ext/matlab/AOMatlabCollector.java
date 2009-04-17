@@ -46,6 +46,11 @@ public class AOMatlabCollector extends AOMatlabWorker {
     /**
      *
      */
+    private static final long serialVersionUID = 10L;
+
+    /**
+     *
+     */
     public AOMatlabCollector() {
     }
 

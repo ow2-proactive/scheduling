@@ -46,6 +46,11 @@ public class DependenceFailedException extends RuntimeException {
     /**  */
 
     /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
+    /**
      * Create a new instance of JobCreationException with the given messag
      *
      * @param msg the message to attach.

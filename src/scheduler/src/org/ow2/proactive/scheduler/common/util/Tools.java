@@ -50,6 +50,11 @@ import org.objectweb.proactive.core.config.PAProperties;
 public class Tools implements Serializable {
 
     /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
+    /**
      * Format the given integer 'toFormat' to a String containing 'nbChar'
      * characters
      *

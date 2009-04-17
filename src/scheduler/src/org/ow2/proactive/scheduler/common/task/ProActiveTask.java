@@ -50,6 +50,11 @@ import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
  */
 @PublicAPI
 public class ProActiveTask extends Task {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
     /** Classname of the executable */
     private String executableClassName = null;
 

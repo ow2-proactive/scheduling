@@ -49,6 +49,11 @@ import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
 public class PriorityPolicy extends Policy {
 
     /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
+    /**
      * This method return the tasks using FIFO policy according to the jobs priorities.
      *
      * @see org.ow2.proactive.scheduler.common.policy.Policy#getOrderedTasks(java.util.List)

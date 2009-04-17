@@ -70,6 +70,11 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 @AccessType("field")
 @Proxy(lazy = false)
 public class ForkedJavaExecutable extends JavaExecutable implements ExecutableContainer {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

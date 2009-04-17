@@ -40,6 +40,11 @@ package org.ow2.proactive.scheduler.common.exception;
  */
 public class MaxJobIdReachedException extends SchedulerException {
     /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
+    /**
      * Create a new instance of MaxJobIdReachedException with the given message.
      *
      * @param msg the message to attach.

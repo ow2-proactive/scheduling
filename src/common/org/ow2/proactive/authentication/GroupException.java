@@ -40,6 +40,11 @@ package org.ow2.proactive.authentication;
 public class GroupException extends Exception {
 
     /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
+    /**
      * Attaches a message to the Exception
      * @param msg message attached
      */

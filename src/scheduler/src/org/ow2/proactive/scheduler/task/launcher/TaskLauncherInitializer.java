@@ -48,6 +48,10 @@ import org.ow2.proactive.scripting.Script;
  */
 public class TaskLauncherInitializer implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     /** The task identification */
     private TaskId taskId;
     /** The content of the security policy file to be sent to forked launcher */

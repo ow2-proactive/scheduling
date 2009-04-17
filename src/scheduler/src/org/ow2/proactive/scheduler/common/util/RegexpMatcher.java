@@ -49,7 +49,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class RegexpMatcher implements Serializable {
 
-    private static final long serialVersionUID = 3248173020881015123L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
     private Pattern pattern = null;
     private Matcher matcher = null;
     private ArrayList<String> matches;

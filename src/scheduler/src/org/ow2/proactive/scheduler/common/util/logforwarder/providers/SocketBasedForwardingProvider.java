@@ -88,6 +88,10 @@ public class SocketBasedForwardingProvider implements LogForwardingProvider {
      */
     public static class SocketAppenderProvider implements AppenderProvider {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = 10L;
         private String hostname;
         private int port;
 
