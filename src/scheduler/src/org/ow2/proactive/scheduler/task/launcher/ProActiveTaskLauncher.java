@@ -83,8 +83,8 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      */
     @Override
     public void initActivity(Body body) {
-        super.initActivity(body);
         PAActiveObject.setImmediateService("getNodes");
+        super.initActivity(body);
     }
 
     /**
