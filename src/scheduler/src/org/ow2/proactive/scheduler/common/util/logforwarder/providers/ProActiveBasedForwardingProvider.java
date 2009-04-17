@@ -122,7 +122,8 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
             try {
                 ProActiveLogCollector remoteCollector = (ProActiveLogCollector) PARemoteObject
                         .lookup(remoteCollectorURI);
-                return new ProActiveAppender(new ThrottlingProvider(FLUSH_PERIOD, 50, 10000), remoteCollector);
+                return new ProActiveAppender(new ThrottlingProvider(FLUSH_PERIOD, 50, 10000, true),
+                    remoteCollector);
             } catch (ProActiveException e) {
                 throw new LogForwardingException("Cannot lookup remote log collector at " +
                     this.remoteCollectorURI, e);
