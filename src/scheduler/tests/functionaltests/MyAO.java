@@ -55,10 +55,6 @@ import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
  */
 public class MyAO implements Serializable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     protected String rmUsername = "demo";
     protected String rmPassword = "demo";
 

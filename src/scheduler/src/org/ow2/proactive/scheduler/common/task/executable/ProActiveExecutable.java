@@ -52,11 +52,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 public abstract class ProActiveExecutable extends JavaExecutable {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
-    /**
      * <font color="red">Not used anymore in this context</font>
      * This method should never be called.<br>
      * It is the last point for this method implementation.

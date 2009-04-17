@@ -48,10 +48,6 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 @PublicAPI
 public class RMState implements Serializable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     private IntWrapper numberOfAllResources;
     private IntWrapper numberOfFreeResources;
 

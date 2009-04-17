@@ -64,10 +64,6 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @PublicAPI
 public class AdminScheduler extends UserScheduler implements AdminSchedulerInterface {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     /** Logger to be used for all messages related to the scheduler */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);

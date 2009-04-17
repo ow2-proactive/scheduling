@@ -49,10 +49,6 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements SchedulerEventListener {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     @Configurable
     protected String url = "";
     @Configurable

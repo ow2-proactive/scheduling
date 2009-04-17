@@ -67,11 +67,6 @@ import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 @Proxy(lazy = false)
 @PublicAPI
 public class UpdatableProperties<T> implements Serializable {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

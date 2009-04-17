@@ -32,6 +32,8 @@
 package org.ow2.proactive.scheduler.examples;
 
 import java.io.Serializable;
+import java.util.Map;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
@@ -45,10 +47,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  */
 public class WaitAndPrint extends JavaExecutable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     /** Sleeping time before displaying. */
     public int sleepTime;
     /** Parameter number. */

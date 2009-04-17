@@ -40,6 +40,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
@@ -60,10 +61,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @AccessType("field")
 @Proxy(lazy = false)
 public class InternalProActiveJob extends InternalJob {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

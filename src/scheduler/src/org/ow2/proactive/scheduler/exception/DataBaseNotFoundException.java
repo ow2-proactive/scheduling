@@ -42,11 +42,7 @@ package org.ow2.proactive.scheduler.exception;
 public class DataBaseNotFoundException extends RuntimeException {
 
     /** serial Version UID */
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
+    private static final long serialVersionUID = -8273901185087235546L;
 
     /**
      * Attaches a message to the Exception

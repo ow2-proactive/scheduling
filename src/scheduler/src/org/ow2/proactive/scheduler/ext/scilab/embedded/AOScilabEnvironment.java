@@ -70,11 +70,6 @@ import java.util.Map;
  */
 public class AOScilabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     private boolean loggedin;
 
     /**
@@ -612,11 +607,6 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
     }
 
     protected class FindNotWaitFilter implements RequestFilter {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 10L;
 
         /**
          * Creates the filter

@@ -55,10 +55,6 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
  */
 public class UserScheduler implements UserSchedulerInterface {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     /** Scheduler proxy as an active object */
     public SchedulerFrontend schedulerFrontend;
 

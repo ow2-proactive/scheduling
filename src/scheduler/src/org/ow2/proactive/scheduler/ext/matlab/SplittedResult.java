@@ -42,10 +42,6 @@ public class SplittedResult implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 10L;
-    /**
-     *
-     */
     private ArrayToken token;
 
     public SplittedResult(ArrayToken token) {

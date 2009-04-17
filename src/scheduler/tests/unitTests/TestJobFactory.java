@@ -31,6 +31,8 @@
  */
 package unitTests;
 
+import java.util.HashMap;
+
 import junit.framework.Assert;
 
 import org.junit.Test;

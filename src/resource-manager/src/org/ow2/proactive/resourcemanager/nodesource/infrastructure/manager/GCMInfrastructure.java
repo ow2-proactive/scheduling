@@ -70,18 +70,9 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 public class GCMInfrastructure extends InfrastructureManager {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
-    /**
      * Deployment data container
      */
     protected class DeploymentData implements Serializable {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 10L;
         byte[] data;
         boolean deployed = false;
     }

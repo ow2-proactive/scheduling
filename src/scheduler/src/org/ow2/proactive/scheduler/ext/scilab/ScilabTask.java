@@ -69,11 +69,6 @@ import java.util.*;
  */
 public class ScilabTask extends JavaExecutable implements NotificationListener {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     final private static String[] DEFAULT_OUT_VARIABLE_SET = { "out" };
 
     protected boolean debug;
@@ -490,11 +485,6 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
      * @author The ProActive Team
      */
     private static class DummyJVMProcess extends JVMProcessImpl {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 10L;
 
         /**
          *

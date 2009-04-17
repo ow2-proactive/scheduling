@@ -48,11 +48,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
  */
 public final class SchedulerStateImpl implements SchedulerState {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     /** Pending jobs */
     private Vector<JobState> pendingJobs = new Vector<JobState>();
 

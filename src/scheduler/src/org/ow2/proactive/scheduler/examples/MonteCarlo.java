@@ -51,10 +51,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  */
 public class MonteCarlo extends JavaExecutable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     /**  */
     private static final long DEFAULT_STEPS = 10;
     private static final long DEFAULT_ITERATIONS = 10000;

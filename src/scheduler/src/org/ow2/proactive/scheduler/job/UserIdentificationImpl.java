@@ -45,11 +45,6 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
  */
 public class UserIdentificationImpl extends UserIdentification {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     /** user name */
     private String username;
 

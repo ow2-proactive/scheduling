@@ -48,11 +48,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  */
 public class PropertyTask extends JavaExecutable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     /**  */
     @Override
     public Serializable execute(TaskResult... results) {

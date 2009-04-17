@@ -66,11 +66,6 @@ import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 @AccessType("field")
 @Proxy(lazy = false)
 public abstract class CommonAttribute implements Serializable {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     /** 
      * Do the job has to cancel when an exception occurs in a task. (default is false) <br />
      * You can override this property inside each task.

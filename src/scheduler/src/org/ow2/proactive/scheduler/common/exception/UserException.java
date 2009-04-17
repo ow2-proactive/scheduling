@@ -45,11 +45,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class UserException extends Exception {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
-    /**
      * Attaches a message to the Exception.
      *
      * @param msg message attached.

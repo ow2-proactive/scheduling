@@ -45,11 +45,6 @@ import java.util.Map;
  */
 public class MatlabSplitter extends MatlabTask {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     private static AOMatlabSplitter splitterWorker = null;
 
     private int numberOfChildren;

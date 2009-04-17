@@ -57,11 +57,6 @@ import org.ow2.proactive.scripting.GenerationScript;
  * @since ProActive Scheduling 0.9
  */
 public class NativeExecutable extends Executable {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /** Process that start the native task */

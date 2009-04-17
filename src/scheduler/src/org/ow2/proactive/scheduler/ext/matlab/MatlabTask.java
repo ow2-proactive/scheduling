@@ -75,11 +75,6 @@ import java.util.*;
  */
 public class MatlabTask extends JavaExecutable implements NotificationListener {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     protected boolean debug;
 
     /**
@@ -535,11 +530,6 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
      *
      */
     public static class DummyJVMProcess extends JVMProcessImpl implements Serializable {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 10L;
 
         public DummyJVMProcess() {
             super();

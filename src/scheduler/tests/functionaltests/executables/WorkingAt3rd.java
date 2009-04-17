@@ -45,10 +45,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 public class WorkingAt3rd extends JavaExecutable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     private String prefix = null;
     private String suffix = null;
 

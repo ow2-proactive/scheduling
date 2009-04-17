@@ -67,11 +67,6 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 @AccessType("field")
 @Proxy(lazy = false)
 public class TaskInfoImpl implements TaskInfo {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

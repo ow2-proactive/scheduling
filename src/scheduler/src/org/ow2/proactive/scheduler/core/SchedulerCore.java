@@ -141,10 +141,6 @@ import org.ow2.proactive.utils.NodeSet;
 public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInterface,
         TaskTerminateNotification, RunActive {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);

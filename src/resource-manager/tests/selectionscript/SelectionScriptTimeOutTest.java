@@ -31,6 +31,8 @@
  */
 package selectionscript;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.io.File;
 
 import nodestate.FunctionalTDefaultRM;

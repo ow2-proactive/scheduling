@@ -51,11 +51,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public abstract class JavaExecutable extends Executable {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
-    /**
      * Initialization default method for a java task.<br>
      * <p>
      * By default, this method try so do some king of automatic assignment between the value given

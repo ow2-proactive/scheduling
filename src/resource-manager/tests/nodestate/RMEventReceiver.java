@@ -42,6 +42,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.MutableInteger;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;

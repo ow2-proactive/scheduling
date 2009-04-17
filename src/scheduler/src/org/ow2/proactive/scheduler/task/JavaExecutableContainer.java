@@ -70,11 +70,6 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 @Proxy(lazy = false)
 public class JavaExecutableContainer implements ExecutableContainer {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

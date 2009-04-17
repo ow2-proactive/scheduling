@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -107,10 +108,6 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, AdminSchedulerInterface {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);

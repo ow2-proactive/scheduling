@@ -41,10 +41,6 @@ import java.util.Comparator;
  * @author Kohsuke Kawaguchi
  */
 public final class CaseInsensitiveComparator implements Comparator<String>, Serializable {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     /**  */
     public static final Comparator<String> INSTANCE = new CaseInsensitiveComparator();
 

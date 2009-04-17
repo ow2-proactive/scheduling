@@ -46,10 +46,6 @@ import java.awt.*;
  */
 public class LoginFrame extends JDialog {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
     private JTextField username;
     private JPasswordField password;
     private AOMatlabEnvironment aome;

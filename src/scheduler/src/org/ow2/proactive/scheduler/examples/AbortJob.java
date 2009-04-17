@@ -48,11 +48,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 public class AbortJob extends JavaExecutable {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = 10L;
-
-    /**
      * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
