@@ -166,14 +166,19 @@ public abstract class TaskLauncher implements InitActive {
      * @param body the body of the active object being initialized
      */
     public void initActivity(Body body) {
+        // TODO cdelbe : race condition remains here 
+        // see PROACTIVE-652
+        // see SCHEDULING-263
+        PAActiveObject.setImmediateService("activateLogs");
+        PAActiveObject.setImmediateService("getNodes");
+        PAActiveObject.setImmediateService("terminate");
+        logger_dev.debug("Immediate services : getNodes, activateLogs, terminate");
+
         // plug stdout/err into a socketAppender
         this.initLoggers();
         // set scheduler defined env variables
         this.initEnv();
-        PAActiveObject.setImmediateService("getNodes");
-        PAActiveObject.setImmediateService("activateLogs");
-        PAActiveObject.setImmediateService("terminate");
-        logger_dev.debug("Immediate services : getNodes, activateLogs, terminate");
+
     }
 
     /**
