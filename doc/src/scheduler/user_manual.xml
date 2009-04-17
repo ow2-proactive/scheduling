@@ -1008,6 +1008,34 @@ job.setTask(aTask);
 				</para>
 			</section>
 		</section>
+		<section xml:id="flat_file_job"><info><title>Create a job in a simple flat file</title></info>
+			<para> ProActive Scheduler provides a way to define a job with a simple plain text file. this method is simpler as a XML file, but presents less features.
+			</para>
+			<para>
+			If you just need to launch a set of native tasks in parallel, without dependancies between tasks, you can create a simple text file,
+			and put in it a list of native commands to submit :
+			</para>
+			<programlisting language="xml">
+# a flat text file containing native commands to launch
+# one command to launch per line
+#
+# One rule to know:
+# command paths must be absolute paths
+
+/path/to/my/exec/myCmd.sh 1
+/path/to/my/exec/myCmd.sh 2
+/path/to/my/exec/myCmd.sh 3
+/path/to/my/exec/myCmd.sh 4
+			</programlisting>
+			<para>
+			Here, we define a job made of 4 native tasks, i.e native commands to launch. Each line beginning with a '#' is a comment, and not taken into account.
+			You have to put one native command per line, and commands must be absolute paths. Contrary to a job definition in XML, you cannot specify any dependencies between tasks.
+			This job definition is useful for embarrassingly parallel jobs. Many features of job are not available at creation time, but can be specified at submission time ; log file, job name, and selection scripts.
+			</para>
+			<para>
+			To see how to submit this kind of job descriptor, see <xref linkend="Submit_a_job_sh" />.
+			</para>
+		</section>
 		<section xml:id="Submit_a_job"><info><title>Submit a job to the Scheduler</title></info>
 			<para>
 				The submission will perform some verifications to ensure that a job is correctly formed.
@@ -1031,8 +1059,17 @@ job.setTask(aTask);
 					<itemizedlist>
 						<listitem>
 							<para>
-								<emphasis>The path to the job</emphasis> file descriptor is
-								mandatory (using the "-j PATH" option)
+								<emphasis>Job to schedule (mandatory)</emphasis>; it can be : an XML Job descriptor, a simple flat file, or directly path to
+								a native command to launch ;
+								<itemizedlist>
+									<listitem><para>Schedule an XML job file: use -j followed by path of an XML file.</para></listitem>
+									<listitem><para>Schedule a flat file containing native commands: use -cmdf followed by path of a flat file containing native commands.</para></listitem>
+									<listitem><para>Schedule a path to a native command: use -cmd followed by path of the native command to launch, with its launching arguments. Here it submits a job made of one native task.</para></listitem>
+								</itemizedlist>
+								For -cmd and -cmdf options, you can use aditional parameters; you can specify a log file that will contain all STDOUT and STDERR of job execution, with -o followed by path of a file.
+								This file is created (emptied if exits) at each beginning of job execution. You can specify a selection script with -s, followed by path of a selection script file.
+								You can specify a job name, with -jn followed by a string specifying a name. These three options; -s, -o and -jn are not taken into account with -j option, because job name,
+								selection scripts and log file are directly specified in XML job descriptor.
 							</para>
 						</listitem>
 						<listitem>
@@ -1059,13 +1096,27 @@ job.setTask(aTask);
 					</itemizedlist>
 				</para>
 				<para>
-					For example :
+					Examples :
+				</para>
+				<para>
 					<emphasis>
 						submit.[sh|bat] -j ../../samples/jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
 					</emphasis>
 					will submit 12 times the <literal>Job_with_dep</literal> job to a local
 					ProActive Scheduler and only your password will be requested.
 					Authorized username and password are defined by the administrator.
+				</para>
+				<para>
+					<emphasis>
+						submit.sh -cmdf ../../samples/jobs_descriptors/job_native_linux_cmd_file/cmds_file.cmd -l jl //localhost/ -jn myJob -o myJob.log
+					</emphasis>
+					will submit a job defined in a flat file, containing 4 native commands. Job is named "myJob", and a log file named "myJob.log" will be created.
+				</para>
+				<para>
+					<emphasis>
+						submit.sh -cmd ../../samples/jobs_descriptors/job_native_linux_cmd_file/myCmd.sh 4 -l jl -u //localhost -s ../../samples/scripts/selection/select.rb
+					</emphasis>
+					will submit a native command to execute; "myCmd.sh", with one argument; "4". A selection script is associated for this native command; "select.rb".
 				</para>
 				<para>
 					For more information, use -h (or --help) option (i.e. "submit.[sh|bat] -h")

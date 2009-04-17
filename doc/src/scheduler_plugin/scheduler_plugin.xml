@@ -376,9 +376,14 @@
 						the whole space.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[4] Submit a new Job</emphasis> : use this button to
+						<emphasis>[4] Submit a Job from an XML file</emphasis> : use this button to
 						submit a new job to the Scheduler. This action will request you for a job XML descriptor.
 						If you don't know how to create such a descriptor, please refer to <xref linkend="Create_job_xml"/>.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[4bis] Submit a a file containing native commands</emphasis> : use this button to submit a job defined in flat file.
+						If you don't know how to create such a job descriptor, please refer to <xref linkend="flat_file_job"/>.
+						This button opens a wizard for creating a subnitting this kind of job; see section  <xref linkend="flat_file_wizard"/></para>
 					</listitem>
 					</itemizedlist>					
 					<para>
@@ -408,7 +413,7 @@
 						</itemizedlist>
 					</listitem>
 					<listitem><para>
-						<emphasis>[7] View selected job output</emphasis> : use this button to
+						<emphasis>[7] View selected job output</emphasis> : use this button toProActive Scheduler
 						view the selected job output. Job output is in fact the output that comes from the different
 						tasks from both standard output and standard error stream.</para>
 					</listitem>
@@ -475,6 +480,62 @@
 				</itemizedlist>
 			</section>
 		</section>
+		<section xml:id="flat_file_wizard"><info><title>Command file job submission</title></info>
+			<para>Once you defined a file containing paths to native commands to submit (see <xref linkend="flat_file_job"/>), this wizard allows you to submit.
+			Main page provides you a way to specify aditional parameters for your job :
+			</para>
+			<para>
+				<figure xml:id="flat_wizard1"><info><title>Control Panel</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="150%" contentdepth="150%" fileref="scheduler_plugin/pics/flat_wizard1.jpg" format="JPG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+			<para>
+			<itemizedlist>
+					<listitem><para>
+						<emphasis>job name</emphasis>: enter a name for your job.
+						</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>command file </emphasis>click on browse button for choosing your file containing native commands, in a file chooser dialog.
+						This file chooser dialog shows only files suffixed by ".cmd".
+						</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>selection script </emphasis>click on browse button and choose a selection script to associate to each native task of your job.
+						</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>path for log file</emphasis>Enter a path to a log file that will contain all STDOUT and STDERR of job execution.
+								This file is created (emptied if exits) at each beginning of job execution.
+						</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>Cancel whole job if one of the commands fails</emphasis>If you check it, Scheduler will stop all executions of your commands if one fails.
+						Scheduler assumes that a failed native command is a command that has a return code different from 0.
+						</para>
+					</listitem>
+			</itemizedlist>
+			</para>
+			<para>
+			Then click on next button, you will see a brief summary of your job :
+			</para>
+			<para>
+				<figure xml:id="flat_wizard2"><info><title>Control Panel</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="150%" contentdepth="150%" fileref="scheduler_plugin/pics/flat_wizard2.jpg" format="JPG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+			<para>
+			Click on finish to launch submission. Native commands are scheduled in parallel.
+			If there are enough free resources (nodes) for every command, all commands will be launched simultaneously.
+			</para>
+		</section>
 	</section>
-
 </chapter>
