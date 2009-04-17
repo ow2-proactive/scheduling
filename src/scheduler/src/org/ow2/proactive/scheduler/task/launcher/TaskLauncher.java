@@ -49,6 +49,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -133,6 +134,8 @@ public abstract class TaskLauncher implements InitActive {
     private final AtomicBoolean loggersFinalized = new AtomicBoolean(false);
     // true if loggers are currently activated
     private final AtomicBoolean loggersActivated = new AtomicBoolean(false);
+    // 0 if the launcher (loggers and env) have been initialized
+    private final SweetCountDownLatch launcherInitialized = new SweetCountDownLatch(1);
 
     /** Maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     protected long wallTime = 0;
@@ -178,7 +181,9 @@ public abstract class TaskLauncher implements InitActive {
         this.initLoggers();
         // set scheduler defined env variables
         this.initEnv();
-
+        // set the launcher as initialized
+        this.launcherInitialized.countDown();
+        logger_dev.debug("TaskLauncher initialized");
     }
 
     /**
@@ -274,6 +279,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     @SuppressWarnings("unchecked")
     public void activateLogs(AppenderProvider logSink) {
+        this.launcherInitialized.await();
         synchronized (this.loggersFinalized) {
             logger_dev.info("Activating logs for task " + this.taskId);
             if (this.loggersActivated.get()) {
