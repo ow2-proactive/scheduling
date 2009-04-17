@@ -109,7 +109,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jetty-6.1.11.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/jetty-util-6.1.11.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/ProActive_examples.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ProActive_utils.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/servlet-api-2.5-6.1.11.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/slf4j-api-1.5.3.jar"/>
