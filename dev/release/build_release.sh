@@ -103,6 +103,7 @@ echo Update the website with new schema version
 ssh sea.inria.fr mkdir /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
 scp src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd $USER@sea.inria.fr:/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
 ssh sea.inria.fr chmod 555 /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
+ssh sea.inria.fr chmod 444 /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
 
 cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 echo " [i] Clean"
