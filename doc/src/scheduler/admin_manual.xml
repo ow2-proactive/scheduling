@@ -5,19 +5,19 @@
 			<section xml:id="Scheduler_Global_Architecture"><info><title>Scheduler Global Architecture</title></info>
 				<para>
 					The ProActive Scheduler Service is the result of a collaboration between 2 entities (the ProActive Scheduler and the Resource
-					Manager) each one of them has its own functionality.
+					Manager). Each one of them has its own functionality.
 				</para>
 				<para>
 					The ProActive Scheduler is the main entity and is a non GUI daemon which is connected to the Resources Manager. It is in
-					charge of scheduling submitted Jobs, in accordance with the scheduling policy.
+					charge of scheduling submitted jobs in accordance with the scheduling policy.
 				</para>
 				<para>
-					In order to launch Jobs, the ProActive Scheduler must obtain nodes (resources) from the Resources Manager.
-					As describe below, the user interacts only with the ProActive Scheduler entity and
-					the managed resources can be simple host or peer to peer resource. For full documentation about the Resource Manager,
+					In order to launch jobs, the ProActive Scheduler has to obtain nodes (resources) from the Resources Manager.
+					As described hereafter, the user interacts only with the ProActive Scheduler entity and
+					the managed resources can be simple hosts or peer to peer resources. For full documentation about the Resource Manager,
 					please refer to <xref linkend="Resource_Manager"/>.
 				</para>
-				<figure xml:id="Scheduler_2_entities"><info><title>the ProActive Scheduler Entities</title></info>
+				<figure xml:id="Scheduler_2_entities"><info><title>The ProActive Scheduler Entities</title></info>
 					<mediaobject>
 						<imageobject>
 							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/scheduler2entities.jpg" format="JPG"/>
@@ -25,15 +25,15 @@
 					</mediaobject>
 				</figure>
 				<para>
-					<emphasis role="bold">In this section</emphasis>
+					<emphasis role="bold">In this section</emphasis>,
 					we will explain how the <emphasis role="bold"> scheduler entity works and how it can be used.</emphasis>
 				</para>
 			</section>
 	
 			<section xml:id="Scheduler_entity_Architecture"><info><title>Scheduler Entity Architecture</title></info>
 				<para>
-					The architecture of the ProActive Scheduler (<xref linkend="Scheduler_entity"/>) is built around 3 Active Objects :
-					To know more about Active Object, refer to the ProActive Documentation.
+					The architecture of the ProActive Scheduler (<xref linkend="Scheduler_entity"/>) is built around 3 Active Objects:
+					To know more about Active Object, please refer to the ProActive Documentation.
 				</para>
 				<itemizedlist>
 					<listitem>
@@ -49,21 +49,21 @@
 							<emphasis role="bold">The Front-end</emphasis>
 							which is the interface returned by the Authentication Interface and allows interaction
 							with the ProActive Scheduler. This interface allows users to submit jobs, get scheduling state, retrieves
-							job result etc...
+							job result...
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							<emphasis role="bold">The Core</emphasis>
 							which is the main entity of the ProActive Scheduler. It is in charge of scheduling Jobs according with the
-							policy (which is FIFO by default), retrieving scheduling events to the user and making storages.
+							policy (FIFO by default), retrieving scheduling events to the user and making storages.
 						</para>
 					</listitem>
 				</itemizedlist>
 				<para>
-					Users cannot interact directly with the ProActive Scheduler Core and must use the Front-end gateway.
+					Users cannot interact directly with the ProActive Scheduler Core. They have to use the Front-end gateway.
 				</para>
-				<figure xml:id="Scheduler_entity"><info><title>the ProActive Scheduler Entity</title></info>
+				<figure xml:id="Scheduler_entity"><info><title>The ProActive Scheduler Entity</title></info>
 					<mediaobject>
 						<imageobject>
 							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG"/>
@@ -75,15 +75,15 @@
 		
 	<section xml:id="Start_scheduler"><info><title>Start the ProActive Scheduler</title></info>
 			<para>
-				First of all, it's good to know that the ProActive Scheduler have to be started with
+				The ProActive Scheduler has to be started with
 				a database that will be used to save scheduling process in case of crash.
 				It allows the ProActive Scheduler to restart with a consistent state.
-				The database is created automatically if it does not exist OR use the existing one if exist.
+				The ProActive Scheduler will either use an existing database or create a new one if it cannot find one.
 				<itemizedlist>
 					<listitem>
 						<para>
 							The database get its properties in the <emphasis>/database/hibernate/hibernate.cfg.xml</emphasis> configuration file.
-							Here's an example of configuration :
+							Here is an example of configuration:
 						</para>
 						<programlisting>
 &lt;property name="connection.driver_class"&gt;org.apache.derby.jdbc.EmbeddedDriver&lt;/property&gt;
@@ -95,16 +95,19 @@
 						</programlisting>
 						<itemizedlist>
 							<listitem><para>
-								The first property defines which driver to use for the current dataBase implementation.
-								The second one define the protocol, url and name used for this dataBase. The goal of this two properties is
+								<emphasis>driver_class</emphasis> defines which driver to use for the current dataBase implementation.
+								</para>
+							</listitem>
+							<listitem><para>
+								<emphasis>url</emphasis> defines the protocol, the url and the name used for this dataBase. The goal of this two first properties is
 								to provide a way to change the implementation of the database and its directory. To start the Scheduler
 								with the provided implementation, just don't modify them.</para>
 							</listitem>
 							<listitem><para>
-								<emphasis>username</emphasis> is the user name authorized to create and manage the database. (default is 'scheduler')</para>
+								<emphasis>username</emphasis> is the user name authorized to create and manage the database ('scheduler' by default)</para>
 							</listitem>
 							<listitem><para>
-								<emphasis>password</emphasis> is the password of the authorized user. (default is empty)</para>
+								<emphasis>password</emphasis> is the password of the authorized user (empty by default)</para>
 							</listitem>
 							<listitem><para>
 								<emphasis>dialect</emphasis> If you intend to change the database implementation, don't forget to change the dialect
@@ -117,115 +120,112 @@
 			<para>
 				It is also possible to configure some properties that rely on the Scheduler. The file
 				<emphasis>PASchedulerProperties.ini</emphasis> in the <emphasis>config</emphasis> directory contains
-				every properties that can be modified by administrator. The <emphasis>PASchedulerProperties</emphasis> class
-				provide a way to override this file with your own one. If you do so, every overridden properties will be used.
-				It is not necessary to specify every properties inside your own file.
-				Here's a way to override default PAScheduler properties file by the code :
+				every property that can be modified by administrator. The <emphasis>PASchedulerProperties</emphasis> class
+				provides a way to override this file with your own one. If you do so, every overridden property will be used.
+				It is not necessary to specify every property inside your own file.
+				Here is a way to override default PAScheduler properties file:
 			</para>
 			<programlisting language="java">
 PASchedulerProperties.updateProperties("your_property_file");
 			</programlisting>
 			<para>
 				The last method to override a property is to specify it into the the java command line using the -d option.
-				Just name the property as in the properties file, and give a value.
-				(ex: java -dpa.scheduler.core.nodepingfrequency=30000 ...). Such a property can be add in the provided script 
-				(startScheduler.[sh|bat] for example)
+				You just have to name the property as it is done in the properties file, and give it a value.
+				(ex: java -dpa.scheduler.core.nodepingfrequency=30000...). Such a property can be added in the provided scripts
+				(startScheduler.[sh|bat] for example).
 			</para>
 			<para>
-				The high overriding priority is the property in the Java command line, next the one you set in your own properties file,
-				and finally, the one in the default properties file.
+				The priority order between two definition of a same property is as follows:
+				the definition with the highest priority is those defined using the Java command line, then it is the one defined in your own properties file and
+				finally, the lowest priority is given to the default definition.
 			</para>
 			<para>
-				Let's now go on to the startup of the ProActiveScheduler. To start it with a shell command just go on to the next section,
-				to start it using Java API go to <xref linkend="Start_scheduler_java"/>.
+				Let's go on to the startup of the ProActiveScheduler. To start it with a shell command, go on to the next section.
+				To start it using the Java API, please refer to <xref linkend="Start_scheduler_java"/>.
 			</para>
 			<section xml:id="Start_scheduler_sh"><info><title>Start the Scheduler using shell command</title></info>
 				<para>
-					Then, to start a local scheduler, run the <emphasis>startScheduler.[sh|bat]</emphasis>
+					To start a local scheduler, run the <emphasis>startScheduler.[sh|bat]</emphasis>
 					script in 'bin/[os]/' directory. Without arguments, the ProActive Scheduler will start on the local
 					host and will try to connect to a started local Resources Manager with the default database configuration file.
-					If Resources Manager does not exist, it will create its own Resources Manager.
-					Note that the database must be created before.
+					If no Resources Manager exists, it will create its own Resources Manager.
+					Note that the database has to be created before.
 				</para>
 				<para>
 					<emphasis>startScheduler.[sh|bat]</emphasis> can be started with 2 optional arguments (use -h option to see 
-					a description of the available options) :
+					a description of the available options):
 					<itemizedlist>
 						<listitem>
 							<para>
-								The URL of a Resources Manager already started (using the "-u URL" option).If
-								you don't use this, it will try to connect to a started Resource Manager on local host.
+								<emphasis>The URL of a Resources Manager</emphasis> already started (using the "-u URL" option).
+								If you don't use this, it will try to connect to a started Resource Manager on the local host.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
-								The scheduling policy that will be started with the Scheduler.
+								<emphasis>The scheduling policy</emphasis> that will be started with the Scheduler
 								(using "-p org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy" option).
-								By default it will use a the <emphasis>PriorityPolicy</emphasis> provided with the package.
+								By default, it will use the <emphasis>PriorityPolicy</emphasis> provided with the package.
 							</para>
 						</listitem>
 					</itemizedlist>
 				</para>
 				<para>
 					For example, the following line will launch a scheduler on a Resource Manager started on "toto". It will also use 
-					the 'PriorityPolicy' scheduling policy :
-				</para>
-				<itemizedlist>
-					<listitem>
-						<para>
-							startScheduler.[sh|bat] -u //toto/ -p org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy
-						</para>
-					</listitem>
-				</itemizedlist>
-				<para>
-					By default, the "config/authentication/" directory has to contain the two authentication files. (group and login).
-					The "config/database/hibernate" directory must contain the "hibernate.cfg.xml" configuration file.
+					the 'PriorityPolicy' scheduling policy:
 				</para>
 				<para>
-					It is also possible to launch the ProActive Scheduler with only one of the options or no option. For more
-					informations, use -h (or --help) option (i.e. "startScheduler.[sh|bat] -h")
+					<code>startScheduler.[sh|bat] -u //toto/ -p org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy</code>
+				</para>
+				<para>
+					By default, the "config/authentication/" directory has to contain the two authentication files (group and login).
+					The "config/database/hibernate" directory has to contain the "hibernate.cfg.xml" configuration file.
+				</para>
+				<para>
+					It is also possible to launch the ProActive Scheduler with only one of these options or without option at all. For more
+					informations, use -h (or --help) option (i.e. "startScheduler.[sh|bat] -h").
 				</para>
 			</section>
-			<section xml:id="Start_scheduler_java"><info><title>Start the Scheduler using Java API</title></info>
+			<section xml:id="Start_scheduler_java"><info><title>Start the Scheduler using the Java API</title></info>
 				<para>
-					First thing to do is start the ProActive Scheduler database.
-					If you don't know how to do that, please read first part of this section : <xref linkend="Start_scheduler"/>.
+					First thing to do is to start the ProActive Scheduler database.
+					If you don't know how to do that, please read the first part of this section: <xref linkend="Start_scheduler"/>.
 				</para>
 				<para>
 					You now can start the ProActive Scheduler using the Java API. Supposing that a Resource Manager is already started
 					(see Resource Manager documentation <xref linkend="Resource_Manager"/> to create a resource Manager Proxy),
-					this can be done as following :
+					this can be done as follows:
 				</para>
 				<programlisting language="java">
 AdminScheduler.createScheduler(
 	resourceManagerProxy,
 	"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
 				</programlisting>
-				<para>Arguments are respectively :</para>
+				<para>where arguments are respectively :</para>
 				<orderedlist>
 					<listitem>
 						<para>
-							<emphasis>resource Manager Proxy</emphasis> : A reference on an already started Resources Manager instance.
-							Refer to the Resource Manager documentation to know how to do that.
-							(<xref linkend="Resource_Manager"/>)
+							<emphasis>The Resource Manager Proxy</emphasis>: A reference on an already started Resources Manager instance.
+							Refer to the Resource Manager documentation to know how to do that
+							(<xref linkend="Resource_Manager"/>).
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>policy Full Class Name</emphasis> : The scheduling policy to use, as a string
+							<emphasis>The Policy Full Class Name</emphasis>: The scheduling policy to use, as a string
 							representing the complete name of the class.
 						</para>
 					</listitem>
 				</orderedlist>
 				<para>
-					<emphasis role="bold">NOTE - </emphasis>
-					By default, authentication are provide by the 2 files into the <emphasis>config/authentication</emphasis> directory.
+					<emphasis role="bold">NOTE: </emphasis>
+					By default, authentication are provided by the 2 files into the <emphasis>config/authentication</emphasis> directory.
 					This files contains username, password and their groups.
 					A LDAP authentication module is also available to replace authentication files (login.cfg and group.cfg) security
 					module by a LDAP security module.
 					To do so, just go into the <emphasis>PASchedulerProperties.ini</emphasis> configuration file and change the value
-					for the property <emphasis>pa.scheduler.core.authentication.loginMethod</emphasis> to "SchedulerLDAPLoginMethod".
-					Informations about your own LDAP configuration can be set in the <emphasis>ldap.cfg</emphasis> into the "config/authentication" directory.
+					of the property <emphasis>pa.scheduler.core.authentication.loginMethod</emphasis> to "SchedulerLDAPLoginMethod".
+					Information about your own LDAP configuration can be set in the <emphasis>ldap.cfg</emphasis> into the "config/authentication" directory.
 				</para>
 				<para>
 					Another way is to start the ProActive Scheduler AND connect an administrator at the same time :
@@ -238,18 +238,18 @@ AdminScheduler.createScheduler(
 	"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
 				</programlisting>
 				<para>
-					Where arguments are the same plus a <emphasis>login</emphasis> and a <emphasis>password</emphasis>
-					as a string that authenticate the administrator that want to connect. The user must be in the login file and
-					his group must be 'admin' in the group file.
+					where arguments are the sames plus a <emphasis>login</emphasis> and a <emphasis>password</emphasis>
+					as a string that authenticate the administrator who wants to connect. The user has to be in the login file and
+					his group has to be 'admin' in the group file.
 				</para>
 			</section>
 		</section>
 		<section xml:id="About_job_submission"><info><title>About job submission</title></info>
 			<para>
-				According to the user manual, once connected, a user is ready to submit Jobs. Here's a short explanation
-				that describe the mechanism of submission.
+				According to the user manual, once connected, a user is ready to submit jobs. Here is a short explanation
+				that describes the mechanism of submission.
 				The <emphasis role="bold"> Authentication interface entity is no longer used</emphasis> for this connected user.
-				<xref linkend="Job_submission"/> shows what happens when the Scheduler received a new Job to schedule.
+				<xref linkend="Job_submission"/> shows what happens when the Scheduler received a new job to schedule.
 				<figure xml:id="Job_submission"><info><title>A job submission</title></info>
 					<mediaobject>
 						<imageobject>
@@ -260,14 +260,13 @@ AdminScheduler.createScheduler(
 				<orderedlist>
 					<listitem>
 						<para>
-							First, the user submits a Job using his <emphasis role="bold">UserSchedulerInterface</emphasis>
-							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it :
+							First, the user submits a job using his <emphasis role="bold">UserSchedulerInterface</emphasis>
+							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it:
 							<programlisting language="java">
 // connecting to the scheduler
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 // checking username and password
-UserSchedulerInterface
-scheduler = auth.logAsUser("username","password");
+UserSchedulerInterface scheduler = auth.logAsUser("username","password");
 // submitting a new job and get the associated id
 JobId myJobId = scheduler.submit(job);
 							</programlisting>
@@ -275,14 +274,14 @@ JobId myJobId = scheduler.submit(job);
 					</listitem>
 					<listitem>
 						<para>
-							The Scheduler Front-end verifies the integrity of the Job, and builds it
+							The Scheduler Front-end checks the integrity of the job, and builds it
 							in order to be ready to be managed by the Scheduler Core. If there is a
-							problem, an exception is thrown explaining what is the cause.
+							problem, an exception is thrown explaining the cause of this problem.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							Finally, the Job is transmitted to the Core for scheduling.
+							Finally, the job is transmitted to the Core for scheduling.
 						</para>
 					</listitem>
 				</orderedlist>
@@ -290,14 +289,14 @@ JobId myJobId = scheduler.submit(job);
 		</section>
 		<section xml:id="Administer_scheduler"><info><title>Administer the ProActive Scheduler</title></info>
 			<para>
-				As a administrator, it is possible to manage the Scheduler like start and stop, kill jobs, set jobs priority, etc...
-				To start a command line administrator, go to next section, to use the Java API to manage it, go to 
+				As an administrator, it is possible to ask the Scheduler to start and stop, to kill jobs, set jobs priority...
+				To start a command line administrator, go on to the next section. To use the Java API to manage it, please refer to
 				<xref linkend="Administer_scheduler_java"/>.
 			</para>
 			<section xml:id="Administer_scheduler_sh"><info><title>Administer the Scheduler using shell command</title></info>
 				<para>
-					The admin shell is an interface that allow a user to administer the ProActive Scheduler without the
-					java API. It is also possible to see exceptions coming from the scheduler to know what happen.
+					The admin shell is an interface which allows a user to administer the ProActive Scheduler without the
+					java API. It is also possible to see exceptions coming from the scheduler to know what happened.
 					To start a admin shell, run the <emphasis>adminScheduler.[sh|bat]</emphasis>
 					script in 'unix/[os]/' directory. Without arguments, the admin shell will try to connect a
 					scheduler on the local host, exceptions from the ProActive Scheduler won't be displayed and
@@ -310,26 +309,26 @@ JobId myJobId = scheduler.submit(job);
 				<itemizedlist>
 					<listitem>
 						<para>
-							Your login (using the "-l login" option). If you use this option, your password only will
+							<emphasis>Your login</emphasis> (using the "-l login" option). If you use this option, only your password will
 							be requested.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							If you use the "-e" option, all exceptions coming from the ProActive Scheduler
+							<emphasis>Exceptions display</emphasis> (using the "-e" option). If this option is used, all exceptions coming from the ProActive Scheduler
 							will be displayed, otherwise exceptions won't be displayed.
-							Default use won't display exception.
+							By default, exceptions arre not displayed.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							The URL of a started scheduler. (using the "-u URL" option)
-							Default use try to connect a local scheduler.
+							<emphasis>URL of a started scheduler</emphasis> (using the "-u URL" option).
+							By default, it tries to connect to a local scheduler.
 						</para>
 					</listitem>
 				</itemizedlist>
 				<para>
-					Here's an overview of the admin shell :
+					Here is an overview of the admin shell :
 				</para>
 				<figure xml:id="admin_shell"><info><title>The admin shell</title></info>
 					<mediaobject>
@@ -339,14 +338,14 @@ JobId myJobId = scheduler.submit(job);
 					</mediaobject>
 				</figure>
 				<para>
-					It is also possible to launch the admin shell with only one of the options or no option. For more
-					informations, use -h (or --help) option (i.e. "adminScheduler.[sh|bat] -h")
+					It is also possible to launch the admin shell with only one of the previous options or without option at all. For more
+					informations, use -h (or --help) option (i.e. "adminScheduler.[sh|bat] -h").
 				</para>
 			</section>
-			<section xml:id="Administer_scheduler_java"><info><title>Administer the Scheduler using Java API</title></info>
+			<section xml:id="Administer_scheduler_java"><info><title>Administer the Scheduler using the Java API</title></info>
 				<para>
 					Let's first explain the connection mechanism.
-					A user can connect to the ProActive Scheduler only if he/she is known. That's the goal of the
+					A user can connect to the ProActive Scheduler only if he/she is known. That is the goal of the
 					authentication interface which is able to authenticate users.
 					Following figure shows how the ProActive Scheduler connects a user.
 					<figure xml:id="userConnection"><info><title>A user connection</title></info>
@@ -406,19 +405,19 @@ UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 					</orderedlist>
 				</para>
 				<para>
-					And now to administer the ProActive Scheduler, just connect it, if it's not already done, and use the 
-					<emphasis role="bold">AdminSchedulerInterface</emphasis> to manage it. Just have a look to the JavaDocumentation 
-					to get more details and features. Let remind how to connect the Scheduler as Administrator :
+					And now to administer the ProActive Scheduler, just connect to it if it's not already done and use the
+					<emphasis role="bold">AdminSchedulerInterface</emphasis> to manage it. Take a look at the JavaDocumentation
+					to get more details and features. Let's remind how to connect the Scheduler as an administrator:
 				</para>
 				<programlisting language="java">
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 AdminSchedulerInterface scheduler = auth.logAsAdmin("admin_username", "admin_password");
 				</programlisting>
 				<para>
-					Then use the returned 'scheduler' Object to communicate with the ProActive Scheduler as Administrator. One interesting thing
+					Then, use the returned 'scheduler' object to communicate with the ProActive Scheduler as an administrator. One interesting thing
 					is to change the policy during the scheduling, that will consequently change the remaining
 					scheduling order. Refer to the <xref linkend="Extend_scheduler_policy"/> to make your own policy and change it as
-					shown below :
+					shown below:
 				</para>
 				<programlisting language="java">
 //scheduler is the AdminSchedulerInterface returned in the previous sections
@@ -427,7 +426,7 @@ scheduler.changePolicy(org.objectweb.proactive.extensions.scheduler.policy.Prior
 			</section>
 		</section>
 		<section xml:id="Extend_scheduler"><info><title>Extend the ProActive Scheduler</title></info>
-			<section xml:id="Extend_scheduler_policy"><info><title>Add a new scheduling Policy</title></info>
+			<section xml:id="Extend_scheduler_policy"><info><title>Add a new scheduling policy</title></info>
 				<para>
 					Create and add a new scheduling policy remains a very simple work. You just have to implements the
 					<emphasis>
@@ -437,8 +436,8 @@ scheduler.changePolicy(org.objectweb.proactive.extensions.scheduler.policy.Prior
 					running.
 				</para>
 				<para>
-					Here's the interface which must be implemented. The default implementation is <emphasis>PriorityPolicy</emphasis>
-					in the same package :
+					Here is the interface which has to be implemented. The default implementation is <emphasis>PriorityPolicy</emphasis>
+					in the same package:
 				</para>
 				<programlisting language="java">
 public interface PolicyInterface extends Serializable {
@@ -449,15 +448,15 @@ public interface PolicyInterface extends Serializable {
 }
 				</programlisting>
 				<para>
-					This method returns all the Tasks that have to be scheduled. The Tasks must be in the desired scheduling
+					This method returns all the tasks that have to be scheduled. Tasks must be in the desired scheduling
 					order. The first task to be scheduled will be the first in the returned Vector.
 				</para>
 				<para>
 					The parameters is a list of running and pendingJobs,
-					which contain Tasks to be scheduled. Some properties in each jobs and tasks
+					which contain tasks to be scheduled. Some properties in each job and task
 					can be accessed in order to make your own scheduling order. It is also possible
-					to access to the "RMState" field that allow you to have informations about resources like
-					nodes used, total nodes number, etc. The only thing to do is
+					to access to the "RMState" field that allows you to have information about resources like
+					used nodes, total nodes number, etc. The only thing to do is to
 					<emphasis>extract the task</emphasis>, <emphasis>re-order them</emphasis>
 					and <emphasis>put them in a vector</emphasis>. Let's see the default implementation of the ProActive
 					Scheduler policy to illustrate it:
@@ -465,7 +464,7 @@ public interface PolicyInterface extends Serializable {
 				<programlisting language="java">
 public class PriorityPolicy implements PolicyInterface {
 	/**
-	 * This method return the tasks using FIFO policy according to the jobs priorities.
+	 * This method returns the tasks using FIFO policy according to the jobs priorities.
 	 *
 	 * @see org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
 	 */
@@ -484,38 +483,35 @@ public class PriorityPolicy implements PolicyInterface {
 }
 				</programlisting>
 				<para>
-					By default, the Jobs knows how to be sorted regarding their priority. But it is simple to create a Comparator
-					and sort the Jobs with it. It is also possible to have informations about the resources using the protected
+					By default, jobs know how to be sorted regarding to their priority. But it is simpler to create a Comparator
+					and sort jobs with it. It is also possible to have some information about resources using the protected
 					<emphasis>RMState</emphasis> field inside the getOrderedTasks method.
-				</para>
-				<para>
-					This conclude with the ProActive Scheduler chapter, let's now look at the ProActive Scheduler Eclipse Plugin.
 				</para>
 			</section>
 		</section>
 
 	<section xml:id="Scheduler_authentication"><info><title>Configure users authentication</title></info>
-		<para> As presented before, scheduler users are authenticated at scheduler connection. Users must enter a login and a password, that are checked by Scheduler. there are 
-		two authorization levels : 
+		<para> As presented before, scheduler users are authenticated at scheduler connection. Users have to enter a login and a password checked by Scheduler. There are
+		two authorization levels:
 		</para>
 		<itemizedlist>
-			 <listitem><para><emphasis>user level </emphasis>: able to submit jobs; see waiting queue, jobs running and jobs finished. They can change priority of their jobs, with 3 priority levels :
-			 lowest, low and normal. They are able to see their jobs output, cancel and retrieve results just for their own jobs. 
+			 <listitem><para><emphasis>user level </emphasis>: enables to submit jobs (see waiting queue, jobs running and jobs finished). They can change priority of their jobs, with 3 priority levels:
+			 lowest, low and normal. They are able to see their jobs output, cancel and retrieve results only from their own jobs.
 			 They cannot perform actions on jobs submitted by other users.</para> 
 			 </listitem>
-			 <listitem><para><emphasis>admin level </emphasis>: They are able to pause, stop and restart scheduler, cancel or retrieve results of any job,
-			 change priority of any job, with 5 priority levels ; lowest, low, normal, high and highest.</para>    
+			 <listitem><para><emphasis>admin level </emphasis>: enables to pause, stop and restart scheduler, cancel or retrieve results of any job,
+			 change priority of any job, with 5 priority levels: lowest, low, normal, high and highest.</para>
 			 </listitem>
 		</itemizedlist>
 		<section xml:id="Sched_authent_select"><info><title>Select authentication method</title></info>
 			<para>
-			So scheduler manages users authentication and authorization, it has to store users account/password, and check login and password at users connection.
-			This storage of users accounts can be managed in two ways, by files, or by LDAP. A Scheduler property (PASchedulerProperties.ini)
-			specifies which kind of authentication will be used :
+			So that the Scheduler can manage users authentication and authorization, it has to store users account/password, and check login and password at users connection.
+			This storage of users accounts can be managed in two ways: by files, or by LDAP. A Scheduler property (PASchedulerProperties.ini)
+			specifies which kind of authentication will be used:
 			</para>
 				<programlisting language="java">
-	#Property that define the method that have to be used for logging users to the Scheduler
-	#It can be one of the following values :
+	#Property that defines the method that has to be used for logging users to the Scheduler
+	#It can be one of the following values:
 	#	- "SchedulerFileLoginMethod" to use file login and group management
 	#	- "SchedulerLDAPLoginMethod" to use LDAP login management
 	pa.scheduler.core.authentication.loginMethod=SchedulerFileLoginMethod
@@ -526,12 +522,12 @@ public class PriorityPolicy implements PolicyInterface {
 			</para>
 		</section>
 		<section xml:id="file_Sched_authent"><info><title>Configure file-based authentication</title></info>
-			<para> By default scheduler stores users accounts, password, and group membership (user or admin), in two files :
+			<para> By default, the Scheduler stores users accounts, passwords, and group memberships (user or admin), in two files:
 			</para>
 			<itemizedlist>
-			 	<listitem><para><emphasis>config/authentication/login.cfg</emphasis>, stores users and passwords accounts.
-			 	Each line must be like <emphasis>user:passwd</emphasis>.  
-			 	Default login.cfg is like this :</para>
+				<listitem><para><emphasis>config/authentication/login.cfg</emphasis> stores users and passwords accounts.
+				Each line has to look like <emphasis>user:passwd</emphasis>.
+				The default login.cfg file is given hereafter:</para>
 			 	<programlisting language="java">
 admin:admin
 user1:pwd1
@@ -539,11 +535,11 @@ user2:pwd2
 demo:demo
 				</programlisting>
 				</listitem>
-			 	<listitem><para><emphasis>config/authentication/group.cfg</emphasis>, stores users memebership. For each 
-			 	user registered in login.cfg, a group membership must be defined in this file. 
-			 	Each line must be like <emphasis>user:group</emphasis>. Group must be <emphasis>user</emphasis> to have user
-			 	rights, or <emphasis>admin</emphasis>, to have administrator rights.  
-			 	Default group.cfg is like this :</para>
+				<listitem><para><emphasis>config/authentication/group.cfg</emphasis> stores users membership. For each
+				user registered in login.cfg, a group membership has to be defined in this file.
+				Each line has to look like <emphasis>user:group</emphasis>. Group has to be <emphasis>user</emphasis> to have user
+				rights, or <emphasis>admin</emphasis> to have administrator rights.
+				Default group.cfg is like this:</para>
 			 	<programlisting language="java">
 admin:admin
 demo:admin
@@ -552,59 +548,59 @@ user2:user
 				</programlisting>
 				</listitem>			
 			</itemizedlist>
-			<para>You can change the default paths of these two files. Edit file <emphasis>config/PASchedulerProperties.ini</emphasis>, and change
-			the two properties : 
+			<para>You can change the default paths of these two files. Edit file <emphasis>config/PASchedulerProperties.ini</emphasis> and change
+			the two properties:
 			</para>
 			<itemizedlist>
-				<listitem><para><emphasis>pa.scheduler.core.defaultloginfilename</emphasis>, to define user/password file, change the line like this :
+				<listitem><para><emphasis>pa.scheduler.core.defaultloginfilename</emphasis> - To define a user/password file, change this line as follows:
 				pa.scheduler.core.defaultloginfilename=/etc/scheduler/mylogins.cfg</para>
 				</listitem>
-				<listitem><para><emphasis>pa.scheduler.core.defaultgroupfilename</emphasis>, to define group membership file, change the line like this :
+				<listitem><para><emphasis>pa.scheduler.core.defaultgroupfilename</emphasis> - To define a group membership file, change the line as follows:
 				pa.scheduler.core.defaultgroupfilename=/etc/scheduler/mygroups.cfg</para>
 				</listitem>
 			</itemizedlist>
 		</section>
 		<section xml:id="LDAP_Sched_authent"><info><title>Configure LDAP-based authentication</title></info>
 			<para>
-			Scheduler is able to connect to an existing LDAP, to check users login/password, and verify users group membership. This authentication method can be usefull
-			if you have in your organization an LDAP that already stores user/password entries. There are several points to configure ; path in LDAP where scheduler users and admins
-			entries are stored, LDAP groups that define user and admin group membership, URL of the LDAP, LDAP binding method used by connection, 
+			Scheduler is able to connect to an existing LDAP, to check users login/password, and verify users group membership. This authentication method can be useful
+			if you have in your organization an LDAP that already stores user/password entries. There are several points to configure: path in LDAP where scheduler users and admins
+			entries are stored, LDAP groups that define user and admin group membership, URL of the LDAP, LDAP binding method used by connection
 			and configuration of SSL/TLS if you want a secured connection between Scheduler and LDAP. All LDAP connection parameters are set in <emphasis>config/authentication/ldap.cfg</emphasis>.
 			</para>
 			<section xml:id="LDAP_users_URL"><info><title>Set LDAP url</title></info>
-				<para> First you have to define the LDAP's URL of you organisation. This address corresponds  to the property : <emphasis>pa.scheduler.ldap.url</emphasis>.
-				 you have to put a standard LDAP-like URL, for example <emphasis>ldap://myLdap</emphasis>, you can also set an URL with secure access ; <emphasis>ldaps://myLdap:636</emphasis>.
+				<para> First, you have to define the LDAP's URL of your organisation. This address corresponds to the property: <emphasis>pa.scheduler.ldap.url</emphasis>.
+				 You have to put a standard LDAP-like URL, for example <emphasis>ldap://myLdap</emphasis>. You can also set an URL with secure access: <emphasis>ldaps://myLdap:636</emphasis>.
 				 See <xref linkend="LDAP_SSL"/> for SSL/TLS configuration.
 				 </para>
 			</section>			
 			<section xml:id="LDAP_users_subtree"><info><title>Set users subtree and login attribute</title></info>
 				<para>You have to define where users entries are stored in LDAP tree, i.e. the path where Scheduler tries to find users and admin entries. 
-				The users subtree correspond to the property : <emphasis>pa.scheduler.ldap.userssubtree</emphasis>. Put a DN of your LDAP like this :
+				The users subtree corresponds to the property: <emphasis>pa.scheduler.ldap.userssubtree</emphasis>. Put a DN of your LDAP like this:
 				<literal>pa.scheduler.ldap.userssubtree=ou=myUsers,o=myOrganisation,dc=myFirm,dc=com</literal>. 
 				</para>
-				<para> Then you have to specify in users entries, attribute that corresponds to the user login, this is done by the property <emphasis>pa.scheduler.ldap.user.login.attr</emphasis>. 
-				put an attribute name like this : <literal>pa.scheduler.ldap.user.login.attr=loginName</literal>.
+				<para> Then, you have to specify in users entries, the attribute that corresponds to the user login. This is done by the property: <emphasis>pa.scheduler.ldap.user.login.attr</emphasis>.
+				Put an attribute name like this: <literal>pa.scheduler.ldap.user.login.attr=loginName</literal>.
 				</para>
 			</section>
 			<section xml:id="LDAP_groups"><info><title>Set users and admin groups</title></info>
 				<para>
-				After having found user entry in LDAP, and checked user password, LDAP check group membership of the user. Your 
-				organization LDAP's must provides two entries of type <emphasis>groupOfUniqueNames</emphasis>, that present attributes
-				of type <emphasis>uniqueMember</emphasis>, which correspond to users DN that have access to Scheduler (typical group definition in a LDAP). You must set
+				After having found user entry in LDAP, and checked user password, LDAP checks group membership of the user. Your
+				organization LDAP's has to provide two entries of type <emphasis>groupOfUniqueNames</emphasis>, that present attributes
+				of type <emphasis>uniqueMember</emphasis>, which corresponds to users DN that has access to the Scheduler (typical group definition in a LDAP). You have to set
 				the two entries of this type wherein users and admins DN are put in 'uniqueMemeber' attribute. Admins group DN is set in scheduler by property 
 				<emphasis>pa.scheduler.ldap.admins.group.dn</emphasis>. User group DN is set by  property <emphasis>pa.scheduler.ldap.users.group.dn</emphasis>. 
 				</para>
 			</section>
-			<section xml:id="LDAP_binding_method"><info><title>configure LDAP authentication parameters</title></info>
+			<section xml:id="LDAP_binding_method"><info><title>Configure LDAP authentication parameters</title></info>
 				<para>
-				By default scheduler bind to LDAP in anonymous mode. you can change this authentication method by modifying the property <emphasis>pa.scheduler.ldap.authentication.method</emphasis>.
-				This property can have several values :
+				By default, the Scheduler binds to LDAP in anonymous mode. You can change this authentication method by modifying the property <emphasis>pa.scheduler.ldap.authentication.method</emphasis>.
+				This property can have several values:
 				<itemizedlist>
-					<listitem><para><emphasis>none</emphasis> default value, Scheduler perform connection to LDAP in anonymous mode.</para>
+					<listitem><para><emphasis>none</emphasis> (default value) - the Scheduler performs connection to LDAP in anonymous mode.</para>
 					</listitem>
-					<listitem><para><emphasis>simple</emphasis> Scheduler performs connection to LDAP with a specified login/password (see below for user password setting).</para>
+					<listitem><para><emphasis>simple</emphasis> - the Scheduler performs connection to LDAP with a specified login/password (see below for user password setting).</para>
 					</listitem>
-					<listitem><para>You can also specify a SASL mechanism for LDAPv3, there are many SASL mechanisms available ; 
+					<listitem><para>You can also specify a SASL mechanism for LDAPv3. There are many SASL mechanisms available:
 					<emphasis>cram-md5</emphasis>, <emphasis>digest-md5</emphasis>, <emphasis>kerberos4</emphasis>... Just put <emphasis>sasl</emphasis> to this property 
 					to let scheduler JVM choose SASL authentication mechanism.</para>
 					</listitem>
@@ -612,58 +608,58 @@ user2:user
 				</para>
 				<para>
 				If you specify an authentication method different from 'none' (anonymous connection to LDAP),
-				you must specify a login/password for authentication, there are two property in PASchedulerProperties.ini to set :
+				you must specify a login/password for authentication. There are two properties in PASchedulerProperties.ini to set:
 				<itemizedlist>
-					<listitem><para><emphasis>pa.scheduler.ldap.bind.login</emphasis> set user name for authentication.</para>
+					<listitem><para><emphasis>pa.scheduler.ldap.bind.login</emphasis> - set user name for authentication.</para>
 					</listitem>
-					<listitem><para><emphasis>pa.scheduler.ldap.bind.pwd</emphasis> set password for authentication.</para>
+					<listitem><para><emphasis>pa.scheduler.ldap.bind.pwd</emphasis> - set password for authentication.</para>
 					</listitem>
 				</itemizedlist>				
 				</para>
 			</section>
 			<section xml:id="LDAP_SSL"><info><title>Set SSL/TLS parameters</title></info>
-				<para>Scheduler is able to communicate with LDAP with a secured SSL/TLS layer, it can be usefull if your network is not trusted, and critical information are transmitted
-				between scheduler and LDAP, such users passwords.
-				First set in LDAP URL property <emphasis>pa.scheduler.ldap.url</emphasis> with URL of type ldaps://myLdap. 
-				After set <emphasis>pa.scheduler.ldap.authentication.method</emphasis> to none, to delegate authentication to SSL.
+				<para>Scheduler is able to communicate with LDAP with a secured SSL/TLS layer. It can be useful if your network is not trusted, and critical information are transmitted
+				between scheduler and LDAP, such as  users passwords.
+				First, set the LDAP URL property <emphasis>pa.scheduler.ldap.url</emphasis> to a URL of type ldaps://myLdap.
+				Then, set <emphasis>pa.scheduler.ldap.authentication.method</emphasis> to none so as to delegate authentication to SSL.
 				</para>
-				<para>For using SSL properly you have to specify your certificate and public keys for SSL handshake. Java stores 
-				certificates in a keyStore and public keys in a trustStore. In most of cases you just have to define a trustStore with public
+				<para>For using SSL properly, you have to specify your certificate and public keys for SSL handshake. Java stores
+				certificates in a keyStore and public keys in a trustStore. In most of cases, you just have to define a trustStore with public
 				key part of LDAP's certificate. Put certificate in a keyStore, and public keys in a trustStore 
-				with command keytool (keytool command is distributed with standard java platforms) :
+				with the keytool command (keytool command is distributed with standard java platforms):
 				</para>
 				<para>
 				keytool -import -alias myAlias -file myCertificate -keystore myKeyStore
 				</para>
 				<para>
-				<emphasis>myAlias</emphasis> is alias name of your certificate, <emphasis>myCertificate</emphasis> is your private certificate file,
-				<emphasis>myKeyStore</emphasis> is the new keyStore file produced in output. This command ask you to enter a password for your keyStore.
+				<emphasis>myAlias</emphasis> is alias name of your certificate, <emphasis>myCertificate</emphasis> is your private certificate file and
+				<emphasis>myKeyStore</emphasis> is the new keyStore file produced in output. This command asks you to enter a password for your keyStore.
 				</para>
 				<para>
-				Put LDAP certificate's public key in a trustStore, with command keytool :
+				Put LDAP certificate's public key in a trustStore, with the keytool command:
 				</para>
 				<para>
 				keytool -import -alias myAlias -file myPublicKey -keystore myTrustStore
 				</para>
 				<para>
 				<emphasis>myAlias</emphasis> is alias name of your certificate's public key, <emphasis>myPublicKey</emphasis> is your certificate's public
-				key file, <emphasis>myTrustore</emphasis> is the new trustStore file produced in output. This command ask you to enter a password for your trustStore.
+				key file and <emphasis>myTrustore</emphasis> is the new trustStore file produced in output. This command asks you to enter a password for your trustStore.
 				</para>
 				<para>
-				Finally set in <emphasis>config/authentication/ldap.cfg</emphasis> keyStore and trustStore created before, with their respective passwords :
+				Finally, in <emphasis>config/authentication/ldap.cfg</emphasis>, set keyStore and trustStore created before to their respective password:
 				</para>
 				<itemizedlist>
 					<listitem><para>
-					Set <emphasis>pa.scheduler.ldap.keystore.path</emphasis> with path of your keyStore.</para>
+					Set <emphasis>pa.scheduler.ldap.keystore.path</emphasis> to the path of your keyStore.</para>
 					</listitem>
 					<listitem><para>
-					Set <emphasis>pa.scheduler.ldap.keystore.passwd</emphasis> with password defined previously for keyStore.</para>
+					Set <emphasis>pa.scheduler.ldap.keystore.passwd</emphasis> to the password defined previously for keyStore.</para>
 					</listitem>
 					<listitem><para>
-					Set <emphasis>pa.scheduler.ldap.truststore.path</emphasis> with path of your trustStore.</para>
+					Set <emphasis>pa.scheduler.ldap.truststore.path</emphasis> to the path of your trustStore.</para>
 					</listitem>
 					<listitem><para>
-					Set <emphasis>pa.scheduler.ldap.truststore.passwd</emphasis> with password defined previously for trustStore.</para>
+					Set <emphasis>pa.scheduler.ldap.truststore.passwd</emphasis> to the password defined previously for trustStore.</para>
 					</listitem>
 				</itemizedlist>
 			</section>			
