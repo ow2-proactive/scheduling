@@ -111,7 +111,7 @@
 			
 			<para>This example does not contain the job type definition. We detail the job type definition in the next sections.</para>
 			<para>
-				To create a ProActive Job, just go to <xref linkend="Create_ProActive_job_xml" />. To create a Taskflow Job, just go to <xref linkend="Create_TaskFlow_job_xml" />.
+				To create a ProActive Job, please refer to <xref linkend="Create_ProActive_job_xml" />. To create a Taskflow Job, please refer to <xref linkend="Create_TaskFlow_job_xml" />.
 			</para>
 		</section>
 			
@@ -287,9 +287,9 @@ public void init(Map&lt;String, Object&gt; args) {
 					</programlisting>
 				</para>
 				<para>
-					The previous code is given as example as the default behavior of the init() method is exactly associating declared
-					java variables to its value according that the variable name given as arguments (in the map) is the same as the java declared one.
-					So, The given code behave in exactly the same way as if it wasn't here or as :
+					The previous code is given as an example. The default behavior of the init() method is to associate declared
+					Java variables to their value, assuming that the variable names given in arguments (in the map) are the same as the Java declared ones.
+					Thus, The given code behaves exactly like the following code:
 					<programlisting language="java">
 private boolean foo;
 private int bar;
@@ -303,7 +303,7 @@ public void init(Map&lt;String, Object&gt; args) {
 				</para>
 				<para>
 					To sum up, create an executable is just extending the <code>JavaExecutable</code> abstract class, and filling
-					the execute method. The given <code>TaskResult... results</code> arguments is a way to get the results from
+					the execute method. The given <code>TaskResult... results</code> argument enables to get the results from
 					previous dependent tasks that have finished their execution.
 				</para>
 				<para>
@@ -323,7 +323,7 @@ public Serializable execute(TaskResult... results) throws Throwable {
 				</para>
 				<para>
 					Finally, overriding the <code>init()</code> method can be useful if you want to retrieve personal arguments or do some
-					stuff before starting the real execution of the task.
+					operations before starting the real execution of the task.
 				</para>
 			</section>
 			
@@ -453,7 +453,7 @@ aTask.setForkEnvironment(env);
 		
 		<section xml:id="Create_native_task"><info><title>Create and add a native task</title></info>
 			<para>
-				<emphasis>Note</emphasis> : A native task can only be added to a TaskFlow Job.
+				<emphasis>Note</emphasis>: A native task can only be added to a TaskFlow Job.
 			</para>
 			<para>
 				To learn how to create a TaskFlow Job,
