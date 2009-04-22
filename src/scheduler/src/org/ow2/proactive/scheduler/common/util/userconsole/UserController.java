@@ -243,7 +243,7 @@ public class UserController {
         if (displayHelp) {
             logger.info("");
             HelpFormatter hf = new HelpFormatter();
-            hf.setWidth(130);
+            hf.setWidth(135);
             String note = "\nNOTE : if no " + control +
                 "command is specified, the controller will start in interactive mode.";
             hf.printHelp(commandName + Tools.shellExtension(), "", options, note, true);
@@ -627,11 +627,11 @@ public class UserController {
         }
     }
 
-    public static void result(String jobId) {
-        shell.result_(jobId);
+    public static JobResult result(String jobId) {
+        return shell.result_(jobId);
     }
 
-    private void result_(String jobId) {
+    private JobResult result_(String jobId) {
         try {
             JobResult result = scheduler.getJobResult(jobId);
 
@@ -651,8 +651,10 @@ public class UserController {
             } else {
                 printf("Job " + jobId + " is not finished or unknown !");
             }
+            return result;
         } catch (Exception e) {
             handleExceptionDisplay("Error on job " + jobId, e);
+            return null;
         }
     }
 

@@ -35,7 +35,7 @@ function removejob(jobId){
 }
 
 function result(jobId){
-    UserController.result(""+jobId);
+    return UserController.result(""+jobId);
 }
 
 function output(jobId){

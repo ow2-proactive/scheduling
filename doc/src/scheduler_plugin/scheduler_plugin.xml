@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Scheduler_Eclipse_Plugin"><info><title>ProActive Scheduler Eclipse Plugin</title></info>
+			<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Scheduler_Eclipse_Plugin"><info><title>ProActive Scheduler Eclipse Plugin</title></info>
 
 	<para>
 		<emphasis role="bold">
@@ -381,7 +381,7 @@
 						If you don't know how to create such a descriptor, please refer to <xref linkend="Create_job_xml"/>.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[4bis] Submit a file containing native commands</emphasis> - use this button to submit a job defined in a flat file.
+						<emphasis>[5] Submit a file containing native commands</emphasis> - use this button to submit a job defined in flat file.
 						If you don't know how to create such a job descriptor, please refer to <xref linkend="flat_file_job"/>.
 						This button opens a wizard for submitting this kind of job (see section  <xref linkend="flat_file_wizard"/>).</para>
 					</listitem>
@@ -392,13 +392,13 @@
 					</para>
 					<itemizedlist>
 					<listitem><para>
-						<emphasis>[5] Pause/Resume a Job</emphasis> - use this button to
+						<emphasis>[6] Pause/Resume a Job</emphasis> - use this button to
 						pause a pending or running job, and to resume a paused job. Note that it is not possible to pause a running task.
 						So once a job paused, each running task will be finished. If a task has to restart for any reasons,
 						it will be paused instead of restarted.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[6] Select Job priority</emphasis> - use this button to
+						<emphasis>[7] Select Job priority</emphasis> - use this button to
 						change the priority of your job. Allowed priorities for a user are:</para>
 						<itemizedlist>
 							<listitem><para>
@@ -413,12 +413,12 @@
 						</itemizedlist>
 					</listitem>
 					<listitem><para>
-						<emphasis>[7] View selected job output</emphasis> - use this button to
+						<emphasis>[8] View selected job output</emphasis> - use this button to
 						view the selected job output. Job output is in fact the output that comes from the different
 						tasks from both standard output and standard error stream.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[8] Kill the selected job</emphasis> - use this button to
+						<emphasis>[9] Kill the selected job</emphasis> - use this button to
 						kill a job. The job will be terminated immediately, removed from the queue where it was, and its 
 						results will be lost.</para>
 					</listitem>

@@ -1156,13 +1156,13 @@ job.setTask(aTask);
 				</para>
 				<para>
 					<emphasis>
-						userScheduler.sh -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/cmds_file.cmd -cmdf -l jl //localhost/ -jn myJob -o myJob.log
+						userScheduler.[sh|bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/cmds_file.cmd -cmdf -l demo //localhost/ -jn myJob -o myJob.log
 					</emphasis>
 					will submit a job defined in a flat file, containing 4 native commands. Job is named "myJob", and a log file named "myJob.log" will be created.
 				</para>
 				<para>
 					<emphasis>
-						userScheduler.sh -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/myCmd.sh 4 -cmd -l jl -u //localhost -s ../../samples/scripts/selection/select.rb
+						userScheduler.[sh|bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/myCmd.sh 4 -cmd -l demo -u //localhost -s ../../samples/scripts/selection/select.rb
 					</emphasis>
 					will submit the native command "myCmd.sh" with "4" as the only argument. A selection script is associated for this native command: "select.rb".
 				</para>
@@ -1315,5 +1315,230 @@ scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEve
 			<para>
 				For more details and features on the user scheduler interface, please refer to the java Documentation.
 			</para>
+		</section>
+		<section xml:id="scheduler_controller"><info><title>Using the Scheduler controller</title></info>
+			<para>
+				The Scheduler controller provides a way to interact with the Scheduler. Start it with the bin/[os]/userScheduler.[sh|bat]
+				script. You can use it as a command line (as shown
+				in some examples above, go to <xref linkend="scheduler_controller_non_interactive"/>) or in interactive mode (go to
+				<xref linkend="scheduler_controller_interactive"/>).
+			</para>
+			<section xml:id="scheduler_controller_non_interactive"><info><title>Non-interactive mode</title></info>
+				<para>
+					Here is the displayed help when using <emphasis>userScheduler.[sh|bat] -h</emphasis> command:
+				</para>
+				<figure xml:id="scheduler_controller_help"><info><title>Scheduler controller help</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/schedulerControllerHelp.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					To use the controller as a command line just specify at list one 'ctl' option. Let's illustrate that way with some examples:
+					<itemizedlist>
+						<listitem>
+							<emphasis>userScheduler.[sh|bat] -l demo -submit path/to/job/xml/descriptor</emphasis> : try to connect user demo, prompt for
+							its password and submit the given XML descriptor file.
+						</listitem>
+						<listitem>
+							<emphasis>userScheduler.[sh|bat] -l demo -cmd -jn test -submit ls -al</emphasis> : try to connect user demo, prompt for
+							its password and submit the given command line in a job named 'test'. In this case, the <emphasis role="italic">-cmd</emphasis> option forces
+							the argument of <emphasis role="italic">-submit</emphasis> option to be a command line
+						</listitem>
+						<listitem>
+							<emphasis>userScheduler.[sh|bat] -cmdf -s path/to/a/selection/script -submit path/to/a/text/file</emphasis> : prompt for a username and
+							its password and submit the given commands file. It also includes the given selection script file.
+							In this case, the <emphasis role="italic">-cmdf</emphasis> option forces
+							the argument of <emphasis role="italic">-submit</emphasis> option to be a flat text file that contains
+							commands. (One command per line, each line will be a task)
+						</listitem>
+						<listitem>
+							<emphasis>userScheduler.[sh|bat] -output 12</emphasis> : prompt for a username and
+							its password and display the output written by job 12 if it is finished.
+						</listitem>
+						<listitem>
+							<emphasis>userScheduler.[sh|bat] -result 34</emphasis> : prompt for a username and
+							its password and display the result of job 34 if it is finished.
+						</listitem>
+						<listitem>
+							<emphasis>userScheduler.[sh|bat] -priority 56 Lowest</emphasis> : prompt for a username and
+							its password and request the Scheduler to change job 56 priority to 'LOWEST'.
+						</listitem>
+					</itemizedlist>
+					<para>
+						Once the command launched, it will terminate by displaying a successful message or the cause of
+						a possible failure as an exception
+					</para>
+				</para>
+			</section>
+			<section xml:id="scheduler_controller_interactive"><info><title>Interactive mode</title></info>
+				<para>
+					An other way to interact with the Scheduler is using the interactive mode of the controller. To start it in this mode,
+					just execute the bin/[os]/userScheduler.[sh|bat] command without specifying a 'ctl' option:
+					<emphasis>userScheduler.[sh|bat] -l demo -u rmi://localhost:1313/</emphasis> is an example which connect the controller
+					to a local Scheduler on the port 1313 with 'demo' login.
+				</para>
+				<para>
+					Once connected, type <emphasis role="italic">?</emphasis> or <emphasis role="italic">help</emphasis> to get the list of
+					provided functions:
+				</para>
+				<figure xml:id="scheduler_controller_i_help"><info><title>Scheduler controller interactive help</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/schedulerControllerIHelp.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					The interactive controller is <emphasis role="bold">based on JavaScript language</emphasis> where some methods
+					(describe in <xref linkend="scheduler_controller_i_help"/>) have been defined in order to facilitate its usage.
+					Here is an example of what can be done with the console:
+				</para>
+				<programlisting>
+  &gt; submit("../../samples/jobs_descriptors/Job_PI.xml");
+Job successfully submitted ! (id=1)
+
+  &gt; myId = submit("../../samples/jobs_descriptors/Job_PI.xml");
+Job successfully submitted ! (id=2)
+
+  &gt; pausejob(1);
+Job 1 paused.
+
+  &gt; resumejob(1);
+Job 1 resumed.
+
+  &gt; result(myId);
+Job 2 result =&gt;
+
+	 Average1 : 3.1414783733333334
+	 Computation3 : 3.1414446
+	 Computation4 : 3.14154732
+	 Average2 : 3.141520226666667
+	 Computation1 : 3.14146984
+	 LastAverage : 3.1414993000000004
+	 Computation5 : 3.14129996
+	 Computation2 : 3.14152068
+	 Computation6 : 3.1417134
+
+  &gt; output(myId);
+Job 2 output =&gt;
+
+Average1 :
+Parameters are :
+3.14146984
+3.14152068
+3.1414446
+Average is : 3.1414783733333334
+
+Average2 :
+Parameters are :
+3.14154732
+3.14129996
+3.1417134
+Average is : 3.141520226666667
+
+LastAverage :
+Parameters are :
+3.1414783733333334
+3.141520226666667
+Average is : 3.1414993000000004
+
+
+  &gt; myResult = result(1)
+Job 1 result =&gt;
+
+	 Average1 : 3.14164032
+	 Computation4 : 3.14176412
+	 Computation3 : 3.14162724
+	 Average2 : 3.1416647466666667
+	 Computation1 : 3.14182172
+	 LastAverage : 3.1416525333333336
+	 Computation5 : 3.1416124
+	 Computation2 : 3.141472
+	 Computation6 : 3.14161772
+
+  &gt; println(myResult.getName());
+job_PI
+				</programlisting>
+				<para>
+					As you can see, the provided methods are useful to get make basic actions. It is also possible to get
+					instances from Scheduler API. As shown, the <emphasis role="italic">myResult = result(1)</emphasis> instruction
+					lead to get an instance of JobResult in the 'myResult' variable. As in Java, use the method of the JobResult API
+					to get other informations. Here is an example:
+				</para>
+				<programlisting>
+  &gt; prio = myResult.getJobInfo().getPriority();
+
+  &gt; status = myResult.getJobInfo().getStatus();
+
+  &gt; nbfinished =  myResult.getJobInfo().getNumberOfFinishedTasks();
+
+  &gt; duration = myResult.getJobInfo().getFinishedTime()-myResult.getJobInfo().getStartTime();
+
+  &gt; println("priority : "+prio);  println("status : "+status); println("finished tasks : "+nbfinished); println("duration = "+duration+" ms");
+priority : Normal
+status : Finished
+finished tasks : 9
+duration = 94386 ms
+				</programlisting>
+				<para>
+					The <emphasis role="italic">exec(...)</emphasis> function provides a way to evaluate a javascript file. For example,
+					just insert the code below in a '.js' file with:
+				</para>
+				<programlisting>
+myResult = result(1);
+prio = myr.getJobInfo().getPriority();
+status = myr.getJobInfo().getStatus();
+nbfinished =  myr.getJobInfo().getNumberOfFinishedTasks();
+duration = myr.getJobInfo().getFinishedTime()-myr.getJobInfo().getStartTime();
+println("priority : "+prio);  println("status : "+status); println("finished tasks : "+nbfinished); println("duration = "+duration+" ms");
+				</programlisting>
+				<para>
+					The result will be exactly the same as the one in the code shown in the previous example.
+				</para>
+				<para>
+					When error occurred in a command, it's possible to show the stack trace on demand. Indeed, the execution stops
+					and prompt the user to show the stackTrace or not.
+					In order to script this interactive controller, you can disable stack trace on demand. To do so, use the
+					<emphasis role="italic">exMode(...)</emphasis> function. The first parameter defines if the stack trace will be
+					displayed or not while the second one defines if the stack trace must be displayed every time or on demand.
+					Setting the first parameter to 'false' disable the second one.
+				</para>
+				<para>
+					As an example, let's see the following script:
+				</para>
+				<programlisting>
+  &gt; exMode(false);
+Exception display mode changed : stack trace not displayed
+
+  &gt; for (i=0;i&lt;5;i++){submit("../../samples/jobs_descriptors/Job_PI.xml")};
+Job successfully submitted ! (id=3)
+Job successfully submitted ! (id=4)
+Job successfully submitted ! (id=5)
+Job successfully submitted ! (id=6)
+Job successfully submitted ! (id=7)
+
+  &gt; for (i=0;i&lt;5;i++){result(i);}
+Error on job 0 : The job represented by this ID is unknow !
+Error on job 1 : The job represented by this ID is unknow !
+Error on job 2 : The job represented by this ID is unknow !
+Job 3 result =&gt;
+
+	 Average1 : 3.1416381333333336
+	 Computation4 : 3.14196316
+	 Computation3 : 3.14175216
+	 Average2 : 3.141720133333333
+	 Computation1 : 3.14169736
+	 LastAverage : 3.1416791333333336
+	 Computation5 : 3.14180604
+	 Computation2 : 3.14146488
+	 Computation6 : 3.1413912
+Job 4 is not finished or unknown !
+				</programlisting>
+				<para>
+					In this case we have error message but not exception and the script can terminate without prompting to view stack trace.
+				</para>
+			</section>
 		</section>
 </chapter>

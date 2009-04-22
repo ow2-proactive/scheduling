@@ -78,8 +78,8 @@ public abstract class Executable implements Serializable {
 
     /**
      * Initialize the task with the arguments given in the constructor.<br>
-     * If args is not null, then the {@link #init(Map)} method is called.
-     * If args is null, the {@link #init(Map)} method is not called.<br>
+     * If args is not empty, then the {@link #init(Map)} method is called.
+     * If args is empty, the {@link #init(Map)} method is not called.<br>
      * It allows you to override the {@link #init(Map)} method in order to do your own initialization process with the arguments hashMap.
      *
      * @throws Exception an exception that the user can throw if something goes wrong.
