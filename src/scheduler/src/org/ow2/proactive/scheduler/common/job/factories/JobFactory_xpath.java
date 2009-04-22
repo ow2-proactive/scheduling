@@ -112,11 +112,11 @@ public class JobFactory_xpath extends JobFactory {
 
     public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
     /** Location of the schema used to parse job descriptor. */
-    public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng";
+    public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/1.0/schedulerjob.rng";
     /** Variables styleScheet location. */
     public static final String STYLESHEET_LOCATION = "/org/ow2/proactive/scheduler/common/xml/stylesheets/variables.xsl";
     /** Job name space. */
-    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:dev";
+    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:1.0";
     /** Job prefix. */
     public static final String JOB_PREFIX = "js";
     private static final String variablesPattern = "\\$\\{[^\\}]+\\}";
