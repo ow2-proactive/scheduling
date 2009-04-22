@@ -3,38 +3,38 @@
 
 	<section xml:id="RM_API_INTRO"><info><title>Introduction</title></info>
 		<para>
-		Resource Manager can be used directly from the java code through its Java API. This chapter explains
+		Resource Manager can be used directly from the Java code through its Java API. This chapter explains
 		how to do that, namely how to start and stop the Resource Manager, add already deployed nodes,
-		deploy nodes with GCM deployment descriptors and finally create peer to peer node source.
+		deploy nodes with GCM deployment descriptors and finally create peer to peer node source
 		Resource Manager is developed with ProActive API, so its main components are the following active objects:
 		<emphasis>RMCore</emphasis>, <emphasis>RMAdmin</emphasis>, <emphasis>RMUser</emphasis>, <emphasis>RMMonitoring</emphasis> and <emphasis>NodeSources</emphasis>.
-		For more information about active objects take a look at ProActive API in ProActive manual
+		For more information about active objects, take a look at ProActive API in ProActive manual
 		Part III. <emphasis> Programming With Active Objects</emphasis>.
 		</para>
 	</section>
 	<section xml:id="RM_API_start"><info><title>Start and stop Resource Manager</title></info>
 		<para>
-			Resource Manager can be started locally using a static method of RMFactory class :
+			Resource Manager can be started locally using a static method of RMFactory class:
 		</para>
 		<programlisting language="java">
 RMFactory.startLocal(); //creates an empty Resource Manager	</programlisting>
 		<para>
-		In order to perform any operations with the Resource Manager you have to authorize and
-		acquire either RMAdmin or RMUser interface. This action is made by using RMConnection class :
+		In order to perform any operations with the Resource Manager, you have to authorize and
+		acquire either RMAdmin or RMUser interface. This action is made by using RMConnection class:
 		</para>
 		<programlisting language="java">
 RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
 RMAdmin admin = auth.logAsAdmin(username, password);</programlisting>
 		<para>
-		Besides RMAdmin or RMUser interfaces RMConnection allows to obtain RMMonitoring
+		Besidesi the RMAdmin or RMUser interfaces, RMConnection allows to obtain RMMonitoring
 		interface which can be used to track resources and their states.
-		Once you have a reference to RMAdmin active object you can perform all administrator actions such as shutdown of the Resource Manager
+		Once you have a reference to RMAdmin active object, you can perform all administrator actions such as shutdown of the Resource Manager
 		</para>
 		<programlisting language="java">
-admin.shutdown(true); //perform preemptive shutdown	</programlisting>
+admin.shutdown(true); //performs preemptive shutdown	</programlisting>
 		<para>
-		This method terminates all RM's active objects and stop JVM where RMCore is running. The boolean parameter that it takes
-		defines whether the Resource Manager stops immediately, even there are some busy
+		This method terminates all RM's active objects and stops JVM where RMCore is running. The boolean parameter that it takes in argument
+		defines whether the Resource Manager stops immediately, even if there are some busy
 		nodes (i.e. some nodes have been provided to an application) or waits while applications
 		give them back.
 		</para>			
@@ -44,7 +44,7 @@ admin.shutdown(true); //perform preemptive shutdown	</programlisting>
 	<section xml:id="RM_API_GCMD"><info><title>Deploy GCM deployment descriptors</title></info>
 		<para>
 		RMFactory provides a way to specify a list of deployment descriptors which will be deployed once Resource Manager is started.
-		Here are an example of starting the Resource Manager with 4 nodes. In this case node source with GCM infrastructure manager and
+		Here is an example of starting the Resource Manager with 4 nodes. In this case, node sources with GCM infrastructure manager and
 		static node acquisition policy will be created.
 		</para>
 		<programlisting language="java">
@@ -52,8 +52,8 @@ String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + 
 RMFactory.startLocal(Collections.singleton(gcmDeployFile));
 		</programlisting>
 		<para>
-		In order to deploy nodes to existing Resource Manager RMAdmin interface should be acquired
-		as in example above and then deployment can be performed
+		In order to deploy nodes to existing Resource Manager, RMAdmin interface should be acquired
+		as in example above and then deployment can be performed:
 		</para>
 		<programlisting language="java">
 //create File object
@@ -65,39 +65,39 @@ byte[] GCMDContent = FileToBytesConverter.convertFileToByteArray(GCMDFile);
 //launch deployment defined in GCMD
 admin.addNodes(sourceName, new Object[] { GCMDContent });</programlisting>
 		<para>
-		Here we ask to RMAdmin to perform deployment by passing to it a byte array containing a GCMD. We can't pass
-		directly the File object to RMAdmin, because RMAdmin active object can run on another JVM, a JVM different
-		than JVM that executes the code above. So File is read by JVM that ask the deployment and content is transfered to RM's active object.
+		This example asks RMAdmin to perform deployment by passing to it a byte array containing a GCMD. It is not possible to
+		directly pass the File object to RMAdmin, since RMAdmin active object can run on another JVM, a JVM different
+		from the JVM that executes the code above. So, File is read by the JVM that asks the deployment and its content is transfered to the RM's active object.
 		</para>
 	</section>
 	<section xml:id="RM_API_add_node"><info><title>Add an already deployed node</title></info>
 	<para>
-	RMAdmin provides a way to add ProActive nodes that are already deployed, node is added with
-	its node's URL.
+	RMAdmin provides a way to add ProActive nodes that are already deployed. Nodes are added using
+	their URLs.
 	</para>
 	<programlisting language="java">
-admin.addNode("rmi://host_1/comptingNode"); //add a node identified with an URL 
+admin.addNode("rmi://host_1/comptingNode"); //adds a node identified with an URL 
 	</programlisting>
 	</section>
 	<section xml:id="RM_API_remove_node"><info><title>Remove a node from RM</title></info>
 	<para>
-	You can remove a node from Resource Manager with the code :
+	You can remove a node from Resource Manager with the code:
 	</para>
 	<programlisting language="java">
 admin.removeNode("rmi://nodeToRemove", true); 
 	</programlisting>
 	<para>
-		First parameter is URL of the node to remove, second parameter is a boolean;
-		if set to true, Resource Manager removes immediately the node, even if it is busy,
-		if set to false, and node is busy, 
-		Resource Manager waits that the Applications that use RM's nodes give back all the busy nodes.
-		Then after removal is performed.
+		The first parameter is the URL of the node to remove and the second one is a boolean.
+		If this boolean is set to true, then Resource Manager removes immediately the node even if it is busy.
+		If this boolean is set to false and the node is busy, then
+		Resource Manager waits that the applications that use RM's nodes give all the busy nodes back.
+		Removal is next performed.
 	</para>
 	</section>
-	<section xml:id="RM_API_custom_node_source"><info><title>Create custom node source</title></info>
+	<section xml:id="RM_API_custom_node_source"><info><title>Create custom node sources</title></info>
 		<para>
-		You can create different node sources using admin interface of RM.
-		Lets take a look at the example how to create the most complex node source.
+		You can create different node sources using the admin interface of RM.
+		Let's take a look at the following example to know how to create the most complex node source:
 		</para>
 		<programlisting language="java">
 // creating infrastructure manager parameters
@@ -117,17 +117,17 @@ admin.createNodesource("Scheduler loading node source", GCMCustomisedInfrastruct
 	SchedulerLoadingPolicy.class.getName(), policyParameters);
 		</programlisting>
 		<para>
-		Here we created the node source with GCM customized infrastructure manager and scheduler loading policy.
-		In order to create the infrastructure manager we preliminary loaded host list and GCM deployment template files and transformed their
-		contents to bytes array. Then we defined parameters of infrastructure manager and node source policy and used
-		<literal> admin.createNodesource(...)</literal> method to create new node source. It is implied that scheduler is running somewhere at the
+		The node source is created with GCM customized infrastructure manager and scheduler loading policy.
+		In order to create the infrastructure manager, host list and GCM deployment template files are preliminary loaded and their
+		contents is transformed to byte arrays. Then, parameters of infrastructure manager and node source policy are defined and the
+		<literal> admin.createNodesource(...)</literal> method is used to create new node sources. It is required that a scheduler is running somewhere at the
 		moment of the node source creation.
 		</para>
 	</section>
 	<section xml:id="RM_API_user"><info><title>Use Resource Manager as a nodes provider for your application</title></info>
 		<para>
 		You can obviously use Resource Manager as a node provider for your distributed application. RMUser active object 
-		provides a way to get and give back computing nodes :
+		provides a way to get computing nodes and give them:
 		</para>
 		<programlisting language="java">
 RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
@@ -135,23 +135,25 @@ RMUser user = auth.logAsUser(username, password);
 
 NodeSet nodes = user.getAtMostNodes(new IntWrapper(4), null);
 
-//perform some tasks on nodes provided by Resource Manager
+//performs some tasks on nodes provided by Resource Manager
 	.
 	.
 	.
-//and give back nodes
+//and gives nodes back
 user.freeNodes(nodes);
 
-// disconnecting from the resource manager
+// disconnects from the resource manager
 user.disconnect();
 		</programlisting>
 	<para>
-	First we get a reference to RMUser active object, after we request a set of nodes to Resource Manager
-	and perform some tasks on these nodes. Finally we give back the nodes and disconnect.
+	First, a reference to RMUser active object is retrieved. 
+	Then, a set of nodes to is required Resource Manager
+	and some tasks are performed on these nodes. Finally, nodes are given back and disconnected.
 	</para>
 		<para>
-	Code examples above are a short overview of Resource Manager API. You can refer to Java documentation
-	of Resource Manager //TODO link to RM javadoc.
+	Above code examples show a short overview of Resource Manager API. You can refer to Java documentation
+	of Resource Manager
+   (<uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/scheduler/api_complete/">http://proactive.inria.fr/release-doc/scheduler/api_complete/</uri>
 	</para>
 	</section>
 </chapter>
