@@ -483,7 +483,7 @@ public class PriorityPolicy implements PolicyInterface {
 }
 				</programlisting>
 				<para>
-					By default, jobs know how to be sorted regarding to their priority. But it is simpler to create a Comparator
+					By default, jobs know how to be sorted regarding to their priorities. But it is simpler to create a Comparator
 					and sort jobs with it. It is also possible to have some information about resources using the protected
 					<emphasis>RMState</emphasis> field inside the getOrderedTasks method.
 				</para>
@@ -646,7 +646,7 @@ user2:user
 				key file and <emphasis>myTrustore</emphasis> is the new trustStore file produced in output. This command asks you to enter a password for your trustStore.
 				</para>
 				<para>
-				Finally, in <emphasis>config/authentication/ldap.cfg</emphasis>, set keyStore and trustStore created before to their respective password:
+				Finally, in <emphasis>config/authentication/ldap.cfg</emphasis>, set keyStore and trustStore created before to their respective passwords:
 				</para>
 				<itemizedlist>
 					<listitem><para>

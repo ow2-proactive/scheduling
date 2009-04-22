@@ -119,7 +119,7 @@ admin.createNodesource("Scheduler loading node source", GCMCustomisedInfrastruct
 		<para>
 		Here we created the node source with GCM customized infrastructure manager and scheduler loading policy.
 		In order to create the infrastructure manager we preliminary loaded host list and GCM deployment template files and transformed their
-		content to bytes array. Then we defined parameters of infrastructure manager and node source policy and used
+		contents to bytes array. Then we defined parameters of infrastructure manager and node source policy and used
 		<literal> admin.createNodesource(...)</literal> method to create new node source. It is implied that scheduler is running somewhere at the
 		moment of the node source creation.
 		</para>

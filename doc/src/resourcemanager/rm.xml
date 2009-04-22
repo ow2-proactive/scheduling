@@ -73,7 +73,7 @@
 						it. Monitors are external programs (such as
 						monitor GUI) that want to be informed about RM
 						current activity (number of nodes and their
-						availability for example). The Monitoring
+						availabilities for example). The Monitoring
 						component is in charge of sending RM
 						information to its listeners.
 					</para>
