@@ -173,7 +173,8 @@
 			<listitem>
 				<para>
 					 <emphasis role="bold">Result Preview</emphasis> view - displays a textual or graphical preview on
-					the selected task result.
+					the selected task result. A simple click will show the internal view while the double click start
+					an external result preview (as a pictures editor or viewer) if provided.
 				</para>
 			</listitem>
 			<listitem>

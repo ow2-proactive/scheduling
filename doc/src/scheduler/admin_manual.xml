@@ -20,7 +20,7 @@
 				<figure xml:id="Scheduler_2_entities"><info><title>The ProActive Scheduler Entities</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="200%" contentdepth="100%" align="center" fileref="scheduler/pics/core/scheduler2entities.jpg" format="JPG"/>
+							<imagedata width="55%" align="center" fileref="scheduler/pics/core/scheduler2entities.jpg" format="JPG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -66,7 +66,7 @@
 				<figure xml:id="Scheduler_entity"><info><title>The ProActive Scheduler Entity</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG"/>
+							<imagedata width="90%" align="center" fileref="scheduler/pics/core/schedulerEntity.jpg" format="JPG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -466,7 +466,7 @@ AdminScheduler.createScheduler(
 				<figure xml:id="Job_submission"><info><title>A job submission</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/jobSubmission.jpg" format="JPG"/>
+							<imagedata width="90%" align="center" fileref="scheduler/pics/core/jobSubmission.jpg" format="JPG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -508,52 +508,29 @@ JobId myJobId = scheduler.submit(job);
 			</para>
 			<section xml:id="Administer_scheduler_sh"><info><title>Administer the Scheduler using shell command</title></info>
 				<para>
-					The admin shell is an interface which allows a user to administer the ProActive Scheduler without the
+					The admin Scheduler controller is an interface which allows to administer the ProActive Scheduler without the
 					java API. It is also possible to see exceptions coming from the scheduler to know what happened.
-					To start a admin shell, run the <emphasis>adminScheduler.[sh|bat]</emphasis>
-					script in 'unix/[os]/' directory. Without arguments, the admin shell will try to connect a
-					scheduler on the local host, exceptions from the ProActive Scheduler won't be displayed and
-					your login and password will be requested. Note that the admin shell uses administrator rights to allow
+					To start a admin controller, run the <emphasis>adminScheduler.[sh|bat]</emphasis>
+					script in 'unix/[os]/' directory. It works exactly the same as the user controller (<xref linkend="scheduler_controller"/>)
+					but some administration function have been added. Note that the admin controller uses administrator rights to allow
 					the connection to the scheduler.
 				</para>
 				<para>
-					<emphasis>adminScheduler.[sh|bat]</emphasis> can be started with 3 optional arguments:
-				</para>
-				<itemizedlist>
-					<listitem>
-						<para>
-							<emphasis>Your login</emphasis> (using the "-l login" option). If you use this option, only your password will
-							be requested.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>Exceptions display</emphasis> (using the "-e" option). If this option is used, all exceptions coming from the ProActive Scheduler
-							will be displayed, otherwise exceptions won't be displayed.
-							By default, exceptions arre not displayed.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>URL of a started scheduler</emphasis> (using the "-u URL" option).
-							By default, it tries to connect to a local scheduler.
-						</para>
-					</listitem>
-				</itemizedlist>
-				<para>
-					Here is an overview of the admin shell :
-				</para>
-				<figure xml:id="admin_shell"><info><title>The admin shell</title></info>
+				This controller provides additional controls compared to the user one. Here is the help of the admin one.
+				To understand how to use it, please refers to the <xref linkend="scheduler_controller"/> section.
+			</para>
+			<para>
+				Here is the displayed help when using <emphasis>adminScheduler.[sh|bat] -h</emphasis> command:
+				<figure xml:id="scheduler_controller_admin_help"><info><title>Scheduler admin controller help</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/admin_shell.png" format="PNG"/>
+							<imagedata width="100%" align="center" fileref="scheduler/pics/schedulerControllerAdminHelp.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
-				<para>
-					It is also possible to launch the admin shell with only one of the previous options or without option at all. For more
-					informations, use -h (or --help) option (i.e. "adminScheduler.[sh|bat] -h").
-				</para>
+				As shown, their are additional controls as start(), stop(), kill(), shutdown(), etc... An administrator can also interact on
+				every jobs while the user can only manage jobs that belong to him.
+			</para>
 			</section>
 			<section xml:id="Administer_scheduler_java"><info><title>Administer the Scheduler using the Java API</title></info>
 				<para>
@@ -564,7 +541,7 @@ JobId myJobId = scheduler.submit(job);
 					<figure xml:id="userConnection"><info><title>A user connection</title></info>
 						<mediaobject>
 							<imageobject>
-								<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/userConnection.jpg" format="JPG"/>
+								<imagedata width="90%" align="center" fileref="scheduler/pics/core/userConnection.jpg" format="JPG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -780,7 +757,7 @@ user2:user
 				</listitem>
 			</itemizedlist>
 		</section>
-		<!-- <section xml:id="LDAP_Sched_authent"><info><title>Configure LDAP-based authentication</title></info>
+		<section xml:id="LDAP_Sched_authent"><info><title>Configure LDAP-based authentication</title></info>
 			<para>
 				Scheduler is able to connect to an existing LDAP, to check users login/password, and verify users group membership. This authentication method can be useful
 				if you have in your organization an LDAP that already stores user/password entries. There are several points to configure: path in LDAP where scheduler users and admins
@@ -813,60 +790,60 @@ user2:user
 			</section>
 			<section xml:id="LDAP_binding_method"><info><title>Configure LDAP authentication parameters</title></info>
 				<para>
-				By default, the Scheduler binds to LDAP in anonymous mode. You can change this authentication method by modifying the property <emphasis>pa.scheduler.ldap.authentication.method</emphasis>.
-				This property can have several values:
-				<itemizedlist>
-					<listitem><para><emphasis>none</emphasis> (default value) - the Scheduler performs connection to LDAP in anonymous mode.</para>
-					</listitem>
-					<listitem><para><emphasis>simple</emphasis> - the Scheduler performs connection to LDAP with a specified login/password (see below for user password setting).</para>
-					</listitem>
-					<listitem><para>You can also specify a SASL mechanism for LDAPv3. There are many SASL mechanisms available:
-					<emphasis>cram-md5</emphasis>, <emphasis>digest-md5</emphasis>, <emphasis>kerberos4</emphasis>... Just put <emphasis>sasl</emphasis> to this property 
-					to let scheduler JVM choose SASL authentication mechanism.</para>
-					</listitem>
-				</itemizedlist>
+					By default, the Scheduler binds to LDAP in anonymous mode. You can change this authentication method by modifying the property <emphasis>pa.scheduler.ldap.authentication.method</emphasis>.
+					This property can have several values:
+					<itemizedlist>
+						<listitem><para><emphasis>none</emphasis> (default value) - the Scheduler performs connection to LDAP in anonymous mode.</para>
+						</listitem>
+						<listitem><para><emphasis>simple</emphasis> - the Scheduler performs connection to LDAP with a specified login/password (see below for user password setting).</para>
+						</listitem>
+						<listitem><para>You can also specify a SASL mechanism for LDAPv3. There are many SASL mechanisms available:
+						<emphasis>cram-md5</emphasis>, <emphasis>digest-md5</emphasis>, <emphasis>kerberos4</emphasis>... Just put <emphasis>sasl</emphasis> to this property 
+						to let scheduler JVM choose SASL authentication mechanism.</para>
+						</listitem>
+					</itemizedlist>
 				</para>
 				<para>
-				If you specify an authentication method different from 'none' (anonymous connection to LDAP),
-				you must specify a login/password for authentication. There are two properties in PASchedulerProperties.ini to set:
-				<itemizedlist>
-					<listitem><para><emphasis>pa.scheduler.ldap.bind.login</emphasis> - set user name for authentication.</para>
-					</listitem>
-					<listitem><para><emphasis>pa.scheduler.ldap.bind.pwd</emphasis> - set password for authentication.</para>
-					</listitem>
-				</itemizedlist>				
+					If you specify an authentication method different from 'none' (anonymous connection to LDAP),
+					you must specify a login/password for authentication. There are two properties in PASchedulerProperties.ini to set:
+					<itemizedlist>
+						<listitem><para><emphasis>pa.scheduler.ldap.bind.login</emphasis> - set user name for authentication.</para>
+						</listitem>
+						<listitem><para><emphasis>pa.scheduler.ldap.bind.pwd</emphasis> - set password for authentication.</para>
+						</listitem>
+					</itemizedlist>				
 				</para>
 			</section>
 			<section xml:id="LDAP_SSL"><info><title>Set SSL/TLS parameters</title></info>
 				<para>Scheduler is able to communicate with LDAP with a secured SSL/TLS layer. It can be useful if your network is not trusted, and critical information are transmitted
-				between scheduler and LDAP, such as  users passwords.
-				First, set the LDAP URL property <emphasis>pa.scheduler.ldap.url</emphasis> to a URL of type ldaps://myLdap.
-				Then, set <emphasis>pa.scheduler.ldap.authentication.method</emphasis> to none so as to delegate authentication to SSL.
+					between scheduler and LDAP, such as  users passwords.
+					First, set the LDAP URL property <emphasis>pa.scheduler.ldap.url</emphasis> to a URL of type ldaps://myLdap.
+					Then, set <emphasis>pa.scheduler.ldap.authentication.method</emphasis> to none so as to delegate authentication to SSL.
 				</para>
 				<para>For using SSL properly, you have to specify your certificate and public keys for SSL handshake. Java stores
-				certificates in a keyStore and public keys in a trustStore. In most of cases, you just have to define a trustStore with public
-				key part of LDAP's certificate. Put certificate in a keyStore, and public keys in a trustStore 
-				with the keytool command (keytool command is distributed with standard java platforms):
+					certificates in a keyStore and public keys in a trustStore. In most of cases, you just have to define a trustStore with public
+					key part of LDAP's certificate. Put certificate in a keyStore, and public keys in a trustStore 
+					with the keytool command (keytool command is distributed with standard java platforms):
 				</para>
 				<para>
-				keytool -import -alias myAlias -file myCertificate -keystore myKeyStore
+					keytool -import -alias myAlias -file myCertificate -keystore myKeyStore
 				</para>
 				<para>
-				<emphasis>myAlias</emphasis> is alias name of your certificate, <emphasis>myCertificate</emphasis> is your private certificate file and
-				<emphasis>myKeyStore</emphasis> is the new keyStore file produced in output. This command asks you to enter a password for your keyStore.
+					<emphasis>myAlias</emphasis> is alias name of your certificate, <emphasis>myCertificate</emphasis> is your private certificate file and
+					<emphasis>myKeyStore</emphasis> is the new keyStore file produced in output. This command asks you to enter a password for your keyStore.
 				</para>
 				<para>
-				Put LDAP certificate's public key in a trustStore, with the keytool command:
+					Put LDAP certificate's public key in a trustStore, with the keytool command:
 				</para>
 				<para>
-				keytool -import -alias myAlias -file myPublicKey -keystore myTrustStore
+					keytool -import -alias myAlias -file myPublicKey -keystore myTrustStore
 				</para>
 				<para>
-				<emphasis>myAlias</emphasis> is alias name of your certificate's public key, <emphasis>myPublicKey</emphasis> is your certificate's public
-				key file and <emphasis>myTrustore</emphasis> is the new trustStore file produced in output. This command asks you to enter a password for your trustStore.
+					<emphasis>myAlias</emphasis> is alias name of your certificate's public key, <emphasis>myPublicKey</emphasis> is your certificate's public
+					key file and <emphasis>myTrustore</emphasis> is the new trustStore file produced in output. This command asks you to enter a password for your trustStore.
 				</para>
 				<para>
-				Finally, in <emphasis>config/authentication/ldap.cfg</emphasis>, set keyStore and trustStore created before to their respective passwords:
+					Finally, in <emphasis>config/authentication/ldap.cfg</emphasis>, set keyStore and trustStore created before to their respective passwords:
 				</para>
 				<itemizedlist>
 					<listitem><para>
@@ -882,10 +859,10 @@ user2:user
 					Set <emphasis>pa.scheduler.ldap.truststore.passwd</emphasis> to the password defined previously for trustStore.</para>
 					</listitem>
 				</itemizedlist>
-			</section>
 			<para>
 				This conclude with the ProActive Scheduler chapter, let's now look at the ProActive Scheduler Eclipse Plugin.
 			</para>
-		</section> -->
+			</section>
+		</section>
 	</section>
 </chapter>
