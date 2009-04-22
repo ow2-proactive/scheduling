@@ -39,7 +39,7 @@
 					<listitem>
 						<para>
 							<emphasis role="bold">The Authentication interface</emphasis>
-							which is the first object that the user may have to contact. It is in charge of authenticate
+							which is the first object that the user may have to contact. It is in charge of authenticating
 							the user and allowing him to access (or not) to the Scheduler. The authentication security system
 							can interact with files or LDAP.
 						</para>
@@ -145,9 +145,9 @@ PASchedulerProperties.updateProperties("your_property_file");
 			</para>
 			<section xml:id="PASchedulerProperties"><info><title>ProActive Scheduler properties</title></info>
 				<para>
-					Note that some properties require a file path. File path can be given relative to the Scheduler home directory
-					(ie : application root directory) OR with an absolute path. Also note that each property can be overridden by
-					using the JVM properties when starting the Scheduler. (ie startScheduler.[sh|bat] -Dpa.scheduler.core.timeout=1000)
+					<emphasis>Note: </emphasis> some properties require a file path. File path can be given relative to the Scheduler home directory
+					(i.e. to the application root directory) OR with an absolute path. Also note that each property can be overridden by
+					using the JVM properties when starting the Scheduler. (i.e. startScheduler.[sh|bat] -Dpa.scheduler.core.timeout=1000)
 				</para>
 				<para>
 					<emphasis>Scheduler properties</emphasis>
@@ -155,50 +155,50 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.home</emphasis> :
-							define Scheduler home directory. The home directory is the one containing the dist, doc, lib, classes, config
-							directory (default is ., the current directory)
+							<emphasis role="italics">pa.scheduler.home</emphasis>:
+							defines Scheduler home directory. The home directory is the one containing the dist, doc, lib, classes, config
+							directory (default is ., the current directory).
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.core.timeout</emphasis> : timeout used in the main scheduling loop. If no new request is received by the SchedulerCore entity,
-							no new resources are available, and tasks are running, it is the time to wait before the next scheduling loop specified in millisecond.
-							(default is 2000ms)
+							<emphasis role="italics">pa.scheduler.core.timeout</emphasis>: timeout used in the main scheduling loop. If no new request is received by the SchedulerCore entity,
+							no new resources are available, and tasks are running, it is the time to wait before the next scheduling loop specified in milliseconds
+							(default is 2000ms).
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.core.nodepingfrequency</emphasis> : time interval between each failed node checking specified in second (default is 20s)
+							<emphasis role="italics">pa.scheduler.core.nodepingfrequency</emphasis>: time interval between each failed node checking specified in second (default is 20s).
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.classserver.usecache</emphasis> : boolean that specify if the classes definition used in task class servers must be cached or not.
-							Set to false to preserve memory usage in SchedulerCore (default is true)
+							<emphasis role="italics">pa.scheduler.classserver.usecache</emphasis>: boolean that specifies if the class definitions used in task class servers must be cached or not.
+							Set to false to preserve memory usage in SchedulerCore (default is true).
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.classserver.tmpdir</emphasis> : directory used to store a job classpath. If this value is not set,
-							it uses the default TMP directory. (default is not set)
+							<emphasis role="italics">pa.scheduler.classserver.tmpdir</emphasis>: directory used to store a job classpath. If this value is not set,
+							it uses the default TMP directory (default is not set).
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.policy</emphasis> : Scheduler default policy full name (default is org.ow2.proactive.scheduler.policy.PriorityPolicy)
-							The policy specified here must be in the Scheduler classpath.
+							<emphasis role="italics">pa.scheduler.policy</emphasis>: Scheduler default policy full name (default is org.ow2.proactive.scheduler.policy.PriorityPolicy).
+							The policy specifies here has to be in the Scheduler classpath.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.forkedtask.security.policy</emphasis> : Forked java task default security policy path,
-							use to define the policy of the forked task (default is config/forkedJavaTask/forkedTask.java.policy)
+							<emphasis role="italics">pa.scheduler.forkedtask.security.policy</emphasis>: Forked java task default security policy path.
+							Uses to define the policy of the forked task (default is config/forkedJavaTask/forkedTask.java.policy).
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.core.jmxmbeanname</emphasis> : Name of the JMX MBean for the scheduler (default is 'SchedulerFrontend:name=SchedulerWrapperMBean')
+							<emphasis role="italics">pa.scheduler.core.jmxmbeanname</emphasis>: Name of the JMX MBean for the scheduler (default is 'SchedulerFrontend:name=SchedulerWrapperMBean')
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -208,22 +208,22 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.job.factor</emphasis> : Number used to create task IDs.
-							If the job number is the 123 and it contains 456 tasks and this property is set to 1000, so the task ID
+							<emphasis role="italics">pa.scheduler.job.factor</emphasis>: Number used to create task IDs.
+							If the job number is 123 and it contains 456 tasks and this property is set to 1000, then the task ID
 							will be 123456. If this property is set to 10000, the task ID will be 1230456.
 							Task ID is (jobId*this_factor+taskId). (default is 10000)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.core.removejobdelay</emphasis> : time interval between the retrieval of a job result and its suppression from the Scheduler
+							<emphasis role="italics">pa.scheduler.core.removejobdelay</emphasis>: time interval between the retrieval of a job result and its suppression from the Scheduler
 							specified in second. Set this time to 0 if you don't want the job to be remove anyway. (default is 3600)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.job.removeFromDataBase</emphasis> : According to the previous property,
-							remove the job also in dataBase when removing it from scheduler. (default is false)
+							<emphasis role="italics">pa.scheduler.job.removeFromDataBase</emphasis>: According to the previous property,
+							removes the job also in dataBase when removing it from scheduler. (default is false)
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -233,19 +233,19 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.task.initialwaitingtime</emphasis> : time to wait for when a task has had a faulty state
+							<emphasis role="italics">pa.scheduler.task.initialwaitingtime</emphasis>: time to wait for when a task has had a faulty state,
 							specified in millisecond.
-							For performance reason, if the task is faulty, it is not restarted immediately. This property define the initial
-							time to wait. Next time are computed following this function: newTimeToWait=previousTimeToWait+n*1000 where n is
+							For performance reason, if the task is faulty, it is not restarted immediately. This property defines the initial
+							time to wait. Next waiting time is computed following this function: newTimeToWait=previousTimeToWait+n*1000 where n is
 							the number of re-execution of the task. The new time to wait is capped to 60000ms. (default is 1000ms)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.task.numberofexecutiononfailure</emphasis> : number of execution
+							<emphasis role="italics">pa.scheduler.task.numberofexecutiononfailure</emphasis>: number of execution
 							allowed if a task failed. The difference between faulty and failed is the state of the resource on which
 							the task is executed. Most of the time, a failure is detected if a task kill a resource. In this case,
-							this property define the number of execution allowed for this kind of potentially harmful task.
+							this property defines the number of execution allowed for this kind of potentially harmful task.
 							(default is 2, so one retry)
 						</para>
 					</listitem>
@@ -256,25 +256,25 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.logs.provider</emphasis> : full class name of logs forwarding method.
-							Logs forwarding is the system used to forward logs from task execution to user. possible values are:
+							<emphasis role="italics">pa.scheduler.logs.provider</emphasis>: full class name of logs forwarding method.
+							Logs forwarding is the system used to forward logs from task execution to user. Possible values are:
 							<itemizedlist>
 								<listitem>
 									<para>
 										org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider for simple socket.
-										This one use simple java socket.
+										This one uses simple Java socket.
 									</para>
 								</listitem>
 								<listitem>
 									<para>
 									org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketWithSSHTunnelBasedForwardingProvider for SSH tunneled socket.
-									This one use java socket with SSH tunneling for secure communication.
+									This one uses Java socket with SSH tunneling for secure communication.
 									</para>
 								</listitem>
 								<listitem>
 									<para>
 									org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider for ProActive based communication.
-									This one use ProActive communication, safer but slower.
+									This one uses ProActive communication, safer but slower.
 									</para>
 								</listitem>
 							</itemizedlist>
@@ -288,29 +288,29 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.ldap.config.path</emphasis> :
+							<emphasis role="italics">pa.scheduler.ldap.config.path</emphasis>:
 							LDAP Authentication configuration file path, used to set LDAP configuration properties.
 							(default is config/authentication/ldap.cfg)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.core.defaultloginfilename</emphasis> :
-							Login file name for file authentication method
+							<emphasis role="italics">pa.scheduler.core.defaultloginfilename</emphasis>:
+							Login file name for file authentication method.
 							(default is config/authentication/login.cfg)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.core.defaultgroupfilename</emphasis> :
-							Group file name for file authentication method
+							<emphasis role="italics">pa.scheduler.core.defaultgroupfilename</emphasis>:
+							Group file name for file authentication method.
 							(default is config/authentication/group.cfg)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.core.authentication.loginMethod</emphasis> :
-							Property that define the method that have to be used for logging users to the Scheduler
+							<emphasis role="italics">pa.scheduler.core.authentication.loginMethod</emphasis>:
+							Property that defines the method that has to be used for logging users to the Scheduler.
 							It can be one of the following values:
 							<itemizedlist>
 								<listitem>
@@ -334,16 +334,16 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.resourcemanager.authentication.username</emphasis> :
-							default username to connect the Resources Manager. Possible authentications are define
-							by the RM authentication management (default is scheduler)
+							<emphasis role="italics">pa.scheduler.resourcemanager.authentication.username</emphasis>:
+							default username to connect the Resources Manager. Possible authentications are defined
+							by the RM authentication management. (default is scheduler)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.resourcemanager.authentication.password</emphasis> :
-							default password to connect the Resources Manager. Possible authentications are define
-							by the RM authentication management (default is scheduler_pwd)
+							<emphasis role="italics">pa.scheduler.resourcemanager.authentication.password</emphasis>:
+							default password to connect the Resources Manager. Possible authentications are defined
+							by the RM authentication management. (default is scheduler_pwd)
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -353,7 +353,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.db.hibernate.configuration</emphasis> :
+							<emphasis role="italics">pa.scheduler.db.hibernate.configuration</emphasis>:
 							Hibernate main configuration file (default is config/database/hibernate/hibernate.cfg.xml)
 						</para>
 					</listitem>
@@ -511,8 +511,8 @@ JobId myJobId = scheduler.submit(job);
 					The admin Scheduler controller is an interface which allows to administer the ProActive Scheduler without the
 					java API. It is also possible to see exceptions coming from the scheduler to know what happened.
 					To start a admin controller, run the <emphasis>adminScheduler.[sh|bat]</emphasis>
-					script in 'unix/[os]/' directory. It works exactly the same as the user controller (<xref linkend="scheduler_controller"/>)
-					but some administration function have been added. Note that the admin controller uses administrator rights to allow
+					script in 'unix/[os]/' directory. It works in the same manner as the user controller (<xref linkend="scheduler_controller"/>)
+					but some administration functions have been added. Note that the admin controller uses administrator rights to allow
 					the connection to the scheduler.
 				</para>
 				<para>
@@ -529,7 +529,7 @@ JobId myJobId = scheduler.submit(job);
 					</mediaobject>
 				</figure>
 				As shown, their are additional controls as start(), stop(), kill(), shutdown(), etc... An administrator can also interact on
-				every jobs while the user can only manage jobs that belong to him.
+				every job while the user can only manage jobs that belong to him.
 			</para>
 			</section>
 			<section xml:id="Administer_scheduler_java"><info><title>Administer the Scheduler using the Java API</title></info>
@@ -595,7 +595,7 @@ UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 					</orderedlist>
 				</para>
 				<para>
-					And now to administer the ProActive Scheduler, just connect to it if it's not already done and use the
+					And now, to administer the ProActive Scheduler, just connect to it if it is not already done and use the
 					<emphasis role="bold">AdminSchedulerInterface</emphasis> to manage it. Take a look at the JavaDocumentation
 					to get more details and features. Let's remind how to connect the Scheduler as an administrator:
 				</para>
@@ -642,7 +642,7 @@ public abstract class Policy implements Serializable {
 					order. The first task to be scheduled will be the first in the returned Vector.
 				</para>
 				<para>
-					The parameters is a list of running and pendingJobs,
+					The parameters is a list of running and pending jobs,
 					which contain tasks to be scheduled. Some properties in each job and task
 					can be accessed in order to make your own scheduling order. It is also possible
 					to access to the "RMState" field that allows you to have information about resources like
@@ -691,17 +691,17 @@ public class PriorityPolicy implements PolicyInterface {
 		two authorization levels:
 		</para>
 		<itemizedlist>
-			 <listitem><para><emphasis>user level </emphasis>: enables to submit jobs (see waiting queue, jobs running and jobs finished). They can change priority of their jobs, with 3 priority levels:
+			 <listitem><para><emphasis>user level: </emphasis> enables to submit jobs (see waiting queue, jobs running and jobs finished). They can change priority of their jobs, with 3 priority levels:
 			 lowest, low and normal. They are able to see their jobs output, cancel and retrieve results only from their own jobs.
 			 They cannot perform actions on jobs submitted by other users.</para> 
 			 </listitem>
-			 <listitem><para><emphasis>admin level </emphasis>: enables to pause, stop and restart scheduler, cancel or retrieve results of any job,
+			 <listitem><para><emphasis>admin level: </emphasis> enables to pause, stop and restart scheduler, cancel or retrieve results of any job,
 			 change priority of any job, with 5 priority levels: lowest, low, normal, high and highest.</para>
 			 </listitem>
 		</itemizedlist>
 		<section xml:id="Sched_authent_select"><info><title>Select authentication method</title></info>
 			<para>
-			So that the Scheduler can manage users authentication and authorization, it has to store users account/password, and check login and password at users connection.
+			So that the Scheduler can manage users authentication and authorization, it has to store users account/password, and check login and password at users' connection.
 			This storage of users accounts can be managed in two ways: by files, or by LDAP. A Scheduler property (PASchedulerProperties.ini)
 			specifies which kind of authentication will be used:
 			</para>
