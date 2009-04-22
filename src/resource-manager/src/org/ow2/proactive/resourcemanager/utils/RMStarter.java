@@ -87,7 +87,7 @@ public class RMStarter {
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(120);
         hf.printHelp("startRM", options, true);
-        logger.info("\n Notice : Without argument, Resource Manager is without any computing node.");
+        logger.info("\n Notice : Without argument, Resource Manager starts without any computing node.");
         System.exit(1);
     }
 

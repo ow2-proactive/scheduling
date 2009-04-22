@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -43,6 +44,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 
 
@@ -208,6 +210,15 @@ public class UserScheduler implements UserSchedulerInterface {
      */
     public BooleanWrapper isConnected() {
         return schedulerFrontend.isConnected();
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getClass().getName() + "@" +
+            Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(schedulerFrontend));
     }
 
 }

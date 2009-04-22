@@ -126,4 +126,11 @@ public interface Console {
      */
     public void handleExceptionDisplay(String msg, Throwable t);
 
+    /**
+     * Convenience method to print a stackTrace on the console
+     *
+     * @param t the throwable to display
+     */
+    public void printStackTrace(Throwable t);
+
 }

@@ -98,6 +98,7 @@ public class AdminController {
     public static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
     protected static final String control = "<ctl> ";
 
+    private static final String EXCEPTIONMODE_CMD = "exMode(display,onDemand)";
     private static final String ADDNODE_CMD = "addnode(nodeURL, nsName)";
     private static final String REMOVENODE_CMD = "removenode(nodeURL,preempt)";
     private static final String GCMDEPLOY_CMD = "gcmdeploy(gcmdFile,nsName)";
@@ -118,6 +119,9 @@ public class AdminController {
     protected boolean intercativeMode = false;
     protected ScriptEngine engine;
     protected Console console = new SimpleConsole();
+
+    protected boolean displayStack = true;
+    protected boolean displayOnDemand = true;
 
     protected MBeanInfoViewer mbeanInfoViewer;
 
@@ -445,10 +449,18 @@ public class AdminController {
 
     protected void handleExceptionDisplay(String msg, Throwable t) {
         if (intercativeMode) {
-            console.handleExceptionDisplay(msg, t);
+            if (!displayStack) {
+                console.error(msg + " : " + (t.getMessage() == null ? t : t.getMessage()));
+            } else {
+                if (displayOnDemand) {
+                    console.handleExceptionDisplay(msg, t);
+                } else {
+                    console.printStackTrace(t);
+                }
+            }
         } else {
-            System.err.printf(msg);
-            t.printStackTrace();
+            System.err.printf(msg + "\n");
+            logger.info("", t);
         }
     }
 
@@ -466,6 +478,26 @@ public class AdminController {
         } else {
             System.err.printf(format, args);
         }
+    }
+
+    public static void setExceptionMode(boolean displayStack, boolean displayOnDemand) {
+        shell.setExceptionMode_(displayStack, displayOnDemand);
+    }
+
+    private void setExceptionMode_(boolean displayStack, boolean displayOnDemand) {
+        this.displayStack = displayStack;
+        this.displayOnDemand = displayOnDemand;
+        String msg = "Exception display mode changed : ";
+        if (!displayStack) {
+            msg += "stack trace not displayed";
+        } else {
+            if (displayOnDemand) {
+                msg += "stack trace displayed on demand";
+            } else {
+                msg += "stack trace displayed everytime";
+            }
+        }
+        printf(msg);
     }
 
     public static void help() {
@@ -640,6 +672,14 @@ public class AdminController {
         terminated = true;
     }
 
+    public static RMAdmin getAdminRM() {
+        return shell.getAdminRM_();
+    }
+
+    private RMAdmin getAdminRM_() {
+        return rm;
+    }
+
     //***************** OTHER *******************
 
     protected void initialize() throws IOException {
@@ -687,6 +727,12 @@ public class AdminController {
 
     protected String helpScreen() {
         StringBuilder out = new StringBuilder("Resource Manager controller commands are :\n\n");
+
+        out
+                .append(String
+                        .format(
+                                " %1$-28s\t Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)\n\n",
+                                EXCEPTIONMODE_CMD));
         out.append(String.format(
                 " %1$-28s\t Add node to the given node source (parameters is a string representing the node URL to add AND"
                     + " a string representing the node source in which to add the node)\n", ADDNODE_CMD));

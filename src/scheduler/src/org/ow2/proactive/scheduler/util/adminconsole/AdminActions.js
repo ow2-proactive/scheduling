@@ -31,3 +31,5 @@ function kill(){
 function linkrm(rmURL){
 	return AdminController.linkRM(""+rmURL);
 }
+
+var scheduler = AdminController.getAdminScheduler();

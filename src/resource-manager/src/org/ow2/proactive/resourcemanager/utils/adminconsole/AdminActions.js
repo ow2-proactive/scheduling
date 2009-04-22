@@ -1,5 +1,15 @@
 importClass(org.ow2.proactive.resourcemanager.utils.adminconsole.AdminController);
 
+function exMode(displayStack, displayOnDemand){
+	if (displayStack == undefined){
+		displayStack = true;
+	}
+	if (displayOnDemand == undefined){
+		displayOnDemand = true;
+	}
+	AdminController.setExceptionMode(displayStack, displayOnDemand);
+}
+
 function addnode(nodeURL, nodeSourceName){
 	if (nodeSourceName==undefined){
 		nodeSourceName = null;
@@ -59,3 +69,5 @@ function exec(commandFilePath){
 function exit(){
 	return AdminController.exit();
 }
+
+var rm = AdminController.getAdminRM();

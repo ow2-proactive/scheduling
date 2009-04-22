@@ -71,6 +71,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
@@ -93,8 +94,10 @@ public class UserController {
     private final String JS_INIT_FILE = "UserActions.js";
 
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
+    protected static final int cmdHelpMaxCharLength = 24;
     protected static final String control = "<ctl> ";
 
+    private static final String EXCEPTIONMODE_CMD = "exMode(display,onDemand)";
     private static final String EXIT_CMD = "exit()";
     private static final String PAUSEJOB_CMD = "pausejob(id)";
     private static final String PRIORITY_CMD = "priority(id,priority)";
@@ -113,6 +116,10 @@ public class UserController {
     protected boolean initialized = false;
     protected boolean terminated = false;
     protected boolean intercativeMode = false;
+
+    protected boolean displayStack = true;
+    protected boolean displayOnDemand = true;
+
     protected ScriptEngine engine;
     protected Console console = new SimpleConsole();
 
@@ -282,11 +289,36 @@ public class UserController {
     protected OptionGroup addCommandLineOptions(Options options) {
         OptionGroup actionGroup = new OptionGroup();
 
-        Option opt = new Option("submit", true, control + "Submit the given job");
+        Option opt = new Option("submit", true, control + "Submit the given job XML file");
         opt.setArgName("XMLDescriptor");
         opt.setRequired(false);
-        opt.setArgs(1);
+        opt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(opt);
+
+        opt = new Option("cmd", false, control +
+            "If mentionned, -submit argument becomes a command line, ie: -submit command args...");
+        opt.setRequired(false);
+        options.addOption(opt);
+        opt = new Option("cmdf", false, control +
+            "If mentionned, -submit argument becomes a text file path containing command lines to schedule");
+        opt.setRequired(false);
+        options.addOption(opt);
+        opt = new Option("o", true, control +
+            "Used with submit action, specify a log file path to store job output");
+        opt.setArgName("logFile");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        options.addOption(opt);
+        opt = new Option("s", true, control + "Used with submit action, specify a selection script");
+        opt.setArgName("selScript");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        options.addOption(opt);
+        opt = new Option("jn", true, control + "Used with submit action, specify the job name");
+        opt.setArgName("jobName");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        options.addOption(opt);
 
         opt = new Option("pausejob", true, control + "Pause the given job (pause every non-running tasks)");
         opt.setArgName("jobId");
@@ -375,7 +407,11 @@ public class UserController {
         } else if (cmd.hasOption("removejob")) {
             remove(cmd.getOptionValue("removejob"));
         } else if (cmd.hasOption("submit")) {
-            submit(cmd.getOptionValue("submit"));
+            if (cmd.hasOption("cmd") || cmd.hasOption("cmdf")) {
+                submitCMD();
+            } else {
+                submit(cmd.getOptionValue("submit"));
+            }
         } else if (cmd.hasOption("result")) {
             result(cmd.getOptionValue("result"));
         } else if (cmd.hasOption("output")) {
@@ -402,7 +438,15 @@ public class UserController {
 
     protected void handleExceptionDisplay(String msg, Throwable t) {
         if (intercativeMode) {
-            console.handleExceptionDisplay(msg, t);
+            if (!displayStack) {
+                console.error(msg + " : " + (t.getMessage() == null ? t : t.getMessage()));
+            } else {
+                if (displayOnDemand) {
+                    console.handleExceptionDisplay(msg, t);
+                } else {
+                    console.printStackTrace(t);
+                }
+            }
         } else {
             System.err.printf(msg + "\n");
             logger.info("", t);
@@ -425,6 +469,26 @@ public class UserController {
         }
     }
 
+    public static void setExceptionMode(boolean displayStack, boolean displayOnDemand) {
+        shell.setExceptionMode_(displayStack, displayOnDemand);
+    }
+
+    private void setExceptionMode_(boolean displayStack, boolean displayOnDemand) {
+        this.displayStack = displayStack;
+        this.displayOnDemand = displayOnDemand;
+        String msg = "Exception display mode changed : ";
+        if (!displayStack) {
+            msg += "stack trace not displayed";
+        } else {
+            if (displayOnDemand) {
+                msg += "stack trace displayed on demand";
+            } else {
+                msg += "stack trace displayed everytime";
+            }
+        }
+        printf(msg);
+    }
+
     public static void help() {
         shell.help_();
     }
@@ -444,7 +508,48 @@ public class UserController {
             printf("Job successfully submitted ! (id=" + id.value() + ")");
             return id.value();
         } catch (Exception e) {
-            handleExceptionDisplay("Error on job Submission (url=" + xmlDescriptor + ")", e);
+            handleExceptionDisplay("Error on job Submission (path=" + xmlDescriptor + ")", e);
+        }
+        return "";
+    }
+
+    private String submitCMD() {
+        try {
+            Job job;
+            String jobGivenName = null;
+            String jobGivenOutput = null;
+            String givenSelScript = null;
+            if (cmd.hasOption("jn")) {
+                jobGivenName = cmd.getOptionValue("jn");
+            }
+            if (cmd.hasOption("o")) {
+                jobGivenOutput = cmd.getOptionValue("o");
+            }
+            if (cmd.hasOption("s")) {
+                givenSelScript = cmd.getOptionValue("s");
+            }
+
+            if (cmd.hasOption("cmd")) {
+                //create job from a command to launch specified in command line
+                String cmdTab[] = cmd.getOptionValues("submit");
+                String jobCommand = "";
+
+                for (String s : cmdTab) {
+                    jobCommand += (s + " ");
+                }
+                jobCommand = jobCommand.trim();
+                job = FlatJobFactory.getFactory().createNativeJobFromCommand(jobCommand, jobGivenName,
+                        givenSelScript, jobGivenOutput, user);
+            } else {
+                String commandFilePath = cmd.getOptionValue("submit");
+                job = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath,
+                        jobGivenName, givenSelScript, jobGivenOutput, user);
+            }
+            JobId id = scheduler.submit(job);
+            printf("Job successfully submitted ! (id=" + id.value() + ")");
+            return id.value();
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on job Submission", e);
         }
         return "";
     }
@@ -629,6 +734,14 @@ public class UserController {
         terminated = true;
     }
 
+    public static UserSchedulerInterface getUserScheduler() {
+        return shell.getUserScheduler_();
+    }
+
+    private UserSchedulerInterface getUserScheduler_() {
+        return scheduler;
+    }
+
     //***************** OTHER *******************
 
     protected void initialize() throws IOException {
@@ -677,48 +790,54 @@ public class UserController {
     protected String helpScreen() {
         StringBuilder out = new StringBuilder("Scheduler controller commands are :\n\n");
 
-        out.append(String.format(
-                " %1$-18s\t Change the priority of the given job (parameters are an int or a string representing the jobId "
-                    + "AND a string representing the new priority)\n"
-                    + " %2$-18s\t Priorities are Idle, Lowest, Low, Normal, High, Highest\n", PRIORITY_CMD,
-                " "));
-        out.append(String.format(
-                " %1$-18s\t Pause the given job (parameter is an int or a string representing the jobId)\n",
-                PAUSEJOB_CMD));
-        out.append(String.format(
-                " %1$-18s\t Resume the given job (parameter is an int or a string representing the jobId)\n",
-                RESUMEJOB_CMD));
-        out.append(String.format(
-                " %1$-18s\t Kill the given job (parameter is an int or a string representing the jobId)\n",
-                KILLJOB_CMD));
         out
                 .append(String
                         .format(
-                                " %1$-18s\t Remove the given job from the Scheduler (parameter is an int or a string representing the jobId)\n",
+                                " %1$-24s Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)\n\n",
+                                EXCEPTIONMODE_CMD));
+        out.append(String.format(
+                " %1$-24s Pause the given job (parameter is an int or a string representing the jobId)\n",
+                PAUSEJOB_CMD));
+        out.append(String.format(
+                " %1$-24s Resume the given job (parameter is an int or a string representing the jobId)\n",
+                RESUMEJOB_CMD));
+        out.append(String.format(
+                " %1$-24s Kill the given job (parameter is an int or a string representing the jobId)\n",
+                KILLJOB_CMD));
+        out.append(String
+                .format(
+                        " %1$-24s Change the priority of the given job (parameters are an int or a string representing the jobId "
+                            + "AND a string representing the new priority)\n"
+                            + " %2$-24s Priorities are Idle, Lowest, Low, Normal, High, Highest\n",
+                        PRIORITY_CMD, " "));
+        out
+                .append(String
+                        .format(
+                                " %1$-24s Remove the given job from the Scheduler (parameter is an int or a string representing the jobId)\n",
                                 REMOVEJOB_CMD));
         out
                 .append(String
                         .format(
-                                " %1$-18s\t Get the result of the given job (parameter is an int or a string representing the jobId)\n",
+                                " %1$-24s Get the result of the given job (parameter is an int or a string representing the jobId)\n",
                                 GET_RESULT_CMD));
         out
                 .append(String
                         .format(
-                                " %1$-18s\t Get the output of the given job (parameter is an int or a string representing the jobId)\n",
+                                " %1$-24s Get the output of the given job (parameter is an int or a string representing the jobId)\n",
                                 GET_OUTPUT_CMD));
         out
                 .append(String
                         .format(
-                                " %1$-18s\t Submit a new job (parameter is a string representing the job XML descriptor URL)\n",
+                                " %1$-24s Submit a new job (parameter is a string representing the job XML descriptor URL)\n",
                                 SUBMIT_CMD));
-        //        out.append(String.format(" %1$-18s\t Display some statistics provided by the Scheduler MBean\n",
+        //        out.append(String.format(" %1$-24s Display some statistics provided by the Scheduler MBean\n",
         //                JMXINFO_CMD));
         out
                 .append(String
                         .format(
-                                " %1$-18s\t Execute the content of the given script file (parameter is a string representing a command-file path)\n",
+                                " %1$-24s Execute the content of the given script file (parameter is a string representing a command-file path)\n",
                                 EXEC_CMD));
-        out.append(String.format(" %1$-18s\t Exits Scheduler controller\n", EXIT_CMD));
+        out.append(String.format(" %1$-24s Exit Scheduler controller\n", EXIT_CMD));
 
         return out.toString();
     }
