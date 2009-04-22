@@ -70,8 +70,8 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
 
         byte[] hosts = InetAddress.getLocalHost().getHostName().getBytes();
         // creating node source
-        admin.createNodesource(sourceName, GCMCustomisedInfrastructure.class.getName(), new Object[] { hosts,
-                GCMDeploymentData }, SchedulerLoadingPolicy.class.getName(), getPolicyParams());
+        admin.createNodesource(sourceName, GCMCustomisedInfrastructure.class.getName(), new Object[] {
+                GCMDeploymentData, hosts }, SchedulerLoadingPolicy.class.getName(), getPolicyParams());
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodeSourcesCreatedEvents().size() == 1);
