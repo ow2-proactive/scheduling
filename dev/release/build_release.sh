@@ -84,26 +84,11 @@ find . -type d -name "SCHEDULER_DB" -exec rm -rf {} \;
 # Remove logs directory
 rm -rf ${SCHEDULER_DIR}/.logs
 
-# Replace all 'dev' version number by this version number in every XML, XSD, RNC files
-echo Replacing 'dev' tag with current version for XML files
-find . -type f -exec sed -i "s#urn:proactive:jobdescriptor:dev#urn:proactive:jobdescriptor:$VERSION#g" {} \;
-find . -type f -exec sed -i "s#http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd#http://proactive.inria.fr/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
-find . -type f -exec sed -i "s#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
-
-
 cd compile || warn_and_exit "Cannot move in compile"
 ./build clean
 ./build convertSchemas
 ./build -Dversion="${VERSION}" deploy.all
 ./build -Dversion="${VERSION}" manualPdf
-
-cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
-# Update the website with new schema version
-echo Update the website with new schema version
-ssh sea.inria.fr mkdir /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
-scp src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd $USER@sea.inria.fr:/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
-ssh sea.inria.fr chmod 555 /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
-ssh sea.inria.fr chmod 444 /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
 
 cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 echo " [i] Clean"
