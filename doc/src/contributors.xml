@@ -372,6 +372,15 @@
                   </para>
                 </listitem>
 
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Fabrice</firstname>
+
+                      <surname>Fontenoy</surname>
+                    </personname>
+                  </para>
+                </listitem>
 				</itemizedlist>
 
  			</entry>
@@ -723,7 +732,7 @@
   </para>
 
   <para>
-    <emphasis role="bold">Public questions, comments, or discussions can pe
+    <emphasis role="bold">Public questions, comments, or discussions can be
     posted on the ProActive public mailing list</emphasis>
   </para>
 
@@ -748,5 +757,12 @@
     <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://galpage-exp.inria.fr:8181/jira">https://galpage-exp.inria.fr:8181/jira</uri>
   </para>
 
+  <para>
+    <emphasis role="bold">The ProActive documentation is accessible from</emphasis>
+  </para>
+
+  <para>
+    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/index.php?page=documentation">http://proactive.inria.fr/index.php?page=documentation</uri>
+  </para>
   <!-- List to be completed and kept up-to-date, sorted alphabeticly -->
 </dedication>
