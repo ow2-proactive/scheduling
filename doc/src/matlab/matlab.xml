@@ -685,7 +685,7 @@
                         You're now ready to run some parallel scripts. In order to run a Matlab function in parallel you'll need to call the function PAsolve() as
                         follows:
                     </para>
-                    <screen>&gt;&gt; resl = PAsolve( {1, 2, 3, 4, 5}, @factorial);</screen>
+                    <screen>&gt;&gt; resl = PAsolve( @factorial, {1, 2, 3, 4, 5} );</screen>
                     <para>
                         This by example will execute the factorial method on 5 different machines, the first machine
                         using the parameter 1, the second, the parameter 2, etc...
@@ -694,20 +694,45 @@
                         The file system between your Matlab session and the remote engines needs to be shared (through
                         NFS or something equivalent). Your local user path will be automatically copied to the remote
                         engine. Meaning that if you are using a Matlab function f located in the m-file f.m at path P,
-                        then the remote engine will try to look at the function at the same path P.
+                        then the remote engine will try to look at the function at the same path P. That's why it is mandatory that the path P is accessible from both the local session and remote engine. 
                     </para>
                     <para>
-                        The result of the PAsolve function is a Matlab Object of type Result list.
+                        The result of the PAsolve function is a Matlab Object of type PAResultList. When displayed this object will print:
                     </para>
+                    <screen>&gt;&gt; resl
+                    Awaited Result List</screen>
+                    <para>
+                    	This means that the result from the PAsolve function is not yet available. The PAsolve is thus called "asynchronously" and doesn't block the matlab interpretor execution.
+                    	This allows for example to run other PAsolve(s) while the first PAsolve is still computing the result. If, at some point, the results of a PAsolve function is needed, this can be achieved by manipulating the PAResultList object.
+                    	A manipulation of the object will trigger a wait-by-necessity mechanism, this means that the matlab interpretor will block and wait until the result is available. The object can be manipulated either by using indexation, thus displaying a single member of the list (or more, depending on the index): 
+                    </para>
+                    <screen>&gt;&gt; resl(3) # triggers wait_by_necessity
+                    6  # fact(3)                    
+                    </screen>
+                    <para>
+                    	Or by using the object attribute <emphasis>wait</emphasis>, in that case the result of the wait attribute will be the whole result list:
+                    </para>
+                    <screen>&gt;&gt; resl.wait # triggers wait_by_necessity 
+                       [1] [2] [6] [24] [120]
+                    </screen>
+                </listitem>
+                <listitem>
+                	<para>
+                		Finally a PAeval function exists, it is similar to PAsolve but takes only one argument instead of a list of argument and returns only a PAResult instead of a PAResultList:
+                	</para>
+                	<screen>
+                		&gt;&gt; res = PAeval( @factorial, {5} )
+                		Awaited Result
+                		&gt;&gt; res.wait   # wait_by_necessity
+                		120
+                	</screen>
                 </listitem>
             </orderedlist>
-
-        </section>
-        <section xml:id="SciMat_Tips_And_Tricks">
-            <info>
-                <title>Tips and Tricks</title>
-            </info>
-            <para></para>
+            <para>
+            	Thanks to the mechanism of asynchronous results, the ProActive Matlab interface can help you run Matlab code in parallel, or turn algorithms to parallel versions, thus improving their speed. 
+            	Each invidual task submitted in parallel should take enough time in order to have a benefit from the parallelization. 
+            	For example, if each matlab task run remotely would run locally in less than a milisecond, no gain would be observed from the parallelization, as the overhead from the network and the different layers in action are far above a milisecond time.   
+            </para>
         </section>
     </section>
 
