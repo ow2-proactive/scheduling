@@ -339,8 +339,15 @@
 				This preview is powerful because of the generic way that will be used to perform the display.
 				It is possible to redefine the displaying behavior by implementing the <emphasis>ResultPreview</emphasis> abstract class.
 				Using this mechanism, it is possible to use an external tool or soft to display the result like an image viewer for picture
-				(see <xref linkend="Create_task_explanation"/> for details).
+				(see <xref linkend="Create_task_explanation"/> for details). Here is an example of what can be done:
 			</para>
+			<figure xml:id="resultPreviewView"><info><title>Result Preview</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="60%" contentdepth="60%" fileref="scheduler_plugin/pics/resultPreviewView2.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
 		</section>
 		
 		<section xml:id="Scheduler_composing_controlPanel"><info><title>Scheduler control panel</title></info>
