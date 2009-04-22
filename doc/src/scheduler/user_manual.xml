@@ -1323,53 +1323,65 @@ scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEve
 				in some examples above, go to <xref linkend="scheduler_controller_non_interactive"/>) or in interactive mode (go to
 				<xref linkend="scheduler_controller_interactive"/>).
 			</para>
-			<section xml:id="scheduler_controller_non_interactive"><info><title>Non-interactive mode</title></info>
+			<section xml:id="scheduler_controller_non_interactive"><info><title>Command line mode</title></info>
 				<para>
 					Here is the displayed help when using <emphasis>userScheduler.[sh|bat] -h</emphasis> command:
+					<figure xml:id="scheduler_controller_help"><info><title>Scheduler controller help</title></info>
+						<mediaobject>
+							<imageobject>
+								<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/schedulerControllerHelp.png" format="PNG"/>
+							</imageobject>
+						</mediaobject>
+					</figure>
 				</para>
-				<figure xml:id="scheduler_controller_help"><info><title>Scheduler controller help</title></info>
-					<mediaobject>
-						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/schedulerControllerHelp.png" format="PNG"/>
-						</imageobject>
-					</mediaobject>
-				</figure>
 				<para>
-					To use the controller as a command line just specify at list one 'ctl' option. Let's illustrate that way with some examples:
-					<itemizedlist>
-						<listitem>
+				To use the controller as a command line just specify at list one 'ctl' option. Let's illustrate that way with some examples:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
 							<emphasis>userScheduler.[sh|bat] -l demo -submit path/to/job/xml/descriptor</emphasis> : try to connect user demo, prompt for
 							its password and submit the given XML descriptor file.
-						</listitem>
-						<listitem>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
 							<emphasis>userScheduler.[sh|bat] -l demo -cmd -jn test -submit ls -al</emphasis> : try to connect user demo, prompt for
-							its password and submit the given command line in a job named 'test'. In this case, the <emphasis role="italic">-cmd</emphasis> option forces
-							the argument of <emphasis role="italic">-submit</emphasis> option to be a command line
-						</listitem>
-						<listitem>
+							its password and submit the given command line in a job named 'test'. In this case, the <emphasis role="italics">-cmd</emphasis> option forces
+							the argument of <emphasis role="italics">-submit</emphasis> option to be a command line.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
 							<emphasis>userScheduler.[sh|bat] -cmdf -s path/to/a/selection/script -submit path/to/a/text/file</emphasis> : prompt for a username and
 							its password and submit the given commands file. It also includes the given selection script file.
-							In this case, the <emphasis role="italic">-cmdf</emphasis> option forces
-							the argument of <emphasis role="italic">-submit</emphasis> option to be a flat text file that contains
+							In this case, the <emphasis role="italics">-cmdf</emphasis> option forces
+							the argument of <emphasis role="italics">-submit</emphasis> option to be a flat text file that contains
 							commands. (One command per line, each line will be a task)
-						</listitem>
-						<listitem>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
 							<emphasis>userScheduler.[sh|bat] -output 12</emphasis> : prompt for a username and
 							its password and display the output written by job 12 if it is finished.
-						</listitem>
-						<listitem>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
 							<emphasis>userScheduler.[sh|bat] -result 34</emphasis> : prompt for a username and
 							its password and display the result of job 34 if it is finished.
-						</listitem>
-						<listitem>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
 							<emphasis>userScheduler.[sh|bat] -priority 56 Lowest</emphasis> : prompt for a username and
 							its password and request the Scheduler to change job 56 priority to 'LOWEST'.
-						</listitem>
-					</itemizedlist>
-					<para>
-						Once the command launched, it will terminate by displaying a successful message or the cause of
-						a possible failure as an exception
-					</para>
+						</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					Once the command launched, it will terminate by displaying a successful message or the cause of
+					a possible failure as an exception
 				</para>
 			</section>
 			<section xml:id="scheduler_controller_interactive"><info><title>Interactive mode</title></info>
@@ -1380,16 +1392,16 @@ scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEve
 					to a local Scheduler on the port 1313 with 'demo' login.
 				</para>
 				<para>
-					Once connected, type <emphasis role="italic">?</emphasis> or <emphasis role="italic">help</emphasis> to get the list of
+					Once connected, type <emphasis role="italics">?</emphasis> or <emphasis role="italics">help</emphasis> to get the list of
 					provided functions:
+					<figure xml:id="scheduler_controller_i_help"><info><title>Scheduler controller interactive help</title></info>
+						<mediaobject>
+							<imageobject>
+								<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/schedulerControllerIHelp.png" format="PNG"/>
+							</imageobject>
+						</mediaobject>
+					</figure>
 				</para>
-				<figure xml:id="scheduler_controller_i_help"><info><title>Scheduler controller interactive help</title></info>
-					<mediaobject>
-						<imageobject>
-							<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/schedulerControllerIHelp.png" format="PNG"/>
-						</imageobject>
-					</mediaobject>
-				</figure>
 				<para>
 					The interactive controller is <emphasis role="bold">based on JavaScript language</emphasis> where some methods
 					(describe in <xref linkend="scheduler_controller_i_help"/>) have been defined in order to facilitate its usage.
@@ -1463,7 +1475,7 @@ job_PI
 				</programlisting>
 				<para>
 					As you can see, the provided methods are useful to get make basic actions. It is also possible to get
-					instances from Scheduler API. As shown, the <emphasis role="italic">myResult = result(1)</emphasis> instruction
+					instances from Scheduler API. As shown, the <emphasis role="italics">myResult = result(1)</emphasis> instruction
 					lead to get an instance of JobResult in the 'myResult' variable. As in Java, use the method of the JobResult API
 					to get other informations. Here is an example:
 				</para>
@@ -1483,7 +1495,7 @@ finished tasks : 9
 duration = 94386 ms
 				</programlisting>
 				<para>
-					The <emphasis role="italic">exec(...)</emphasis> function provides a way to evaluate a javascript file. For example,
+					The <emphasis role="italics">exec(...)</emphasis> function provides a way to evaluate a javascript file. For example,
 					just insert the code below in a '.js' file with:
 				</para>
 				<programlisting>
@@ -1501,7 +1513,7 @@ println("priority : "+prio);  println("status : "+status); println("finished tas
 					When error occurred in a command, it's possible to show the stack trace on demand. Indeed, the execution stops
 					and prompt the user to show the stackTrace or not.
 					In order to script this interactive controller, you can disable stack trace on demand. To do so, use the
-					<emphasis role="italic">exMode(...)</emphasis> function. The first parameter defines if the stack trace will be
+					<emphasis role="italics">exMode(...)</emphasis> function. The first parameter defines if the stack trace will be
 					displayed or not while the second one defines if the stack trace must be displayed every time or on demand.
 					Setting the first parameter to 'false' disable the second one.
 				</para>
@@ -1537,7 +1549,7 @@ Job 3 result =&gt;
 Job 4 is not finished or unknown !
 				</programlisting>
 				<para>
-					In this case we have error message but not exception and the script can terminate without prompting to view stack trace.
+					In this case we get some error messages but no exception and the script can terminate without prompting to view stack trace.
 				</para>
 			</section>
 		</section>

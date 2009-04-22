@@ -81,6 +81,55 @@
                   </para>
                 </listitem>  
 
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Clement</firstname>
+
+                      <surname>Mathieu</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Cedric</firstname>
+
+                      <surname>Dalmasso</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Jean-Luc</firstname>
+
+                      <surname>Scheefer</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Jean-Michel</firstname>
+
+                      <surname>Guillaume</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Maxime</firstname>
+
+                      <surname>Menant</surname>
+                    </personname>
+                  </para>
+                </listitem>
 
 	          </itemizedlist>
 	          </entry>
@@ -156,17 +205,6 @@
                     </personname>
                   </para>
                 </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Maxime</firstname>
-
-                      <surname>Menant</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
 
                 <listitem>
                   <para>
@@ -287,18 +325,6 @@
                       <firstname>Guillaume</firstname>
 
                       <surname>Chazarain</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Clement</firstname>
-
-                      <surname>Mathieu</surname>
                     </personname>
                   </para>
                 </listitem>
@@ -465,16 +491,6 @@
                 <listitem>
                   <para>
                     <personname>
-                      <firstname>Jean-Michael</firstname>
-
-                      <surname>Guillamume</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
                       <firstname>Abhishek-Rajeev</firstname>
 
                       <surname>Gupta</surname>
@@ -602,27 +618,6 @@
                       <firstname>Fabien</firstname>
 
                       <surname>Viale</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-			  <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Cédric</firstname>
-
-                      <surname>Dalmasso</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Jean-Luc</firstname>
-
-                      <surname>Scheefer</surname>
                     </personname>
                   </para>
                 </listitem>
