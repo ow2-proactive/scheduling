@@ -100,7 +100,7 @@
 						<para>
 							<emphasis>JobClasspath</emphasis> (optional) - equivalent to the Java classpath.
 							All classes in this path can be loaded by
-							java tasks contained in this job. The jobClasspath can either contain class directories or jar files.
+							Java tasks contained in this job. The jobClasspath can either contain class directories or jar files.
 						</para>
 					</listitem>
 				</itemizedlist>
