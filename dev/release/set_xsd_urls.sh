@@ -6,6 +6,7 @@ PREVIOUS_TAG=dev
 
 # mv to scheduler dir
 cd $SCHEDULER_DIR
+WORKING_DIR=$PWD
 
 # Replace all 'dev' version number by this version number in every XML, XSD, RNC files
 echo Replacing \'$PREVIOUS_TAG\' tag with current version for XML files
@@ -26,9 +27,11 @@ cp ./dev/* ./$VERSION/
 rm -r ./dev/*
 
 
+cd $WORKING_DIR
+
 # Update the website with new schema version
 echo Update the website with new schema version
 ssh sea.inria.fr mkdir /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
-scp src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$PREVIOUS_TAG/schedulerjob.xsd $USER@sea.inria.fr:/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
+scp src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd $USER@sea.inria.fr:/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
 ssh sea.inria.fr chmod 555 /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
 ssh sea.inria.fr chmod 444 /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
