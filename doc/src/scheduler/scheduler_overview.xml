@@ -36,8 +36,8 @@
 	<section xml:id="scheduler_installation"><info><title>Scheduler Installation</title></info>
 		<para>
 			The Scheduler archive contains a sources folder, a distribution folder that contains every library used
-			by the ProActive Scheduler, a bin folder that contains every starting script, and a jobs descriptor directory including
-			lots of job XML descriptors (see <xref linkend="user_manual"/> to know what a job descriptor is). 
+			by the ProActive Scheduler, a bin folder that contains every starting script, and a sample directory including
+			lots of job XML descriptors and scripts examples (see <xref linkend="user_manual"/> to know what a job descriptor is).
 			More folders are available but these are the ones which are needed to start.
 		</para>
 		<itemizedlist>
@@ -51,22 +51,22 @@
 				This database is used to store ProActive Scheduler activities and to offer fault tolerance.
 				The scheduler will start and connect to the Resources Manager that either you have already launched
 				or that the scheduler has created if no Resources Manager has been found. Scheduler starting sequence is finished when 
-				<code>Scheduler successfully created on rmi://kisscool.inria.fr:1099/</code> is displayed.</para>
+				<code>Scheduler successfully created on rmi://hostname:port/</code> is displayed.</para>
 				<para>
-					At this point the ProActive Scheduler is started with 4 nodes available.
+					At this point the ProActive Scheduler is started with 4 available nodes.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					What you can do now is submitting a job. To do so, just start the <emphasis>submit.[sh|bat]</emphasis> script with
-					proper parameters. Using 
-					<emphasis>submit.[sh|bat] -j ../../samples/jobs_descriptors/Job_8_tasks.xml -n 1</emphasis>,
+					What you can do now is submitting a job. To do so, just start the <emphasis>userScheduler.[sh|bat]</emphasis> script with
+					proper parameters (in the same directory). Use
+					<emphasis>userScheduler.sh -submit ../../samples/jobs_descriptors/Job_8_tasks.xml</emphasis>,
 					this will request for login and password, and then submit this job to the scheduler. The default login and password, 
 					is <emphasis>user1 pwd1</emphasis>.
 				</para>
 				<para>
 					Once executed, you can see that the scheduler is now scheduling this job. You can also see the Scheduler activity
-					by starting the Scheduler Eclipse Plugin, the Graphical User Interface for the Scheduler.
+					by starting the Scheduler Eclipse Plugin : the Graphical User Interface for the Scheduler.
 					To do so, just uncompress the Scheduler_Plugin archive and start the <emphasis>Scheduler[.exe]</emphasis> launcher.
 					The first screen presents a non-connected Scheduler interface. Just right click, then connect.
 					You will be requested for a started Scheduler URL, user name and password. If you followed this quick start step by step,
@@ -193,10 +193,10 @@
 			</para>
 
 			<para>
-				During its execution, a task can crash due to the host (computing node) or
-				a code failure. The Scheduler solves this potential problem 
-				by offering parameterizable tasks
-				which can be restarted a set number of times (see re-runnable in section <xref linkend="Create_add_task"/>).
+				During its execution, a Task can crash due to the host (computing node) or
+				code failure. The Scheduler solves this potential problem
+				by offering  parameterizable Tasks
+				which can be restarted a set number of times (see maxNumberOfExecution in section <xref linkend="Create_add_task"/>).
 			</para>
 
 			<para>
@@ -236,15 +236,15 @@
 			<para>
 				In this example, an 8 task job is defined (where job's
 				type is TaskFlow). As you can see, task 4 depends on
-				task 1, task 5 depends on tasks 2 and 3, and so on. In other
+				task 1, task 5 depends on tasks 2 and 3, and so on... In other
 				words, task 4 will wait for the end of task 1 before
 				starting and task 5 will wait for the end of task 2
 				<emphasis>AND</emphasis>
 				3... In addition, the order in which you specify
 				that task 5 depends of task 2 and 3 is very important.
 				Indeed, if you set the list of dependencies for task 5
-				as: 2 then 3, the result of these two tasks will be
-				given to task 5 in this order.
+				as : 2 then 3, the result of these two task will be
+				given to task 5 (as parameter) in this order.
 			</para>
 		</section>
 		<section xml:id="scheduling_policy"><info><title>Scheduling Policy</title></info>

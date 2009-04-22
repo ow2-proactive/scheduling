@@ -40,7 +40,7 @@
 							error occurs during the job process. This property can also be defined in each task.
 							If the value of this property is defined at the job level, each cancelJobOnError property of each task
 							will have this value as the default one (excepted if this property has been set at the task level). 
-							True means that the job will immediately stop every remaining running tasks if an error occurs in one of
+							'True' implies for the job to immediately stop every remaining running tasks if an error occurs in one of
 							the tasks. It is useful when there is no need to go further after a task failure.
 						</para>
 					</listitem>
@@ -57,7 +57,8 @@
 					<listitem>
 						<para>
 							<emphasis>nbMaxOfExecution</emphasis> (optional - 1 by default) - defines how many times tasks are allowed to be restarted.
-							Defining this property will set the nbMaxOfExecution property of each task to this value as the default one (excepted if this property has been set at the task level).
+							Defining this property will set the nbMaxOfExecution property of each task to this value as the default one
+							(excepted if this property has been set at the task level).
 							The value has to be a non-negative and non-null integer.
 						</para>
 					</listitem>
@@ -82,7 +83,7 @@
 							Note that you can also refer to variables defined in the JVM properties. 
 							For instance, if the JVM that starts the Job parser (JobFactory)
 							has been started with the option -Dtoto=helloWorld, the variable ${toto} in the XML descriptor file would have 'helloWorld' as value.
-							This method is not commonly used but can be very useful to manage your relative path.
+							This way is not commonly used but can be very useful to manage your relative path.
 						</para>
 					</listitem>
 					<listitem>
@@ -109,6 +110,9 @@
 			<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/job.xml"/></textobject></programlisting>
 			
 			<para>This example does not contain the job type definition. We detail the job type definition in the next sections.</para>
+			<para>
+				To create a ProActive Job, just go to <xref linkend="Create_ProActive_job_xml" />. To create a Taskflow Job, just go to <xref linkend="Create_TaskFlow_job_xml" />.
+			</para>
 		</section>
 			
 		<section xml:id="Create_TaskFlow_job_xml"><info><title>Create a Task Flow job using an XML descriptor</title></info>
@@ -213,7 +217,7 @@ job.setEnv(je);
 		</para>
 		<section xml:id="Create_java_task"><info><title>Create and add a Java task</title></info>
 			<para>
-				<emphasis>Note</emphasis> : It is only possible to add a Java task in a TaskFlow job.
+				<emphasis>Note</emphasis> : A java task can only be added to a TaskFlow Job.
 			</para>
 			<para>
 				To learn how to create a TaskFlow job,
@@ -283,12 +287,27 @@ public void init(Map&lt;String, Object&gt; args) {
 					</programlisting>
 				</para>
 				<para>
+					The previous code is given as example as the default behavior of the init() method is exactly associating declared
+					java variables to its value according that the variable name given as arguments (in the map) is the same as the java declared one.
+					So, The given code behave in exactly the same way as if it wasn't here or as :
+					<programlisting language="java">
+private boolean foo;
+private int bar;
+private String test;
+
+@Override
+public void init(Map&lt;String, Object&gt; args) {
+	super.init(args);
+}
+					</programlisting>
+				</para>
+				<para>
 					To sum up, create an executable is just extending the <code>JavaExecutable</code> abstract class, and filling
-					the execute method. The given <code>TaskResult... results</code> arguments permit to get the results from
+					the execute method. The given <code>TaskResult... results</code> arguments is a way to get the results from
 					previous dependent tasks that have finished their execution.
 				</para>
 				<para>
-					As shown in the following lines, the given array of TaskResults(<emphasis>results</emphasis>)
+					As shown in the following lines, the given array of TaskResults (<emphasis>results</emphasis>)
 					will be an array of two results (TaskResult 2 and 3) in this order
 					if the dependences of Task 5 is Task 2 and Task 3 in this order.
 					Therefore you can use them to perform Task 5 process.
@@ -302,9 +321,12 @@ public Serializable execute(TaskResult... results) throws Throwable {
 }
 					</programlisting>
 				</para>
+				<para>
+					Finally, overriding the <code>init()</code> method can be useful if you want to retrieve personal arguments or do some
+					stuff before starting the real execution of the task.
+				</para>
 			</section>
 			
-
 			<section xml:id="Create_java_task_xml"><info><title>Create and add a Java task using an XML descriptor</title></info>
 					<para>
 						The task is the entity that will be scheduled by ProActive Scheduler.
@@ -355,10 +377,9 @@ JavaTask aTask = new JavaTask();
 aTask.setExecutableClassName("org.ow2.proactive.scheduler.examples.WaitAndPrint");
 //then, set the desired options
 aTask.setName("task 1");
-aTask.setDescription("This task will do
-something...");
+aTask.setDescription("This task will do something...");
 aTask.addGenericInformation("key","value");
-aTask.setRerunnable(2);
+aTask.setMxNumberOfExecution(3);
 aTask.setRestartTaskOnError(RestartMode.ELSEWHERE);
 aTask.setCancelJobOnError(false);
 aTask.setResultPreview(UserDefinedResultPreview.class);
@@ -432,7 +453,7 @@ aTask.setForkEnvironment(env);
 		
 		<section xml:id="Create_native_task"><info><title>Create and add a native task</title></info>
 			<para>
-				<emphasis>Note</emphasis>: It is only possible to add a native task in a TaskFlow Job.
+				<emphasis>Note</emphasis> : A native task can only be added to a TaskFlow Job.
 			</para>
 			<para>
 				To learn how to create a TaskFlow Job,
@@ -484,7 +505,7 @@ aTask.setDescription("This task will do
 something...");
 aTask.addGenericInformation("key","value");
 aTask.setPreciousResult(true);
-aTask.setRerunnable(2);
+aTask.setMaxNumberOfExecution(3);
 aTask.setRestartTaskOnError(RestartMode.ELSEWHERE);
 aTask.setResultPreview(UserDefinedResultPreview.class);
 
@@ -548,7 +569,7 @@ aTask.setWallTime(10000);
 					the ProActive Scheduler as a task execution. The returned string will be parsed
 					and transform as a String array according to this example ( '%' is the escape character ):
 					<itemizedlist>
-						<listitem><para>the string "/path/to/cmd arg1 arg 2 arg% 3 arg%%% 4 5</para></listitem>
+						<listitem><para>the string "/path/to/cmd arg1 arg 2 arg% 3 arg%%% 4 5"</para></listitem>
 						<listitem><para>will generate : [/path/to/cmd,arg1,arg,2,arg 3,arg% 4,5]</para></listitem>
  					</itemizedlist>
 					where the first element is the command.
