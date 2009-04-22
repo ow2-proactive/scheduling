@@ -373,9 +373,9 @@
 				For more information about GCM deployment, please refer to <xref linkend="RM_GCM"/>
 				</para>
 				<para>
-				<warning> When nodes are added by GCM deployment descriptor, it does not mean that they will be
+				<warning><para>When nodes are added by GCM deployment descriptor, it does not mean that they will be
 				acquired right away. It is true only if this node source uses static acquisition policy. Otherwise, nodes will be acquired
-				at the moment they are needed according to the node source policy.</warning>
+				at the moment they are needed according to the node source policy.</para></warning>
 				</para>
 			</section>
 		</section>
