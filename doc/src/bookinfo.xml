@@ -12,7 +12,7 @@ to -->
   <author><orgname/></author>
 
 <copyright>
-    <year>1997-2008</year>
+    <year>1997-2009</year>
 
     <holder>INRIA</holder>
   </copyright>
@@ -20,7 +20,7 @@ to -->
   <legalnotice xml:id="LegalNotice">
     <para>The ProActive Scheduler is distributed under the GPL2 license. </para>
 
-    <para>Copyright INRIA 1997-2008.</para>
+    <para>Copyright INRIA 1997-2009.</para>
   </legalnotice>
 
   <mediaobject>
