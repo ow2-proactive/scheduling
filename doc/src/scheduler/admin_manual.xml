@@ -121,9 +121,9 @@
 				It is also possible to configure some properties that rely on the Scheduler. The file
 				<emphasis>PASchedulerProperties.ini</emphasis> in the <emphasis>config</emphasis> directory contains
 				every property that can be modified by administrator. The <emphasis>PASchedulerProperties</emphasis> class
-				provides a way to override this file with your own one. If you do so, every overridden property will be used.
-				It is not necessary to specify every property inside your own file.
-				Here is a way to override default PAScheduler properties file:
+				provide a way to override this file with your own one. If you do so, every overridden properties will be used.
+				It is not necessary to specify every properties inside your own file.
+				Here's a way to override default PAScheduler properties file by the code:
 			</para>
 			<programlisting language="java">
 PASchedulerProperties.updateProperties("your_property_file");
@@ -143,13 +143,179 @@ PASchedulerProperties.updateProperties("your_property_file");
 				Let's go on to the startup of the ProActiveScheduler. To start it with a shell command, go on to the next section.
 				To start it using the Java API, please refer to <xref linkend="Start_scheduler_java"/>.
 			</para>
+			<section xml:id="PASchedulerProperties"><info><title>ProActive Scheduler properties</title></info>
+				<para>
+					<para>
+						Note that some properties require a file path. File path can be given relative to the Scheduler home directory
+						(ie : application root directory) OR with an absolute path. Also note that each property can be overridden by
+						using the JVM properties when starting the Scheduler. (ie startScheduler.[sh|bat] -Dpa.scheduler.core.timeout=1000)
+					</para>
+					<para>
+						<emphasis>Scheduler properties</emphasis>
+					</para>
+					<itemizedlist>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.home</emphasis> :
+							define Scheduler home directory. The home directory is the one containing the dist, doc, lib, classes, config
+							directory (default is ., the current directory)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.core.timeout</emphasis> : timeout used in the main scheduling loop. If no new request is received by the SchedulerCore entity,
+							no new resources are available, and tasks are running, it is the time to wait before the next scheduling loop specified in millisecond.
+							(default is 2000ms)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.core.nodepingfrequency</emphasis> : time interval between each failed node checking specified in second (default is 20s)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.classserver.usecache</emphasis> : boolean that specify if the classes definition used in task class servers must be cached or not.
+							Set to false to preserve memory usage in SchedulerCore (default is true)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.classserver.tmpdir</emphasis> : directory used to store a job classpath. If this value is not set,
+							it uses the default TMP directory. (default is not set)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.policy</emphasis> : Scheduler default policy full name (default is org.ow2.proactive.scheduler.policy.PriorityPolicy)
+							The policy specified here must be in the Scheduler classpath.
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.forkedtask.security.policy</emphasis> : Forked java task default security policy path,
+							use to define the policy of the forked task (default is config/forkedJavaTask/forkedTask.java.policy)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.core.jmxmbeanname</emphasis> : Name of the JMX MBean for the scheduler (default is 'SchedulerFrontend:name=SchedulerWrapperMBean')
+						</listitem>
+					</itemizedlist>
+					<para>
+						<emphasis>Jobs properties</emphasis>
+					</para>
+					<itemizedlist>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.job.factor</emphasis> : Number used to create task IDs.
+							If the job number is the 123 and it contains 456 tasks and this property is set to 1000, so the task ID
+							will be 123456. If this property is set to 10000, the task ID will be 1230456.
+							Task ID is (jobId*this_factor+taskId). (default is 10000)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.core.removejobdelay</emphasis> : time interval between the retrieval of a job result and its suppression from the Scheduler
+							specified in second. Set this time to 0 if you don't want the job to be remove anyway. (default is 3600)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.job.removeFromDataBase</emphasis> : According to the previous property,
+							remove the job also in dataBase when removing it from scheduler. (default is false)
+						</listitem>
+					</itemizedlist>
+					<para>
+						<emphasis>Tasks properties</emphasis>
+					</para>
+					<itemizedlist>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.task.initialwaitingtime</emphasis> : time to wait for when a task has had a faulty state
+							specified in millisecond.
+							For performance reason, if the task is faulty, it is not restarted immediately. This property define the initial
+							time to wait. Next time are computed following this function: newTimeToWait=previousTimeToWait+n*1000 where n is
+							the number of re-execution of the task. The new time to wait is capped to 60000ms. (default is 1000ms)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.task.numberofexecutiononfailure</emphasis> : number of execution
+							allowed if a task failed. The difference between faulty and failed is the state of the resource on which
+							the task is executed. Most of the time, a failure is detected if a task kill a resource. In this case,
+							this property define the number of execution allowed for this kind of potentially harmful task.
+							(default is 2, so one retry)
+						</listitem>
+					</itemizedlist>
+					<para>
+						<emphasis>Logs properties</emphasis>
+					</para>
+					<itemizedlist>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.logs.provider</emphasis> : full class name of logs forwarding method.
+							Logs forwarding is the system used to forward logs from task execution to user. possible values are:
+							<itemizedlist>
+								<listitem>
+									org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider for simple socket.
+									This one use simple java socket.
+								</listitem>
+								<listitem>
+									org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketWithSSHTunnelBasedForwardingProvider for SSH tunneled socket.
+									This one use java socket with SSH tunneling for secure communication.
+								</listitem>
+								<listitem>
+									org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider for ProActive based communication.
+									This one use ProActive communication, safer but slower.
+								</listitem>
+							</itemizedlist>
+							(Default is org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider)
+						</listitem>
+					</itemizedlist>
+					<para>
+						<emphasis>Tasks properties</emphasis>
+					</para>
+					<itemizedlist>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.ldap.config.path</emphasis> :
+							LDAP Authentication configuration file path, used to set LDAP configuration properties.
+							(default is config/authentication/ldap.cfg)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.core.defaultloginfilename</emphasis> :
+							Login file name for file authentication method
+							(default is config/authentication/login.cfg)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.core.defaultgroupfilename</emphasis> :
+							Group file name for file authentication method
+							(default is config/authentication/group.cfg)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.core.authentication.loginMethod</emphasis> :
+							Property that define the method that have to be used for logging users to the Scheduler
+							It can be one of the following values:
+							<itemizedlist>
+								<listitem>
+									SchedulerFileLoginMethod to use file login and group management
+								</listitem>
+								<listitem>
+									SchedulerLDAPLoginMethod to use LDAP login management
+								</listitem>
+							</itemizedlist>
+							(default is SchedulerFileLoginMethod)
+						</listitem>
+					</itemizedlist>
+					<para>
+						<emphasis>Resources manager related properties</emphasis>
+					</para>
+					<itemizedlist>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.resourcemanager.authentication.username</emphasis> :
+							default username to connect the Resources Manager. Possible authentications are define
+							by the RM authentication management (default is scheduler)
+						</listitem>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.resourcemanager.authentication.password</emphasis> :
+							default password to connect the Resources Manager. Possible authentications are define
+							by the RM authentication management (default is scheduler_pwd)
+						</listitem>
+					</itemizedlist>
+					<para>
+						<emphasis>Hibernate properties</emphasis>
+					</para>
+					<itemizedlist>
+						<listitem>
+							<emphasis role="italic">pa.scheduler.db.hibernate.configuration</emphasis> :
+							Hibernate main configuration file (default is config/database/hibernate/hibernate.cfg.xml)
+						</listitem>
+					</itemizedlist>
+				</para>
+			</section>
 			<section xml:id="Start_scheduler_sh"><info><title>Start the Scheduler using shell command</title></info>
 				<para>
 					To start a local scheduler, run the <emphasis>startScheduler.[sh|bat]</emphasis>
 					script in 'bin/[os]/' directory. Without arguments, the ProActive Scheduler will start on the local
 					host and will try to connect to a started local Resources Manager with the default database configuration file.
 					If no Resources Manager exists, it will create its own Resources Manager.
-					Note that the database has to be created before.
+					Note that the database will be created if it does not exist.
 				</para>
 				<para>
 					<emphasis>startScheduler.[sh|bat]</emphasis> can be started with 2 optional arguments (use -h option to see 
@@ -188,17 +354,14 @@ PASchedulerProperties.updateProperties("your_property_file");
 			</section>
 			<section xml:id="Start_scheduler_java"><info><title>Start the Scheduler using the Java API</title></info>
 				<para>
-					First thing to do is to start the ProActive Scheduler database.
-					If you don't know how to do that, please read the first part of this section: <xref linkend="Start_scheduler"/>.
-				</para>
-				<para>
-					You now can start the ProActive Scheduler using the Java API. Supposing that a Resource Manager is already started
-					(see Resource Manager documentation <xref linkend="Resource_Manager"/> to create a resource Manager Proxy),
-					this can be done as follows:
+					You can start the ProActive Scheduler using the Java API. Supposing that a Resource Manager is already started on toto
+					(see Resource Manager documentation <xref linkend="Resource_Manager"/> to create a resource Manager),
+					this can be done as following:
 				</para>
 				<programlisting language="java">
+ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("//toto/"));
 AdminScheduler.createScheduler(
-	resourceManagerProxy,
+	rmp,
 	"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
 				</programlisting>
 				<para>where arguments are respectively :</para>
@@ -228,13 +391,13 @@ AdminScheduler.createScheduler(
 					Information about your own LDAP configuration can be set in the <emphasis>ldap.cfg</emphasis> into the "config/authentication" directory.
 				</para>
 				<para>
-					Another way is to start the ProActive Scheduler AND connect an administrator at the same time :
+					Another way is to start the ProActive Scheduler AND connect an administrator at the same time:
 				</para>
 				<programlisting language="java">
 AdminScheduler.createScheduler(
 	"login",
 	"password",
-	rm,
+	rmp,
 	"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
 				</programlisting>
 				<para>
@@ -260,7 +423,7 @@ AdminScheduler.createScheduler(
 				<orderedlist>
 					<listitem>
 						<para>
-							First, the user submits a job using his <emphasis role="bold">UserSchedulerInterface</emphasis>
+							First, the user submits a Job using his <emphasis role="bold">UserSchedulerInterface</emphasis>
 							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it:
 							<programlisting language="java">
 // connecting to the scheduler
@@ -289,7 +452,7 @@ JobId myJobId = scheduler.submit(job);
 		</section>
 		<section xml:id="Administer_scheduler"><info><title>Administer the ProActive Scheduler</title></info>
 			<para>
-				As an administrator, it is possible to ask the Scheduler to start and stop, to kill jobs, set jobs priority...
+				As an administrator, it is possible to ask the Scheduler to start and stop, to kill jobs, set jobs priority, and so on...
 				To start a command line administrator, go on to the next section. To use the Java API to manage it, please refer to
 				<xref linkend="Administer_scheduler_java"/>.
 			</para>
@@ -304,7 +467,7 @@ JobId myJobId = scheduler.submit(job);
 					the connection to the scheduler.
 				</para>
 				<para>
-					<emphasis>adminScheduler.[sh|bat]</emphasis> can be started with 3 optional arguments :
+					<emphasis>adminScheduler.[sh|bat]</emphasis> can be started with 3 optional arguments:
 				</para>
 				<itemizedlist>
 					<listitem>
@@ -430,21 +593,21 @@ scheduler.changePolicy(org.objectweb.proactive.extensions.scheduler.policy.Prior
 				<para>
 					Create and add a new scheduling policy remains a very simple work. You just have to implements the
 					<emphasis>
-						org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface
+						org.ow2.proactive.scheduler.common.policy.Policy
 					</emphasis>
-					and start a new Scheduler with this new policy as argument, or dynamically change it if the scheduler is already
-					running.
+					interface and start a new Scheduler with this new policy as argument, or dynamically change it
+					if the scheduler is already running.
 				</para>
 				<para>
 					Here is the interface which has to be implemented. The default implementation is <emphasis>PriorityPolicy</emphasis>
 					in the same package:
 				</para>
 				<programlisting language="java">
-public interface PolicyInterface extends Serializable {
+public abstract class Policy implements Serializable {
 	//Resource Manager state field.
 	public RMState RMState = null;
 	//method to implement
-	Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks(List&lt;JobDescriptor&gt; jobs);
+	public abstract Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks(List&lt;JobDescriptor&gt; jobs);
 }
 				</programlisting>
 				<para>
@@ -463,6 +626,7 @@ public interface PolicyInterface extends Serializable {
 				</para>
 				<programlisting language="java">
 public class PriorityPolicy implements PolicyInterface {
+
 	/**
 	 * This method returns the tasks using FIFO policy according to the jobs priorities.
 	 *
@@ -470,15 +634,20 @@ public class PriorityPolicy implements PolicyInterface {
 	 */
 	@Override
 	public Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks( List&lt;JobDescriptor&gt; jobs) {
-		Vector&lt;EligibleTaskDescriptor&gt; toReturn = new
-		Vector&lt;EligibleTaskDescriptor&gt;();
-		//sort jobs by
-		priority Collections.sort(jobs);
 
+		Vector&lt;EligibleTaskDescriptor&gt; toReturn = new Vector&lt;EligibleTaskDescriptor&gt;();
+
+		//sort jobs by priority
+		Collections.sort(jobs);
+
+		//add tasks to the list to return
 		for (JobDescriptor lj : jobs) {
 			toReturn.addAll(lj.getEligibleTasks());
 		}
-		return toReturn; 
+
+		//return
+		return toReturn;
+
 	}
 }
 				</programlisting>
@@ -542,6 +711,7 @@ demo:demo
 				Default group.cfg is like this:</para>
 			 	<programlisting language="java">
 admin:admin
+demo:admin
 demo:admin
 user1:user
 user2:user
@@ -662,7 +832,10 @@ user2:user
 					Set <emphasis>pa.scheduler.ldap.truststore.passwd</emphasis> to the password defined previously for trustStore.</para>
 					</listitem>
 				</itemizedlist>
-			</section>			
+			</section>
+			<para>
+				This conclude with the ProActive Scheduler chapter, let's now look at the ProActive Scheduler Eclipse Plugin.
+			</para>
 		</section>
 	</section>
 </chapter>

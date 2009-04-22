@@ -42,6 +42,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
 
@@ -350,6 +351,14 @@ public class AdminController extends UserController {
         return success;
     }
 
+    public static AdminSchedulerInterface getAdminScheduler() {
+        return ((AdminController) shell).getAdminScheduler_();
+    }
+
+    private AdminSchedulerInterface getAdminScheduler_() {
+        return (AdminSchedulerInterface) scheduler;
+    }
+
     //***************** OTHER *******************
 
     @Override
@@ -366,26 +375,22 @@ public class AdminController extends UserController {
     protected String helpScreen() {
         StringBuilder out = new StringBuilder(super.helpScreen());
 
-        out.append(String.format("\n %1$-18s\t Starts Scheduler\n", START_CMD));
-        out.append(String.format(" %1$-18s\t Stops Scheduler\n", STOP_CMD));
+        out.append(String.format("\n %1$-24s Start Scheduler\n", START_CMD));
+        out.append(String.format(" %1$-24s Stop Scheduler\n", STOP_CMD));
         out.append(String.format(
-                " %1$-18s\t pauses Scheduler, causes every jobs but running one to be paused\n", PAUSE_CMD));
+                " %1$-24s pause Scheduler, causes every jobs but running one to be paused\n", PAUSE_CMD));
         out
                 .append(String
                         .format(
-                                " %1$-18s\t freezes Scheduler, causes all jobs to be paused (every non-running tasks are paused)\n",
+                                " %1$-24s freeze Scheduler, causes all jobs to be paused (every non-running tasks are paused)\n",
                                 FREEZE_CMD));
-        out
-                .append(String.format(" %1$-18s\t resumes Scheduler, causes all jobs to be resumed\n",
-                        RESUME_CMD));
-        out.append(String.format(" %1$-18s\t Waits for running jobs to finish and shutdown Scheduler\n",
+        out.append(String.format(" %1$-24s resume Scheduler, causes all jobs to be resumed\n", RESUME_CMD));
+        out.append(String.format(" %1$-24s Wait for running jobs to finish and shutdown Scheduler\n",
                 SHUTDOWN_CMD));
-        out.append(String.format(" %1$-18s\t Kill every tasks and jobs and shutdown Scheduler\n", KILL_CMD));
-        out
-                .append(String
-                        .format(
-                                " %1$-18s\t Reconnect a Resource Manager (parameter is a string representing the new rmURL)\n",
-                                LINK_RM_CMD));
+        out.append(String.format(" %1$-24s Kill every tasks and jobs and shutdown Scheduler\n", KILL_CMD));
+        out.append(String.format(
+                " %1$-24s Reconnect a Resource Manager (parameter is a string representing the new rmURL)\n",
+                LINK_RM_CMD));
 
         return out.toString();
     }

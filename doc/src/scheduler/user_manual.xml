@@ -752,8 +752,8 @@ aTask.setSelectionScript(selScript);
 job.setTask(aTask);
 				</programlisting>
 				<para>
-					To have an exhaustive list of which options are available and what they are for, just go to
-					<xref linkend="Create_task_explanation"/>.
+					To have an exhaustive list of which options are available and what they are for, just read
+					the next section.
 				</para>
 			</section>
 			
@@ -855,7 +855,7 @@ job.setTask(aTask);
 							'm' is the maximum number of executions.
 						</para>
 						<para>
-							Here is table that sum-up the different possible executions, that can be useful to know the behavior of your job :
+							Here is a table that sum-up the different possible executions, that can be useful to know the behavior of your job :
 						</para>
 						<para>
 							<figure xml:id="cancel_restart"><info><title>CancelJobOnError and RestartTaskOnError behavior</title></info>
@@ -1026,14 +1026,14 @@ job.setTask(aTask);
 									, that indicates if the candidate node is suitable for
 									the execution of the associated task.
 									A java helper (org.ow2.proactive.scripting.helper.selection.SelectionUtils)
-									is provided for javascript, ruby and python script languages allowing user to simply
-									make some kind of selections. (script samples are available in 'samples/scripts/selection' directory.)
+									is provided for allowing user to simply make some kind of selections.
+									(script samples are available in 'samples/scripts/selection' directory.)
 								</para>
 							</listitem>
 							<listitem>
 								<para>
 									<emphasis>pre-script</emphasis> - 
-									the pre-script (if used) is always executed on the node that has
+									the pre-script is always executed on the node that has
 									been selected by the Resource Manager <emphasis>before</emphasis>
 									the execution of the task itself.
 									Java helper (org.ow2.proactive.scripting.helper.filetransfer package) is also available
@@ -1058,6 +1058,15 @@ job.setTask(aTask);
 							</listitem>
 						</itemizedlist>
 						<para>
+							For pre, post and cleaning script, you can use the file transfer helper classes. It provides easier
+							way to copy, paste, transfer files from a host to another. (Examples are available in
+							'samples/scripts/filetransfer' directory)
+						</para>
+						<para>
+							To use your favorite script language, you just have to add the two needed jars (engine and implementation)
+							in the nodes, Resources Manager and Scheduler classpath.
+						</para>
+						<para>
 							Note: For any script engine or script implementation used in this package or brought by you,
 							you have to notice that:
 						</para>
@@ -1074,7 +1083,7 @@ job.setTask(aTask);
 					</listitem>
 				</itemizedlist>
 				<para>
-					Now that your have your job created, next step is to submit it to the ProActive Scheduler.
+					Once your job created, next step is to submit it to the ProActive Scheduler.
 				</para>
 			</section>
 		</section>
@@ -1085,7 +1094,7 @@ job.setTask(aTask);
 				become available. Once done, the job will be started on the resources deployed by the
 				Resource Manager. Finally, once finished, the job goes to the queue of finished jobs and will wait until the user
 				retrieves his result.
-				Their are three ways to submit a job to the Scheduler. These ways are described in the following sub-sections. 
+				Their are three ways to submit a job to the Scheduler described in the following sub-sections.
 			</para>
 			<section xml:id="Submit_a_job_GUI"><info><title>Submit a job using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
 				<para>
@@ -1096,22 +1105,23 @@ job.setTask(aTask);
 			</section>
 			<section xml:id="Submit_a_job_sh"><info><title>Submit a job using the shell command</title></info>
 				<para>
-					Use the provided shell script <emphasis>submit.[sh|bat]</emphasis> to submit a job using command line.
-					This script (bin/[os]/submit.[sh|bat]) has 1 mandatory option and 3 optional:
+					Use the provided shell script <emphasis>userScheduler.[sh|bat]</emphasis> to submit a job using command line.
+					This script (bin/[os]/userScheduler.[sh|bat] used to submit a job) has 1 mandatory option and 2 optional :
 					<itemizedlist>
 						<listitem>
 							<para>
 								<emphasis>Job to schedule</emphasis> (mandatory) -
-								It can be : an XML Job descriptor, a simple flat file, or a path to
-								a native command to launch:
+								It can be an XML Job descriptor, a simple flat file, or a path to a native command to launch :
+								Use -submit followed by the path or the command to give, and :
 								<itemizedlist>
-									<listitem><para>Schedule an XML job file: use -j followed by the path of an XML file.</para></listitem>
-									<listitem><para>Schedule a flat file containing native commands: use -cmdf followed the by path of a flat file containing native commands.</para></listitem>
-									<listitem><para>Schedule a path to a native command: use -cmd followed by the path of the native command to launch, with its launching arguments. Here it submits a job made of one native task.</para></listitem>
+									<listitem><para>To schedule an XML job file : use -submit followed by the path of an XML descriptor</para></listitem>
+									<listitem><para>To schedule a flat file containing native commands : use -submit followed the by path of a flat file containing native commands and -cmdf to specify that it is a command file.</para></listitem>
+									<listitem><para>To schedule a path to a native command : use -submit followed by the path of the native command to launch, with its launching arguments. Here it submits a job made of one native task.
+									Then use -cmd to specify that it is a command path.</para></listitem>
 								</itemizedlist>
 								For -cmd and -cmdf options, you can use aditional parameters. For instance, you can specify a log file that will contain all STDOUT and STDERR of job execution, with -o followed by the path of a file.
 								This file is created (emptied if exits) at each beginning of job execution. You can specify a selection script with -s, followed by the path of a selection script file.
-								You can specify a job name, with -jn followed by a string specifying a name. These three options (-s, -o and -jn) are not taken into account with -j option, because job name,
+								You can specify a job name, with -jn followed by a string specifying a name. These three options (-s, -o and -jn) are not taken into account if -cmd or -cmdf are not specified option, because job name,
 								selection scripts and log file are directly specified in the XML job descriptor.
 							</para>
 						</listitem>
@@ -1131,13 +1141,6 @@ job.setTask(aTask);
 								Otherwise, both will be.
 							</para>
 						</listitem>
-						<listitem>
-							<para>
-								<emphasis>The number of jobs</emphasis> (optional) -
-								To use this option, add a "-n NUMBER" argument. By default,
-								only 1 job will be submitted (using the "-n A_NUMBER" option).
-							</para>
-						</listitem>
 					</itemizedlist>
 				</para>
 				<para>
@@ -1145,26 +1148,26 @@ job.setTask(aTask);
 				</para>
 				<para>
 					<emphasis>
-						submit.[sh|bat] -j ../../samples/jobs_descriptors/Job_with_dep.xml -l login -n 12 -u //localhost/
+						userScheduler.[sh|bat] -submit ../../samples/jobs_descriptors/Job_with_dep.xml -l login -u //localhost:1099/
 					</emphasis>
-					will submit 12 times the <literal>Job_with_dep</literal> job to a local
-					ProActive Scheduler and only your password will be requested.
+					will submit the <literal>Job_with_dep</literal> job to a local
+					ProActive Scheduler on port 1099 with the username 'login', and only your password will be requested.
 					Authorized username and password are defined by the administrator.
 				</para>
 				<para>
 					<emphasis>
-						submit.sh -cmdf ../../samples/jobs_descriptors/job_native_linux_cmd_file/cmds_file.cmd -l jl //localhost/ -jn myJob -o myJob.log
+						userScheduler.sh -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/cmds_file.cmd -cmdf -l jl //localhost/ -jn myJob -o myJob.log
 					</emphasis>
 					will submit a job defined in a flat file, containing 4 native commands. Job is named "myJob", and a log file named "myJob.log" will be created.
 				</para>
 				<para>
 					<emphasis>
-						submit.sh -cmd ../../samples/jobs_descriptors/job_native_linux_cmd_file/myCmd.sh 4 -l jl -u //localhost -s ../../samples/scripts/selection/select.rb
+						userScheduler.sh -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/myCmd.sh 4 -cmd -l jl -u //localhost -s ../../samples/scripts/selection/select.rb
 					</emphasis>
 					will submit the native command "myCmd.sh" with "4" as the only argument. A selection script is associated for this native command: "select.rb".
 				</para>
 				<para>
-					For more information, use -h (or --help) option (i.e. "submit.[sh|bat] -h")
+					For more information, use -h (or --help) option (i.e. "userScheduler.[sh|bat] -h")
 				</para>
 			</section>
 			<section xml:id="Submit_a_job_java"><info><title>Submit a job using the Java API</title></info>
@@ -1187,7 +1190,7 @@ JobId myJobId = scheduler.submit(job);
 		</section>
 		<section xml:id="get_result"><info><title>Get a job result</title></info>
 			<para>
-				Once a Job terminated, it is possible to get its result. You can only get the result of the job that you own.
+				Once a Job is terminated, it is possible to get its result. You can only get the result of the job that you own.
 			</para>
 			<section xml:id="get_result_GUI"><info><title>Get a job result using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
 				<para>
@@ -1197,12 +1200,12 @@ JobId myJobId = scheduler.submit(job);
 			</section>
 			<section xml:id="get_result_sh"><info><title>Get a job result using the shell command</title></info>
 				<para>
-					To get the result of you job using a command line, launch the command <emphasis>userScheduler.[sh|bat] -result 'jobID'</emphasis> script in the bin/[unix|windows]/ directory.
-					This script has 2 optional options:
+					To get the result of you job using a command line, launch the command <emphasis>userScheduler.[sh|bat] -result jobID</emphasis> script in the bin/[os]/ directory.
+					This script has 2 optional options :
 					<itemizedlist>
 						<listitem>
 							<para>
-								The URL of a started scheduler ("-u URL" option). If you
+								The URL of a started Scheduler ("-u URL" option). If you
 								don't use this, it will try to connect to a started scheduler on
 								the local host.
 							</para>
@@ -1226,7 +1229,7 @@ JobId myJobId = scheduler.submit(job);
 			<section xml:id="get_result_java"><info><title>Get a job result using the Java API</title></info>
 				<para>
 					To do it in Java, use the <emphasis role="bold">getJobResult(JobId)</emphasis> method in the
-					<emphasis role="bold"> UserSchedulerInterface </emphasis> interface and the job ID you have got when you submitted it.
+					<emphasis role="bold"> UserSchedulerInterface </emphasis> interface and the job ID you got when you submitted it.
 					A job result is in fact a list of task result ordered in three lists:
 				</para>
 				<itemizedlist>
@@ -1266,6 +1269,11 @@ UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 JobResult myResult = scheduler.getJobResult(myJobId);
 //look at inside the JobResult to retrieve TaskResult...
 				</programlisting>
+				<para>
+					The above example is useful when you kept a reference of myJobId. If you want to submit a job and disconnect, just keep
+					the id as a string (using myJobId.value() ). Then when reconnecting the Scheduler to get the result,
+					just use the getJobResult(String jobId) method.
+				</para>
 			</section>
 		</section>
 		<section xml:id="Register_events"><info><title>Register to ProActive Scheduler events</title></info>

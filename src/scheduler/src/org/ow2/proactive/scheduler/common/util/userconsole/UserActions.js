@@ -1,5 +1,15 @@
 importClass(org.ow2.proactive.scheduler.common.util.userconsole.UserController);
 
+function exMode(displayStack, displayOnDemand){
+	if (displayStack == undefined){
+		displayStack = true;
+	}
+	if (displayOnDemand == undefined){
+		displayOnDemand = true;
+	}
+	UserController.setExceptionMode(displayStack, displayOnDemand);
+}
+
 function help(){
 	UserController.help();
 }
@@ -43,3 +53,5 @@ function exec(commandFilePath){
 function exit(){
 	UserController.exit();
 }
+
+var scheduler = UserController.getUserScheduler();
