@@ -58,8 +58,9 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
 
         byte[] hosts = "localhost1 localhost2 localhost3 localhost4 localhost5".getBytes();
         // creating node source
-        admin.createNodesource(sourceName, GCMCustomisedInfrastructure.class.getName(), new Object[] { hosts,
-                GCMDeploymentData }, ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
+        admin.createNodesource(sourceName, GCMCustomisedInfrastructure.class.getName(), new Object[] {
+                GCMDeploymentData, hosts }, ReleaseResourcesWhenSchedulerIdle.class.getName(),
+                getPolicyParams());
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodeSourcesCreatedEvents().size() == 1);

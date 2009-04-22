@@ -74,7 +74,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
         admin.createNodesource(sourceName, GCMCustomisedInfrastructure.class.getName(), new Object[] {
-                hostsListData, GCMDeploymentData }, StaticPolicy.class.getName(), null);
+                GCMDeploymentData, hostsListData }, StaticPolicy.class.getName(), null);
 
         receiver.waitForNEvent(defaultDescriptorNodesNb + 1);
         assertTrue(receiver.cleanNgetNodeSourcesCreatedEvents().size() == 1);
@@ -82,7 +82,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
     }
 
     protected void addNodes(String sourceName) throws Exception {
-        admin.addNodes(sourceName, new Object[] { hostsListData, GCMDeploymentData });
+        admin.addNodes(sourceName, new Object[] { GCMDeploymentData, hostsListData });
         // waiting for adding nodes acquisition info event
         receiver.waitForNEvent(1);
     }

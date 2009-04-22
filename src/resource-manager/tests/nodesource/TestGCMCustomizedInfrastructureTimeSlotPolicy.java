@@ -71,7 +71,7 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfras
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
         admin.createNodesource(sourceName, GCMCustomisedInfrastructure.class.getName(), new Object[] {
-                hostsListData, GCMDeploymentData }, TimeSlotPolicy.class.getName(), getPolicyParams());
+                GCMDeploymentData, hostsListData }, TimeSlotPolicy.class.getName(), getPolicyParams());
 
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodeSourcesCreatedEvents().size() == 1);
