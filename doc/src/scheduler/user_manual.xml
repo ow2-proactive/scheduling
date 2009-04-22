@@ -1329,7 +1329,7 @@ scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEve
 					<figure xml:id="scheduler_controller_help"><info><title>Scheduler controller help</title></info>
 						<mediaobject>
 							<imageobject>
-								<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/schedulerControllerHelp.png" format="PNG"/>
+								<imagedata width="100%" align="center" fileref="scheduler/pics/schedulerControllerHelp.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1397,7 +1397,7 @@ scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEve
 					<figure xml:id="scheduler_controller_i_help"><info><title>Scheduler controller interactive help</title></info>
 						<mediaobject>
 							<imageobject>
-								<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/schedulerControllerIHelp.png" format="PNG"/>
+								<imagedata width="100%" align="center" fileref="scheduler/pics/schedulerControllerIHelp.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
