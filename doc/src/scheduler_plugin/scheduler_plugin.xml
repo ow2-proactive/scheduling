@@ -457,7 +457,7 @@
 						Nevertheless, all running tasks will be terminated.</para>
 					</listitem>
 					<listitem><para>
-						<emphasis>[B] Freeze the Scheduler</emphasis> - The behavior is the same than the stop
+						<emphasis>[B] Freeze the Scheduler</emphasis> - The behavior is the same as those of the stop
 						button except that job can still be submitted.</para>
 					</listitem>
 					<listitem><para>

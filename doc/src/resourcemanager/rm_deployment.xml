@@ -110,7 +110,7 @@
 						path in the file system to the remote host where ProActive is stored.
 						Here, the path of application to launch is built from the root of the file system and the path corresponds
 						to the environment variable ${proactive.home} defined above. So, ProActive home directory of the application to launch on remote hosts
-						is the same than the Resource Manager path (this path can be overridden in GCMDeployment file).</para>
+						is the same as the Resource Manager path (this path can be overridden in GCMDeployment file).</para>
 						</listitem>
 						<listitem><para><emphasis>configuration</emphasis> - defines configuration of ProActive application to launch. Here,
 						the Java classpath of the JVM, that will be launched on a remote host, is defined. In the tag <emphasis>applicationClassPath</emphasis>,
@@ -151,7 +151,7 @@
 						<programlisting language="xml"><textobject><textdata fileref="resourcemanager/xml/gcmdLocal.xml"/></textobject></programlisting>
 						<para>
 							<itemizedlist>
-								<listitem><para><emphasis>environment</emphasis> - in the same way than in the GCMA, this tag defines variables that can be
+								<listitem><para><emphasis>environment</emphasis> - in the same way as in the GCMA, this tag defines variables that can be
 								reused in the GCMD. A Java Property variable is defined, which is called 'user.home', that will be used later.</para>  
 								</listitem>
 								<listitem><para><emphasis>resources</emphasis> - describes the hierarchical structure of the available grid resources, 
