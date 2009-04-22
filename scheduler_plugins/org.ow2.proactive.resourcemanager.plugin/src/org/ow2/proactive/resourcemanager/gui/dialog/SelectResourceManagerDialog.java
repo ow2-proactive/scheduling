@@ -236,6 +236,8 @@ public class SelectResourceManagerDialog extends Dialog {
             port = System.getProperty("proactive.rmi.port");
         } catch (UnknownHostException e) {
             initialHostValue = "localhost";
+        }
+        if (port == null) {
             port = "1099";
         }
         urlCombo.add("rmi://" + initialHostValue + ":" + port + "/");
