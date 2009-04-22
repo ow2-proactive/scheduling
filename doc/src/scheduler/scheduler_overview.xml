@@ -21,7 +21,7 @@
 			The Scheduler is accessible either from
 			a Java programming API  or 
 			a command-line based job submitter.
-			In the following chapters we will also present how the
+			In the following chapters, we will also present how the
 			scheduler works, what policies govern the job management,
 			how to create a job and how to get the jobs and the nodes
 			state using either the administration shell or the GUI.
@@ -87,10 +87,10 @@
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="bold">TASKSFLOW</emphasis> - represents a Job containing a bag of
+							<emphasis role="bold">TASKSFLOW</emphasis> - represents a job containing a bag of
 							tasks, which can be executed either in parallel or
 							according to a dependency tree. Tasks
-							inside this Job can be either Java (A task written in Java extending
+							inside this job can be either Java (A task written in Java extending
 							a given interface) or Native (Any native process).
 						</para>
 					</listitem>
@@ -98,13 +98,13 @@
 					<listitem>
 						<para>
 							<emphasis role="bold">PROACTIVE</emphasis> -
-							 represents a Job that contains a ProActive
+							 represents a job that contains a ProActive
 							application (embedded in
 							<emphasis>only one ProActive Task</emphasis>).
 							Its execution starts with a given
 							predefined number of resources on which the user
 							can start the ProActive application. This
-							kind of Job requires  the
+							kind of job requires  the
 							ProActive API, in order to build a
 							ProActive application.
 						</para>
@@ -112,9 +112,9 @@
 
 					<!--  <listitem>
 						<para><emphasis role="bold">PARAMETER SWEEPING (not yet implemented)</emphasis>, is a
-						Job that represents multiple executions of one type of Task with
+						job that represents multiple executions of one type of task with
 						different given parameters. It is typically executed in parallel.
-						The Tasks inside this job can also be Java or Native. </para>
+						The tasks inside this job can also be Java or Native. </para>
 						</listitem>-->
 				</itemizedlist>
 			</para>
@@ -125,9 +125,9 @@
 				you can mark its corresponding task as
 				<emphasis role="bold">precious</emphasis>
 				in order to retrieve their result easily in the job
-				result. If the job termination has been caused by a failure, then the finished Job
+				result. If the job termination has been caused by a failure, then the finished job
 				contains the causes of the exception. Further details on how to
-				create a Job and the different options can be found in
+				create a job and the different options can be found in
 				<xref linkend="Create_job"/>
 				.
 			</para>
@@ -149,7 +149,7 @@
 			</para>
 
 			<para>
-				There are three types of Tasks:
+				There are three types of tasks:
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -193,7 +193,7 @@
 			</para>
 
 			<para>
-				During its execution, a Task can crash due to the host (computing node) or
+				During its execution, a task can crash due to the host (computing node) or
 				code failure. The Scheduler solves this potential problem
 				by offering  parameterizable tasks
 				which can be restarted a set number of times (see maxNumberOfExecution in section <xref linkend="Create_add_task"/>).
@@ -209,7 +209,7 @@
 
 			<para>
 				Dependencies between tasks can also be defined. This
-				aspect is detailed in next section.
+				aspect is detailed in the next section.
 			</para>
 		</section>
 
@@ -217,7 +217,7 @@
 		<section xml:id="how_dependences"><info><title>Dependencies between tasks</title></info>
 
 			<para>
-				Dependencies can be set between tasks in a TaskFlow Job.
+				Dependencies can be set between tasks in a TaskFlow job.
 				It provides a way to execute your tasks in a specified
 				order, but also to forward result of an ancestor
 				task to its children as parameter. Dependency between
