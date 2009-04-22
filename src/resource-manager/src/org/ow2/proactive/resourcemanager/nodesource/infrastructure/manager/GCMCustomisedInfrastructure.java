@@ -76,14 +76,14 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
             return;
         }
         if (parameters.length == 2) {
-            String hosts = new String((byte[]) parameters[0]);
+            String hosts = new String((byte[]) parameters[1]);
 
             String[] hostsList = hosts.split("\\s");
             logger.debug("Number of hosts " + hostsList.length);
 
             for (String host : hostsList) {
                 DeploymentData dd = new DeploymentData();
-                dd.data = (byte[]) parameters[1];
+                dd.data = (byte[]) parameters[0];
                 logger.debug("Registed deployment data for host " + host);
                 this.hosts.put(host, dd);
             }
