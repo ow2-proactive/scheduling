@@ -2,7 +2,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="user_manual"><info><title>User guide</title></info>			
 	<section xml:id="Create_job"><info><title>Create a job</title></info>
 		<para>
-			A job is the entity that will be submitted to the ProActive Scheduler. As it has been explained in the <xref linkend="what_is_job"/>, it's possible to create more than one type of job. A job can be created using an XML descriptor or the provided ProActive Scheduler Java API or also with a simple flat file.
+			A job is the entity that will be submitted to the ProActive Scheduler. As it has been explained in the <xref linkend="what_is_job"/>, it is possible to create more than one type of job. A job can be created using an XML descriptor or the provided ProActive Scheduler Java API or also with a simple flat file.
 		</para>
 		<section xml:id="Create_job_xml"><info><title>Job XML descriptor</title></info>
 			<para>
@@ -12,7 +12,7 @@
 			descriptor XSD schema</uri>
 			</para>
 			<para>
-				Several parameters can be set for a job :
+				Several parameters can be set for a job:
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -37,7 +37,8 @@
 						<para>
 							<emphasis>cancelJobOnError</emphasis> (optional - false by default) - defines whether 
 							the job must continue when a user exception or
-							error occurs during the job process. This property can also be defined in each task.
+							error occurs during the job process.
+							This property can also be defined in each task.
 							If the value of this property is defined at the job level, each cancelJobOnError property of each task
 							will have this value as the default one (excepted if this property has been set at the task level). 
 							'True' implies for the job to immediately stop every remaining running tasks if an error occurs in one of
@@ -47,7 +48,8 @@
 					<listitem>
 						<para>
 							<emphasis>restartTaskOnError</emphasis> (optional - anywhere by default) - defines whether tasks that have to be restarted 
-							will restart on an other resource. Defining this property will set the restartTaskOnError property of each task
+							will restart on an other resource.
+							Defining this property will set the restartTaskOnError property of each task
 							to this value as the default one (excepted if this property has been set at the task level). 
 							Possible values are 'anywhere' or 'elsewhere' meaning respectively
 							that the concerned task will be restart on any available resources or especially on a different one.
@@ -96,7 +98,8 @@
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>JobClasspath</emphasis> (optional) - equivalent to the Java classpath. All classes in this path can be loaded by 
+							<emphasis>JobClasspath</emphasis> (optional) - equivalent to the Java classpath.
+							All classes in this path can be loaded by
 							java tasks contained in this job. The jobClasspath can either contain class directories or jar files.
 						</para>
 					</listitem>
@@ -666,44 +669,46 @@ public void init(Map&lt;String, Object&gt; args) {
 			</section>
 			<section xml:id="Create_ProActive_task_xml"><info><title>Create and add a ProActive task using XML descriptor</title></info>
 				<para>
-					Just take a look at the example below to understand the syntax of the ProActive task :
+					To understand the syntax of the ProActive task, please take a look at the following example:
 				</para>
 				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_simple.xml"/></textobject></programlisting>
 				<para>
-					The ProActive Task is composed of one 'proActiveExecutable' that specified the 'ProActiveExecutable' Java class to use.
-					A set of parameters has also be defined to provide this executable some information. These parameters will be
-					available into the <code>HashMap</code> of the <code>init(HashMap)</code> method into your <code>ProActiveExecutable</code>.
+					The ProActive Task is composed of one 'proActiveExecutable' tag that specifies the 'ProActiveExecutable' Java class to use.
+					A set of parameters has also be defined to provide this executable with some information. These parameters will be
+					available into the <code>Map</code> of the <code>init(Map)</code> method into your <code>ProActiveExecutable</code>.
 					To put this task inside your ProActive job, just put it between the 'ProActive' tags.
-					On this job it is necessarily to set the number of node you desired for your ProActiveExecutable.
-					Instead of deploying resources as it must be done in ProActive Suite, the resources are provides by the ProActive Scheduler.
-					Here's how a complete ready-to-be-scheduled ProActive Job seems like :
+					For this job, it is necessarily to set the number of nodes you want for your ProActiveExecutable.
+					Instead of deploying resources as it has to be done in ProActive Suite, the resources are provided by the ProActive Scheduler.
+					Here is a complete ready-to-be-scheduled ProActive job:
 				</para>
 				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job_complete.xml"/></textobject></programlisting>
 				<para>
-					Some other stuffs and options can be set onto a ProActive task, here's a new example of what can be done with
-					task XML descriptors :
+					Some other options can be set in a ProActive task. Here is a new example of what can be done with
+					an XML descriptor:
 				</para>
 				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_script.xml"/></textobject></programlisting>
 				<para>
-					To have an exhaustive list of which options are available and what they are suppose to do, just go to
+					To have an exhaustive list of available options and their functionalities, please refer to
 					the task explanation section at <xref linkend="Create_task_explanation"/>.
 				</para>
 			</section>
 			<section xml:id="Create_ProActive_task_java"><info><title>Create and add a ProActive task using Java API</title></info>
 				<para>
-					To <emphasis>create a ProActive task</emphasis> use the
-					<emphasis>ProActiveTask</emphasis> class.
-					In this type, you must specify the class you want to start with, by mentioning a
-					Class of extending  ProActiveExecutable. (To make your own executable see the
-					proper section <xref linkend="define_executable_ProActive"/> ).
+					To <emphasis>create a ProActive task</emphasis>, you have first to instantiate a
+					<emphasis>ProActiveTask</emphasis> object.
+					Then, you have to specify the class you want to start with, by mentioning a
+					Class of extending the ProActiveExecutable class (To make your own executable, see the
+					proper section <xref linkend="define_executable_ProActive"/>).
 					In addition, you can add arguments with which the task will be launched.
 					These launching arguments will be given to the ProActive executable as a Map.
-					Just take a look at the example below to see how to use the task creation Java API
-					(see also Java DOCumentation of the Scheduler to learn more) :
+					Take a look at the example below to see how to use the task creation Java API
+					(see also Java Documentation of the Scheduler to learn more):
 				</para>
 				<programlisting language="java">
 //create a ProActive Task using the default constructor that we'll call 'aTask'
 ProActiveTask aTask = new ProActiveTask();
+//add executable class or instance
+pat.setExecutableClassName("org.ow2.proactive.scheduler.examples.ProActiveExample");
 //then, set the desired options : (for example)
 aTask.setName("task 1");
 aTask.setDescription("This task will do
@@ -714,8 +719,6 @@ aTask.setResultPreview(UserDefinedResultPreview.class);
 aTask.addArgument("foo",new Boolean(true));
 aTask.addArgument("bar",new Integer(12));
 aTask.addArgument("test","test1");
-//add executable class or instance
-pat.setExecutableClassName("org.ow2.proactive.scheduler.examples.ProActiveExample");
 //add number of nodes needed for the application
       pat.setNumberOfNodesNeeded(10);
 
@@ -744,16 +747,18 @@ SelectionScript selScript = new SelectionScript(script, true);
 aTask.setSelectionScript(selScript);
 				</programlisting>
 				<para>
-					To complete your job by adding the task inside the job, just add it as followed :
-					(note that you can only add ONE ProActive task in a ProActive Job)
+					To complete your job by adding the task inside the job, add it as followed:
 				</para>
 				<programlisting language="java">
 //add the task to the job
 job.setTask(aTask);
 				</programlisting>
 				<para>
-					To have an exhaustive list of which options are available and what they are for, just read
-					the next section.
+					<emphasis>Note: </emphasis> you can add <emphasis>only one</emphasis> ProActive task in a ProActive job
+				</para>
+				<para>
+					To have an exhaustive list of available options and their functionalities, please refer to
+					the task explanation section at <xref linkend="Create_task_explanation"/>.
 				</para>
 			</section>
 			
@@ -768,8 +773,6 @@ job.setTask(aTask);
 						<para>
 							<emphasis>name</emphasis> -
 							name of the task. 
-						</para>	
-						<para>
 							It can be whatever you want.
 							This name must be unique.
 						</para>
@@ -778,8 +781,6 @@ job.setTask(aTask);
 						<para>
 							<emphasis>description</emphasis> (optional) - 
 							human readable description of the task.
-						</para>	
-						<para>
 							It is for human use only. This field is optional but it is better to set it.
 						</para>
 					</listitem>
@@ -787,8 +788,6 @@ job.setTask(aTask);
 						<para>
 							<emphasis>genericInformation</emphasis> (optional) - 
 							defines some information inside your task.
-						</para>	
-						<para>
 							This information could be read inside the policy (similar to job's one).
 							It can be useful to add new complex scheduling behavior.
 						</para>
@@ -797,8 +796,6 @@ job.setTask(aTask);
 						<para>
 							<emphasis>preciousResult</emphasis> (optional - false by default) - 
 							defines whether a result of a task is important. 
-						</para>	
-						<para>
 							For example, in a job result, you could have to retrieve only some task results that are
 							important for you. By setting the precious result option to 'true', you will be able
 							to retrieve them easily.
@@ -809,8 +806,6 @@ job.setTask(aTask);
 							<emphasis>cancelJobOnError</emphasis> (optional - false by default or set to the cancelJobOnError value of its job) - 
 							defines whether your job must continue if a user exception or an
 							error occurs during this task process. 
-						</para>	
-						<para>
 							True means that the job
 							will immediately stop every remaining running tasks if an error occurs in this task.
 							It is useful when there is no need to go further if this task fails.
@@ -822,10 +817,8 @@ job.setTask(aTask);
 							<emphasis>maxNumberOfExecution</emphasis> (optional - 1 by default or set to the maxNumberOfExecution value of its job) - 
 							defines how many times a task will run if it ends with an exception
 							or an error code. 
-						</para>	
-						<para>
 							If the task ends in a normal way, this property has no effect.
-							If the task has exception or error more than defined in this property, there are 2 possibilities:
+							If the task has an exception or an error more than defined in this property, there are 2 possibilities:
 							<itemizedlist>
 								<listitem>
 									<para>
@@ -845,8 +838,6 @@ job.setTask(aTask);
 						<para>
 							<emphasis>restartTaskOnError</emphasis> (optional - anywhere by default or set to the restartTaskOnError value of its job) - 
 							defines whether this task has to restart on an other resource.
-						</para>	
-						<para>
 							Possible values are 'anywhere' or 'elsewhere' meaning respectively
 							that the concerned task will be restart on any available resources or on a different one.
 							A task can be restarted when an exception occurred (Java Task) or when an error code is returned (Native Task) and 
@@ -871,8 +862,6 @@ job.setTask(aTask);
 						<para>
 							<emphasis>Walltime</emphasis> (optional) - 
 							maximum time for the task execution (timeout).
-						</para>	
-						<para>
 							It can be specified for any task, irrespectively of its type.
 							If a task does not finish before its walltime it is terminated by the ProActive Scheduler.
 							An example has been given above with the walltime specified. Note that, the walltime
@@ -895,8 +884,6 @@ job.setTask(aTask);
 						<para>
 							<emphasis>fork and forkEnvironment</emphasis> (optional, only for Java Task) - 
 							defines respectively whether a task has to be forked and if so, defines the fork environment.
-						</para>	
-						<para>
 							The purpose of a Forked Java Task is to gain more flexibility with
 							respect to the execution environment of a task.
 							A new JVM is started with an inherited classpath and (possibly) redefined Java home path and JVM properties.
@@ -918,8 +905,6 @@ job.setTask(aTask);
 						<para>
 							<emphasis>parameters</emphasis> (optional, only for Java and ProActive Task) - 
 							defines some parameters to be transfered to the executable. 
-						</para>
-						<para>
 							This is best explained
 							in <xref linkend="define_executable_java"/>. Each parameter is define with a name and a value
 							and will be passed to the Java Executable as an <code>Map</code>.
@@ -929,8 +914,6 @@ job.setTask(aTask);
 						<para>
 							<emphasis>arguments</emphasis> (optional, only for native Task) - 
 							defines arguments for your native process. 
-						</para>
-						<para>
 							Each argument is define by a value
 							that will be appended to the process name to create a String array command line.
 						</para>
@@ -940,8 +923,6 @@ job.setTask(aTask);
 							<emphasis>resultPreview</emphasis> (optional) - 
 							allows to specify how the result of a task should be displayed in the
 							Scheduler graphical client. 
-						</para>
-						<para>
 							The user should implement a result preview class
 							(extending the
 							<literal>
@@ -1090,7 +1071,7 @@ job.setTask(aTask);
 		<section xml:id="Submit_a_job"><info><title>Submit a job to the Scheduler</title></info>
 			<para>
 				The submission will perform some verifications to ensure that a job is correctly formed.
-				Then the job is inserted in the pending queue and wait for executions until free resources
+				Then, the job is inserted in the pending queue and waits for executions until free resources
 				become available. Once done, the job will be started on the resources deployed by the
 				Resource Manager. Finally, once finished, the job goes to the queue of finished jobs and will wait until the user
 				retrieves his result.
@@ -1114,10 +1095,10 @@ job.setTask(aTask);
 								It can be an XML Job descriptor, a simple flat file, or a path to a native command to launch :
 								Use -submit followed by the path or the command to give, and :
 								<itemizedlist>
-									<listitem><para>To schedule an XML job file : use -submit followed by the path of an XML descriptor</para></listitem>
-									<listitem><para>To schedule a flat file containing native commands : use -submit followed the by path of a flat file containing native commands and -cmdf to specify that it is a command file.</para></listitem>
-									<listitem><para>To schedule a path to a native command : use -submit followed by the path of the native command to launch, with its launching arguments. Here it submits a job made of one native task.
-									Then use -cmd to specify that it is a command path.</para></listitem>
+									<listitem><para>To schedule an XML job file: use -submit followed by the path of an XML descriptor</para></listitem>
+									<listitem><para>To schedule a flat file containing native commands: use -submit followed the by the path of a flat file containing native commands and -cmdf to specify that it is a command file.</para></listitem>
+									<listitem><para>To schedule a path to a native command : use -submit followed by the path of the native command to launch, with its launching arguments. Here, it submits a job made of one native task.
+									Then, use -cmd to specify that it is a command path.</para></listitem>
 								</itemizedlist>
 								For -cmd and -cmdf options, you can use aditional parameters. For instance, you can specify a log file that will contain all STDOUT and STDERR of job execution, with -o followed by the path of a file.
 								This file is created (emptied if exits) at each beginning of job execution. You can specify a selection script with -s, followed by the path of a selection script file.
@@ -1129,7 +1110,7 @@ job.setTask(aTask);
 							<para>
 								<emphasis>The URL of a started scheduler</emphasis> (optional) - 
 								To use this option, add a "-u URL" argument. If not mentioned,
-								the script will connect an existing local Scheduler.
+								the script will connect to an existing local Scheduler.
 							</para>
 						</listitem>
 						<listitem>
@@ -1144,7 +1125,7 @@ job.setTask(aTask);
 					</itemizedlist>
 				</para>
 				<para>
-					Examples :
+					Examples:
 				</para>
 				<para>
 					<emphasis>
@@ -1167,7 +1148,7 @@ job.setTask(aTask);
 					will submit the native command "myCmd.sh" with "4" as the only argument. A selection script is associated for this native command: "select.rb".
 				</para>
 				<para>
-					For more information, use -h (or --help) option (i.e. "userScheduler.[sh|bat] -h")
+					For more information, use -h (or --help) option (i.e. "userScheduler.[sh|bat] -h").
 				</para>
 			</section>
 			<section xml:id="Submit_a_job_java"><info><title>Submit a job using the Java API</title></info>
@@ -1201,7 +1182,7 @@ JobId myJobId = scheduler.submit(job);
 			<section xml:id="get_result_sh"><info><title>Get a job result using the shell command</title></info>
 				<para>
 					To get the result of you job using a command line, launch the command <emphasis>userScheduler.[sh|bat] -result jobID</emphasis> script in the bin/[os]/ directory.
-					This script has 2 optional options :
+					This script has 2 optional options:
 					<itemizedlist>
 						<listitem>
 							<para>
@@ -1223,7 +1204,7 @@ JobId myJobId = scheduler.submit(job);
 					toString() Java method could have done it.
 				</para>
 				<para>
-					For more information, use -h (or --help) option (i.e. "userScheduler.[sh|bat] -h")
+					For more information, use -h (or --help) option (i.e. "userScheduler.[sh|bat] -h").
 				</para>
 			</section>
 			<section xml:id="get_result_java"><info><title>Get a job result using the Java API</title></info>
@@ -1318,7 +1299,7 @@ scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEve
 		</section>
 		<section xml:id="scheduler_controller"><info><title>Using the Scheduler controller</title></info>
 			<para>
-				The Scheduler controller provides a way to interact with the Scheduler. Start it with the bin/[os]/userScheduler.[sh|bat]
+				The Scheduler controller provides a way to interact with the Scheduler. Start it with the <emphasis>bin/[os]/userScheduler.[sh|bat]</emphasis>
 				script. You can use it as a command line (as shown
 				in some examples above, go to <xref linkend="scheduler_controller_non_interactive"/>) or in interactive mode (go to
 				<xref linkend="scheduler_controller_interactive"/>).
@@ -1340,53 +1321,53 @@ scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEve
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -l demo -submit path/to/job/xml/descriptor</emphasis> : try to connect user demo, prompt for
-							its password and submit the given XML descriptor file.
+							<emphasis>userScheduler.[sh|bat] -l demo -submit path/to/job/xml/descriptor</emphasis>: tries to connect user demo, prompts for
+							its password and submits the given XML descriptor file.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -l demo -cmd -jn test -submit ls -al</emphasis> : try to connect user demo, prompt for
-							its password and submit the given command line in a job named 'test'. In this case, the <emphasis role="italics">-cmd</emphasis> option forces
+							<emphasis>userScheduler.[sh|bat] -l demo -cmd -jn test -submit ls -al</emphasis>: tries to connect user demo, prompts for
+							its password and submits the given command line in a job named 'test'. In this case, the <emphasis role="italics">-cmd</emphasis> option forces
 							the argument of <emphasis role="italics">-submit</emphasis> option to be a command line.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -cmdf -s path/to/a/selection/script -submit path/to/a/text/file</emphasis> : prompt for a username and
-							its password and submit the given commands file. It also includes the given selection script file.
+							<emphasis>userScheduler.[sh|bat] -cmdf -s path/to/a/selection/script -submit path/to/a/text/file</emphasis>: prompts for a username and
+							its password and submits the given commands file. It also includes the given selection script file.
 							In this case, the <emphasis role="italics">-cmdf</emphasis> option forces
 							the argument of <emphasis role="italics">-submit</emphasis> option to be a flat text file that contains
-							commands. (One command per line, each line will be a task)
+							commands (One command per line, each line will be a task).
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -output 12</emphasis> : prompt for a username and
-							its password and display the output written by job 12 if it is finished.
+							<emphasis>userScheduler.[sh|bat] -output 12</emphasis>: prompts for a username and
+							its password and displays the output written by job 12 if it is finished.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -result 34</emphasis> : prompt for a username and
-							its password and display the result of job 34 if it is finished.
+							<emphasis>userScheduler.[sh|bat] -result 34</emphasis>: prompts for a username and
+							its password and displays the result of job 34 if it is finished.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -priority 56 Lowest</emphasis> : prompt for a username and
-							its password and request the Scheduler to change job 56 priority to 'LOWEST'.
+							<emphasis>userScheduler.[sh|bat] -priority 56 Lowest</emphasis>: prompts for a username and
+							its password and requests the Scheduler to change job 56 priority to 'LOWEST'.
 						</para>
 					</listitem>
 				</itemizedlist>
 				<para>
 					Once the command launched, it will terminate by displaying a successful message or the cause of
-					a possible failure as an exception
+					a possible failure as an exception.
 				</para>
 			</section>
 			<section xml:id="scheduler_controller_interactive"><info><title>Interactive mode</title></info>
 				<para>
-					An other way to interact with the Scheduler is using the interactive mode of the controller. To start it in this mode,
+					Another way to interact with the Scheduler is using the interactive mode of the controller. To start it in this mode,
 					just execute the bin/[os]/userScheduler.[sh|bat] command without specifying a 'ctl' option:
 					<emphasis>userScheduler.[sh|bat] -l demo -u rmi://localhost:1313/</emphasis> is an example which connect the controller
 					to a local Scheduler on the port 1313 with 'demo' login.
@@ -1474,9 +1455,9 @@ Job 1 result =&gt;
 job_PI
 				</programlisting>
 				<para>
-					As you can see, the provided methods are useful to get make basic actions. It is also possible to get
+					As you can see, the provided methods are useful to make basic actions. It is also possible to get
 					instances from Scheduler API. As shown, the <emphasis role="italics">myResult = result(1)</emphasis> instruction
-					lead to get an instance of JobResult in the 'myResult' variable. As in Java, use the method of the JobResult API
+					leads to get an instance of JobResult in the 'myResult' variable. As in Java, use the method of the JobResult API
 					to get other informations. Here is an example:
 				</para>
 				<programlisting>
@@ -1510,12 +1491,12 @@ println("priority : "+prio);  println("status : "+status); println("finished tas
 					The result will be exactly the same as the one in the code shown in the previous example.
 				</para>
 				<para>
-					When error occurred in a command, it's possible to show the stack trace on demand. Indeed, the execution stops
-					and prompt the user to show the stackTrace or not.
+					When error occurred in a command, it is possible to show the stack trace on demand. Indeed, the execution stops
+					and prompts the user to show the stackTrace or not.
 					In order to script this interactive controller, you can disable stack trace on demand. To do so, use the
-					<emphasis role="italics">exMode(...)</emphasis> function. The first parameter defines if the stack trace will be
-					displayed or not while the second one defines if the stack trace must be displayed every time or on demand.
-					Setting the first parameter to 'false' disable the second one.
+					<emphasis role="italics">exMode(...)</emphasis> function. The first parameter defines whether the stack trace will be
+					displayed while the second one defines if the stack trace has to be displayed every time or on demand.
+					Setting the first parameter to 'false' disables the second one.
 				</para>
 				<para>
 					As an example, let's see the following script:
@@ -1549,7 +1530,7 @@ Job 3 result =&gt;
 Job 4 is not finished or unknown !
 				</programlisting>
 				<para>
-					In this case we get some error messages but no exception and the script can terminate without prompting to view stack trace.
+					In this case, we get some error messages but no exception and the script can terminate without prompting to view stack trace.
 				</para>
 			</section>
 		</section>
