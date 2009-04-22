@@ -150,7 +150,7 @@
 	<para>
 	In this tasks graph, we see that task 4 is preceded by task 1, that means scheduler waits the end of task 1 execution 
 	before launching task 4. In a more concrete way, task 1 could be the calculation of a part of the problem to solve, 
-	and task 4 takes result provided by task 1 and compute another step of the calculation. 
+	and task 4 takes result provided by task 1 and compute another step of the calculation.
 	We introduce here the concept of <emphasis role="bold">result passing</emphasis> between tasks, explained later.
 	This relation is called a dependence, and we say that task 4 <emphasis role="bold">depends</emphasis> on task 1. 
 	</para>
@@ -609,7 +609,7 @@ public class HelloTask extends JavaExecutable{
 		<para>
 		Specifies a task of the job. The task name is used to 
 		identify the task from the others. This parameter is mandatory 
-		and has to be unique in the XML job descriptor. 
+		and has to be unique in the XML job descriptor.
 		The parameter preciousResult="true" precises that the result
 		is needed and have to be retrieved at the end of the job.
 		The task2 task contains a tag
