@@ -151,7 +151,7 @@
 	In this tasks graph, we see that task 4 is preceded by task 1, that means scheduler waits the end of task 1 execution 
 	before launching task 4. In a more concrete way, task 1 could be the calculation of a part of the problem to solve, 
 	and task 4 takes result provided by task 1 and compute another step of the calculation. 
-	We introduce here concept of <emphasis role="bold">result passing</emphasis> between tasks, explained later. 
+	We introduce here the concept of <emphasis role="bold">result passing</emphasis> between tasks, explained later.
 	This relation is called a dependence, and we say that task 4 <emphasis role="bold">depends</emphasis> on task 1. 
 	</para>
 	<para>
@@ -159,7 +159,7 @@
 	because there are independent from each other.
 	</para>
 	<para>
-	Definition of the task-flow graph is made at job's definition, before scheduling, and cannot be modified during
+	Definition of the task-flow graph is made at job definition, before scheduling, and cannot be modified during
 	the job execution, this kind of work flow is called a <emphasis role="bold">static work flow</emphasis>.
 	A task flow job is described in XML language.
 	</para>
@@ -509,7 +509,7 @@ public class HelloTask extends JavaExecutable{
 	<para>
 	The scheduler provides the possibility to launch jobs containing tasks which are native executables,
 	like a C/C++ program. The following example is a native C executable called nativTask which 
-	displays ten dots, waiting a number of seconds given in argument between each dot's display.
+	displays ten dots, waiting a number of seconds given in argument between each display.
 	</para>
 	<section xml:id="native_c_code"><info><title>Native C code of the task</title></info>
 		
@@ -569,7 +569,7 @@ public class HelloTask extends JavaExecutable{
 				</para>
 				<para>
 				There are tree priority levels: lowest, low, normal. Actually, there are five levels, 
-		but the two other levels (high and highest) can only be setted by scheduler's administrator.
+		but the two other levels (high and highest) can only be setted by the administrator of the scheduler.
 				</para>
 			</listitem>
 			<listitem>
@@ -610,7 +610,7 @@ public class HelloTask extends JavaExecutable{
 		Specifies a task of the job. The task name is used to 
 		identify the task from the others. This parameter is mandatory 
 		and has to be unique in the XML job descriptor. 
-		The parameter preciousResult="true" precises that the task's result 
+		The parameter preciousResult="true" precises that the result
 		is needed and have to be retrieved at the end of the job.
 		The task2 task contains a tag
 		called <emphasis role="bold">&lt;depends&gt;</emphasis> which specifies a list of tasks that have to be executed
@@ -771,7 +771,7 @@ public class HelloTask extends JavaExecutable{
 	<section xml:id="retrieve_result"><info><title>Retrieving the result</title></info>
 		
 	<para>
-	When the scheduling of a job is finished, scheduler stores job's result and waits for the user to retrieve it.
+	When the scheduling of a job is finished, scheduler stores its result and waits for the user to retrieve it.
 	As it has already been said, the <emphasis>userScheduler.sh</emphasis> script is used to retrieve results.
 	Launch on scheduler host this following command
 	(still into the <code>[Scheduler_Home_Dir]/bin/[OS]/</code> directory):	
@@ -781,7 +781,7 @@ public class HelloTask extends JavaExecutable{
 	</para>
 	<para>
 		Type the user1's password.
-		The job's result is then displayed:
+		The job result is then displayed:
 	</para>
 	<para>
 	<code>Job 1 Result =&gt;</code>
