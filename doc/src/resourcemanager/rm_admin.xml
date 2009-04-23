@@ -419,7 +419,7 @@ user2:user
 				<emphasis role="italics">exec(commandFilePath)</emphasis>; execute content of a given script file (parameter is a string representing a command-file path).
 				See <xref linkend="rm_admin_js_console_script"/>.
 			</para>
-		</listitem>q
+		</listitem>
 		<listitem>
 			<para>
 				<emphasis role="italics">exit()</emphasis>; Exits Resource manager's JavaScript console.
