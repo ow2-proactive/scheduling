@@ -70,4 +70,8 @@ function exit(){
 	return AdminController.exit();
 }
 
+function help(){
+	AdminController.help();
+}
+
 var rm = AdminController.getAdminRM();
