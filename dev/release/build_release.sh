@@ -88,7 +88,7 @@ cd compile || warn_and_exit "Cannot move in compile"
 ./build clean
 ./build convertSchemas
 ./build -Dversion="${VERSION}" deploy.all
-./build -Dversion="${VERSION}" manualPdf
+./build -Dversion="${VERSION}" doc.Scheduler.manualPdf
 
 cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 echo " [i] Clean"
