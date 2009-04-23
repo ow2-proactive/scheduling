@@ -103,7 +103,7 @@
 	
       <!-- javadoc paths are not include through subant-->
       <path id="docs.utils.classpath.javadoc">
-	      <fileset dir="../doc/toolchain/lib">
+	      <fileset dir="../doc/toolchain/lib">  
 		      <include name="**/*.jar"/>
 	      </fileset>
 	      
