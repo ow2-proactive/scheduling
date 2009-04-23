@@ -1316,7 +1316,7 @@ scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEve
 					</figure>
 				</para>
 				<para>
-				To use the controller as a command line just specify at list one 'ctl' option. Let's illustrate that way with some examples:
+				To use the controller as a command line, just specify at least one 'ctl' option. Let's illustrate that with some examples:
 				</para>
 				<itemizedlist>
 					<listitem>
@@ -1369,7 +1369,7 @@ scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEve
 				<para>
 					Another way to interact with the Scheduler is using the interactive mode of the controller. To start it in this mode,
 					just execute the bin/[os]/userScheduler.[sh|bat] command without specifying a 'ctl' option:
-					<emphasis>userScheduler.[sh|bat] -l demo -u rmi://localhost:1313/</emphasis> is an example which connect the controller
+					<emphasis>userScheduler.[sh|bat] -l demo -u rmi://localhost:1313/</emphasis> is an example which connects the controller
 					to a local Scheduler on the port 1313 with 'demo' login.
 				</para>
 				<para>
