@@ -39,7 +39,7 @@
                 <title>Features</title>
             </info>
             <para>
-                The interface with Matlab and Scilab inside ProActive comes in two different ways:
+                The interface with Matlab inside ProActive comes in two different ways:
             </para>
             <itemizedlist>
                 <listitem>
@@ -702,7 +702,7 @@
                     </para>
                     <screen>&gt;&gt; resl = PAsolve( @factorial, {1, 2, 3, 4, 5} );</screen>
                     <para>
-                        This by example will execute the factorial function on 5 different machines, the first machine
+                        This for example will execute the factorial function on 5 different machines, the first machine
                         using the parameter 1, the second, the parameter 2, etc...
                         The function used must take one argument and return one result. It cannot be a Mex function, unless the same mex function is made manually available on the remote engines.
                     </para>
@@ -718,9 +718,9 @@
                     <screen>&gt;&gt; resl
                     Awaited Result List</screen>
                     <para>
-                    	This means that the result from the PAsolve function is not yet available. The PAsolve is thus called "asynchronously" and doesn't block the matlab interpretor execution.
+                    	This means that the result from the PAsolve function is not yet available. The PAsolve is thus called "asynchronously" and doesn't block the matlab interpreter execution.
                     	This allows for example to run other PAsolve(s) while the first PAsolve is still computing the result. If, at some point, the results of a PAsolve function is needed, this can be achieved by manipulating the PAResultList object.
-                    	A manipulation of the object will trigger a wait-by-necessity mechanism, this means that the matlab interpretor will block and wait until the result is available. The object can be manipulated either by using indexation, thus displaying a single member of the list (or more, depending on the index): 
+                    	A manipulation of the object will trigger a wait-by-necessity mechanism, this means that the matlab interpreter will block and wait until the result is available. The object can be manipulated either by using indexation, thus displaying a single member of the list (or more, depending on the index): 
                     </para>
                     <screen>&gt;&gt; resl(3) # triggers wait_by_necessity
                     6  # fact(3)                    
