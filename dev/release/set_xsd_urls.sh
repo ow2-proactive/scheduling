@@ -16,8 +16,9 @@ for sd in $(ls);
 do
 find ./$sd -type f -exec sed -i "s#urn:proactive:jobdescriptor:$PREVIOUS_TAG#urn:proactive:jobdescriptor:$VERSION#g" {} \;
 find ./$sd -type f -exec sed -i "s#http://proactive.inria.fr/schemas/jobdescriptor/$PREVIOUS_TAG/schedulerjob.xsd#http://proactive.inria.fr/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
-find ./$sd -type f -exec sed -i "s#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$PREVIOUS_TAG/schedulerjob.xsd#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
-find ./$sd -type f -exec sed -i "s#/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$PREVIOUS_TAG/schedulerjob#/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob#g" {} \;
+#find ./$sd -type f -exec sed -i "s#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$PREVIOUS_TAG/schedulerjob.xsd#org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd#g" {} \;
+#find ./$sd -type f -exec sed -i "s#/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$PREVIOUS_TAG/schedulerjob#/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob#g" {} \;
+find ./$sd -type f -exec sed -i "s#/common/xml/schemas/jobdescriptor/$PREVIOUS_TAG#/common/xml/schemas/jobdescriptor/$VERSION#g" {} \;
 done
 
 # create local dir for schemas
@@ -30,6 +31,8 @@ rm -r ./dev/*
 cd $WORKING_DIR
 
 # Update the website with new schema version
+echo convert schema
+./build convertSchemas
 echo Update the website with new schema version
 ssh sea.inria.fr mkdir /net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION
 scp src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/$VERSION/schedulerjob.xsd $USER@sea.inria.fr:/net/servers/www-sop/teams/oasis/proactive/schemas/jobdescriptor/$VERSION/schedulerjob.xsd
