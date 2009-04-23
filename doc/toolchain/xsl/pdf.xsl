@@ -64,7 +64,7 @@
 	<xsl:param name="draft.watermark.image" />
 
 	<!-- Having long lines be broken up  -->
-	<xsl:param name="hyphenate.verbatim">yes</xsl:param>
+	<xsl:param name="hyphenate.verbatim">0</xsl:param>
 
 	<!-- Have screens written on darker background -->
 	<xsl:attribute-set name="verbatim.properties">
