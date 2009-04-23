@@ -6,6 +6,10 @@
 					of a distributed application. Resource Manager uses this standard to deploy computing nodes and aggregate them in a pool
 					of computing nodes.
 			</para>
+			<warning><para>
+			ProActive Scheduling 1.0.0 supports only 'one node per JVM' configuration (i.e. GCMD vmCapacity set to 1). In the following, the term "node" always
+			refers to a <emphasis>single node deployed in a dedicated JVM.</emphasis>
+			</para></warning>
 			<section xml:id="RM_start"><info><title>Launch the Resource Manager</title></info>
 				<para>  
 					To start the Resource Manager, run the <emphasis>startRM.[sh|bat]</emphasis>
