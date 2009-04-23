@@ -97,7 +97,7 @@
 			<figure xml:id="connectToSchedulerDialog"><info><title>Connection dialog</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="70%" contentdepth="70%" fileref="scheduler_plugin/pics/connectToSchedulerDialog.png" format="PNG"/>
+						<imagedata width="70%" fileref="scheduler_plugin/pics/connectToSchedulerDialog.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -195,7 +195,7 @@
 			<figure xml:id="jobsView"><info><title>Jobs view</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler_plugin/pics/jobsView.png" format="PNG"/>
+						<imagedata width="90%" fileref="scheduler_plugin/pics/jobsView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -221,7 +221,7 @@
 			<figure xml:id="consoleView"><info><title>Console view</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="55%" contentdepth="55%" fileref="scheduler_plugin/pics/consoleView.png" format="PNG"/>
+						<imagedata width="70%" fileref="scheduler_plugin/pics/consoleView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -234,7 +234,7 @@
 			<figure xml:id="tasksView"><info><title>Tasks view</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="scheduler_plugin/pics/tasksView.png" format="PNG"/>
+						<imagedata width="85%" fileref="scheduler_plugin/pics/tasksView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -279,7 +279,7 @@
 			<figure xml:id="jobInfoView"><info><title>Job Info view</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="55%" contentdepth="55%" fileref="scheduler_plugin/pics/jobInfoView.png" format="PNG"/>
+						<imagedata width="55%" fileref="scheduler_plugin/pics/jobInfoView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -330,7 +330,7 @@
 			<figure xml:id="resultPreviewView"><info><title>Result Preview</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="60%" contentdepth="60%" fileref="scheduler_plugin/pics/resultPreviewView.png" format="PNG"/>
+						<imagedata width="60%" fileref="scheduler_plugin/pics/resultPreviewView.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -344,7 +344,7 @@
 			<figure xml:id="resultPreviewView2"><info><title>custom Result Preview</title></info>
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="60%" contentdepth="60%" fileref="scheduler_plugin/pics/resultPreviewView2.png" format="PNG"/>
+						<imagedata  width="50%" fileref="scheduler_plugin/pics/resultPreviewView2.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -496,7 +496,7 @@
 				<figure xml:id="flat_wizard1"><info><title>Control Panel</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="150%" contentdepth="150%" fileref="scheduler_plugin/pics/flat_wizard1.jpg" format="JPG"/>
+							<imagedata width="60%" fileref="scheduler_plugin/pics/flat_wizard1.jpg" format="JPG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -535,7 +535,7 @@
 				<figure xml:id="flat_wizard2"><info><title>Control Panel</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata scalefit="1" width="150%" contentdepth="150%" fileref="scheduler_plugin/pics/flat_wizard2.jpg" format="JPG"/>
+							<imagedata width="60%" fileref="scheduler_plugin/pics/flat_wizard2.jpg" format="JPG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>

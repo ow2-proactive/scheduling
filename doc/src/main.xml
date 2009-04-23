@@ -32,7 +32,7 @@
 
 	<part xml:id="ProActiveScheduling">
 		<info>
-			<title>ProActive Scheduler</title>
+			<title>ProActive Scheduling</title>
 		</info>
 		&Scheduler;
 		&Scheduler_user_manual;
