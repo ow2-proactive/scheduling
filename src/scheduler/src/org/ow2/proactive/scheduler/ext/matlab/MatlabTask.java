@@ -365,7 +365,16 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
         if (debug) {
             System.out.println("[" + host + " MatlabTask] Initializing");
         }
-        sw.init(inputScript, scriptLines, debug);
+        try {
+            sw.init(inputScript, scriptLines, debug);
+        } catch (Exception e) {
+            if (debug) {
+                System.out.println("[" + host + " MatlabTask] Worker is dead redeploying");
+            }
+            sw = deploy(AOMatlabWorker.class.getName());
+            sw.init(inputScript, scriptLines, debug);
+
+        }
         if (debug) {
             System.out.println("[" + host + " MatlabTask] Executing");
         }

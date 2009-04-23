@@ -115,7 +115,7 @@ for i=1:length(args)
     % Creating the input command
     % (We use this amazing contribution which converts (nearly) any variable
     % to an evaluatable string)
-    main = strcat('in = ',vararg2str(args(i)));
+    main = strcat('in = ',vararg2str(args(i)),';');
 
     % Creating the rest of the command (evaluation of the user function)
     main = strcat(main ,'; func = ', strfunc,'; out = func(in);');
@@ -125,9 +125,16 @@ end
 
 % use the selection script which figures out if matlab is installed
 [pathstr, name, ext, versn] = fileparts(mfilename('fullpath'));
-url = java.net.URL(['file:' pathstr filesep 'checkMatlab' '.js']);
+scriptUrl = java.net.URL(['file:' pathstr filesep 'checkMatlab' '.js']);
+% find the list of toolboxes used by the user function and give it as parameter to the script
+tblist = findUsedToolboxes(func2str(func));
+scriptParams = javaArray('java.lang.String',length(args));
+for i=1:length(tblist)
+    scriptParams(i) = java.lang.String(tblist{i});    
+end
+
 % send the task list to the scheduler
-resfuture = solver.solve(inputScripts,mainScripts,url,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug);
+resfuture = solver.solve(inputScripts,mainScripts,scriptUrl,scriptParams,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug);
 if length(args) == 1
   results = PAResult(resfuture);
 else

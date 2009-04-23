@@ -346,7 +346,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      * @param priority     priority of the job
      */
     public ArrayList<Token> solve(String[] inputScripts, String[] mainScripts, URL scriptURL,
-            JobPriority priority, boolean debugJob) {
+            String[] scriptParams, JobPriority priority, boolean debugJob) {
 
         if (schedulerStopped) {
             System.err.println("[AOMatlabEnvironment] the Scheduler is stopped");
@@ -374,6 +374,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         job.setPriority(priority);
         job.setCancelJobOnError(true);
         job.setDescription("Set of parallel matlab tasks");
+
         for (int i = 0; i < mainScripts.length; i++) {
 
             JavaTask schedulerTask = new JavaTask();
@@ -390,7 +391,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             if (availableScript != null) {
                 SelectionScript sscript = null;
                 try {
-                    sscript = new SelectionScript(availableScript, new String[] {}, true);
+                    sscript = new SelectionScript(availableScript, scriptParams, true);
                 } catch (InvalidScriptException e1) {
                     throw new RuntimeException(e1);
                 }

@@ -156,7 +156,7 @@ public class MatlabEngine {
      */
     private static void clear() throws IllegalActionException {
         init();
-        eng.evalString(engineHandle, "clear all");
+        eng.evalString(engineHandle, "clear all;");
     }
 
     /**
