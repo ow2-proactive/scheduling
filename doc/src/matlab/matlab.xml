@@ -330,6 +330,21 @@
                             </para>
                         </listitem>
                     </itemizedlist>
+                    <para>
+                    	No matter what is chosen to define the matlab script. The script must obey to the following rules :                    	
+                    </para>
+                    <itemizedlist>
+                        <listitem>
+                            <para>
+                            	The script must generate a matlab variable <emphasis>out</emphasis>.
+                            </para>
+                        </listitem>
+                        <listimtem>
+                        	<para>
+                        		This Matlab variable can be either : Numeric Array, Char Array, Complex Array, Cell Array or Struct. It can be as well a combination of struct, cell, etc. It cannot be a function handle, a graphical handle or any other custom Matlab object. 
+                        	</para>
+                        </listitem>
+                    </itemizedlist>
                 </section>
                 <section xml:id="Scheduler_Matlab_Complete_Descriptor">
                     <info>
@@ -687,8 +702,9 @@
                     </para>
                     <screen>&gt;&gt; resl = PAsolve( @factorial, {1, 2, 3, 4, 5} );</screen>
                     <para>
-                        This by example will execute the factorial method on 5 different machines, the first machine
+                        This by example will execute the factorial function on 5 different machines, the first machine
                         using the parameter 1, the second, the parameter 2, etc...
+                        The function used must take one argument and return one result. It cannot be a Mex function, unless the same mex function is made manually available on the remote engines.
                     </para>
                     <para>
                         The file system between your Matlab session and the remote engines needs to be shared (through
