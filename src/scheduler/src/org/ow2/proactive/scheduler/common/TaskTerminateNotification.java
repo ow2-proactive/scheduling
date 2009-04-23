@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 
 
@@ -43,6 +44,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
  * @author The ProActive Team
  * @since ProActive Scheduling 1
  */
+@PublicAPI
 public interface TaskTerminateNotification extends Serializable {
 
     /**

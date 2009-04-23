@@ -33,6 +33,8 @@ package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * NotificationData is used by the Scheduler Core to notify the front-end of any changes.
@@ -43,6 +45,7 @@ import java.io.Serializable;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
+@PublicAPI
 public class NotificationData<T extends Object> implements Serializable {
 
     /** Event type of the update */
@@ -53,8 +56,8 @@ public class NotificationData<T extends Object> implements Serializable {
     /**
      * Create a new instance of NotificationData.
      *
-     * @param eventType
-     * @param data
+     * @param eventType the Type of the event.
+     * @param data the data contained in the notification
      */
     public NotificationData(SchedulerEvent eventType, T data) {
         this.eventType = eventType;
