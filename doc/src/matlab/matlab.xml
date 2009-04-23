@@ -69,17 +69,35 @@
 
         <para>
             This Scheduler Matlab interface supports many Matlab releases (from
-            7.1 on) and manipulates the following types: Double
-            Matrixes, String Matrixes, Complex Matrixes, Integer
-            Matrixes, Cells and Structs.
+            7.1 on).
         </para>
 
         <para>
-            For Matlab use, Matlab's link to Java (from the
+            In order to work, the interface uses Ptolemy II's Matlab-Java linkage (from the
             <link xlink:href="http://ptolemy.eecs.berkeley.edu/ptolemyII/index.htm">ptolemy</link>
             project
-            ) needs to be compiled, the instructions for compiling it
-            are described in the file SCHEDULING/extensions/matlab/README :
+            ). This matlab-java linkage needs to be compiled for the different architectures or matlab versions in use. The linkage has already been compiled for several architecture/version couples:
+        </para>
+        <itemizedlist>
+                <listitem>
+                    <para>
+                        Linux 32 bits / Matlab 7.1,7.3,7.5
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Linux 64 bits / Matlab 7.5
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Windows 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5
+                    </para>
+                </listitem>
+        </itemizedlist>
+        <para>
+            For other architectures versions, the instructions for compiling the linkage
+            are in the file SCHEDULING/extensions/matlab/README :
         </para>
 
         <programlisting><textobject><textdata fileref="../../extensions/matlab/README"/></textobject></programlisting>
@@ -89,6 +107,10 @@
         <info>
             <title>Matlab Scheduler Jobs</title>
         </info>
+        <para>
+            This section describes how to write matlab tasks for the scheduler using the scheduler's XML job descriptors.
+            The section suppose that the installation steps have been followed.
+        </para>
         <section xml:id="Scheduler_Matlab_Quick_Start">
             <info>
                 <title>Quick Start with Matlab Scheduler Jobs</title>
@@ -576,6 +598,9 @@
             <title>Matlab embedded parallelization</title>
         </info>
         <para>
+            This section describes the integration of ProActive Scheduler inside the Matlab environment.
+        </para>
+        <para>
             The purpose of this toolkit is to allow parallel execution directly inside the Matlab environment. The user
             can transparently launch parallel scripts and functions using its familiar way of programming within Matlab.
             The feature currently supports embarassingly parrallel problems only, meaning that for a set of scripts
@@ -649,32 +674,18 @@
                     </para>
                     <screen>&gt;&gt; PAconnect('//machine-where-the scheduler-is-running');</screen>
                     <para>
-                        This will trigger a download of the ProActive libraries from the ProActive website. If you don't
-                        have access to internet, or if you want to use a specific version of ProActive, run the command
-                        as PAconnect('path-to-the-proactive-jar','//machine-where-the scheduler-is-running').
-                    </para>
-                    <para>
-                        In any case, if the scheduler can be found on the machine you specified, a pop up window will
+                        This will try to connect to the Scheduler at the specified location.
+                        If the scheduler can be found on the machine you specified, a pop up window will
                         appear asking you to enter your login information. In order to create accounts for the
                         scheduler, read the scheduler documentation.
                     </para>
                 </listitem>
                 <listitem>
                     <para>
-                        You're now ready to run some parallel scripts. We provide a little script, PAwarmup() which
-                        "warm up" the Matlab Engines by executing a set of vanilla tasks. If ever any problem exist in
-                        your configuration, they will probably appear here. Don't use PAwarmup each time ! Matlab
-                        Engines, once started will remain in activity with the scheduler. Reuse the script only if you
-                        needed to restart the scheduler.
-                    </para>
-                    <screen>&gt;&gt; PAwarmup();</screen>
-                </listitem>
-                <listitem>
-                    <para>
-                        In order to run a Matlab function in parallel you'll need to call the function PAsolve() as
+                        You're now ready to run some parallel scripts. In order to run a Matlab function in parallel you'll need to call the function PAsolve() as
                         follows:
                     </para>
-                    <screen>&gt;&gt; PAsolve( {1, 2, 3, 4, 5}, @factorial);</screen>
+                    <screen>&gt;&gt; resl = PAsolve( {1, 2, 3, 4, 5}, @factorial);</screen>
                     <para>
                         This by example will execute the factorial method on 5 different machines, the first machine
                         using the parameter 1, the second, the parameter 2, etc...
@@ -684,6 +695,9 @@
                         NFS or something equivalent). Your local user path will be automatically copied to the remote
                         engine. Meaning that if you are using a Matlab function f located in the m-file f.m at path P,
                         then the remote engine will try to look at the function at the same path P.
+                    </para>
+                    <para>
+                        The result of the PAsolve function is a Matlab Object of type Result list.
                     </para>
                 </listitem>
             </orderedlist>
