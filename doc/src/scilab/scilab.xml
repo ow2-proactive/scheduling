@@ -259,6 +259,31 @@
             <para>
             	This last step (loading the toolkit must be done at each Scilab session before using the toolkit.
             </para>
+
+            <para>
+                One other step needed before using the toolkit it to create a file that grants the scilab jvm the necessary rights to work with ProActive.
+                Here is the procedure for creating such file :
+            </para>
+            <itemizedlist>
+
+                <listitem>
+                    <para>
+                        Create a file called <emphasis>scilab.java.policy</emphasis> in the <emphasis>HOME</emphasis> directory of the current user.
+                For Windows users the HOME directory is the folder "\Documents And Settings\username". The file must contain the following text:
+                    </para>
+                    <screen>grant {
+  permission java.security.AllPermission;
+};</screen>
+                    <para>
+                        Edit the file <emphasis>SCILAB_DIR/share/scilab/modules/jvm/etc/jvm_options.xml</emphasis>. In this file add the two following lines :
+                    </para>
+                    <screen><![CDATA[<option value="-Djava.security.manager"/>
+<option value="-Djava.security.policy="HOMEDIR/scilab.java.policy""/>]]></screen>
+                    <para>
+                        Where HOMEDIR is the full path to the current user HOME directory as explained above.
+                    </para>
+                </listitem>
+            </itemizedlist>
                         
 
         </section>
@@ -318,7 +343,17 @@
                     <para>
                         The result of the PAsolve function will be a scilab list. Again here there is a difference with the matlab version, as the call to PAsolve is not made asynchronously and blocks the execution of the scilab interpretor until the results are received.
                     </para>                    
-                </listitem>               
+                </listitem>
+                <listitem>
+                    <para>
+                        A second syntax is avaible for the PAsolve function. This syntax is used to avoid the following limitation : in the code above the 'cosh' function can be replaced of course by a user-defined function, but this function must not depend on others user-defined ones. The second syntax, thus allow users to run functions which have dependencies. Here is how it works:
+                    </para>
+                    <screen>getf('path_to_myfunc/myfunc.sci');
+&gt;&gt; resl = PAsolve( 'myfunc', list(1, 2, 3, 4, 5), 'path_to_myfunc/myfunc.sci' );</screen>
+                    <para>
+                        The first line loads the function into scilab (necessary for checking purpose). The second line, actually runs the function, and specifies where the function definition can be found. The file myfunc.sci must contain the code to every dependant functions used by 'myfunc'. 
+                    </para>
+                </listitem>
             </orderedlist>
         </section>
     </section>

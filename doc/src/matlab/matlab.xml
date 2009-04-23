@@ -211,7 +211,11 @@
                         <emphasis>taskFlow</emphasis>
                         job (a job containing several tasks).
                     </para>
-                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_SIMPLE_JOB_DEFINITION.snip"/></textobject></programlisting>
+                    <programlisting language="xml"><![CDATA[<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    xmlns="urn:proactive:jobdescriptor:dev" id="Matlab_job_simplest">
+    <description>A simple Matlab job, which computes the roots of several polynomials</description>
+    <taskFlow>]]></programlisting>
                 </section>
                 <section xml:id="Scheduler_Matlab_Task_Definition">
                     <info>
@@ -255,7 +259,13 @@
                             http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js
                         </uri>
                     </para>
-                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_SIMPLE_TASK_DEFINITION.snip"/></textobject></programlisting>
+                    <programlisting language="xml"><![CDATA[        <task id="root1" preciousResult="true">
+            <description>Calculates the root of a polynomial</description>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>]]></programlisting>
                 </section>
                 <section xml:id="Scheduler_Matlab_Script_Definition">
                     <info>
@@ -270,7 +280,12 @@
                         java program that will connect to the Matlab
                         engine and launch the given script inside it.
                     </para>
-                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_SIMPLE_EXECUTABLE.snip"/></textobject></programlisting>
+                    <programlisting language="xml"><![CDATA[<javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
+                <parameters>
+                    <parameter name="input" value="in=[1 0 3 -2 5 1];"/>
+                    <parameter name="script" value="out=roots(in);"/>
+                </parameters>
+            </javaExecutable>]]></programlisting>
                     <para>
                         The javaExecutable tag contains an attribute
                         <emphasis>class</emphasis>
@@ -440,7 +455,12 @@
                     the variables declaration in the preceding
                     descriptor:
                 </para>
-                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_MATLAB_VARIABLE.snip"/></textobject></programlisting>
+                <programlisting language="xml"><![CDATA[<variables>
+        <variable name="SCHEDULER_HOME"
+            value="/home/user/Scheduler" /> <!-- CHANGE ME -->
+        <variable name="MATLAB_SCRIPTS"
+            value="${SCHEDULER_HOME}/extensions/matlab/examples" />
+    </variables>]]></programlisting>
                 <para>
                     the
                     <emphasis>variables</emphasis>
@@ -467,8 +487,18 @@
                     </title>
                 </info>
 
-                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_SPLITTER.snip"/></textobject></programlisting>
-                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_COLLECTOR.snip"/></textobject></programlisting>
+                <programlisting language="xml"><![CDATA[<javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabSplitter">
+                <parameters>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/splitter.m"/>
+                    <parameter name="input" value="in=round(rand(1,1000000)*100-50)"/>
+                    <parameter name="number_of_children" value="6"/>
+                </parameters>
+            </javaExecutable>]]></programlisting>
+                <programlisting language="xml"><![CDATA[<javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabCollector">
+                <parameters>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/collector.m"/>
+                </parameters>
+            </javaExecutable>]]></programlisting>
                 <para>
                     Two new tasks appear in this descriptor : the
                     <emphasis>MatlabSplitter</emphasis>
@@ -496,7 +526,11 @@
                     In order to do complex task flows, it is necessary
                     to add the concept of dependencies between tasks.
                 </para>
-                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_DEPENDENCIES.snip"/></textobject></programlisting>
+                <programlisting language="xml"><![CDATA[<selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>]]></programlisting>
                 <para>
                     The
                     <emphasis>depends</emphasis>
@@ -524,7 +558,13 @@
                     </title>
                 </info>
 
-                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/SCHEDULER_MATLAB_JOB_INDEX.snip"/></textobject></programlisting>
+                <programlisting language="xml"><![CDATA[<javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask
+ */">
+                <parameters>
+                    <parameter name="index" value="0"/>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
+                </parameters>
+            </javaExecutable>]]></programlisting>
                 <para>
                     A new parameter appears in this descriptor for the
                     SimpleMatlab task : the
@@ -663,8 +703,33 @@
                 Scheduler : it will have access to the native libraries you've compiled.
             </para>
             <para>
-                One other step needed before using the toolkit it to create  
+                One other step needed before using the toolkit it to create a file that grants the matlab jvm the necessary rights to work with ProActive.
+                There are two ways of doing this. Both ways have pros and cons and users must determine what's best for them:                
             </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Create a file called <emphasis>.java.policy</emphasis> (notice the "dot" in front of the file name) in the <emphasis>HOME</emphasis> directory of the current user.
+                For Windows users the HOME directory is the folder "\Documents And Settings\username". The file must contain the following text:
+                    </para>
+                    <screen>grant {
+  permission java.security.AllPermission;
+};</screen>
+                    <para>
+                        Pros of this method is that it has to be done once and will remain for every matlab session afterwards for the same user. Cons is that it overrides the default security scheme used by java, and thus every jvm started by the user will have a relaxed security scheme.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Create a <emphasis>java.opts</emphasis> file in the directory where the matlab software session is started. Create as well a <emphasis>matlab.java.policy</emphasis> file in the same directory. The matlab.java.policy must have the same content as the .java.policy file above. The java.opts file should contain:
+                    </para>
+                    <screen>-Djava.security.manager -Djava.security.policy="matlab.java.policy"</screen>
+                    <para>
+                        Pros of this method is that it allows users to specify that only the matlab jvm has relaxed permission and not every jvms run on the computer. Cons is that it needs to be done each time the matlab session is started.
+                    </para>
+                </listitem>
+            </itemizedlist>
+
 
         </section>
         <section xml:id="SciMat_Embedded_Usage">
@@ -719,32 +784,28 @@
                         The result of the PAsolve function is a Matlab Object of type PAResultList. When displayed this object will print:
                     </para>
                     <screen>&gt;&gt; resl
-                    Awaited Result List</screen>
+Awaited Result List</screen>
                     <para>
                     	This means that the result from the PAsolve function is not yet available. The PAsolve is thus called "asynchronously" and doesn't block the matlab interpreter execution.
                     	This allows for example to run other PAsolve(s) while the first PAsolve is still computing the result. If, at some point, the results of a PAsolve function is needed, this can be achieved by manipulating the PAResultList object.
                     	A manipulation of the object will trigger a wait-by-necessity mechanism, this means that the matlab interpreter will block and wait until the result is available. The object can be manipulated either by using indexation, thus displaying a single member of the list (or more, depending on the index): 
                     </para>
                     <screen>&gt;&gt; resl(3) # triggers wait_by_necessity
-                    6  # fact(3)                    
-                    </screen>
+6  # fact(3)</screen>
                     <para>
                     	Or by using the object attribute <emphasis>wait</emphasis>, in that case the result of the wait attribute will be the whole result list:
                     </para>
                     <screen>&gt;&gt; resl.wait # triggers wait_by_necessity 
-                       [1] [2] [6] [24] [120]
-                    </screen>
+[1] [2] [6] [24] [120]</screen>
                 </listitem>
                 <listitem>
                 	<para>
                 		Finally a PAeval function exists, it is similar to PAsolve but takes only one argument instead of a list of argument and returns only a PAResult instead of a PAResultList:
                 	</para>
-                	<screen>
-                		&gt;&gt; res = PAeval( @factorial, {5} )
-                		Awaited Result
-                		&gt;&gt; res.wait   # wait_by_necessity
-                		120
-                	</screen>
+                	<screen>&gt;&gt; res = PAeval( @factorial, {5} )
+Awaited Result
+&gt;&gt; res.wait   # wait_by_necessity
+120</screen>
                 </listitem>
             </orderedlist>
             <para>
