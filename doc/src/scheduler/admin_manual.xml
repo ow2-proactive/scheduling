@@ -288,7 +288,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.ldap.config.path</emphasis>:
+							<emphasis role="italics">pa.ldap.config.path</emphasis>:
 							LDAP Authentication configuration file path, used to set LDAP configuration properties.
 							(default is config/authentication/ldap.cfg)
 						</para>
@@ -764,19 +764,23 @@ user2:user
 				entries are stored, LDAP groups that define user and admin group membership, URL of the LDAP, LDAP binding method used by connection
 				and configuration of SSL/TLS if you want a secured connection between Scheduler and LDAP. All LDAP connection parameters are set in <emphasis>config/authentication/ldap.cfg</emphasis>.
 			</para>
+			<para>
+			<emphasis>PASchedulerProperties.ini</emphasis> in <emphasis>config</emphasis> directory, defines a path to a configuration file that contains all LDAP connection and authentication properties.
+			Default value for this property defines a default configuration file;  <emphasis>config/authentication/ldap.cfg</emphasis>. Specify your LDAP properties in this file. Properties are explained below. 
+			</para>
 			<section xml:id="LDAP_users_URL"><info><title>Set LDAP url</title></info>
-				<para> First, you have to define the LDAP's URL of your organisation. This address corresponds to the property: <emphasis>pa.scheduler.ldap.url</emphasis>.
+				<para> First, you have to define the LDAP's URL of your organisation. This address corresponds to the property: <emphasis>pa.ldap.url</emphasis>.
 				 You have to put a standard LDAP-like URL, for example <emphasis>ldap://myLdap</emphasis>. You can also set an URL with secure access: <emphasis>ldaps://myLdap:636</emphasis>.
 				 See <xref linkend="LDAP_SSL"/> for SSL/TLS configuration.
 				 </para>
 			</section>			
 			<section xml:id="LDAP_users_subtree"><info><title>Set users subtree and login attribute</title></info>
 				<para>You have to define where users entries are stored in LDAP tree, i.e. the path where Scheduler tries to find users and admin entries. 
-				The users subtree corresponds to the property: <emphasis>pa.scheduler.ldap.userssubtree</emphasis>. Put a DN of your LDAP like this:
-				<literal>pa.scheduler.ldap.userssubtree=ou=myUsers,o=myOrganisation,dc=myFirm,dc=com</literal>. 
+				The users subtree corresponds to the property: <emphasis>pa.ldap.userssubtree</emphasis>. Put a DN of your LDAP like this:
+				<literal>pa.ldap.userssubtree=ou=myUsers,o=myOrganisation,dc=myFirm,dc=com</literal>. 
 				</para>
-				<para> Then, you have to specify in users entries, the attribute that corresponds to the user login. This is done by the property: <emphasis>pa.scheduler.ldap.user.login.attr</emphasis>.
-				Put an attribute name like this: <literal>pa.scheduler.ldap.user.login.attr=loginName</literal>.
+				<para> Then, you have to specify in users entries, the attribute that corresponds to the user login. This is done by the property: <emphasis>pa.ldap.user.login.attr</emphasis>.
+				Put an attribute name like this: <literal>pa.ldap.user.login.attr=loginName</literal>.
 				</para>
 			</section>
 			<section xml:id="LDAP_groups"><info><title>Set users and admin groups</title></info>
@@ -785,12 +789,12 @@ user2:user
 				organization LDAP's has to provide two entries of type <emphasis>groupOfUniqueNames</emphasis>, that present attributes
 				of type <emphasis>uniqueMember</emphasis>, which corresponds to users DN that has access to the Scheduler (typical group definition in a LDAP). You have to set
 				the two entries of this type wherein users and admins DN are put in 'uniqueMemeber' attribute. Admins group DN is set in scheduler by property 
-				<emphasis>pa.scheduler.ldap.admins.group.dn</emphasis>. User group DN is set by  property <emphasis>pa.scheduler.ldap.users.group.dn</emphasis>. 
+				<emphasis>pa.ldap.admins.group.dn</emphasis>. User group DN is set by  property <emphasis>pa.ldap.users.group.dn</emphasis>. 
 				</para>
 			</section>
 			<section xml:id="LDAP_binding_method"><info><title>Configure LDAP authentication parameters</title></info>
 				<para>
-					By default, the Scheduler binds to LDAP in anonymous mode. You can change this authentication method by modifying the property <emphasis>pa.scheduler.ldap.authentication.method</emphasis>.
+					By default, the Scheduler binds to LDAP in anonymous mode. You can change this authentication method by modifying the property <emphasis>pa.ldap.authentication.method</emphasis>.
 					This property can have several values:
 					<itemizedlist>
 						<listitem><para><emphasis>none</emphasis> (default value) - the Scheduler performs connection to LDAP in anonymous mode.</para>
@@ -807,9 +811,9 @@ user2:user
 					If you specify an authentication method different from 'none' (anonymous connection to LDAP),
 					you must specify a login/password for authentication. There are two properties in PASchedulerProperties.ini to set:
 					<itemizedlist>
-						<listitem><para><emphasis>pa.scheduler.ldap.bind.login</emphasis> - set user name for authentication.</para>
+						<listitem><para><emphasis>pa.ldap.bind.login</emphasis> - set user name for authentication.</para>
 						</listitem>
-						<listitem><para><emphasis>pa.scheduler.ldap.bind.pwd</emphasis> - set password for authentication.</para>
+						<listitem><para><emphasis>pa.ldap.bind.pwd</emphasis> - set password for authentication.</para>
 						</listitem>
 					</itemizedlist>				
 				</para>
@@ -817,8 +821,8 @@ user2:user
 			<section xml:id="LDAP_SSL"><info><title>Set SSL/TLS parameters</title></info>
 				<para>Scheduler is able to communicate with LDAP with a secured SSL/TLS layer. It can be useful if your network is not trusted, and critical information are transmitted
 					between scheduler and LDAP, such as  users passwords.
-					First, set the LDAP URL property <emphasis>pa.scheduler.ldap.url</emphasis> to a URL of type ldaps://myLdap.
-					Then, set <emphasis>pa.scheduler.ldap.authentication.method</emphasis> to none so as to delegate authentication to SSL.
+					First, set the LDAP URL property <emphasis>pa.ldap.url</emphasis> to a URL of type ldaps://myLdap.
+					Then, set <emphasis>pa.ldap.authentication.method</emphasis> to none so as to delegate authentication to SSL.
 				</para>
 				<para>For using SSL properly, you have to specify your certificate and public keys for SSL handshake. Java stores
 					certificates in a keyStore and public keys in a trustStore. In most of cases, you just have to define a trustStore with public
@@ -847,16 +851,16 @@ user2:user
 				</para>
 				<itemizedlist>
 					<listitem><para>
-					Set <emphasis>pa.scheduler.ldap.keystore.path</emphasis> to the path of your keyStore.</para>
+					Set <emphasis>pa.ldap.keystore.path</emphasis> to the path of your keyStore.</para>
 					</listitem>
 					<listitem><para>
-					Set <emphasis>pa.scheduler.ldap.keystore.passwd</emphasis> to the password defined previously for keyStore.</para>
+					Set <emphasis>pa.ldap.keystore.passwd</emphasis> to the password defined previously for keyStore.</para>
 					</listitem>
 					<listitem><para>
-					Set <emphasis>pa.scheduler.ldap.truststore.path</emphasis> to the path of your trustStore.</para>
+					Set <emphasis>pa.ldap.truststore.path</emphasis> to the path of your trustStore.</para>
 					</listitem>
 					<listitem><para>
-					Set <emphasis>pa.scheduler.ldap.truststore.passwd</emphasis> to the password defined previously for trustStore.</para>
+					Set <emphasis>pa.ldap.truststore.passwd</emphasis> to the password defined previously for trustStore.</para>
 					</listitem>
 				</itemizedlist>
 			<para>

@@ -411,15 +411,52 @@ user2:user
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">exec(commandFilePath)</emphasis>; execute content of a given script file (parameter is a string representing a command-file path).
+				<emphasis role="italics">exMode(display,onDemand)</emphasis>; change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks).
 			</para>
 		</listitem>
 		<listitem>
 			<para>
+				<emphasis role="italics">exec(commandFilePath)</emphasis>; execute content of a given script file (parameter is a string representing a command-file path).
+				See <xref linkend="rm_admin_js_console_script"/>.
+			</para>
+		</listitem>q
+		<listitem>
+			<para>
 				<emphasis role="italics">exit()</emphasis>; Exits Resource manager's JavaScript console.
 			</para>
-		</listitem>						
-	</itemizedlist>		
+		</listitem>
+	</itemizedlist>
+	<section xml:id="rm_admin_js_console_script"><info><title>execute actions in a Java script file</title></info>
+		<para>
+			You can script a sequence of commands to send to Resource Manager in javascript file:
+		</para>
+		<programlisting>
+/* set exec mode in order to not display stack trace, and not ask for either.*/
+exMode(false,false);
+
+/* remove a node source, preemptively */
+removens("my_node_source",true);
+
+/* create a new node source */
+createns("my_node_source");
+
+/*deploy computing nodes with a GCM deployment descriptor,
+and add nodes to the created node source */
+gcmdeploy("myGCMD.xml","my_node_source");
+
+/* wait for a while */
+java.lang.Thread.sleep(10000);
+
+/* check that deployment has succeed */
+listnodes();
+		</programlisting>
+		<para>
+		Then run this script by typing in interactive mode:
+		</para>
+		<programlisting>
+ > exec("myScript.js");
+		</programlisting>
+		</section>
 	</section>	
 	</section>
 </chapter>
