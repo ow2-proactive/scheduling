@@ -281,6 +281,12 @@
                     </para>
                 </listitem>
                 <listitem>
+                     <para>
+                         Define the path to the ProActive scheduler by using the environment variable <emphasis>SCHEDULER_HOME</emphasis>:
+                     </para>
+                    <screen>setenv('SCHEDULER_HOME','/my_path_to_scheduler/')</screen>
+                </listitem>
+                <listitem>
                     <para>
                         Execute the following command on the Scilab prompt:
                     </para>
