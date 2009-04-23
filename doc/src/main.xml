@@ -15,6 +15,7 @@
 	  
 	  <!ENTITY RM SYSTEM "resourcemanager/rm.xml">
 	  <!ENTITY RM_deployment SYSTEM "resourcemanager/rm_deployment.xml">
+	  <!ENTITY RM_admin SYSTEM "resourcemanager/rm_admin.xml">
 	  <!ENTITY RM_API SYSTEM "resourcemanager/rm_api.xml">
 	  <!ENTITY RM_plugin SYSTEM "resourcemanager_plugin/rm_plugin.xml">
 	  
@@ -46,6 +47,7 @@
 		</info>
 		&RM;
 		&RM_deployment;
+		&RM_admin;
 		&RM_plugin;
 		&RM_API;
 	</part>
