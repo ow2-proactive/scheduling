@@ -10,37 +10,32 @@ Javadoc and updated documentation are available online: http://proactive.inria.f
 
 *** Quick start :
 
-* Set JAVA_HOME environment variable to the directory where 1.5 or
-greater JDK
+* Set JAVA_HOME environment variable to the directory where java 1.5 or
+greater is located.
 
-* Start a command shell and go into the bin/[os] directory into your
-installed scheduler home path. You can start the scheduler by
-launching the startScheduler.[sh|bat] script. If run without an
-argument, it will first start a Resources Manager on the local host
-and deploy 4 nodes. Then the scheduler will be started and connected
-to this resource Manager. Scheduler is starting sequence, that is
-finished when the line:
+* Start a command shell and go into the bin/[os] directory of your installed 
+scheduler home path. You can start the scheduler by launching the 
+startScheduler.[sh|bat] script. If ran without argument, it starts a Resource 
+Manager on the local host and deploy 4 nodes. Scheduler finishes its starting 
+sequence when the following line is displayed:
 	 Scheduler successfully created on rmi://hostname:port/
-is displayed. At this point, ProActive Scheduler is started with 4 nodes available.
+At this point, ProActive Scheduler is started with 4 free nodes.
 
 A database is used to store ProActive Scheduler activities and to
 offer fault tolerance.The database is configured in the
 'hibernate.cfg.xml' file in the 'config/database/hibernate' directory.
 
-* You can now submit a job. To do so, you can use the command-line
-controller.Just start the userScheduler.[sh|bat] script with proper
-parameters:
-~> userScheduler.[sh|bat] --submit ../../samples/jobs_descriptors/Job_8_tasks.xml
+* You can now submit a job. To do so, use the command-line controller.
+Just start the userScheduler.[sh|bat] script with proper parameters:
+~> userScheduler.[sh|bat] --submit ../../samples/jobs_descriptors/Job_PI.xml
 
-You will requested for login and password, and then the Job_PI.xml is
-submitted to the scheduler. If you need a login and password, a
-default couple one is demo:demo.There are many other jobs examples in
-job_descriptors directory.
+You will be requested for login and password, and then the Job_PI.xml is
+submitted to the scheduler (use for instance demo:demo). You may find many 
+other jobs examples in samples/job_descriptors directory.
 
-* The scheduler is now scheduling this job. For further information,
-please refers to the Scheduler documentation; an administration guide
-will help you to tune the scheduler, and user guide will explain how
-to build and submit jobs.
+* For further information, please refers to the Scheduler documentation; the
+administration guide will help you to tune the scheduler, and the user guide 
+will explain how to build and submit jobs.
 
 
 *** Compilation :
@@ -75,7 +70,7 @@ Details can be found on the ProActive Jira bug-tracking system
 (https://galpage-exp.inria.fr:8181/jira):
 
 - SCHEDULING-166 ProActive Scheduling 1.0.0 supports only 'one node
-  per JVM' configuration (i.e.  GCMD vmCapacity set to 1).
+  per JVM' configuration (i.e. GCMD vmCapacity set to 1).
 
 - SCHEDULING-256 Concurrent access to the same job logs can lead to
   log loss.
