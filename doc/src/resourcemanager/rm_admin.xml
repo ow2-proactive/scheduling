@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager_admin"><info><title>Administration Manual</title></info>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager_admin"><info><title>Administration guide</title></info>
 
-	<section xml:id="rm-config"><info><title>Resource manager configuration file.</title></info>
+	<section xml:id="rm-config"><info><title>Resource manager configuration file</title></info>
 	<para>
-		Resource manager has a set of properties that can be changed, regarding to your computing infrastructure and your needs. 
+		Resource manager has a set of properties that can be changed regarding to your computing infrastructure and your needs.
 		These properties are set in <emphasis>PAResourceManagerProperties.ini</emphasis> in the <emphasis>config</emphasis> directory:
 	</para>
 	<para>
-		You can define these variables in <emphasis>PAResourceManagerProperties.ini</emphasis> in the <emphasis>config</emphasis> directory, or define/override them
-		 in the the java command line using the -D option. 
-		 You just have to name the property as it is done in the properties file, and give it a value. (ex: java -Dpa.rm.node.source.ping.frequency=45000...). 
+		You can define these variables in <emphasis>PAResourceManagerProperties.ini</emphasis> in the <emphasis>config</emphasis> directory or define/override them
+		 in the the java command line using the -D option (ex: java -Dpa.rm.node.source.ping.frequency=45000 ...).
 		 Such a property can be added in the provided scripts (startRM.[sh|bat] for example).
 	</para>
 	<itemizedlist>
 		<listitem>
 			<para>
 				<emphasis role="italics">pa.rm.node.name</emphasis>: 
-				defines name of the ProActive node that contains Resource manager active objects.
+				defines a name of the ProActive node that contains Resource manager active objects.
 				Default is <emphasis>RM_NODE</emphasis>.
 			</para>
 		</listitem>
@@ -24,7 +23,7 @@
 			<para>
 				<emphasis role="italics">pa.rm.node.source.ping.frequency</emphasis>: 
 				Resource Manager checks whether computing nodes are still alive. This property set this verification frequency in milliseconds.
-				Default is <emphasis>45000</emphasis>. 
+				Default is <emphasis>45000</emphasis>.
 			</para>
 		</listitem>
 		<listitem>
@@ -32,15 +31,15 @@
 				<emphasis role="italics">pa.rm.select.script.timeout</emphasis>: 
 				Max execution time of a selection script, in milliseconds. If execution time is longer than this value, 
 				Resource Manager assumes that computing node is not suitable for this selection script.
-				Default is <emphasis>12000</emphasis>. 
+				Default is <emphasis>45000</emphasis>.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
 				<emphasis role="italics">pa.rm.gcm.template.application.file</emphasis>: 
 				Path of default GCM Application descriptor, used for all GCM deployments.
-				If this file path is a relative, path is evaluated from the Resource manager dir (ie application's root dir)
-				with the variable defined below: <emphasis role="italics">pa.rm.home</emphasis>, else, the path is absolute, path is directly interpreted.
+				If this file path is a relative, path is evaluated from the Resource manager dir (variable <emphasis role="italics">pa.rm.home</emphasis>)
+				with, otherwise path is directly interpreted.
 				See <xref linkend="RM_GCM"/> part.
 				Default is <emphasis>config/deployment/GCMNodeSourceApplication.xml</emphasis>.
 			</para>
@@ -48,7 +47,7 @@
 		<listitem>
 			<para>
 				<emphasis role="italics">pa.rm.gcmd.path.property.name</emphasis>: 
-				String in the default GCM application that will be replaced by a path to a GCM deployment descriptor. See<xref linkend="RM_GCM"/> part.
+				String in the default GCM application that will be replaced by a path to a GCM deployment descriptor. See <xref linkend="RM_GCM"/> part.
 				Default is <emphasis>gcmd.file</emphasis>.
 			</para>
 		</listitem>
@@ -63,14 +62,14 @@
 		<listitem>
 			<para>
 				<emphasis role="italics">pa.rm.nodesource.infrastructures</emphasis>: 
-				path to a file containing the list of supported infrastructures in the resource manager.
+				Path to a file containing the list of supported infrastructures in the resource manager.
 				Default is <emphasis>config/nodesource/infrastructures</emphasis>.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
 				<emphasis role="italics">pa.rm.nodesource.policies</emphasis>: 
-				path to a file containing the list of supported node acquisition policies in the resource manager.
+				Path to a file containing the list of supported node acquisition policies in the resource manager.
 				Default is <emphasis>config/nodesource/policies</emphasis>.
 			</para>
 		</listitem>
@@ -173,14 +172,15 @@ user2:user
 		</section>
 		<section xml:id="LDAP_RM_authent"><info><title>Configure LDAP-based authentication</title></info>
 			<para>
-				Resource Manager is able to connect to an existing LDAP, to check users login/password, and verify users group membership. This authentication method can be useful
-				if you have in your organization an LDAP that already stores user/password entries. There are several points to configure: path in LDAP where users and admins
-				entries are stored, LDAP groups that define user and admin group membership, URL of the LDAP, LDAP binding method used by connection
+				Resource Manager is able to connect to an existing LDAP, to check users login/password and verify users group membership.
+				This authentication method can be used with existing LDAP server which is already configured.
+				In order to use it, few parameters have to be configured, such as path in LDAP tree users, LDAP groups that define user and admin group membership,
+				URL of the LDAP server, LDAP binding method used by connection
 				and configuration of SSL/TLS if you want a secured connection between Resource Manager and LDAP. 
 			</para>
 			<para>
 			<emphasis>PAResourceManagerProperties.ini</emphasis> in <emphasis>config</emphasis> directory, defines a path to a configuration file that contains all LDAP connection and authentication properties.
-			Default value for this property defines a default configuration file;  <emphasis>config/authentication/ldap.cfg</emphasis>. Specify your LDAP properties in this file. Properties are explained below. 
+			Default value for this property defines a default configuration file;  <emphasis>config/authentication/ldap.cfg</emphasis>. Specify your LDAP properties in this file. Properties are explained below.
 			</para>
 			<section xml:id="RM_LDAP_users_URL"><info><title>Set LDAP url</title></info>
 				<para> First, you have to define the LDAP's URL of your organisation. This address corresponds to the property: <emphasis>pa.ldap.url</emphasis>.
@@ -193,17 +193,17 @@ user2:user
 				The users subtree corresponds to the property: <emphasis>pa.ldap.userssubtree</emphasis>. Put a DN of your LDAP like this:
 				<literal>pa.ldap.userssubtree=ou=myUsers,o=myOrganisation,dc=myFirm,dc=com</literal>. 
 				</para>
-				<para> Then, you have to specify in users entries, the attribute that corresponds to the user login. This is done by the property: <emphasis>pa.ldap.user.login.attr</emphasis>.
+				<para> Then you have to specify in users entries the attribute that corresponds to the user login. This is done by the property: <emphasis>pa.ldap.user.login.attr</emphasis>.
 				Put an attribute name like this: <literal>pa.ldap.user.login.attr=loginName</literal>.
 				</para>
 			</section>
 			<section xml:id="RM_LDAP_groups"><info><title>Set users and admin groups</title></info>
 				<para>
-				After having found user entry in LDAP, and checked user password, LDAP checks group membership of the user. Your
-				organization LDAP's has to provide two entries of type <emphasis>groupOfUniqueNames</emphasis>, that present attributes
+				After user entry has been found in LDAP and checked password has been checked, LDAP checks group membership of the user. Your
+				organization LDAP has to provide two entries of type <emphasis>groupOfUniqueNames</emphasis>, that present attributes
 				of type <emphasis>uniqueMember</emphasis>, which corresponds to users DN that has access to the Resouce Manager (typical group definition in a LDAP). You have to set
-				the two entries of this type wherein users and admins DN are put in 'uniqueMemeber' attribute. Admins group DN is set by property 
-				<emphasis>pa.ldap.admins.group.dn</emphasis>. User group DN is set by  property <emphasis>pa.ldap.users.group.dn</emphasis>. 
+				two entries of this type wherein users and admins DN are put in 'uniqueMemeber' attribute. Admins group DN is set by property
+				<emphasis>pa.ldap.admins.group.dn</emphasis>. User group DN is set by property <emphasis>pa.ldap.users.group.dn</emphasis>.
 				</para>
 			</section>
 			<section xml:id="RM_LDAP_binding_method"><info><title>Configure LDAP authentication parameters</title></info>
@@ -225,9 +225,9 @@ user2:user
 				If you specify an authentication method different from 'none' (anonymous connection to LDAP),
 				you must specify a login/password for authentication. There are two properties to set in LDAP configuration file:
 				<itemizedlist>
-					<listitem><para><emphasis>pa.ldap.bind.login</emphasis> - set user name for authentication.</para>
+					<listitem><para><emphasis>pa.ldap.bind.login</emphasis> - sets user name for authentication.</para>
 					</listitem>
-					<listitem><para><emphasis>pa.ldap.bind.pwd</emphasis> - set password for authentication.</para>
+					<listitem><para><emphasis>pa.ldap.bind.pwd</emphasis> - sets password for authentication.</para>
 					</listitem>
 				</itemizedlist>				
 				</para>
@@ -236,7 +236,7 @@ user2:user
 				<para>Resource Manager is able to communicate with LDAP with a secured SSL/TLS layer. It can be useful if your network is not trusted, and critical information are transmitted
 				between Resource Manager and LDAP, such as  users passwords.
 				First, set the LDAP URL property <emphasis>pa.ldap.url</emphasis> to a URL of type ldaps://myLdap.
-				Then, set <emphasis>pa.ldap.authentication.method</emphasis> to none so as to delegate authentication to SSL.
+				Then set <emphasis>pa.ldap.authentication.method</emphasis> to none so as to delegate authentication to SSL.
 				</para>
 				<para>For using SSL properly, you have to specify your certificate and public keys for SSL handshake. Java stores
 				certificates in a keyStore and public keys in a trustStore. In most of cases, you just have to define a trustStore with public
@@ -361,68 +361,62 @@ user2:user
 	<itemizedlist>
 		<listitem>
 			<para>
-				<emphasis role="italics">addnode(nodeURL, nsName)</emphasis>; add an existing Resource manager node to Resource manager
+				<emphasis role="italics">addnode(nodeURL, nsName)</emphasis>; adds an existing Resource manager node to Resource manager
 			(parameters are a string representing the node URL to add, and a string representing the node source in which to add the node).
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">removenode(nodeURL,preempt)</emphasis>; remove the given node (parameter is a string representing the node URL, node is removed immediately if second parameter is true.
+				<emphasis role="italics">removenode(nodeURL,preempt)</emphasis>; removes the given node (parameter is a string representing the node URL, node is removed immediately if second parameter is true.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">gcmdeploy(gcmdFile,nsName)</emphasis>; deploy a GCM deployment descriptor to the given node source
+				<emphasis role="italics">gcmdeploy(gcmdFile,nsName)</emphasis>; deploys a GCM deployment descriptor to the given node source
 				(parameter is a string representing the a GCMD file, and a string representing the node source in which nodes will be added).
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">createns(nsName)</emphasis>; Create a new node source (parameter is a string representing the node source name to create).
+				<emphasis role="italics">createns(nsName)</emphasis>; creates a new node source (parameter is a string representing the node source name to create).
 			</para>
 		</listitem>
 		<listitem>
 			<para>
 				<emphasis role="italics">removens(nsName,preempt)</emphasis>; 
-				remove a given node source (parameter is a string representing a node source name to remove,
+				removes a given node source (parameter is a string representing a node source name to remove,
 				nodeSource is removed immediately if second parameter is true).
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">listnodes()</emphasis>; list every handled nodes.
+				<emphasis role="italics">listnodes()</emphasis>; lists every handled nodes.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">-r or --removens</emphasis> followed by a name of an existing node source, to remove a node source.
-				This argument can be used with <emphasis role="italics">-f or --force</emphasis> argument, in order to force removal of busy nodes in the specified node source.
+				<emphasis role="italics">listns()</emphasis>; lists all node sources.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">listns()</emphasis>; list all node sources.
+				<emphasis role="italics">shutdown(preempt)</emphasis>; shutdown the Resource Manager (RM shutdown immediately if parameter is true).
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">shutdown(preempt)</emphasis>; Shutdown the Resource Manager (RM shutdown immediately if parameter is true).
+				<emphasis role="italics">exMode(display,onDemand)</emphasis>; changes the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks).
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">exMode(display,onDemand)</emphasis>; change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks).
-			</para>
-		</listitem>
-		<listitem>
-			<para>
-				<emphasis role="italics">exec(commandFilePath)</emphasis>; execute content of a given script file (parameter is a string representing a command-file path).
+				<emphasis role="italics">exec(commandFilePath)</emphasis>; executes content of a given script file (parameter is a string representing a command-file path).
 				See <xref linkend="rm_admin_js_console_script"/>.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">exit()</emphasis>; Exits Resource manager's JavaScript console.
+				<emphasis role="italics">exit()</emphasis>; terminates Resource manager's JavaScript console.
 			</para>
 		</listitem>
 	</itemizedlist>
