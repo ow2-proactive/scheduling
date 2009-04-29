@@ -110,7 +110,7 @@ public class ResourceExplorerView extends ViewPart {
         if (rmShell == null) {
             rmShell = Display.getDefault().getActiveShell();
         }
-        System.out.println(rmShell);
+        //System.out.println(rmShell);
     }
 
     public static Shell getRMShell() {
