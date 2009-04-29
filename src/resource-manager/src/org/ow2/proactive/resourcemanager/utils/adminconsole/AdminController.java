@@ -669,6 +669,10 @@ public class AdminController {
 
     private void exit_() {
         console.printf("Exiting controller.");
+        try {
+            rm.disconnect();
+        } catch (Exception e) {
+        }
         terminated = true;
     }
 

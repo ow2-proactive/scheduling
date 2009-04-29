@@ -733,6 +733,10 @@ public class UserController {
 
     private void exit_() {
         console.printf("Exiting controller.");
+        try {
+            scheduler.disconnect();
+        } catch (Exception e) {
+        }
         terminated = true;
     }
 
