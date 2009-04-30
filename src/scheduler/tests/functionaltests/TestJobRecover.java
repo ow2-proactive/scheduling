@@ -35,6 +35,7 @@ import junit.framework.Assert;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 import functionalTests.FunctionalTest;
 
@@ -90,6 +91,12 @@ public class TestJobRecover extends FunctionalTest {
 
         SchedulerTHelper.log("check result job 1");
         JobResult result = SchedulerTHelper.getJobResult(idJ1);
+        
+        for (int i = 1; i <= 6; i++) {
+        	TaskResult tr = result.getResult("Computation" + i);
+        	System.out.println(tr.getTaskId().getReadableName() + " : " + tr.value());
+        }
+        
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
             Assert.assertNotNull(result.getResult("Computation" + i).value());
@@ -97,6 +104,12 @@ public class TestJobRecover extends FunctionalTest {
         }
         SchedulerTHelper.log("check result job 2");
         result = SchedulerTHelper.getJobResult(idJ2);
+        
+        for (int i = 1; i <= 6; i++) {
+        	TaskResult tr = result.getResult("Computation" + i);
+        	System.out.println(tr.getTaskId().getReadableName() + " : " + tr.value());
+        }
+        
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
             Assert.assertNotNull(result.getResult("Computation" + i).value());
@@ -104,6 +117,12 @@ public class TestJobRecover extends FunctionalTest {
         }
         SchedulerTHelper.log("check result job 3");
         result = SchedulerTHelper.getJobResult(idJ3);
+        
+        for (int i = 1; i <= 6; i++) {
+        	TaskResult tr = result.getResult("Computation" + i);
+        	System.out.println(tr.getTaskId().getReadableName() + " : " + tr.value());
+        }
+        
         Assert.assertEquals(6, result.getAllResults().size());
         for (int i = 1; i <= 6; i++) {
             Assert.assertNotNull(result.getResult("Computation" + i).value());
