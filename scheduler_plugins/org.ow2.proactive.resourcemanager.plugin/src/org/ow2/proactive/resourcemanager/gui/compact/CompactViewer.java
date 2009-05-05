@@ -152,7 +152,6 @@ public class CompactViewer implements ISelectionProvider {
             // full reload
             reloadMatrix();
         } else {
-            System.out.println("should no be here");
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
                     synchronized (reloadRequests) {
