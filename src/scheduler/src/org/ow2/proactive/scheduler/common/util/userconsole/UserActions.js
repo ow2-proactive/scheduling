@@ -38,8 +38,16 @@ function result(jobId){
     return UserController.result(""+jobId);
 }
 
+function tresult(jobId,taskName){
+    return UserController.tresult(""+jobId,""+taskName);
+}
+
 function output(jobId){
     UserController.output(""+jobId);
+}
+
+function toutput(jobId,taskName){
+    UserController.toutput(""+jobId,""+taskName);
 }
 
 function priority(jobId, priority){

@@ -106,7 +106,9 @@ public class UserController {
     private static final String REMOVEJOB_CMD = "removejob(id)";
     private static final String SUBMIT_CMD = "submit(XMLdescriptor)";
     private static final String GET_RESULT_CMD = "result(id)";
+    private static final String GET_TASK_RESULT_CMD = "tresult(id,taskName)";
     private static final String GET_OUTPUT_CMD = "output(id)";
+    private static final String GET_TASK_OUTPUT_CMD = "toutput(id,taskName)";
     private static final String JMXINFO_CMD = "jmxinfo()";
     private static final String EXEC_CMD = "exec(commandFilePath)";
 
@@ -350,10 +352,22 @@ public class UserController {
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
+        opt = new Option("tresult", true, control + "Get the result of the given task");
+        opt.setArgName("jobId taskName");
+        opt.setRequired(false);
+        opt.setArgs(2);
+        actionGroup.addOption(opt);
+
         opt = new Option("output", true, control + "Get the output of the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
+        actionGroup.addOption(opt);
+
+        opt = new Option("toutput", true, control + "Get the output of the given task");
+        opt.setArgName("jobId taskName");
+        opt.setRequired(false);
+        opt.setArgs(2);
         actionGroup.addOption(opt);
 
         opt = new Option("priority", true, control +
@@ -414,8 +428,20 @@ public class UserController {
             }
         } else if (cmd.hasOption("result")) {
             result(cmd.getOptionValue("result"));
+        } else if (cmd.hasOption("tresult")) {
+            String[] optionValues = cmd.getOptionValues("tresult");
+            if (optionValues == null || optionValues.length != 2) {
+                error("tresult must have two arguments. Start with --help for more informations");
+            }
+            tresult(optionValues[0], optionValues[1]);
         } else if (cmd.hasOption("output")) {
             output(cmd.getOptionValue("output"));
+        } else if (cmd.hasOption("toutput")) {
+            String[] optionValues = cmd.getOptionValues("toutput");
+            if (optionValues == null || optionValues.length != 2) {
+                error("toutput must have two arguments. Start with --help for more informations");
+            }
+            toutput(optionValues[0], optionValues[1]);
         } else if (cmd.hasOption("priority")) {
             try {
                 priority(cmd.getOptionValues("priority")[0], cmd.getOptionValues("priority")[1]);
@@ -658,6 +684,32 @@ public class UserController {
         }
     }
 
+    public static TaskResult tresult(String jobId, String taskName) {
+        return shell.tresult_(jobId, taskName);
+    }
+
+    private TaskResult tresult_(String jobId, String taskName) {
+        try {
+            TaskResult result = scheduler.getTaskResult(jobId, taskName);
+
+            if (result != null) {
+                printf("Task " + taskName + " result => \n");
+
+                try {
+                    printf("\t " + result.value());
+                } catch (Throwable e1) {
+                    handleExceptionDisplay("\t " + result.getException().getMessage(), e1);
+                }
+            } else {
+                printf("Task '" + taskName + "' is still running !");
+            }
+            return result;
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on task " + taskName, e);
+            return null;
+        }
+    }
+
     public static void output(String jobId) {
         shell.output_(jobId);
     }
@@ -683,6 +735,29 @@ public class UserController {
             }
         } catch (Exception e) {
             handleExceptionDisplay("Error on job " + jobId, e);
+        }
+    }
+
+    public static void toutput(String jobId, String taskName) {
+        shell.toutput_(jobId, taskName);
+    }
+
+    private void toutput_(String jobId, String taskName) {
+        try {
+            TaskResult result = scheduler.getTaskResult(jobId, taskName);
+
+            if (result != null) {
+                try {
+                    printf(taskName + " output :");
+                    printf(result.getOutput().getAllLogs(false));
+                } catch (Throwable e1) {
+                    handleExceptionDisplay("\t " + result.getException().getMessage(), e1);
+                }
+            } else {
+                printf("Task '" + taskName + "' is still running !");
+            }
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on task " + taskName, e);
         }
     }
 
@@ -834,8 +909,18 @@ public class UserController {
         out
                 .append(String
                         .format(
+                                " %1$-24s Get the result of the given task (parameter is an int or a string representing the jobId, and the task name)\n",
+                                GET_TASK_RESULT_CMD));
+        out
+                .append(String
+                        .format(
                                 " %1$-24s Get the output of the given job (parameter is an int or a string representing the jobId)\n",
                                 GET_OUTPUT_CMD));
+        out
+                .append(String
+                        .format(
+                                " %1$-24s Get the output of the given task (parameter is an int or a string representing the jobId, and the task name)\n",
+                                GET_TASK_OUTPUT_CMD));
         out
                 .append(String
                         .format(
