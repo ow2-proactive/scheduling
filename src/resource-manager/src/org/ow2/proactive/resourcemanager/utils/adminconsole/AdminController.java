@@ -97,6 +97,7 @@ public class AdminController {
 
     public static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
     protected static final String control = "<ctl> ";
+    private static String newline = System.getProperty("line.separator");
 
     private static final String EXCEPTIONMODE_CMD = "exMode(display,onDemand)";
     private static final String ADDNODE_CMD = "addnode(nodeURL, nsName)";
@@ -185,7 +186,7 @@ public class AdminController {
                 auth = RMConnection.join(url);
                 logger.info("\t-> Connection established on " + url);
 
-                logger.info("\nConnecting admin to the RM");
+                logger.info(newline + "Connecting admin to the RM");
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
                     pwdMsg = user + "'s password: ";
@@ -232,13 +233,15 @@ public class AdminController {
         } catch (ParseException e) {
             displayHelp = true;
         } catch (RMException e) {
-            logger.error("Error at connection : " + e.getMessage() + "\nShutdown the controller.\n");
+            logger.error("Error at connection : " + e.getMessage() + newline + "Shutdown the controller." +
+                newline);
             System.exit(1);
         } catch (LoginException e) {
-            logger.error(e.getMessage() + "\nShutdown the controller.\n");
+            logger.error(e.getMessage() + newline + "Shutdown the controller." + newline);
             System.exit(1);
         } catch (Exception e) {
-            logger.error("An error has occurred : " + e.getMessage() + "\nShutdown the controller.\n", e);
+            logger.error("An error has occurred : " + e.getMessage() + newline + "Shutdown the controller." +
+                newline, e);
             System.exit(1);
         }
 
@@ -246,7 +249,7 @@ public class AdminController {
             logger.info("");
             HelpFormatter hf = new HelpFormatter();
             hf.setWidth(160);
-            String note = "\nNOTE : if no " + control +
+            String note = newline + "NOTE : if no " + control +
                 " command is specified, the controller will start in interactive mode.";
             hf.printHelp(commandName + shellExtension(), "", options, note, true);
             System.exit(2);
@@ -258,7 +261,7 @@ public class AdminController {
 
     protected void connect() throws LoginException {
         rm = auth.logAsAdmin(user, pwd);
-        logger.info("\t-> Admin '" + user + "' successfully connected\n");
+        logger.info("\t-> Admin '" + user + "' successfully connected" + newline);
     }
 
     private void connectJMXClient(String url) {
@@ -364,12 +367,12 @@ public class AdminController {
     private void startCommandListener() throws Exception {
         initialize();
         console.start(" > ");
-        console.printf("Type command here (type '?' or help() to see the list of commands)\n");
+        console.printf("Type command here (type '?' or help() to see the list of commands)%n");
         String stmt;
         while (!terminated) {
             stmt = console.readStatement();
             if ("?".equals(stmt)) {
-                console.printf("\n" + helpScreen());
+                console.printf("%n" + helpScreen());
             } else {
                 eval(stmt);
                 console.printf("");
@@ -459,7 +462,7 @@ public class AdminController {
                 }
             }
         } else {
-            System.err.printf(msg + "\n");
+            System.err.printf(msg + newline);
             logger.info("", t);
         }
     }
@@ -468,7 +471,7 @@ public class AdminController {
         if (intercativeMode) {
             console.printf(format, args);
         } else {
-            System.out.printf(format + "\n", args);
+            System.out.printf(format + newline, args);
         }
     }
 
@@ -505,7 +508,7 @@ public class AdminController {
     }
 
     private void help_() {
-        printf("\n" + helpScreen());
+        printf(newline + helpScreen());
     }
 
     public static void shutdown(boolean preempt) {
@@ -735,45 +738,46 @@ public class AdminController {
     //***************** HELP SCREEN *******************
 
     protected String helpScreen() {
-        StringBuilder out = new StringBuilder("Resource Manager controller commands are :\n\n");
+        StringBuilder out = new StringBuilder("Resource Manager controller commands are :" + newline +
+            newline);
 
         out
                 .append(String
                         .format(
-                                " %1$-28s\t Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)\n\n",
+                                " %1$-28s\t Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)%n%n",
                                 EXCEPTIONMODE_CMD));
         out.append(String.format(
                 " %1$-28s\t Add node to the given node source (parameters is a string representing the node URL to add AND"
-                    + " a string representing the node source in which to add the node)\n", ADDNODE_CMD));
+                    + " a string representing the node source in which to add the node)%n", ADDNODE_CMD));
         out.append(String.format(
                 " %1$-28s\t Remove the given node (parameter is a string representing the node URL,"
-                    + " node is removed immediately if second parameter is true)\n", REMOVENODE_CMD));
+                    + " node is removed immediately if second parameter is true)%n", REMOVENODE_CMD));
         out.append(String
                 .format(
                         " %1$-28s\t Add node(s) to the given node source (parameter is a string representing the a GCMD file AND"
-                            + " a string representing the node source in which to add the node(s) )\n",
+                            + " a string representing the node source in which to add the node(s) )%n",
                         GCMDEPLOY_CMD));
         out
                 .append(String
                         .format(
-                                " %1$-28s\t Create a new node source (parameter is a string representing the node source name to create)\n",
+                                " %1$-28s\t Create a new node source (parameter is a string representing the node source name to create)%n",
                                 CREATENS_CMD));
         out.append(String.format(
                 " %1$-28s\t Remove the given node source (parameter is a string representing the node source name to remove,"
-                    + " nodeSource is removed immediately if second parameter is true)\n", REMOVENS_CMD));
-        out.append(String.format(" %1$-28s\t List every handled nodes\n", LISTNODES_CMD));
-        out.append(String.format(" %1$-28s\t List every handled node sources\n", LISTNS_CMD));
+                    + " nodeSource is removed immediately if second parameter is true)%n", REMOVENS_CMD));
+        out.append(String.format(" %1$-28s\t List every handled nodes%n", LISTNODES_CMD));
+        out.append(String.format(" %1$-28s\t List every handled node sources%n", LISTNS_CMD));
         out.append(String.format(
-                " %1$-28s\t Shutdown the Resource Manager (RM shutdown immediately if parameter is true)\n",
+                " %1$-28s\t Shutdown the Resource Manager (RM shutdown immediately if parameter is true)%n",
                 SHUTDOWN_CMD));
-        //        out.append(String.format(" %1$-28s\t Display some statistics provided by the Scheduler MBean\n",
+        //        out.append(String.format(" %1$-28s\t Display some statistics provided by the Scheduler MBean%n",
         //                JMXINFO_CMD));
         out
                 .append(String
                         .format(
-                                " %1$-28s\t Execute the content of the given script file (parameter is a string representing a command-file path)\n",
+                                " %1$-28s\t Execute the content of the given script file (parameter is a string representing a command-file path)%n",
                                 EXEC_CMD));
-        out.append(String.format(" %1$-28s\t Exits RM controller\n", EXIT_CMD));
+        out.append(String.format(" %1$-28s\t Exits RM controller%n", EXIT_CMD));
 
         return out.toString();
     }
