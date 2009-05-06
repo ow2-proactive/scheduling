@@ -33,8 +33,9 @@ package org.ow2.proactive.scheduler.core;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -75,8 +76,8 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
@@ -96,14 +97,6 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
- */
-/**
- * @author cdelbe
- *
- */
-/**
- * @author cdelbe
- *
  */
 public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, AdminSchedulerInterface {
 
@@ -125,6 +118,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
     /** List of connected user */
     private SchedulerUsers connectedUsers = new SchedulerUsers();
+
+    /** List used to mark the user that does not respond anymore */
+    private Set<UniqueID> dirtyList = new HashSet<UniqueID>();
 
     /** Implementation of Resource Manager */
     private transient ResourceManagerProxy resourceManager;
@@ -892,21 +888,33 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /* ########################################################################################### */
 
     /**
-     * Clear a listener that is no more responding
-     * 
-     * @param iter the iterator corresponding to the listener
-     * @param id the identification of the user that is no more available
-     * @param userId the userIdentification corresponding to the id.
+     * Clear every dirty listeners that are no more responding
      */
-    private void clearListener(Iterator<UniqueID> iter, UniqueID id, UserIdentification userId) {
-        iter.remove();
-        UserIdentificationImpl ident = identifications.remove(id);
-        //remove this user to the list of connected user
-        ident.setToRemove();
-        connectedUsers.update(ident);
-        usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
-        logger.warn(userId.getUsername() + "@" + userId.getHostName() +
-            " has been disconnected from events listener!");
+    private void clearListeners() {
+        for (UniqueID uId : dirtyList) {
+            //remove listener
+            schedulerListeners.remove(uId);
+            //get identification
+            UserIdentificationImpl ident = identifications.remove(uId);
+            //remove this user to the list of connected user
+            ident.setToRemove();
+            connectedUsers.update(ident);
+            //dispatch events
+            dispatchUsersUpdated(
+                    new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident), false);
+            logger.warn(ident.getUsername() + "@" + ident.getHostName() +
+                " has been disconnected from events listener!");
+        }
+        dirtyList.clear();
+    }
+
+    /**
+     * Put this is to be removed in the dirty list.
+     * 
+     * @param id the id of the user to be removed.
+     */
+    private void markAsDirty(UniqueID id) {
+        dirtyList.add(id);
     }
 
     /**
@@ -919,20 +927,20 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + eventType.toString() + "'");
             }
-            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
-            while (iter.hasNext()) {
-                UniqueID id = iter.next();
+            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+                UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
                     //if their is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(eventType)) {
-                        schedulerListeners.get(id).schedulerStateUpdatedEvent(eventType);
+                        entry.getValue().schedulerStateUpdatedEvent(eventType);
                     }
                 } catch (Exception e) {
-                    clearListener(iter, id, userId);
+                    markAsDirty(id);
                 }
             }
+            clearListeners();
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
@@ -948,9 +956,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
             }
-            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
-            while (iter.hasNext()) {
-                UniqueID id = iter.next();
+            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+                UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
@@ -960,16 +967,17 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                         //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
-                            schedulerListeners.get(id).jobSubmittedEvent(job);
+                            entry.getValue().jobSubmittedEvent(job);
                         }
                     }
                 } catch (NullPointerException e) {
                     //can't do anything
                     logger_dev.debug("", e);
                 } catch (Exception e) {
-                    clearListener(iter, id, userId);
+                    markAsDirty(id);
                 }
             }
+            clearListeners();
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
@@ -986,9 +994,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
-            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
-            while (iter.hasNext()) {
-                UniqueID id = iter.next();
+            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+                UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
@@ -998,13 +1005,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                         //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            schedulerListeners.get(id).jobStateUpdatedEvent(notification);
+                            entry.getValue().jobStateUpdatedEvent(notification);
                         }
                     }
                 } catch (Exception e) {
-                    clearListener(iter, id, userId);
+                    markAsDirty(id);
                 }
             }
+            clearListeners();
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
@@ -1021,9 +1029,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
-            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
-            while (iter.hasNext()) {
-                UniqueID id = iter.next();
+            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+                UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
@@ -1033,13 +1040,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                         //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            schedulerListeners.get(id).taskStateUpdatedEvent(notification);
+                            entry.getValue().taskStateUpdatedEvent(notification);
                         }
                     }
                 } catch (Exception e) {
-                    clearListener(iter, id, userId);
+                    markAsDirty(id);
                 }
             }
+            clearListeners();
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
@@ -1050,14 +1058,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * 
      * @param notification the data to send to every client
      */
-    private void dispatchUsersUpdated(NotificationData<UserIdentification> notification) {
+    private void dispatchUsersUpdated(NotificationData<UserIdentification> notification,
+            boolean checkForDownUser) {
         try {
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
-            Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
-            while (iter.hasNext()) {
-                UniqueID id = iter.next();
+            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+                UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
@@ -1068,12 +1076,16 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(
                                     notification.getData().getUsername()))) {
-                            schedulerListeners.get(id).usersUpdatedEvent(notification);
+                            entry.getValue().usersUpdatedEvent(notification);
                         }
                     }
                 } catch (Exception e) {
-                    clearListener(iter, id, userId);
+                    markAsDirty(id);
                 }
+            }
+            //Important condition to avoid recursive checks
+            if (checkForDownUser) {
+                clearListeners();
             }
         } catch (SecurityException e) {
             logger_dev.error(e);
@@ -1167,7 +1179,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     public void usersUpdated(NotificationData<UserIdentification> notification) {
         switch (notification.getEventType()) {
             case USERS_UPDATE:
-                dispatchUsersUpdated(notification);
+                dispatchUsersUpdated(notification, true);
                 schedulerBean.usersUpdate(notification.getData());
                 break;
             default:
