@@ -38,6 +38,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.resourcemanager.gui.compact.view.NodeView;
 import org.ow2.proactive.resourcemanager.gui.compact.view.View;
 import org.ow2.proactive.resourcemanager.gui.compact.view.ViewFractory;
@@ -142,27 +144,102 @@ public class CompactViewer implements ISelectionProvider {
      * of the matrix reloads everything (otherwise it's too complex to reloads only affected elements).
      */
     public void addView(final TreeLeafElement element) {
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                selectionManager.deselectAll();
+        // checking if element is added into the middle of the matrix
+        // if true -> reload everything
+        final View parent = rootView.findView(element.getParent());
 
-                // checking if element is added into the middle of the matrix
-                // if true -> reload everything
-                View parent = rootView.findView(element.getParent());
-
-                if (parent == null || !lastElement(element)) {
-                    // full reload
-                    clear();
-                    loadMatrix();
-                } else {
-                    // adding to the end of the matrix
-                    View view = createView(element);
-                    parent.getChilds().add(view);
-                    view.setParent(parent);
+        if (parent == null || !lastElement(element)) {
+            // full reload
+            reloadMatrix();
+        } else {
+            System.out.println("should no be here");
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    synchronized (reloadRequests) {
+                        // if reloadRequests > 0 don't do anything
+                        // everything will be reloaded anyway
+                        if (reloadRequests.getValue() == 0) {
+                            // adding to the end of the matrix
+                            View view = createView(element);
+                            parent.getChilds().add(view);
+                            view.setParent(parent);
+                            composite.layout();
+                        }
+                    }
                 }
-                composite.layout();
+            });
+        }
+    }
+
+    // number of compact view reload requests
+    MutableInteger reloadRequests = new MutableInteger(0);
+    // thread that performs reloading
+    Reloader reloader = new Reloader();
+
+    /**
+     * As reloading of the whole view is quite an expensive operation, so we
+     * cannot do it each time when node is added to the view. In order to
+     * optimize reloading especially during initial nodes deployment do it smoothly
+     * from this thread.
+     */
+    private class Reloader extends Thread {
+
+        private boolean stop = false;
+
+        public Reloader() {
+            start();
+        }
+
+        public void run() {
+            while (!stop) {
+                int numberOfReloadRequests = 0;
+                synchronized (reloadRequests) {
+                    numberOfReloadRequests = reloadRequests.getValue();
+                }
+
+                if (numberOfReloadRequests == 0) {
+                    try {
+                        synchronized (reloadRequests) {
+                            reloadRequests.wait();
+                        }
+                    } catch (InterruptedException e) {
+                    }
+                } else {
+                    synchronized (reloadRequests) {
+                        if (numberOfReloadRequests <= reloadRequests.getValue()) {
+                            reloadRequests.setValue(reloadRequests.getValue() - numberOfReloadRequests);
+                        }
+                    }
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            clear();
+                            loadMatrix();
+                            composite.layout();
+                        }
+                    });
+                    // sleeping for a while after full reloading
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                }
             }
-        });
+        }
+
+        public void stopThread() {
+            stop = true;
+            synchronized (reloadRequests) {
+                reloadRequests.notifyAll();
+            }
+        }
+    }
+
+    private void reloadMatrix() {
+
+        synchronized (reloadRequests) {
+            reloadRequests.add(1);
+            reloadRequests.notifyAll();
+        }
     }
 
     /**
@@ -289,5 +366,9 @@ public class CompactViewer implements ISelectionProvider {
      * Dummy implementation of ISelectionProvider
      */
     public void setSelection(ISelection selection) {
+    }
+
+    public void dispose() {
+        reloader.stopThread();
     }
 }

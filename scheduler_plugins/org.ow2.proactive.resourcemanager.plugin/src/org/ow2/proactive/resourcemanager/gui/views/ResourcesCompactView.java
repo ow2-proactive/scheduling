@@ -76,6 +76,7 @@ public class ResourcesCompactView extends ViewPart {
      */
     public void dispose() {
         super.dispose();
+        compactView.dispose();
         compactView = null;
     }
 
