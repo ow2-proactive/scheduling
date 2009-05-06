@@ -37,13 +37,13 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 ) ELSE (
 	rem Script engines must be added to classpath to be found
 	rem it must also placed before jars containing jar-index
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\script-js.jar
+	SET JARS=%PA_SCHEDULER%\dist\lib\script-js.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby-engine.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jython-engine.jar
 	rem  Needed explicitly by VFS (file transfer in pre/post script
     SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-logging-1.0.4.jar
 	rem fill with ProActive.jar : use jar index for proActive dependencies
-	SET JARS=%PA_SCHEDULER%\dist\lib\ProActive.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive.jar
 	rem fill with Scheduler jars : use jar index for Scheduler dependencies
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_SRM-common.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_ResourceManager.jar
