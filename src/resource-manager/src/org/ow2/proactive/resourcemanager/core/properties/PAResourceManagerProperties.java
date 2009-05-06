@@ -63,6 +63,9 @@ public enum PAResourceManagerProperties {
     /** ping frequency in ms used by node source for keeping a watch on handled nodes */
     RM_NODE_SOURCE_PING_FREQUENCY("pa.rm.node.source.ping.frequency", PAPropertiesType.INTEGER),
 
+    /** ping frequency used by resource manager to ping connected clients (in ms) */
+    RM_CLIENT_PING_FREQUENCY("pa.rm.client.ping.frequency", PAPropertiesType.INTEGER),
+
     /**  Timeout in ms for selection script execution */
     RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PAPropertiesType.INTEGER),
 

@@ -33,6 +33,7 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -41,6 +42,8 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -104,11 +107,16 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
      */
     public void initActivity(Body body) {
         try {
+            thisStub = (RMUserImpl) PAActiveObject.getStubOnThis();
+
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
 
             registerTrustedService(authentication);
             registerTrustedService(rmcore);
+
+            userNodes = new Hashtable<Node, UniversalBody>();
+            pinger = new Pinger("Admins pinger");
 
         } catch (ProActiveException e) {
             logger.debug("Cannot register RMAdmin. Aborting...", e);
@@ -226,6 +234,7 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
      * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#shutdown(boolean)
      */
     public BooleanWrapper shutdown(boolean preempt) throws ProActiveException {
+        pinger.stopThread();
         return rmcore.shutdown(preempt);
     }
 
