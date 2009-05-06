@@ -256,7 +256,7 @@
 
 				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
 				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/scheduler-log4j" />
-				<jvmarg value="-Dproactive.http.jetty.xml=${base.dir}/src/resource-manager/tests/nodestate/jetty.xml"/>
+				<jvmarg value="-Dproactive.http.jetty.xml=${base.dir}/config/deployment/jetty.xml"/>
 				<jvmargs />
 
 				<!--
