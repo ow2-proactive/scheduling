@@ -468,7 +468,7 @@ public class AdminController {
         if (intercativeMode) {
             console.printf(format, args);
         } else {
-            System.out.printf(format, args);
+            System.out.printf(format + "\n", args);
         }
     }
 
