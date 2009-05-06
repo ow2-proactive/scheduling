@@ -386,7 +386,7 @@ public class UserController {
                 prompt = status.toString();
             }
             stmt = console.readStatement(" " + prompt + " > ");
-            if (stmt.equals("?")) {
+            if ("?".equals(stmt)) {
                 console.printf("\n" + helpScreen());
             } else {
                 eval(stmt);
@@ -765,7 +765,12 @@ public class UserController {
                 initialize();
             }
             //Evaluate the command
-            engine.eval(cmd);
+            if (cmd == null) {
+                console.error("*ERROR* - Standard input stream has been terminated !");
+                terminated = true;
+            } else {
+                engine.eval(cmd);
+            }
         } catch (ScriptException e) {
             console.error("*SYNTAX ERROR* - " + format(e.getMessage()));
         } catch (Exception e) {
