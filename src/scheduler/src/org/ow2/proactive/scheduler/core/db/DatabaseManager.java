@@ -280,7 +280,7 @@ public class DatabaseManager {
             }
             String squery = "SELECT c from " + egClass.getName() + " c" + conds.toString();
             Query query = session.createQuery(squery);
-            logger_dev.info("Created query : " + squery);
+            logger_dev.debug("Created query : " + squery);
             if (conditions != null && conditions.length > 0) {
                 for (int i = 0; i < conditions.length; i++) {
                     query.setParameter("C" + i, conditions[i].getValue());
@@ -288,6 +288,9 @@ public class DatabaseManager {
                 }
             }
             return query.list();
+        } catch (org.hibernate.exception.LockAcquisitionException LockAcq) {
+            logger_dev.info("", LockAcq);
+            throw LockAcq;
         } catch (Exception e) {
             logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to recover the objects !", e);
