@@ -429,16 +429,12 @@ public class TaskComposite extends Composite {
 
             public int compare(TaskState t1, TaskState t2) {
                 try {
-                    if (t1.getFinishedTime() < 0 || t2.getFinishedTime() < 0) {
-                        return 0;
+                    long t1Duration = t1.getFinishedTime() - t1.getStartTime();
+                    long t2Duration = t2.getFinishedTime() - t2.getStartTime();
+                    if (order == TaskState.ASC_ORDER) {
+                        return (int) (t1Duration - t2Duration);
                     } else {
-                        long t1Duration = t1.getFinishedTime() - t1.getStartTime();
-                        long t2Duration = t2.getFinishedTime() - t2.getStartTime();
-                        if (order == TaskState.ASC_ORDER) {
-                            return (int) (t1Duration - t2Duration);
-                        } else {
-                            return (int) (t2Duration - t1Duration);
-                        }
+                        return (int) (t2Duration - t1Duration);
                     }
                 } catch (Exception e) {
                     return 0;
