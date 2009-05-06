@@ -201,8 +201,9 @@ public class TaskResultImpl implements TaskResult {
      */
     public Serializable value() throws Throwable {
         if (hadException()) {
+            Throwable thrown = null;
             try {
-                throw this.instanciateException(this.getTaskClassLoader());
+                thrown = this.instanciateException(this.getTaskClassLoader());
             } catch (IOException e) {
                 throw new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
                     " : " + e.getMessage());
@@ -210,6 +211,7 @@ public class TaskResultImpl implements TaskResult {
                 throw new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
                     " : " + e.getMessage());
             }
+            throw thrown;
         } else {
             try {
                 return this.instanciateValue(this.getTaskClassLoader());
