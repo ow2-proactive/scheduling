@@ -12,7 +12,7 @@
 		<proactive base="root" relpath="${proactive.home}">
 	<configuration>
 		<jvmarg value="-Dproactive.test=true"/>
-		<jvmarg value="-Dproactive.http.jetty.xml=${proactive.home}/classes/resource-managerTests/nodestate/jetty.xml"/>	
+		<jvmarg value="-Dproactive.http.jetty.xml=${proactive.home}/config/deployment/jetty.xml"/>
 		<applicationClasspath>
 			<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
 			<!-- Script engines must be explicitly in application classpath -->
