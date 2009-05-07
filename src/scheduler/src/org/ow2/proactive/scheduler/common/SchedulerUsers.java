@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -54,16 +55,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 public class SchedulerUsers implements Serializable {
 
     /** List of connected user. */
-    private HashSet<UserIdentification> users = new HashSet<UserIdentification>();
-
-    /**
-     * Add a new user to the list of connected user.
-     *
-     * @param user the new user to add.
-     */
-    public void addUser(UserIdentification user) {
-        users.add(user);
-    }
+    private Set<UserIdentification> users = new HashSet<UserIdentification>();
 
     /**
      * Return a sorted collection of all connected users.
@@ -82,16 +74,24 @@ public class SchedulerUsers implements Serializable {
 
     /**
      * Update the list of users with this given user.
+     * As this method could both add or remove user, it doesn't use the default SET.remove() or SET.add() methods.
+     * This method will first remove the given user (if it is new, it won't be deleted).
+     * Then, if it is not marked as 'toRemoved', the user is added to the list.
+     * If it's just an update, for example 'increase number of submit' it will be updated at client side as it is removed
+     * and added.
      *
      * @param user the user to update.
      */
     public void update(UserIdentification user) {
+        //remove all userIdentification that are equals to the given user (can be more than one)
+        //if the user is a new one, nothing is removed
         Iterator<UserIdentification> iter = users.iterator();
         while (iter.hasNext()) {
             if (iter.next().equals(user)) {
                 iter.remove();
             }
         }
+        //add or re-inject the user if it was not to remove
         if (!user.isToRemove()) {
             users.add(user);
         }

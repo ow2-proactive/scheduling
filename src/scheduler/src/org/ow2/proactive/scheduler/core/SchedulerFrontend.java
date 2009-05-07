@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,6 +58,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -106,8 +109,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
+
     private static final String SCHEDULER_BEAN_NAME = PASchedulerProperties.SCHEDULER_JMX_MBEAN_NAME
             .getValueAsString();
+    private static final long USER_SESSION_DURATION = PASchedulerProperties.SCHEDULER_USER_SESSION_TIME
+            .getValueAsInt() * 1000;
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
     private Map<UniqueID, UserIdentificationImpl> identifications = new HashMap<UniqueID, UserIdentificationImpl>();
@@ -142,6 +148,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /** Scheduler's MBean */
     private SchedulerWrapper schedulerBean;
 
+    /** Session timer */
+    private Timer sessionTimer;
+
     /* ########################################################################################### */
     /*                                                                                             */
     /* ################################## SCHEDULER CONSTRUCTION ################################# */
@@ -170,8 +179,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         policyFullName = policyFullClassName;
         logger_dev.debug("Policy used is " + policyFullClassName);
         jobs = new HashMap<JobId, IdentifiedJob>();
-        //Register the scheduler MBean
-        registerMBean();
+        sessionTimer = new Timer();
     }
 
     /**
@@ -247,6 +255,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         }
         //once recovered, activate scheduler communication
         authentication.setActivated(true);
+        //Register the JMX scheduler MBean
+        logger_dev.info("Registering scheduler MBean...");
+        registerMBean();
     }
 
     /**
@@ -265,20 +276,53 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         }
         logger.info(identification.getUsername() + " successfully connected !");
         identifications.put(sourceBodyID, identification);
+        renewUserSession(sourceBodyID, identification);
+        //add this new user in the list of connected user
+        connectedUsers.update(identification);
+        //send events
+        usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, identification));
+    }
+
+    /**
+     * Create or renew the session (timer task) for the given user identification.
+     * A call to this method will cancel the previous session (timerTask), 
+     * create and schedule a new one and purge the timer.
+     * 
+     * @param id The unique ID of the user
+     * @param identification the user on which to renew the session
+     */
+    private void renewUserSession(final UniqueID id, UserIdentificationImpl identification) {
+        if (schedulerListeners.containsKey(id)) {
+            //if this id has a listener, do not renew user session
+            return;
+        }
+        final String userName = identification.getUsername();
+        TimerTask session = identification.getSession();
+        if (session != null) {
+            session.cancel();
+        }
+        identification.setSession(new TimerTask() {
+            @Override
+            public void run() {
+                logger.info("End of session for user " + userName + ", id=" + id);
+                disconnect(id);
+            }
+        });
+        sessionTimer.purge();
+        sessionTimer.schedule(identification.getSession(), USER_SESSION_DURATION);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#submit(org.ow2.proactive.scheduler.common.job.Job)
      */
     public JobId submit(Job userJob) throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-
         logger_dev.info("New job submission requested : " + userJob.getName());
 
-        if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
-            throw new SchedulerException(ACCESS_DENIED);
-        }
+        UniqueID id = checkAccess();
+
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
 
         //check if the scheduler is stopped
         if (!scheduler.isSubmitPossible()) {
@@ -296,7 +340,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         }
 
         //verifying that the user has right to set the given priority to his job. 
-        if (!identifications.get(id).isAdmin()) {
+        if (!ident.isAdmin()) {
             if ((job.getPriority().getPriority() > 3) || (job.getPriority() == JobPriority.IDLE)) {
                 String msg = "Only the administrator can submit a job with such priority : " +
                     job.getPriority();
@@ -305,7 +349,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             }
         }
         logger_dev.info("Preparing and settings job submission");
-        UserIdentificationImpl ident = identifications.get(id);
         //setting the job properties
         try {
             job.setId(JobIdImpl.nextId(job.getName()));
@@ -342,10 +385,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         scheduler.submit();
         //increase number of submit for this user
         ident.addSubmit();
-        //send update user event only if the user is in the list of connected users.
-        if (connectedUsers.getUsers().contains(ident)) {
-            usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
-        }
+        //send update user event
+        usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
         logger.info("New job submitted '" + job.getId() + "' containing " + job.getTotalNumberOfTasks() +
             " tasks (owner is '" + job.getOwner() + "')");
         return job.getId();
@@ -356,12 +397,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     public JobResult getJobResult(JobId jobId) throws SchedulerException {
         //checking permissions
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        UniqueID id = checkAccess();
 
-        if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
-            throw new SchedulerException(ACCESS_DENIED);
-        }
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
 
         IdentifiedJob ij = jobs.get(jobId);
 
@@ -371,7 +411,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throw new SchedulerException(msg);
         }
 
-        if (!ij.hasRight(identifications.get(id))) {
+        if (!ij.hasRight(ident)) {
             String msg = "You do not have permission to access this job !";
             logger_dev.info(msg);
             throw new SchedulerException(msg);
@@ -400,12 +440,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException {
         //checking permissions
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        UniqueID id = checkAccess();
 
-        if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
-            throw new SchedulerException(ACCESS_DENIED);
-        }
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
 
         IdentifiedJob ij = jobs.get(jobId);
 
@@ -415,7 +454,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throw new SchedulerException(msg);
         }
 
-        if (!ij.hasRight(identifications.get(id))) {
+        if (!ij.hasRight(ident)) {
             String msg = "You do not have permission to access this job !";
             logger_dev.info(msg);
             throw new SchedulerException(msg);
@@ -439,12 +478,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     public void remove(JobId jobId) throws SchedulerException {
         //checking permissions
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        UniqueID id = checkAccess();
 
-        if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
-            throw new SchedulerException(ACCESS_DENIED);
-        }
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
 
         IdentifiedJob ij = jobs.get(jobId);
 
@@ -454,7 +492,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throw new SchedulerException(msg);
         }
 
-        if (!ij.hasRight(identifications.get(id))) {
+        if (!ij.hasRight(ident)) {
             String msg = "You do not have permission to remove this job !";
             logger_dev.info(msg);
             throw new SchedulerException(msg);
@@ -464,16 +502,15 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         scheduler.remove(jobId);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
      */
     public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        UniqueID id = checkAccess();
 
-        if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
-            throw new SchedulerException(ACCESS_DENIED);
-        }
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
 
         IdentifiedJob ij = jobs.get(jobId);
 
@@ -483,7 +520,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throw new SchedulerException(msg);
         }
 
-        if (!ij.hasRight(identifications.get(id))) {
+        if (!ij.hasRight(ident)) {
             String msg = "You do not have permission to listen the log of this job !";
             logger_dev.info(msg);
             throw new SchedulerException(msg);
@@ -495,7 +532,12 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStatus()
      */
-    public SchedulerStatus getStatus() {
+    public SchedulerStatus getStatus() throws SchedulerException {
+        UniqueID id = checkAccess();
+
+        //renew session for this user
+        renewUserSession(id, identifications.get(id));
+
         return schedulerBean.getSchedulerStatus_();
     }
 
@@ -504,6 +546,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, boolean myEventsOnly,
             SchedulerEvent... events) throws SchedulerException {
+
+        UniqueID id = checkAccess();
+
+        UserIdentificationImpl uIdent = identifications.get(id);
 
         // check if listener is not null
         if (sel == null) {
@@ -518,25 +564,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throw new SchedulerException(msg);
         }
 
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-
-        UserIdentificationImpl uIdent = identifications.get(id);
-
-        if (uIdent == null) {
-            logger_dev.info(ACCESS_DENIED);
-            throw new SchedulerException(ACCESS_DENIED);
-        }
-
-        if (events.length > 0) {
-            uIdent.setUserEvents(events);
-        }
+        uIdent.setUserEvents(events);
         //set if the user wants to get its events only or every events
         uIdent.setMyEventsOnly(myEventsOnly);
-        //put this new user in the list of connected user
-        connectedUsers.addUser(uIdent);
-        usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, uIdent));
         //add the listener to the list of listener for this user.
         schedulerListeners.put(id, sel);
+        //cancel timer for this user : session is now managed by events
+        uIdent.getSession().cancel();
         //get the scheduler State
         SchedulerStateImpl initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler
                 .getSchedulerState()));
@@ -550,12 +584,27 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeSchedulerEventListener()
      */
     public void removeSchedulerEventListener() throws SchedulerException {
+        //Remove the listener on that user designated by its given UniqueID,
+        //then renew its user session as it is no more managed by the listener.
+        UniqueID id = checkAccess();
+        schedulerListeners.remove(id);
+        //recreate the session for this user which is no more managed by listener
+        renewUserSession(id, identifications.get(id));
+    }
+
+    /**
+     * Get the unique ID of the caller, check the access, and return the id.
+     * 
+     * @return the id of the caller if it is known
+     * @throws SchedulerException 'access denied' if the caller is not known
+     */
+    private UniqueID checkAccess() throws SchedulerException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
         if (!identifications.containsKey(id)) {
             logger_dev.info(ACCESS_DENIED);
             throw new SchedulerException(ACCESS_DENIED);
         }
-        schedulerListeners.remove(id);
+        return id;
     }
 
     /* ########################################################################################### */
@@ -568,31 +617,26 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * Factoring for the next 7 scheduler orders.
      *
      * @param permissionMsg the message to log if an error occurs.
-     * @return true if order can continue, false if not.
+     * @throws SchedulerException if user has not the permission to access this method
      */
-    private boolean ssprsc(String permissionMsg) {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+    private void ssprsc(String permissionMsg) throws SchedulerException {
+        UniqueID id = checkAccess();
 
-        if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
-            return false;
-        }
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
 
-        if (!identifications.get(id).isAdmin()) {
+        if (!ident.isAdmin()) {
             logger_dev.warn(permissionMsg);
-            return false;
+            throw new SchedulerException(permissionMsg);
         }
-
-        return true;
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#start()
      */
     public BooleanWrapper start() throws SchedulerException {
-        if (!ssprsc("You do not have permission to start the scheduler !")) {
-            return new BooleanWrapper(false);
-        }
+        ssprsc("You do not have permission to start the scheduler !");
         return scheduler.start();
     }
 
@@ -600,9 +644,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#stop()
      */
     public BooleanWrapper stop() throws SchedulerException {
-        if (!ssprsc("You do not have permission to stop the scheduler !")) {
-            return new BooleanWrapper(false);
-        }
+        ssprsc("You do not have permission to stop the scheduler !");
         return scheduler.stop();
     }
 
@@ -610,9 +652,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#pause()
      */
     public BooleanWrapper pause() throws SchedulerException {
-        if (!ssprsc("You do not have permission to pause the scheduler !")) {
-            return new BooleanWrapper(false);
-        }
+        ssprsc("You do not have permission to pause the scheduler !");
         return scheduler.pause();
     }
 
@@ -620,9 +660,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#freeze()
      */
     public BooleanWrapper freeze() throws SchedulerException {
-        if (!ssprsc("You do not have permission to pause the scheduler !")) {
-            return new BooleanWrapper(false);
-        }
+        ssprsc("You do not have permission to pause the scheduler !");
         return scheduler.freeze();
     }
 
@@ -630,9 +668,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#resume()
      */
     public BooleanWrapper resume() throws SchedulerException {
-        if (!ssprsc("You do not have permission to resume the scheduler !")) {
-            return new BooleanWrapper(false);
-        }
+        ssprsc("You do not have permission to resume the scheduler !");
         return scheduler.resume();
     }
 
@@ -640,9 +676,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#shutdown()
      */
     public BooleanWrapper shutdown() throws SchedulerException {
-        if (!ssprsc("You do not have permission to shutdown the scheduler !")) {
-            return new BooleanWrapper(false);
-        }
+        ssprsc("You do not have permission to shutdown the scheduler !");
         return scheduler.shutdown();
     }
 
@@ -650,9 +684,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#kill()
      */
     public BooleanWrapper kill() throws SchedulerException {
-        if (!ssprsc("You do not have permission to kill the scheduler !")) {
-            return new BooleanWrapper(false);
-        }
+        ssprsc("You do not have permission to kill the scheduler !");
         return scheduler.kill();
     }
 
@@ -660,21 +692,29 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#disconnect()
      */
     public void disconnect() throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        UniqueID id = checkAccess();
+        disconnect(id);
+    }
 
-        if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
-            throw new SchedulerException(ACCESS_DENIED);
-        }
-
-        String user = identifications.get(id).getUsername();
-        schedulerListeners.remove(id);
+    /**
+     * Disconnect a user, remove and clean user dependent lists and objects
+     * 
+     * @param id the uniqueID of the user
+     */
+    private void disconnect(UniqueID id) {
         UserIdentificationImpl ident = identifications.remove(id);
+        //remove listeners if needed
+        schedulerListeners.remove(id);
         //remove this user to the list of connected user
         ident.setToRemove();
         connectedUsers.update(ident);
-        usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
-        logger_dev.info("User '" + user + "' has left the scheduler !");
+        //cancel the timer
+        ident.getSession().cancel();
+        //log and send events
+        String user = ident.getUsername();
+        logger_dev.info("User '" + user + "' has disconnect the scheduler !");
+        dispatchUsersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident),
+                false);
     }
 
     /**
@@ -700,6 +740,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throw new SchedulerException(ACCESS_DENIED);
         }
 
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
+
         IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
@@ -708,7 +752,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throw new SchedulerException(msg);
         }
 
-        if (!ij.hasRight(identifications.get(id))) {
+        if (!ij.hasRight(ident)) {
             logger_dev.info(permissionMsg);
             throw new SchedulerException(permissionMsg);
         }
@@ -814,10 +858,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#changePolicy(java.lang.Class)
      */
     public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
-        UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
-                .getSourceBodyID());
+        UniqueID id = checkAccess();
 
-        if (!ui.isAdmin()) {
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
+
+        if (!ident.isAdmin()) {
             String msg = "You do not have permission to change the policy of the scheduler !";
             logger_dev.info(msg);
             throw new SchedulerException(msg);
@@ -830,10 +877,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @see org.ow2.proactive.scheduler.common.AdminSchedulerInterface#linkResourceManager(java.lang.String)
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
-        UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
-                .getSourceBodyID());
+        UniqueID id = checkAccess();
 
-        if (!ui.isAdmin()) {
+        UserIdentificationImpl ident = identifications.get(id);
+        //renew session for this user
+        renewUserSession(id, ident);
+
+        if (!ident.isAdmin()) {
             String msg = "You do not have permission to reconnect a RM to the scheduler !";
             logger_dev.info(msg);
             throw new SchedulerException(msg);
@@ -888,18 +938,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     private void clearListeners() {
         for (UniqueID uId : dirtyList) {
-            //remove listener
-            schedulerListeners.remove(uId);
-            //get identification
-            UserIdentificationImpl ident = identifications.remove(uId);
-            //remove this user to the list of connected user
-            ident.setToRemove();
-            connectedUsers.update(ident);
-            //dispatch events
-            dispatchUsersUpdated(
-                    new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident), false);
-            logger.warn(ident.getUsername() + "@" + ident.getHostName() +
-                " has been disconnected from events listener!");
+            disconnect(uId);
         }
         dirtyList.clear();
     }
@@ -1086,6 +1125,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
+        schedulerBean.usersUpdate(notification.getData());
     }
 
     //--------------------------------------------------------------------------------------------
@@ -1176,7 +1216,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         switch (notification.getEventType()) {
             case USERS_UPDATE:
                 dispatchUsersUpdated(notification, true);
-                schedulerBean.usersUpdate(notification.getData());
                 break;
             default:
                 logger_dev.info("Unconsistent update type received from Scheduler Core : " +

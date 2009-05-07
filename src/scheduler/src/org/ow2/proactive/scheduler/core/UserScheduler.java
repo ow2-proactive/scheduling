@@ -112,7 +112,7 @@ public class UserScheduler implements UserSchedulerInterface {
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStatus()
      */
-    public SchedulerStatus getStatus() {
+    public SchedulerStatus getStatus() throws SchedulerException {
         return schedulerFrontend.getStatus();
     }
 

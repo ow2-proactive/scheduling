@@ -75,6 +75,10 @@ public enum PASchedulerProperties {
     /** Name of the JMX MBean for the scheduler */
     SCHEDULER_JMX_MBEAN_NAME("pa.scheduler.core.jmxmbeanname", PAPropertiesType.STRING),
 
+    /** User session time (user is automatically disconnect after this time if no request is made to the scheduler)
+    	negative number indicates that session is infinite (value specified in second) */
+    SCHEDULER_USER_SESSION_TIME("pa.scheduler.core.usersessiontime", PAPropertiesType.INTEGER),
+
     /* ***************************************************************** */
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */

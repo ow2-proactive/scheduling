@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
+import java.util.TimerTask;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -115,6 +116,13 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
      * @return the myEventsOnly.
      */
     public abstract boolean isMyEventsOnly();
+
+    /**
+     * Get the session for this user (timer task)
+     *
+     * @return the session for this user, null if it has no session.
+     */
+    public abstract TimerTask getSession();
 
     /**
      * Set the field to sort on.

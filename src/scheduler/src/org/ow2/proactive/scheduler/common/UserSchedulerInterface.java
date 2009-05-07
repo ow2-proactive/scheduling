@@ -168,7 +168,7 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      *
      * @return the current status of the Scheduler
      */
-    public SchedulerStatus getStatus();
+    public SchedulerStatus getStatus() throws SchedulerException;
 
     /**
      * Add a scheduler event Listener. this listener provides method to notice of

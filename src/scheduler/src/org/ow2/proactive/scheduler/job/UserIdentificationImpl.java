@@ -32,6 +32,9 @@
 package org.ow2.proactive.scheduler.job;
 
 import java.util.HashSet;
+import java.util.TimerTask;
+
+import javax.persistence.Transient;
 
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -67,7 +70,11 @@ public class UserIdentificationImpl extends UserIdentification {
     private boolean myEventsOnly = false;
 
     /** List of events that the user want to receive. */
-    private HashSet<SchedulerEvent> userEvents = null;
+    private transient HashSet<SchedulerEvent> userEvents = null;
+
+    /** Associated timerTask for user session management */
+    //must be transient because useless on user side and TimerTask is not serializable
+    private transient TimerTask session;
 
     /**
      * Constructor of user identification using user name.
@@ -150,10 +157,15 @@ public class UserIdentificationImpl extends UserIdentification {
 
     /**
      * Sets the userEvents to the given userEvents value.
+     * If the given value is null, user will listen to every events.
      *
      * @param events the userEvents to set.
      */
     public void setUserEvents(SchedulerEvent[] events) {
+        if (events == null || events.length == 0) {
+            userEvents = null;
+            return;
+        }
         userEvents = new HashSet<SchedulerEvent>();
         //protect from duplicated events
         for (SchedulerEvent e : events) {
@@ -200,6 +212,23 @@ public class UserIdentificationImpl extends UserIdentification {
      */
     public void setMyEventsOnly(boolean myEventsOnly) {
         this.myEventsOnly = myEventsOnly;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.UserIdentification#getSession()
+     */
+    @Override
+    public TimerTask getSession() {
+        return session;
+    }
+
+    /**
+     * Set the session value to the given session value
+     * 
+     * @param session the session to set
+     */
+    public void setSession(TimerTask session) {
+        this.session = session;
     }
 
     /**
