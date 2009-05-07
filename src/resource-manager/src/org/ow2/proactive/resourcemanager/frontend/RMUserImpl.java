@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
@@ -342,7 +343,11 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
                 } catch (InterruptedException e) {
                 }
 
-                Set<UniversalBody> clients = new TreeSet<UniversalBody>();
+                Set<UniversalBody> clients = new TreeSet<UniversalBody>(new Comparator<UniversalBody>() {
+                    public int compare(UniversalBody o1, UniversalBody o2) {
+                        return (o1.getID().compareTo(o2.getID()));
+                    }
+                });
 
                 clients.addAll(userNodes.values());
                 logger.debug(getName() + ": Number of clients to ping " + clients.size());
