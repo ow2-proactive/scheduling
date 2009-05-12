@@ -99,7 +99,10 @@ public enum PAResourceManagerProperties {
     RM_NODESOURCE_INFRASTRUCTURE_FILE("pa.rm.nodesource.infrastructures", PAPropertiesType.STRING),
 
     /** Resource Manager node source policies file*/
-    RM_NODESOURCE_POLICY_FILE("pa.rm.nodesource.policies", PAPropertiesType.STRING);
+    RM_NODESOURCE_POLICY_FILE("pa.rm.nodesource.policies", PAPropertiesType.STRING),
+
+    /** Max number of threads in node source for parallel task execution */
+    RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PAPropertiesType.INTEGER);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

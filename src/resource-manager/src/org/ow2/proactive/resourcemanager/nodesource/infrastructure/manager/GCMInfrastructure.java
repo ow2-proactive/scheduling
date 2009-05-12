@@ -41,6 +41,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
@@ -194,12 +197,17 @@ public class GCMInfrastructure extends InfrastructureManager {
 
             logger.info("Terminating the node " + node.getNodeInformation().getName());
             if (!isThereNodesInSameJVM(node)) {
-                try {
-                    logger.info("Terminating the runtime " + node.getProActiveRuntime().getURL());
-                    node.getProActiveRuntime().killRT(false);
-                } catch (Exception e) {
-                    //do nothing, no exception treatment for node just killed before
-                }
+                final Node n = node;
+                nodeSource.executeInParallel(new Runnable() {
+                    public void run() {
+                        try {
+                            logger.info("Terminating the runtime " + n.getProActiveRuntime().getURL());
+                            n.getProActiveRuntime().killRT(false);
+                        } catch (Exception e) {
+                            //do nothing, no exception treatment for node just killed before
+                        }
+                    }
+                });
             }
             nodesCount--;
 

@@ -33,6 +33,8 @@ package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -49,6 +51,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
@@ -88,6 +91,8 @@ public class NodeSource implements InitActive {
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
     private LinkedList<Node> downNodes = new LinkedList<Node>();
 
+    private transient BoundedNonRejectedThreadPool threadPool;
+
     /**
      * Creates a new instance of NodeSource.
      * This constructor is used by Proactive as one of requirements for active objects.
@@ -118,6 +123,9 @@ public class NodeSource implements InitActive {
     public void initActivity(Body body) {
         infrastructureManager.setNodeSource(this);
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
+        threadPool = new BoundedNonRejectedThreadPool(0,
+            PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt(), 1L,
+            TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         try {
             pinger = (Pinger) PAActiveObject.newActive(Pinger.class.getName(), new Object[] { PAActiveObject
                     .getStubOnThis() });
@@ -288,6 +296,15 @@ public class NodeSource implements InitActive {
     protected void finishNodeSourceShutdown() {
         logger.info("[" + name + "] Shutdown finalization");
         PAFuture.waitFor(nodeSourcePolicy.disactivate());
+
+        try {
+            threadPool.shutdown();
+            // join emulation
+            threadPool.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         pinger.shutdown();
         rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this, RMEventType.NODESOURCE_REMOVED));
         // object should be terminated NON preemptively
@@ -340,5 +357,13 @@ public class NodeSource implements InitActive {
      */
     public RMCoreInterface getRMCore() {
         return rmcore;
+    }
+
+    /**
+     * Executed command in parallel using thread pool
+     * @param command to execute
+     */
+    public void executeInParallel(Runnable command) {
+        threadPool.execute(command);
     }
 }
