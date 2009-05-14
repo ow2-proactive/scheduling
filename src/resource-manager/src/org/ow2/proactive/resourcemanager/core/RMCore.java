@@ -195,7 +195,12 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      */
     public static String getHostURL(String url) {
         URI uri = URI.create(url);
-        return uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + "/";
+        int port = uri.getPort();
+        if (port == -1) {
+            return uri.getScheme() + "://" + uri.getHost() + "/";
+        } else {
+            return uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + "/";
+        }
     }
 
     /**

@@ -49,6 +49,8 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -95,7 +97,7 @@ public class SchedulerStarter {
         help.setRequired(false);
         options.addOption(help);
 
-        Option rmURL = new Option("u", "rmURL", true, "the resource manager URL (default //localhost)");
+        Option rmURL = new Option("u", "rmURL", true, "the resource manager URL (default localhost)");
         rmURL.setArgName("rmURL");
         rmURL.setRequired(false);
         options.addOption(rmURL);
@@ -145,7 +147,7 @@ public class SchedulerStarter {
                         System.exit(2);
                     }
                 } else {
-                    URI uri = new URI("rmi://localhost/");
+                    URI uri = new URI(getLocalAdress());
                     //trying to connect to a started local RM
                     logger_dev.info("Trying to connect to a started Resource Manager on " + uri);
                     try {
@@ -154,7 +156,7 @@ public class SchedulerStarter {
                                 .info("Resource Manager URL was not specified, connection made to the local Resource Manager at " +
                                     uri);
                     } catch (Exception e) {
-                        logger.info("Resource Manager doesn't exist on " + uri);
+                        logger.info("Resource Manager doesn't exist on the local host");
                         try {
                             //Starting a local RM using default deployment descriptor
                             RMFactory.setOsJavaProperty();
@@ -170,9 +172,8 @@ public class SchedulerStarter {
                             //get the proxy on the Resource Manager
                             imp = ResourceManagerProxy.getProxy(uri);
 
-                            logger.debug("Resource Manager created on " +
-                                Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(imp)) +
-                                " as it does not exist locally");
+                            logger.info("Resource Manager created on " +
+                                Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(imp)));
                         } catch (AlreadyBoundException abe) {
                             logger.error("Resource Manager already exists on local host", abe);
                             System.exit(4);
@@ -224,5 +225,13 @@ public class SchedulerStarter {
             System.exit(10);
         }
 
+    }
+
+    private static String getLocalAdress() {
+        try {
+            return AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory().getBaseURI().toString();
+        } catch (UnknownProtocolException e) {
+            return "rmi://localhost/";
+        }
     }
 }
