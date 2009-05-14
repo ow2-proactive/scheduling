@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.Root;
-import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
 
@@ -56,8 +55,8 @@ public class TableContentProvider implements IStructuredContentProvider {
         // TODO Auto-generated method stub
     }
 
-    public ArrayList<NodeTableItem> getAllTableItems(Root root) {
-        ArrayList<NodeTableItem> items = new ArrayList<NodeTableItem>();
+    public ArrayList<Node> getAllTableItems(Root root) {
+        ArrayList<Node> items = new ArrayList<Node>();
         synchronized (root) {
             //nodes sources
             for (TreeLeafElement src : root.getChildren()) {
@@ -72,9 +71,7 @@ public class TableContentProvider implements IStructuredContentProvider {
                         TreeParentElement jvm = (TreeParentElement) jvms;
                         //nodes
                         for (TreeLeafElement node : jvm.getChildren()) {
-                            String url = node.getName();
-                            items.add(new NodeTableItem(nodeSourceName, hostName, ((Node) node).getState(),
-                                url));
+                            items.add((Node) node);
                         }
                     }
                 }

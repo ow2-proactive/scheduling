@@ -33,6 +33,7 @@ import java.util.List;
 import org.ow2.proactive.resourcemanager.gui.compact.view.NodeView;
 import org.ow2.proactive.resourcemanager.gui.compact.view.View;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 
 
@@ -133,11 +134,11 @@ public class SelectionManager {
      */
     public void updateSelectionHandler() {
         if (RMStore.isConnected()) {
-            ArrayList<String> selectedNodes = new ArrayList<String>();
+            ArrayList<Node> selectedNodes = new ArrayList<Node>();
 
             for (View view : selected) {
                 if (view instanceof NodeView) {
-                    selectedNodes.add(((NodeView) view).getElement().getName());
+                    selectedNodes.add((Node) view.getElement());
                 }
             }
             RemoveNodesHandler.getInstance().setSelectedNodes(selectedNodes);

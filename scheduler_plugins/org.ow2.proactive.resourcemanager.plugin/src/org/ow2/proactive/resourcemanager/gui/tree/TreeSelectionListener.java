@@ -38,6 +38,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeParentElement;
@@ -48,7 +49,7 @@ public class TreeSelectionListener implements ISelectionChangedListener {
 
     public void selectionChanged(SelectionChangedEvent event) {
         List<TreeLeafElement> list;
-        ArrayList<String> selectionList = new ArrayList<String>();
+        ArrayList<Node> selectionList = new ArrayList<Node>();
         if (event != null && event.getSelectionProvider() != null) {
             Object selection = event.getSelectionProvider().getSelection();
             if (selection != null) {
@@ -64,10 +65,10 @@ public class TreeSelectionListener implements ISelectionChangedListener {
         }
     }
 
-    private void getSubTreeNodesList(TreeLeafElement leaf, ArrayList<String> selectList) {
+    private void getSubTreeNodesList(TreeLeafElement leaf, ArrayList<Node> selectList) {
         if (leaf.getType().equals(TreeElementType.NODE)) {
             if (!selectList.contains(leaf.getName()))
-                selectList.add(leaf.getName());
+                selectList.add((Node) leaf);
         } else if (((TreeParentElement) leaf).hasChildren()) {
             for (TreeLeafElement element : ((TreeParentElement) leaf).getChildren()) {
                 getSubTreeNodesList(element, selectList);

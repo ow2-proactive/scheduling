@@ -38,8 +38,8 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 
 
 public class RMTableViewer extends TableViewer {
@@ -62,29 +62,26 @@ public class RMTableViewer extends TableViewer {
         });
     }
 
-    public void updateItem(String nodeSource, String host, NodeState state, String nodeUrl) {
-        final NodeTableItem item = new NodeTableItem(nodeSource, host, state, nodeUrl);
+    public void updateItem(final Node node) {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                update(item, null);
+                update(node, null);
             }
         });
     }
 
-    public void removeItem(String nodeUrl) {
-        final NodeTableItem item = new NodeTableItem("", "", null, nodeUrl);
+    public void removeItem(final Node node) {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                remove(item);
+                remove(node);
             }
         });
     }
 
-    public void addItem(String nodeSource, String host, NodeState state, String nodeUrl) {
-        final NodeTableItem item = new NodeTableItem(nodeSource, host, state, nodeUrl);
+    public void addItem(final Node node) {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                add(item);
+                add(node);
             }
         });
     }

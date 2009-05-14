@@ -40,6 +40,7 @@ import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.dialog.RemoveNodeDialog;
 
 
@@ -48,7 +49,7 @@ public class RemoveNodesHandler extends AbstractHandler implements IHandler {
     private static RemoveNodesHandler instance;
 
     private boolean previousState = true;
-    private ArrayList<String> selectedNodes = null;
+    private ArrayList<Node> selectedNodes = null;
 
     public RemoveNodesHandler() {
         super();
@@ -85,7 +86,7 @@ public class RemoveNodesHandler extends AbstractHandler implements IHandler {
         return null;
     }
 
-    public void setSelectedNodes(ArrayList<String> selectedNodes) {
+    public void setSelectedNodes(ArrayList<Node> selectedNodes) {
         this.selectedNodes = selectedNodes;
         if (!previousState && selectedNodes.size() > 0) {
             fireHandlerChanged(new HandlerEvent(this, true, false));

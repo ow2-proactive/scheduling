@@ -35,6 +35,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 
 
 public class TableLabelProvider extends ColumnLabelProvider {
@@ -52,8 +53,8 @@ public class TableLabelProvider extends ColumnLabelProvider {
     }
 
     public Image getImage(Object element) {
-        if (element instanceof NodeTableItem && columnIndex == STATE_COLUMN_NUMBER) {
-            switch (((NodeTableItem) element).getState()) {
+        if (element instanceof Node && columnIndex == STATE_COLUMN_NUMBER) {
+            switch (((Node) element).getState()) {
                 case DOWN:
                     return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/down.gif")
                             .createImage();
@@ -72,18 +73,18 @@ public class TableLabelProvider extends ColumnLabelProvider {
     }
 
     public String getText(Object element) {
-        if (element instanceof NodeTableItem) {
-            NodeTableItem nodeItem = (NodeTableItem) element;
+        if (element instanceof Node) {
+            Node node = (Node) element;
             String str = null;
             switch (columnIndex) {
                 case NS_COLUMN_NUMBER:
-                    str = nodeItem.getNodeSource();
+                    str = node.getParent().getParent().getParent().getName();
                     break;
                 case HOST_COLUMN_NUMBER:
-                    str = nodeItem.getHost();
+                    str = node.getParent().getParent().getName();
                     break;
                 case URL_COLUMN_NUMBER:
-                    str = nodeItem.getNodeUrl();
+                    str = node.getName();
                     break;
             }
             return str;
@@ -108,8 +109,8 @@ public class TableLabelProvider extends ColumnLabelProvider {
     }
 
     public String getToolTipText(Object element) {
-        if (element instanceof NodeTableItem && columnIndex == STATE_COLUMN_NUMBER) {
-            switch (((NodeTableItem) element).getState()) {
+        if (element instanceof Node && columnIndex == STATE_COLUMN_NUMBER) {
+            switch (((Node) element).getState()) {
                 case DOWN:
                     return "Node is down or unreachable";
                 case FREE:

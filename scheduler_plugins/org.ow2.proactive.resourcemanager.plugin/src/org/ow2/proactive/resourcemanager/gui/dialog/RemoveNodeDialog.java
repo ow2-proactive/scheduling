@@ -41,8 +41,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 
 
 /**
@@ -55,7 +57,7 @@ public class RemoveNodeDialog extends Dialog {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
-    private RemoveNodeDialog(final Shell parent, ArrayList<String> nodesUrls) {
+    private RemoveNodeDialog(final Shell parent, final ArrayList<Node> nodes) {
 
         // Pass the default styles here
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -75,14 +77,15 @@ public class RemoveNodeDialog extends Dialog {
         Label urlLabel = new Label(shell, SWT.NONE);
         final Button preemptCheck = new Button(shell, SWT.CHECK);
         preemptCheck.setSelection(true);
+        final Button downCheck = new Button(shell, SWT.CHECK);
         Button okButton = new Button(shell, SWT.NONE);
         Button cancelButton = new Button(shell, SWT.NONE);
 
         String message;
-        if (nodesUrls.size() == 1) {
-            message = "Confirm removal of node : \n\n" + nodesUrls.get(0);
+        if (nodes.size() == 1) {
+            message = "Confirm removal of node : \n\n" + nodes.get(0).getName();
         } else {
-            message = "Confirm removal of " + Integer.toString(nodesUrls.size()) + " nodes";
+            message = "Confirm removal of " + Integer.toString(nodes.size()) + " nodes";
         }
 
         // label sourceName
@@ -92,19 +95,29 @@ public class RemoveNodeDialog extends Dialog {
         urlLabel.setLayoutData(urlFormData);
 
         // preempt check
-        preemptCheck.setText("wait tasks end on busy nodes");
+        preemptCheck.setText("wait for tasks completion on busy nodes");
         FormData checkFormData = new FormData();
         checkFormData.top = new FormAttachment(urlLabel, 20, SWT.BOTTOM);
         preemptCheck.setLayoutData(checkFormData);
 
-        final ArrayList<String> urls = nodesUrls;
+        // down check
+        downCheck.setText("remove only if node is down");
+        FormData downNodeFormData = new FormData();
+        downNodeFormData.top = new FormAttachment(preemptCheck, 5, SWT.BOTTOM);
+        downCheck.setLayoutData(downNodeFormData);
+
         // button "OK"
         okButton.setText("OK");
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 try {
-                    for (String url : urls) {
-                        RMStore.getInstance().getRMAdmin().removeNode(url, !preemptCheck.getSelection());
+                    boolean removeDownNodes = downCheck.getSelection();
+                    boolean preemptive = !preemptCheck.getSelection();
+                    for (Node node : nodes) {
+                        if (removeDownNodes && node.getState() != NodeState.DOWN) {
+                            continue;
+                        }
+                        RMStore.getInstance().getRMAdmin().removeNode(node.getName(), preemptive);
                     }
                 } catch (RMException e) {
                     MessageDialog.openError(parent, "Access denied", e.getMessage());
@@ -154,7 +167,7 @@ public class RemoveNodeDialog extends Dialog {
      * @param parent
      *            the parent
      */
-    public static void showDialog(Shell parent, ArrayList<String> nodesUrls) {
-        new RemoveNodeDialog(parent, nodesUrls);
+    public static void showDialog(Shell parent, ArrayList<Node> nodes) {
+        new RemoveNodeDialog(parent, nodes);
     }
 }
