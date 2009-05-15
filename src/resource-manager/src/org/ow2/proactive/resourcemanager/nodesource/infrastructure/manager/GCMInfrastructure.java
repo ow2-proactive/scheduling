@@ -41,9 +41,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
@@ -192,7 +189,7 @@ public class GCMInfrastructure extends InfrastructureManager {
         try {
 
             if (forever) {
-                logger.error("Cannot remove node forever in GCM infrastructure");
+                logger.warn("Cannot remove node forever in GCM infrastructure");
             }
 
             logger.info("Terminating the node " + node.getNodeInformation().getName());
@@ -212,11 +209,18 @@ public class GCMInfrastructure extends InfrastructureManager {
             nodesCount--;
 
             if (nodesCount == 0) {
-                // last node release - clear deployment status
-                // for standard GCM it's the only one possible granularity
-                for (DeploymentData dd : deploymentData) {
-                    logger.debug("Last node was removed");
-                    dd.deployed = false;
+                if (forever) {
+                    // last node released
+                    // forever is set to true, so remove all deployment
+                    // data in order not to redeploy nodes in the future
+                    deploymentData.clear();
+                } else {
+                    // last node release - clear deployment status
+                    // for standard GCM it's the only one possible granularity
+                    for (DeploymentData dd : deploymentData) {
+                        logger.debug("Last node was removed");
+                        dd.deployed = false;
+                    }
                 }
             }
         } catch (Exception e) {
