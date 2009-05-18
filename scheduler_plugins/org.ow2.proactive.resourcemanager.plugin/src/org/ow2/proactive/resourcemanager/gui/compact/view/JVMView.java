@@ -27,39 +27,41 @@
  */
 package org.ow2.proactive.resourcemanager.gui.compact.view;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.resourcemanager.gui.compact.Filter;
-import org.ow2.proactive.resourcemanager.gui.data.model.Host;
-import org.ow2.proactive.resourcemanager.gui.data.model.Node;
-import org.ow2.proactive.resourcemanager.gui.data.model.Source;
+import org.ow2.proactive.resourcemanager.gui.compact.LabelMouseListener;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
-import org.ow2.proactive.resourcemanager.gui.data.model.VirtualMachine;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 
 
 /**
  *
- * Class represents the factory for view creation.
+ * Graphical representation of the JVM.
  *
  */
-public class ViewFractory {
+public class JVMView extends View {
+    // JVM image
+    private static Image jvmImage = PlatformUI.getWorkbench().getSharedImages().getImage(
+            ISharedImages.IMG_OBJ_ELEMENT);
 
-    /**
-     * Creates views based on the specified element.
-     */
-    public static View createView(TreeLeafElement element, Filter filter) {
-        View view = null;
-        if (element instanceof Node) {
-            view = new NodeView(element, filter);
-        } else if (element instanceof VirtualMachine) {
-            view = new JVMView(element, filter);
-        } else if (element instanceof Host) {
-            view = new HostView(element, filter);
-        } else if (element instanceof Source) {
-            view = new SourceView(element, filter);
-        } else {
-            view = new View(element);
+    public JVMView(TreeLeafElement element, Filter filter) {
+        super(element);
+
+        if (filter.showJVMs) {
+            label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
+            label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
+
+            label.setImage(jvmImage);
+            label.setToolTipText(toString());
+            label.addMouseListener(new LabelMouseListener(this));
         }
-
-        return view;
     }
 
+    public String toString() {
+        return "JVM: " + element.getName();
+    }
 }

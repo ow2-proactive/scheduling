@@ -36,6 +36,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.compact.CompactViewer;
+import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 
 
 /**
@@ -98,5 +99,9 @@ public class ResourcesCompactView extends ViewPart {
 
     public static ResourcesCompactView getInstance() {
         return instance;
+    }
+
+    public void repaint(Filter filter) {
+        compactView.repaint(filter);
     }
 }
