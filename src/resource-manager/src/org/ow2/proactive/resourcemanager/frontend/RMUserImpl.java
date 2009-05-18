@@ -240,7 +240,7 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
 
         if (declaredOwner == null) {
             logger.warn("An attempt to remove non existing node " + node.getNodeInformation().getURL());
-        } else if (declaredOwner.equals(owner)) {
+        } else if (declaredOwner.getID().equals(owner.getID())) {
             logger.debug("FreeNode : " + node.getNodeInformation().getURL());
             userNodes.remove(declaredOwner);
             rmcore.freeNode(node);
@@ -261,7 +261,7 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
             UniversalBody nodeOwner = userNodes.get(node);
             if (nodeOwner == null) {
                 logger.warn("An attempt to remove non existing node " + node.getNodeInformation().getURL());
-            } else if (nodeOwner.equals(caller)) {
+            } else if (nodeOwner.getID().equals(caller.getID())) {
                 logger.debug("FreeNode : " + node.getNodeInformation().getURL());
                 filtredNodeList.add(node);
                 userNodes.remove(node);
