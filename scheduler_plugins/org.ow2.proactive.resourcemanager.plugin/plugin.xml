@@ -113,10 +113,6 @@
             id="org.ow2.proactive.resourcemanager.plugin.removeNodes"
             name="Remove nodes">
       </command>
-      <command
-            id="org.ow2.proactive.resourcemanager.plugin.command1"
-            name="name">
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
