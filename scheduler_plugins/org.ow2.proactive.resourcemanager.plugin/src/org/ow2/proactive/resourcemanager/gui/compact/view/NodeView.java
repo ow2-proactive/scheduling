@@ -32,6 +32,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Label;
 import org.ow2.proactive.resourcemanager.gui.compact.CompactViewer;
+import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 import org.ow2.proactive.resourcemanager.gui.compact.LabelMouseListener;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
@@ -51,15 +52,17 @@ public class NodeView extends View {
             ImageDescriptor.createFromFile(CompactViewer.class, "icons/down.gif").createImage(),
             ImageDescriptor.createFromFile(CompactViewer.class, "icons/to_release.gif").createImage(), };
 
-    public NodeView(TreeLeafElement element) {
+    public NodeView(TreeLeafElement element, Filter filter) {
         super(element);
 
-        label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
-        label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
+        if (filter.showNodes) {
+            label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
+            label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
 
-        label.setImage(images[((Node) element).getState().ordinal()]);
-        label.addMouseListener(new LabelMouseListener(this));
-        label.setToolTipText(toString());
+            label.setImage(images[((Node) element).getState().ordinal()]);
+            label.addMouseListener(new LabelMouseListener(this));
+            label.setToolTipText(toString());
+        }
     }
 
     public String toString() {
@@ -78,10 +81,12 @@ public class NodeView extends View {
     }
 
     public void dispose() {
-        label.dispose();
+        if (label != null)
+            label.dispose();
     }
 
     public void update() {
-        label.setImage(images[((Node) element).getState().ordinal()]);
+        if (label != null)
+            label.setImage(images[((Node) element).getState().ordinal()]);
     }
 }

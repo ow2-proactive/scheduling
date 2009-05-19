@@ -113,6 +113,10 @@
             id="org.ow2.proactive.resourcemanager.plugin.removeNodes"
             name="Remove nodes">
       </command>
+      <command
+            id="org.ow2.proactive.resourcemanager.plugin.command1"
+            name="name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -317,6 +321,24 @@
             schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
             sequence="R">
       </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="popup:org.eclipse.ui.popup.configureview"
+            targetID="org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView">
+         <action
+               class="org.ow2.proactive.resourcemanager.gui.compact.actions.ConfigureViewAction"
+               id="org.ow2.proactive.resourcemanager.plugin.configureviewaction"
+               label="Configure view"
+               menubarPath="org.ow2.proactive.resourcemanager.plugin.configureviewmenu"
+               style="push">
+         </action>
+         <menu
+               id="org.ow2.proactive.resourcemanager.plugin.configureviewmenu"
+               label="Configure view">
+         </menu>
+      </viewerContribution>
    </extension>
 
 </plugin>

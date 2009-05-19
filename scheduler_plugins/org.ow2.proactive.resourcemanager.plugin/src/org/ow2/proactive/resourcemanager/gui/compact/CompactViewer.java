@@ -38,7 +38,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.resourcemanager.gui.compact.view.NodeView;
 import org.ow2.proactive.resourcemanager.gui.compact.view.View;
@@ -65,6 +64,8 @@ public class CompactViewer implements ISelectionProvider {
     private View rootView;
     // view position
     private int currentPosition = 0;
+    // filter
+    private Filter filter = new Filter();
 
     /**
      * Creates new CompactViewer.
@@ -122,7 +123,7 @@ public class CompactViewer implements ISelectionProvider {
      */
     private View createView(TreeLeafElement element) {
 
-        View view = ViewFractory.createView(element);
+        View view = ViewFractory.createView(element, filter);
         view.setPosition(currentPosition);
 
         if (element instanceof TreeParentElement) {
@@ -369,5 +370,10 @@ public class CompactViewer implements ISelectionProvider {
 
     public void dispose() {
         reloader.stopThread();
+    }
+
+    public void repaint(Filter filter) {
+        this.filter = filter;
+        reloadMatrix();
     }
 }

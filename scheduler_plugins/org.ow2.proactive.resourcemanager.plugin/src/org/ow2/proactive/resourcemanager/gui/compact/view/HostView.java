@@ -32,6 +32,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Label;
 import org.ow2.proactive.resourcemanager.gui.compact.CompactViewer;
+import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 import org.ow2.proactive.resourcemanager.gui.compact.LabelMouseListener;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -47,15 +48,17 @@ public class HostView extends View {
     private static Image hostImage = ImageDescriptor.createFromFile(CompactViewer.class, "icons/host.gif")
             .createImage();
 
-    public HostView(TreeLeafElement element) {
+    public HostView(TreeLeafElement element, Filter filter) {
         super(element);
 
-        label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
-        label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
+        if (filter.showHosts) {
+            label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
+            label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
 
-        label.setImage(hostImage);
-        label.setToolTipText(toString());
-        label.addMouseListener(new LabelMouseListener(this));
+            label.setImage(hostImage);
+            label.setToolTipText(toString());
+            label.addMouseListener(new LabelMouseListener(this));
+        }
     }
 
     public String toString() {
