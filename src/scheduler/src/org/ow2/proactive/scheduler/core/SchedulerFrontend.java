@@ -107,6 +107,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);
+    public static final Logger logger_console = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
@@ -203,7 +204,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             PAActiveObject.registerByName(schedulerAuth, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
             // run !!
         } catch (Exception e) {
-            logger_dev.error(e);
+            logger_console.error("", e);
             System.exit(1);
         }
     }

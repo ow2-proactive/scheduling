@@ -193,7 +193,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Thread that will ping the running nodes */
     private Thread pinger;
 
-    /** Timer used for remove result method (transient because Timer is not serializable)*/
+    /** Timer used for remove result method (transient because Timer is not serializable) */
     private transient Timer timer = new Timer();
 
     /** Log forwarding service for nodes */
@@ -1102,6 +1102,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         if (runningTasks != null) {
             runningTasks.remove(taskId);
         } else {
+            logger_dev.error("RunningTasks list was null, This is an abnormal case");
             return;
         }
         try {
@@ -1122,7 +1123,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             updateTaskIdReferences(res, descriptor.getId());
 
             if (res != null) {
-                // HANDLE DESCIPTORS
+                // HANDLE DESCRIPTORS
                 res.setPreviewerClassName(descriptor.getResultPreview());
                 res.setJobClasspath(job.getEnvironment().getJobClasspath()); // can be null
                 if (PAException.isException(res)) {
@@ -1137,8 +1138,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
+                    DatabaseManager.forceStartTransaction();
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
+                    DatabaseManager.forceCommitTransaction();
                     //free execution node even if it is dead
                     try {
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes());
@@ -1170,8 +1173,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
+                    DatabaseManager.forceStartTransaction();
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
+                    DatabaseManager.forceCommitTransaction();
                     //free execution node even if it is dead
                     resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                             .getCleaningScript());
@@ -1214,6 +1219,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                                 .getCleaningScript());
                     } catch (Exception e) {
+                        logger_dev.error("", e);
                         //cannot get back the node, RM take care about that.
                     }
                     //change status and update GUI
@@ -1224,9 +1230,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             .isPreciousResult());
                     //and update database
                     //update job and task info
+                    DatabaseManager.forceStartTransaction();
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
                     DatabaseManager.update(job.getJobResult());
+                    DatabaseManager.forceCommitTransaction();
                     //send event to user
                     frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
@@ -1250,9 +1258,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 descriptor.getName() + "'");
 
             //and update database
+            DatabaseManager.forceStartTransaction();
             DatabaseManager.synchronize(job.getJobInfo());
             DatabaseManager.synchronize(descriptor.getTaskInfo());
             DatabaseManager.update(job.getJobResult());
+            DatabaseManager.forceCommitTransaction();
 
             //clean the result to improve memory usage
             if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {
@@ -1299,6 +1309,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                     .getCleaningScript());
         } catch (NullPointerException eNull) {
+            logger_dev.error("", eNull);
             //the task has been killed. Nothing to do anymore with this one.
         }
     }

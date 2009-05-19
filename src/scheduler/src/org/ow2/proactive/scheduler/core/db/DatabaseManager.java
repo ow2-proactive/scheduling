@@ -87,12 +87,18 @@ public class DatabaseManager {
     private static final String ALTERABLE_REQUEST_FIELD = "alterable";
     //ObjectID field name for HQL request
     private static final String OBJECTID_REQUEST_FIELD = "objectId";
+    //lock
+    private static Object sessionlock = new Object();
     //Memory for id field name by class
     private static Map<Class<?>, String> idFields = new HashMap<Class<?>, String>();
     //Hibernate Session factory
     private static SessionFactory sessionFactory;
     //Hibernate configuration
     private static Configuration configuration;
+    //Hibernate external forced session
+    //if a user has manually open a session, this value is not null
+    //so no new session must be created until this value to be null again.
+    private static Session externalForcedSession = null;
 
     static {
         //Create configuration from hibernate.cfg.xml using XML file for mapping
@@ -170,6 +176,92 @@ public class DatabaseManager {
     }
 
     /**
+     * Force a transaction to be started. This method has to be used only when multiple calls
+     * to methods of this class have to be performed.<br />
+     * For simple atomic call, transaction is implicit.<br /><br />
+     *
+     * To use the manual transaction, call this forceStartTransaction() method,<br/>
+     * then, (when multiple modifications are done) a call to {@link #forceCommitTransaction()} OR {@link #forceRollbackTransaction()}
+     * will terminate the transaction.
+     */
+    public static void forceStartTransaction() {
+        synchronized (sessionlock) {
+            externalForcedSession = DatabaseManager.getSessionFactory().openSession();
+            externalForcedSession.beginTransaction();
+        }
+    }
+
+    /**
+     * Force a manually opened transaction to be committed.
+     * See {@link #forceStartTransaction()} for details.
+     */
+    public static void forceCommitTransaction() {
+        synchronized (sessionlock) {
+            externalForcedSession.getTransaction().commit();
+            externalForcedSession.close();
+            externalForcedSession = null;
+        }
+    }
+
+    /**
+     * Force a manually opened transaction to be rolledback.
+     * See {@link #forceStartTransaction()} for details.
+     */
+    public static void forceRollbackTransaction() {
+        synchronized (sessionlock) {
+            externalForcedSession.getTransaction().rollback();
+            externalForcedSession.close();
+            externalForcedSession = null;
+        }
+    }
+
+    /**
+     * Begin a transaction
+     * First open a session, the begin a transaction on this session.
+     *
+     * @return the new opened session
+     */
+    private static Session beginTransaction() {
+        //if a session has been manually opened by a user, use it
+        if (externalForcedSession != null) {
+            return externalForcedSession;
+        }
+        Session session = DatabaseManager.getSessionFactory().openSession();
+        session.beginTransaction();
+        return session;
+    }
+
+    /**
+     * Commit and close the given session.
+     *
+     * @param session the session to be committed.
+     */
+    private static void commitTransaction(Session session) {
+        //if a session has been manually opened by a user, don't commit, wait for user to commit
+        if (externalForcedSession != null) {
+            return;
+        }
+        session.getTransaction().commit();
+        session.close();
+        logger_dev.debug("Transaction committed and closed");
+    }
+
+    /**
+     * Rollback and close the given session.
+     *
+     * @param session the session to be rolledback.
+     */
+    private static void rollbackTransaction(Session session) {
+        //if a session has been manually opened by a user, don't rollback, wait for user to commit
+        if (externalForcedSession != null) {
+            return;
+        }
+        session.getTransaction().rollback();
+        session.close();
+        logger_dev.debug("Transaction rolledback and closed");
+    }
+
+    /**
      * Register an object. The object must be an Hibernate entity.
      * This method will persist the given object and store it in the database.
      *
@@ -177,19 +269,15 @@ public class DatabaseManager {
      */
     public static void register(Object o) {
         checkIsEntity(o);
-        Session session = DatabaseManager.getSessionFactory().openSession();
+        Session session = beginTransaction();
         try {
             logger_dev.info("Registering new Object : " + o.getClass().getName());
-            session.beginTransaction();
             session.save(o);
-            session.getTransaction().commit();
+            commitTransaction(session);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            rollbackTransaction(session);
             logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to store the given object !", e);
-        } finally {
-            session.close();
-            logger_dev.debug("Session closed");
         }
     }
 
@@ -201,19 +289,15 @@ public class DatabaseManager {
      */
     public static void delete(Object o) {
         checkIsEntity(o);
-        Session session = DatabaseManager.getSessionFactory().openSession();
+        Session session = beginTransaction();
         try {
             logger_dev.info("Deleting Object : " + o.getClass().getName());
-            session.beginTransaction();
             session.delete(o);
-            session.getTransaction().commit();
+            commitTransaction(session);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            rollbackTransaction(session);
             logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to delete the given object !", e);
-        } finally {
-            session.close();
-            logger_dev.debug("Session closed");
         }
     }
 
@@ -226,19 +310,15 @@ public class DatabaseManager {
      */
     public static void update(Object o) {
         checkIsEntity(o);
-        Session session = DatabaseManager.getSessionFactory().openSession();
+        Session session = beginTransaction();
         try {
             logger_dev.info("Updating Object : " + o.getClass().getName());
-            session.beginTransaction();
             session.update(o);
-            session.getTransaction().commit();
+            commitTransaction(session);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            rollbackTransaction(session);
             logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to update the given object !", e);
-        } finally {
-            session.close();
-            logger_dev.debug("Session closed");
         }
     }
 
@@ -385,10 +465,9 @@ public class DatabaseManager {
         Field[] fields = getDeclaredFields(clazz, true);
         boolean hasAlterable = false;
         logger_dev.info("Synchronizing " + o.getClass().getName());
-        Session session = DatabaseManager.getSessionFactory().openSession();
+        //start transaction
+        Session session = beginTransaction();
         try {
-            //begin transaction
-            session.beginTransaction();
             //get id value to set it in the request
             Field id = clazz.getDeclaredField(hibernateId);
             id.setAccessible(true);
@@ -419,15 +498,12 @@ public class DatabaseManager {
                 return;
             }
             //commit
-            session.getTransaction().commit();
+            commitTransaction(session);
             logger_dev.debug("Transaction committed");
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            rollbackTransaction(session);
             logger_dev.error("", e);
             throw new DatabaseManagerException("Unable to synchronize this object !", e);
-        } finally {
-            session.close();
-            logger_dev.debug("Session closed");
         }
     }
 
