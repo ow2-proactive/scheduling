@@ -75,27 +75,32 @@ public class TaskClassLoader extends ClassLoader {
      */
     public Class<?> findClass(String className) throws ClassNotFoundException {
         logger_dev.debug("Looking for class " + className);
-        Class<?> res = null;
-        // try parent
-        try {
-            res = this.getParent().loadClass(className);
-            logger_dev.debug("Found class " + className + " locally");
-        } catch (ClassNotFoundException e) {
-            if (remoteServer != null) {
-                // tries remote TaskClassServer...
-                logger_dev.debug("Ask for class " + className + " to the remote TaskClassServer");
-                byte[] classBytes = this.remoteServer.getClassBytes(className);
-                if (classBytes == null || classBytes.length == 0) {
-                    logger_dev.debug("Did not find " + className);
-                    throw new ClassNotFoundException(className);
+        Class<?> res = this.findLoadedClass(className);
+        if (res != null) {
+            // seeked class is already loaded. Return it.
+            logger_dev.info("Class " + className + " was already loaded");
+        } else {
+            // try parent
+            try {
+                res = this.getParent().loadClass(className);
+                logger_dev.debug("Found class " + className + " locally");
+            } catch (ClassNotFoundException e) {
+                if (remoteServer != null) {
+                    // tries remote TaskClassServer...
+                    logger_dev.debug("Ask for class " + className + " to the remote TaskClassServer");
+                    byte[] classBytes = this.remoteServer.getClassBytes(className);
+                    if (classBytes == null || classBytes.length == 0) {
+                        logger_dev.debug("Did not find " + className);
+                        throw new ClassNotFoundException(className);
+                    } else {
+                        logger_dev.debug("Found " + className);
+                        res = this.defineClass(className, classBytes, 0, classBytes.length);
+                    }
                 } else {
-                    logger_dev.debug("Found " + className);
-                    res = this.defineClass(className, classBytes, 0, classBytes.length);
+                    // no remote classserver available...
+                    logger_dev.debug("No TaskClassServer found when looking for " + className);
+                    throw e;
                 }
-            } else {
-                // no remote classserver available...
-                logger_dev.debug("No TaskClassServer found when looking for " + className);
-                throw e;
             }
         }
         return res;
