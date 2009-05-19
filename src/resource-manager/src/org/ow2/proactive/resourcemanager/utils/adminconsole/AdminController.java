@@ -34,17 +34,10 @@ package org.ow2.proactive.resourcemanager.utils.adminconsole;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.List;
 
-import javax.management.MBeanInfo;
-import javax.management.ObjectName;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.AlreadySelectedException;
@@ -61,24 +54,16 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.jmx.ProActiveConnection;
-import org.objectweb.proactive.core.jmx.client.ClientConnector;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
-import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.console.Console;
-import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive.utils.console.SimpleConsole;
+import org.ow2.proactive.utils.console.VisualConsole;
 
 
 /**
@@ -93,52 +78,46 @@ import org.ow2.proactive.utils.console.SimpleConsole;
 public class AdminController {
 
     private static final String RM_DEFAULT_URL = getHostURL("//localhost/");
-    private final String JS_INIT_FILE = "AdminActions.js";
 
-    public static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
     protected static final String control = "<ctl> ";
-    private static String newline = System.getProperty("line.separator");
-
-    private static final String EXCEPTIONMODE_CMD = "exMode(display,onDemand)";
-    private static final String ADDNODE_CMD = "addnode(nodeURL, nsName)";
-    private static final String REMOVENODE_CMD = "removenode(nodeURL,preempt)";
-    private static final String GCMDEPLOY_CMD = "gcmdeploy(gcmdFile,nsName)";
-    private static final String CREATENS_CMD = "createns(nsName)";
-    private static final String REMOVENS_CMD = "removens(nsName,preempt)";
-    private static final String LISTNODES_CMD = "listnodes()";
-    private static final String LISTNS_CMD = "listns()";
-    private static final String SHUTDOWN_CMD = "shutdown(preempt)";
-    private static final String EXIT_CMD = "exit()";
-    private static final String JMXINFO_CMD = "jmxinfo()";
-    private static final String EXEC_CMD = "exec(commandFilePath)";
+    protected static final String newline = System.getProperty("line.separator");
+    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
+    protected static AdminController shell;
 
     private String commandName = "adminRM";
 
-    protected RMAdmin rm;
-    protected boolean initialized = false;
-    protected boolean terminated = false;
-    protected boolean intercativeMode = false;
-    protected ScriptEngine engine;
-    protected Console console = new SimpleConsole();
-
-    protected boolean displayStack = true;
-    protected boolean displayOnDemand = true;
-
-    protected MBeanInfoViewer mbeanInfoViewer;
-
-    protected RMAuthentication auth = null;
     protected CommandLine cmd = null;
     protected String user = null;
     protected String pwd = null;
 
-    protected static AdminController shell;
+    protected RMAuthentication auth = null;
+    protected AdminRMModel model;
+
+    //private MBeanInfoViewer mbeanInfoViewer;
 
     /**
-     * @param args
+     * Start the RM controller
+     *
+     * @param args the arguments to be passed
      */
     public static void main(String[] args) {
-        shell = new AdminController();
+        shell = new AdminController(null);
         shell.load(args);
+    }
+
+    /**
+     * Create a new instance of AdminController
+     */
+    protected AdminController() {
+    }
+
+    /**
+     * Create a new instance of AdminController
+     *
+     * Convenience constructor to let the default one do nothing
+     */
+    protected AdminController(Object o) {
+        model = AdminRMModel.getModel();
     }
 
     public void load(String[] args) {
@@ -161,6 +140,10 @@ public class AdminController {
         rmURL.setArgs(1);
         rmURL.setRequired(false);
         options.addOption(rmURL);
+
+        Option visual = new Option("g", "gui", false, "Start the console in a graphical view");
+        rmURL.setRequired(false);
+        options.addOption(visual);
 
         addCommandLineOptions(options);
 
@@ -260,29 +243,30 @@ public class AdminController {
     }
 
     protected void connect() throws LoginException {
-        rm = auth.logAsAdmin(user, pwd);
+        RMAdmin rm = auth.logAsAdmin(user, pwd);
+        model.connectRM(rm);
         logger.info("\t-> Admin '" + user + "' successfully connected" + newline);
     }
 
-    private void connectJMXClient(String url) {
-        if (!url.startsWith("//")) {
-            url = "//" + url;
-        }
-        if (!url.endsWith("/")) {
-            url = url + "/";
-        }
-        //connect the JMX client
-        ClientConnector connectorClient = new ClientConnector(url, "ServerMonitoring");
-        try {
-            connectorClient.connect();
-            ProActiveConnection connection = connectorClient.getConnection();
-            ObjectName mbeanName = new ObjectName("RMFrontend:name=RMBean");
-            MBeanInfo info = connection.getMBeanInfo(mbeanName);
-            mbeanInfoViewer = new MBeanInfoViewer(connection, mbeanName, info);
-        } catch (Exception e) {
-            logger.error("Scheduler MBean not found using : RMFrontend:name=RMBean");
-        }
-    }
+    //    private void connectJMXClient(String url) {
+    //        if (!url.startsWith("//")) {
+    //            url = "//" + url;
+    //        }
+    //        if (!url.endsWith("/")) {
+    //            url = url + "/";
+    //        }
+    //        //connect the JMX client
+    //        ClientConnector connectorClient = new ClientConnector(url, "ServerMonitoring");
+    //        try {
+    //            connectorClient.connect();
+    //            ProActiveConnection connection = connectorClient.getConnection();
+    //            ObjectName mbeanName = new ObjectName("RMFrontend:name=RMBean");
+    //            MBeanInfo info = connection.getMBeanInfo(mbeanName);
+    //            mbeanInfoViewer = new MBeanInfoViewer(connection, mbeanName, info);
+    //        } catch (Exception e) {
+    //            logger.error("Scheduler MBean not found using : RMFrontend:name=RMBean");
+    //        }
+    //    }
 
     private void start() throws Exception {
         //start one of the two command behavior
@@ -365,34 +349,28 @@ public class AdminController {
     }
 
     private void startCommandListener() throws Exception {
-        initialize();
-        console.start(" > ");
-        console.printf("Type command here (type '?' or help() to see the list of commands)%n");
-        String stmt;
-        while (!terminated) {
-            stmt = console.readStatement();
-            if ("?".equals(stmt)) {
-                console.printf("%n" + helpScreen());
-            } else {
-                eval(stmt);
-                console.printf("");
-            }
+        Console console;
+        if (cmd.hasOption("g")) {
+            console = new VisualConsole();
+        } else {
+            console = new SimpleConsole();
         }
-        console.stop();
+        model.connectConsole(console);
+        model.startModel();
     }
 
     protected boolean startCommandLine(CommandLine cmd) {
-        intercativeMode = false;
+        model.setDisplayOnStdStream(true);
         if (cmd.hasOption("addnodes")) {
             String[] nodesURls = cmd.getOptionValues("addnodes");
             if (cmd.hasOption("ns")) {
                 String nsName = cmd.getOptionValue("ns");
                 for (String nUrl : nodesURls) {
-                    addnode(nUrl, nsName);
+                    AdminRMModel.addnode(nUrl, nsName);
                 }
             } else {
                 for (String nUrl : nodesURls) {
-                    addnode(nUrl, null);
+                    AdminRMModel.addnode(nUrl, null);
                 }
             }
         } else if (cmd.hasOption("gcmdeploy")) {
@@ -401,385 +379,51 @@ public class AdminController {
             for (String gcmdf : gcmdTab) {
                 File gcmdFile = new File(gcmdf);
                 if (!(gcmdFile.exists() && gcmdFile.isFile() && gcmdFile.canRead())) {
-                    error("Cannot read GCMDeployment descriptor : " + gcmdf);
+                    model.error("Cannot read GCMDeployment descriptor : " + gcmdf);
                 }
             }
             if (cmd.hasOption("ns")) {
                 String nsName = cmd.getOptionValue("ns");
                 for (String desc : gcmdTab) {
-                    gcmdeploy(desc, nsName);
+                    AdminRMModel.gcmdeploy(desc, nsName);
                 }
             } else {
                 for (String desc : gcmdTab) {
-                    gcmdeploy(desc, null);
+                    AdminRMModel.gcmdeploy(desc, null);
                 }
             }
         } else if (cmd.hasOption("removenodes")) {
             String[] nodesURls = cmd.getOptionValues("removenodes");
             boolean preempt = cmd.hasOption("f");
             for (String nUrl : nodesURls) {
-                removenode(nUrl, preempt);
+                AdminRMModel.removenode(nUrl, preempt);
             }
         } else if (cmd.hasOption("createns")) {
             String[] nsNames = cmd.getOptionValues("createns");
             for (String nsName : nsNames) {
-                createns(nsName);
+                AdminRMModel.createns(nsName);
             }
         } else if (cmd.hasOption("listnodes")) {
-            listnodes();
+            AdminRMModel.listnodes();
         } else if (cmd.hasOption("listns")) {
-            listns();
+            AdminRMModel.listns();
         } else if (cmd.hasOption("removens")) {
             String[] nsNames = cmd.getOptionValues("removens");
             boolean preempt = cmd.hasOption("f");
             for (String nsName : nsNames) {
-                removens(nsName, preempt);
+                AdminRMModel.removens(nsName, preempt);
             }
         } else if (cmd.hasOption("shutdown")) {
-            shutdown(cmd.hasOption("f"));
+            AdminRMModel.shutdown(cmd.hasOption("f"));
         }
         //        else if (cmd.hasOption("jmxinfo")) {
         //            JMXinfo();
         //        } 
         else {
-            intercativeMode = true;
-            return intercativeMode;
+            model.setDisplayOnStdStream(false);
+            return true;
         }
         return false;
-    }
-
-    //***************** COMMAND LISTENER *******************
-
-    protected void handleExceptionDisplay(String msg, Throwable t) {
-        if (intercativeMode) {
-            if (!displayStack) {
-                console.error(msg + " : " + (t.getMessage() == null ? t : t.getMessage()));
-            } else {
-                if (displayOnDemand) {
-                    console.handleExceptionDisplay(msg, t);
-                } else {
-                    console.printStackTrace(t);
-                }
-            }
-        } else {
-            System.err.printf(msg + newline);
-            logger.info("", t);
-        }
-    }
-
-    protected void printf(String format, Object... args) {
-        if (intercativeMode) {
-            console.printf(format, args);
-        } else {
-            System.out.printf(format + newline, args);
-        }
-    }
-
-    protected void error(String format, Object... args) {
-        if (intercativeMode) {
-            console.error(format, args);
-        } else {
-            System.err.printf(format, args);
-        }
-    }
-
-    public static void setExceptionMode(boolean displayStack, boolean displayOnDemand) {
-        shell.setExceptionMode_(displayStack, displayOnDemand);
-    }
-
-    private void setExceptionMode_(boolean displayStack, boolean displayOnDemand) {
-        this.displayStack = displayStack;
-        this.displayOnDemand = displayOnDemand;
-        String msg = "Exception display mode changed : ";
-        if (!displayStack) {
-            msg += "stack trace not displayed";
-        } else {
-            if (displayOnDemand) {
-                msg += "stack trace displayed on demand";
-            } else {
-                msg += "stack trace displayed everytime";
-            }
-        }
-        printf(msg);
-    }
-
-    public static void help() {
-        shell.help_();
-    }
-
-    private void help_() {
-        printf(newline + helpScreen());
-    }
-
-    public static void shutdown(boolean preempt) {
-        shell.shutdown_(preempt);
-    }
-
-    private void shutdown_(boolean preempt) {
-        try {
-            rm.shutdown(preempt);
-            printf("Shutdown request sent to Resource Manager, controller will shutdown !");
-            terminated = true;
-        } catch (Exception e) {
-            handleExceptionDisplay("Error while shutting down the RM", e);
-        }
-    }
-
-    public static void removens(String nodeSourceName, boolean preempt) {
-        shell.removens_(nodeSourceName, preempt);
-    }
-
-    private void removens_(String nodeSourceName, boolean preempt) {
-        try {
-            rm.removeSource(nodeSourceName, preempt);
-            printf("Node source '" + nodeSourceName + "' removal request sent to Resource Manager");
-        } catch (Exception e) {
-            handleExceptionDisplay("Error while removing node source '" + nodeSourceName, e);
-        }
-    }
-
-    public static void listns() {
-        shell.listns_();
-    }
-
-    private void listns_() {
-        List<RMNodeSourceEvent> list = rm.getNodeSourcesList();
-        for (RMNodeSourceEvent evt : list) {
-            printf(evt.getSourceName() + "\t" + evt.getSourceDescription());
-        }
-    }
-
-    public static void listnodes() {
-        shell.listnodes_();
-    }
-
-    private void listnodes_() {
-        List<RMNodeEvent> list = rm.getNodesList();
-        if (list.size() == 0) {
-            printf("No nodes handled by Resource Manager");
-        } else {
-            for (RMNodeEvent evt : list) {
-                String state = null;
-                switch (evt.getNodeState()) {
-                    case DOWN:
-                        state = "DOWN";
-                        break;
-                    case FREE:
-                        state = "FREE";
-                        break;
-                    case BUSY:
-                        state = "BUSY";
-                        break;
-                    case TO_BE_RELEASED:
-                        state = "TO_BE_RELEASED";
-                }
-                printf(evt.getNodeSource() + "\t" + evt.getHostName() + "\t" + state + "\t" +
-                    evt.getNodeUrl());
-            }
-        }
-    }
-
-    public static void createns(String nodeSourceName) {
-        shell.createns_(nodeSourceName);
-    }
-
-    private void createns_(String nodeSourceName) {
-        try {
-            rm.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(), null, StaticPolicy.class
-                    .getName(), null);
-            printf("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
-        } catch (Exception e) {
-            handleExceptionDisplay("Error while creating node source '" + nodeSourceName, e);
-        }
-    }
-
-    public static void removenode(String nodeURL, boolean preempt) {
-        shell.removenode_(nodeURL, preempt);
-    }
-
-    private void removenode_(String nodeURL, boolean preempt) {
-        rm.removeNode(nodeURL, preempt);
-        printf("Nodes '" + nodeURL + "' removal request sent to Resource Manager");
-    }
-
-    public static void gcmdeploy(String fileName, String nodeSourceName) {
-        shell.gcmdeploy_(fileName, nodeSourceName);
-    }
-
-    private void gcmdeploy_(String fileName, String nodeSourceName) {
-        try {
-            File gcmDeployFile = new File(fileName);
-            if (nodeSourceName != null) {
-                rm.addNodes(nodeSourceName, new Object[] { FileToBytesConverter
-                        .convertFileToByteArray(gcmDeployFile) });
-            } else {
-                rm.addNodes(NodeSource.DEFAULT_NAME, new Object[] { FileToBytesConverter
-                        .convertFileToByteArray(gcmDeployFile) });
-            }
-            printf("GCM deployment '" + fileName + "' request sent to Resource Manager");
-        } catch (Exception e) {
-            handleExceptionDisplay("Error while load GCMD file '" + fileName, e);
-        }
-    }
-
-    public static void addnode(String nodeName, String nodeSourceName) {
-        shell.addnode_(nodeName, nodeSourceName);
-    }
-
-    private void addnode_(String nodeName, String nodeSourceName) {
-        try {
-            if (nodeSourceName != null) {
-                rm.addNode(nodeName, nodeSourceName);
-            } else {
-                rm.addNode(nodeName);
-            }
-            printf("Adding node '" + nodeName + "' request sent to Resource Manager");
-        } catch (Exception e) {
-            handleExceptionDisplay("Error while adding node '" + nodeName + "'", e);
-        }
-    }
-
-    public static void JMXinfo() {
-        shell.JMXinfo_();
-    }
-
-    private void JMXinfo_() {
-        try {
-            printf(mbeanInfoViewer.getInfo());
-        } catch (Exception e) {
-            handleExceptionDisplay("Error while retrieving JMX informations", e);
-        }
-    }
-
-    public static void exec(String commandFilePath) {
-        shell.exec_(commandFilePath);
-    }
-
-    private void exec_(String commandFilePath) {
-        try {
-            File f = new File(commandFilePath.trim());
-            BufferedReader br = new BufferedReader(new FileReader(f));
-            eval(readFileContent(br));
-            br.close();
-        } catch (Exception e) {
-            handleExceptionDisplay("*ERROR*", e);
-        }
-    }
-
-    public static void exit() {
-        shell.exit_();
-    }
-
-    private void exit_() {
-        console.printf("Exiting controller.");
-        try {
-            rm.disconnect();
-        } catch (Exception e) {
-        }
-        terminated = true;
-    }
-
-    public static RMAdmin getAdminRM() {
-        return shell.getAdminRM_();
-    }
-
-    private RMAdmin getAdminRM_() {
-        return rm;
-    }
-
-    //***************** OTHER *******************
-
-    protected void initialize() throws IOException {
-        if (!initialized) {
-            ScriptEngineManager manager = new ScriptEngineManager();
-            // Engine selection
-            engine = manager.getEngineByExtension("js");
-            initialized = true;
-            //read and launch Action.js
-            BufferedReader br = new BufferedReader(new InputStreamReader(AdminController.class
-                    .getResourceAsStream(JS_INIT_FILE)));
-            eval(readFileContent(br));
-        }
-    }
-
-    protected void eval(String cmd) {
-        try {
-            if (!initialized) {
-                initialize();
-            }
-            //Evaluate the command
-            if (cmd == null) {
-                console.error("*ERROR* - Standard input stream has been terminated !");
-                terminated = true;
-            } else {
-                engine.eval(cmd);
-            }
-        } catch (ScriptException e) {
-            console.error("*SYNTAX ERROR* - " + format(e.getMessage()));
-        } catch (Exception e) {
-            handleExceptionDisplay("Error while evaluating command", e);
-        }
-    }
-
-    private static String format(String msg) {
-        msg = msg.replaceFirst("[^:]+:", "");
-        return msg.replaceFirst("[(]<.*", "").trim();
-    }
-
-    protected static String readFileContent(BufferedReader reader) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        String tmp;
-        while ((tmp = reader.readLine()) != null) {
-            sb.append(tmp);
-        }
-        return sb.toString();
-    }
-
-    //***************** HELP SCREEN *******************
-
-    protected String helpScreen() {
-        StringBuilder out = new StringBuilder("Resource Manager controller commands are :" + newline +
-            newline);
-
-        out
-                .append(String
-                        .format(
-                                " %1$-28s\t Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)%n%n",
-                                EXCEPTIONMODE_CMD));
-        out.append(String.format(
-                " %1$-28s\t Add node to the given node source (parameters is a string representing the node URL to add AND"
-                    + " a string representing the node source in which to add the node)%n", ADDNODE_CMD));
-        out.append(String.format(
-                " %1$-28s\t Remove the given node (parameter is a string representing the node URL,"
-                    + " node is removed immediately if second parameter is true)%n", REMOVENODE_CMD));
-        out.append(String
-                .format(
-                        " %1$-28s\t Add node(s) to the given node source (parameter is a string representing the a GCMD file AND"
-                            + " a string representing the node source in which to add the node(s) )%n",
-                        GCMDEPLOY_CMD));
-        out
-                .append(String
-                        .format(
-                                " %1$-28s\t Create a new node source (parameter is a string representing the node source name to create)%n",
-                                CREATENS_CMD));
-        out.append(String.format(
-                " %1$-28s\t Remove the given node source (parameter is a string representing the node source name to remove,"
-                    + " nodeSource is removed immediately if second parameter is true)%n", REMOVENS_CMD));
-        out.append(String.format(" %1$-28s\t List every handled nodes%n", LISTNODES_CMD));
-        out.append(String.format(" %1$-28s\t List every handled node sources%n", LISTNS_CMD));
-        out.append(String.format(
-                " %1$-28s\t Shutdown the Resource Manager (RM shutdown immediately if parameter is true)%n",
-                SHUTDOWN_CMD));
-        //        out.append(String.format(" %1$-28s\t Display some statistics provided by the Scheduler MBean%n",
-        //                JMXINFO_CMD));
-        out
-                .append(String
-                        .format(
-                                " %1$-28s\t Execute the content of the given script file (parameter is a string representing a command-file path)%n",
-                                EXEC_CMD));
-        out.append(String.format(" %1$-28s\t Exits RM controller%n", EXIT_CMD));
-
-        return out.toString();
     }
 
     /**
@@ -809,12 +453,4 @@ public class AdminController {
         }
     }
 
-    /**
-     * Set the commandName value to the given commandName value
-     *
-     * @param commandName the commandName to set
-     */
-    public void setCommandName(String commandName) {
-        this.commandName = commandName;
-    }
 }

@@ -29,7 +29,7 @@
  * ################################################################
  * $PROACTIVE_INITIAL_DEV$
  */
-package org.ow2.proactive.scheduler.common.util;
+package org.ow2.proactive.utils;
 
 import java.util.Collection;
 import java.util.LinkedList;

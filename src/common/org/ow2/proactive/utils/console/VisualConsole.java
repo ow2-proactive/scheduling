@@ -51,7 +51,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.ow2.proactive.scheduler.common.util.BoundedLinkedList;
+import org.ow2.proactive.utils.BoundedLinkedList;
 
 
 /**

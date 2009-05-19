@@ -1,4 +1,4 @@
-importClass(org.ow2.proactive.resourcemanager.utils.adminconsole.AdminController);
+importClass(org.ow2.proactive.resourcemanager.utils.adminconsole.AdminRMModel);
 
 function exMode(displayStack, displayOnDemand){
 	if (displayStack == undefined){
@@ -7,7 +7,7 @@ function exMode(displayStack, displayOnDemand){
 	if (displayOnDemand == undefined){
 		displayOnDemand = true;
 	}
-	AdminController.setExceptionMode(displayStack, displayOnDemand);
+	AdminRMModel.setExceptionMode(displayStack, displayOnDemand);
 }
 
 function addnode(nodeURL, nodeSourceName){
@@ -15,7 +15,7 @@ function addnode(nodeURL, nodeSourceName){
 		nodeSourceName = null;
 		println("Node Source will be the default one as it is not set");
 	}
-	return AdminController.addnode(nodeURL, nodeSourceName);
+	return AdminRMModel.addnode(nodeURL, nodeSourceName);
 }
 
 function removenode(nodeURL,preemptively){
@@ -23,7 +23,7 @@ function removenode(nodeURL,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-    return AdminController.removenode(nodeURL,preemptively);
+    return AdminRMModel.removenode(nodeURL,preemptively);
 }
 
 function gcmdeploy(gcmdFile, nodeSourceName){
@@ -31,11 +31,11 @@ function gcmdeploy(gcmdFile, nodeSourceName){
 		nodeSourceName = null;
 		println("Node Source will be the default one as it is not set");
 	}
-    return AdminController.gcmdeploy(gcmdFile, nodeSourceName);
+    return AdminRMModel.gcmdeploy(gcmdFile, nodeSourceName);
 }
 
 function createns(nodeSourceName){
-    return AdminController.createns(nodeSourceName);
+    return AdminRMModel.createns(nodeSourceName);
 }
 
 function removens(nodeSourceName,preemptively){
@@ -43,15 +43,15 @@ function removens(nodeSourceName,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return AdminController.removens(nodeSourceName,preemptively);
+	return AdminRMModel.removens(nodeSourceName,preemptively);
 }
 
 function listnodes(){
-    return AdminController.listnodes();
+    return AdminRMModel.listnodes();
 }
 
 function listns(){
-    return AdminController.listns();
+    return AdminRMModel.listns();
 }
 
 function shutdown(preemptively){
@@ -59,19 +59,19 @@ function shutdown(preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return AdminController.shutdown(preemptively);
+	return AdminRMModel.shutdown(preemptively);
 }
 
 function exec(commandFilePath){
-	return AdminController.exec(commandFilePath);
+	return AdminRMModel.exec(commandFilePath);
 }
 
 function exit(){
-	return AdminController.exit();
+	return AdminRMModel.exit();
 }
 
 function help(){
-	AdminController.help();
+	AdminRMModel.help();
 }
 
-var rm = AdminController.getAdminRM();
+var rm = AdminRMModel.getAdminRM();

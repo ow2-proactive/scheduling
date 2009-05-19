@@ -33,14 +33,10 @@ package org.ow2.proactive.utils.console;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
 
 
 /**
@@ -51,8 +47,7 @@ import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
  */
 public abstract class ConsoleModel {
 
-    protected static final int cmdHelpMaxCharLength = 24;
-    protected String JS_INIT_FILE = null;
+    protected static String newline = System.getProperty("line.separator");
 
     protected boolean initialized = false;
     protected boolean terminated = false;
@@ -64,13 +59,14 @@ public abstract class ConsoleModel {
     protected ScriptEngine engine;
     protected Console console;
 
+    protected static ConsoleModel model;
+
     /**
      * Start this model
      *
-     * @throws IOException
-     * @throws SchedulerException
+     * @throws Exception
      */
-    public abstract void start() throws IOException, SchedulerException;
+    public abstract void startModel() throws Exception;
 
     //***************** DISPLAY HANDLING *******************
 
@@ -93,7 +89,7 @@ public abstract class ConsoleModel {
                 }
             }
         } else {
-            System.err.printf(msg + "\n");
+            System.err.printf(msg + newline);
             t.printStackTrace();
         }
     }
@@ -146,6 +142,10 @@ public abstract class ConsoleModel {
         print(msg);
     }
 
+    protected void help_() {
+        print(newline + helpScreen());
+    }
+
     //***************** OTHER *******************
 
     /**
@@ -170,12 +170,7 @@ public abstract class ConsoleModel {
             engine = manager.getEngineByExtension("js");
             engine.getContext().setWriter(console.writer());
             initialized = true;
-            //read and launch Action.js
-            if (JS_INIT_FILE != null) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(UserController.class
-                        .getResourceAsStream(JS_INIT_FILE)));
-                eval(readFileContent(br));
-            }
+
         }
     }
 
@@ -231,6 +226,10 @@ public abstract class ConsoleModel {
         return msg.replaceFirst("[(]<.*", "").trim();
     }
 
+    //*****************  HELP SCREEN  *******************
+
+    protected abstract String helpScreen();
+
     //***************** GETTER SETTER *******************
 
     /**
@@ -270,24 +269,6 @@ public abstract class ConsoleModel {
      */
     public void setDisplayOnStdStream(boolean displayOnStdStream) {
         this.displayOnStdStream = displayOnStdStream;
-    }
-
-    /**
-     * Get the JS_INIT_FILE
-     *
-     * @return the JS_INIT_FILE
-     */
-    protected String getJS_INIT_FILE() {
-        return JS_INIT_FILE;
-    }
-
-    /**
-     * Set the JS_INIT_FILE value to the given js_init_file value
-     *
-     * @param js_init_file the JS_INIT_FILE to set
-     */
-    protected void setJS_INIT_FILE(String js_init_file) {
-        JS_INIT_FILE = js_init_file;
     }
 
 }

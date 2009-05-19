@@ -33,7 +33,7 @@ package unitTests;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.util.BoundedLinkedList;
+import org.ow2.proactive.utils.BoundedLinkedList;
 
 
 /**

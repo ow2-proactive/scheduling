@@ -31,19 +31,13 @@
  */
 package org.ow2.proactive.scheduler.util.adminconsole;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
-import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
 
 
@@ -51,24 +45,9 @@ import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
  * AdminController will help you to manage the scheduler.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.0
  */
 public class AdminController extends UserController {
-
-    private static final String JS_INIT_FILE = "AdminActions.js";
-
-    private static final String YES = "yes";
-    private static final String NO = "no";
-    private static final String YES_NO = "(" + YES + "/" + NO + ")";
-
-    private static final String START_CMD = "start()";
-    private static final String STOP_CMD = "stop()";
-    private static final String PAUSE_CMD = "pause()";
-    private static final String FREEZE_CMD = "freeze()";
-    private static final String RESUME_CMD = "resume()";
-    private static final String SHUTDOWN_CMD = "shutdown()";
-    private static final String KILL_CMD = "kill()";
-    private static final String LINK_RM_CMD = "linkrm(rmURL)";
 
     /**
      * Start the Scheduler controller
@@ -76,15 +55,31 @@ public class AdminController extends UserController {
      * @param args the arguments to be passed
      */
     public static void main(String[] args) {
-        shell = new AdminController();
-        shell.setCommandName("adminScheduler");
+        shell = new AdminController(null);
         shell.load(args);
+    }
+
+    /**
+     * Create a new instance of AdminController
+     */
+    protected AdminController() {
+    }
+
+    /**
+     * Create a new instance of AdminController
+     *
+     * Convenience constructor to let the default one do nothing
+     */
+    protected AdminController(Object o) {
+        commandName = "adminScheduler";
+        model = AdminSchedulerModel.getModel();
     }
 
     @Override
     protected void connect() throws LoginException {
-        scheduler = auth.logAsAdmin(user, pwd);
-        logger.info("\t-> Admin '" + user + "' successfully connected\n");
+        UserSchedulerInterface scheduler = auth.logAsAdmin(user, pwd);
+        model.connectScheduler(scheduler);
+        logger.info("\t-> Admin '" + user + "' successfully connected" + newline);
     }
 
     @Override
@@ -137,262 +132,29 @@ public class AdminController extends UserController {
     @Override
     protected boolean startCommandLine(CommandLine cmd) {
         if (super.startCommandLine(cmd)) {
-            intercativeMode = false;
+            model.setDisplayOnStdStream(true);
             if (cmd.hasOption("start")) {
-                start();
+                AdminSchedulerModel.start();
             } else if (cmd.hasOption("stop")) {
-                stop();
+                AdminSchedulerModel.stop();
             } else if (cmd.hasOption("pause")) {
-                pause();
+                AdminSchedulerModel.pause();
             } else if (cmd.hasOption("freeze")) {
-                freeze();
+                AdminSchedulerModel.freeze();
             } else if (cmd.hasOption("resume")) {
-                resume();
+                AdminSchedulerModel.resume();
             } else if (cmd.hasOption("shutdown")) {
-                shutdown();
+                AdminSchedulerModel.shutdown();
             } else if (cmd.hasOption("kill")) {
-                kill();
+                AdminSchedulerModel.kill();
             } else if (cmd.hasOption("linkrm")) {
-                linkRM(cmd.getOptionValue("linkrm"));
+                AdminSchedulerModel.linkRM(cmd.getOptionValue("linkrm"));
             } else {
-                intercativeMode = true;
-                return intercativeMode;
+                model.setDisplayOnStdStream(false);
+                return true;
             }
         }
         return false;
-    }
-
-    //***************** COMMAND LISTENER *******************
-
-    public static boolean start() {
-        return ((AdminController) shell).start_();
-    }
-
-    private boolean start_() {
-        boolean success = false;
-        try {
-            success = ((AdminSchedulerInterface) scheduler).start().booleanValue();
-        } catch (Exception e) {
-            handleExceptionDisplay("Start Scheduler is not possible", e);
-            return false;
-        }
-        if (success) {
-            printf("Scheduler started.");
-        } else {
-            printf("Scheduler cannot be started in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean stop() {
-        return ((AdminController) shell).stop_();
-    }
-
-    private boolean stop_() {
-        boolean success = false;
-        try {
-            success = ((AdminSchedulerInterface) scheduler).stop().booleanValue();
-        } catch (Exception e) {
-            handleExceptionDisplay("Stop Scheduler is not possible", e);
-            return false;
-        }
-        if (success) {
-            printf("Scheduler stopped.");
-        } else {
-            printf("Scheduler cannot be stopped in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean pause() {
-        return ((AdminController) shell).pause_();
-    }
-
-    private boolean pause_() {
-        boolean success = false;
-        try {
-            success = ((AdminSchedulerInterface) scheduler).pause().booleanValue();
-        } catch (Exception e) {
-            handleExceptionDisplay("Pause Scheduler is not possible", e);
-            return false;
-        }
-        if (success) {
-            printf("Scheduler paused.");
-        } else {
-            printf("Scheduler cannot be paused in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean freeze() {
-        return ((AdminController) shell).freeze_();
-    }
-
-    private boolean freeze_() {
-        boolean success = false;
-        try {
-            success = ((AdminSchedulerInterface) scheduler).freeze().booleanValue();
-        } catch (Exception e) {
-            handleExceptionDisplay("Freeze Scheduler is not possible", e);
-            return false;
-        }
-        if (success) {
-            printf("Scheduler frozen.");
-        } else {
-            printf("Scheduler cannot be frozen in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean resume() {
-        return ((AdminController) shell).resume_();
-    }
-
-    private boolean resume_() {
-        boolean success = false;
-        try {
-            success = ((AdminSchedulerInterface) scheduler).resume().booleanValue();
-        } catch (Exception e) {
-            handleExceptionDisplay("Resume Scheduler is not possible", e);
-            return false;
-        }
-        if (success) {
-            printf("Scheduler resumed.");
-        } else {
-            printf("Scheduler cannot be resumed in its current state.");
-        }
-        return success;
-    }
-
-    public static boolean shutdown() {
-        return ((AdminController) shell).shutdown_();
-    }
-
-    private boolean shutdown_() {
-        boolean success = false;
-        try {
-            if (intercativeMode) {
-                String s = console.readStatement("Are you sure you want to shutdown the Scheduler ? " +
-                    YES_NO + " > ");
-                success = s.equalsIgnoreCase(YES);
-            }
-            if (success || !intercativeMode) {
-                try {
-                    success = ((AdminSchedulerInterface) scheduler).shutdown().booleanValue();
-                } catch (SchedulerException e) {
-                    error("Shutdown Scheduler is not possible : " + e.getMessage());
-                    return false;
-                }
-                if (success) {
-                    printf("Shutdown sequence initialized, it might take a while to finish all executions, shell will exit.");
-                    terminated = true;
-                } else {
-                    printf("Scheduler cannot be shutdown in its current state.");
-                }
-            } else {
-                printf("Shutdown aborted !");
-            }
-        } catch (Exception e) {
-            handleExceptionDisplay("*ERROR*", e);
-        }
-        return success;
-    }
-
-    public static boolean kill() {
-        return ((AdminController) shell).kill_();
-    }
-
-    private boolean kill_() {
-        boolean success = false;
-        try {
-            if (intercativeMode) {
-                String s = console.readStatement("Are you sure you want to kill the Scheduler ? " + YES_NO +
-                    " > ");
-                success = s.equalsIgnoreCase(YES);
-            }
-            if (success || !intercativeMode) {
-                try {
-                    success = ((AdminSchedulerInterface) scheduler).kill().booleanValue();
-                } catch (SchedulerException e) {
-                    error("Kill Scheduler is not possible : " + e.getMessage());
-                    return false;
-                }
-                if (success) {
-                    printf("Sheduler has just been killed, shell will exit.");
-                    terminated = true;
-                } else {
-                    printf("Scheduler cannot be killed in its current state.");
-                }
-            } else {
-                printf("Kill aborted !");
-            }
-        } catch (Exception e) {
-            handleExceptionDisplay("*ERROR*", e);
-        }
-        return success;
-    }
-
-    public static boolean linkRM(String rmURL) {
-        return ((AdminController) shell).linkRM_(rmURL);
-    }
-
-    private boolean linkRM_(String rmURL) {
-        boolean success = false;
-        try {
-            success = ((AdminSchedulerInterface) scheduler).linkResourceManager(rmURL.trim()).booleanValue();
-            if (success) {
-                printf("The new Resource Manager at " + rmURL + " has been rebound to the scheduler.");
-            } else {
-                error("Reconnect a Resource Manager is only possible when RM is dead !");
-            }
-        } catch (Exception e) {
-            handleExceptionDisplay("*ERROR*", e);
-        }
-        return success;
-    }
-
-    public static AdminSchedulerInterface getAdminScheduler() {
-        return ((AdminController) shell).getAdminScheduler_();
-    }
-
-    private AdminSchedulerInterface getAdminScheduler_() {
-        return (AdminSchedulerInterface) scheduler;
-    }
-
-    //***************** OTHER *******************
-
-    @Override
-    protected void initialize() throws IOException {
-        super.initialize();
-        //read and launch Action.js
-        BufferedReader br = new BufferedReader(new InputStreamReader(AdminController.class
-                .getResourceAsStream(JS_INIT_FILE)));
-        eval(readFileContent(br));
-    }
-
-    //***************** HELP SCREEN *******************
-
-    protected String helpScreen() {
-        StringBuilder out = new StringBuilder(super.helpScreen());
-
-        out.append(String.format("\n %1$-24s Start Scheduler\n", START_CMD));
-        out.append(String.format(" %1$-24s Stop Scheduler\n", STOP_CMD));
-        out.append(String.format(
-                " %1$-24s pause Scheduler, causes every jobs but running one to be paused\n", PAUSE_CMD));
-        out
-                .append(String
-                        .format(
-                                " %1$-24s freeze Scheduler, causes all jobs to be paused (every non-running tasks are paused)\n",
-                                FREEZE_CMD));
-        out.append(String.format(" %1$-24s resume Scheduler, causes all jobs to be resumed\n", RESUME_CMD));
-        out.append(String.format(" %1$-24s Wait for running jobs to finish and shutdown Scheduler\n",
-                SHUTDOWN_CMD));
-        out.append(String.format(" %1$-24s Kill every tasks and jobs and shutdown Scheduler\n", KILL_CMD));
-        out.append(String.format(
-                " %1$-24s Reconnect a Resource Manager (parameter is a string representing the new rmURL)\n",
-                LINK_RM_CMD));
-
-        return out.toString();
     }
 
 }

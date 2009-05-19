@@ -75,20 +75,21 @@ import org.ow2.proactive.utils.console.VisualConsole;
  */
 public class UserController {
 
-    private static final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
+    protected static final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
 
-    private static final String control = "<ctl> ";
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
-    private static UserController shell;
+    protected static final String control = "<ctl> ";
+    protected static final String newline = System.getProperty("line.separator");
+    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
+    protected static UserController shell;
 
-    private String commandName = "userScheduler";
+    protected String commandName = "userScheduler";
 
-    private CommandLine cmd = null;
-    private String user = null;
-    private String pwd = null;
+    protected CommandLine cmd = null;
+    protected String user = null;
+    protected String pwd = null;
 
-    private SchedulerAuthenticationInterface auth = null;
-    private UserSchedulerModel userModel;
+    protected SchedulerAuthenticationInterface auth = null;
+    protected UserSchedulerModel model;
 
     //private MBeanInfoViewer mbeanInfoViewer;
 
@@ -98,12 +99,23 @@ public class UserController {
      * @param args the arguments to be passed
      */
     public static void main(String[] args) {
-        shell = new UserController();
+        shell = new UserController(null);
         shell.load(args);
     }
 
-    public UserController() {
-        userModel = UserSchedulerModel.getModel();
+    /**
+     * Create a new instance of UserController
+     */
+    protected UserController() {
+    }
+
+    /**
+     * Create a new instance of UserController
+     *
+     * Convenience constructor to let the default one do nothing
+     */
+    protected UserController(Object o) {
+        model = UserSchedulerModel.getModel();
     }
 
     public void load(String[] args) {
@@ -152,7 +164,7 @@ public class UserController {
                 auth = SchedulerConnection.join(url);
                 logger.info("\t-> Connection established on " + url);
 
-                logger.info("\nConnecting admin to the Scheduler");
+                logger.info(newline + "Connecting admin to the Scheduler");
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
                     pwdMsg = user + "'s password: ";
@@ -198,13 +210,14 @@ public class UserController {
         } catch (ParseException e) {
             displayHelp = true;
         } catch (LoginException e) {
-            logger.error(e.getMessage() + "\nShutdown the controller.\n");
+            logger.error(e.getMessage() + newline + "Shutdown the controller." + newline);
             System.exit(1);
         } catch (SchedulerException e) {
-            logger.error(e.getMessage() + "\nShutdown the controller.\n");
+            logger.error(e.getMessage() + newline + "Shutdown the controller." + newline);
             System.exit(1);
         } catch (Exception e) {
-            logger.error("An error has occurred : " + e.getMessage() + "\nShutdown the controller.\n", e);
+            logger.error("An error has occurred : " + e.getMessage() + newline + "Shutdown the controller." +
+                newline, e);
             System.exit(1);
         }
 
@@ -212,7 +225,7 @@ public class UserController {
             logger.info("");
             HelpFormatter hf = new HelpFormatter();
             hf.setWidth(135);
-            String note = "\nNOTE : if no " + control +
+            String note = newline + "NOTE : if no " + control +
                 "command is specified, the controller will start in interactive mode.";
             hf.printHelp(commandName + Tools.shellExtension(), "", options, note, true);
             System.exit(2);
@@ -224,8 +237,8 @@ public class UserController {
 
     protected void connect() throws LoginException {
         UserSchedulerInterface scheduler = auth.logAsUser(user, pwd);
-        userModel.connectScheduler(scheduler);
-        logger.info("\t-> User '" + user + "' successfully connected\n");
+        model.connectScheduler(scheduler);
+        logger.info("\t-> User '" + user + "' successfully connected" + newline);
     }
 
     //    private void connectJMXClient(String url) {
@@ -362,12 +375,12 @@ public class UserController {
         } else {
             console = new SimpleConsole();
         }
-        userModel.connectConsole(console);
-        userModel.start();
+        model.connectConsole(console);
+        model.startModel();
     }
 
     protected boolean startCommandLine(CommandLine cmd) {
-        userModel.setDisplayOnStdStream(true);
+        model.setDisplayOnStdStream(true);
         if (cmd.hasOption("pausejob")) {
             UserSchedulerModel.pause(cmd.getOptionValue("pausejob"));
         } else if (cmd.hasOption("resumejob")) {
@@ -387,7 +400,7 @@ public class UserController {
         } else if (cmd.hasOption("tresult")) {
             String[] optionValues = cmd.getOptionValues("tresult");
             if (optionValues == null || optionValues.length != 2) {
-                userModel.error("tresult must have two arguments. Start with --help for more informations");
+                model.error("tresult must have two arguments. Start with --help for more informations");
             }
             UserSchedulerModel.tresult(optionValues[0], optionValues[1]);
         } else if (cmd.hasOption("output")) {
@@ -395,7 +408,7 @@ public class UserController {
         } else if (cmd.hasOption("toutput")) {
             String[] optionValues = cmd.getOptionValues("toutput");
             if (optionValues == null || optionValues.length != 2) {
-                userModel.error("toutput must have two arguments. Start with --help for more informations");
+                model.error("toutput must have two arguments. Start with --help for more informations");
             }
             UserSchedulerModel.toutput(optionValues[0], optionValues[1]);
         } else if (cmd.hasOption("priority")) {
@@ -403,16 +416,15 @@ public class UserController {
                 UserSchedulerModel.priority(cmd.getOptionValues("priority")[0], cmd
                         .getOptionValues("priority")[1]);
             } catch (ArrayIndexOutOfBoundsException e) {
-                userModel
-                        .print("Missing arguments for job priority. Arguments must be <jobId> <newPriority>\n\t"
-                            + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
+                model.print("Missing arguments for job priority. Arguments must be <jobId> <newPriority>" +
+                    newline + "\t" + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
         }
         //        else if (cmd.hasOption("jmxinfo")) {
         //            JMXinfo();
         //        } 
         else {
-            userModel.setDisplayOnStdStream(false);
+            model.setDisplayOnStdStream(false);
             return true;
         }
         return false;
@@ -450,22 +462,13 @@ public class UserController {
                 job = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(commandFilePath,
                         jobGivenName, givenSelScript, jobGivenOutput, user);
             }
-            JobId id = userModel.getScheduler().submit(job);
-            userModel.print("Job successfully submitted ! (id=" + id.value() + ")");
+            JobId id = model.getScheduler().submit(job);
+            model.print("Job successfully submitted ! (id=" + id.value() + ")");
             return id.value();
         } catch (Exception e) {
-            userModel.handleExceptionDisplay("Error on job Submission", e);
+            model.handleExceptionDisplay("Error on job Submission", e);
         }
         return "";
-    }
-
-    /**
-     * Set the commandName value to the given commandName value
-     *
-     * @param commandName the commandName to set
-     */
-    public void setCommandName(String commandName) {
-        this.commandName = commandName;
     }
 
 }

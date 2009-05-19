@@ -35,12 +35,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -60,22 +60,19 @@ import org.ow2.proactive.utils.console.ConsoleModel;
  */
 public class UserSchedulerModel extends ConsoleModel {
 
-    protected static UserSchedulerModel userModel;
-    protected String jsInitFile = "UserActions.js";
-
+    private static final String JS_INIT_FILE = "UserActions.js";
+    protected static final int cmdHelpMaxCharLength = 24;
     protected UserSchedulerInterface scheduler;
-
-    protected ArrayList<Command> commands;
+    private ArrayList<Command> commands;
 
     public static UserSchedulerModel getModel() {
-        if (userModel == null) {
-            userModel = new UserSchedulerModel();
+        if (model == null) {
+            model = new UserSchedulerModel();
         }
-        return userModel;
+        return (UserSchedulerModel) model;
     }
 
-    private UserSchedulerModel() {
-        setJS_INIT_FILE(jsInitFile);
+    protected UserSchedulerModel() {
         commands = new ArrayList<Command>();
         commands
                 .add(new Command(
@@ -87,7 +84,8 @@ public class UserSchedulerModel extends ConsoleModel {
                 .add(new Command(
                     "priority(id,priority)",
                     "Change the priority of the given job (parameters are an int or a string representing the jobId " +
-                        "AND a string representing the new priority)\n" +
+                        "AND a string representing the new priority)" +
+                        newline +
                         String.format(" %1$-" + cmdHelpMaxCharLength +
                             "s Priorities are Idle, Lowest, Low, Normal, High, Highest", " ")));
         commands.add(new Command("pausejob(id)",
@@ -118,6 +116,10 @@ public class UserSchedulerModel extends ConsoleModel {
         commands.add(new Command("exit()", "Exit Scheduler controller"));
     }
 
+    /**
+     * @see org.ow2.proactive.utils.console.ConsoleModel#checkIsReady()
+     */
+    @Override
     protected void checkIsReady() {
         super.checkIsReady();
         if (scheduler == null) {
@@ -125,10 +127,25 @@ public class UserSchedulerModel extends ConsoleModel {
         }
     }
 
-    public void start() throws IOException, SchedulerException {
+    /**
+     * @see org.ow2.proactive.utils.console.ConsoleModel#initialize()
+     */
+    @Override
+    protected void initialize() throws IOException {
+        super.initialize();
+        //read and launch Action.js
+        BufferedReader br = new BufferedReader(new InputStreamReader(UserController.class
+                .getResourceAsStream(JS_INIT_FILE)));
+        eval(readFileContent(br));
+    }
+
+    /**
+     * @see org.ow2.proactive.utils.console.ConsoleModel#startModel()
+     */
+    public void startModel() throws Exception {
         checkIsReady();
         console.start(" > ");
-        console.print("Type command here (type '?' or help() to see the list of commands)\n");
+        console.print("Type command here (type '?' or help() to see the list of commands)" + newline);
         initialize();
         String stmt;
         while (!terminated) {
@@ -139,7 +156,7 @@ public class UserSchedulerModel extends ConsoleModel {
             }
             stmt = console.readStatement(prompt + "> ");
             if ("?".equals(stmt)) {
-                console.print("\n" + helpScreen());
+                console.print(newline + helpScreen());
             } else {
                 eval(stmt);
                 console.print("");
@@ -158,10 +175,6 @@ public class UserSchedulerModel extends ConsoleModel {
     public static void help() {
         getModel().checkIsReady();
         getModel().help_();
-    }
-
-    private void help_() {
-        print("\n" + helpScreen());
     }
 
     public static String submit(String xmlDescriptor) {
@@ -268,7 +281,7 @@ public class UserSchedulerModel extends ConsoleModel {
             JobResult result = scheduler.getJobResult(jobId);
 
             if (result != null) {
-                print("Job " + jobId + " result => \n");
+                print("Job " + jobId + " result => " + newline);
 
                 for (Entry<String, TaskResult> e : result.getAllResults().entrySet()) {
                     TaskResult tRes = e.getValue();
@@ -300,7 +313,7 @@ public class UserSchedulerModel extends ConsoleModel {
             TaskResult result = scheduler.getTaskResult(jobId, taskName);
 
             if (result != null) {
-                print("Task " + taskName + " result => \n");
+                print("Task " + taskName + " result => " + newline);
 
                 try {
                     print("\t " + result.value());
@@ -327,13 +340,13 @@ public class UserSchedulerModel extends ConsoleModel {
             JobResult result = scheduler.getJobResult(jobId);
 
             if (result != null) {
-                print("Job " + jobId + " output => \n");
+                print("Job " + jobId + " output => " + newline);
 
                 for (Entry<String, TaskResult> e : result.getAllResults().entrySet()) {
                     TaskResult tRes = e.getValue();
 
                     try {
-                        print(e.getKey() + " : \n" + tRes.getOutput().getAllLogs(false));
+                        print(e.getKey() + " : " + newline + tRes.getOutput().getAllLogs(false));
                     } catch (Throwable e1) {
                         error(tRes.getException().toString());
                     }
@@ -439,14 +452,14 @@ public class UserSchedulerModel extends ConsoleModel {
     //****************** HELP SCREEN ********************
 
     protected String helpScreen() {
-        StringBuilder out = new StringBuilder("Scheduler controller commands are :\n\n");
+        StringBuilder out = new StringBuilder("Scheduler controller commands are :" + newline + newline);
 
-        out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s\n\n", commands.get(0).getName(),
-                commands.get(0).getDescription()));
+        out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline + newline, commands.get(
+                0).getName(), commands.get(0).getDescription()));
 
         for (int i = 1; i < commands.size(); i++) {
-            out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s\n", commands.get(i).getName(),
-                    commands.get(i).getDescription()));
+            out.append(String.format(" %1$-" + cmdHelpMaxCharLength + "s %2$s" + newline, commands.get(i)
+                    .getName(), commands.get(i).getDescription()));
         }
 
         return out.toString();
