@@ -106,10 +106,23 @@ public class SimpleConsole implements Console {
     }
 
     /**
+     * Escape special character used by java in regexp in the given string and retrieve the escaped String.
+     * 
+     * @param formattedString a string that contains special char to escape such as %.
+     * @return the same string with special char escaped
+     */
+    private String escape(String formattedString) {
+        String toRet = formattedString.replaceAll("%", "%%");
+        //add other replacement if needed
+        return toRet;
+    }
+
+    /**
      * @see org.ow2.proactive.utils.console.Console#printf(java.lang.String, java.lang.Object[])
      */
     public Console printf(String format, Object... args) {
         if (this.started) {
+            format = escape(format);
             writer.format(format, args);
             writer.println();
             writer.flush();
@@ -123,8 +136,13 @@ public class SimpleConsole implements Console {
      * @see org.ow2.proactive.utils.console.Console#error(java.lang.String, java.lang.Object[])
      */
     public Console error(String format, Object... args) {
-        System.err.format(format, args);
-        System.err.println();
+        if (this.started) {
+            format = escape(format);
+            System.err.format(format, args);
+            System.err.println();
+        } else {
+            throw new RuntimeException("Console is not started !");
+        }
         return this;
     }
 
