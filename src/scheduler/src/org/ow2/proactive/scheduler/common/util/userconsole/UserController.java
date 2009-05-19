@@ -79,6 +79,7 @@ import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive.utils.console.SimpleConsole;
+import org.ow2.proactive.utils.console.VisualConsole;
 
 
 /**
@@ -123,7 +124,7 @@ public class UserController {
     protected boolean displayOnDemand = true;
 
     protected ScriptEngine engine;
-    protected Console console = new SimpleConsole();
+    protected Console console;
 
     protected MBeanInfoViewer mbeanInfoViewer;
 
@@ -162,6 +163,10 @@ public class UserController {
         schedulerURL.setArgName("schedulerURL");
         schedulerURL.setRequired(false);
         options.addOption(schedulerURL);
+
+        Option visual = new Option("g", "gui", false, "Start the console in a graphical view");
+        schedulerURL.setRequired(false);
+        options.addOption(visual);
 
         addCommandLineOptions(options);
 
@@ -389,17 +394,22 @@ public class UserController {
     }
 
     private void startCommandListener() throws Exception {
-        initialize();
+        if (cmd.hasOption("g")) {
+            console = new VisualConsole();
+        } else {
+            console = new SimpleConsole();
+        }
         console.start(" > ");
         console.printf("Type command here (type '?' or help() to see the list of commands)\n");
+        initialize();
         String stmt;
         while (!terminated) {
             SchedulerStatus status = scheduler.getStatus();
-            String prompt = "";
+            String prompt = " ";
             if (status != SchedulerStatus.STARTED) {
-                prompt = status.toString();
+                prompt += "[" + status.toString() + "] ";
             }
-            stmt = console.readStatement(" " + prompt + " > ");
+            stmt = console.readStatement(prompt + "> ");
             if ("?".equals(stmt)) {
                 console.printf("\n" + helpScreen());
             } else {
@@ -830,6 +840,7 @@ public class UserController {
             ScriptEngineManager manager = new ScriptEngineManager();
             // Engine selection
             engine = manager.getEngineByExtension("js");
+            engine.getContext().setWriter(console.writer());
             initialized = true;
             //read and launch Action.js
             BufferedReader br = new BufferedReader(new InputStreamReader(UserController.class

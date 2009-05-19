@@ -1506,8 +1506,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         TaskResult result = ((JobResultImpl) job.getJobResult()).getResult(taskName);
         if (result == null) {
             //the task is unknown
-            logger_dev.info("Task '" + taskName + "' does not exist");
-            throw new SchedulerException("The task does not exist !");
+            logger_dev.info("Result of task " + taskName + " does not exist !");
+            throw new SchedulerException("Result of task " + taskName + " does not exist !");
         }
         if (PAFuture.isAwaited(result)) {
             //the result is not yet available
