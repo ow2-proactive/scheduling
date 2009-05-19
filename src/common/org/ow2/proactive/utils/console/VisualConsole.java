@@ -190,15 +190,15 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#error(java.lang.String, java.lang.Object[])
+     * @see org.ow2.proactive.utils.console.Console#error(java.lang.String)
      */
-    public Console error(String format, Object... args) {
+    public Console error(String msg) {
         if (this.started) {
             //			jTextArea.setSelectedTextColor(SELECTED_TEXT_COLOR);
             //			jTextArea.setSelectionColor(SELECTION_COLOR);
             //			jTextArea.requestFocus();
             //jTextArea.setSelectionStart(jTextArea.getText().length());
-            jTextArea.append(String.format(format, args));
+            jTextArea.append(msg);
             //jTextArea.setSelectionEnd(jTextArea.getText().length());
             jTextArea.append("\n");
             jTextArea.setCaretPosition(jTextArea.getDocument().getLength());
@@ -253,11 +253,11 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#printf(java.lang.String, java.lang.Object[])
+     * @see org.ow2.proactive.utils.console.Console#print(java.lang.String)
      */
-    public Console printf(String format, Object... args) {
+    public Console print(String msg) {
         if (this.started) {
-            jTextArea.append(String.format(format, args));
+            jTextArea.append(msg);
             jTextArea.append("\n");
             jTextArea.setCaretPosition(jTextArea.getDocument().getLength());
         } else {

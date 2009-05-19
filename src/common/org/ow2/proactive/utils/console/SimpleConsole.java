@@ -106,12 +106,11 @@ public class SimpleConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#printf(java.lang.String, java.lang.Object[])
+     * @see org.ow2.proactive.utils.console.Console#print(java.lang.String)
      */
-    public Console printf(String format, Object... args) {
+    public Console print(String msg) {
         if (this.started) {
-            writer.format(format, args);
-            writer.println();
+            writer.println(msg);
             writer.flush();
         } else {
             throw new RuntimeException("Console is not started !");
@@ -120,11 +119,10 @@ public class SimpleConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#error(java.lang.String, java.lang.Object[])
+     * @see org.ow2.proactive.utils.console.Console#error(java.lang.String)
      */
-    public Console error(String format, Object... args) {
-        System.err.format(format, args);
-        System.err.println();
+    public Console error(String msg) {
+        System.err.println(msg);
         return this;
     }
 

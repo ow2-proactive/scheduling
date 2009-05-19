@@ -32,60 +32,60 @@
 package org.ow2.proactive.utils.console;
 
 /**
- * Command is the class that define commands for the SCHEDULING project consoles.
+ * Command is the class that defines commands for the SCHEDULING project consoles.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
 public class Command {
-	private String name;
-	private String description;
+    private String name;
+    private String description;
 
-	/**
-	 * Create a new instance of Command
-	 *
-	 * @param name the name or method name to be used
-	 * @param description the description of the command and arguments
-	 */
-	public Command(String name, String description) {
-		this.name = name;
-		this.description = description;
-	}
+    /**
+     * Create a new instance of Command
+     *
+     * @param name the name or method name to be used
+     * @param description the description of the command and arguments
+     */
+    public Command(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
-	/**
-	 * Get the name
-	 *
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * Get the name
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * Set the name value to the given name value
-	 *
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+    /**
+     * Set the name value to the given name value
+     *
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	/**
-	 * Get the description
-	 *
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
+    /**
+     * Get the description
+     *
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
 
-	/**
-	 * Set the description value to the given description value
-	 *
-	 * @param description the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    /**
+     * Set the description value to the given description value
+     *
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
 }

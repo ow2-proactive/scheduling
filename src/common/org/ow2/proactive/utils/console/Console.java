@@ -64,24 +64,20 @@ public interface Console {
     public void flush();
 
     /**
-     * A convenience method to write a formatted string to this console's output stream using the specified format string and arguments.
+     * A convenience method to write a string to this console's output stream.
      *
-     * @param format A format string as described in Format string syntax.
-     * @param args Arguments referenced by the format specifiers in the format string.
-     * 		  If there are more arguments than format specifiers, the extra arguments are ignored.
+     * @param msg A string representing the message to be printed out.
      * @return This console
      */
-    public Console printf(String format, Object... args);
+    public Console print(String msg);
 
     /**
-     * A convenience method to write a formatted string to this console's error stream using the specified format string and arguments.
+     * A convenience method to write a string to this console's error stream.
      *
-     * @param format A format string as described in Format string syntax.
-     * @param args Arguments referenced by the format specifiers in the format string.
-     * 		  If there are more arguments than format specifiers, the extra arguments are ignored.
+     * @param msg A string representing the message to be printed out.
      * @return This console
      */
-    public Console error(String format, Object... args);
+    public Console error(String format);
 
     /**
      * Retrieves the unique Reader object associated with this console.

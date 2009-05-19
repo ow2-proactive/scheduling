@@ -1,4 +1,4 @@
-importClass(org.ow2.proactive.scheduler.common.util.userconsole.UserController);
+importClass(org.ow2.proactive.scheduler.common.util.userconsole.UserSchedulerModel);
 
 function exMode(displayStack, displayOnDemand){
 	if (displayStack == undefined){
@@ -7,59 +7,59 @@ function exMode(displayStack, displayOnDemand){
 	if (displayOnDemand == undefined){
 		displayOnDemand = true;
 	}
-	UserController.setExceptionMode(displayStack, displayOnDemand);
+	UserSchedulerModel.setExceptionMode(displayStack, displayOnDemand);
 }
 
 function help(){
-	UserController.help();
+	UserSchedulerModel.help();
 }
 
 function submit(xmlDescriptor){
-    return UserController.submit(""+xmlDescriptor);
+    return UserSchedulerModel.submit(""+xmlDescriptor);
 }
 
 function pausejob(jobId){
-    return UserController.pause(""+jobId);
+    return UserSchedulerModel.pause(""+jobId);
 }
 
 function resumejob(jobId){
-    return UserController.resume(""+jobId);
+    return UserSchedulerModel.resume(""+jobId);
 }
 
 function killjob(jobId){
-    return UserController.kill(""+jobId);
+    return UserSchedulerModel.kill(""+jobId);
 }
 
 function removejob(jobId){
-    UserController.remove(""+jobId);
+    UserSchedulerModel.remove(""+jobId);
 }
 
 function result(jobId){
-    return UserController.result(""+jobId);
+    return UserSchedulerModel.result(""+jobId);
 }
 
 function tresult(jobId,taskName){
-    return UserController.tresult(""+jobId,""+taskName);
+    return UserSchedulerModel.tresult(""+jobId,""+taskName);
 }
 
 function output(jobId){
-    UserController.output(""+jobId);
+    UserSchedulerModel.output(""+jobId);
 }
 
 function toutput(jobId,taskName){
-    UserController.toutput(""+jobId,""+taskName);
+    UserSchedulerModel.toutput(""+jobId,""+taskName);
 }
 
 function priority(jobId, priority){
-    UserController.priority(""+jobId,""+priority);
+    UserSchedulerModel.priority(""+jobId,""+priority);
 }
 
 function exec(commandFilePath){
-	UserController.exec(""+commandFilePath);
+	UserSchedulerModel.exec(""+commandFilePath);
 }
 
 function exit(){
-	UserController.exit();
+	UserSchedulerModel.exit();
 }
 
-var scheduler = UserController.getUserScheduler();
+var scheduler = UserSchedulerModel.getUserScheduler();
