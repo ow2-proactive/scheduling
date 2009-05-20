@@ -143,17 +143,14 @@ public class ConfigureViewAction implements IViewActionDelegate {
         }
     };
 
-    @Override
     public void init(IViewPart view) {
         this.view = (ResourcesCompactView) view;
     }
 
-    @Override
     public void run(IAction action) {
         new ConfigureViewDialog(Display.getCurrent().getActiveShell());
     }
 
-    @Override
     public void selectionChanged(IAction action, ISelection selection) {
     }
 }
