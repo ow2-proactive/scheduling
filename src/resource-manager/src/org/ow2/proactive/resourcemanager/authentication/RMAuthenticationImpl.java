@@ -53,9 +53,10 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
+ * RMAuthenticationImpl represents authentication service of the resource manager.
  *
- * Class represents authentication service of the resource manager.
- *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 1.0
  */
 public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthentication, InitActive {
 

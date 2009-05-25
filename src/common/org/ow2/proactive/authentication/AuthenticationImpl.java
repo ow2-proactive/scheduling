@@ -91,8 +91,7 @@ public abstract class AuthenticationImpl implements Authentication {
      * @param password the password of the user
      * @throws LoginException if username or password is incorrect.
      */
-    protected void loginAs(String role, String[] groups, String username, String password)
-            throws LoginException {
+    public void loginAs(String role, String[] groups, String username, String password) throws LoginException {
 
         if (activated == false) {
             throw new LoginException("Authentication active object is not activated.");

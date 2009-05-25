@@ -67,6 +67,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
@@ -182,6 +183,8 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     /** nodes to deploy during startup of resource manager */
     private Collection<String> localGCMDeploymentFiles = null;
 
+    JMXMonitoringHelper jmxHelper = new JMXMonitoringHelper();
+
     /**
      * Normalize the given URL into an URL that only contains protocol://host:port/
      *
@@ -295,6 +298,9 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             if (logger.isDebugEnabled()) {
                 logger.debug("active object RMMonitoring");
             }
+            // Create the MBeanServers and the Connectors before creating the monitoring Object
+            jmxHelper.createMBeanServers();
+            jmxHelper.createConnectors(authentication);
             monitoring = (RMMonitoringImpl) PAActiveObject.newActive(RMMonitoringImpl.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 
@@ -1176,4 +1182,5 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     public Logger getLogger() {
         return logger;
     }
+
 }

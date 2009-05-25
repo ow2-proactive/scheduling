@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 1.0
  */
 @PublicAPI
-public interface SchedulerWrapperMBean {
+public interface SchedulerWrapperAnonymMBean {
 
     /**
      * Returns the state of the scheduler.
@@ -112,40 +112,4 @@ public interface SchedulerWrapperMBean {
      * @return The number of finished Tasks of the scheduler.
      */
     public int getNumberOfFinishedTasks();
-
-    /**
-     * @return current mean job pending time as integer
-     */
-    public int getMeanJobPendingTime();
-
-    /**
-     * @return current mean job execution time as integer
-     */
-    public int getMeanJobExecutionTime();
-
-    /**
-     * @return current mean job submitting period as integer
-     */
-    public int getJobSubmittingPeriod();
-
-    /**
-     * Returns the Key Performance Indicator related to the average of pending time for a job.
-     *
-     * @return A string representing the average pending time for a job.
-     */
-    public String getFormattedMeanJobPendingTime();
-
-    /**
-     * Returns the Key Performance Indicator related to the average of executing time for a job.
-     *
-     * @return A string representing the average executing time for a job.
-     */
-    public String getFormattedMeanJobExecutionTime();
-
-    /**
-     * Returns the Key Performance Indicator related to the average period of arrival time for a job.
-     *
-     * @return A string representing the average submitting period for a job.
-     */
-    public String getFormattedJobSubmittingPeriod();
 }

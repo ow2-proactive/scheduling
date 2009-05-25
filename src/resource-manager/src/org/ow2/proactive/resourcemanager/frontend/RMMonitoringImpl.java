@@ -31,11 +31,7 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import java.lang.management.ManagementFactory;
 import java.util.HashMap;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -52,8 +48,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
-import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMWrapper;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMWrapperAdmin;
+import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMWrapperAnonym;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
@@ -74,19 +70,14 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive {
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);
 
-    private static final String RM_BEAN_NAME = PAResourceManagerProperties.RM_JMX_MBEAN_NAME
-            .getValueAsString();
-
     // Attributes
     private RMCoreInterface rmcore;
     private HashMap<UniqueID, RMEventListener> RMListeners;
     private String MonitoringUrl = null;
 
-    /** Scheduler's MBean Server */
-    private MBeanServer mbs = null;
-
     /** Resource Manager's MBean */
-    private RMWrapper rMBean = null;
+    public static RMWrapperAnonym rMBeanAnonym = new RMWrapperAnonym();
+    public static RMWrapperAdmin rMBeanAdmin = new RMWrapperAdmin();
 
     // ----------------------------------------------------------------------//
     // CONSTRUTORS
@@ -102,8 +93,6 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     public RMMonitoringImpl(RMCoreInterface rmcore) {
         RMListeners = new HashMap<UniqueID, RMEventListener>();
         this.rmcore = rmcore;
-        // Register the Resource Manager MBean
-        registerMBean();
     }
 
     /**
@@ -147,26 +136,6 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     }
 
     /**
-     * Register the Resource Manager MBean
-     */
-    private void registerMBean() {
-        //Get the platform MBeanServer
-        mbs = ManagementFactory.getPlatformMBeanServer();
-        // Unique identification of Scheduler MBean
-        rMBean = new RMWrapper();
-        ObjectName rMName = null;
-        try {
-            // Uniquely identify the MBeans and register them with the platform MBeanServer 
-            rMName = new ObjectName(RM_BEAN_NAME);
-            mbs.registerMBean(rMBean, rMName);
-            //            ServerConnector connector = new ServerConnector("ServerMonitoring");
-            //            connector.start();
-        } catch (Exception e) {
-            logger.debug("", e);
-        }
-    }
-
-    /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMMonitoring#isAlive()
      */
     public boolean isAlive() {
@@ -180,7 +149,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeEvent(RMNodeEvent event) {
         event.setRMUrl(this.MonitoringUrl);
-        rMBean.nodeEvent(event);
+        rMBeanAnonym.nodeEvent(event);
+        rMBeanAdmin.nodeEvent(event);
         for (RMEventListener listener : RMListeners.values()) {
             listener.nodeEvent(event);
         }
@@ -201,7 +171,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void rmEvent(RMEvent event) {
         event.setRMUrl(this.MonitoringUrl);
-        rMBean.rmEvent(event);
+        rMBeanAnonym.rmEvent(event);
+        rMBeanAdmin.rmEvent(event);
         for (RMEventListener listener : RMListeners.values()) {
             listener.rmEvent(event);
         }

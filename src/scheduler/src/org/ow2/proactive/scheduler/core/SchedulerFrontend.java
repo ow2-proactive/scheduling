@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,9 +39,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -67,7 +63,6 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.exception.MaxJobIdReachedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.jmx.mbean.SchedulerWrapper;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -80,6 +75,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -96,7 +92,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * Scheduler Front-end. This is the API to talk to when you want to managed a scheduler core.
  * Creating this class can only be done by using <code>AdminScheduler</code>.
  * You can join this front-end by using the <code>join()</code> method
- * in {@link SchedulerConnection} .
+ * in {@link SchedulerConnection}.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -111,8 +107,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
 
-    private static final String SCHEDULER_BEAN_NAME = PASchedulerProperties.SCHEDULER_JMX_MBEAN_NAME
-            .getValueAsString();
     private static final long USER_SESSION_DURATION = PASchedulerProperties.SCHEDULER_USER_SESSION_TIME
             .getValueAsInt() * 1000;
 
@@ -146,11 +140,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /** scheduler listeners */
     private Map<UniqueID, SchedulerEventListener> schedulerListeners = new ConcurrentHashMap<UniqueID, SchedulerEventListener>();
 
-    /** Scheduler's MBean */
-    private SchedulerWrapper schedulerBean;
-
     /** Session timer */
     private Timer sessionTimer;
+
+    /** JMX Helper reference */
+    private JMXMonitoringHelper jmxHelper = new JMXMonitoringHelper();
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -258,7 +252,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         authentication.setActivated(true);
         //Register the JMX scheduler MBean
         logger_dev.info("Registering scheduler MBean...");
-        registerMBean();
+        // Call the jmxHelper to create the MBean Views
+        jmxHelper.createMBeanServers();
+        // Call the jmxHelper to create the Server Connectors for the JMX Scheduler MBean Server and start them
+        jmxHelper.createConnectors(authentication);
     }
 
     /**
@@ -539,7 +536,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         //renew session for this user
         renewUserSession(id, identifications.get(id));
 
-        return schedulerBean.getSchedulerStatus_();
+        return jmxHelper.getSchedulerStatus_();
     }
 
     /**
@@ -908,26 +905,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         return true;
     }
 
-    /**
-     * Register the Scheduler MBean
-     */
-    private void registerMBean() {
-        //Get the platform MBeanServer
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        // Unique identification of Scheduler MBean
-        schedulerBean = new SchedulerWrapper();
-        ObjectName schedulerName = null;
-        try {
-            // Uniquely identify the MBeans and register them with the platform MBeanServer 
-            schedulerName = new ObjectName(SCHEDULER_BEAN_NAME);
-            mbs.registerMBean(schedulerBean, schedulerName);
-            //            ServerConnector connector = new ServerConnector("ServerFrontend");
-            //            connector.start();
-        } catch (Exception e) {
-            logger_dev.debug("", e);
-        }
-    }
-
     /* ########################################################################################### */
     /*                                                                                             */
     /* ################################## LISTENER DISPATCHER #################################### */
@@ -1126,7 +1103,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
-        schedulerBean.usersUpdate(notification.getData());
+        jmxHelper.usersUpdatedEvent(notification);
     }
 
     //--------------------------------------------------------------------------------------------
@@ -1148,7 +1125,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case RM_UP:
             case POLICY_CHANGED:
                 dispatchSchedulerStateUpdated(eventType);
-                schedulerBean.schedulerStateUpdated(eventType);
+                jmxHelper.schedulerStateUpdatedEvent(eventType);
                 break;
             default:
                 logger_dev.info("Unconsistent update type received from Scheduler Core : " + eventType);
@@ -1160,7 +1137,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     public void jobSubmitted(JobState job) {
         dispatchJobSubmitted(job);
-        schedulerBean.jobSubmittedEvent(job);
+        jmxHelper.jobSubmittedEvent(job);
     }
 
     /**
@@ -1173,19 +1150,19 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case JOB_PENDING_TO_RUNNING:
             case JOB_CHANGE_PRIORITY:
                 dispatchJobStateUpdated(owner, notification);
-                schedulerBean.jobStateUpdated(notification);
+                jmxHelper.jobStateUpdatedEvent(notification);
                 break;
             case JOB_RUNNING_TO_FINISHED:
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 dispatchJobStateUpdated(owner, notification);
-                schedulerBean.jobStateUpdated(notification);
+                jmxHelper.jobStateUpdatedEvent(notification);
                 break;
             case JOB_REMOVE_FINISHED:
                 //removing jobs from the global list : this job is no more managed
                 jobs.remove(notification.getData().getJobId());
                 dispatchJobStateUpdated(owner, notification);
-                schedulerBean.jobStateUpdated(notification);
+                jmxHelper.jobStateUpdatedEvent(notification);
                 break;
             default:
                 logger_dev.info("Unconsistent update type received from Scheduler Core : " +
@@ -1202,7 +1179,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
                 dispatchTaskStateUpdated(owner, notification);
-                schedulerBean.taskStateUpdated(notification);
+                jmxHelper.taskStateUpdatedEvent(notification);
                 break;
             default:
                 logger_dev.info("Unconsistent update type received from Scheduler Core : " +

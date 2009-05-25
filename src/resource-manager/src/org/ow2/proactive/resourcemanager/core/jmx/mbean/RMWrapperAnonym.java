@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -31,6 +31,10 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
+import java.io.Serializable;
+
+import javax.management.NotificationBroadcasterSupport;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
@@ -43,12 +47,13 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
  * It provides some attributes and some statistics indicators.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.0
  */
 @PublicAPI
-public class RMWrapper implements RMWrapperMBean {
+public class RMWrapperAnonym extends NotificationBroadcasterSupport implements RMWrapperAnonymMBean,
+        Serializable {
     /** The state of the Resource Manager */
-    private String rMState = "STOPPED";
+    private String rMStatus = "STOPPED";
 
     /** Variables representing the fields of the MBean */
     private int totalNumberOfNodes = 0;
@@ -58,14 +63,6 @@ public class RMWrapper implements RMWrapperMBean {
     private int numberOfFreeNodes = 0;
 
     private int numberOfBusyNodes = 0;
-
-    private int timePercentageOfNodesInactivity;
-
-    private int timePercentageOfNodesUsage;
-
-    private int totalTimeOfAllAvailableNodes;
-
-    private long previousTimeStamp;
 
     /**
      * Method to manage node events of the Resource Manager
@@ -98,13 +95,6 @@ public class RMWrapper implements RMWrapperMBean {
     }
 
     private void nodeAdded() {
-        // Each time that there`s an event, update global percentage based on the number of free and
-        // on the number of used nodes in the previous event
-        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
-        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
-        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
-        this.previousTimeStamp = System.currentTimeMillis();
         //Update fields
         this.totalNumberOfNodes++;
         //When a node is added, initially, it is free
@@ -118,13 +108,6 @@ public class RMWrapper implements RMWrapperMBean {
      * @param event
      */
     private void nodeBusy() {
-        // Each time that there`s an event, update global percentage based on the number of free and
-        // on the number of used nodes in the previous event
-        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
-        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
-        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
-        this.previousTimeStamp = System.currentTimeMillis();
         // Update fields
         this.numberOfFreeNodes--;
         this.numberOfBusyNodes++;
@@ -137,13 +120,6 @@ public class RMWrapper implements RMWrapperMBean {
      * @param event
      */
     private void nodeDown(boolean busy) {
-        // Each time that there`s an event, update global percentage based on the number of free and
-        // on the number of used nodes in the previous event
-        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
-        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
-        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
-        this.previousTimeStamp = System.currentTimeMillis();
         // Update fields
         if (busy) {
             this.numberOfBusyNodes--;
@@ -162,13 +138,6 @@ public class RMWrapper implements RMWrapperMBean {
      * @param event
      */
     private void nodeFree() {
-        // Each time that there`s an event, update global percentage based on the number of free and
-        // on the number of used nodes in the previous event
-        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
-        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
-        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
-        this.previousTimeStamp = System.currentTimeMillis();
         // Update fields
         this.numberOfBusyNodes--;
         this.numberOfFreeNodes++;
@@ -181,13 +150,6 @@ public class RMWrapper implements RMWrapperMBean {
      * @param event
      */
     private void nodeRemovedEvent(boolean busy, boolean free) {
-        // Each time that there`s an event, update global percentage based on the number of free and
-        // on the number of used nodes in the previous event
-        long interval = (System.currentTimeMillis() - this.previousTimeStamp);
-        this.timePercentageOfNodesInactivity += this.numberOfFreeNodes * interval;
-        this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
-        this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
-        this.previousTimeStamp = System.currentTimeMillis();
         // Update fields
         this.totalNumberOfNodes--;
         //Check the state of the removed node
@@ -204,13 +166,13 @@ public class RMWrapper implements RMWrapperMBean {
     public void rmEvent(RMEvent event) {
         switch (event.getEventType()) {
             case STARTED:
-                rMState = "STARTED";
+                rMStatus = "STARTED";
                 break;
             case SHUTTING_DOWN:
-                rMState = "SHUTTING_DOWN";
+                rMStatus = "SHUTTING_DOWN";
                 break;
             case SHUTDOWN:
-                rMState = "STOPPED";
+                rMStatus = "STOPPED";
                 break;
         }
     }
@@ -248,45 +210,7 @@ public class RMWrapper implements RMWrapperMBean {
     /** 
      * @return the current state of the resource manager
      */
-    public String getRMState() {
-        return this.rMState;
-    }
-
-    /**
-     * It`s the percentage time of inactivity of all the available nodes 
-     * 
-     * @return the percentage time of nodes inactivity as integer
-     */
-    public int getTimePercentageOfNodesInactivity() {
-        return (int) (((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
-    }
-
-    /**
-     * It`s the percentage time of usage of all the available nodes
-     * 
-     * @return the percentage time of nodes usage as integer
-     */
-    public int getTimePercentageOfNodesUsage() {
-        return (int) (((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
-    }
-
-    // UTILITY METHODS
-
-    /**
-     * Getter method for the KPI value timePercentageOfNodesInactivity as double
-     * 
-     * @return the current percentage time of nodes inactivity as double
-     */
-    public double getTimePercentageOfNodesInactivityAsDouble() {
-        return (((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
-    }
-
-    /**
-     * Getter method for the KPI value timePercentageOfNodesUsage as double
-     * 
-     * @return the current percentage time of nodes usage as double
-     */
-    public double getTimePercentageOfNodesUsageAsDouble() {
-        return (((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
+    public String getRMStatus() {
+        return this.rMStatus;
     }
 }

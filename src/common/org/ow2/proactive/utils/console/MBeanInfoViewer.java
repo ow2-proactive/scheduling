@@ -33,9 +33,8 @@ package org.ow2.proactive.utils.console;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
+import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
-
-import org.objectweb.proactive.core.jmx.ProActiveConnection;
 
 
 /**
@@ -45,7 +44,7 @@ import org.objectweb.proactive.core.jmx.ProActiveConnection;
  * @since ProActive Scheduling 1.0
  */
 public class MBeanInfoViewer {
-    private ProActiveConnection connection;
+    private MBeanServerConnection connection;
     private ObjectName mbeanName;
     private MBeanInfo info;
 
@@ -56,7 +55,7 @@ public class MBeanInfoViewer {
      * @param mbeanName
      * @param info
      */
-    public MBeanInfoViewer(ProActiveConnection connection, ObjectName mbeanName, MBeanInfo info) {
+    public MBeanInfoViewer(MBeanServerConnection connection, ObjectName mbeanName, MBeanInfo info) {
         super();
         this.connection = connection;
         this.mbeanName = mbeanName;

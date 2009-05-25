@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -35,13 +35,13 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * MBean interface representing the attributes and the KPI values to monitor the Resource Manager
+ * MBean interface representing the attributes and the statistic values to monitor the Resource Manager
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.0
  */
 @PublicAPI
-public interface RMWrapperMBean {
+public interface RMWrapperAdminMBean {
 
     /**
      * Method to get the total number of nodes used by the Resource Manager
@@ -76,7 +76,7 @@ public interface RMWrapperMBean {
      * 
      * @return the current state of the resource manager
      */
-    public String getRMState();
+    public String getRMStatus();
 
     /**
      * It`s the percentage time of inactivity of all the available nodes

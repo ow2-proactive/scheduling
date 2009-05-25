@@ -51,10 +51,10 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 public class JavaTask extends Task {
 
     /** Classname of the executable */
-    private String executableClassName = null;
+    protected String executableClassName = null;
 
     /** Arguments of the task as a map */
-    private Map<String, String> arguments = new HashMap<String, String>();
+    protected Map<String, String> arguments = new HashMap<String, String>();
 
     /** if the task will be executed in a separate JVM */
     private boolean fork;
