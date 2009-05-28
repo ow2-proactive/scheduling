@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.gui.actions.SchedulerGUIAction;
+import org.ow2.proactive.scheduler.gui.views.ControllerView;
 
 
 /**
@@ -93,9 +94,10 @@ public class ActionsManager {
             }
         }
 
-        for (SchedulerGUIAction action : actions)
+        for (SchedulerGUIAction action : actions) {
             action.setEnabled(connected, schedulerStatus, SchedulerProxy.getInstance().isAnAdmin(),
                     jobSelected, owner, jobInFinishQueue);
+        }
     }
 
     public static ActionsManager getInstance() {

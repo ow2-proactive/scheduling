@@ -64,14 +64,25 @@ public class AdminRMModel extends ConsoleModel {
     protected RMAdmin rm;
     private ArrayList<Command> commands;
 
-    public static AdminRMModel getModel() {
+    /**
+     * Get this model. Also specify if the exit command should do something or not
+     *
+     * @param allowExitCommand true if the exit command is part of the commands, false if exit command does not exist.
+     * @return the current model associated to this class.
+     */
+    public static AdminRMModel getModel(boolean allowExitCommand) {
         if (model == null) {
-            model = new AdminRMModel();
+            model = new AdminRMModel(allowExitCommand);
         }
         return (AdminRMModel) model;
     }
 
-    protected AdminRMModel() {
+    private static AdminRMModel getModel() {
+        return (AdminRMModel) model;
+    }
+
+    protected AdminRMModel(boolean allowExitCommand) {
+        this.allowExitCommand = allowExitCommand;
         commands = new ArrayList<Command>();
         commands
                 .add(new Command(
@@ -99,7 +110,9 @@ public class AdminRMModel extends ConsoleModel {
         commands
                 .add(new Command("exec(commandFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a command-file path)"));
-        commands.add(new Command("exit()", "Exits RM controller"));
+        if (allowExitCommand) {
+            commands.add(new Command("exit()", "Exits RM controller"));
+        }
 
     }
 
@@ -329,12 +342,16 @@ public class AdminRMModel extends ConsoleModel {
     }
 
     private void exit_() {
-        console.print("Exiting controller.");
-        try {
-            rm.disconnect();
-        } catch (Exception e) {
+        if (allowExitCommand) {
+            console.print("Exiting controller.");
+            try {
+                rm.disconnect();
+            } catch (Exception e) {
+            }
+            terminated = true;
+        } else {
+            console.print("Exit command has been disabled !");
         }
-        terminated = true;
     }
 
     public static RMAdmin getAdminRM() {

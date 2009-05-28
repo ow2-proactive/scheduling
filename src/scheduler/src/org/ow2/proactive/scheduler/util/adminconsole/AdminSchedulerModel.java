@@ -58,15 +58,37 @@ public class AdminSchedulerModel extends UserSchedulerModel {
 
     private ArrayList<Command> commands;
 
-    public static AdminSchedulerModel getModel() {
+    /**
+     * Get this model. Also specify if the exit command should do something or not
+     *
+     * @param allowExitCommand true if the exit command is part of the commands, false if exit command does not exist.
+     * @return the current model associated to this class.
+     */
+    public static AdminSchedulerModel getModel(boolean allowExitCommand) {
         if (model == null) {
-            model = new AdminSchedulerModel();
+            model = new AdminSchedulerModel(allowExitCommand);
         }
         return (AdminSchedulerModel) model;
     }
 
-    protected AdminSchedulerModel() {
-        super();
+    /**
+     * Get a new model. Also specify if the exit command should do something or not
+     * WARNING, this method should just be used to re-create an instance of a model, it will disabled previous instance.
+     *
+     * @param allowExitCommand true if the exit command is part of the commands, false if exit command does not exist.
+     * @return a brand new model associated to this class.
+     */
+    public static AdminSchedulerModel getNewModel(boolean allowExitCommand) {
+        model = new AdminSchedulerModel(allowExitCommand);
+        return (AdminSchedulerModel) model;
+    }
+
+    private static AdminSchedulerModel getModel() {
+        return (AdminSchedulerModel) model;
+    }
+
+    protected AdminSchedulerModel(boolean allowExitCommand) {
+        super(allowExitCommand);
         commands = new ArrayList<Command>();
         commands.add(new Command("start()", "Start Scheduler"));
         commands.add(new Command("stop()", "Stop Scheduler"));
@@ -96,7 +118,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     //***************** COMMAND LISTENER *******************
 
     public static boolean start() {
-        return ((AdminSchedulerModel) model).start_();
+        return getModel().start_();
     }
 
     private boolean start_() {
@@ -116,7 +138,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     }
 
     public static boolean stop() {
-        return ((AdminSchedulerModel) model).stop_();
+        return getModel().stop_();
     }
 
     private boolean stop_() {
@@ -136,7 +158,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     }
 
     public static boolean pause() {
-        return ((AdminSchedulerModel) model).pause_();
+        return getModel().pause_();
     }
 
     private boolean pause_() {
@@ -156,7 +178,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     }
 
     public static boolean freeze() {
-        return ((AdminSchedulerModel) model).freeze_();
+        return getModel().freeze_();
     }
 
     private boolean freeze_() {
@@ -176,7 +198,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     }
 
     public static boolean resume() {
-        return ((AdminSchedulerModel) model).resume_();
+        return getModel().resume_();
     }
 
     private boolean resume_() {
@@ -196,7 +218,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     }
 
     public static boolean shutdown() {
-        return ((AdminSchedulerModel) model).shutdown_();
+        return getModel().shutdown_();
     }
 
     private boolean shutdown_() {
@@ -230,7 +252,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     }
 
     public static boolean kill() {
-        return ((AdminSchedulerModel) model).kill_();
+        return getModel().kill_();
     }
 
     private boolean kill_() {
@@ -264,7 +286,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     }
 
     public static boolean linkRM(String rmURL) {
-        return ((AdminSchedulerModel) model).linkRM_(rmURL);
+        return getModel().linkRM_(rmURL);
     }
 
     private boolean linkRM_(String rmURL) {
@@ -283,7 +305,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     }
 
     public static AdminSchedulerInterface getAdminScheduler() {
-        return ((AdminSchedulerModel) model).getAdminScheduler_();
+        return getModel().getAdminScheduler_();
     }
 
     private AdminSchedulerInterface getAdminScheduler_() {

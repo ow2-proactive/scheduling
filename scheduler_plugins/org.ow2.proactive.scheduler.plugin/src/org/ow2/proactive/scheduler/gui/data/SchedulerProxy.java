@@ -57,17 +57,18 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.gui.Activator;
-import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
+import org.ow2.proactive.scheduler.gui.views.ControllerView;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 
 /**
- *
+ * SchedulerProxy...
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -84,6 +85,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     private Boolean logAsAdmin = false;
     private Thread pinger;
     private String schedulerURL;
+    private boolean connected = false;
 
     List<SchedulerConnectionListener> observers;
 
@@ -134,6 +136,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
                 //disconnect scheduler if it is not dead
                 //protect disconnection with a try catch
                 scheduler.disconnect();
+                connected = false;
             } catch (Exception e) {
                 // Nothing to do
                 Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error in  disconnect action", e);
@@ -158,6 +161,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
                     e.printStackTrace();
                 }
                 SeparatedJobView.clearOnDisconnection(true);
+                connected = false;
             }
         });
     }
@@ -233,7 +237,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return scheduler.resume(jobId);
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume event ", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume action", e);
             e.printStackTrace();
         }
         return new BooleanWrapper(false);
@@ -253,7 +257,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             scheduler.remove(jobId);
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on remove job event ", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on remove job action ", e);
             e.printStackTrace();
         }
     }
@@ -268,7 +272,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).kill();
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on kill event ", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on kill action ", e);
             e.printStackTrace();
         }
         return new BooleanWrapper(false);
@@ -281,7 +285,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).pause();
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on pause event ", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on pause action ", e);
             e.printStackTrace();
         }
         return new BooleanWrapper(false);
@@ -294,7 +298,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).freeze();
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on freeze event ", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on freeze action ", e);
             e.printStackTrace();
         }
         return new BooleanWrapper(false);
@@ -307,7 +311,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).resume();
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume event ", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume action ", e);
             e.printStackTrace();
         }
         return new BooleanWrapper(false);
@@ -323,7 +327,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).shutdown();
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on shut down event ", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on shut down action ", e);
             e.printStackTrace();
         }
         return new BooleanWrapper(false);
@@ -336,7 +340,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).start();
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on start event", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on start action", e);
             e.printStackTrace();
         }
         return new BooleanWrapper(false);
@@ -349,7 +353,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             return ((AdminSchedulerInterface) scheduler).stop();
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on stop event ", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on stop action ", e);
             e.printStackTrace();
         }
         return new BooleanWrapper(false);
@@ -362,7 +366,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         try {
             scheduler.changePriority(jobId, priority);
         } catch (SchedulerException e) {
-            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on change priority event ", e);
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on change priority action ", e);
             e.printStackTrace();
         }
     }
@@ -371,24 +375,33 @@ public class SchedulerProxy implements AdminSchedulerInterface {
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#changePolicy(java.lang.Class)
      */
     public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            return ((AdminSchedulerInterface) scheduler).changePolicy(newPolicyFile);
+        } catch (SchedulerException e) {
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on change Policy action", e);
+            e.printStackTrace();
+        }
+        return new BooleanWrapper(false);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#linkResourceManager(java.lang.String)
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            return ((AdminSchedulerInterface) scheduler).linkResourceManager(rmURL);
+        } catch (SchedulerException e) {
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on link Resource Manager action", e);
+            e.printStackTrace();
+        }
+        return new BooleanWrapper(false);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#isConnected()
      */
     public BooleanWrapper isConnected() {
-        // TODO Auto-generated method stub
-        return null;
+        return ((AdminSchedulerInterface) scheduler).isConnected();
     }
 
     // -------------------------------------------------------------------- //
@@ -407,6 +420,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             }
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
             startPinger();
+            connected = true;
+            ControllerView.getInstance().connectedEvent(logAsAdmin);
             return CONNECTED;
         } catch (LoginException e) {
             e.printStackTrace();
@@ -488,6 +503,14 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         return instance;
     }
 
+    public boolean isProxyConnected() {
+        return connected;
+    }
+
+    public UserSchedulerInterface getScheduler() {
+        return scheduler;
+    }
+
     public static void clearInstance() {
         instance = null;
     }
@@ -516,43 +539,41 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         }
     }
 
-    public JobResult getJobResult(String arg0) throws SchedulerException {
-        // TODO Auto-generated method stub
-        return null;
+    public JobResult getJobResult(String jobId) throws SchedulerException {
+        return scheduler.getJobResult(jobId);
     }
 
-    public TaskResult getTaskResult(String arg0, String arg1) throws SchedulerException {
-        // TODO Auto-generated method stub
-        return null;
+    public TaskResult getTaskResult(String jobId, String taskName) throws SchedulerException {
+        return scheduler.getTaskResult(jobId, taskName);
     }
 
-    public void changePriority(String arg0, JobPriority arg1) throws SchedulerException {
-        // TODO Auto-generated method stub
-
+    public void changePriority(String jobId, JobPriority newPrio) throws SchedulerException {
+        scheduler.changePriority(jobId, newPrio);
     }
 
-    public BooleanWrapper kill(String arg0) throws SchedulerException {
-        // TODO Auto-generated method stub
-        return null;
+    public BooleanWrapper kill(String jobId) throws SchedulerException {
+        return scheduler.kill(jobId);
     }
 
-    public BooleanWrapper pause(String arg0) throws SchedulerException {
-        // TODO Auto-generated method stub
-        return null;
+    public BooleanWrapper pause(String jobId) throws SchedulerException {
+        return scheduler.pause(jobId);
     }
 
-    public void remove(String arg0) throws SchedulerException {
-        // TODO Auto-generated method stub
-
+    public void remove(String jobId) throws SchedulerException {
+        scheduler.remove(jobId);
     }
 
-    public BooleanWrapper resume(String arg0) throws SchedulerException {
-        // TODO Auto-generated method stub
-        return null;
+    public BooleanWrapper resume(String jobId) throws SchedulerException {
+        return scheduler.resume(jobId);
     }
 
     public SchedulerStatus getStatus() {
-        // TODO Auto-generated method stub
+        try {
+            return scheduler.getStatus();
+        } catch (SchedulerException e) {
+            Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error while getting status", e);
+            e.printStackTrace();
+        }
         return null;
     }
 

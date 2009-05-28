@@ -51,8 +51,17 @@
             allowMultiple="false"
             category="org.ow2.proactive.scheduler.gui"
             class="org.ow2.proactive.scheduler.gui.views.Users"
+            icon="icons/info.png"
             id="org.ow2.proactive.scheduler.gui.views.Users"
             name="Open user sessions">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.ow2.proactive.scheduler.gui"
+            class="org.ow2.proactive.scheduler.gui.views.ControllerView"
+            icon="icons/info.png"
+            id="org.ow2.proactive.scheduler.gui.views.ControllerView"
+            name="Controller">
       </view>
    </extension>
    <extension
@@ -87,6 +96,9 @@
          </viewShortcut>
          <viewShortcut
                id="org.ow2.proactive.scheduler.gui.views.ResultPreview">
+         </viewShortcut>
+         <viewShortcut
+               id="org.ow2.proactive.scheduler.gui.views.ControllerView">
          </viewShortcut>
       </perspectiveExtension>
    </extension>

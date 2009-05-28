@@ -35,6 +35,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedReader;
@@ -64,12 +65,13 @@ import org.ow2.proactive.utils.BoundedLinkedList;
  */
 public class VisualConsole extends JFrame implements Console, KeyListener {
 
-    private static final int HISTORY_SIZE = 40;
-    private static final Object lock = new Object();
-    private static final Color CARET_COLOR = Color.GREEN;
-    private static final Color BACKGROUND_COLOR = Color.BLACK;
-    private static final Color FOREGROUND_COLOR = Color.WHITE;
-    private static final int PROMPT_NB_LINES = 4;
+    private int HISTORY_SIZE = 40;
+    private Color CARET_COLOR = Color.GREEN;
+    private Color BACKGROUND_COLOR = Color.BLACK;
+    private Color FOREGROUND_COLOR = Color.WHITE;
+    private int PROMPT_NB_LINES = 4;
+
+    private final Object lock = new Object();
     private JPanel jContentPane = null;
     private JScrollPane jScrollPane = null;
     private JScrollPane jScrollPanePrompt = null;
@@ -81,6 +83,7 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
     private PipedWriter internalPipedWriter;
     private String valueToReturn;
     private boolean started = false;
+    private boolean displayOnFrame = true;
     private String prompt = " > ";
 
     /**
@@ -89,6 +92,30 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
      */
     public VisualConsole() {
         super();
+        initialize();
+    }
+
+    /**
+     * Create a new instance of VisualConsole
+     *
+     * @param history_size the size of the history that is stored in the console
+     * @param caret_color the color of the Caret
+     * @param background_color the background color of the console view
+     * @param foreground_color the foreground color of the console view
+     * @param prompt_nb_lines number of line for the prompt
+     * @param displayOnFrame true if the console must be displayed on its own frame or false if the display is exported elsewhere
+     * 						If so, the content pane can be retrieve using the {@link #getJContentPane()} method.
+     * @throws HeadlessException
+     */
+    public VisualConsole(int history_size, Color caret_color, Color background_color, Color foreground_color,
+            int prompt_nb_lines, boolean displayOnFrame) {
+        super();
+        HISTORY_SIZE = history_size;
+        CARET_COLOR = caret_color;
+        BACKGROUND_COLOR = background_color;
+        FOREGROUND_COLOR = foreground_color;
+        PROMPT_NB_LINES = prompt_nb_lines;
+        this.displayOnFrame = displayOnFrame;
         initialize();
     }
 
@@ -110,7 +137,7 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
         this.setTitle("Visual Controller");
     }
 
-    private JPanel getJContentPane() {
+    public JPanel getJContentPane() {
         if (jContentPane == null) {
             jContentPane = new JPanel();
             jContentPane.setLayout(new BorderLayout());
@@ -194,9 +221,9 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
      */
     public Console error(String msg) {
         if (this.started) {
-            //			jTextArea.setSelectedTextColor(SELECTED_TEXT_COLOR);
-            //			jTextArea.setSelectionColor(SELECTION_COLOR);
-            //			jTextArea.requestFocus();
+            //jTextArea.setSelectedTextColor(SELECTED_TEXT_COLOR);
+            //jTextArea.setSelectionColor(SELECTION_COLOR);
+            //jTextArea.requestFocus();
             //jTextArea.setSelectionStart(jTextArea.getText().length());
             jTextArea.append(msg);
             //jTextArea.setSelectionEnd(jTextArea.getText().length());
@@ -334,10 +361,12 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
+        if (displayOnFrame) {
+            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            this.setVisible(true);
+            this.jTextAreaPrompt.requestFocus();
+        }
         this.started = true;
-        this.jTextAreaPrompt.requestFocus();
         return this;
     }
 
@@ -347,6 +376,9 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
     public void stop() {
         if (this.started) {
             this.started = false;
+            synchronized (lock) {
+                lock.notify();
+            }
         }
     }
 

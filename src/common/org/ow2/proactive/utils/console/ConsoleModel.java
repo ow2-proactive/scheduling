@@ -60,6 +60,7 @@ public abstract class ConsoleModel {
     protected Console console;
 
     protected static ConsoleModel model;
+    protected boolean allowExitCommand;
 
     /**
      * Start this model

@@ -224,6 +224,7 @@
 		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/Manifest-base.mf" index="true">
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
+				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/util/adminconsole/*" />
 				<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />

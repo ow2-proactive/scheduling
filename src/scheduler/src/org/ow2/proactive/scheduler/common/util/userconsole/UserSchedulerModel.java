@@ -65,14 +65,37 @@ public class UserSchedulerModel extends ConsoleModel {
     protected UserSchedulerInterface scheduler;
     private ArrayList<Command> commands;
 
-    public static UserSchedulerModel getModel() {
+    /**
+     * Get this model. Also specify if the exit command should do something or not
+     *
+     * @param allowExitCommand true if the exit command is part of the commands, false if exit command does not exist.
+     * @return the current model associated to this class.
+     */
+    public static UserSchedulerModel getModel(boolean allowExitCommand) {
         if (model == null) {
-            model = new UserSchedulerModel();
+            model = new UserSchedulerModel(allowExitCommand);
         }
         return (UserSchedulerModel) model;
     }
 
-    protected UserSchedulerModel() {
+    /**
+     * Get a new model. Also specify if the exit command should do something or not
+     * WARNING, this method should just be used to re-create an instance of a model, it will disabled previous instance.
+     *
+     * @param allowExitCommand true if the exit command is part of the commands, false if exit command does not exist.
+     * @return a brand new model associated to this class.
+     */
+    public static UserSchedulerModel getNewModel(boolean allowExitCommand) {
+        model = new UserSchedulerModel(allowExitCommand);
+        return (UserSchedulerModel) model;
+    }
+
+    private static UserSchedulerModel getModel() {
+        return (UserSchedulerModel) model;
+    }
+
+    protected UserSchedulerModel(boolean allowExitCommand) {
+        this.allowExitCommand = allowExitCommand;
         commands = new ArrayList<Command>();
         commands
                 .add(new Command(
@@ -113,7 +136,9 @@ public class UserSchedulerModel extends ConsoleModel {
         commands
                 .add(new Command("exec(commandFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a command-file path)"));
-        commands.add(new Command("exit()", "Exit Scheduler controller"));
+        if (allowExitCommand) {
+            commands.add(new Command("exit()", "Exit Scheduler controller"));
+        }
     }
 
     /**
@@ -152,7 +177,12 @@ public class UserSchedulerModel extends ConsoleModel {
             SchedulerStatus status = scheduler.getStatus();
             String prompt = " ";
             if (status != SchedulerStatus.STARTED) {
-                prompt += "[" + status.toString() + "] ";
+                try {
+                    prompt += "[" + status.toString() + "] ";
+                } catch (NullPointerException npe) {
+                    //status is null
+                    prompt += "[Unknown] ";
+                }
             }
             stmt = console.readStatement(prompt + "> ");
             if ("?".equals(stmt)) {
@@ -432,12 +462,16 @@ public class UserSchedulerModel extends ConsoleModel {
     }
 
     private void exit_() {
-        console.print("Exiting controller.");
-        try {
-            scheduler.disconnect();
-        } catch (Exception e) {
+        if (allowExitCommand) {
+            console.print("Exiting controller.");
+            try {
+                scheduler.disconnect();
+            } catch (Exception e) {
+            }
+            terminated = true;
+        } else {
+            console.print("Exit command has been disabled !");
         }
-        terminated = true;
     }
 
     public static UserSchedulerInterface getUserScheduler() {

@@ -115,7 +115,7 @@ public class UserController {
      * Convenience constructor to let the default one do nothing
      */
     protected UserController(Object o) {
-        model = UserSchedulerModel.getModel();
+        model = UserSchedulerModel.getModel(true);
     }
 
     public void load(String[] args) {

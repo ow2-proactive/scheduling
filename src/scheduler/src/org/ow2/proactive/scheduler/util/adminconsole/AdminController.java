@@ -72,7 +72,7 @@ public class AdminController extends UserController {
      */
     protected AdminController(Object o) {
         commandName = "adminScheduler";
-        model = AdminSchedulerModel.getModel();
+        model = AdminSchedulerModel.getModel(true);
     }
 
     @Override

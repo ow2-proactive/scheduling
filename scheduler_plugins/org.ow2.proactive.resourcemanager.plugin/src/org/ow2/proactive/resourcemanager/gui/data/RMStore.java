@@ -49,6 +49,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
+import org.ow2.proactive.resourcemanager.gui.views.ControllerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
@@ -113,6 +114,7 @@ public class RMStore {
                     new Object[] { rmMonitoring });
             SelectResourceManagerDialog.saveInformations();
             isConnected = true;
+            //ControllerView.getInstance().connectedEvent(isAdmin);
             RMStatusBarItem.getInstance().setText("connected");
         } catch (ActiveObjectCreationException e) {
             RMStatusBarItem.getInstance().setText("disconnected");
@@ -229,5 +231,6 @@ public class RMStore {
         isConnected = false;
         PAActiveObject.terminateActiveObject(receiver, true);
         RMStatusBarItem.getInstance().setText("disconnected");
+        //ControllerView.clearInstance();
     }
 }

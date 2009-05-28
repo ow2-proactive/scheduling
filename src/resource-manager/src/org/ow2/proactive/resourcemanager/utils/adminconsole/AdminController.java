@@ -117,7 +117,7 @@ public class AdminController {
      * Convenience constructor to let the default one do nothing
      */
     protected AdminController(Object o) {
-        model = AdminRMModel.getModel();
+        model = AdminRMModel.getModel(true);
     }
 
     public void load(String[] args) {
