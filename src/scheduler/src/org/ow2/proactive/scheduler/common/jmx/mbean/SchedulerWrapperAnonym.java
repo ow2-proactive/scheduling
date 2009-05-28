@@ -31,6 +31,9 @@
  */
 package org.ow2.proactive.scheduler.common.jmx.mbean;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.management.NotificationBroadcasterSupport;
 
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -54,27 +57,27 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport implements
         SchedulerWrapperAnonymMBean, SchedulerEventListener {
     /** Scheduler current state */
-    private SchedulerStatus schedulerStatus = SchedulerStatus.STOPPED;
+    protected SchedulerStatus schedulerStatus = SchedulerStatus.STOPPED;
 
     /** Variables representing the attributes of the SchedulerWrapperMBean */
-    private int totalNumberOfJobs = 0;
+    protected int totalNumberOfJobs = 0;
 
-    private int totalNumberOfTasks = 0;
+    protected int totalNumberOfTasks = 0;
 
-    private int numberOfPendingJobs = 0;
+    protected int numberOfPendingJobs = 0;
 
-    private int numberOfRunningJobs = 0;
+    protected int numberOfRunningJobs = 0;
 
-    private int numberOfFinishedJobs = 0;
+    protected int numberOfFinishedJobs = 0;
 
-    private int numberOfPendingTasks = 0;
+    protected int numberOfPendingTasks = 0;
 
-    private int numberOfRunningTasks = 0;
+    protected int numberOfRunningTasks = 0;
 
-    private int numberOfFinishedTasks = 0;
+    protected int numberOfFinishedTasks = 0;
 
     /** Number of Connected Users */
-    private int numberOfConnectedUsers = 0;
+    protected Set<UserIdentification> users = new HashSet<UserIdentification>();
 
     /**
      * Empty constructor required by JMX
@@ -172,7 +175,7 @@ public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport imple
      * 
      * @param job info
      */
-    private void jobPendingToRunningEvent(JobInfo info) {
+    protected void jobPendingToRunningEvent(JobInfo info) {
         // Update the status
         this.numberOfPendingJobs--;
         this.numberOfRunningJobs++;
@@ -183,14 +186,12 @@ public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport imple
      * 
      * @param info the job's information
      */
-    private void jobRemoveFinishedEvent(JobInfo info) {
+    protected void jobRemoveFinishedEvent(JobInfo info) {
         this.numberOfFinishedJobs--;
         this.totalNumberOfJobs--;
         // For each task of the Job decrement the number of finished tasks and the total number of tasks
-        for (int i = 0; i < info.getTotalNumberOfTasks(); i++) {
-            this.totalNumberOfTasks--;
-            this.numberOfFinishedTasks--;
-        }
+        this.totalNumberOfTasks -= info.getTotalNumberOfTasks();
+        this.numberOfFinishedTasks -= info.getTotalNumberOfTasks();
     }
 
     /**
@@ -198,7 +199,7 @@ public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport imple
      * 
      * @param info the job's information
      */
-    private void jobRunningToFinishedEvent(JobInfo info) {
+    protected void jobRunningToFinishedEvent(JobInfo info) {
         this.numberOfRunningJobs--;
         this.numberOfFinishedJobs++;
     }
@@ -213,10 +214,8 @@ public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport imple
         this.totalNumberOfJobs++;
         this.numberOfPendingJobs++;
         // For each task of the Job increment the number of pending tasks and the total number of tasks
-        for (int i = 0; i < job.getTotalNumberOfTasks(); i++) {
-            this.totalNumberOfTasks++;
-            this.numberOfPendingTasks++;
-        }
+        this.totalNumberOfTasks += job.getTotalNumberOfTasks();
+        this.numberOfPendingTasks += job.getTotalNumberOfTasks();
     }
 
     /**
@@ -224,7 +223,7 @@ public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport imple
      * 
      * @param info task's information
      */
-    private void taskPendingToRunningEvent(TaskInfo info) {
+    protected void taskPendingToRunningEvent(TaskInfo info) {
         this.numberOfPendingTasks--;
         this.numberOfRunningTasks++;
     }
@@ -234,7 +233,7 @@ public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport imple
      * 
      * @param info task's information
      */
-    private void taskRunningToFinishedEvent(TaskInfo info) {
+    protected void taskRunningToFinishedEvent(TaskInfo info) {
         this.numberOfRunningTasks--;
         this.numberOfFinishedTasks++;
     }
@@ -245,9 +244,9 @@ public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport imple
     public void usersUpdatedEvent(NotificationData<UserIdentification> notificationData) {
         // It can be an update to remove or to add a User
         if (notificationData.getData().isToRemove()) {
-            this.numberOfConnectedUsers--;
+            users.remove(notificationData.getData());
         } else {
-            this.numberOfConnectedUsers++;
+            users.add(notificationData.getData());
         }
     }
 
@@ -261,7 +260,7 @@ public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport imple
      * @return current number of connected users
      */
     public int getNumberOfConnectedUsers() {
-        return this.numberOfConnectedUsers;
+        return this.users.size();
     }
 
     /**

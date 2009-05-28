@@ -33,7 +33,10 @@ package org.ow2.proactive.scheduler.common.jmx.mbean;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -44,7 +47,6 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
@@ -62,29 +64,6 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
         SchedulerEventListener {
     /** Scheduler logger device */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
-
-    /** Scheduler current state */
-    private SchedulerStatus schedulerStatus = SchedulerStatus.STOPPED;
-
-    /** Variables representing the attributes of the SchedulerWrapperMBean */
-    private int totalNumberOfJobs = 0;
-
-    private int totalNumberOfTasks = 0;
-
-    private int numberOfPendingJobs = 0;
-
-    private int numberOfRunningJobs = 0;
-
-    private int numberOfFinishedJobs = 0;
-
-    private int numberOfPendingTasks = 0;
-
-    private int numberOfRunningTasks = 0;
-
-    private int numberOfFinishedTasks = 0;
-
-    /** Number of Connected Users */
-    private int numberOfConnectedUsers = 0;
 
     /** Variables representing the Key Performance Indicators for the SchedulerWrapper */
     private long meanJobPendingTime = 0;
@@ -113,23 +92,21 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
     /** The Scheduler Started Time */
     private long schedulerStartedTime = 0;
 
-    /** Sequence number for Notifications */
-    //private long sequenceNumber = 1;
     /** 
      * Fields to keep the informations need for the Operations to get the Key Performance Indicator values 
      * The first two are references to the Map of pending and running time for each job
      */
-    private HashMap<String, Long> jobPendingTimeMap = new HashMap<String, Long>();
-    private HashMap<String, Long> jobRunningTimeMap = new HashMap<String, Long>();
+    private Map<String, Long> jobPendingTimeMap = new HashMap<String, Long>();
+    private Map<String, Long> jobRunningTimeMap = new HashMap<String, Long>();
     /** The task timings list and the mean timings for the tasks of a given job */
-    private HashMap<String, Long> taskPendingTimeMap = new HashMap<String, Long>();
-    private HashMap<String, Long> taskRunningTimeMap = new HashMap<String, Long>();
-    private HashMap<String, Long> meanTaskPendingTimeMap = new HashMap<String, Long>();
-    private HashMap<String, Long> meanTaskRunningTimeMap = new HashMap<String, Long>();
+    private Map<String, List<Long>> taskPendingTimeMap = new HashMap<String, List<Long>>();
+    private Map<String, List<Long>> taskRunningTimeMap = new HashMap<String, List<Long>>();
+    private Map<String, Long> meanTaskPendingTimeMap = new HashMap<String, Long>();
+    private Map<String, Long> meanTaskRunningTimeMap = new HashMap<String, Long>();
     /** Map of the number of nodes used by the jobs */
-    private HashMap<String, Integer> nodesUsedByJobMap = new HashMap<String, Integer>();
+    private Map<String, Integer> nodesUsedByJobMap = new HashMap<String, Integer>();
     /** List of execution host for each task of each job */
-    private HashMap<String, String> executionHostNames = new HashMap<String, String>();
+    private Map<String, Set<String>> executionHostNames = new HashMap<String, Set<String>>();
 
     /**
      * Empty constructor required by JMX
@@ -237,27 +214,10 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param job info
      */
-    private void jobPendingToRunningEvent(JobInfo info) {
-        // Update the status
-        this.numberOfPendingJobs--;
-        this.numberOfRunningJobs++;
+    protected void jobPendingToRunningEvent(JobInfo info) {
+        super.jobPendingToRunningEvent(info);
         // Call the private method to calculate the mean pending time
         calculateMeanJobPendingTime(info);
-    }
-
-    /**
-     * the job is no more managed, it is removed from scheduler
-     * 
-     * @param info the job's information
-     */
-    private void jobRemoveFinishedEvent(JobInfo info) {
-        this.numberOfFinishedJobs--;
-        this.totalNumberOfJobs--;
-        // For each task of the Job decrement the number of finished tasks and the total number of tasks
-        for (int i = 0; i < info.getTotalNumberOfTasks(); i++) {
-            this.totalNumberOfTasks--;
-            this.numberOfFinishedTasks--;
-        }
     }
 
     /**
@@ -265,36 +225,23 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param info the job's information
      */
-    private void jobRunningToFinishedEvent(JobInfo info) {
-        this.numberOfRunningJobs--;
-        this.numberOfFinishedJobs++;
-        // Call the private method to calculate the mean execution time
-        calculateMeanJobExecutionTime(info);
+    protected void jobRunningToFinishedEvent(JobInfo info) {
+        super.jobRunningToFinishedEvent(info);
+        // Call the private method to compute the mean execution time
+        computeMeanJobExecutionTime(info);
         // Add the meanTaskPendingTime for this job to the meanTaskPendingTimeMap in position [jobId]
-        long mean = this.calculateMean(this.taskPendingTimeMap, info.getJobId().value());
-        this.meanTaskPendingTimeMap.put(info.getJobId().value(), mean);
+        String jobId = info.getJobId().value();
+        long mean = this.computeMean(this.taskPendingTimeMap, jobId);
+        this.meanTaskPendingTimeMap.put(jobId, mean);
         // Add the meanTaskRunningTime for this job to the meanTaskRunningTimeMap in position [jobId]
-        mean = this.calculateMean(this.taskRunningTimeMap, info.getJobId().value());
-        this.meanTaskRunningTimeMap.put(info.getJobId().value(), mean);
-        /*
-         *  Calculate the number of nodes used by the Job and put it in the nodesUsedByJobMap in position [jobId]
-         */
-        Iterator<String> valuesIterator = this.executionHostNames.values().iterator();
-        Iterator<String> keyIterator = this.executionHostNames.keySet().iterator();
-        // Initialize the hostNames Array for the given job 
-        ArrayList<String> hostNames = new ArrayList<String>();
-        while (keyIterator.hasNext()) {
-            String key = keyIterator.next();
-            String value = valuesIterator.next();
-            // If is the given job, add the host name to the list of nodes used by the job
-            if (key.startsWith(info.getJobId().value())) {
-                // Add the node name only if this node has not been used already by the given job
-                if (!hostNames.contains(value)) {
-                    hostNames.add(value);
-                }
-            }
+        mean = this.computeMean(this.taskRunningTimeMap, jobId);
+        this.meanTaskRunningTimeMap.put(jobId, mean);
+        /* put the number of nodes used by the Job and put it in the nodesUsedByJobMap in position [jobId] */
+        try {
+            this.nodesUsedByJobMap.put(jobId, this.executionHostNames.get(info.getJobId().value()).size());
+        } catch (NullPointerException npe) {
+            this.nodesUsedByJobMap.put(jobId, 0);
         }
-        this.nodesUsedByJobMap.put(info.getJobId().value(), hostNames.size());
     }
 
     /**
@@ -303,13 +250,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * @param job the state of the job
      */
     public void jobSubmittedEvent(JobState job) {
-        this.totalNumberOfJobs++;
-        this.numberOfPendingJobs++;
-        // For each task of the Job increment the number of pending tasks and the total number of tasks
-        for (int i = 0; i < job.getTotalNumberOfTasks(); i++) {
-            this.totalNumberOfTasks++;
-            this.numberOfPendingTasks++;
-        }
+        super.jobSubmittedEvent(job);
         // Call the private method to calculate the mean arrival time
         calculateJobSubmittingPeriod(job.getJobInfo());
     }
@@ -319,13 +260,16 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param info task's information
      */
-    private void taskPendingToRunningEvent(TaskInfo info) {
-        this.numberOfPendingTasks--;
-        this.numberOfRunningTasks++;
+    protected void taskPendingToRunningEvent(TaskInfo info) {
+        super.taskPendingToRunningEvent(info);
         // Calculate the Pending time for this Task (taskStartTime - jobSubmittedTime)
         long taskPendingTime = (info.getStartTime() - info.getJobInfo().getSubmittedTime());
         // Add the taskPendingTime for this task to the taskPendingTimeMap in position [jobTaskId]
-        this.taskPendingTimeMap.put(info.getJobId() + " " + info.getTaskId().toString(), taskPendingTime);
+        String jobId = info.getJobId().value();
+        if (this.taskPendingTimeMap.get(jobId) == null) {
+            this.taskPendingTimeMap.put(jobId, new ArrayList<Long>());
+        }
+        this.taskPendingTimeMap.get(jobId).add(taskPendingTime);
     }
 
     /**
@@ -333,31 +277,21 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param info task's information
      */
-    private void taskRunningToFinishedEvent(TaskInfo info) {
-        this.numberOfRunningTasks--;
-        this.numberOfFinishedTasks++;
+    protected void taskRunningToFinishedEvent(TaskInfo info) {
+        super.taskRunningToFinishedEvent(info);
         // Calculate the Pending time for this Task (taskFinishedTime - taskStartTime)
         long taskRunningTime = (info.getFinishedTime() - info.getStartTime());
         // Add the taskRunningTime for this task to the taskRunningTimeMap in position [jobTaskId]
-        this.taskRunningTimeMap.put(info.getJobId() + " " + info.getTaskId().toString(), taskRunningTime);
-        /*
-         *  Put the host name in the Map<jobTaskId,hostName> of nodes used by the job
-         *  jobTaskId is a String made like (jobId taskId)
-         */
-        this.executionHostNames.put(info.getJobId() + " " + info.getTaskId().toString(), info
-                .getExecutionHostName());
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
-     */
-    public void usersUpdatedEvent(NotificationData<UserIdentification> notificationData) {
-        // It can be an update to remove or to add a User
-        if (notificationData.getData().isToRemove()) {
-            this.numberOfConnectedUsers--;
-        } else {
-            this.numberOfConnectedUsers++;
+        String jobId = info.getJobId().value();
+        if (this.taskRunningTimeMap.get(jobId) == null) {
+            this.taskRunningTimeMap.put(jobId, new ArrayList<Long>());
         }
+        this.taskRunningTimeMap.get(jobId).add(taskRunningTime);
+        // Put the host name in the Map<jobTaskId,hostNames> of nodes used by the job
+        if (this.executionHostNames.get(jobId) == null) {
+            this.executionHostNames.put(jobId, new HashSet<String>());
+        }
+        this.executionHostNames.get(jobId).add(info.getExecutionHostName());
     }
 
     // PRIVATE METHODS FOR CALCULATING KPIs
@@ -387,7 +321,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param job info
      */
-    private void calculateMeanJobExecutionTime(JobInfo info) {
+    private void computeMeanJobExecutionTime(JobInfo info) {
         // Calculate the Running time for this Job (finishedTime - startTime)
         long jobRunningTime = (info.getFinishedTime() - info.getStartTime());
         // Increment the cumulative execution time
@@ -425,34 +359,25 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
     }
 
     /**
-     * Method to calculate the mean of the values on a given map make of all the job and task keys
+     * Method to compute the mean of the values on a given map make of all the job and task keys
      * with key in the form <jobId taskId>
      * 
-     * @param an HashMap<String,Long>
+     * @param map
      * @return a long representation of the mean
      */
-    private long calculateMean(HashMap<String, Long> map, String jobId) {
-        Iterator<Long> valuesIterator = map.values().iterator();
-        Iterator<String> keyIterator = map.keySet().iterator();
-        // Initialize the mean for the given job 
+    private long computeMean(Map<String, List<Long>> map, String jobId) {
+        List<Long> list = map.get(jobId);
+        if (list == null || list.size() == 0) {
+            return 0;
+        }
+        // Initialize the mean for the given job
         long mean = 0;
         int counter = 0;
-        while (keyIterator.hasNext()) {
-            String key = keyIterator.next();
-            long value = valuesIterator.next();
-            // If is the given job sum the value to the mean and increment the number of the tasks
-            // of the given job 
-            if (key.startsWith(jobId)) {
-                // Remove the key for the tasks of the given job cause we don`t need it anymore
-                //this.taskPendingTimeMap.remove(key);
-                //this.taskRunningTimeMap.remove(key);
-                mean = mean + value;
-                counter++;
-            }
+        for (Long l : list) {
+            mean = mean + l;
+            counter++;
         }
-        // The final mean
-        mean = mean / counter;
-        return mean;
+        return mean / counter;
     }
 
     /**
@@ -465,77 +390,6 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
     }
 
     // ATTRIBUTES TO CONTROL
-
-    /**
-     * The following methods represent the Attributes that is possible to monitor from the MBean
-     * 
-     * Methods to get the values of the attributes of the MBean
-     * 
-     * @return current number of connected users
-     */
-    public int getNumberOfConnectedUsers() {
-        return this.numberOfConnectedUsers;
-    }
-
-    /**
-     * @return current number of finished jobs
-     */
-    public int getNumberOfFinishedJobs() {
-        return this.numberOfFinishedJobs;
-    }
-
-    /**
-     * @return current number of finished tasks
-     */
-    public int getNumberOfFinishedTasks() {
-        return this.numberOfFinishedTasks;
-    }
-
-    public int getNumberOfPendingJobs() {
-        return this.numberOfPendingJobs;
-    }
-
-    /**
-     * @return current number of pending tasks
-     */
-    public int getNumberOfPendingTasks() {
-        return this.numberOfPendingTasks;
-    }
-
-    /**
-     * @return current number of running jobs
-     */
-    public int getNumberOfRunningJobs() {
-        return this.numberOfRunningJobs;
-    }
-
-    /**
-     * @return current number of running tasks
-     */
-    public int getNumberOfRunningTasks() {
-        return this.numberOfRunningTasks;
-    }
-
-    /**
-     * @return current state of the Scheduler
-     */
-    public String getSchedulerStatus() {
-        return this.schedulerStatus.toString();
-    }
-
-    /**
-     * @return current number of jobs submitted to the Scheduler
-     */
-    public int getTotalNumberOfJobs() {
-        return this.totalNumberOfJobs;
-    }
-
-    /**
-     * @return current number of tasks submitted to the Scheduler
-     */
-    public int getTotalNumberOfTasks() {
-        return this.totalNumberOfTasks;
-    }
 
     /**
      * Getter methods for the KPI values
@@ -601,8 +455,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
         try {
             result = this.jobPendingTimeMap.get(jobId);
         } catch (Exception e) {
-            String msg = "Job '" + jobId + "' is not present in the job pending time map";
-            logger_dev.error(msg, e);
+            logger_dev.error("Job '" + jobId + "' is not present in the job pending time map", e);
         }
         return result;
     }
@@ -620,8 +473,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
         try {
             result = this.jobRunningTimeMap.get(jobId);
         } catch (Exception e) {
-            String msg = "Job '" + jobId + "' is not present in the job running time map";
-            logger_dev.error(msg, e);
+            logger_dev.error("Job '" + jobId + "' is not present in the job running time map", e);
         }
         return result;
     }
@@ -639,8 +491,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
         try {
             result = this.meanTaskPendingTimeMap.get(jobId);
         } catch (Exception e) {
-            String msg = "Job '" + jobId + "' is not present in the task pending time map";
-            logger_dev.error(msg, e);
+            logger_dev.error("Job '" + jobId + "' is not present in the task pending time map", e);
         }
         return result;
     }
@@ -657,8 +508,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
         try {
             result = this.meanTaskRunningTimeMap.get(jobId);
         } catch (Exception e) {
-            String msg = "Job '" + jobId + "' is not present in the task running time map";
-            logger_dev.error(msg, e);
+            logger_dev.error("Job '" + jobId + "' is not present in the task running time map", e);
         }
         return result;
     }
@@ -675,8 +525,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
         try {
             result = this.nodesUsedByJobMap.get(jobId);
         } catch (Exception e) {
-            String msg = "Job '" + jobId + "' is not present in the nodes used by job map";
-            logger_dev.error(msg, e);
+            logger_dev.error("Job '" + jobId + "' is not present in the nodes used by job map", e);
         }
         return result;
     }

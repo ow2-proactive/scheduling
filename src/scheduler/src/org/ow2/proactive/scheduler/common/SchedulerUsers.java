@@ -83,7 +83,7 @@ public class SchedulerUsers implements Serializable {
      * @param user the user to update.
      */
     public void update(UserIdentification user) {
-        //remove all userIdentification that are equals to the given user (can be more than one)
+        //remove all userIdentification that are equals to the given user
         //if the user is a new one, nothing is removed
         Iterator<UserIdentification> iter = users.iterator();
         while (iter.hasNext()) {
