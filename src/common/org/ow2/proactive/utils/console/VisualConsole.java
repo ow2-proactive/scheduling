@@ -464,7 +464,11 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
                 if (!shiftPressed) {
                     jTextAreaPrompt.setText("");
                 } else {
-                    jTextAreaPrompt.append("\n");
+                    String text = jTextAreaPrompt.getText();
+                    int caretPos = jTextAreaPrompt.getCaretPosition();
+                    text = text.substring(0, caretPos) + "\n" + text.substring(caretPos);
+                    jTextAreaPrompt.setText(text);
+                    jTextAreaPrompt.setCaretPosition(caretPos + 1);
                 }
                 break;
             case KeyEvent.VK_SHIFT:
