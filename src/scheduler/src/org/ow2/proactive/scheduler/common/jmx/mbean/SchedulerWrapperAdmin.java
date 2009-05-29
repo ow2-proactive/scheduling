@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -60,8 +59,7 @@ import org.ow2.proactive.scheduler.common.util.Tools;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements SchedulerWrapperAdminMBean,
-        SchedulerEventListener {
+public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements SchedulerWrapperAdminMBean {
     /** Scheduler logger device */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
 
@@ -156,53 +154,6 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
             case RM_DOWN:
             case RM_UP:
             case POLICY_CHANGED:
-                break;
-        }
-    }
-
-    /**
-     * Call the MBean event for the related Job Updated event type
-     *
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
-     * @param notification data containing job info
-     */
-    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
-        switch (notification.getEventType()) {
-            case JOB_PAUSED:
-                this.numberOfRunningJobs--;
-                break;
-            case JOB_RESUMED:
-                this.numberOfRunningJobs++;
-                break;
-            case JOB_PENDING_TO_RUNNING:
-                jobPendingToRunningEvent(notification.getData());
-                break;
-            case JOB_RUNNING_TO_FINISHED:
-                jobRunningToFinishedEvent(notification.getData());
-                break;
-            case JOB_REMOVE_FINISHED:
-                jobRemoveFinishedEvent(notification.getData());
-                break;
-            case JOB_CHANGE_PRIORITY:
-                break;
-        }
-    }
-
-    /**
-     * Call the MBean event for the related Task Updated event type
-     * 
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
-     * @param notification data containing task info
-     */
-    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
-        switch (notification.getEventType()) {
-            case TASK_PENDING_TO_RUNNING:
-                taskPendingToRunningEvent(notification.getData());
-                break;
-            case TASK_RUNNING_TO_FINISHED:
-                taskRunningToFinishedEvent(notification.getData());
-                break;
-            case TASK_WAITING_FOR_RESTART:
                 break;
         }
     }

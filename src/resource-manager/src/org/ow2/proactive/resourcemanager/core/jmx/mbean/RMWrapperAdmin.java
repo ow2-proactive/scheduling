@@ -32,9 +32,6 @@
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.common.event.RMEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 
 
 /**
@@ -47,19 +44,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
  */
 @PublicAPI
 public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBean {
-    /** Sequence number for Notifications */
-    //private long sequenceNumber = 1;
-    /** The state of the Resource Manager */
-    private String rMStatus = "STOPPED";
-
-    /** Variables representing the fields of the MBean */
-    private int totalNumberOfNodes = 0;
-
-    private int numberOfDownNodes = 0;
-
-    private int numberOfFreeNodes = 0;
-
-    private int numberOfBusyNodes = 0;
 
     private int timePercentageOfNodesInactivity;
 
@@ -69,37 +53,7 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
 
     private long previousTimeStamp;
 
-    /**
-     * Method to manage node events of the Resource Manager
-     * 
-     * @param event
-     */
-    public void nodeEvent(RMNodeEvent event) {
-        switch (event.getEventType()) {
-            case NODE_ADDED:
-                nodeAdded();
-                break;
-            case NODE_STATE_CHANGED:
-                switch (event.getNodeState()) {
-                    case BUSY:
-                        nodeBusy();
-                        break;
-                    case DOWN:
-                        nodeDown(event.getNodeState() == NodeState.BUSY);
-                        break;
-                    case FREE:
-                        nodeFree();
-                        break;
-                }
-                break;
-            case NODE_REMOVED:
-                nodeRemovedEvent(event.getNodeState() == NodeState.BUSY,
-                        event.getNodeState() == NodeState.FREE);
-                break;
-        }
-    }
-
-    private void nodeAdded() {
+    protected void nodeAdded() {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -107,10 +61,8 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
         this.timePercentageOfNodesUsage += this.numberOfBusyNodes * interval;
         this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
         this.previousTimeStamp = System.currentTimeMillis();
-        //Update fields
-        this.totalNumberOfNodes++;
-        //When a node is added, initially, it is free
-        this.numberOfFreeNodes++;
+        //update fields
+        super.nodeAdded();
     }
 
     /**
@@ -119,7 +71,7 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
      *
      * @param event
      */
-    private void nodeBusy() {
+    protected void nodeBusy() {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -128,8 +80,7 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
         this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
         this.previousTimeStamp = System.currentTimeMillis();
         // Update fields
-        this.numberOfFreeNodes--;
-        this.numberOfBusyNodes++;
+        super.nodeBusy();
     }
 
     /**
@@ -138,7 +89,7 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
      *
      * @param event
      */
-    private void nodeDown(boolean busy) {
+    protected void nodeDown(boolean busy) {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -147,14 +98,7 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
         this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
         this.previousTimeStamp = System.currentTimeMillis();
         // Update fields
-        if (busy) {
-            this.numberOfBusyNodes--;
-            this.numberOfDownNodes++;
-        } else {
-            this.numberOfFreeNodes--;
-            this.numberOfDownNodes++;
-        }
-
+        super.nodeDown(busy);
     }
 
     /**
@@ -163,7 +107,7 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
      *
      * @param event
      */
-    private void nodeFree() {
+    protected void nodeFree() {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -172,8 +116,7 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
         this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
         this.previousTimeStamp = System.currentTimeMillis();
         // Update fields
-        this.numberOfBusyNodes--;
-        this.numberOfFreeNodes++;
+        super.nodeFree();
     }
 
     /**
@@ -182,7 +125,7 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
      *
      * @param event
      */
-    private void nodeRemovedEvent(boolean busy, boolean free) {
+    protected void nodeRemovedEvent(boolean busy, boolean free) {
         // Each time that there`s an event, update global percentage based on the number of free and
         // on the number of used nodes in the previous event
         long interval = (System.currentTimeMillis() - this.previousTimeStamp);
@@ -191,67 +134,7 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
         this.totalTimeOfAllAvailableNodes += ((this.numberOfFreeNodes * interval) + (this.numberOfBusyNodes * interval));
         this.previousTimeStamp = System.currentTimeMillis();
         // Update fields
-        this.totalNumberOfNodes--;
-        //Check the state of the removed node
-        if (busy) {
-            this.numberOfBusyNodes--;
-        } else if (free) {
-            this.numberOfFreeNodes--;
-        } else {
-            //If the node is not busy, nor free, it is down
-            this.numberOfDownNodes--;
-        }
-    }
-
-    public void rmEvent(RMEvent event) {
-        switch (event.getEventType()) {
-            case STARTED:
-                rMStatus = "STARTED";
-                break;
-            case SHUTTING_DOWN:
-                rMStatus = "SHUTTING_DOWN";
-                break;
-            case SHUTDOWN:
-                rMStatus = "STOPPED";
-                break;
-        }
-    }
-
-    /**
-     * Methods to get the attributes of the RMWrapper MBean
-     * 
-     * @return the current number of down nodes
-     */
-    public int getNumberOfDownNodes() {
-        return this.numberOfDownNodes;
-    }
-
-    /** 
-     * @return the current number of free nodes
-     */
-    public int getNumberOfFreeNodes() {
-        return this.numberOfFreeNodes;
-    }
-
-    /** 
-     * @return the current number of busy nodes
-     */
-    public int getNumberOfBusyNodes() {
-        return this.numberOfBusyNodes;
-    }
-
-    /** 
-     * @return the current number of total nodes available
-     */
-    public int getTotalNumberOfNodes() {
-        return this.totalNumberOfNodes;
-    }
-
-    /** 
-     * @return the current state of the resource manager
-     */
-    public String getRMStatus() {
-        return this.rMStatus;
+        super.nodeRemovedEvent(busy, free);
     }
 
     /**
@@ -260,6 +143,9 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
      * @return the percentage time of nodes inactivity as integer
      */
     public int getTimePercentageOfNodesInactivity() {
+        if (this.totalTimeOfAllAvailableNodes == 0) {
+            return 0;
+        }
         return (int) (((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 
@@ -269,6 +155,9 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
      * @return the percentage time of nodes usage as integer
      */
     public int getTimePercentageOfNodesUsage() {
+        if (this.totalTimeOfAllAvailableNodes == 0) {
+            return 0;
+        }
         return (int) (((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 
@@ -280,6 +169,9 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
      * @return the current percentage time of nodes inactivity as double
      */
     public double getTimePercentageOfNodesInactivityAsDouble() {
+        if (this.totalTimeOfAllAvailableNodes == 0) {
+            return 0;
+        }
         return (((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 
@@ -289,6 +181,9 @@ public class RMWrapperAdmin extends RMWrapperAnonym implements RMWrapperAdminMBe
      * @return the current percentage time of nodes usage as double
      */
     public double getTimePercentageOfNodesUsageAsDouble() {
+        if (this.totalTimeOfAllAvailableNodes == 0) {
+            return 0;
+        }
         return (((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 }

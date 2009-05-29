@@ -452,4 +452,30 @@ listnodes();
 		</section>
 	</section>	
 	</section>
+	<section xml:id="rm_JMX_admin"><info><title>Connecting to JMX as administrator</title></info>
+		<para>
+			ProActive Resource Manager provides a way to get informations or statistics through JMX using standard tools.
+			Their are two different access. Anonym access can be used to retrieve general state informations when Administrator access could 
+			be used to retrieve the same informations plus some statistics.
+			For example, using the JConsole, just connect using the following URL as a remote access :
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXRMAgent</emphasis> where <emphasis>hostname</emphasis> is the host name on which is 
+					started the RM. (Anonym access)
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXRMAgentadmin</emphasis> where <emphasis>hostname</emphasis> is the host name on which is 
+					started the RM. (Admin access)
+					In this case, add RM Admin username and password. (demo//demo for example)
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			Once connected, you'll get access to states and some statistics on Resource Manager.
+		</para>
+	</section>
 </chapter>

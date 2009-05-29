@@ -34,8 +34,6 @@ package org.ow2.proactive.scheduler.common.jmx.mbean;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.management.NotificationBroadcasterSupport;
-
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -54,8 +52,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class SchedulerWrapperAnonym extends NotificationBroadcasterSupport implements
-        SchedulerWrapperAnonymMBean, SchedulerEventListener {
+public class SchedulerWrapperAnonym implements SchedulerWrapperAnonymMBean, SchedulerEventListener {
     /** Scheduler current state */
     protected SchedulerStatus schedulerStatus = SchedulerStatus.STOPPED;
 

@@ -53,16 +53,16 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 public class RMWrapperAnonym extends NotificationBroadcasterSupport implements RMWrapperAnonymMBean,
         Serializable {
     /** The state of the Resource Manager */
-    private String rMStatus = "STOPPED";
+    protected String rMStatus = "STOPPED";
 
     /** Variables representing the fields of the MBean */
-    private int totalNumberOfNodes = 0;
+    protected int totalNumberOfNodes = 0;
 
-    private int numberOfDownNodes = 0;
+    protected int numberOfDownNodes = 0;
 
-    private int numberOfFreeNodes = 0;
+    protected int numberOfFreeNodes = 0;
 
-    private int numberOfBusyNodes = 0;
+    protected int numberOfBusyNodes = 0;
 
     /**
      * Method to manage node events of the Resource Manager
@@ -94,7 +94,7 @@ public class RMWrapperAnonym extends NotificationBroadcasterSupport implements R
         }
     }
 
-    private void nodeAdded() {
+    protected void nodeAdded() {
         //Update fields
         this.totalNumberOfNodes++;
         //When a node is added, initially, it is free
@@ -107,7 +107,7 @@ public class RMWrapperAnonym extends NotificationBroadcasterSupport implements R
      *
      * @param event
      */
-    private void nodeBusy() {
+    protected void nodeBusy() {
         // Update fields
         this.numberOfFreeNodes--;
         this.numberOfBusyNodes++;
@@ -119,7 +119,7 @@ public class RMWrapperAnonym extends NotificationBroadcasterSupport implements R
      *
      * @param event
      */
-    private void nodeDown(boolean busy) {
+    protected void nodeDown(boolean busy) {
         // Update fields
         if (busy) {
             this.numberOfBusyNodes--;
@@ -137,7 +137,7 @@ public class RMWrapperAnonym extends NotificationBroadcasterSupport implements R
      *
      * @param event
      */
-    private void nodeFree() {
+    protected void nodeFree() {
         // Update fields
         this.numberOfBusyNodes--;
         this.numberOfFreeNodes++;
@@ -149,7 +149,7 @@ public class RMWrapperAnonym extends NotificationBroadcasterSupport implements R
      *
      * @param event
      */
-    private void nodeRemovedEvent(boolean busy, boolean free) {
+    protected void nodeRemovedEvent(boolean busy, boolean free) {
         // Update fields
         this.totalNumberOfNodes--;
         //Check the state of the removed node
