@@ -615,6 +615,32 @@ scheduler.changePolicy(org.objectweb.proactive.extensions.scheduler.policy.Prior
 				</programlisting>
 			</section>
 		</section>
+		<section xml:id="scheduler_JMX_admin"><info><title>Connecting to JMX as administrator</title></info>
+			<para>
+				ProActive Scheduling provides a way to get informations or statistics through JMX using standard tools. Their are two different access.
+				Anonym access can be used to retrieve some general scheduling informations when Administrator access could be used to retrieve
+				the same informations plus some specified job statistics. Admin can also perform operations. 
+				For example, using the JConsole, just connect using the following URL as a remote access :
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXSchedulerAgent</emphasis> where <emphasis>hostname</emphasis> is the host name on which is 
+						started the Scheduler. (Anonym access)
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXSchedulerAgentadmin</emphasis> where <emphasis>hostname</emphasis> is the host name on which is 
+						started the Scheduler. (Admin access)
+						In this case, add Scheduler Admin username and password. (demo//demo for example)
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				Once connected, you'll get access to some statistics on general scheduling process, specified jobs, tasks and perform operations.
+			</para>
+		</section>
 		<section xml:id="Extend_scheduler"><info><title>Extend the ProActive Scheduler</title></info>
 			<section xml:id="Extend_scheduler_policy"><info><title>Add a new scheduling policy</title></info>
 				<para>
