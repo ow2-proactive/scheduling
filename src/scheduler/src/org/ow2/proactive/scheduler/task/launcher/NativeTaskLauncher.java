@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutable;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -69,11 +70,6 @@ public class NativeTaskLauncher extends TaskLauncher {
      * used for kill the task   
      */
     private static String COOKIE_ENV = "PROACTIVE_COOKIE";
-
-    /**
-     * random value of the ProActive cookie environment variable 
-     */
-    private String cookie_value;
 
     private static String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n"
         + "A generation script must define a variable named 'command' which contains "
@@ -133,13 +129,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 }
             }
 
-            // set envp
-            toBeLaunched.setEnvp(this.buildNativeExecEnvVars());
-
-            //set modelEnv Var for kill action
-            Map<String, String> modelEnvVar = new HashMap<String, String>();
-            modelEnvVar.put(COOKIE_ENV, cookie_value);
-            toBeLaunched.setModelEnvVar(modelEnvVar);
+            setEnvironmentVariables(toBeLaunched);
 
             if (isWallTime()) {
                 scheduleTimer();
@@ -193,15 +183,25 @@ public class NativeTaskLauncher extends TaskLauncher {
     }
 
     /**
-     * Build environment variables for the native executable to launch : the task's environment vairables
+     * Build environment variables for the native executable to launch : the task's environment variables :
      * (task name job name, job id, task id...), system environment variables of the JVM, 
      * and the cookie environment variable used by ProcessTreeKiller
-     * @return the envp array for scheduler related variables, i.e. {"VAR1_NAME=value1","VAR2_NAME=value2",...}
+     * 
      */
-    private String[] buildNativeExecEnvVars() {
+    private void setEnvironmentVariables(NativeExecutable executable) {
+
+        //Set Model environment variable HashMap for the executable;
+        //if this process must be killed bu ProcessTreeKiller
+        String cookie_value = ProcessTreeKiller.createCookie();
+        Map<String, String> modelEnvVar = new HashMap<String, String>();
+        modelEnvVar.put(COOKIE_ENV, cookie_value);
+        executable.setModelEnvVar(modelEnvVar);
+
+        //Set environment variables array used to launch the external native command,
+        //with system environment variables, ProActive Scheduling environment variables,
+        //and ProcessTreeKiller environment variable (cookie)
 
         Map<String, String> taskEnvVariables = new Hashtable<String, String>(4);
-
         taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString()));
         taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), System
@@ -213,26 +213,27 @@ public class NativeTaskLauncher extends TaskLauncher {
 
         Map<String, String> systemEnvVariables = System.getenv();
 
-        String[] returnTab = new String[taskEnvVariables.size() + systemEnvVariables.size() + 1];
+        String[] envVarsTab = new String[taskEnvVariables.size() + systemEnvVariables.size() + 1];
 
         //first we add to the returnTab the task environment variables
         int i = 0;
         for (Map.Entry<String, String> entry : taskEnvVariables.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            returnTab[i++] = NativeTaskLauncher.convertJavaenvNameToSysenvName("" + name + "=" + value);
+            envVarsTab[i++] = NativeTaskLauncher.convertJavaenvNameToSysenvName("" + name + "=" + value);
         }
 
         //after we add to the returnTab the system environment variables
         for (Map.Entry<String, String> entry : systemEnvVariables.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            returnTab[i++] = "" + name + "=" + value;
+            envVarsTab[i++] = "" + name + "=" + value;
         }
 
         //then the cookie used by ProcessTreeKiller
-        returnTab[i] = COOKIE_ENV + "=" + cookie_value;
-        return returnTab;
+        envVarsTab[i] = COOKIE_ENV + "=" + cookie_value;
+        executable.setEnvp(envVarsTab);
+
     }
 
     /**

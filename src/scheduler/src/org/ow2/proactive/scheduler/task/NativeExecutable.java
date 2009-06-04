@@ -76,7 +76,8 @@ public class NativeExecutable extends Executable {
     /**
      * HM of environment variables used for
      * for kill action of the task, processes that export
-     * theses environment variables will be killed  
+     * theses environment variables will be killed.
+     * Used by ProcessTreeKiller
      */
     private Map<String, String> modelEnvVar = null;
 
