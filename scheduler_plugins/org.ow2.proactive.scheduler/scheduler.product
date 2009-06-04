@@ -17,6 +17,7 @@
       <vmArgs>-Xmx512M -Xms512M
 -Dproactive.net.nolocal=true
 -Dlog4j.configuration=file:proactive-log4j
+-Dproactive.configuration=file:ProActiveConfiguration.xml
 -Dpa.scheduler.logs.provider=org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider</vmArgs>
    </launcherArgs>
 
