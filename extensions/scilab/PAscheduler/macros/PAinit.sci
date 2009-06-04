@@ -14,7 +14,7 @@ function [] = PAinit()
      end
 
      if ~isdir(schedulerdir)
-         error(strcat(['The path "',schedulerdir,'" doesn't exist or is not a directory']));
+         error(strcat(['The path "',schedulerdir,'" doesn''t exist or is not a directory']));
      end
      schedjar = fullfile(schedulerdir,'dist','lib','ProActive_Scheduler-core.jar');
      if length(fileinfo(schedjar)) == 0
@@ -30,7 +30,7 @@ function [] = PAinit()
      cp = [fullfile(schedulerdir,'dist','lib','ProActive_Scheduler-core.jar'); cp];
      cp = [fullfile(schedulerdir,'dist','lib','ProActive_SRM-common.jar'); cp];
      cp = [fullfile(schedulerdir,'dist','lib','ProActive.jar'); cp];
-     cp = [fullfile(schedulerdir,'dist','lib','javasci.jar');cp];
+     cp = [fullfile(schedulerdir,'dist','lib','javasci.jar'); cp];
      javaclasspath(cp);
 
      // Call the native JNI connection to the Scheduler classes
