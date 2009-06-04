@@ -69,8 +69,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         task2.setCommandLine(new String[] { nativeLinuxExecLauncher });
         job2.addTask(task2);
 
-        new File(nativeLinuxExecLauncher).setExecutable(true);
-        new File(nativeLinuxDetachedProcess).setExecutable(true);
+        setExecutable(nativeLinuxExecLauncher+ " "+nativeLinuxDetachedProcess);
 
         //submit two jobs
         JobId id1 = SchedulerTHelper.submitJob(job1);
@@ -123,5 +122,9 @@ public class TestProcessTreeKiller extends FunctionalTest {
         }
         input.close();
         return toReturn;
+    }
+
+    private void setExecutable(String filesList) throws IOException{
+        Runtime.getRuntime().exec("chmod +x "+ filesList);
     }
 }
