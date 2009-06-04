@@ -69,7 +69,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         task2.setCommandLine(new String[] { nativeLinuxExecLauncher });
         job2.addTask(task2);
 
-        setExecutable(nativeLinuxExecLauncher+ " "+nativeLinuxDetachedProcess);
+        setExecutable(nativeLinuxExecLauncher + " " + nativeLinuxDetachedProcess);
 
         //submit two jobs
         JobId id1 = SchedulerTHelper.submitJob(job1);
@@ -102,10 +102,10 @@ public class TestProcessTreeKiller extends FunctionalTest {
         runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
         SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
         Assert.assertEquals(0, runningDetachedProcNumber);
-        
+
         JobResult res = SchedulerTHelper.getJobResult(id1);
         Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
-        
+
         res = SchedulerTHelper.getJobResult(id2);
         Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
     }
@@ -124,7 +124,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         return toReturn;
     }
 
-    private void setExecutable(String filesList) throws IOException{
-        Runtime.getRuntime().exec("chmod +x "+ filesList);
+    private void setExecutable(String filesList) throws IOException {
+        Runtime.getRuntime().exec("chmod +x " + filesList);
     }
 }
