@@ -182,8 +182,8 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
                 shutdownhookSet = true;
             }
 
-            LoggingThread lt1 = new LoggingThread(p.getInputStream(), "[" + host + " OUT]", false);
-            LoggingThread lt2 = new LoggingThread(p.getErrorStream(), "[" + host + " ERR]", true);
+            LoggingThread lt1 = new LoggingThread(p.getInputStream(), "[" + host + " OUT]", System.out);
+            LoggingThread lt2 = new LoggingThread(p.getErrorStream(), "[" + host + " ERR]", System.err);
             IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, p.getOutputStream());
 
             // We define the loggers which will write on standard output what comes from the java process

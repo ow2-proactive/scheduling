@@ -45,6 +45,8 @@ import java.net.URL;
 import java.util.List;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.common.util.ProcessResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
@@ -67,7 +69,7 @@ public class MatlabFinder {
      * @throws MatlabInitException
      */
     public static MatlabConfiguration findMatlab(boolean debug) throws IOException, InterruptedException,
-            MatlabInitException {
+            MatlabInitException, NodeException {
 
         Process p1 = null;
         MatlabConfiguration answer = null;
@@ -88,7 +90,13 @@ public class MatlabFinder {
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
             String tmpDir = System.getProperty("java.io.tmpdir");
-            File batchFile = new File(tmpDir, MATLAB_SCRIPT_WINDOWS);
+            String nodeName = PAActiveObject.getNode().getNodeInformation().getName().replace('-', '_');
+            File nodeDir = new File(tmpDir, nodeName);
+            if (!nodeDir.exists()) {
+                nodeDir.mkdir();
+                nodeDir.deleteOnExit();
+            }
+            File batchFile = new File(nodeDir, MATLAB_SCRIPT_WINDOWS);
 
             if (batchFile.exists()) {
                 batchFile.delete();
@@ -113,11 +121,12 @@ public class MatlabFinder {
             if (debug) {
                 System.out.println("Using script at " + batchFile.getAbsolutePath());
             }
-            while (!batchFile.exists()) {
-                Thread.sleep(100);
-            }
+            //            while (!batchFile.exists()) {
+            //                Thread.sleep(100);
+            //            }
             // finally we launch the batch file
-            p1 = Runtime.getRuntime().exec("cmd /c " + batchFile.getAbsolutePath());
+            p1 = Runtime.getRuntime().exec(new String[] { "cmd", "/c", batchFile.getName() }, null,
+                    batchFile.getParentFile());
         } else {
             throw new UnsupportedOperationException("Finding Matlab on " + os + " is not supported yet");
         }
@@ -133,9 +142,9 @@ public class MatlabFinder {
             System.out.flush();
             System.err.println("Error output of script :");
             for (String ln : pres.getError()) {
-                System.out.println(ln);
+                System.err.println(ln);
             }
-            System.out.flush();
+            System.err.flush();
         }
 
         // The batch file is supposed to write, if it's successful, two lines :
@@ -226,7 +235,8 @@ public class MatlabFinder {
         return answer.getAbsolutePath();
     }
 
-    public static void main(String[] args) throws MatlabInitException, IOException, InterruptedException {
+    public static void main(String[] args) throws MatlabInitException, IOException, InterruptedException,
+            NodeException {
         MatlabFinder.findMatlab(true);
     }
 

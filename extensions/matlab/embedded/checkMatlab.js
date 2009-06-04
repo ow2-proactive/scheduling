@@ -32,6 +32,8 @@
 
 importPackage(java.lang);
 importPackage(org.ow2.proactive.scheduler.ext.common.util);
+importPackage(org.objectweb.proactive.api);
+importPackage(org.ow2.proactive.scheduler.ext.matlab);
 
 // This script is run on remote computing hosts
 // It will test that Matlab is installed on the machine
@@ -88,11 +90,29 @@ toolboxmap.put("stateflow", "object = sfclipboard;");
 // Compiler
 toolboxmap.put("compiler", "mcc -m cosh;");
 
+finalcode = "out=1;";
 
-codebegin = "try;";
-codemiddle = "pause(1);"
-codeend = "catch ME;disp('licence error');java.lang.System.exit(1);end;quit;"
 
+// these two values are used to create synchronisation files between the different processes;
+
+// Name of the ProActive Node where is this script is launched
+nodeName = PAActiveObject.getNode().getNodeInformation().getName().replace('-','_');
+
+// system temp dir
+tmpPath = System.getProperty("java.io.tmpdir");
+
+// log file writer used for debugging
+logFile = java.io.File(tmpPath,nodeName+".log");
+if (!logFile.exists()) {
+    logFile.createNewFile();
+}
+logWriter = java.io.PrintStream(java.io.BufferedOutputStream(java.io.FileOutputStream(logFile, true)));
+
+
+selected = false;
+host = java.net.InetAddress.getLocalHost().getHostName();
+
+logWriter.println("Executing selection script on " + host);
 
 if (System.getProperty("os.name").startsWith("Windows")) {
     try {
@@ -134,44 +154,39 @@ else {
     }
 }
 if (selected) {
-    if (windows) {
-        cmd_options = ["-automation", "-r"];
-    }
-    else {
-        cmd_options = ["-nodisplay", "-nosplash", "-r"];
-    }
 
+    // we build the matlab code that will be run to trigger the licence token acquisitions
+    fullcode = "";
+    allargs = "";
     for (i = 0; i < args.length; i++) {
-        cmd_array = [command];
-        cmd_array = cmd_array.concat(cmd_options);
         arg = args[i];
-        if (arg != null) {
-            print("Testing licence coin for " + arg + " : " + java.net.InetAddress.getLocalHost().getHostName() + "\n");
-            if (toolboxmap.containsKey(arg)) {
-                code = toolboxmap.get(arg);
-                cmd_array = cmd_array.concat([codebegin + code + codemiddle + code + codeend]);
-                rt = java.lang.Runtime.getRuntime();
-                process = rt.exec(cmd_array);
-                // The following commented code can be used for debugging, use it with care as it starts threads
-                // lt2 = IOTools.LoggingThread(process.getErrorStream(), "[ERR]", true);
-                // t2 = java.lang.Thread(lt2, "ERR Matlab");
-                // t2.setDaemon(true);
-                // t2.start();
-                res = process.waitFor();
-                //t2.stop();
-                if (res > 0) {
-                    selected = false;
-                    print("Unsufficient licence coin for " + arg + " : " + java.net.InetAddress.getLocalHost().getHostName() + "\n");
-                    break;
-                }
-            }
+        if ((arg != null) && toolboxmap.containsKey(arg)) {
+            allargs += " " + arg;
+            code = toolboxmap.get(arg);
+            fullcode += code;
         }
     }
+    fullcode += finalcode;
+    if (allargs != "") {
+        logWriter.println("Testing licence coin for " + allargs + " : " + host );
+    }
+
+    task = MatlabTask("i=0;",fullcode);
+
+    try {
+        task.execute([]);
+        selected = true;
+    }
+    catch(err) {
+        logWriter.println("Error occured : "+err.message );
+        selected = false;
+    }
+
+    
     if (selected) {
-        print("Good : " + java.net.InetAddress.getLocalHost().getHostName() + "\n");
-        java.lang.System.out.flush();
-        java.lang.Thread.sleep(2000);
+        logWriter.println("Good : " + java.net.InetAddress.getLocalHost().getHostName());
     }
 }
-else print("No Matlab installed or system error: " + java.net.InetAddress.getLocalHost().getHostName() + "\n");
+else logWriter.println("No Matlab installed or system error: " + java.net.InetAddress.getLocalHost().getHostName());
 
+logWriter.close();

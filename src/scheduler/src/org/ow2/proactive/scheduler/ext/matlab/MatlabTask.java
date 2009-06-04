@@ -56,10 +56,7 @@ import org.ow2.proactive.scheduler.ext.matlab.util.MatlabJVMInfo;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -105,7 +102,6 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
     /**
      *  The URI to which the spawned JVM(Node) is registered
      */
-    //protected static String uri = null;
     protected static Map<String, MatlabJVMInfo> jvmInfos = new HashMap<String, MatlabJVMInfo>();
 
     /**
@@ -219,8 +215,8 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
             }
 
             // We define the loggers which will write on standard output what comes from the java process
-            LoggingThread lt1 = new LoggingThread(p.getInputStream(), "[" + host + " OUT]", false);
-            LoggingThread lt2 = new LoggingThread(p.getErrorStream(), "[" + host + " ERR]", true);
+            LoggingThread lt1 = new LoggingThread(p.getInputStream(), "[" + host + " OUT]", System.out);
+            LoggingThread lt2 = new LoggingThread(p.getErrorStream(), "[" + host + " ERR]", System.err);
             IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, p.getOutputStream());
 
             jvminfo.setLogger(lt1);
