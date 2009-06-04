@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.resourcemanager;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
@@ -234,6 +235,20 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      */
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
         return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScript, exclusion);
+    }
+
+    /**
+     * Provides nbNodes nodes verifying several selection scripts AND the exclusion nodes.
+     * If the Resource manager (RM) don't have enough free nodes
+     * it returns the maximum amount of valid free nodes
+     * @param nbNodes the number of nodes.
+     * @param selectionScriptsList : a list of scripts to be verified. Returned nodes
+     * verify ALL selection scripts of this list.
+     * @param exclusion the exclusion nodes that cannot be returned
+     * @return an array list of nodes.
+     */
+    public NodeSet getAtMostNodes(int nbNodes, List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
+        return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScriptsList, exclusion);
     }
 
     /**

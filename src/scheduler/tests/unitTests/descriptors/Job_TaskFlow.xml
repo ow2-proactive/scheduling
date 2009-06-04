@@ -25,6 +25,14 @@
 						</arguments>
 					</file>
 				</script>
+				<script type="dynamic">
+					<file path="${WORK_DIR}/host_selection.js">
+						<arguments>
+							<argument value="test1"/>
+							<argument value="test2"/>
+						</arguments>
+					</file>
+				</script>
 			</selection>
 			<pre>
 				<script>

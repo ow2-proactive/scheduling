@@ -103,9 +103,12 @@ public abstract class Task extends CommonAttribute {
      * selection script : can be launched before getting a node in order to
      * verify some computer specificity.
      */
+    @ManyToAny(metaColumn = @Column(name = "SELECTION_SCRIPT", length = 5))
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = { @MetaValue(targetEntity = SelectionScript.class, value = "SS") })
+    @JoinTable(joinColumns = @JoinColumn(name = "SS_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
+    @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = SelectionScript.class)
-    protected SelectionScript selectionScript;
+    protected List<SelectionScript> selectionScripts;
 
     /**
      * PreScript : can be used to launch script just before the task
@@ -330,18 +333,34 @@ public abstract class Task extends CommonAttribute {
      *
      * @return the selection Script.
      */
-    public SelectionScript getSelectionScript() {
-        return selectionScript;
+    public List<SelectionScript> getSelectionScripts() {
+        if (selectionScripts == null || selectionScripts.size() == 0) {
+            return null;
+        } else {
+            return selectionScripts;
+        }
     }
 
     /**
-     * To set the selection script.
+     * To set a list of selection scripts. These are the scripts that will select a node.
+     *
+     * @return the selection Scripts list to set.
+     */
+    public void setSelectionScripts(List<SelectionScript> selScriptsList) {
+        this.selectionScripts = selScriptsList;
+    }
+
+    /**
+     * To add a selection script to the list of selection script.
      *
      * @param selectionScript
-     *            the selectionScript to set.
+     *            the selectionScript to add.
      */
-    public void setSelectionScript(SelectionScript selectionScript) {
-        this.selectionScript = selectionScript;
+    public void addSelectionScript(SelectionScript selectionScript) {
+        if (this.selectionScripts == null) {
+            this.selectionScripts = new ArrayList<SelectionScript>();
+        }
+        this.selectionScripts.add(selectionScript);
     }
 
     /**

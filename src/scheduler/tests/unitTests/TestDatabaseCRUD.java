@@ -126,6 +126,7 @@ public class TestDatabaseCRUD {
         List<InternalJob> recovering = DatabaseManager.recoverAllJobs();
         Assert.assertTrue(recovering.size() == 1);
         itfJob = (InternalTaskFlowJob) recovering.get(0);
+
         //Check job properties
         Assert.assertEquals(itfJob.getOwner(), "toto");
         Assert.assertEquals(itfJob.getDescription(), "No paquit in its HostName.");
@@ -146,10 +147,10 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getRestartTaskOnError(), RestartMode.ANYWHERE);
                 Assert.assertEquals(it.getMaxNumberOfExecution(), 1);
                 Assert.assertEquals(it.getDescription(), "Parallel Tasks - Task 1");
-                Assert.assertEquals(it.getSelectionScript().isDynamic(), false);
-                Assert.assertNotNull(it.getSelectionScript().getScript());
-                Assert.assertEquals(it.getSelectionScript().getParameters().length, 1);
-                Assert.assertEquals(it.getSelectionScript().getParameters()[0], "paquit");
+                Assert.assertEquals(false, it.getSelectionScripts().get(0).isDynamic());
+                Assert.assertNotNull(it.getSelectionScripts().get(0).getScript());
+                Assert.assertEquals(1, it.getSelectionScripts().get(0).getParameters().length);
+                Assert.assertEquals("paquit", it.getSelectionScripts().get(0).getParameters()[0]);
                 Assert.assertTrue(it.getPreScript().getScript().contains("Beginning of Pre-Script"));
                 Assert.assertTrue(it.getPostScript().getScript().contains(
                         "Content is equals to " + URLbegin + "samples/scripts/misc/unset.js"));
@@ -184,7 +185,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getRestartTaskOnError(), RestartMode.ELSEWHERE);
                 Assert.assertEquals(it.getMaxNumberOfExecution(), 2);
                 Assert.assertEquals(it.getDescription(), "Parallel Tasks - Task 2");
-                Assert.assertNull(it.getSelectionScript());
+                Assert.assertNull(it.getSelectionScripts());
                 Assert.assertTrue(it.getPreScript().getScript().contains("Beginning of Pre-Script"));
                 Assert.assertNull(it.getPostScript());
                 Assert.assertNull(it.getCleaningScript());
@@ -222,7 +223,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getRestartTaskOnError(), RestartMode.ELSEWHERE);
                 Assert.assertEquals(it.getMaxNumberOfExecution(), 2);
                 Assert.assertEquals(it.getDescription(), "Dependent Tasks - Task 3");
-                Assert.assertNull(it.getSelectionScript());
+                Assert.assertNull(it.getSelectionScripts());
                 Assert.assertNull(it.getPreScript());
                 Assert.assertTrue(it.getPostScript().getScript().contains(
                         "Unsetting system property user.property1"));
@@ -255,7 +256,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getRestartTaskOnError(), RestartMode.ANYWHERE);
                 Assert.assertEquals(it.getMaxNumberOfExecution(), 3);
                 Assert.assertNull(it.getDescription());
-                Assert.assertNull(it.getSelectionScript());
+                Assert.assertNull(it.getSelectionScripts());
                 Assert.assertNull(it.getPreScript());
                 Assert.assertNull(it.getPostScript());
                 Assert.assertNull(it.getCleaningScript());

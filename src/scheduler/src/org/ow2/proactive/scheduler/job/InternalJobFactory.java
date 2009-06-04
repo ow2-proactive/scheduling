@@ -315,7 +315,7 @@ public class InternalJobFactory implements Serializable {
         taskToSet.setPreScript(task.getPreScript());
         taskToSet.setPostScript(task.getPostScript());
         taskToSet.setCleaningScript(task.getCleaningScript());
-        taskToSet.setSelectionScript(task.getSelectionScript());
+        taskToSet.setSelectionScripts(task.getSelectionScripts());
         taskToSet.setResultPreview(task.getResultPreview());
         taskToSet.setWallTime(task.getWallTime());
         //Properties with priority between job and tasks

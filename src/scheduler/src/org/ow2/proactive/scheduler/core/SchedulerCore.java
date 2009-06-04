@@ -611,13 +611,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             InternalJob currentJob = jobs.get(taskDescriptor.getJobId());
             InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
             InternalTask sentinel = internalTask;
-            SelectionScript ss = internalTask.getSelectionScript();
+            int ssHashCode = SelectionScript.hashCodeFromList(internalTask.getSelectionScripts());
             NodeSet ns = internalTask.getNodeExclusion();
             logger_dev.debug("Get the most nodes matching the current selection");
             //if free resources are available and (selection script ID and Node Exclusion) are the same as the first
             while (freeResourcesNb > 0 &&
-                (ss == internalTask.getSelectionScript() || (ss != null && ss.equals(internalTask
-                        .getSelectionScript()))) &&
+                (ssHashCode == SelectionScript.hashCodeFromList(internalTask.getSelectionScripts())) &&
                 (ns == internalTask.getNodeExclusion() || (ns != null && ns.equals(internalTask
                         .getNodeExclusion())))) {
                 //last task to be launched
@@ -648,10 +647,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             if (nbNodesToAskFor > 0) {
                 logger.debug("Asking for " + nbNodesToAskFor + " node(s) with" +
-                    ((ss == null) ? "out " : " ") + "selection script");
+                    ((ssHashCode == 0) ? "out " : " ") + "selection script");
 
                 try {
-                    nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, ss, ns);
+                    nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, internalTask
+                            .getSelectionScripts(), ns);
                     //the following line is used to unwrap the future, warning when moving or removing
                     //it may also throw a ScriptException which is a RuntimeException
                     logger.debug("Got " + nodeSet.size() + " node(s)");

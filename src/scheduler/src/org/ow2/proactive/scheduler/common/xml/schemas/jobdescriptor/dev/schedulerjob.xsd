@@ -411,10 +411,13 @@
       </xs:element>
     </xs:sequence>
   </xs:group>
-  <xs:element name="selection" type="jd:selectionScript">
+  <xs:element name="selection">
     <xs:annotation>
       <xs:documentation>A script used to select resources that can handle the task </xs:documentation>
     </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:selectionScript"/>
+    </xs:complexType>
   </xs:element>
   <xs:element name="pre" type="jd:script">
     <xs:annotation>
@@ -447,7 +450,7 @@
       </xs:element>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="selectionScript">
+  <xs:group name="selectionScript">
     <xs:sequence>
       <xs:element name="script">
         <xs:annotation>
@@ -472,7 +475,7 @@
         </xs:complexType>
       </xs:element>
     </xs:sequence>
-  </xs:complexType>
+  </xs:group>
   <xs:attributeGroup name="scriptType">
     <xs:attribute name="type" use="required">
       <xs:annotation>

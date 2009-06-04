@@ -37,6 +37,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -313,5 +314,24 @@ public class SelectionScript extends Script<Boolean> {
             }
             return true;
         }
+    }
+
+    /**
+     * Util method to get an hashCode of a list of selection script. Can be used to compare two lists of selectionScript
+     * and see if it is the same.
+     * If the list is empty or null, then the return value will be 0, meaning no selection scripts are provided.
+     *
+     * @param selScriptsList a list of selection scripts
+     * @return 0 if the list is null or empty, otherwise, an hashCode of the list content
+     */
+    public static int hashCodeFromList(List<SelectionScript> selScriptsList) {
+        if (selScriptsList == null || selScriptsList.size() == 0) {
+            return 0;
+        }
+        int toReturn = 0;
+        for (SelectionScript ss : selScriptsList) {
+            toReturn += ss.hashCode();
+        }
+        return toReturn;
     }
 }

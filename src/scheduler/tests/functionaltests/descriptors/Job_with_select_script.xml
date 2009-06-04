@@ -22,6 +22,13 @@
 					</arguments>
 					</file>
 				</script>
+				<script type="static">
+					<file path="${WORK_DIR}/host_selection.js">
+					<arguments>
+						<argument value="toto"/>
+					</arguments>
+					</file>
+				</script>
 			</selection>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>

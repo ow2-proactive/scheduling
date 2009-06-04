@@ -391,7 +391,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
                 } catch (InvalidScriptException e1) {
                     throw new RuntimeException(e1);
                 }
-                schedulerTask.setSelectionScript(sscript);
+                schedulerTask.addSelectionScript(sscript);
             }
 
             try {

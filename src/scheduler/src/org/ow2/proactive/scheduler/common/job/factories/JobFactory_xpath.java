@@ -594,12 +594,14 @@ public class JobFactory_xpath extends JobFactory {
             logger.debug(ATTRIBUTE_MAXNUMBEROFEXECUTION + " = " + task.getMaxNumberOfExecution());
         }
 
-        // TASK VERIF
-        Node verifNode = (Node) xpath.evaluate(addPrefixes(TASK_TAG_SELECTION + "/" + TASK_TAG_SCRIPT),
-                taskNode, XPathConstants.NODE);
-        if (verifNode != null) {
-            task.setSelectionScript(createSelectionScript(verifNode));
-            logger.debug(TASK_TAG_SELECTION + "/" + TASK_TAG_SCRIPT + " set");
+        // TASK SELECTION
+        NodeList selectNodes = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_SELECTION + "/" +
+            TASK_TAG_SCRIPT), taskNode, XPathConstants.NODESET);
+        if (selectNodes != null) {
+            for (int k = 0; k < selectNodes.getLength(); k++) {
+                task.addSelectionScript(createSelectionScript(selectNodes.item(k)));
+                logger.debug(TASK_TAG_SELECTION + "/" + TASK_TAG_SCRIPT + " set");
+            }
         }
 
         // TASK PRE

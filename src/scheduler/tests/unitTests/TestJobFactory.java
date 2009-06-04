@@ -31,8 +31,6 @@
  */
 package unitTests;
 
-import java.util.HashMap;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -64,11 +62,11 @@ public class TestJobFactory {
 
     @Test
     public void run() throws Throwable {
-        log("TEST jobFactory STAX");
         //test default behavior as well (null is STAX)
+        log("TEST jobFactory STAX");
         run_(null);
-        log("TEST jobFactory XPATH");
         //test XPATH factory
+        log("TEST jobFactory XPATH");
         run_(org.ow2.proactive.scheduler.common.job.factories.JobFactory_xpath.class.getCanonicalName());
     }
 
@@ -95,10 +93,16 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task1").getRestartTaskOnError(), RestartMode.ANYWHERE);
         Assert.assertEquals(tfJob.getTask("task1").getMaxNumberOfExecution(), 1);
         Assert.assertEquals(tfJob.getTask("task1").getDescription(), "Parallel Tasks - Task 1");
-        Assert.assertEquals(tfJob.getTask("task1").getSelectionScript().isDynamic(), false);
-        Assert.assertTrue(tfJob.getTask("task1").getSelectionScript().getScript() != null);
-        Assert.assertEquals(tfJob.getTask("task1").getSelectionScript().getParameters().length, 1);
-        Assert.assertEquals(tfJob.getTask("task1").getSelectionScript().getParameters()[0], "paquit");
+        Assert.assertEquals(2, tfJob.getTask("task1").getSelectionScripts().size());
+        Assert.assertEquals(false, tfJob.getTask("task1").getSelectionScripts().get(0).isDynamic());
+        Assert.assertTrue(tfJob.getTask("task1").getSelectionScripts().get(0).getScript() != null);
+        Assert.assertEquals(1, tfJob.getTask("task1").getSelectionScripts().get(0).getParameters().length);
+        Assert.assertEquals("paquit", tfJob.getTask("task1").getSelectionScripts().get(0).getParameters()[0]);
+        Assert.assertEquals(true, tfJob.getTask("task1").getSelectionScripts().get(1).isDynamic());
+        Assert.assertTrue(tfJob.getTask("task1").getSelectionScripts().get(1).getScript() != null);
+        Assert.assertEquals(2, tfJob.getTask("task1").getSelectionScripts().get(1).getParameters().length);
+        Assert.assertEquals("test1", tfJob.getTask("task1").getSelectionScripts().get(1).getParameters()[0]);
+        Assert.assertEquals("test2", tfJob.getTask("task1").getSelectionScripts().get(1).getParameters()[1]);
         Assert.assertTrue(tfJob.getTask("task1").getPreScript().getScript().contains(
                 "Beginning of Pre-Script"));
         Assert.assertTrue(tfJob.getTask("task1").getPostScript().getScript().contains(
@@ -129,7 +133,7 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task2").getRestartTaskOnError(), RestartMode.ELSEWHERE);
         Assert.assertEquals(tfJob.getTask("task2").getMaxNumberOfExecution(), 2);
         Assert.assertEquals(tfJob.getTask("task2").getDescription(), "Parallel Tasks - Task 2");
-        Assert.assertEquals(tfJob.getTask("task2").getSelectionScript(), null);
+        Assert.assertEquals(tfJob.getTask("task2").getSelectionScripts(), null);
         Assert.assertTrue(tfJob.getTask("task2").getPreScript().getScript().contains(
                 "Beginning of Pre-Script"));
         Assert.assertEquals(tfJob.getTask("task2").getPostScript(), null);
@@ -168,7 +172,7 @@ public class TestJobFactory {
         //this property is tested in the TestDatabaseCRUD
         //Assert.assertEquals(tfJob.getTask("task3").getMaxNumberOfExecution(),2);
         Assert.assertEquals(tfJob.getTask("task3").getDescription(), "Dependent Tasks - Task 3");
-        Assert.assertEquals(tfJob.getTask("task3").getSelectionScript(), null);
+        Assert.assertEquals(tfJob.getTask("task3").getSelectionScripts(), null);
         Assert.assertEquals(tfJob.getTask("task3").getPreScript(), null);
         Assert.assertTrue(tfJob.getTask("task3").getPostScript().getScript().contains(
                 "Unsetting system property user.property1"));
@@ -196,7 +200,7 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task4").getRestartTaskOnError(), RestartMode.ANYWHERE);
         Assert.assertEquals(tfJob.getTask("task4").getMaxNumberOfExecution(), 3);
         Assert.assertEquals(tfJob.getTask("task4").getDescription(), null);
-        Assert.assertEquals(tfJob.getTask("task4").getSelectionScript(), null);
+        Assert.assertEquals(tfJob.getTask("task4").getSelectionScripts(), null);
         Assert.assertEquals(tfJob.getTask("task4").getPreScript(), null);
         Assert.assertEquals(tfJob.getTask("task4").getPostScript(), null);
         Assert.assertEquals(tfJob.getTask("task4").getCleaningScript(), null);
@@ -249,7 +253,7 @@ public class TestJobFactory {
         Assert.assertEquals(paJob.getTask().getPostScript(), null);
         Assert.assertEquals(paJob.getTask().getRestartTaskOnError(), RestartMode.ANYWHERE);
         Assert.assertEquals(paJob.getTask().getResultPreview(), "path.to.package.class");
-        Assert.assertEquals(paJob.getTask().getSelectionScript(), null);
+        Assert.assertEquals(paJob.getTask().getSelectionScripts(), null);
         Assert.assertEquals(paJob.getTask().isPreciousResult(), true);
 
         log("Test generated task name");

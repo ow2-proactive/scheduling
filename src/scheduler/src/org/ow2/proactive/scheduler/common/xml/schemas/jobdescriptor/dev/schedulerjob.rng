@@ -354,7 +354,9 @@
   <define name="selection">
     <element name="selection">
       <doc:documentation>A script used to select resources that can handle the task </doc:documentation>
-      <ref name="selectionScript"/>
+      <oneOrMore>
+        <ref name="selectionScript"/>
+      </oneOrMore>
     </element>
   </define>
   <define name="pre">

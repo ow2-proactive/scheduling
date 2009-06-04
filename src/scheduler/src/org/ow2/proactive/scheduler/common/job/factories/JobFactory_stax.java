@@ -40,6 +40,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -575,7 +576,7 @@ public class JobFactory_stax extends JobFactory {
                         } else if (current.equals(JobFactory_stax.ELEMENT_COMMON_DESCRIPTION)) {
                             tmpTask.setDescription(getDescription(cursorTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_SELECTION)) {
-                            tmpTask.setSelectionScript(createSelectionScript(cursorTask));
+                            tmpTask.setSelectionScripts(createSelectionScript(cursorTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_PRE)) {
                             tmpTask.setPreScript(createScript(cursorTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_POST)) {
@@ -602,7 +603,7 @@ public class JobFactory_stax extends JobFactory {
                         break;
                 }
             }
-            //fill the real job with common attribute if it is a new one
+            //fill the real task with common attribute if it is a new one
             if (taskToFill == null) {
                 toReturn.setCleaningScript(tmpTask.getCleaningScript());
                 toReturn.setDescription(tmpTask.getDescription());
@@ -612,7 +613,7 @@ public class JobFactory_stax extends JobFactory {
                 toReturn.setPreciousResult(tmpTask.isPreciousResult());
                 toReturn.setPreScript(tmpTask.getPreScript());
                 toReturn.setResultPreview(tmpTask.getResultPreview());
-                toReturn.setSelectionScript(tmpTask.getSelectionScript());
+                toReturn.setSelectionScripts(tmpTask.getSelectionScripts());
                 toReturn.setWallTime(tmpTask.getWallTime());
                 //set the following properties only if it is needed.
                 if (tmpTask.getCancelJobOnErrorProperty().isSet()) {
@@ -686,9 +687,13 @@ public class JobFactory_stax extends JobFactory {
         try {
             boolean isDynamic = true;
             Script<?> toReturn = null;
-            int eventType;
+            int eventType = -1;
             while (cursorScript.hasNext()) {
-                eventType = cursorScript.next();
+                if (selection && eventType == -1) {
+                    eventType = cursorScript.getEventType();
+                } else {
+                    eventType = cursorScript.next();
+                }
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         String current = cursorScript.getLocalName();
@@ -758,8 +763,38 @@ public class JobFactory_stax extends JobFactory {
      * @param cursorScript the streamReader with the cursor on the 'ELEMENT_SCRIPT_SELECTION' tag.
      * @return the script defined at the specified cursor.
      */
-    private SelectionScript createSelectionScript(XMLStreamReader cursorScript) throws JobCreationException {
-        return (SelectionScript) createScript(cursorScript, true);
+    private List<SelectionScript> createSelectionScript(XMLStreamReader cursorScript)
+            throws JobCreationException {
+        List<SelectionScript> scripts = new ArrayList<SelectionScript>();
+        String selectionTag = cursorScript.getLocalName();
+        try {
+            SelectionScript newOne = null;
+            int eventType;
+            while (cursorScript.hasNext()) {
+                eventType = cursorScript.next();
+                switch (eventType) {
+                    case XMLEvent.START_ELEMENT:
+                        String current = cursorScript.getLocalName();
+                        if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_SCRIPT)) {
+                            newOne = (SelectionScript) createScript(cursorScript, true);
+                            scripts.add(newOne);
+                        }
+                        break;
+                    case XMLEvent.END_ELEMENT:
+                        if (cursorScript.getLocalName().equals(selectionTag)) {
+                            if (scripts.size() == 0) {
+                                return null;
+                            } else {
+                                return scripts;
+                            }
+                        }
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            throw new JobCreationException(e.getMessage(), e);
+        }
+        return scripts;
     }
 
     /**
@@ -1118,7 +1153,7 @@ public class JobFactory_stax extends JobFactory {
                 logger.debug("mnoe  : " + t.getMaxNumberOfExecution());
                 logger.debug("wall  : " + t.getWallTime());
                 logger.debug("prev  : " + t.getResultPreview());
-                logger.debug("selec : " + t.getSelectionScript());
+                logger.debug("selec : " + t.getSelectionScripts());
                 logger.debug("pre   : " + t.getPreScript());
                 logger.debug("post  : " + t.getPostScript());
                 logger.debug("clean : " + t.getCleaningScript());

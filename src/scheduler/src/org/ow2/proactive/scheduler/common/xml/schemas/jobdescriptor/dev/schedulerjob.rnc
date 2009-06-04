@@ -83,7 +83,7 @@ depends = ## A list of dependencies for this task
 dependsTask = ## A task from which this task depends 
     element task { attribute ref { xsd:IDREF } }
 selection = ## A script used to select resources that can handle the task 
-    element selection { selectionScript }
+    element selection { selectionScript+ }
 pre = ## A script launched before the task execution in the task node
     element pre { script }
 post = ## A script launched after the task execution in the task node

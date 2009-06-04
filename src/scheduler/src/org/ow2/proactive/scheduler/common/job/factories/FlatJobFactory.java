@@ -254,7 +254,7 @@ public class FlatJobFactory {
         if (selectionScriptPath != null) {
             SelectionScript script = new SelectionScript(
                 new SimpleScript(new File(selectionScriptPath), null), true);
-            desc.setSelectionScript(script);
+            desc.addSelectionScript(script);
         }
         return desc;
     }
