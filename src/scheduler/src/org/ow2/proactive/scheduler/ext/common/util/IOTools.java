@@ -156,8 +156,8 @@ public class IOTools {
         private String appendMessage;
         /**  */
         public Boolean goon = true;
-        private boolean err;
-        private InputStream streamToLog;
+        private PrintStream out;
+        private BufferedReader br;
 
         /**  */
         public ArrayList<String> output = new ArrayList<String>();
@@ -177,45 +177,62 @@ public class IOTools {
          * @param err
          */
         public LoggingThread(InputStream is, String appendMessage, boolean err) {
-            this.streamToLog = is;
+            this.br = new BufferedReader(new InputStreamReader(is));
             this.appendMessage = appendMessage;
-            this.err = err;
+            if (err) {
+                this.out = System.err;
+            } else {
+                this.out = System.out;
+            }
+        }
+
+        /**
+         * Create a new instance of LoggingThread.
+         *
+         * @param is
+         * @param appendMessage
+         * @param out
+         */
+        public LoggingThread(InputStream is, String appendMessage, PrintStream out) {
+            this.br = new BufferedReader(new InputStreamReader(is));
+            this.appendMessage = appendMessage;
+            this.out = out;
+        }
+
+        private String getLineOrDie() {
+            String answer = null;
+            try {
+                while (!br.ready()) {
+                    Thread.sleep(10);
+                }
+                answer = br.readLine();
+
+            } catch (IOException e) {
+
+            } catch (InterruptedException e) {
+
+            }
+            return answer;
         }
 
         /**
          * @see java.lang.Runnable#run()
          */
         public void run() {
-            BufferedReader br = new BufferedReader(new InputStreamReader(streamToLog));
             String line = null;
-            try {
-                boolean first_line = true;
-                while ((line = br.readLine()) != null && goon) {
-                    if (err) {
-                        if (first_line && line.trim().length() > 0) {
-                            first_line = false;
-                            System.err.println(appendMessage + line);
-                            System.err.flush();
-                        } else if (!first_line) {
-                            System.err.println(appendMessage + line);
-                            System.err.flush();
-                        }
-                    } else {
-                        if (first_line && line.trim().length() > 0) {
-                            first_line = false;
-                            System.out.println(appendMessage + line);
-                            System.out.flush();
-                        } else if (!first_line) {
-                            System.err.println(appendMessage + line);
-                            System.err.flush();
-                        }
-                    }
+            boolean first_line = true;
+            while ((line = getLineOrDie()) != null && goon) {
+                if (first_line && line.trim().length() > 0) {
+                    first_line = false;
+                    out.println(appendMessage + line);
+                    out.flush();
+                } else if (!first_line) {
+                    out.println(appendMessage + line);
+                    out.flush();
                 }
-
-                //line = br.readLine();
-            } catch (IOException e) {
-                goon = false;
             }
+
+            //line = br.readLine();
 
             try {
                 br.close();

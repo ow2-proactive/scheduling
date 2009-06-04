@@ -32,6 +32,8 @@
 package org.ow2.proactive.scheduler.ext.scilab.util;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
 import org.ow2.proactive.scheduler.ext.scilab.exception.ScilabInitException;
 import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
@@ -56,7 +58,7 @@ public class ScilabFinder {
      * @throws ScilabInitException
      */
     public static final ScilabConfiguration findScilab(boolean debug) throws IOException,
-            InterruptedException, ScilabInitException {
+            InterruptedException, ScilabInitException, NodeException {
 
         Process p1 = null;
         ScilabConfiguration answer = null;
@@ -73,7 +75,15 @@ public class ScilabFinder {
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
-            File batchFile = new File(SCILAB_SCRIPT_WINDOWS);
+
+            String tmpDir = System.getProperty("java.io.tmpdir");
+            String nodeName = PAActiveObject.getNode().getNodeInformation().getName().replace('-', '_');
+            File nodeDir = new File(tmpDir, nodeName);
+            if (!nodeDir.exists()) {
+                nodeDir.mkdir();
+                nodeDir.deleteOnExit();
+            }
+            File batchFile = new File(nodeDir, SCILAB_SCRIPT_WINDOWS);
 
             if (batchFile.exists()) {
                 batchFile.delete();
