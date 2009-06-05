@@ -170,6 +170,7 @@ public class Log4JTaskLogs implements TaskLogs {
      * Return all the currently logged events
      * @return a list containing all the currently logged events
      */
+    @SuppressWarnings("unchecked")
     public LinkedList<LoggingEvent> getAllEvents() {
         return (LinkedList<LoggingEvent>) allEvents.clone();
     }
