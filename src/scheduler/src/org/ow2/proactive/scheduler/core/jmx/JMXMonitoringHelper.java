@@ -36,12 +36,12 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorServer;
 import org.ow2.proactive.jmx.naming.JMXProperties;
 import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -62,11 +62,31 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 1.0
  */
 public class JMXMonitoringHelper implements SchedulerEventListener {
-    /** MBean Names */
-    private static final String SCHEDULER_BEAN_NAME = PASchedulerProperties.SCHEDULER_JMX_MBEAN_NAME
-            .getValueAsString();
     /** logger device */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);
+
+    private static final String SCHEDULER_BEAN_NAME = "SchedulerFrontend:name=SchedulerWrapperMBean";
+    private static final String JMX_CONNECTOR_NAME = PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME
+            .getValueAsString();
+
+    /**
+     * The default jmx Connector Server url for the scheduler, is specified the port to use for exchanging objects
+     * (the first one) and the port where the RMI registry is reachable (the second port) so that a firewall
+     * will not block the requests to the JMX connector
+     * An example of address for connection to the RMI Connector (e.g. service:jmx:rmi:///jndi/rmi://hostName/serverName)
+     */
+    private static final String DEFAULT_JMX_CONNECTOR_URL;
+
+    static {
+        if (PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsString() == null) {
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost/jndi/rmi://localhost:" +
+                PAProperties.PA_RMI_PORT.getValue() + "/";
+        } else {
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost:" +
+                PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt() + "/jndi/rmi://localhost:" +
+                PAProperties.PA_RMI_PORT.getValue() + "/";
+        }
+    }
 
     /** Scheduler's MBean */
     private static SchedulerWrapperAnonym schedulerBeanAnonym = new SchedulerWrapperAnonym();
@@ -106,12 +126,10 @@ public class JMXMonitoringHelper implements SchedulerEventListener {
         PAAuthenticationConnectorServer rmiConnectorAnonym;
         PAAuthenticationConnectorServer rmiConnectorAdmin;
         // Create the RMI MBean Server Connectors
-        rmiConnectorAnonym = new PAAuthenticationConnectorServer(
-            SchedulerConstants.DEFAULT_JMX_CONNECTOR_URL, SchedulerConstants.DEFAULT_JMX_CONNECTOR_NAME,
-            mbsAnonym, authentication, true, logger_dev);
-        rmiConnectorAdmin = new PAAuthenticationConnectorServer(SchedulerConstants.DEFAULT_JMX_CONNECTOR_URL,
-            SchedulerConstants.DEFAULT_JMX_CONNECTOR_NAME + JMXProperties.JMX_ADMIN, mbsAdmin,
-            authentication, false, logger_dev);
+        rmiConnectorAnonym = new PAAuthenticationConnectorServer(DEFAULT_JMX_CONNECTOR_URL,
+            JMX_CONNECTOR_NAME, mbsAnonym, authentication, true, logger_dev);
+        rmiConnectorAdmin = new PAAuthenticationConnectorServer(DEFAULT_JMX_CONNECTOR_URL,
+            JMX_CONNECTOR_NAME + "_" + JMXProperties.JMX_ADMIN, mbsAdmin, authentication, false, logger_dev);
         // Start the Connectors	
         rmiConnectorAnonym.start();
         rmiConnectorAdmin.start();

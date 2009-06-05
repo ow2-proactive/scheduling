@@ -63,17 +63,4 @@ public class SchedulerConstants {
     /** Name of the environment variable for unix home directory on the common file system. */
     public static final String UNIX_HOME_ENV_VAR = "UNIX_HOME";
 
-    /** 
-     * The default jmx Connector Server url for the scheduler, is specified the port to use for exchanging objects 
-     * (the first one) and the port where the RMI registry is reachable (the second port) so that a firewall
-     * will not block the requests to the JMX connector 
-     * An example of address for connection to the RMI Connector (e.g. service:jmx:rmi:///jndi/rmi://hostName/serverName)
-     */
-    public static final String DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost:" +
-        PAProperties.PA_RMI_PORT.getValue() + "/jndi/rmi://localhost:" + PAProperties.PA_RMI_PORT.getValue() +
-        "/";
-
-    /** The default jmx Connector Server name for the scheduler */
-    public static final String DEFAULT_JMX_CONNECTOR_NAME = "JMXSchedulerAgent";
-
 }

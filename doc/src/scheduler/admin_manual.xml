@@ -198,7 +198,13 @@ PASchedulerProperties.updateProperties("your_property_file");
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.core.jmxmbeanname</emphasis>: Name of the JMX MBean for the scheduler (default is 'SchedulerFrontend:name=SchedulerWrapperMBean')
+							<emphasis role="italics">pa.scheduler.core.jmx.connectorname</emphasis>: Name of the JMX Connector for the Scheduler (default is 'JMXSchedulerAgent')
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.core.jmx.port</emphasis>: Port number used by JMX.
+							If not set a random one is used. Use this property if you use a firewall and want a specific port.
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -631,7 +637,7 @@ scheduler.changePolicy(org.objectweb.proactive.extensions.scheduler.policy.Prior
 				</listitem>
 				<listitem>
 					<para>
-						<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXSchedulerAgentadmin</emphasis> where <emphasis>hostname</emphasis> is the host name on which is 
+						<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXSchedulerAgent_admin</emphasis> where <emphasis>hostname</emphasis> is the host name on which is
 						started the Scheduler. (Admin access)
 						In this case, add Scheduler Admin username and password. (demo//demo for example)
 					</para>

@@ -73,7 +73,10 @@ public enum PASchedulerProperties {
     SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PAPropertiesType.INTEGER),
 
     /** Name of the JMX MBean for the scheduler */
-    SCHEDULER_JMX_MBEAN_NAME("pa.scheduler.core.jmxmbeanname", PAPropertiesType.STRING),
+    SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PAPropertiesType.STRING),
+
+    /** Port of the JMX service. Random if not set */
+    SCHEDULER_JMX_PORT("pa.scheduler.core.jmx.port", PAPropertiesType.INTEGER),
 
     /** User session time (user is automatically disconnect after this time if no request is made to the scheduler)
     	negative number indicates that session is infinite (value specified in second) */

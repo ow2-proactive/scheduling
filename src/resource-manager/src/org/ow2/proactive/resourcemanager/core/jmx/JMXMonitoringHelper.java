@@ -38,11 +38,11 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorServer;
 import org.ow2.proactive.jmx.naming.JMXProperties;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -58,9 +58,29 @@ public class JMXMonitoringHelper implements Serializable {
 
     /** logger device */
     public static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);
-    /** MBean Name */
-    private static final String RM_BEAN_NAME = PAResourceManagerProperties.RM_JMX_MBEAN_NAME
+    private static final String RM_BEAN_NAME = "RMFrontend:name=RMBean";
+
+    private static final String JMX_CONNECTOR_NAME = PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME
             .getValueAsString();
+
+    /**
+     * The default jmx Connector Server url for the RM, is specified the port to use for exchanging objects
+     * (the first one) and the port where the RMI registry is reachable (the second port) so that a firewall
+     * will not block the requests to the JMX connector
+     * An example of address for connection to the RMI Connector (e.g. service:jmx:rmi:///jndi/rmi://hostName/serverName)
+     */
+    public static final String DEFAULT_JMX_CONNECTOR_URL;
+
+    static {
+        if (PAResourceManagerProperties.RM_JMX_PORT.getValueAsString() == null) {
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost/jndi/rmi://localhost:" +
+                PAProperties.PA_RMI_PORT.getValue() + "/";
+        } else {
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost:" +
+                PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + "/jndi/rmi://localhost:" +
+                PAProperties.PA_RMI_PORT.getValue() + "/";
+        }
+    }
 
     /** RM`s MBeanServer */
     private MBeanServer mbsAnonym;
@@ -95,11 +115,10 @@ public class JMXMonitoringHelper implements Serializable {
      */
     public void createConnectors(AuthenticationImpl authentication) {
         PAAuthenticationConnectorServer rmiConnectorAnonym = new PAAuthenticationConnectorServer(
-            RMConstants.DEFAULT_JMX_CONNECTOR_URL, RMConstants.DEFAULT_JMX_CONNECTOR_NAME, this.mbsAnonym,
-            authentication, true, logger);
+            DEFAULT_JMX_CONNECTOR_URL, JMX_CONNECTOR_NAME, this.mbsAnonym, authentication, true, logger);
         PAAuthenticationConnectorServer rmiConnectorAdmin = new PAAuthenticationConnectorServer(
-            RMConstants.DEFAULT_JMX_CONNECTOR_URL, RMConstants.DEFAULT_JMX_CONNECTOR_NAME +
-                JMXProperties.JMX_ADMIN, this.mbsAdmin, authentication, false, logger);
+            DEFAULT_JMX_CONNECTOR_URL, JMX_CONNECTOR_NAME + "_" + JMXProperties.JMX_ADMIN, this.mbsAdmin,
+            authentication, false, logger);
         // Start the Connectors
         rmiConnectorAnonym.start();
         rmiConnectorAdmin.start();

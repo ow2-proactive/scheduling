@@ -32,7 +32,6 @@
 package org.ow2.proactive.resourcemanager.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.config.PAProperties;
 
 
 /**
@@ -64,17 +63,5 @@ public interface RMConstants {
 
     /** The default name of the static node source created  at Resource manager Startup */
     public static final String DEFAULT_STATIC_SOURCE_NAME = "Default";
-
-    /** 
-     * The default jmx Connector Server url for the resource manager, is specified the port to use for exchanging objects 
-     * (the first one) and the port where the RMI registry is reachable (the second port) so that a firewall
-     * should not block the requests to the JMX connector 
-     */
-    public static final String DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost:" +
-        PAProperties.PA_RMI_PORT.getValue() + "/jndi/rmi://localhost:" + PAProperties.PA_RMI_PORT.getValue() +
-        "/";
-
-    /** The default jmx Connector Server name for the resource manager */
-    public static final String DEFAULT_JMX_CONNECTOR_NAME = "JMXRMAgent";
 
 }
