@@ -41,6 +41,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -49,6 +52,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -111,8 +115,28 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
-    private static final String SCHEDULER_BEAN_NAME = PASchedulerProperties.SCHEDULER_JMX_MBEAN_NAME
+    private static final String SCHEDULER_BEAN_NAME = "SchedulerFrontend:name=SchedulerWrapperMBean";
+    private static final String JMX_CONNECTOR_NAME = PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME
             .getValueAsString();
+
+    /** 
+     * The default jmx Connector Server url for the scheduler, is specified the port to use for exchanging objects 
+     * (the first one) and the port where the RMI registry is reachable (the second port) so that a firewall
+     * will not block the requests to the JMX connector 
+     * An example of address for connection to the RMI Connector (e.g. service:jmx:rmi:///jndi/rmi://hostName/serverName)
+     */
+    private static final String DEFAULT_JMX_CONNECTOR_URL;
+
+    static {
+        if (PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsString() == null) {
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost/jndi/rmi://localhost:" +
+                PAProperties.PA_RMI_PORT.getValue() + "/";
+        } else {
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost:" +
+                PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt() + "/jndi/rmi://localhost:" +
+                PAProperties.PA_RMI_PORT.getValue() + "/";
+        }
+    }
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
     private Map<UniqueID, UserIdentificationImpl> identifications = new HashMap<UniqueID, UserIdentificationImpl>();
@@ -875,8 +899,15 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             // Uniquely identify the MBeans and register them with the platform MBeanServer 
             schedulerName = new ObjectName(SCHEDULER_BEAN_NAME);
             mbs.registerMBean(schedulerBean, schedulerName);
-            //            ServerConnector connector = new ServerConnector("ServerFrontend");
-            //            connector.start();
+            //creating connector
+            // Create the enviroment Map
+            HashMap<String, Object> env = null;
+            // The url where is the MBean Server registry and the server name
+            String url = DEFAULT_JMX_CONNECTOR_URL + JMX_CONNECTOR_NAME;
+            JMXServiceURL jmxUrl = new JMXServiceURL(url);
+            JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jmxUrl, env, mbs);
+            // Start the Connectors	
+            cs.start();
         } catch (Exception e) {
             logger_dev.debug("", e);
         }

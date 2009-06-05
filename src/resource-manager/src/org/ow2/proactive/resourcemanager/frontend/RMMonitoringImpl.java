@@ -36,6 +36,9 @@ import java.util.HashMap;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -43,6 +46,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
@@ -74,19 +78,37 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive {
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);
 
-    private static final String RM_BEAN_NAME = PAResourceManagerProperties.RM_JMX_MBEAN_NAME
+    private static final String RM_BEAN_NAME = "RMFrontend:name=RMBean";
+
+    private static final String JMX_CONNECTOR_NAME = PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME
             .getValueAsString();
+
+    /** 
+     * The default jmx Connector Server url for the RM, is specified the port to use for exchanging objects 
+     * (the first one) and the port where the RMI registry is reachable (the second port) so that a firewall
+     * will not block the requests to the JMX connector 
+     * An example of address for connection to the RMI Connector (e.g. service:jmx:rmi:///jndi/rmi://hostName/serverName)
+     */
+    public static final String DEFAULT_JMX_CONNECTOR_URL;
+
+    static {
+        if (PAResourceManagerProperties.RM_JMX_PORT.getValueAsString() == null) {
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost/jndi/rmi://localhost:" +
+                PAProperties.PA_RMI_PORT.getValue() + "/";
+        } else {
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi://localhost:" +
+                PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + "/jndi/rmi://localhost:" +
+                PAProperties.PA_RMI_PORT.getValue() + "/";
+        }
+    }
 
     // Attributes
     private RMCoreInterface rmcore;
     private HashMap<UniqueID, RMEventListener> RMListeners;
     private String MonitoringUrl = null;
 
-    /** Scheduler's MBean Server */
-    private MBeanServer mbs = null;
-
     /** Resource Manager's MBean */
-    private RMWrapper rMBean = null;
+    private RMWrapper rmBean = null;
 
     // ----------------------------------------------------------------------//
     // CONSTRUTORS
@@ -151,16 +173,23 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     private void registerMBean() {
         //Get the platform MBeanServer
-        mbs = ManagementFactory.getPlatformMBeanServer();
-        // Unique identification of Scheduler MBean
-        rMBean = new RMWrapper();
-        ObjectName rMName = null;
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        // Unique identification of RM MBean
+        rmBean = new RMWrapper();
+        ObjectName rmName = null;
         try {
             // Uniquely identify the MBeans and register them with the platform MBeanServer 
-            rMName = new ObjectName(RM_BEAN_NAME);
-            mbs.registerMBean(rMBean, rMName);
-            //            ServerConnector connector = new ServerConnector("ServerMonitoring");
-            //            connector.start();
+            rmName = new ObjectName(RM_BEAN_NAME);
+            mbs.registerMBean(rmBean, rmName);
+            //creating connector
+            // Create the enviroment Map
+            HashMap<String, Object> env = null;
+            // The url where is the MBean Server registry and the server name
+            String url = DEFAULT_JMX_CONNECTOR_URL + JMX_CONNECTOR_NAME;
+            JMXServiceURL jmxUrl = new JMXServiceURL(url);
+            JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jmxUrl, env, mbs);
+            // Start the Connectors	
+            cs.start();
         } catch (Exception e) {
             logger.debug("", e);
         }
@@ -180,7 +209,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeEvent(RMNodeEvent event) {
         event.setRMUrl(this.MonitoringUrl);
-        rMBean.nodeEvent(event);
+        rmBean.nodeEvent(event);
         for (RMEventListener listener : RMListeners.values()) {
             listener.nodeEvent(event);
         }
@@ -201,7 +230,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void rmEvent(RMEvent event) {
         event.setRMUrl(this.MonitoringUrl);
-        rMBean.rmEvent(event);
+        rmBean.rmEvent(event);
         for (RMEventListener listener : RMListeners.values()) {
             listener.rmEvent(event);
         }

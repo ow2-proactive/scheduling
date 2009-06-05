@@ -90,7 +90,10 @@ public enum PAResourceManagerProperties {
     RM_GROUP_FILE("pa.rm.defaultgroupfilename", PAPropertiesType.STRING),
 
     /** Name of the JMX MBean for the RM */
-    RM_JMX_MBEAN_NAME("pa.rm.core.jmxmbeanname", PAPropertiesType.STRING),
+    RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PAPropertiesType.STRING),
+
+    /** Port of the JMX service. Random if not set */
+    RM_JMX_PORT("pa.rm.jmx.port", PAPropertiesType.INTEGER),
 
     /** Resource Manager node source infrastructures file*/
     RM_NODESOURCE_INFRASTRUCTURE_FILE("pa.rm.nodesource.infrastructures", PAPropertiesType.STRING),

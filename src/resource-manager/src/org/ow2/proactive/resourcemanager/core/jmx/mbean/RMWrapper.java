@@ -258,6 +258,9 @@ public class RMWrapper implements RMWrapperMBean {
      * @return the percentage time of nodes inactivity as integer
      */
     public int getTimePercentageOfNodesInactivity() {
+        if (totalTimeOfAllAvailableNodes == 0) {
+            return 0;
+        }
         return (int) (((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 
@@ -267,6 +270,9 @@ public class RMWrapper implements RMWrapperMBean {
      * @return the percentage time of nodes usage as integer
      */
     public int getTimePercentageOfNodesUsage() {
+        if (totalTimeOfAllAvailableNodes == 0) {
+            return 0;
+        }
         return (int) (((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 
@@ -278,6 +284,9 @@ public class RMWrapper implements RMWrapperMBean {
      * @return the current percentage time of nodes inactivity as double
      */
     public double getTimePercentageOfNodesInactivityAsDouble() {
+        if (totalTimeOfAllAvailableNodes == 0) {
+            return 0;
+        }
         return (((double) this.timePercentageOfNodesInactivity / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 
@@ -287,6 +296,9 @@ public class RMWrapper implements RMWrapperMBean {
      * @return the current percentage time of nodes usage as double
      */
     public double getTimePercentageOfNodesUsageAsDouble() {
+        if (totalTimeOfAllAvailableNodes == 0) {
+            return 0;
+        }
         return (((double) this.timePercentageOfNodesUsage / (double) this.totalTimeOfAllAvailableNodes) * 100);
     }
 }
