@@ -41,7 +41,7 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby-engine.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jython-engine.jar
 	rem  Needed explicitly by VFS (file transfer in pre/post script
-    SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-logging-1.0.4.jar
+    	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-logging-1.0.4.jar
 	rem fill with ProActive.jar : use jar index for proActive dependencies
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive.jar
 	rem fill with Scheduler jars : use jar index for Scheduler dependencies
