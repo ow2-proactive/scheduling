@@ -84,34 +84,44 @@ else
     % Dist libs
     dist_lib_dir = [scheduling_dir filesep 'dist' filesep 'lib'];
 
-    if (ispc)
-        old_dir = pwd;
-        cd(dist_lib_dir);
-        [s,dist_lib_dir] = dos('command.com /c cd');
-        dist_lib_dir = strtrim(dist_lib_dir);
-        [s,w] = dos('dir /x ProActive.jar');
-        p1 = [dist_lib_dir filesep shortname(w,'ProActive.jar')];
-        [s,w] = dos('dir /x ProActive_Scheduler-core.jar');
-        p2 = [dist_lib_dir filesep shortname(w,'ProActive_Scheduler-core.jar')];
-        [s,w] = dos('dir /x ProActive_ResourceManager.jar');
-        p3 = [dist_lib_dir filesep shortname(w,'ProActive_ResourceManager.jar')];
-        [s,w] = dos('dir /x ProActive_SRM-common.jar');
-        p4 = [dist_lib_dir filesep shortname(w,'ProActive_SRM-common.jar')];
-        cd(old_dir);
-    else
-        p1 = [dist_lib_dir filesep 'ProActive.jar'];
-        p2 = [dist_lib_dir filesep 'ProActive_Scheduler-core.jar'];
-        p3 = [dist_lib_dir filesep 'ProActive_ResourceManager.jar'];
-        p4 = [dist_lib_dir filesep 'ProActive_SRM-common.jar'];
-
+    proactiveset = 0;
+    try
+        ao = org.objectweb.proactive.api.PAActiveObject.newActive('org.objectweb.proactive.core.util.wrapper.StringWrapper',[]);
+        proactiveset = 1;
+    catch ME
     end
 
-    javaaddpath(p1);
-    javaaddpath(p2);
-    javaaddpath(p3);
-    javaaddpath(p4);
+    if ~proactiveset
+
+        if (ispc)
+            old_dir = pwd;
+            cd(dist_lib_dir);
+            [s,dist_lib_dir] = dos('command.com /c cd');
+            dist_lib_dir = strtrim(dist_lib_dir);
+            [s,w] = dos('dir /x ProActive.jar');
+            p1 = [dist_lib_dir filesep shortname(w,'ProActive.jar')];
+            [s,w] = dos('dir /x ProActive_Scheduler-core.jar');
+            p2 = [dist_lib_dir filesep shortname(w,'ProActive_Scheduler-core.jar')];
+            [s,w] = dos('dir /x ProActive_ResourceManager.jar');
+            p3 = [dist_lib_dir filesep shortname(w,'ProActive_ResourceManager.jar')];
+            [s,w] = dos('dir /x ProActive_SRM-common.jar');
+            p4 = [dist_lib_dir filesep shortname(w,'ProActive_SRM-common.jar')];
+            cd(old_dir);
+        else
+            p1 = [dist_lib_dir filesep 'ProActive.jar'];
+            p2 = [dist_lib_dir filesep 'ProActive_Scheduler-core.jar'];
+            p3 = [dist_lib_dir filesep 'ProActive_ResourceManager.jar'];
+            p4 = [dist_lib_dir filesep 'ProActive_SRM-common.jar'];
+
+        end
+
+        javaaddpath(p1);
+        javaaddpath(p2);
+        javaaddpath(p3);
+        javaaddpath(p4);
 
 
+    end
 end
 end
 
