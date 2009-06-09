@@ -85,10 +85,12 @@ else
     dist_lib_dir = [scheduling_dir filesep 'dist' filesep 'lib'];
 
     proactiveset = 0;
-    try
-        ao = org.objectweb.proactive.api.PAActiveObject.newActive('org.objectweb.proactive.core.util.wrapper.StringWrapper',[]);
-        proactiveset = 1;
-    catch ME
+    jcp = javaclasspath('-static');
+    for i=1:length(jcp)
+        line = jcp{i};
+        if findstr(line,'ProActive.jar')
+            proactiveset = 1;
+        end    
     end
 
     if ~proactiveset
