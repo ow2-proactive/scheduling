@@ -3,7 +3,7 @@
 %   Usage:
 %       >> PAprepare(proactive);  // prepares ProActive for Matlab using the given proactive path
 %       >> PAprepare();           // prepares ProActive for Matlab by downloading
-%                                 // ProActive from the proactive website 
+%                                 // ProActive from the proactive website
 %
 %   Inputs:
 %       proactive - local path to proactive
@@ -51,28 +51,28 @@ if nargin == 1
     [pathstr, name, ext, versn] = fileparts(varargin{1});
     if strcmp(ext,'jar')
         javaaddpath(varargin{1});
-        
+
     else
         javaaddpath(strcat(pathstr,fileset,'ProActive.jar'));
     end
     if fopen(strcat(pathstr,filesep,'proactive-log4j'))
-            log4jFile = java.io.File(strcat(pathstr,filesep,'lib',filesep,'proactive-log4j'));
-            urlLog4jFile = log4jFile.toURI().toURL();
-            java.lang.System.setProperty('log4j.configuration',urlLog4jFile.toExternalForm());
-    end 
+        log4jFile = java.io.File(strcat(pathstr,filesep,'lib',filesep,'proactive-log4j'));
+        urlLog4jFile = log4jFile.toURI().toURL();
+        java.lang.System.setProperty('log4j.configuration',urlLog4jFile.toExternalForm());
+    end
 else
     % Otherwise, we retrieve the last updated ProActive library from the
     % web
     %grabProActiveLibrary();
-    
+
     [pathstr, name, ext, versn] = fileparts(mfilename('fullpath'));
-    
+
     % Scheduler root
     javafile = java.io.File(pathstr);
     scheduling_dir = char(javafile.getParentFile().getParentFile().getParent().toString());
 
-    
-    
+
+
     % Log4J file
     log4jFile = java.io.File([scheduling_dir filesep 'config' filesep 'log4j' filesep 'log4j-client']);
     urlLog4jFile = log4jFile.toURI().toURL();
@@ -80,12 +80,49 @@ else
 
     % Policy
     java.lang.System.setProperty('java.security.policy',[scheduling_dir filesep 'config' filesep 'scheduler.java.policy']);
-    
+
     % Dist libs
     dist_lib_dir = [scheduling_dir filesep 'dist' filesep 'lib'];
-    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive.jar'));
-    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_Scheduler-core.jar'));
-    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_ResourceManager.jar'));
-    javaaddpath(strcat(dist_lib_dir,filesep,'ProActive_SRM-common.jar'));
+
+    if (ispc)
+        old_dir = pwd;
+        cd(dist_lib_dir);
+        [s,dist_lib_dir] = dos('command.com /c cd');
+        dist_lib_dir = strtrim(dist_lib_dir);
+        [s,w] = dos('dir /x ProActive.jar');
+        p1 = [dist_lib_dir filesep shortname(w,'ProActive.jar')];
+        [s,w] = dos('dir /x ProActive_Scheduler-core.jar');
+        p2 = [dist_lib_dir filesep shortname(w,'ProActive_Scheduler-core.jar')];
+        [s,w] = dos('dir /x ProActive_ResourceManager.jar');
+        p3 = [dist_lib_dir filesep shortname(w,'ProActive_ResourceManager.jar')];
+        [s,w] = dos('dir /x ProActive_SRM-common.jar');
+        p4 = [dist_lib_dir filesep shortname(w,'ProActive_SRM-common.jar')]
+        cd(old_dir);
+    else
+        p1 = [dist_lib_dir filesep 'ProActive.jar'];
+        p2 = [dist_lib_dir filesep 'ProActive_Scheduler-core.jar'];
+        p3 = [dist_lib_dir filesep 'ProActive_ResourceManager.jar'];
+        p4 = [dist_lib_dir filesep 'ProActive_SRM-common.jar'];
+
+    end
+
+    javaaddpath(p1);
+    javaaddpath(p2);
+    javaaddpath(p3);
+    javaaddpath(p4);
+
+
+end
+end
+
+function out = shortname(in, match)
+while true
+    [str, in] = strtok(in);
+    if isempty(str),  break;  end
+    if strcmp(str, match)
+        out = old_str;
+    end
+    old_str = str;
+end
 end
 
