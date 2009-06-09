@@ -96,7 +96,7 @@ else
         [s,w] = dos('dir /x ProActive_ResourceManager.jar');
         p3 = [dist_lib_dir filesep shortname(w,'ProActive_ResourceManager.jar')];
         [s,w] = dos('dir /x ProActive_SRM-common.jar');
-        p4 = [dist_lib_dir filesep shortname(w,'ProActive_SRM-common.jar')]
+        p4 = [dist_lib_dir filesep shortname(w,'ProActive_SRM-common.jar')];
         cd(old_dir);
     else
         p1 = [dist_lib_dir filesep 'ProActive.jar'];
