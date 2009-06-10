@@ -249,7 +249,7 @@ public class TaskClassServer {
      * @throws IOException if the jar file cannot be read.
      */
     private byte[] lookIntoDirectory(String classname, File directory) throws IOException {
-        String pathToClass = convertNameToPath(classname);
+        String pathToClass = convertNameToPath(classname, true);
         if (directory.exists() && directory.isDirectory()) {
             File[] files = directory.listFiles();
             for (int i = 0; i < files.length; i++) {
@@ -284,7 +284,7 @@ public class TaskClassServer {
      */
     private byte[] lookIntoJarFile(String classname, JarFile file) throws IOException {
         byte result[] = null;
-        String path = convertNameToPath(classname);
+        String path = convertNameToPath(classname, false);
         ZipEntry entry = file.getEntry(path);
         if (entry != null) {
             InputStream inStream = file.getInputStream(entry);
@@ -316,16 +316,8 @@ public class TaskClassServer {
      * Convert classname parameter (qualified) into path to the class file 
      * (with the .class suffix)
      */
-    private String convertNameToPath(String classname) {
-        return classname.replace('.', '/') + ".class";
-    }
-
-    /**
-     * Convert the path to a class into a qualified classname.
-     */
-    @SuppressWarnings("unused")
-    private String convertPathToName(String path) {
-        return path.replace('/', '.').substring(0, path.length() - ".class".length());
+    private String convertNameToPath(String classname, boolean useSystemFileSeparator) {
+        return classname.replace('.', useSystemFileSeparator ? File.separatorChar : '/') + ".class";
     }
 
     /**
