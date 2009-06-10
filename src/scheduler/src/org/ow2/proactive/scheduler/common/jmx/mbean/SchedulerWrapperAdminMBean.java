@@ -42,77 +42,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
  * @since ProActive Scheduling 1.0
  */
 @PublicAPI
-public interface SchedulerWrapperAdminMBean {
-
-    /**
-     * Returns the state of the scheduler.
-     *
-     * @return The state of the scheduler.
-     */
-    public String getSchedulerStatus();
-
-    /**
-     * Returns the number of users connected to the scheduler.
-     * 
-     * @return the number of users connected to the scheduler.
-     */
-    public int getNumberOfConnectedUsers();
-
-    /**
-     * Returns the total number of jobs.
-     * 
-     * @return the total number of jobs.
-     */
-    public int getTotalNumberOfJobs();
-
-    /**
-     * Returns the number of pending jobs of the scheduler.
-     *
-     * @return The number of pending jobs of the scheduler.
-     */
-    public int getNumberOfPendingJobs();
-
-    /**
-     * Returns the number of running jobs of the scheduler.
-     *
-     * @return The number of running jobs of the scheduler.
-     */
-    public int getNumberOfRunningJobs();
-
-    /**
-     * Returns the number of finished jobs of the scheduler.
-     *
-     * @return The number of finished jobs of the scheduler.
-     */
-    public int getNumberOfFinishedJobs();
-
-    /**
-     * Returns the total number of Tasks.
-     * 
-     * @return the total number of Tasks.
-     */
-    public int getTotalNumberOfTasks();
-
-    /**
-     * Returns the number of pending Tasks of the scheduler.
-     *
-     * @return The number of pending Tasks of the scheduler.
-     */
-    public int getNumberOfPendingTasks();
-
-    /**
-     * Returns the number of running Tasks of the scheduler.
-     *
-     * @return The number of running Tasks of the scheduler.
-     */
-    public int getNumberOfRunningTasks();
-
-    /**
-     * Returns the number of finished Tasks of the scheduler.
-     *
-     * @return The number of finished Tasks of the scheduler.
-     */
-    public int getNumberOfFinishedTasks();
+public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean {
 
     /**
      * @return current mean job pending time as integer

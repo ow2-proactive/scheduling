@@ -58,6 +58,10 @@ function exec(commandFilePath){
 	UserSchedulerModel.exec(""+commandFilePath);
 }
 
+function jmxinfo(){
+	UserSchedulerModel.JMXinfo();
+}
+
 function exit(){
 	UserSchedulerModel.exit();
 }

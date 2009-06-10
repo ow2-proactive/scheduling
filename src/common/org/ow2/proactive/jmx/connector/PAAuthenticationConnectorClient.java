@@ -80,7 +80,7 @@ public class PAAuthenticationConnectorClient {
         // Create the enviroment Map
         HashMap<String, Object> env = new HashMap<String, Object>();
         // If the connector server need the credentials
-        if (!(username.equals(null) || username.equals(""))) {
+        if (!(username == null || password == null)) {
             String[] creds = { username, password };
             // Put the credentials in the enviroment
             env.put(JMXConnector.CREDENTIALS, creds);

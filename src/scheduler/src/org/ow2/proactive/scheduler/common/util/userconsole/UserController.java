@@ -35,6 +35,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXProviderException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.AlreadySelectedException;
@@ -50,8 +53,10 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
+import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorClient;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
@@ -62,6 +67,7 @@ import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.utils.console.Console;
+import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive.utils.console.SimpleConsole;
 import org.ow2.proactive.utils.console.VisualConsole;
 
@@ -90,8 +96,6 @@ public class UserController {
 
     protected SchedulerAuthenticationInterface auth = null;
     protected UserSchedulerModel model;
-
-    //private MBeanInfoViewer mbeanInfoViewer;
 
     /**
      * Start the Scheduler controller
@@ -191,7 +195,7 @@ public class UserController {
                 //connect to the scheduler
                 connect();
                 //connect JMX service
-                //connectJMXClient(URIBuilder.getHostNameFromUrl(url));
+                connectJMXClient(URIBuilder.getHostNameFromUrl(url));
                 //start the command line or the interactive mode
                 start();
             }
@@ -241,25 +245,18 @@ public class UserController {
         logger.info("\t-> User '" + user + "' successfully connected" + newline);
     }
 
-    //    private void connectJMXClient(String url) {
-    //        if (!url.startsWith("//")) {
-    //            url = "//" + url;
-    //        }
-    //        if (!url.endsWith("/")) {
-    //            url = url + "/";
-    //        }
-    //        //connect the JMX client
-    //        ClientConnector connectorClient = new ClientConnector(url, "ServerFrontend");
-    //        try {
-    //            connectorClient.connect();
-    //            ProActiveConnection connection = connectorClient.getConnection();
-    //            ObjectName mbeanName = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean");
-    //            MBeanInfo info = connection.getMBeanInfo(mbeanName);
-    //            mbeanInfoViewer = new MBeanInfoViewer(connection, mbeanName, info);
-    //        } catch (Exception e) {
-    //            logger.error("Scheduler MBean not found using : SchedulerFrontend:name=SchedulerWrapperMBean");
-    //        }
-    //    }
+    protected void connectJMXClient(String hostname) throws JMXProviderException {
+        try {
+            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(
+                "service:jmx:rmi:///jndi/rmi://" + hostname + "/JMXSchedulerAgent");
+            cli.connect();
+            MBeanServerConnection conn = cli.getConnection();
+            ObjectName on = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean");
+            model.setJMXInfo(new MBeanInfoViewer(conn, on));
+        } catch (Exception e) {
+            logger.error("Error while connection JMX : ", e);
+        }
+    }
 
     private void start() throws Exception {
         //start one of the two command behavior
@@ -357,11 +354,11 @@ public class UserController {
         opt.setArgs(2);
         actionGroup.addOption(opt);
 
-        //        opt = new Option("jmxinfo", false, control +
-        //            "Display some statistics provided by the Scheduler MBean");
-        //        opt.setRequired(false);
-        //        opt.setArgs(0);
-        //        actionGroup.addOption(opt);
+        opt = new Option("jmxinfo", false, control +
+            "Display some statistics provided by the Scheduler MBean");
+        opt.setRequired(false);
+        opt.setArgs(0);
+        actionGroup.addOption(opt);
 
         options.addOptionGroup(actionGroup);
 
@@ -419,11 +416,9 @@ public class UserController {
                 model.print("Missing arguments for job priority. Arguments must be <jobId> <newPriority>" +
                     newline + "\t" + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
-        }
-        //        else if (cmd.hasOption("jmxinfo")) {
-        //            JMXinfo();
-        //        } 
-        else {
+        } else if (cmd.hasOption("jmxinfo")) {
+            UserSchedulerModel.JMXinfo();
+        } else {
             model.setDisplayOnStdStream(false);
             return true;
         }

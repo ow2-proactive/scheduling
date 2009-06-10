@@ -31,14 +31,19 @@
  */
 package org.ow2.proactive.scheduler.util.adminconsole;
 
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXProviderException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
+import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorClient;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
+import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
 
 /**
@@ -155,6 +160,19 @@ public class AdminController extends UserController {
             }
         }
         return false;
+    }
+
+    protected void connectJMXClient(String hostname) throws JMXProviderException {
+        try {
+            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(
+                "service:jmx:rmi:///jndi/rmi://" + hostname + "/JMXSchedulerAgent_admin");
+            cli.connect(user, pwd);
+            MBeanServerConnection conn = cli.getConnection();
+            ObjectName on = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean_admin");
+            model.setJMXInfo(new MBeanInfoViewer(conn, on));
+        } catch (Exception e) {
+            logger.error("Error while connection JMX : ", e);
+        }
     }
 
 }

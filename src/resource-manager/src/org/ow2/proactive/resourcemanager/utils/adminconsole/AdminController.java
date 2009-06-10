@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.AlreadySelectedException;
@@ -54,14 +56,17 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
+import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorClient;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.console.Console;
+import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive.utils.console.SimpleConsole;
 import org.ow2.proactive.utils.console.VisualConsole;
 
@@ -92,8 +97,6 @@ public class AdminController {
 
     protected RMAuthentication auth = null;
     protected AdminRMModel model;
-
-    //private MBeanInfoViewer mbeanInfoViewer;
 
     /**
      * Start the RM controller
@@ -196,7 +199,7 @@ public class AdminController {
                 //connect to the scheduler
                 connect();
                 //connect JMX service
-                //connectJMXClient(URIBuilder.getHostNameFromUrl(url));
+                connectJMXClient(URIBuilder.getHostNameFromUrl(url));
                 //start the command line or the interactive mode
                 start();
 
@@ -248,25 +251,18 @@ public class AdminController {
         logger.info("\t-> Admin '" + user + "' successfully connected" + newline);
     }
 
-    //    private void connectJMXClient(String url) {
-    //        if (!url.startsWith("//")) {
-    //            url = "//" + url;
-    //        }
-    //        if (!url.endsWith("/")) {
-    //            url = url + "/";
-    //        }
-    //        //connect the JMX client
-    //        ClientConnector connectorClient = new ClientConnector(url, "ServerMonitoring");
-    //        try {
-    //            connectorClient.connect();
-    //            ProActiveConnection connection = connectorClient.getConnection();
-    //            ObjectName mbeanName = new ObjectName("RMFrontend:name=RMBean");
-    //            MBeanInfo info = connection.getMBeanInfo(mbeanName);
-    //            mbeanInfoViewer = new MBeanInfoViewer(connection, mbeanName, info);
-    //        } catch (Exception e) {
-    //            logger.error("Scheduler MBean not found using : RMFrontend:name=RMBean");
-    //        }
-    //    }
+    protected void connectJMXClient(String hostName) {
+        try {
+            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(
+                "service:jmx:rmi:///jndi/rmi://" + hostName + "/JMXRMAgent_admin");
+            cli.connect(user, pwd);
+            MBeanServerConnection conn = cli.getConnection();
+            ObjectName on = new ObjectName("RMFrontend:name=RMBean_admin");
+            model.setJMXInfo(new MBeanInfoViewer(conn, on));
+        } catch (Exception e) {
+            logger.error("Error while connection JMX : ", e);
+        }
+    }
 
     private void start() throws Exception {
         //start one of the two command behavior
@@ -323,11 +319,11 @@ public class AdminController {
         shutdownOpt.setRequired(false);
         actionGroup.addOption(shutdownOpt);
 
-        //        Option jmx = new Option("jmxinfo", false, control +
-        //            "Display some statistics provided by the Scheduler MBean");
-        //        jmx.setRequired(false);
-        //        jmx.setArgs(0);
-        //        actionGroup.addOption(jmx);
+        Option jmx = new Option("jmxinfo", false, control +
+            "Display some statistics provided by the Scheduler MBean");
+        jmx.setRequired(false);
+        jmx.setArgs(0);
+        actionGroup.addOption(jmx);
 
         options.addOptionGroup(actionGroup);
 
@@ -415,11 +411,9 @@ public class AdminController {
             }
         } else if (cmd.hasOption("shutdown")) {
             AdminRMModel.shutdown(cmd.hasOption("f"));
-        }
-        //        else if (cmd.hasOption("jmxinfo")) {
-        //            JMXinfo();
-        //        } 
-        else {
+        } else if (cmd.hasOption("jmxinfo")) {
+            AdminRMModel.JMXinfo();
+        } else {
             model.setDisplayOnStdStream(false);
             return true;
         }

@@ -48,6 +48,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.console.Command;
 import org.ow2.proactive.utils.console.ConsoleModel;
+import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
 
 /**
@@ -63,6 +64,8 @@ public class AdminRMModel extends ConsoleModel {
     protected static final int cmdHelpMaxCharLength = 28;
     protected RMAdmin rm;
     private ArrayList<Command> commands;
+
+    protected MBeanInfoViewer jmxInfoViewer = null;
 
     /**
      * Get this model. Also specify if the exit command should do something or not
@@ -106,7 +109,7 @@ public class AdminRMModel extends ConsoleModel {
         commands.add(new Command("listns()", "List every handled node sources"));
         commands.add(new Command("shutdown(preempt)",
             "Shutdown the Resource Manager (RM shutdown immediately if parameter is true)"));
-        //commands.add(new Command("jmxinfo()","Display some statistics provided by the Scheduler MBean"));
+        commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
         commands
                 .add(new Command("exec(commandFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a command-file path)"));
@@ -307,18 +310,18 @@ public class AdminRMModel extends ConsoleModel {
         }
     }
 
-    //    public static void JMXinfo() {
-    //    	getModel().checkIsReady();
-    //    	getModel().JMXinfo_();
-    //    }
-    //
-    //    private void JMXinfo_() {
-    //        try {
-    //            printf(mbeanInfoViewer.getInfo());
-    //        } catch (Exception e) {
-    //            handleExceptionDisplay("Error while retrieving JMX informations", e);
-    //        }
-    //    }
+    public static void JMXinfo() {
+        getModel().checkIsReady();
+        getModel().JMXinfo_();
+    }
+
+    private void JMXinfo_() {
+        try {
+            print(jmxInfoViewer.getInfo());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
 
     public static void exec(String commandFilePath) {
         getModel().checkIsReady();
@@ -401,6 +404,15 @@ public class AdminRMModel extends ConsoleModel {
             throw new NullPointerException("Given Resource Manager is null");
         }
         this.rm = rm;
+    }
+
+    /**
+     * Set the JMX information : it is not a mandatory option, if set, it will show informations, if not nothing will be displayed.
+     * 
+     * @param info the jmx information about the current connection
+     */
+    public void setJMXInfo(MBeanInfoViewer info) {
+        jmxInfoViewer = info;
     }
 
 }

@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.utils.console.Command;
 import org.ow2.proactive.utils.console.ConsoleModel;
+import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
 
 /**
@@ -64,6 +65,8 @@ public class UserSchedulerModel extends ConsoleModel {
     protected static final int cmdHelpMaxCharLength = 24;
     protected UserSchedulerInterface scheduler;
     private ArrayList<Command> commands;
+
+    protected MBeanInfoViewer jmxInfoViewer = null;
 
     /**
      * Get this model. Also specify if the exit command should do something or not
@@ -132,7 +135,7 @@ public class UserSchedulerModel extends ConsoleModel {
         commands
                 .add(new Command("removejob(id)",
                     "Remove the given job from the Scheduler (parameter is an int or a string representing the jobId)"));
-        //commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
+        commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
         commands
                 .add(new Command("exec(commandFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a command-file path)"));
@@ -428,17 +431,17 @@ public class UserSchedulerModel extends ConsoleModel {
         }
     }
 
-    //    public static void JMXinfo() {
-    //    	userModel.JMXinfo_();
-    //    }
-    //
-    //    private void JMXinfo_() {
-    //        try {
-    //            print(mbeanInfoViewer.getInfo());
-    //        } catch (Exception e) {
-    //            handleExceptionDisplay("Error while retrieving JMX informations", e);
-    //        }
-    //    }
+    public static void JMXinfo() {
+        getModel().JMXinfo_();
+    }
+
+    private void JMXinfo_() {
+        try {
+            print(jmxInfoViewer.getInfo());
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
 
     public static void exec(String commandFilePath) {
         getModel().checkIsReady();
@@ -520,6 +523,15 @@ public class UserSchedulerModel extends ConsoleModel {
             throw new NullPointerException("Given Scheduler is null");
         }
         this.scheduler = scheduler;
+    }
+
+    /**
+     * Set the JMX information : it is not a mandatory option, if set, it will show informations, if not nothing will be displayed.
+     * 
+     * @param info the jmx information about the current connection
+     */
+    public void setJMXInfo(MBeanInfoViewer info) {
+        jmxInfoViewer = info;
     }
 
 }

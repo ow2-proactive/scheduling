@@ -32,7 +32,6 @@
 package org.ow2.proactive.utils.console;
 
 import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
@@ -46,7 +45,6 @@ import javax.management.ObjectName;
 public class MBeanInfoViewer {
     private MBeanServerConnection connection;
     private ObjectName mbeanName;
-    private MBeanInfo info;
 
     /**
      * Create a new instance of MBeanInfoViewer
@@ -55,11 +53,10 @@ public class MBeanInfoViewer {
      * @param mbeanName
      * @param info
      */
-    public MBeanInfoViewer(MBeanServerConnection connection, ObjectName mbeanName, MBeanInfo info) {
+    public MBeanInfoViewer(MBeanServerConnection connection, ObjectName mbeanName) {
         super();
         this.connection = connection;
         this.mbeanName = mbeanName;
-        this.info = info;
     }
 
     /**
@@ -69,21 +66,22 @@ public class MBeanInfoViewer {
      */
     public String getInfo() {
         try {
+            MBeanAttributeInfo[] attrs = connection.getMBeanInfo(mbeanName).getAttributes();
             int len = 0;
-            for (MBeanAttributeInfo attr : info.getAttributes()) {
+            for (MBeanAttributeInfo attr : attrs) {
                 if (attr.getName().length() > len) {
                     len = attr.getName().length();
                 }
             }
             len += 2;
             StringBuilder out = new StringBuilder();
-            for (MBeanAttributeInfo attr : info.getAttributes()) {
+            for (MBeanAttributeInfo attr : attrs) {
                 out.append(String.format("  %1$-" + len + "s" +
                     connection.getAttribute(mbeanName, attr.getName()) + "\n", attr.getName()));
             }
             return out.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Cannot retrieve JMX informations from SchedulerMBean");
+            throw new RuntimeException("Cannot retrieve JMX informations from Selected Bean", e);
         }
     }
 }

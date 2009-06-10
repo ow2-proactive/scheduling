@@ -41,42 +41,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 1.0
  */
 @PublicAPI
-public interface RMWrapperAdminMBean {
-
-    /**
-     * Method to get the total number of nodes used by the Resource Manager
-     *
-     * @return the current number of total nodes available
-     */
-    public int getTotalNumberOfNodes();
-
-    /**
-     * Method to get the number of free nodes used by the Resource Manager 
-     * 
-     * @return the current number of free nodes
-     */
-    public int getNumberOfFreeNodes();
-
-    /**
-     * Method to get the number of busy nodes used by the Resource Manager
-     * 
-     * @return the current number of busy nodes
-     */
-    public int getNumberOfBusyNodes();
-
-    /**
-     * Method to get the number of down nodes used by the Resource Manager
-     * 
-     * @return the current number of down nodes
-     */
-    public int getNumberOfDownNodes();
-
-    /**
-     * Method to get the state of the Resource Manager 
-     * 
-     * @return the current state of the resource manager
-     */
-    public String getRMStatus();
+public interface RMWrapperAdminMBean extends RMWrapperAnonymMBean {
 
     /**
      * It`s the percentage time of inactivity of all the available nodes

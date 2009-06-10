@@ -62,6 +62,10 @@ function shutdown(preemptively){
 	return AdminRMModel.shutdown(preemptively);
 }
 
+function jmxinfo(){
+	AdminRMModel.JMXinfo();
+}
+
 function exec(commandFilePath){
 	return AdminRMModel.exec(commandFilePath);
 }
