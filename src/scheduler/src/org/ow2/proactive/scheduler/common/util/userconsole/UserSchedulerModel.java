@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.console.Command;
 import org.ow2.proactive.utils.console.ConsoleModel;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
@@ -449,14 +450,10 @@ public class UserSchedulerModel extends ConsoleModel {
 
     private void test_() {
         try {
-            String home = "../../";
-            String descriptorPath = home + "samples/jobs_descriptors/";
-            if (!new File(descriptorPath).exists()) {
-                home = "./";
-                descriptorPath = home + "samples/jobs_descriptors/";
-            }
+            String descriptorPath = PASchedulerProperties.SCHEDULER_HOME + "/samples/jobs_descriptors/";
             if (System.getProperty("pa.scheduler.home") == null) {
-                System.setProperty("pa.scheduler.home", new File(home).getAbsolutePath());
+                System.setProperty("pa.scheduler.home", PASchedulerProperties.SCHEDULER_HOME
+                        .getValueAsString());
             }
             getModel().submit_(descriptorPath + "Job_2_tasks.xml");
             getModel().submit_(descriptorPath + "Job_8_tasks.xml");
