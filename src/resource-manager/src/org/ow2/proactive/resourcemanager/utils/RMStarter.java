@@ -31,7 +31,9 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -148,7 +150,8 @@ public class RMStarter {
             }
 
             logger.info("(Once started, press 'e' to shutdown)");
-            while (System.in.read() != 'e')
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            while (!br.readLine().equals("e"))
                 ;
 
             logger.info("Shutting down the resource manager");
