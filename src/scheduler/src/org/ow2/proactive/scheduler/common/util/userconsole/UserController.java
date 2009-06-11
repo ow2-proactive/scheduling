@@ -360,6 +360,12 @@ public class UserController {
         opt.setArgs(0);
         actionGroup.addOption(opt);
 
+        opt = new Option("test", false, control +
+            "Test if the Scheduler is successfully started by committing some examples");
+        opt.setRequired(false);
+        opt.setArgs(0);
+        actionGroup.addOption(opt);
+
         options.addOptionGroup(actionGroup);
 
         return actionGroup;
@@ -418,6 +424,8 @@ public class UserController {
             }
         } else if (cmd.hasOption("jmxinfo")) {
             UserSchedulerModel.JMXinfo();
+        } else if (cmd.hasOption("test")) {
+            UserSchedulerModel.test();
         } else {
             model.setDisplayOnStdStream(false);
             return true;

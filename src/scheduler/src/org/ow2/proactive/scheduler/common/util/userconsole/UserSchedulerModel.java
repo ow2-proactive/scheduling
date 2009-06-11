@@ -219,7 +219,7 @@ public class UserSchedulerModel extends ConsoleModel {
         try {
             Job job = JobFactory.getFactory().createJob(xmlDescriptor);
             JobId id = scheduler.submit(job);
-            print("Job successfully submitted ! (id=" + id.value() + ")");
+            print("Job '" + xmlDescriptor + "' successfully submitted ! (id=" + id.value() + ")");
             return id.value();
         } catch (Exception e) {
             handleExceptionDisplay("Error on job Submission (path=" + xmlDescriptor + ")", e);
@@ -440,6 +440,35 @@ public class UserSchedulerModel extends ConsoleModel {
             print(jmxInfoViewer.getInfo());
         } catch (Exception e) {
             handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
+
+    public static void test() {
+        getModel().test_();
+    }
+
+    private void test_() {
+        try {
+            String home = "../../";
+            String descriptorPath = home + "samples/jobs_descriptors/";
+            if (!new File(descriptorPath).exists()) {
+                home = "./";
+                descriptorPath = home + "samples/jobs_descriptors/";
+            }
+            if (System.getProperty("pa.scheduler.home") == null) {
+                System.setProperty("pa.scheduler.home", new File(home).getAbsolutePath());
+            }
+            getModel().submit_(descriptorPath + "Job_2_tasks.xml");
+            getModel().submit_(descriptorPath + "Job_8_tasks.xml");
+            getModel().submit_(descriptorPath + "Job_Aborted.xml");
+            getModel().submit_(descriptorPath + "Job_fork.xml");
+            getModel().submit_(descriptorPath + "Job_nativ.xml");
+            getModel().submit_(descriptorPath + "Job_PI.xml");
+            getModel().submit_(descriptorPath + "Job_pre_post.xml");
+            getModel().submit_(descriptorPath + "Job_with_dep.xml");
+            getModel().submit_(descriptorPath + "Job_with_select_script.xml");
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while starting examples", e);
         }
     }
 

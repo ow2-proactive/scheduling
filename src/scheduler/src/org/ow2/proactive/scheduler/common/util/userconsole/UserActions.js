@@ -62,6 +62,10 @@ function jmxinfo(){
 	UserSchedulerModel.JMXinfo();
 }
 
+function test(){
+	UserSchedulerModel.test();
+}
+
 function exit(){
 	UserSchedulerModel.exit();
 }
