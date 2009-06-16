@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.core.jmx;
 
+import java.util.Map;
+
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
@@ -47,11 +49,13 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.jmx.mbean.SchedulerWrapperAdmin;
 import org.ow2.proactive.scheduler.common.jmx.mbean.SchedulerWrapperAnonym;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
@@ -140,6 +144,16 @@ public class JMXMonitoringHelper implements SchedulerEventListener {
      */
     public SchedulerStatus getSchedulerStatus_() {
         return schedulerBeanAnonym.getSchedulerStatus_();
+    }
+
+    /**
+     * Recover the JMX objects
+     *
+     * @param jobList the list of job to be recovered
+     */
+    public void recover(Map<JobId, InternalJob> jobList) {
+        schedulerBeanAnonym.recover(jobList);
+        schedulerBeanAdmin.recover(jobList);
     }
 
     // ----------------- Event Management --------------------

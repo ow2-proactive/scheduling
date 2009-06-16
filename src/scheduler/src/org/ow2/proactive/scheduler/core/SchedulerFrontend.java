@@ -248,14 +248,16 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         } else {
             logger_dev.info("job list empty");
         }
-        //once recovered, activate scheduler communication
-        authentication.setActivated(true);
-        //Register the JMX scheduler MBean
-        logger_dev.info("Registering scheduler MBean...");
         // Call the jmxHelper to create the MBean Views
         jmxHelper.createMBeanServers();
+        //Register the JMX scheduler MBean
+        logger_dev.info("Registering scheduler MBean...");
         // Call the jmxHelper to create the Server Connectors for the JMX Scheduler MBean Server and start them
         jmxHelper.createConnectors(authentication);
+        //rebuild JMX object
+        jmxHelper.recover(jobList);
+        //once recovered, activate scheduler communication
+        authentication.setActivated(true);
     }
 
     /**
