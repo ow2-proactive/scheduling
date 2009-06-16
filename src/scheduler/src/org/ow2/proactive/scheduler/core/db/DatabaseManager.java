@@ -87,7 +87,7 @@ public class DatabaseManager {
     private static final String ALTERABLE_REQUEST_FIELD = "alterable";
     //ObjectID field name for HQL request
     private static final String OBJECTID_REQUEST_FIELD = "objectId";
-    //lock
+    //locks
     private static Object sessionlock = new Object();
     //Memory for id field name by class
     private static Map<Class<?>, String> idFields = new HashMap<Class<?>, String>();
@@ -209,9 +209,12 @@ public class DatabaseManager {
      */
     public static void forceRollbackTransaction() {
         synchronized (sessionlock) {
-            externalForcedSession.getTransaction().rollback();
-            externalForcedSession.close();
-            externalForcedSession = null;
+            try {
+                externalForcedSession.getTransaction().rollback();
+            } finally {
+                externalForcedSession.close();
+                externalForcedSession = null;
+            }
         }
     }
 

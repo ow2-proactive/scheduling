@@ -31,40 +31,27 @@
  */
 package functionaltests;
 
-import java.util.Map.Entry;
+import java.io.File;
+import java.net.URI;
 
-import org.junit.Assert;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
 
 import functionalTests.FunctionalTest;
+import functionaltests.executables.ResultAsArray;
 
 
 /**
- * This class tests a basic actions of a job submission to ProActive scheduler :
- * Connection to scheduler, with authentication
- * Register a monitor to Scheduler in order to receive events concerning
- * job submission.
- * 
- * Submit a Task flow job (test 1). 
- * After the job submission, the test monitor all jobs states changes, in order
- * to observe its execution :
- * job submitted (test 2),
- * job pending to running (test 3),
- * all task pending to running, and all tasks running to finished (test 4),
- * job running to finished (test 5).
- * After it retrieves job's result and check that all 
- * tasks results are available (test 6).
- * 
+ *
+ *
  * @author The ProActive Team
- * @date 2 jun 08
+ * @date 12 jun 09
  * @since ProActive Scheduling 1.0
  */
-public class TestJobTaskFlowSubmission extends FunctionalTest {
-
-    private static String jobDescriptor = TestJobTaskFlowSubmission.class.getResource(
-            "/functionaltests/descriptors/Job_PI.xml").getPath();
+public class TestJobInstantGetTaskResult extends FunctionalTest {
 
     /**
     * Tests start here.
@@ -73,19 +60,32 @@ public class TestJobTaskFlowSubmission extends FunctionalTest {
     */
     @org.junit.Test
     public void run() throws Throwable {
+        //create Scheduler client as an active object
+        SubmitJob client = (SubmitJob) PAActiveObject.newActive(SubmitJob.class.getName(), new Object[] {});
+        //begin to use the client : must be a futur result in order to start the scheduler at next step
+        client.begin();
 
-        JobId id = SchedulerTHelper.testJobSubmission(jobDescriptor);
-
-        // check result are not null
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
-
-        for (Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
-            Assert.assertNotNull(entry.getValue().value());
+        //create job
+        TaskFlowJob job = new TaskFlowJob();
+        try {
+            final JobEnvironment je = new JobEnvironment();
+            final URI uri = ResultAsArray.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+            je.setJobClasspath(new String[] { new File(uri).getAbsolutePath() });
+            job.setEnvironment(je);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
 
-        //remove job
-        SchedulerTHelper.removeJob(id);
+        for (int i = 0; i < 50; i++) {
+            JavaTask t = new JavaTask();
+            t.setExecutableClassName(ResultAsArray.class.getName());
+            t.setName("task" + i);
+            job.addTask(t);
+        }
+
+        JobId id = SchedulerTHelper.submitJob(job);
+        client.setJobId(id);
+
         SchedulerTHelper.waitForEventJobRemoved(id);
     }
 }
