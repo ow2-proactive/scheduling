@@ -414,7 +414,7 @@ public class SeparatedJobView extends ViewPart {
         setVisible(false);
 
         if (schedulerShell == null) {
-            schedulerShell = Display.getDefault().getShells()[1];
+            schedulerShell = Display.getDefault().getActiveShell();
         }
     }
 
