@@ -452,7 +452,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //used to read the enumerate schedulerStatus in order to know when submit is possible.
             //have to be immediate service
             body.setImmediateService("isSubmitPossible");
-            body.setImmediateService("getTaskResult");
+            //body.setImmediateService("getTaskResult");
             body.setImmediateService("getJobResult");
             logger_dev.debug("Core immediate services : isSubmitPossible,getTaskResult,getJobResult");
 
@@ -1534,27 +1534,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //extract full copy from DB to avoid load, unload operation
         //Hibernate hold every taskResults even the faulty one, can be interesting to have history
         //So get the result of the task is getting the last one.
-        int nbTries = 1;
-        while (true) {
-            try {
-                List<? extends TaskResult> results = DatabaseManager.recover(result.getClass(),
-                        new Condition("id", ConditionComparator.EQUALS_TO, result.getTaskId()));
-                result = results.get(results.size() - 1);
-                break;
-            } catch (org.hibernate.exception.LockAcquisitionException lockAcq) {
-                logger_dev.info("Lock Acq (retry : " + nbTries + ") ! ");
-                //With derby impl, this exception could append when an update is made on taskResult table
-                //while getting this result.
-                if (nbTries++ == 3) {
-                    throw new SchedulerException(
-                        "The task result cannot be accessed due to a lock acquisition, please retry later !");
-                }
-                try {
-                    Thread.sleep(150);
-                } catch (InterruptedException e) {
-                }
-            }
-        }
+        List<? extends TaskResult> results = DatabaseManager.recover(result.getClass(), new Condition("id",
+            ConditionComparator.EQUALS_TO, result.getTaskId()));
+        result = results.get(results.size() - 1);
 
         if ((result != null)) {
             logger_dev.info("Get '" + taskName + "' task result for job '" + jobId + "'");

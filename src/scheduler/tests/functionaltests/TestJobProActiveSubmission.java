@@ -87,6 +87,5 @@ public class TestJobProActiveSubmission extends FunctionalTest {
         SchedulerTHelper.removeJob(id);
         SchedulerTHelper.waitForEventJobRemoved(id);
 
-        SchedulerTHelper.killScheduler();
     }
 }
