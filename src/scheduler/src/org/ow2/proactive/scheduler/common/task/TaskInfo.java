@@ -71,6 +71,13 @@ public interface TaskInfo extends Serializable {
     public JobId getJobId();
 
     /**
+     * Get the name of the task
+     *
+     * @return the name of the task
+     */
+    public String getName();
+
+    /**
      * To get the startTime
      *
      * @return the startTime

@@ -194,6 +194,13 @@ public class TaskInfoImpl implements TaskInfo {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getName()
+     */
+    public String getName() {
+        return this.taskId.getReadableName();
+    }
+
+    /**
      * To set the taskId
      *
      * @param taskId The taskId to be set.
