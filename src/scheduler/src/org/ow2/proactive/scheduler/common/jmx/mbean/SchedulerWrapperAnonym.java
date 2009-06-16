@@ -35,18 +35,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -93,10 +90,9 @@ public class SchedulerWrapperAnonym implements SchedulerWrapperAnonymMBean, Sche
      *
      * @param jobList the list of job to be recovered
      */
-    public void recover(Map<JobId, InternalJob> jobList) {
+    public void recover(Set<JobState> jobList) {
         if (jobList != null) {
-            for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
-                JobState js = e.getValue();
+            for (JobState js : jobList) {
                 totalNumberOfJobs++;
                 totalNumberOfTasks += js.getTotalNumberOfTasks();
                 String jobId = js.getId().value();
