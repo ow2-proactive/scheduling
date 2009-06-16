@@ -31,6 +31,10 @@
  */
 package org.ow2.proactive.scheduler.common.jmx.mbean;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -64,11 +68,11 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
 
     private int numberOfFinishedJobs = 0;
 
-    private int numberOfPendingTasks = 0;
+    protected Map<String, Integer> numberOfPendingTasks = new HashMap<String, Integer>();
 
-    private int numberOfRunningTasks = 0;
+    protected Map<String, Integer> numberOfRunningTasks = new HashMap<String, Integer>();
 
-    private int numberOfFinishedTasks = 0;
+    protected Map<String, Integer> numberOfFinishedTasks = new HashMap<String, Integer>();
 
     /** Number of Connected Users */
     private int numberOfConnectedUsers = 0;
@@ -105,6 +109,42 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      */
     public SchedulerWrapper() {
         /* Empty Constructor required by JMX */
+    }
+
+    /**
+     * Recover this JMX Bean
+     *
+     * @param jobList the list of job to be recovered
+     */
+    public void recover(Set<JobState> jobList) {
+        if (jobList != null) {
+            for (JobState js : jobList) {
+                totalNumberOfJobs++;
+                totalNumberOfTasks += js.getTotalNumberOfTasks();
+                String jobId = js.getId().value();
+                numberOfRunningTasks.put(jobId, js.getNumberOfRunningTasks());
+                numberOfFinishedTasks.put(jobId, js.getNumberOfFinishedTasks());
+                switch (js.getStatus()) {
+                    case PENDING:
+                    case PAUSED:
+                        numberOfPendingTasks.put(jobId, js.getTotalNumberOfTasks());
+                        numberOfPendingJobs++;
+                        break;
+                    case RUNNING:
+                    case STALLED:
+                        numberOfPendingTasks.put(jobId, js.getNumberOfPendingTasks());
+                        numberOfRunningJobs++;
+                        break;
+                    case CANCELED:
+                    case FAILED:
+                    case FINISHED:
+                    case KILLED:
+                        numberOfPendingTasks.put(jobId, 0);
+                        numberOfFinishedJobs++;
+                        break;
+                }
+            }
+        }
     }
 
     // EVENT MANAGEMENT
@@ -212,10 +252,11 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
         this.numberOfFinishedJobs--;
         this.totalNumberOfJobs--;
         // For each task of the Job decrement the number of finished tasks and the total number of tasks
-        for (int i = 0; i < info.getTotalNumberOfTasks(); i++) {
-            this.totalNumberOfTasks--;
-            this.numberOfFinishedTasks--;
-        }
+        this.totalNumberOfTasks -= info.getTotalNumberOfTasks();
+        String jobId = info.getJobId().value();
+        this.numberOfPendingTasks.remove(jobId);
+        this.numberOfRunningTasks.remove(jobId);
+        this.numberOfFinishedTasks.remove(jobId);
     }
 
     /**
@@ -226,6 +267,10 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     private void jobRunningToFinishedEvent(JobInfo info) {
         this.numberOfRunningJobs--;
         this.numberOfFinishedJobs++;
+        String jobId = info.getJobId().value();
+        this.numberOfPendingTasks.put(jobId, info.getNumberOfPendingTasks());
+        this.numberOfRunningTasks.put(jobId, 0);
+        this.numberOfFinishedTasks.put(jobId, info.getNumberOfFinishedTasks());
         // Call the private method to calculate the mean execution time
         calculateMeanJobExecutionTime(info);
     }
@@ -238,11 +283,11 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
     public void jobSubmittedEvent(JobState job) {
         this.totalNumberOfJobs++;
         this.numberOfPendingJobs++;
-        // For each task of the Job increment the number of pending tasks and the total number of tasks
-        for (int i = 0; i < job.getTotalNumberOfTasks(); i++) {
-            this.totalNumberOfTasks++;
-            this.numberOfPendingTasks++;
-        }
+        this.totalNumberOfTasks += job.getTotalNumberOfTasks();
+        String jobId = job.getId().value();
+        this.numberOfPendingTasks.put(jobId, job.getTotalNumberOfTasks());
+        this.numberOfRunningTasks.put(jobId, 0);
+        this.numberOfFinishedTasks.put(jobId, 0);
         // Call the private method to calculate the mean arrival time
         calculateJobSubmittingPeriod(job.getJobInfo());
     }
@@ -253,8 +298,9 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      * @param info task's information
      */
     private void taskPendingToRunningEvent(TaskInfo info) {
-        this.numberOfPendingTasks--;
-        this.numberOfRunningTasks++;
+        String jobId = info.getJobId().value();
+        this.numberOfPendingTasks.put(jobId, this.numberOfPendingTasks.get(jobId) - 1);
+        this.numberOfRunningTasks.put(jobId, this.numberOfRunningTasks.get(jobId) + 1);
     }
 
     /**
@@ -263,8 +309,9 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      * @param info task's information
      */
     private void taskRunningToFinishedEvent(TaskInfo info) {
-        this.numberOfRunningTasks--;
-        this.numberOfFinishedTasks++;
+        String jobId = info.getJobId().value();
+        this.numberOfRunningTasks.put(jobId, this.numberOfRunningTasks.get(jobId) - 1);
+        this.numberOfFinishedTasks.put(jobId, this.numberOfFinishedTasks.get(jobId) + 1);
     }
 
     /**
@@ -372,7 +419,11 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      * @return current number of finished tasks
      */
     public int getNumberOfFinishedTasks() {
-        return this.numberOfFinishedTasks;
+        int total = 0;
+        for (int noft : this.numberOfFinishedTasks.values()) {
+            total += noft;
+        }
+        return total;
     }
 
     public int getNumberOfPendingJobs() {
@@ -383,7 +434,11 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      * @return current number of pending tasks
      */
     public int getNumberOfPendingTasks() {
-        return this.numberOfPendingTasks;
+        int total = 0;
+        for (int nopt : this.numberOfPendingTasks.values()) {
+            total += nopt;
+        }
+        return total;
     }
 
     /**
@@ -397,7 +452,11 @@ public class SchedulerWrapper implements SchedulerWrapperMBean {
      * @return current number of running tasks
      */
     public int getNumberOfRunningTasks() {
-        return this.numberOfRunningTasks;
+        int total = 0;
+        for (int nort : this.numberOfRunningTasks.values()) {
+            total += nort;
+        }
+        return total;
     }
 
     /**

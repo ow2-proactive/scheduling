@@ -199,8 +199,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         policyFullName = policyFullClassName;
         logger_dev.debug("Policy used is " + policyFullClassName);
         jobs = new HashMap<JobId, IdentifiedJob>();
-        //Register the scheduler MBean
-        registerMBean();
     }
 
     /**
@@ -255,9 +253,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @param jobList the jobList that may appear in this front-end.
      */
     public void recover(Map<JobId, InternalJob> jobList) {
+        Set<JobState> jobStates = new HashSet<JobState>();
         if (jobList != null) {
             logger_dev.info("job list : " + jobList.size());
             for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
+                jobStates.add(e.getValue());
                 UserIdentificationImpl uIdent = new UserIdentificationImpl(e.getValue().getOwner());
                 IdentifiedJob ij = new IdentifiedJob(e.getKey(), uIdent);
                 jobs.put(e.getKey(), ij);
@@ -274,6 +274,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         } else {
             logger_dev.info("job list empty");
         }
+        //Register the scheduler MBean
+        registerMBean();
+        schedulerBean.recover(jobStates);
         //once recovered, activate scheduler communication
         authentication.setActivated(true);
     }
