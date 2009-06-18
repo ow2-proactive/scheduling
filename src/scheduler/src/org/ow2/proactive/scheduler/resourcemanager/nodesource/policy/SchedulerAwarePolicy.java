@@ -31,9 +31,13 @@
  */
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -49,6 +53,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements SchedulerEventListener {
 
+    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+
     @Configurable
     protected String url = "";
     @Configurable
@@ -56,19 +62,28 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     @Configurable(password = true)
     protected String password = "";
     @Configurable
-    protected boolean preemptive = true;
+    protected boolean preemptive = false;
 
     protected SchedulerState state;
     protected UserSchedulerInterface userInterface;
 
+    public void configure(Object... params) throws RMException {
+        SchedulerAuthenticationInterface authentication;
+        try {
+            authentication = SchedulerConnection.join(params[0].toString());
+            userInterface = authentication.logAsUser(params[1].toString(), params[2].toString());
+            preemptive = Boolean.parseBoolean(params[3].toString());
+        } catch (Throwable t) {
+            throw new RMException(t);
+        }
+    }
+
     public BooleanWrapper activate() {
         SchedulerAuthenticationInterface authentication;
         try {
-            authentication = SchedulerConnection.join(url);
-            userInterface = authentication.logAsUser(userName, password);
             state = userInterface.addSchedulerEventListener(getSchedulerListener(), true, getEventsList());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("", e);
             return new BooleanWrapper(false);
         }
         return new BooleanWrapper(true);
@@ -79,7 +94,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
             userInterface.removeSchedulerEventListener();
             userInterface.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("", e);
             return new BooleanWrapper(false);
         }
         return new BooleanWrapper(true);

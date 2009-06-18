@@ -38,6 +38,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -65,12 +66,13 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
      */
-    public void configure(Object... policyParameters) {
-        url = policyParameters[0].toString();
-        userName = policyParameters[1].toString();
-        password = policyParameters[2].toString();
-        preemptive = Boolean.parseBoolean(policyParameters[3].toString());
-        idleTime = Long.parseLong(policyParameters[4].toString());
+    public void configure(Object... policyParameters) throws RMException {
+        super.configure(policyParameters);
+        try {
+            idleTime = Long.parseLong(policyParameters[4].toString());
+        } catch (RuntimeException e) {
+            throw new RMException(e);
+        }
     }
 
     public void initActivity(Body body) {
@@ -97,7 +99,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
     }
 
     public String getDescription() {
-        return "[BETA] Releases all resources when scheduler is idle for specified\ntime. Acquires them back on job submission.";
+        return "Releases all resources when scheduler is idle for specified\ntime. Acquires them back on job submission.";
     }
 
     public String toString() {

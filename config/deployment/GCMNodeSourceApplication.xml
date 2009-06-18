@@ -28,6 +28,7 @@
 					<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jython.jar"/> -->
 				</applicationClasspath>
+				<securityPolicy base="proactive" relpath="/config/scheduler.java.policy"/>
 				<log4jProperties base="proactive" relpath="/config/log4j/defaultNode-log4j"/>
 			</configuration>
 			<virtualNode id="Workers">

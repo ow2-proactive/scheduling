@@ -164,7 +164,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * Node source description
      */
     public String getDescription() {
-        return "[BETA] Handles hosts from the list using specified gcm deployment descriptor\n"
+        return "Handles hosts from the list using specified gcm deployment descriptor\n"
             + "template with HOST java variable contract (see proactive documentation)";
     }
 }

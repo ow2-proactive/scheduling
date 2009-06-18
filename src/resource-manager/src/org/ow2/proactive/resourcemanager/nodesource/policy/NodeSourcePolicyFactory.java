@@ -89,7 +89,8 @@ public class NodeSourcePolicyFactory {
                 }
             }
             policy = (NodeSourcePolicy) policyClass.newInstance();
-            policy.configure(policyParameters);
+        } catch (RMException e) {
+            throw e;
         } catch (Exception e) {
             throw new RMException(e);
         }
@@ -98,6 +99,9 @@ public class NodeSourcePolicyFactory {
         NodeSourcePolicy stub;
         try {
             stub = (NodeSourcePolicy) PAActiveObject.turnActive(policy);
+            stub.configure(policyParameters);
+        } catch (RMException e) {
+            throw e;
         } catch (Exception e) {
             throw new RMException(e);
         }

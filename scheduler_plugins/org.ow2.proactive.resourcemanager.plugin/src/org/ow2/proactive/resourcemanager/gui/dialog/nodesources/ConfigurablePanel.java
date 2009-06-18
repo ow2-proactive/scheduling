@@ -244,15 +244,11 @@ public class ConfigurablePanel extends Group {
     protected void checkSubclass() {
     }
 
-    public Object[] getParameters() {
+    public Object[] getParameters() throws IOException {
         List<Object> params = new ArrayList<Object>();
         for (Property p : properties) {
             if (p.isFile) {
-                try {
-                    params.add(FileToBytesConverter.convertFileToByteArray(new File(p.getValue())));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                params.add(FileToBytesConverter.convertFileToByteArray(new File(p.getValue())));
             } else {
                 params.add(p.getValue());
             }

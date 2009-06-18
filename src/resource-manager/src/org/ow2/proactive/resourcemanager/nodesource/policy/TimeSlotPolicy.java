@@ -43,6 +43,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 
 
@@ -103,7 +104,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * Period in milliseconds between nodes acquisition/releasing iterations
      */
     @Configurable(description = "ms (1 day by default)")
-    private String period = new Integer(24 * 60 * 60 * 1000).toString();
+    private Long period = new Long(24 * 60 * 60 * 1000);
 
     /**
      * The way of nodes removing
@@ -126,11 +127,30 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
      */
-    public void configure(Object... policyParameters) {
-        acquireTime = policyParameters[0].toString();
-        releaseTime = policyParameters[1].toString();
-        period = policyParameters[2].toString();
-        preemptive = Boolean.parseBoolean(policyParameters[3].toString());
+    public void configure(Object... policyParameters) throws RMException {
+        try {
+            // validation of date parameters
+            dateFormat.parse(policyParameters[0].toString());
+            dateFormat.parse(policyParameters[1].toString());
+
+            acquireTime = policyParameters[0].toString();
+            releaseTime = policyParameters[1].toString();
+
+            if (policyParameters[2].toString().length() > 0) {
+                period = Long.parseLong(policyParameters[2].toString());
+
+                if (period < 0) {
+                    throw new RMException("Period cannot be less than zero");
+                }
+
+            } else {
+                period = new Long(0);
+            }
+
+            preemptive = Boolean.parseBoolean(policyParameters[3].toString());
+        } catch (Throwable t) {
+            throw new RMException(t);
+        }
     }
 
     /**
@@ -144,25 +164,21 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * Activates the policy. Schedules acquire/release tasks with specified period.
      */
     public BooleanWrapper activate() {
+
         try {
-            long period = Long.parseLong(this.period);
-
-            if (period <= 0) {
-                throw new Exception();
-            }
-
-            info("Scheduling periodic nodes acquision");
-            timer.scheduleAtFixedRate(new AcquireTask(), dateFormat.parse(acquireTime), period);
-            timer.scheduleAtFixedRate(new ReleaseTask(), dateFormat.parse(releaseTime), period);
-        } catch (Exception e) {
-            try {
+            if (period > 0) {
+                info("Scheduling periodic nodes acquision");
+                timer.scheduleAtFixedRate(new AcquireTask(), dateFormat.parse(acquireTime), period);
+                timer.scheduleAtFixedRate(new ReleaseTask(), dateFormat.parse(releaseTime), period);
+            } else {
                 info("Scheduling non periodic nodes acquision");
                 timer.schedule(new AcquireTask(), dateFormat.parse(acquireTime));
                 timer.schedule(new ReleaseTask(), dateFormat.parse(releaseTime));
-            } catch (ParseException e1) {
-                return new BooleanWrapper(false);
             }
+        } catch (ParseException e) {
+            return new BooleanWrapper(false);
         }
+
         return new BooleanWrapper(true);
     }
 
@@ -190,7 +206,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * @return policy description
      */
     public String getDescription() {
-        return "[BETA] Acquires and releases nodes at specified time.";
+        return "Acquires and releases nodes at specified time.";
     }
 
     /**
