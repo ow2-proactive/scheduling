@@ -33,6 +33,8 @@ package org.ow2.proactive.scheduler.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.scheduler.common.exception.AccessRightException;
+import org.ow2.proactive.scheduler.common.exception.AuthenticationException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 
@@ -55,7 +57,9 @@ public interface AdminMethodsInterface {
      *
      * @param newPolicyFile the new policy file as a class.
      * @return true if the policy has been correctly change, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws SchedulerException if an exception occurs while serving the request.
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws AccessRightException if you have not enough permission to access this method.
      */
     public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException;
 
@@ -63,7 +67,8 @@ public interface AdminMethodsInterface {
      * For administrator only, Start the scheduler.
      *
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws AccessRightException if you have not enough permission to access this method.
      */
     public BooleanWrapper start() throws SchedulerException;
 
@@ -73,7 +78,8 @@ public interface AdminMethodsInterface {
      * Every running jobs will be terminated.
      *
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws AccessRightException if you have not enough permission to access this method.
      */
     public BooleanWrapper stop() throws SchedulerException;
 
@@ -81,7 +87,8 @@ public interface AdminMethodsInterface {
      * For administrator only, Pause the scheduler by terminating running jobs.
      *
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws AccessRightException if you have not enough permission to access this method.
      */
     public BooleanWrapper pause() throws SchedulerException;
 
@@ -89,7 +96,8 @@ public interface AdminMethodsInterface {
      * For administrator only, Freeze the scheduler by terminating running tasks.
      *
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws AccessRightException if you have not enough permission to access this method.
      */
     public BooleanWrapper freeze() throws SchedulerException;
 
@@ -97,7 +105,8 @@ public interface AdminMethodsInterface {
      * For administrator only, Resume the scheduler.
      *
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws AccessRightException if you have not enough permission to access this method.
      */
     public BooleanWrapper resume() throws SchedulerException;
 
@@ -107,7 +116,8 @@ public interface AdminMethodsInterface {
      * Use {@link #kill()} if you want to stop the scheduling and exit the scheduler.
      *
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws AccessRightException if you have not enough permission to access this method.
      */
     public BooleanWrapper shutdown() throws SchedulerException;
 
@@ -116,7 +126,8 @@ public interface AdminMethodsInterface {
      * Will stop the scheduling, and shutdown the scheduler.
      *
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws AccessRightException if you have not enough permission to access this method.
      */
     public BooleanWrapper kill() throws SchedulerException;
 
@@ -127,7 +138,9 @@ public interface AdminMethodsInterface {
      * @param rmURL the URL of the new Resource Manager to link to the scheduler.<br>
      * 		Example : //host/RM_node_name
      * @return true if success, false otherwise.
-     * @throws SchedulerException If an error occurred during RM reconnection.
+     * @throws SchedulerException if an exception occurs while serving the request.
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws AccessRightException if you have not enough permission to access this method.
      */
     public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException;
 }

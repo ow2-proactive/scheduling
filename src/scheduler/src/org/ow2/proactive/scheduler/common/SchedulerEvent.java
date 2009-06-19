@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * Enumeration of all different events that scheduler can invoke.<br>
  * This is also used to choose which events you want to received from the scheduler.
- * See {@link UserSchedulerInterface}.addSchedulerEventListener for more details.
+ * See {@link UserSchedulerInterface#addEventListener}. for more details.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9

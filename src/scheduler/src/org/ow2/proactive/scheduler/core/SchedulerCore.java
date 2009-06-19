@@ -79,6 +79,8 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface_;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UnknowJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknowTaskResultException;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -1465,7 +1467,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
 
         if (job == null) {
-            throw new SchedulerException("The job " + jobId + " does not exist !");
+            throw new UnknowJobException("The job " + jobId + " does not exist !");
         }
 
         logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
@@ -1510,7 +1512,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         if (job == null) {
             logger_dev.info("Job '" + jobId + "' does not exist");
-            throw new SchedulerException("The job does not exist !");
+            throw new UnknowJobException("The job does not exist !");
         }
 
         //extract taskResult reference from memory (weak instance)
@@ -1519,7 +1521,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         if (result == null) {
             //the task is unknown
             logger_dev.info("Result of task " + taskName + " does not exist !");
-            throw new SchedulerException("Result of task " + taskName + " does not exist !");
+            throw new UnknowTaskResultException("Result of task " + taskName + " does not exist !");
         }
         if (PAFuture.isAwaited(result)) {
             //the result is not yet available

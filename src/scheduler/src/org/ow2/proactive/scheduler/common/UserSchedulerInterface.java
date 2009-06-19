@@ -33,7 +33,11 @@ package org.ow2.proactive.scheduler.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.scheduler.common.exception.AccessRightException;
+import org.ow2.proactive.scheduler.common.exception.AuthenticationException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UnknowJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknowTaskResultException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -62,17 +66,18 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * </p>
      * Thus, user could get the job result according to the precious result.
      * <br /><br />
-     * It is possible to get a listener on the scheduler. (see {@link UserSchedulerInterface#addSchedulerEventListener(SchedulerEventListener, boolean, SchedulerEvent...)} for more details)
+     * It is possible to get a listener on the scheduler. (see {@link UserSchedulerInterface#addEventListener(SchedulerEventListener, boolean, SchedulerEvent...)} for more details)
      *
      * @param job the new job to submit.
      * @return the generated new job ID.
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+     * @throws SchedulerException if the operation cannot be performed.
+     * @throws AuthenticationException if you are not authenticated.
      */
     public JobId submit(Job job) throws SchedulerException;
 
     /**
      * Get the result for the given jobId.<br>
-     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
      * A user can only get HIS result back except if he is admin.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.<br>
      * So, if you have the right to get the job result represented by the given jobId and if the job exists,
@@ -80,13 +85,17 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      *
      * @param jobId the job on which the result will be send
      * @return a job Result containing information about the result.
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+     * 		If the job result is not yet available (job not finished), null is returned.
+     * @throws SchedulerException if an exception occurs while serving the request.
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws UnknowJobException if the job does not exist.
+     * @throws AccessRightException if you can't access to this particular job.
      */
     public JobResult getJobResult(String jobId) throws SchedulerException;
 
     /**
      * Get the result for the given task name in the given jobId. <br >
-     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
      * A user can only get HIS result back.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.<br>
      * So, if you have the right to get the task result that is in the job represented by the given jobId and if the job and task name exist,
@@ -96,18 +105,24 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * @param taskName the name of the task in which the result is.
      * @return a job Result containing information about the result.
      * 		If null is returned, this task is not yet terminated.
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+     * @throws SchedulerException if an exception occurs while serving the request.
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws UnknowJobException if the job does not exist.
+     * @throws UnknowTaskResultException if this task result does not exist or is unknown.
+     * @throws AccessRightException if you can't access to this particular job.
      */
     public TaskResult getTaskResult(String jobId, String taskName) throws SchedulerException;
 
     /**
      * Remove the job from the scheduler. <br>
-     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
      * A user can only remove HIS job.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.
      *
      * @param jobId the job to be removed.
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws UnknowJobException if the job does not exist.
+     * @throws AccessRightException if you can't access to this particular job.
      */
     public void remove(String jobId) throws SchedulerException;
 
@@ -115,13 +130,15 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * Kill the job represented by jobId.<br>
      * This method will kill every running tasks of this job, and remove it from the scheduler.<br>
      * The job won't be terminated, it won't have result.<br><br>
-     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
      * A user can only kill HIS job.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.
      *
      * @param jobId the job to kill.
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws UnknowJobException if the job does not exist.
+     * @throws AccessRightException if you can't access to this particular job.
      */
     public BooleanWrapper kill(String jobId) throws SchedulerException;
 
@@ -129,49 +146,61 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * Pause the job represented by jobId.<br>
      * This method will finish every running tasks of this job, and then pause the job.<br>
      * The job will have to be resumed in order to finish.<br><br>
-     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
      * A user can only pause HIS job.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.
      *
      * @param jobId the job to pause.
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws UnknowJobException if the job does not exist.
+     * @throws AccessRightException if you can't access to this particular job.
      */
     public BooleanWrapper pause(String jobId) throws SchedulerException;
 
     /**
      * Resume the job represented by jobId.<br>
      * This method will restart every non-finished tasks of this job.<br><br>
-     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
      * A user can only resume HIS job.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.
      *
      * @param jobId the job to resume.
      * @return true if success, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws UnknowJobException if the job does not exist.
+     * @throws AccessRightException if you can't access to this particular job.
      */
     public BooleanWrapper resume(String jobId) throws SchedulerException;
 
     /**
-     * Change the priority of the job represented by jobId.<br><br>
-     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * Change the priority of the job represented by jobId.<br>
+     * Only administrator can change the priority to HIGH, HIGEST, IDLE.<br><br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
      * A user can only change HIS job priority.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.
      *
      * @param jobId the job on which to change the priority.
      * @param priority The new priority to apply to the job.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * @throws SchedulerException if the job is already finished.
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws UnknowJobException if the job does not exist.
+     * @throws AccessRightException if you can't access to this particular job.
      */
     public void changePriority(String jobId, JobPriority priority) throws SchedulerException;
 
     /**
      * Return the state of the given job.<br>
      * The state contains informations about the job, every tasks and informations about the tasks.<br><br>
-     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
      * A user can only get the state of HIS job.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.
      *
-     * @param jobId the job on which to change the priority.
+     * @param jobId the job on which to get the state.
+     * @return the current state of the given job
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws UnknowJobException if the job does not exist.
+     * @throws AccessRightException if you can't access to this particular job.
      */
     public JobState getState(String jobId) throws SchedulerException;
 
@@ -185,6 +214,8 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * Get the current status of the Scheduler
      *
      * @return the current status of the Scheduler
+     * @throws SchedulerException if an exception occurs while serving the request.
+     * @throws AuthenticationException if you are not authenticated.
      */
     public SchedulerStatus getSchedulerStatus() throws SchedulerException;
 
@@ -213,7 +244,8 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * 			This won't affect the scheduler state event that will be sent anyway.
      * @param events An array of events that you want to receive from the scheduler.
      * @return the scheduler current state containing the different lists of jobs.
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right), or if the registered listener is not a remote object.
+     * @throws SchedulerException if an exception occurs while serving the request.
+     * @throws AuthenticationException if you are not authenticated.
      */
     public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws SchedulerException;
@@ -238,7 +270,8 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * @param getInitialState if false, this method returns null, if true, it returns the Scheduler current state.
      * @param events An array of events that you want to receive from the scheduler.
      * @return the scheduler current state containing the different lists of jobs if the getInitialState parameter is true, null if false.
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right), or if the registered listener is not a remote object.
+     * @throws SchedulerException if an exception occurs while serving the request.
+     * @throws AuthenticationException if you are not authenticated.
      */
     public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
             boolean getInitialState, SchedulerEvent... events) throws SchedulerException;
@@ -246,13 +279,15 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
     /**
      * Remove the current event listener your listening on.<br>
      * If no listener is defined, this method has no effect.
+     * 
+     * @throws AuthenticationException if you are not authenticated.
      */
     public void removeEventListener() throws SchedulerException;
 
     /**
      * Disconnect properly the user from the scheduler.
      *
-     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+     * @throws AuthenticationException if the caller is not authenticated.
      */
     public void disconnect() throws SchedulerException;
 
