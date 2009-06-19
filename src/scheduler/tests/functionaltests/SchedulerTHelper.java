@@ -776,8 +776,7 @@ public class SchedulerTHelper {
             eventReceiver = (MonitorEventReceiver) PAActiveObject.turnActive(passiveEventReceiver);
 
         }
-        SchedulerState state = schedInt.addSchedulerEventListener((SchedulerEventListener) eventReceiver,
-                false);
+        SchedulerState state = schedInt.addEventListener((SchedulerEventListener) eventReceiver, true, true);
         mHandler.init(state);
     }
 
@@ -803,7 +802,7 @@ public class SchedulerTHelper {
     private static void connectAsUser() throws Exception {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
         if (adminSchedInterface != null) {
-            adminSchedInterface.removeSchedulerEventListener();
+            adminSchedInterface.removeEventListener();
             adminSchedInterface.disconnect();
             adminSchedInterface = null;
         }
@@ -819,7 +818,7 @@ public class SchedulerTHelper {
     private static void connectAsAdmin() throws Exception {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
         if (userschedInterface != null) {
-            userschedInterface.removeSchedulerEventListener();
+            userschedInterface.removeEventListener();
             userschedInterface.disconnect();
             userschedInterface = null;
         }

@@ -81,7 +81,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     public BooleanWrapper activate() {
         SchedulerAuthenticationInterface authentication;
         try {
-            state = userInterface.addSchedulerEventListener(getSchedulerListener(), true, getEventsList());
+            state = userInterface.addEventListener(getSchedulerListener(), true, true, getEventsList());
         } catch (Exception e) {
             logger.error("", e);
             return new BooleanWrapper(false);
@@ -91,7 +91,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
 
     public BooleanWrapper disactivate() {
         try {
-            userInterface.removeSchedulerEventListener();
+            userInterface.removeEventListener();
             userInterface.disconnect();
         } catch (Exception e) {
             logger.error("", e);

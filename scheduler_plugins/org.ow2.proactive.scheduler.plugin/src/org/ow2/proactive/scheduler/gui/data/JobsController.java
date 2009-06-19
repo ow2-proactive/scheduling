@@ -992,10 +992,10 @@ public class JobsController implements SchedulerEventListener {
      */
     public boolean init() {
         SchedulerState state = null;
-        state = SchedulerProxy.getInstance().addSchedulerEventListener(
-                ((SchedulerEventListener) PAActiveObject.getStubOnThis()), false);
+        state = SchedulerProxy.getInstance().addEventListener(
+                ((SchedulerEventListener) PAActiveObject.getStubOnThis()), false, true);
 
-        if (state == null) { // addSchedulerEventListener failed
+        if (state == null) { // addEventListener failed
             return false;
         }
 

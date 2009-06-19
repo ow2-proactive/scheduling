@@ -449,7 +449,8 @@ public class UserSchedulerModel extends ConsoleModel {
             JobState js = scheduler.getState(jobId);
             JobInfo ji = js.getJobInfo();
             String state = "Job '" + ji.getJobId() + "' - name:" + ji.getJobId().getReadableName() +
-                "  status:" + ji.getStatus() + "  #tasks:" + ji.getTotalNumberOfTasks();
+                " owner:" + js.getOwner() + "  status:" + ji.getStatus() + "  #tasks:" +
+                ji.getTotalNumberOfTasks();
             state += newline + newline;
             state += String.format("\t%1$-8s", "ID");
             state += String.format(" %1$-20s", "Name");

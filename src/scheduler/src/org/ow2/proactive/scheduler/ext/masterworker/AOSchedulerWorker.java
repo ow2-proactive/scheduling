@@ -148,7 +148,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
 
         // We register this active object as a listener
         try {
-            this.scheduler.addSchedulerEventListener((AOSchedulerWorker) stubOnThis, false,
+            this.scheduler.addEventListener((AOSchedulerWorker) stubOnThis, false,
                     SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                     SchedulerEvent.SHUTTING_DOWN);
         } catch (SchedulerException e) {

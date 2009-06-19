@@ -32,7 +32,7 @@ public class SubmitJob implements SchedulerEventListener {
             user = auth.logAsUser(SchedulerTHelper.username, SchedulerTHelper.password);
 
             //let the client be notified of its own 'job termination' -> job running to finished event
-            user.addSchedulerEventListener((SubmitJob) PAActiveObject.getStubOnThis(), true,
+            user.addEventListener((SubmitJob) PAActiveObject.getStubOnThis(), true,
                     SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
         } catch (Exception e) {
             throw new RuntimeException(e);

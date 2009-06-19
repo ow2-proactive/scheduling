@@ -31,28 +31,6 @@
  */
 package org.ow2.proactive.scheduler.ext.scilab.embedded;
 
-import javasci.SciData;
-import javasci.SciStringMatrix;
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.*;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scripting.InvalidScriptException;
-import org.ow2.proactive.scripting.SelectionScript;
-
-import javax.security.auth.login.LoginException;
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +39,46 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+
+import javasci.SciData;
+import javasci.SciStringMatrix;
+
+import javax.security.auth.login.LoginException;
+import javax.swing.SwingUtilities;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -158,7 +176,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
         loggedin = true;
 
-        this.scheduler.addSchedulerEventListener((AOScilabEnvironment) stubOnThis, false,
+        this.scheduler.addEventListener((AOScilabEnvironment) stubOnThis, false,
                 SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN);
 

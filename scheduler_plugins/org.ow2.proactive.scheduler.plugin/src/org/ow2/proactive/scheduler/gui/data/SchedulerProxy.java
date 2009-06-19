@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -103,13 +104,26 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     // -------------------------------------------------------------------- //
     // ---------------- implements AdminSchedulerInterface ---------------- //
     // -------------------------------------------------------------------- //
-    /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
-     */
+    @Deprecated
     public SchedulerState addSchedulerEventListener(SchedulerEventListener listener, boolean myEventsOnly,
             SchedulerEvent... events) {
+        // Do nothing
+        return null;
+    }
+
+    public void addEventListener(SchedulerEventListener listener, boolean myEventsOnly,
+            SchedulerEvent... events) throws SchedulerException {
+        // Do nothing (unused)
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     */
+    public SchedulerState addEventListener(SchedulerEventListener listener, boolean myEventsOnly,
+            boolean getSchedulerState, SchedulerEvent... events) {
         try {
-            return (SchedulerState) scheduler.addSchedulerEventListener(listener, myEventsOnly, events);
+            return (SchedulerState) scheduler.addEventListener(listener, myEventsOnly, getSchedulerState,
+                    events);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
             e.printStackTrace();
@@ -117,10 +131,15 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         return null;
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeSchedulerEventListener()
-     */
+    @Deprecated
     public void removeSchedulerEventListener() throws SchedulerException {
+        //unused anymore
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeEventListener()
+     */
+    public void removeEventListener() throws SchedulerException {
         //not used for the GUI
     }
 
@@ -539,42 +558,86 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         }
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobResult(java.lang.String)
+     */
     public JobResult getJobResult(String jobId) throws SchedulerException {
         return scheduler.getJobResult(jobId);
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getTaskResult(java.lang.String, java.lang.String)
+     */
     public TaskResult getTaskResult(String jobId, String taskName) throws SchedulerException {
         return scheduler.getTaskResult(jobId, taskName);
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#changePriority(java.lang.String, org.ow2.proactive.scheduler.common.job.JobPriority)
+     */
     public void changePriority(String jobId, JobPriority newPrio) throws SchedulerException {
         scheduler.changePriority(jobId, newPrio);
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#kill(java.lang.String)
+     */
     public BooleanWrapper kill(String jobId) throws SchedulerException {
         return scheduler.kill(jobId);
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#pause(java.lang.String)
+     */
     public BooleanWrapper pause(String jobId) throws SchedulerException {
         return scheduler.pause(jobId);
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#remove(java.lang.String)
+     */
     public void remove(String jobId) throws SchedulerException {
         scheduler.remove(jobId);
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#resume(java.lang.String)
+     */
     public BooleanWrapper resume(String jobId) throws SchedulerException {
         return scheduler.resume(jobId);
     }
 
+    @Deprecated
     public SchedulerStatus getStatus() {
+        //unused anymore
+        return null;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerStatus()
+     */
+    public SchedulerStatus getSchedulerStatus() throws SchedulerException {
         try {
-            return scheduler.getStatus();
+            return scheduler.getSchedulerStatus();
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error while getting status", e);
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getState(java.lang.String)
+     */
+    public JobState getState(String id) throws SchedulerException {
+        return scheduler.getState(id);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getState(org.ow2.proactive.scheduler.common.job.JobId)
+     */
+    public JobState getState(JobId id) throws SchedulerException {
+        return scheduler.getState(id);
     }
 
 }

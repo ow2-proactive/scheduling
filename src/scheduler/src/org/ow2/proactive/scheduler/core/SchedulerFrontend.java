@@ -557,8 +557,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     * @deprecated {@link SchedulerFrontend#addEventListener(SchedulerEventListener, boolean, SchedulerEvent...)}
      */
+    @Deprecated
     public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, boolean myEventsOnly,
             SchedulerEvent... events) throws SchedulerException {
 
@@ -596,9 +597,70 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeSchedulerEventListener()
+     * @deprecated {@link SchedulerFrontend#removeEventListener()}
      */
+    @Deprecated
     public void removeSchedulerEventListener() throws SchedulerException {
+        //Remove the listener on that user designated by its given UniqueID,
+        //then renew its user session as it is no more managed by the listener.
+        UniqueID id = checkAccess();
+        schedulerListeners.remove(id);
+        //recreate the session for this user which is no more managed by listener
+        renewUserSession(id, identifications.get(id));
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     */
+    public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
+            throws SchedulerException {
+        addEventListener(sel, myEventsOnly, false, events);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     */
+    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
+            boolean getInitialState, SchedulerEvent... events) throws SchedulerException {
+        UniqueID id = checkAccess();
+
+        UserIdentificationImpl uIdent = identifications.get(id);
+
+        // check if listener is not null
+        if (sel == null) {
+            String msg = "Scheduler listener must not be null !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
+        }
+        // check if the listener is a reified remote object
+        if (!MOP.isReifiedObject(sel)) {
+            String msg = "Scheduler listener must be a remote object !";
+            logger_dev.info(msg);
+            throw new SchedulerException(msg);
+        }
+
+        uIdent.setUserEvents(events);
+        //set if the user wants to get its events only or every events
+        uIdent.setMyEventsOnly(myEventsOnly);
+        //add the listener to the list of listener for this user.
+        schedulerListeners.put(id, sel);
+        //cancel timer for this user : session is now managed by events
+        uIdent.getSession().cancel();
+        //get the scheduler State
+        SchedulerStateImpl initState = null;
+        if (getInitialState) {
+            initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler.getSchedulerState()));
+            //and update the connected users list.
+            initState.setUsers(connectedUsers);
+        }
+        //return to the user
+        return initState;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeEventListener()
+     */
+    public void removeEventListener() throws SchedulerException {
         //Remove the listener on that user designated by its given UniqueID,
         //then renew its user session as it is no more managed by the listener.
         UniqueID id = checkAccess();

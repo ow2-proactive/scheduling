@@ -129,18 +129,43 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addSchedulerEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     * @deprecated {@link UserScheduler#addEventListener(SchedulerEventListener, boolean, SchedulerEvent...)}
      */
+    @Deprecated
     public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, boolean myEventsOnly,
             SchedulerEvent... events) throws SchedulerException {
         return schedulerFrontend.addSchedulerEventListener(sel, myEventsOnly, events);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeSchedulerEventListener()
+     * @deprecated {@link UserScheduler#removeEventListener()}
      */
+    @Deprecated
     public void removeSchedulerEventListener() throws SchedulerException {
         schedulerFrontend.removeSchedulerEventListener();
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     */
+    public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
+            throws SchedulerException {
+        schedulerFrontend.addEventListener(sel, myEventsOnly, events);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     */
+    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
+            boolean getInitialState, SchedulerEvent... events) throws SchedulerException {
+        return schedulerFrontend.addEventListener(sel, myEventsOnly, getInitialState, events);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeEventListener()
+     */
+    public void removeEventListener() throws SchedulerException {
+        schedulerFrontend.removeEventListener();
     }
 
     /**
