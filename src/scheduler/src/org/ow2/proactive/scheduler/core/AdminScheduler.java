@@ -34,7 +34,6 @@ package org.ow2.proactive.scheduler.core;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -61,7 +60,6 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@PublicAPI
 public class AdminScheduler extends UserScheduler implements AdminSchedulerInterface {
 
     /** Logger to be used for all messages related to the scheduler */

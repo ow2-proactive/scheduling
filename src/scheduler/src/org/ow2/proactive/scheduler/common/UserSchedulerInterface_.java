@@ -38,6 +38,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
@@ -145,4 +146,14 @@ public interface UserSchedulerInterface_ extends Serializable {
      * @throws SchedulerException (can be due to insufficient permission)
      */
     public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException;
+
+    /**
+     * Return the state of the given job.<br>
+     * The state contains informations about the job, every tasks and informations about the tasks.<br><br>
+     * A user can only get the state of HIS job.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     *
+     * @param jobId the job on which to change the priority.
+     */
+    public JobState getState(JobId jobId) throws SchedulerException;
 }

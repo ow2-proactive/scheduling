@@ -532,9 +532,22 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStatus()
+     * @deprecated {@link SchedulerFrontend#getSchedulerStatus()}
      */
+    @Deprecated
     public SchedulerStatus getStatus() throws SchedulerException {
+        UniqueID id = checkAccess();
+
+        //renew session for this user
+        renewUserSession(id, identifications.get(id));
+
+        return jmxHelper.getSchedulerStatus_();
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerStatus()
+     */
+    public SchedulerStatus getSchedulerStatus() throws SchedulerException {
         UniqueID id = checkAccess();
 
         //renew session for this user
@@ -822,6 +835,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getState(org.ow2.proactive.scheduler.common.job.JobId)
+     */
+    public JobState getState(JobId jobId) throws SchedulerException {
+        prkcp(jobId, "You do not have permission to get the state of this job !");
+        return scheduler.getState(jobId);
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#kill(java.lang.String)
      */
     public BooleanWrapper kill(String jobId) throws SchedulerException {
@@ -854,6 +875,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     public void changePriority(String jobId, JobPriority priority) throws SchedulerException {
         this.changePriority(JobIdImpl.makeJobId(jobId), priority);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getState(java.lang.String)
+     */
+    public JobState getState(String jobId) throws SchedulerException {
+        return this.getState(JobIdImpl.makeJobId(jobId));
     }
 
     /**

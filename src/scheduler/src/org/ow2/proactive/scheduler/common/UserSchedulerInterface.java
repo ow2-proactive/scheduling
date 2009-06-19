@@ -38,6 +38,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
@@ -164,11 +165,28 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
     public void changePriority(String jobId, JobPriority priority) throws SchedulerException;
 
     /**
+     * Return the state of the given job.<br>
+     * The state contains informations about the job, every tasks and informations about the tasks.<br><br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method.<br>
+     * A user can only get the state of HIS job.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     *
+     * @param jobId the job on which to change the priority.
+     */
+    public JobState getState(String jobId) throws SchedulerException;
+
+    /**
+     * @deprecated {@link UserSchedulerInterface#getSchedulerStatus()}
+     */
+    @Deprecated
+    public SchedulerStatus getStatus() throws SchedulerException;
+
+    /**
      * Get the current status of the Scheduler
      *
      * @return the current status of the Scheduler
      */
-    public SchedulerStatus getStatus() throws SchedulerException;
+    public SchedulerStatus getSchedulerStatus() throws SchedulerException;
 
     /**
      * Add a scheduler event Listener. this listener provides method to notice of

@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -111,9 +112,20 @@ public class UserScheduler implements UserSchedulerInterface {
 
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStatus()
+     *
+     * @deprecated {@link UserScheduler#getSchedulerStatus()}
      */
+    @Deprecated
     public SchedulerStatus getStatus() throws SchedulerException {
         return schedulerFrontend.getStatus();
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerStatus()
+     *
+     */
+    public SchedulerStatus getSchedulerStatus() throws SchedulerException {
+        return schedulerFrontend.getSchedulerStatus();
     }
 
     /**
@@ -167,6 +179,13 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getState(org.ow2.proactive.scheduler.common.job.JobId)
+     */
+    public JobState getState(JobId jobId) throws SchedulerException {
+        return schedulerFrontend.getState(jobId);
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#kill(java.lang.String)
      */
     public BooleanWrapper kill(String jobId) throws SchedulerException {
@@ -199,6 +218,13 @@ public class UserScheduler implements UserSchedulerInterface {
      */
     public void changePriority(String jobId, JobPriority priority) throws SchedulerException {
         schedulerFrontend.changePriority(jobId, priority);
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getState(java.lang.String)
+     */
+    public JobState getState(String jobId) throws SchedulerException {
+        return schedulerFrontend.getState(jobId);
     }
 
     /**

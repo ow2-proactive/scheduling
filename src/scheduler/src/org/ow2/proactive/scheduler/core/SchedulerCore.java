@@ -1867,6 +1867,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getState(org.ow2.proactive.scheduler.common.job.JobId)
+     */
+    public JobState getState(JobId jobId) throws SchedulerException {
+        logger_dev.info("Request sent to get the State of job '" + jobId + "'");
+        return jobs.get(jobId);
+    }
+
+    /**
      * Change the policy of the scheduler.<br>
      * This method will immediately change the policy and so the whole scheduling process.
      *
