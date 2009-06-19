@@ -62,7 +62,7 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * </p>
      * Thus, user could get the job result according to the precious result.
      * <br /><br />
-     * It is possible to get a listener on the scheduler. (see {@link UserSchedulerInterface#addSchedulerEventListener(SchedulerEventListener,SchedulerEvent...)} for more details)
+     * It is possible to get a listener on the scheduler. (see {@link UserSchedulerInterface#addSchedulerEventListener(SchedulerEventListener, boolean, SchedulerEvent...)} for more details)
      *
      * @param job the new job to submit.
      * @return the generated new job ID.

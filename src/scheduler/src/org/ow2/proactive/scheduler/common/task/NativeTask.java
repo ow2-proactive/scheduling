@@ -37,7 +37,7 @@ import org.ow2.proactive.scripting.GenerationScript;
 
 
 /**
- * Use this class to build a native task that will use a {@link org.ow2.proactive.scheduler.task.NativeExecutable} and be integrated in a {@link TaskFlowJob}.</br>
+ * Use this class to build a native task that will use a 'org.ow2.proactive.scheduler.task.NativeExecutable' and be integrated in a {@link TaskFlowJob}.</br>
  * A native task just includes a command line that can be set using {@link #setCommandLine(String[])}.</br>
  * You don't have to extend this class to launch your own native executable.
  *

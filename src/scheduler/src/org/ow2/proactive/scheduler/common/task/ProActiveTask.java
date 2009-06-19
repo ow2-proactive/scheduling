@@ -31,9 +31,7 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.ProActiveJob;
@@ -43,7 +41,7 @@ import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
 /**
  * Use this class to build a ProActive task that will use a {@link ProActiveExecutable} and be integrated in a {@link ProActiveJob}.<br>
  * You have to specify the number of nodes you need during the execution using the {@link #setNumberOfNodesNeeded(int)} method.<br>
- * You can also specify arguments to give to the task using the {@link #setArguments(Map)} as the java task does it.
+ * You can also specify arguments to give to the task using the {@link JavaTask#addArgument(String, String)} as the java task does it.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9

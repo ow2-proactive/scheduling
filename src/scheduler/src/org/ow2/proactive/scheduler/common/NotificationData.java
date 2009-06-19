@@ -38,7 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * NotificationData is used by the Scheduler Core to notify the front-end of any changes.
- * It is sent through the method in {@link SchedulerStateUpdate} interface.
+ * It is sent through notification methods in core interface.
  *
  * @param T the type of the data to be sent in the notification.
  *

@@ -32,7 +32,6 @@
 package org.ow2.proactive.scheduler.common.jmx.mbean;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -84,34 +83,31 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * This method represents a possible Operation to Invoke on the MBean.
      * It gives the pending time for a given Job
      *
-     * @param jobId, the id of the Job to check
+     * @param jobId the id of the Job to check
      * @return a representation as long of the duration of the pending time for the given job. 
-     * @throws SchedulerException 
      */
     public long getJobPendingTime(String jobId);
 
     /**
      * This method gives the running time for a given Job.
      *
-     * @param jobId, the id of the Job to check
+     * @param jobId the id of the Job to check
      * @return a representation as long of the duration of the running time for the given job. 
-     * @throws SchedulerException 
      */
     public long getJobRunningTime(String jobId);
 
     /**
      * This method gives the mean task pending time for a given Job
      *
-     * @param jobId, the id of the Job to check
+     * @param jobId the id of the Job to check
      * @return a representation as long of the duration of the mean task pending time for the given job. 
-    * @throws SchedulerException 
      */
     public long getMeanTaskPendingTime(String jobId);
 
     /**
      * This method gives the mean task running time for a given Job
      *
-     * @param jobId, the id of the Job to check
+     * @param jobId the id of the Job to check
      * @return a representation as long of the duration of the mean task running time for the given job. 
      */
     public long getMeanTaskRunningTime(String jobId);
@@ -119,7 +115,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
     /**
      * This method gives the total number of nodes used by a given Job
      *
-     * @param jobId, the id of the Job to check
+     * @param jobId the id of the Job to check
      * @return the total number of nodes used by the given job. 
      */
     public int getTotalNumberOfNodesUsed(String jobId);
@@ -128,7 +124,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * This method represents a possible Operation to Invoke on the MBean.
      * It gives the pending time for a given Job as String
      *
-     * @param jobId, the id of the Job to check
+     * @param jobId the id of the Job to check
      * @return a representation as long of the duration of the pending time for the given job. 
      */
     public String getFormattedJobPendingTime(String jobId);
@@ -136,7 +132,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
     /**
      * This method gives the running time for a given Job as String
      *
-     * @param jobId, the id of the Job to check
+     * @param jobId the id of the Job to check
      * @return a representation as long of the duration of the running time for the given job. 
      */
     public String getFormattedJobRunningTime(String jobId);
@@ -144,7 +140,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
     /**
      * This method gives the mean task pending time for a given Job as String
      *
-     * @param jobId, the id of the Job to check
+     * @param jobId the id of the Job to check
      * @return a representation as long of the duration of the mean task pending time for the given job. 
      */
     public String getFormattedMeanTaskPendingTime(String jobId);
@@ -152,7 +148,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
     /**
      * This method gives the mean task running time for a given Job as String
      *
-     * @param jobId, the id of the Job to check
+     * @param jobId the id of the Job to check
      * @return a representation as long of the duration of the mean task running time for the given job. 
      */
     public String getFormattedMeanTaskRunningTime(String jobId);
