@@ -70,6 +70,17 @@ function exec(commandFilePath){
 	return AdminRMModel.exec(commandFilePath);
 }
 
+function setLogsDir(logsDir){
+	if (logsDir == undefined){
+		logsDir = "";
+	}
+	AdminRMModel.setLogsDir(""+logsDir);
+}
+
+function viewlogs(nbLines){
+	AdminRMModel.viewlogs(""+nbLines);
+}
+
 function exit(){
 	return AdminRMModel.exit();
 }

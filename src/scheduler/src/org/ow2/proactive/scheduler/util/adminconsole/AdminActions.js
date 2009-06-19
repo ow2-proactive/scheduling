@@ -32,4 +32,19 @@ function linkrm(rmURL){
 	return AdminSchedulerModel.linkRM(""+rmURL);
 }
 
+function setLogsDir(logsDir){
+	if (logsDir == undefined){
+		logsDir = "";
+	}
+	AdminSchedulerModel.setLogsDir(""+logsDir);
+}
+
+function viewlogs(nbLines){
+	AdminSchedulerModel.viewlogs(""+nbLines);
+}
+
+function viewDevlogs(nbLines){
+	AdminSchedulerModel.viewDevlogs(""+nbLines);
+}
+
 var scheduler = AdminSchedulerModel.getAdminScheduler();
