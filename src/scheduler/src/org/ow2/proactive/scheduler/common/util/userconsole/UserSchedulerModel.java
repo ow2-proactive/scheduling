@@ -43,10 +43,14 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.console.Command;
 import org.ow2.proactive.utils.console.ConsoleModel;
@@ -136,6 +140,9 @@ public class UserSchedulerModel extends ConsoleModel {
         commands
                 .add(new Command("removejob(id)",
                     "Remove the given job from the Scheduler (parameter is an int or a string representing the jobId)"));
+        commands
+                .add(new Command("jobstate(id)",
+                    "Get the current state of the given job (parameter is an int or a string representing the jobId)"));
         commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
         commands
                 .add(new Command("exec(commandFilePath)",
@@ -178,7 +185,7 @@ public class UserSchedulerModel extends ConsoleModel {
         initialize();
         String stmt;
         while (!terminated) {
-            SchedulerStatus status = scheduler.getStatus();
+            SchedulerStatus status = scheduler.getSchedulerStatus();
             String prompt = " ";
             if (status != SchedulerStatus.STARTED) {
                 try {
@@ -430,6 +437,59 @@ public class UserSchedulerModel extends ConsoleModel {
         } catch (Exception e) {
             handleExceptionDisplay("Error on job " + jobId, e);
         }
+    }
+
+    public static void jobState(String jobId) {
+        getModel().checkIsReady();
+        getModel().jobState_(jobId);
+    }
+
+    private void jobState_(String jobId) {
+        try {
+            JobState js = scheduler.getState(jobId);
+            JobInfo ji = js.getJobInfo();
+            String state = "Job '" + ji.getJobId() + "' - name:" + ji.getJobId().getReadableName() +
+                "  status:" + ji.getStatus() + "  #tasks:" + ji.getTotalNumberOfTasks();
+            state += newline + newline;
+            state += String.format("\t%1$-8s", "ID");
+            state += String.format(" %1$-20s", "Name");
+            state += String.format(" %1$-16s", "Status");
+            state += String.format(" %1$-24s", "HostName");
+            state += String.format(" %1$-14s", "Duration");
+            state += String.format(" %1$-14s", "#nodes killed");
+            state += newline;
+            for (TaskState ts : js.getTasks()) {
+                state += String.format("\t%1$-8s", ts.getId());
+                state += String.format(" %1$-20s", cutNchar(ts.getName(), 20));
+                state += String.format(" %1$-16s", ts.getStatus());
+                state += String.format(" %1$-24s", cutNchar(ts.getExecutionHostName(), 24));
+                state += String.format(" %1$-14s", Tools.getFormattedDuration(ts.getFinishedTime(), ts
+                        .getStartTime()));
+                state += String.format(" %1$-14s", (ts.getMaxNumberOfExecutionOnFailure() - ts
+                        .getNumberOfExecutionOnFailureLeft()) +
+                    "/" + ts.getMaxNumberOfExecutionOnFailure());
+                state += newline;
+            }
+            print(state);
+        } catch (Exception e) {
+            handleExceptionDisplay("Error on job " + jobId, e);
+        }
+    }
+
+    /**
+     * Cut the given string to the specified number of character
+     *
+     * @param str the string to cut.
+     * @param nbChar the maximum length of the string to be returned
+     * @return a string that is the same as the given one if str.length() is lesser or equals to nbChar,
+     * 			otherwise a shortcut string endind with '...'
+     */
+    private String cutNchar(String str, int nbChar) {
+        nbChar--;//use to have a space after the returned string
+        if (str == null || str.length() <= nbChar) {
+            return str;
+        }
+        return str.substring(0, nbChar - 3) + "...";
     }
 
     public static void JMXinfo() {

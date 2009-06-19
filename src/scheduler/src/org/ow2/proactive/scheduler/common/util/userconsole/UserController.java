@@ -354,6 +354,13 @@ public class UserController {
         opt.setArgs(2);
         actionGroup.addOption(opt);
 
+        opt = new Option("jobstate", true, control +
+            "Get the current state of the given job (Also tasks description)");
+        opt.setArgName("jobId");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        actionGroup.addOption(opt);
+
         opt = new Option("jmxinfo", false, control +
             "Display some statistics provided by the Scheduler MBean");
         opt.setRequired(false);
@@ -422,6 +429,8 @@ public class UserController {
                 model.print("Missing arguments for job priority. Arguments must be <jobId> <newPriority>" +
                     newline + "\t" + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
+        } else if (cmd.hasOption("jobstate")) {
+            UserSchedulerModel.jobState(cmd.getOptionValues("jobstate")[0]);
         } else if (cmd.hasOption("jmxinfo")) {
             UserSchedulerModel.JMXinfo();
         } else if (cmd.hasOption("test")) {

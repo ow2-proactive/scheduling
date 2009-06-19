@@ -54,6 +54,10 @@ function priority(jobId, priority){
     UserSchedulerModel.priority(""+jobId,""+priority);
 }
 
+function jobstate(jobId){
+	UserSchedulerModel.jobState(""+jobId);
+}
+
 function exec(commandFilePath){
 	UserSchedulerModel.exec(""+commandFilePath);
 }
