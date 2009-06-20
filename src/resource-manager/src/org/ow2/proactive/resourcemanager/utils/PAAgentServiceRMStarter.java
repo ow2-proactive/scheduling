@@ -39,6 +39,8 @@ import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
+import java.io.IOException;
+
 
 /**
  * This class is responsible for implementing actions that are started in
@@ -67,11 +69,25 @@ public final class PAAgentServiceRMStarter {
      * @param args
      *            The arguments needed to join the Resource Manager
      */
-    public static void main(final String args[]) {
+    public static void main(final String args[]) throws IOException, InterruptedException {
         if (args.length < 3 || args.length > 4) {
             System.out.println("Usage: java PAAgentServiceRMStarter username password rmUrl nodename");
             return;
         }
+        //Process ps = Runtime.getRuntime().exec("taskkill /f /IM MATLAB.exe /T");
+        String userName = System.getProperty("PAAgent.user.name");
+        Process ps = null;
+        if (userName == null) {
+            ps = Runtime.getRuntime()
+                    .exec(
+                            new String[] { "taskkill", "/f", "/IM", "MATLAB.exe", "/T", "/FI",
+                                    "USERNAME eq SYSTEM" });
+        } else {
+            ps = Runtime.getRuntime().exec(
+                    new String[] { "taskkill", "/f", "/IM", "MATLAB.exe", "/T", "/FI",
+                            "USERNAME eq " + userName.trim() });
+        }
+        ps.waitFor();
         final String username = args[0];
         final String password = args[1];
         final String rmUrl = args[2];

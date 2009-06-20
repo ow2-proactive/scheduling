@@ -171,7 +171,7 @@ if (selected) {
         logWriter.println("Testing licence coin for " + allargs + " : " + host );
     }
 
-    task = MatlabTask("i=0;",fullcode);
+    task = MatlabTask("i='PROACTIVE_INITIALIZATION_CODE';",fullcode);
 
     try {
         task.execute([]);

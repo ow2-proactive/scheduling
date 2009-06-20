@@ -75,16 +75,22 @@ if ~isa(func, 'function_handle')
     error('func parameter should be of class "function_handle" (the function handle of the task needed to be executed in parallel)');
 end
 failure = '';
-
-try 
-if nargin(func)~=1
-    failure = 'func parameter should be a function with one and only one input parameter';
-end
-catch err
-    if strcmp(err.identifier,'MATLAB:nargin:isScript') == 1
-        error('func parameter is a script, expected a function with one input and one output');
-    else 
-        throw(err);
+v=version;
+if str2num(v(1:3)) > 7.2
+    try
+    if nargin(func)~=1
+        failure = 'func parameter should be a function with one and only one input parameter';
+    end
+    catch err
+        if strcmp(err.identifier,'MATLAB:nargin:isScript') == 1
+            error('func parameter is a script, expected a function with one input and one output');
+        else
+            throw(err);
+        end
+    end
+else
+    if nargin(func)~=1
+        failure = 'func parameter should be a function with one and only one input parameter';
     end
 end
 if length(failure) > 0
