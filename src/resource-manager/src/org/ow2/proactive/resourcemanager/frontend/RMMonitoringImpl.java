@@ -31,7 +31,10 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -73,6 +76,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     // Attributes
     private RMCoreInterface rmcore;
     private HashMap<UniqueID, RMEventListener> RMListeners;
+
+    private List<UniqueID> dirtyListeners = new ArrayList<UniqueID>();
+
     private String MonitoringUrl = null;
 
     /** Resource Manager's MBean */
@@ -102,6 +108,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
+
         } catch (ProActiveException e) {
             logger.debug("Cannot register RMMonitoring. Aborting...", e);
             PAActiveObject.terminateActiveObject(true);
@@ -151,9 +158,18 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         event.setRMUrl(this.MonitoringUrl);
         rMBeanAnonym.nodeEvent(event);
         rMBeanAdmin.nodeEvent(event);
-        for (RMEventListener listener : RMListeners.values()) {
-            listener.nodeEvent(event);
+
+        for (Entry<UniqueID, RMEventListener> entry : RMListeners.entrySet()) {
+            RMEventListener listener = entry.getValue();
+            try {
+                listener.nodeEvent(event);
+            } catch (Exception e) {
+                logger.info("Error on a listener, it will be removed. Error is : " + e.getMessage());
+                logger.debug(e.getStackTrace());
+                dirtyListeners.add(entry.getKey());
+            }
         }
+        clearDirtyListeners();
     }
 
     /**
@@ -161,9 +177,17 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeSourceEvent(RMNodeSourceEvent event) {
         event.setRMUrl(this.MonitoringUrl);
-        for (RMEventListener listener : RMListeners.values()) {
-            listener.nodeSourceEvent(event);
+        for (Entry<UniqueID, RMEventListener> entry : RMListeners.entrySet()) {
+            RMEventListener listener = entry.getValue();
+            try {
+                listener.nodeSourceEvent(event);
+            } catch (Exception e) {
+                logger.info("Error on a listener, it will be removed. Error is : " + e.getMessage());
+                logger.debug(e.getStackTrace());
+                dirtyListeners.add(entry.getKey());
+            }
         }
+        clearDirtyListeners();
     }
 
     /**
@@ -173,9 +197,17 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         event.setRMUrl(this.MonitoringUrl);
         rMBeanAnonym.rmEvent(event);
         rMBeanAdmin.rmEvent(event);
-        for (RMEventListener listener : RMListeners.values()) {
-            listener.rmEvent(event);
+        for (Entry<UniqueID, RMEventListener> entry : RMListeners.entrySet()) {
+            RMEventListener listener = entry.getValue();
+            try {
+                listener.rmEvent(event);
+            } catch (Exception e) {
+                logger.info("Error on a listener, it will be removed. Error is : " + e.getMessage());
+                logger.debug(e.getStackTrace());
+                dirtyListeners.add(entry.getKey());
+            }
         }
+        clearDirtyListeners();
     }
 
     /** 
@@ -189,5 +221,12 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     public Logger getLogger() {
         return logger;
+    }
+
+    private void clearDirtyListeners() {
+        for (UniqueID id : dirtyListeners) {
+            this.RMListeners.remove(id);
+        }
+        dirtyListeners.clear();
     }
 }

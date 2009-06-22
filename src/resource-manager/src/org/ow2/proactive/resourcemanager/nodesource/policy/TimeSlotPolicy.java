@@ -36,6 +36,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -84,7 +85,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
 
     /** Date formatter */
     public static transient DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(
-            SimpleDateFormat.SHORT, SimpleDateFormat.FULL);
+            SimpleDateFormat.SHORT, SimpleDateFormat.FULL, new Locale("en"));
     /** Timer used for tasks scheduling */
     private transient Timer timer = new Timer(true);
 
