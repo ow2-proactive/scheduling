@@ -126,6 +126,7 @@ public class MatlabEngine {
                     engineHandle = eng.open(configuration.getMatlabCommandName() + " -automation", true);
                 }
                 Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    public void run() {
                         eng.close(engineHandle);
                         eng = null;
                     }
