@@ -607,6 +607,13 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         return scheduler.resume(jobId);
     }
 
+    /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#listenLog(java.lang.String, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
+     */
+    public void listenLog(String jobId, AppenderProvider appender) throws SchedulerException {
+        scheduler.listenLog(jobId, appender);
+    }
+
     @Deprecated
     public SchedulerStatus getStatus() {
         //unused anymore

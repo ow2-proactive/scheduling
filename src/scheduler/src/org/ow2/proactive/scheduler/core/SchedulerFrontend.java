@@ -534,6 +534,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#listenLog(java.lang.String, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
+     */
+    public void listenLog(String jobId, AppenderProvider appenderProvider) throws SchedulerException {
+        this.listenLog(JobIdImpl.makeJobId(jobId), appenderProvider);
+    }
+
+    /**
      * @deprecated {@link SchedulerFrontend#getSchedulerStatus()}
      */
     @Deprecated

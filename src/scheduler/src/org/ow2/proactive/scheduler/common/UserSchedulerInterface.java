@@ -44,6 +44,8 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 
 
 /**
@@ -125,6 +127,20 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * @throws AccessRightException if you can't access to this particular job.
      */
     public void remove(String jobId) throws SchedulerException;
+
+    /**
+     * Listen for the tasks user log.<br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
+     * A user can only listen to HIS jobs.
+     *
+     * @param jobId the id of the job to listen to.
+     * @param appenderProvider a provider for an appender that must be connected on a log server on the caller side (see {@link LogForwardingService})
+     * @throws SchedulerException if an exception occurs while serving the request, specially if the appender cannot be created.
+     * @throws AuthenticationException if you are not authenticated.
+     * @throws UnknowJobException if the job does not exist.
+     * @throws AccessRightException if you can't access to this particular job.
+     */
+    public void listenLog(String jobId, AppenderProvider appenderProvider) throws SchedulerException;
 
     /**
      * Kill the job represented by jobId.<br>

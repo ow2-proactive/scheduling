@@ -111,6 +111,13 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#listenLog(java.lang.String, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
+     */
+    public void listenLog(String jobId, AppenderProvider appenderProvider) throws SchedulerException {
+        schedulerFrontend.listenLog(jobId, appenderProvider);
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStatus()
      *
      * @deprecated {@link UserScheduler#getSchedulerStatus()}
