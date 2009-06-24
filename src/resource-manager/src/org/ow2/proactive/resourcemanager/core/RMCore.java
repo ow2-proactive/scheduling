@@ -960,7 +960,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             } else {
                 scriptExecitionResults.add(new ScriptWithResult(script, null));
                 // script has not been executed on remote host
-                logger.info("Error occured executing verifying script : " +
+                logger.info("Error occured executing selection script : " +
                     scriptResult.getException().getMessage());
             }
         }

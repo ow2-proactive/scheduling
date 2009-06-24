@@ -825,10 +825,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 logger_dev.error("", e1);
                 //Something goes wrong with the active object creation (createLauncher)
                 logger.warn("Active object creation exception : " + e1.getMessage());
-                //so try to get back the node to the resource manager
+                //so try to get back every remaining nodes to the resource manager
                 try {
-                    resourceManager.freeNode(node);
+                    resourceManager.freeNodes(nodeSet);
                 } catch (Exception e2) {
+                    logger_dev.info("Unable to get back the nodeSet to the RM", e2);
                 }
                 if (--activeObjectCreationRetryTimeNumber == 0) {
                     return;
@@ -837,10 +838,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 logger_dev.error("", e1);
                 //if we are here, it is that something append while launching the current task.
                 logger.warn("Current node (" + node + ") has failed : " + e1.getMessage(), e1);
-                //so try to get back the node to the resource manager
+                //so try to get back every remaining nodes to the resource manager
                 try {
-                    resourceManager.freeNode(node);
+                    resourceManager.freeNodes(nodeSet);
                 } catch (Exception e2) {
+                    logger_dev.info("Unable to get back the nodeSet to the RM", e2);
                 }
             }
 
@@ -1083,6 +1085,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param taskId the identification of the executed task.
      */
     public void terminate(TaskId taskId) {
+        boolean hasBeenReleased = false;
         int nativeIntegerResult = 0;
         JobId jobId = taskId.getJobId();
         logger_dev.info("Received terminate task request for task '" + taskId + "' - job '" + jobId + "'");
@@ -1144,6 +1147,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //free execution node even if it is dead
                     try {
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes());
+                        hasBeenReleased = true;
                     } catch (Exception e) {
                         //save the return
                     }
@@ -1179,6 +1183,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //free execution node even if it is dead
                     resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                             .getCleaningScript());
+                    hasBeenReleased = true;
                     return;
                 } catch (StartProcessException spe) {
                     //if res.value throws a StartProcessException, it can be due to an IOException thrown by the process
@@ -1217,6 +1222,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     try {
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                                 .getCleaningScript());
+                        hasBeenReleased = true;
                     } catch (Exception e) {
                         logger_dev.error("", e);
                         //cannot get back the node, RM take care about that.
@@ -1304,12 +1310,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     SchedulerEvent.JOB_RUNNING_TO_FINISHED, job.getJobInfo()));
             }
 
-            //free every execution nodes
-            resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
-                    .getCleaningScript());
+            //free every execution nodes in the finally
+
         } catch (NullPointerException eNull) {
             logger_dev.error("", eNull);
+            //avoid race condition between kill and terminate task
             //the task has been killed. Nothing to do anymore with this one.
+            //should never happen
+        } finally {
+            if (!hasBeenReleased) {
+                //free every execution nodes
+                resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
+                        .getCleaningScript());
+            }
         }
     }
 
@@ -1725,7 +1738,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                         try {
                             td.getExecuterInformations().getLauncher().terminate();
-                        } catch (Exception e) { /* Tested, nothing to do */
+                        } catch (Exception e) {
+                            /* Tested, nothing to do */
+                            logger_dev.error("", e);
                         }
 
                         try {
@@ -1739,6 +1754,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         }
                     } catch (Exception e) {
                         //do nothing, the task is already terminated.
+                        logger_dev.error("", e);
                     }
                 }
             }
