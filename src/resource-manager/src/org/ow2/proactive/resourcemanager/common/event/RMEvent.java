@@ -81,4 +81,12 @@ public class RMEvent implements Serializable {
     public RMEventType getEventType() {
         return type;
     }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return this.type + "[" + this.RMUrl + "]";
+    }
 }

@@ -105,6 +105,7 @@ public class RMNodeEvent extends RMEvent {
 
     /**
      * Compare two RMNodeEvent objects.
+     *
      * @param obj RMNodeEvent object to compare.
      * @return true if the two events represent the same Node.
      */
@@ -118,6 +119,7 @@ public class RMNodeEvent extends RMEvent {
 
     /**
      * Returns node's URL.
+     *
      * @return URL of the node.
      */
     public String getNodeUrl() {
@@ -126,6 +128,7 @@ public class RMNodeEvent extends RMEvent {
 
     /**
      * Returns {@link NodeSource} name of the node
+     *
      * @return name of the node.
      */
     public String getNodeSource() {
@@ -134,6 +137,7 @@ public class RMNodeEvent extends RMEvent {
 
     /**
      * Returns {@link ProActiveDescriptor} name of the node.
+     *
      * @return ProActiveDescriptor name of the node.
      */
     public String getPADName() {
@@ -142,6 +146,7 @@ public class RMNodeEvent extends RMEvent {
 
     /**
      * Returns {@link VirtualNode} name of the node.
+     *
      * @return Virtual Node name of the node.
      */
     public String getVnName() {
@@ -150,6 +155,7 @@ public class RMNodeEvent extends RMEvent {
 
     /**
      * Returns host name of the node.
+     *
      * @return host name of the node.
      */
     public String getHostName() {
@@ -158,6 +164,7 @@ public class RMNodeEvent extends RMEvent {
 
     /**
      * Returns java Virtual machine name of the node.
+     *
      * @return java Virtual machine name of the node.
      */
     public String getVMName() {
@@ -166,9 +173,19 @@ public class RMNodeEvent extends RMEvent {
 
     /**
      * Returns the state of the node related to this event.
+     *
      * @return state of the node.
      */
     public NodeState getNodeState() {
         return nodeState;
     }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return this.getEventType() + "[" + this.nodeUrl + ":" + this.nodeState + "]";
+    }
+
 }
