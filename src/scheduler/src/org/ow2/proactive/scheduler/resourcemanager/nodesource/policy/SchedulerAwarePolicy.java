@@ -60,7 +60,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     @Configurable(password = true)
     protected String password = "";
     @Configurable
-    protected boolean preemptive = true;
+    protected boolean preemptive = false;
 
     protected SchedulerState state;
     protected UserSchedulerInterface userInterface;
