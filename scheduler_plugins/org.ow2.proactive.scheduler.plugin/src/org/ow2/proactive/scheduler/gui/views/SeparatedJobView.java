@@ -414,11 +414,11 @@ public class SeparatedJobView extends ViewPart {
         setVisible(false);
 
         if (schedulerShell == null) {
-		try {
-			schedulerShell = Display.getDefault().getShells()[1];
-		} catch (RuntimeException e){
-			schedulerShell = Display.getDefault().getActiveShell();
-		}
+            try {
+                schedulerShell = Display.getDefault().getShells()[1];
+            } catch (RuntimeException e) {
+                schedulerShell = Display.getDefault().getActiveShell();
+            }
         }
 
         Display.getCurrent().asyncExec(new Runnable() {

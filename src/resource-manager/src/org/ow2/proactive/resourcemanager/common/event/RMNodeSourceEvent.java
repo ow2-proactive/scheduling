@@ -113,4 +113,12 @@ public class RMNodeSourceEvent extends RMEvent {
     public String getSourceDescription() {
         return this.nodeSourceDescription;
     }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return this.getEventType() + "[" + getSourceName() + "]";
+    }
 }
