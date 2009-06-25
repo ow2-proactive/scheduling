@@ -155,6 +155,27 @@ else {
 }
 if (selected) {
 
+    // we first try to see if Matlab is available
+    if (windows) {
+  	  cmd_options = ["-automation","-r"];
+    }
+    else {
+	  cmd_options = ["-nodisplay", "-nosplash", "-r"];
+    }
+    logWriter.println(java.util.Date()+" Trying to start a Matlab session");
+    cmd_array = [command];
+    cmd_array = cmd_array.concat(cmd_options);
+    cmd_array = cmd_array.concat("i=0;");
+    rt = java.lang.Runtime.getRuntime();
+    process = rt.exec(cmd_array);
+    res = process.waitFor();
+    if (res > 0) {
+        selected = false;
+        logWriter.println(java.util.Date()+" Unsufficient licence coin for matlab. " + java.net.InetAddress.getLocalHost().getHostName());
+    }
+    if (selected) {
+
+
     // we build the matlab code that will be run to trigger the licence token acquisitions
     fullcode = "";
     allargs = "";
@@ -186,6 +207,7 @@ if (selected) {
     if (selected) {
         logWriter.println(java.util.Date()+" : Good : " + java.net.InetAddress.getLocalHost().getHostName());
     }
+  }
 }
 else logWriter.println(java.util.Date()+" : No Matlab installed or system error: " + java.net.InetAddress.getLocalHost().getHostName());
 

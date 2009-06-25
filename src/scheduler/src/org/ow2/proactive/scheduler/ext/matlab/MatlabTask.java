@@ -224,7 +224,9 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
         } else {
 
             if (!threadstarted) {
-                System.out.println("[" + host + " MATLAB TASK] Starting the Threads");
+                if (debug) {
+                    System.out.println("[" + host + " MATLAB TASK] Starting the Threads");
+                }
                 // We define the loggers which will write on standard output what comes from the java process
                 LoggingThread lt1 = new LoggingThread(jvminfo.getProcess().getInputStream(), "[" + host +
                     " OUT]", new PrintStream(new File("D:\\test_out.txt")));// new PrintStream(new File("D:\\test_out.txt")));//System.out);
