@@ -72,7 +72,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     // policy state
     private int currentNodeNumber = 0;
-    private int pendingNodesNumber = 0;
+    private int pendingNodesNumberAcq = 0;
+    private int pendingNodesNumberRel = 0;
     private int releaseNodesNumber = 0;
     private transient Timer timer;
     private SchedulerLoadingPolicy thisStub;
@@ -127,20 +128,34 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     private synchronized void refreshPolicyState() {
         int nodeSize = nodeSource.getNodesCount();
-        if (pendingNodesNumber == 0) {
+
+        if (pendingNodesNumberRel != 0) {
+            if (nodeSize < currentNodeNumber) {
+                pendingNodesNumberRel -= currentNodeNumber - nodeSize;
+
+                if (pendingNodesNumberRel < 0) {
+                    logger.debug("Some nodes probably were removed from node source: old nodes size=" +
+                        currentNodeNumber + ", new nodes size=" + nodeSize + ", pending nodes=" +
+                        pendingNodesNumberRel);
+                    pendingNodesNumberRel = 0;
+                }
+            }
+        }
+
+        if (pendingNodesNumberAcq == 0) {
             currentNodeNumber = nodeSize;
         } else {
 
             if (nodeSize > currentNodeNumber) {
-                pendingNodesNumber -= nodeSize - currentNodeNumber;
+                pendingNodesNumberAcq -= nodeSize - currentNodeNumber;
             }
 
             currentNodeNumber = nodeSize;
-            if (pendingNodesNumber < 0) {
+            if (pendingNodesNumberAcq < 0) {
                 logger.debug("Some nodes probably were removed from node source: old nodes size=" +
                     currentNodeNumber + ", new nodes size=" + nodeSize + ", pending nodes=" +
-                    pendingNodesNumber);
-                pendingNodesNumber = 0;
+                    pendingNodesNumberAcq);
+                pendingNodesNumberAcq = 0;
             }
         }
     }
@@ -148,9 +163,10 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private void updateNumberOfNodes() {
         refreshPolicyState();
 
-        logger.debug("updateNumberOfNodes() - currentNodeSize=" + currentNodeNumber + ", pendingNodesSize=" +
-            pendingNodesNumber);
-        int potentialNodeSize = currentNodeNumber + pendingNodesNumber;
+        logger.debug("updateNumberOfNodes() - currentNodeSize=" + currentNodeNumber +
+            ", pendingNodesNumberAcq=" + pendingNodesNumberAcq + ", pendingNodesNumberRel=" +
+            pendingNodesNumberRel);
+        int potentialNodeSize = currentNodeNumber + pendingNodesNumberAcq - pendingNodesNumberRel;
 
         if (potentialNodeSize < minNodes) {
             int difference = minNodes - potentialNodeSize;
@@ -165,6 +181,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         }
 
         int requiredNodesNumber = activeTask / loadingFactor + (activeTask % loadingFactor == 0 ? 0 : 1);
+        logger.debug("required node number " + requiredNodesNumber);
 
         if (requiredNodesNumber == potentialNodeSize) {
             return;
@@ -186,6 +203,11 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     }
 
     private void acquireNNodes(int number) {
+        if (pendingNodesNumberRel > 0) {
+            logger.debug("Some nodes removals are pending. Acquire request will not be sent.");
+            return;
+        }
+
         logger.debug("Acquiring " + number + " nodes");
         super.acquireNodes(number);
 
@@ -195,7 +217,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             }
         }
 
-        pendingNodesNumber += number;
+        pendingNodesNumberAcq += number;
     }
 
     private void removeNodes(int number) {
@@ -228,13 +250,14 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                         return;
                     }
 
-                    if (maxNumberOfAttempts > 0 && pendingNodesNumber > 0) {
+                    if (maxNumberOfAttempts > 0 && pendingNodesNumberAcq > 0) {
                         maxNumberOfAttempts--;
                         logger.debug("Some nodes are still initializing. Release request will not be sent.");
                         return;
                     }
 
                     releaseNodesNumber--;
+                    pendingNodesNumberRel++;
                     logger.debug("Releasing node");
                     thisStub.removeNodes(1, preemptive);
                 }
