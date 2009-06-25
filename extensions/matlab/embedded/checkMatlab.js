@@ -108,6 +108,11 @@ if (!logFile.exists()) {
 }
 logWriter = java.io.PrintStream(java.io.BufferedOutputStream(java.io.FileOutputStream(logFile, true)));
 
+nodeDir = java.io.File(tmpPath,nodeName);
+if (!nodeDir.exists()) {
+	nodeDir.mkdir();
+}
+
 
 selected = false;
 host = java.net.InetAddress.getLocalHost().getHostName();
@@ -162,16 +167,24 @@ if (selected) {
     else {
 	  cmd_options = ["-nodisplay", "-nosplash", "-r"];
     }
+
+    testF = java.io.File(nodeDir,"matlabTest.lock");
+
     logWriter.println(java.util.Date()+" Trying to start a Matlab session");
     cmd_array = [command];
     cmd_array = cmd_array.concat(cmd_options);
-    cmd_array = cmd_array.concat("i=0;");
+    cmd_array = cmd_array.concat("delete('"+testF.toString()+"');quit;");
     rt = java.lang.Runtime.getRuntime();
     process = rt.exec(cmd_array);
-    res = process.waitFor();
-    if (res > 0) {
+    process.waitFor();
+    if (testF.exists()) {
         selected = false;
         logWriter.println(java.util.Date()+" Unsufficient licence coin for matlab. " + java.net.InetAddress.getLocalHost().getHostName());
+    }
+    try {
+       process.destroy();
+    }
+    catch(err) {
     }
     if (selected) {
 

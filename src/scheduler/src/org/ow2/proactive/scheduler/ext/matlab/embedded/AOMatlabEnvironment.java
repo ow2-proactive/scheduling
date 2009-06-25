@@ -386,7 +386,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Matlab Environment Job " + lastGenJobId++);
         job.setPriority(priority);
-        job.setCancelJobOnError(true);
+        job.setCancelJobOnError(false);
         job.setDescription("Set of parallel matlab tasks");
 
         for (int i = 0; i < mainScripts.length; i++) {

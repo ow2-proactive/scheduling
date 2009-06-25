@@ -229,9 +229,9 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
                 }
                 // We define the loggers which will write on standard output what comes from the java process
                 LoggingThread lt1 = new LoggingThread(jvminfo.getProcess().getInputStream(), "[" + host +
-                    " OUT]", new PrintStream(new File("D:\\test_out.txt")));// new PrintStream(new File("D:\\test_out.txt")));//System.out);
+                        " OUT]", new PrintStream(new File("D:\\test_out.txt")));// new PrintStream(new File("D:\\test_out.txt")));//System.out);
                 LoggingThread lt2 = new LoggingThread(jvminfo.getProcess().getErrorStream(), "[" + host +
-                    " ERR]", new PrintStream(new File("D:\\test_err.txt")));// new PrintStream(new File("D:\\test_err.txt")));//System.err);
+                        " ERR]", new PrintStream(new File("D:\\test_err.txt")));// new PrintStream(new File("D:\\test_err.txt")));//System.err);
                 //IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, jvminfo.getProcess().getOutputStream());
 
                 jvminfo.setLogger(lt1);
@@ -307,7 +307,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
 
         if (scriptLines.size() == 0) {
             throw new IllegalArgumentException(
-                "Either one of \"script\" \"scripturl\" \"scriptfile\" must be given");
+                    "Either one of \"script\" \"scripturl\" \"scriptfile\" must be given");
         }
 
         // an input script, launched before the main script (embedded only)
@@ -346,7 +346,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
         }
 
         final AOMatlabWorker worker = (AOMatlabWorker) PAActiveObject.newActive(className,
-                new Object[] { matlabConfig }, jvminfo.getNode());
+                new Object[]{matlabConfig}, jvminfo.getNode());
 
         jvminfo.setWorker(worker);
 
@@ -368,6 +368,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
      */
     protected Serializable executeInternal(TaskResult... results) throws Throwable {
 
+        boolean releaseEngine = inputScript.indexOf("PROACTIVE_INITIALIZATION_CODE") == -1;
         MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
         AOMatlabWorker sw = jvminfo.getWorker();
         if (sw == null) {
@@ -393,22 +394,31 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
         if (debug) {
             System.out.println("[" + host + " MatlabTask] Executing");
         }
+        Serializable res = null;
+        try {
 
-        // We execute the task on the worker
-        Serializable res = sw.execute(index, results);
-        // We wait for the result
-        res = (Serializable) PAFuture.getFutureValue(res);
+            // We execute the task on the worker
+            res = sw.execute(index, results);
+            // We wait for the result
+            res = (Serializable) PAFuture.getFutureValue(res);
 
-        if (debug) {
-            System.out.println("[" + host + " MatlabTask] Received result");
-        }
-
-        if (inputScript.indexOf("PROACTIVE_INITIALIZATION_CODE") == -1) {
             if (debug) {
-                System.out.println("[" + host + " MatlabTask] Terminating Matlab engine");
+                System.out.println("[" + host + " MatlabTask] Received result");
             }
-            sw.terminate();
+            if (releaseEngine) {
+                if (debug) {
+                    System.out.println("[" + host + " MatlabTask] Terminating Matlab engine");
+                }
+                sw.terminate();
+            }
+
         }
+        catch (Exception e) {
+            System.out.println("[" + host + " MatlabTask] Terminating Matlab engine");
+            sw.terminate();
+            throw e;
+        }
+
 
         return res;
     }
@@ -432,7 +442,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
         subscribeJMXRuntimeEvent();
 
         javaCommandBuilder.setParameters("-d " + deployid + " -p " +
-            RuntimeFactory.getDefaultRuntime().getURL());
+                RuntimeFactory.getDefaultRuntime().getURL());
 
         // We build the process with a separate environment
         ProcessBuilder pb = new ProcessBuilder();
@@ -462,7 +472,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
         // we set as well the java.library.path property (precaution), we forward as well the RMI port in use
 
         javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
-            " -Dproactive.rmi.port=" + Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()));
+                " -Dproactive.rmi.port=" + Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()));
 
         if (debug) {
             System.out.println("Starting Process:");
@@ -552,12 +562,12 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
         }
 
         newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabBinDir()) +
-            newPath;
+                newPath;
         newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + matlabConfig.getMatlabLibDirName()) +
-            os.pathSeparator() + newPath;
+                os.pathSeparator() + newPath;
         newPath = (matlabConfig.getMatlabHome() + os.fileSeparator() + "sys" + os.fileSeparator() + "os" +
-            os.fileSeparator() + lastDir) +
-            os.pathSeparator() + newPath;
+                os.fileSeparator() + lastDir) +
+                os.pathSeparator() + newPath;
 
         return newPath;
     }
