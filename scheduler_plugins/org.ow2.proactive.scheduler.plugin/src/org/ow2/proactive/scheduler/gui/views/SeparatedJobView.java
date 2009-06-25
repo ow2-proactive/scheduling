@@ -420,6 +420,13 @@ public class SeparatedJobView extends ViewPart {
 			schedulerShell = Display.getDefault().getActiveShell();
 		}
         }
+
+        Display.getCurrent().asyncExec(new Runnable() {
+            public void run() {
+                connectSchedulerAction.run();
+            }
+        });
+
     }
 
     public static Shell getSchedulerShell() {

@@ -37,10 +37,12 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.handlers.ConnectHandler;
 import org.ow2.proactive.resourcemanager.gui.table.RMTableViewer;
 import org.ow2.proactive.resourcemanager.gui.table.TableLabelProvider;
 import org.ow2.proactive.resourcemanager.gui.table.TableSelectionListener;
@@ -87,6 +89,12 @@ public class ResourcesTabView extends ViewPart {
         if (RMStore.isConnected()) {
             tabViewer.init();
         }
+
+        Display.getCurrent().asyncExec(new Runnable() {
+            public void run() {
+                ConnectHandler.getHandler().execute(Display.getDefault().getActiveShell());
+            }
+        });
     }
 
     private void hookContextMenu() {
@@ -102,8 +110,6 @@ public class ResourcesTabView extends ViewPart {
     /**
      * Called when view is closed
      * sacrifices tabViewer to garbage collector
-     */
-    /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
      */
     public void dispose() {

@@ -214,7 +214,7 @@ public class SelectResourceManagerDialog extends Dialog {
         shell.pack();
         shell.open();
 
-        // pwdText.setFocus();
+        pwdText.setFocus();
 
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) {
