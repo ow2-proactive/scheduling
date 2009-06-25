@@ -39,6 +39,7 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
@@ -48,7 +49,16 @@ import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialogR
 
 public class ConnectHandler extends AbstractHandler implements IHandler {
 
-    boolean previousState = true;
+    private boolean previousState = true;
+    private static ConnectHandler thisHandler;
+
+    public ConnectHandler() {
+        thisHandler = this;
+    }
+
+    public static ConnectHandler getHandler() {
+        return thisHandler;
+    }
 
     @Override
     public boolean isEnabled() {
@@ -62,8 +72,11 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
     }
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(HandlerUtil
-                .getActiveWorkbenchWindowChecked(event).getShell());
+        return execute(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell());
+    }
+
+    public Object execute(Shell parent) {
+        SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(parent);
         if (dialogResult != null && !dialogResult.isCanceled()) {
             try {
                 RMStore.newInstance(dialogResult.getUrl(), dialogResult.getLogin(), dialogResult
