@@ -32,9 +32,9 @@
 package org.ow2.proactive.resourcemanager.frontend;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.management.MBeanServer;
@@ -108,9 +108,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     // Attributes
     private RMCoreInterface rmcore;
     private HashMap<UniqueID, RMEventListener> RMListeners;
-
-    private List<UniqueID> dirtyListeners = new ArrayList<UniqueID>();
-
+    /** List used to mark the user that does not respond anymore */
+    private Set<UniqueID> dirtyList = new HashSet<UniqueID>();
     private String MonitoringUrl = null;
 
     /** Resource Manager's MBean */
@@ -209,26 +208,41 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         return true;
     }
 
-    /** inherited from RMEventListener methods
+    /**
+     * Clear every dirty listeners that are no more responding
      */
+    private void clearListeners() {
+        for (UniqueID uId : dirtyList) {
+            RMListeners.remove(uId);
+            logger.info("User known as '" + uId.shortString() + "' has been removed from listeners");
+        }
+        dirtyList.clear();
+    }
+
+    /**
+     * Put this is to be removed in the dirty list.
+     *
+     * @param id the id of the user to be removed.
+     */
+    private void markAsDirty(UniqueID id) {
+        logger.info("User known as '" + id.shortString() + "' seems to be down");
+        dirtyList.add(id);
+    }
+
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeEvent(RMNodeEvent event) {
         event.setRMUrl(this.MonitoringUrl);
         rmBean.nodeEvent(event);
-
         for (Entry<UniqueID, RMEventListener> entry : RMListeners.entrySet()) {
-            RMEventListener listener = entry.getValue();
             try {
-                listener.nodeEvent(event);
+                entry.getValue().nodeEvent(event);
             } catch (Exception e) {
-                logger.info("Error on a listener, it will be removed. Error is : " + e.getMessage());
-                logger.debug(e.getStackTrace());
-                dirtyListeners.add(entry.getKey());
+                markAsDirty(entry.getKey());
             }
         }
-        clearDirtyListeners();
+        clearListeners();
     }
 
     /**
@@ -236,17 +250,18 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeSourceEvent(RMNodeSourceEvent event) {
         event.setRMUrl(this.MonitoringUrl);
+        //dispatch event
+        if (logger.isDebugEnabled()) {
+            logger.debug("Dispatch event '" + event.toString() + "'");
+        }
         for (Entry<UniqueID, RMEventListener> entry : RMListeners.entrySet()) {
-            RMEventListener listener = entry.getValue();
             try {
-                listener.nodeSourceEvent(event);
+                entry.getValue().nodeSourceEvent(event);
             } catch (Exception e) {
-                logger.info("Error on a listener, it will be removed. Error is : " + e.getMessage());
-                logger.debug(e.getStackTrace());
-                dirtyListeners.add(entry.getKey());
+                markAsDirty(entry.getKey());
             }
         }
-        clearDirtyListeners();
+        clearListeners();
     }
 
     /**
@@ -256,16 +271,13 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         event.setRMUrl(this.MonitoringUrl);
         rmBean.rmEvent(event);
         for (Entry<UniqueID, RMEventListener> entry : RMListeners.entrySet()) {
-            RMEventListener listener = entry.getValue();
             try {
-                listener.rmEvent(event);
+                entry.getValue().rmEvent(event);
             } catch (Exception e) {
-                logger.info("Error on a listener, it will be removed. Error is : " + e.getMessage());
-                logger.debug(e.getStackTrace());
-                dirtyListeners.add(entry.getKey());
+                markAsDirty(entry.getKey());
             }
         }
-        clearDirtyListeners();
+        clearListeners();
     }
 
     /** 
@@ -279,12 +291,5 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     public Logger getLogger() {
         return logger;
-    }
-
-    private void clearDirtyListeners() {
-        for (UniqueID id : dirtyListeners) {
-            this.RMListeners.remove(id);
-        }
-        dirtyListeners.clear();
     }
 }
