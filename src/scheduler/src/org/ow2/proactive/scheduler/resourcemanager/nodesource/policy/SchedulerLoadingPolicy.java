@@ -40,6 +40,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.PolicyRestriction;
@@ -68,7 +69,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private int releasePeriod = 1000;
 
     // policy state
-    private int currentNodeNumber = 0;
+    private int currentNSNodeNumber = 0;
+    private int totalNodeNumber = 0;
     private int pendingNodesNumberAcq = 0;
     private int pendingNodesNumberRel = 0;
     private int releaseNodesNumber = 0;
@@ -97,6 +99,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     public void initActivity(Body body) {
         thisStub = (SchedulerLoadingPolicy) PAActiveObject.getStubOnThis();
+        PAActiveObject.setImmediateService("getTotalNodeNumber");
     }
 
     public BooleanWrapper activate() {
@@ -125,16 +128,25 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         return thisStub;
     }
 
+    protected IntWrapper getTotalNodeNumber() {
+        return nodeSource.getRMCore().getNbAllRMNodes();
+    }
+
     private synchronized void refreshPolicyState() {
-        int nodeSize = nodeSource.getNodesCount();
+        totalNodeNumber = thisStub.getTotalNodeNumber().intValue();
+        int nsNodeSize = nodeSource.getNodesCount();
+
+        if (nsNodeSize == 0) {
+            pendingNodesNumberRel = 0;
+        }
 
         if (pendingNodesNumberRel != 0) {
-            if (nodeSize < currentNodeNumber) {
-                pendingNodesNumberRel -= currentNodeNumber - nodeSize;
+            if (nsNodeSize < currentNSNodeNumber) {
+                pendingNodesNumberRel -= currentNSNodeNumber - nsNodeSize;
 
                 if (pendingNodesNumberRel < 0) {
                     logger.debug("Some nodes probably were removed from node source: old nodes size=" +
-                        currentNodeNumber + ", new nodes size=" + nodeSize + ", pending nodes=" +
+                        currentNSNodeNumber + ", new nodes size=" + nsNodeSize + ", pending nodes=" +
                         pendingNodesNumberRel);
                     pendingNodesNumberRel = 0;
                 }
@@ -142,17 +154,17 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         }
 
         if (pendingNodesNumberAcq == 0) {
-            currentNodeNumber = nodeSize;
+            currentNSNodeNumber = nsNodeSize;
         } else {
 
-            if (nodeSize > currentNodeNumber) {
-                pendingNodesNumberAcq -= nodeSize - currentNodeNumber;
+            if (nsNodeSize > currentNSNodeNumber) {
+                pendingNodesNumberAcq -= nsNodeSize - currentNSNodeNumber;
             }
 
-            currentNodeNumber = nodeSize;
+            currentNSNodeNumber = nsNodeSize;
             if (pendingNodesNumberAcq < 0) {
                 logger.debug("Some nodes probably were removed from node source: old nodes size=" +
-                    currentNodeNumber + ", new nodes size=" + nodeSize + ", pending nodes=" +
+                    currentNSNodeNumber + ", new nodes size=" + nsNodeSize + ", pending nodes=" +
                     pendingNodesNumberAcq);
                 pendingNodesNumberAcq = 0;
             }
@@ -162,10 +174,10 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private void updateNumberOfNodes() {
         refreshPolicyState();
 
-        logger.debug("updateNumberOfNodes() - currentNodeSize=" + currentNodeNumber +
-            ", pendingNodesNumberAcq=" + pendingNodesNumberAcq + ", pendingNodesNumberRel=" +
-            pendingNodesNumberRel);
-        int potentialNodeSize = currentNodeNumber + pendingNodesNumberAcq - pendingNodesNumberRel;
+        logger.debug("Policy State: currentNSNodeSize=" + currentNSNodeNumber + ", totalNodeNumber=" +
+            totalNodeNumber + ", pendingNodesNumberAcq=" + pendingNodesNumberAcq +
+            ", pendingNodesNumberRel=" + pendingNodesNumberRel);
+        int potentialNodeSize = totalNodeNumber + pendingNodesNumberAcq - pendingNodesNumberRel;
 
         if (potentialNodeSize < minNodes) {
             int difference = minNodes - potentialNodeSize;
@@ -244,7 +256,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                     refreshPolicyState();
 
                     if (releaseNodesNumber == 0) {
-                        logger.debug("Released everything");
+                        logger.debug("Timer finished releasing nodes");
                         timer.cancel();
                         return;
                     }
@@ -253,6 +265,13 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                         maxNumberOfAttempts--;
                         logger.debug("Some nodes are still initializing. Release request will not be sent.");
                         return;
+                    } else if (pendingNodesNumberAcq > 0) {
+                        logger
+                                .warn("Some nodes have not been acquired for a long time. It prevents policy to release nodes.");
+                        logger
+                                .warn("Probably maximum number of nodes in policy configuration exeeds physical capasycy of the infrastructure");
+                        logger.warn("Reseting pending acquiring nodes number");
+                        pendingNodesNumberAcq = 0;
                     }
 
                     releaseNodesNumber--;
