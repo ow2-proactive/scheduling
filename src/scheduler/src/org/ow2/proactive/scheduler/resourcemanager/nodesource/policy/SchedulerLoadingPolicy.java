@@ -69,8 +69,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private int releasePeriod = 1000;
 
     // policy state
-    private int currentNSNodeNumber = 0;
-    private int totalNodeNumber = 0;
+    private int currentNodeNumberInNodeSource = 0;
+    private int currentNodeNumberInResourceManager = 0;
     private int pendingNodesNumberAcq = 0;
     private int pendingNodesNumberRel = 0;
     private int releaseNodesNumber = 0;
@@ -133,89 +133,149 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     }
 
     private synchronized void refreshPolicyState() {
-        totalNodeNumber = thisStub.getTotalNodeNumber().intValue();
-        int nsNodeSize = nodeSource.getNodesCount();
+        // recalculating the current node number in resource manager and the node source
+        currentNodeNumberInResourceManager = thisStub.getTotalNodeNumber().intValue();
+        int newNodeNumberInNodeSource = nodeSource.getNodesCount();
 
-        if (nsNodeSize == 0) {
-            pendingNodesNumberRel = 0;
-        }
-
+        // recalculating pending nodes to release and to acquire
         if (pendingNodesNumberRel != 0) {
-            if (nsNodeSize < currentNSNodeNumber) {
-                pendingNodesNumberRel -= currentNSNodeNumber - nsNodeSize;
+            // there are some pending node removal requests
+            if (newNodeNumberInNodeSource < currentNodeNumberInNodeSource) {
+                pendingNodesNumberRel -= currentNodeNumberInNodeSource - newNodeNumberInNodeSource;
 
                 if (pendingNodesNumberRel < 0) {
-                    logger.debug("Some nodes probably were removed from node source: old nodes size=" +
-                        currentNSNodeNumber + ", new nodes size=" + nsNodeSize + ", pending nodes=" +
+                    // possible only if some nodes were removed by user (should not be done for this policy)
+                    // if it's the same this message could be ignored
+                    logger.warn("Incorrect node source state: [pending node removal requests < 0] : " +
+                        "currentNodeNumberInNodeSource" + currentNodeNumberInNodeSource +
+                        ", newNodeNumberInNodeSource=" + newNodeNumberInNodeSource +
+                        ", pendingNodesNumberAcq=" + pendingNodesNumberAcq + ", pendingNodesNumberRel=" +
                         pendingNodesNumberRel);
                     pendingNodesNumberRel = 0;
                 }
+            } else if (newNodeNumberInNodeSource > currentNodeNumberInNodeSource) {
+                // pending node removal request > 0 => should not acquire nodes at this time
+                logger
+                        .warn("Incorrect node source state: [waiting for node removal and should not acquire nodes at this phase] : " +
+                            "currentNodeNumberInNodeSource" +
+                            currentNodeNumberInNodeSource +
+                            ", newNodeNumberInNodeSource=" +
+                            newNodeNumberInNodeSource +
+                            ", pendingNodesNumberAcq=" +
+                            pendingNodesNumberAcq +
+                            ", pendingNodesNumberRel=" +
+                            pendingNodesNumberRel);
             }
         }
 
         if (pendingNodesNumberAcq == 0) {
-            currentNSNodeNumber = nsNodeSize;
+            // no pending acquisition requests
+            // just updating current node size in the node source
+            currentNodeNumberInNodeSource = newNodeNumberInNodeSource;
         } else {
 
-            if (nsNodeSize > currentNSNodeNumber) {
-                pendingNodesNumberAcq -= nsNodeSize - currentNSNodeNumber;
+            // updating pending node acquisition requests 
+            if (newNodeNumberInNodeSource > currentNodeNumberInNodeSource) {
+                pendingNodesNumberAcq -= newNodeNumberInNodeSource - currentNodeNumberInNodeSource;
             }
 
-            currentNSNodeNumber = nsNodeSize;
+            currentNodeNumberInNodeSource = newNodeNumberInNodeSource;
             if (pendingNodesNumberAcq < 0) {
-                logger.debug("Some nodes probably were removed from node source: old nodes size=" +
-                    currentNSNodeNumber + ", new nodes size=" + nsNodeSize + ", pending nodes=" +
-                    pendingNodesNumberAcq);
+                // acquired more nodes than expected
+                logger.warn("Incorrect node source state: [pending node acquisition requests < 0] : " +
+                    "currentNodeNumberInNodeSource" + currentNodeNumberInNodeSource +
+                    ", newNodeNumberInNodeSource=" + newNodeNumberInNodeSource + ", pendingNodesNumberAcq=" +
+                    pendingNodesNumberAcq + ", pendingNodesNumberRel=" + pendingNodesNumberRel);
                 pendingNodesNumberAcq = 0;
             }
         }
+
+        // consistency checks
+        if (currentNodeNumberInNodeSource == minNodes && pendingNodesNumberRel > 0) {
+            logger
+                    .warn("Incorrect node source state: [the node source has min number of nodes but pendingNodesNumberRel > 0] : " +
+                        "currentNodeNumberInNodeSource" +
+                        currentNodeNumberInNodeSource +
+                        ", pendingNodesNumberAcq=" +
+                        pendingNodesNumberAcq +
+                        ", pendingNodesNumberRel=" +
+                        pendingNodesNumberRel);
+            pendingNodesNumberRel = 0;
+        }
+        if (currentNodeNumberInNodeSource == maxNodes && pendingNodesNumberAcq > 0) {
+            logger
+                    .warn("Incorrect node source state: [the node source has max number of nodes but pendingNodesNumberAcq > 0] : " +
+                        "currentNodeNumberInNodeSource" +
+                        currentNodeNumberInNodeSource +
+                        ", pendingNodesNumberAcq=" +
+                        pendingNodesNumberAcq +
+                        ", pendingNodesNumberRel=" +
+                        pendingNodesNumberRel);
+            pendingNodesNumberAcq = 0;
+        }
+
     }
 
     private void updateNumberOfNodes() {
         refreshPolicyState();
 
-        logger.debug("Policy State: currentNSNodeSize=" + currentNSNodeNumber + ", totalNodeNumber=" +
-            totalNodeNumber + ", pendingNodesNumberAcq=" + pendingNodesNumberAcq +
-            ", pendingNodesNumberRel=" + pendingNodesNumberRel);
-        int potentialNodeSize = totalNodeNumber + pendingNodesNumberAcq - pendingNodesNumberRel;
+        logger.debug("Policy State: currentNodeNumberInNodeSource=" + currentNodeNumberInNodeSource +
+            ", currentNodeNumberInResourceManager=" + currentNodeNumberInResourceManager +
+            ", pendingNodesNumberAcq=" + pendingNodesNumberAcq + ", pendingNodesNumberRel=" +
+            pendingNodesNumberRel);
 
-        if (potentialNodeSize < minNodes) {
-            int difference = minNodes - potentialNodeSize;
+        int potentialNodeNumberInResourceManager = currentNodeNumberInResourceManager +
+            pendingNodesNumberAcq - pendingNodesNumberRel;
+        int potentialNodeNumberInNodeSource = currentNodeNumberInNodeSource + pendingNodesNumberAcq -
+            pendingNodesNumberRel;
+
+        if (potentialNodeNumberInNodeSource < minNodes) {
+            int difference = minNodes - potentialNodeNumberInNodeSource;
             acquireNNodes(difference);
             return;
         }
 
-        if (potentialNodeSize > maxNodes) {
-            int difference = potentialNodeSize - maxNodes;
+        if (potentialNodeNumberInNodeSource > maxNodes) {
+            int difference = potentialNodeNumberInNodeSource - maxNodes;
             removeNodes(difference);
             return;
         }
 
         int requiredNodesNumber = activeTask / loadingFactor + (activeTask % loadingFactor == 0 ? 0 : 1);
-        logger.debug("required node number " + requiredNodesNumber);
+        logger.debug("Required node number " + requiredNodesNumber);
 
-        if (requiredNodesNumber == potentialNodeSize) {
+        if (requiredNodesNumber == potentialNodeNumberInResourceManager) {
             return;
         }
 
         int difference = 0;
 
-        if (requiredNodesNumber < potentialNodeSize) {
-            // releasing
-            difference = requiredNodesNumber < minNodes ? potentialNodeSize - minNodes : potentialNodeSize -
-                requiredNodesNumber;
+        if (requiredNodesNumber < potentialNodeNumberInResourceManager) {
+            // releasing nodes
+
+            // how much do we need in total
+            difference = potentialNodeNumberInResourceManager - requiredNodesNumber;
+            // correction if after removal there will be too few nodes in the node source
+            if (potentialNodeNumberInNodeSource - difference < minNodes) {
+                difference = potentialNodeNumberInNodeSource - minNodes;
+            }
             removeNodes(difference);
         } else {
-            // acquiring
-            difference = requiredNodesNumber > maxNodes ? maxNodes - potentialNodeSize : requiredNodesNumber -
-                potentialNodeSize;
+            // acquiring nodes
+
+            difference = requiredNodesNumber - potentialNodeNumberInResourceManager;
+            // correct it if exceed max node number in the node source
+            if (potentialNodeNumberInNodeSource + difference > maxNodes) {
+                difference = maxNodes - potentialNodeNumberInNodeSource;
+            }
+
             acquireNNodes(difference);
         }
     }
 
     private void acquireNNodes(int number) {
         if (pendingNodesNumberRel > 0) {
-            logger.debug("Some nodes removals are pending. Acquire request will not be sent.");
+            logger.debug("Waiting for nodes to be removed. Acquire request will not be sent.");
             return;
         }
 
@@ -263,7 +323,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
                     if (maxNumberOfAttempts > 0 && pendingNodesNumberAcq > 0) {
                         maxNumberOfAttempts--;
-                        logger.debug("Some nodes are still initializing. Release request will not be sent.");
+                        logger.debug("Waiting for nodes to be acquired. Release request will not be sent.");
                         return;
                     } else if (pendingNodesNumberAcq > 0) {
                         logger

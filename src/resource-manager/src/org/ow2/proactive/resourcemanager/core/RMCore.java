@@ -635,6 +635,8 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             } else if (rmnode.isBusy()) {
                 internalSetToRelease(rmnode);
             }
+        } else {
+            logger.warn("Attempt to remove non existing node " + nodeUrl);
         }
     }
 
@@ -680,6 +682,10 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                     numberOfRemovedNodes++;
                 }
             }
+        }
+
+        if (numberOfRemovedNodes < number) {
+            logger.warn("Cannot remove " + number + " nodes from node source " + nodeSourceName);
         }
     }
 
