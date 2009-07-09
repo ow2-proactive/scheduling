@@ -1140,10 +1140,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
-                    DatabaseManager.forceStartTransaction();
+                    DatabaseManager.startTransaction();
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
-                    DatabaseManager.forceCommitTransaction();
+                    DatabaseManager.commitTransaction();
                     //free execution node even if it is dead
                     try {
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes());
@@ -1176,10 +1176,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
-                    DatabaseManager.forceStartTransaction();
+                    DatabaseManager.startTransaction();
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
-                    DatabaseManager.forceCommitTransaction();
+                    DatabaseManager.commitTransaction();
                     //free execution node even if it is dead
                     resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                             .getCleaningScript());
@@ -1235,11 +1235,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             .isPreciousResult());
                     //and update database
                     //update job and task info
-                    DatabaseManager.forceStartTransaction();
+                    DatabaseManager.startTransaction();
                     DatabaseManager.synchronize(job.getJobInfo());
                     DatabaseManager.synchronize(descriptor.getTaskInfo());
                     DatabaseManager.update(job.getJobResult());
-                    DatabaseManager.forceCommitTransaction();
+                    DatabaseManager.commitTransaction();
                     //send event to user
                     frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
@@ -1263,11 +1263,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 descriptor.getName() + "'");
 
             //and update database
-            DatabaseManager.forceStartTransaction();
+            DatabaseManager.startTransaction();
             DatabaseManager.synchronize(job.getJobInfo());
             DatabaseManager.synchronize(descriptor.getTaskInfo());
             DatabaseManager.update(job.getJobResult());
-            DatabaseManager.forceCommitTransaction();
+            DatabaseManager.commitTransaction();
 
             //clean the result to improve memory usage
             if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {

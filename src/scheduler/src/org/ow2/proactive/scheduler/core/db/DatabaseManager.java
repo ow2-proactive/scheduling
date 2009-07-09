@@ -185,10 +185,10 @@ public class DatabaseManager {
      * For simple atomic call, transaction is implicit.<br /><br />
      *
      * To use the manual transaction, call this forceStartTransaction() method,<br/>
-     * then, (when multiple modifications are done) a call to {@link #forceCommitTransaction()} OR {@link #forceRollbackTransaction()}
+     * then, (when multiple modifications are done) a call to {@link #commitTransaction()} OR {@link #rollbackTransaction()}
      * will terminate the transaction.
      */
-    public static void forceStartTransaction() {
+    public static void startTransaction() {
         synchronized (sessionlock) {
             Session s = globalSession.get();
             if (s == null) {
@@ -201,9 +201,9 @@ public class DatabaseManager {
 
     /**
      * Force a manually opened transaction to be committed.
-     * See {@link #forceStartTransaction()} for details.
+     * See {@link #startTransaction()} for details.
      */
-    public static void forceCommitTransaction() {
+    public static void commitTransaction() {
         synchronized (sessionlock) {
             Session s = globalSession.get();
             if (s == null) {
@@ -220,9 +220,9 @@ public class DatabaseManager {
 
     /**
      * Force a manually opened transaction to be rolledback.
-     * See {@link #forceStartTransaction()} for details.
+     * See {@link #startTransaction()} for details.
      */
-    public static void forceRollbackTransaction() {
+    public static void rollbackTransaction() {
         synchronized (sessionlock) {
             Session s = globalSession.get();
             if (s == null) {
