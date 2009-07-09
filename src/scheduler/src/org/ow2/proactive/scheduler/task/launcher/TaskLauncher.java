@@ -224,7 +224,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     @SuppressWarnings("unchecked")
     protected void initLoggers() {
-        logger_dev.info("Init loggers");
+        logger_dev.debug("Init loggers");
         // error about log should not be logged
         LogLog.setQuietMode(true);
         // create logger
@@ -323,7 +323,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     protected void finalizeLoggers() {
         synchronized (this.loggersFinalized) {
-            logger_dev.info("Terminating loggers for task " + this.taskId + "...");
+            logger_dev.debug("Terminating loggers for task " + this.taskId + "...");
             this.loggersFinalized.set(true);
             this.loggersActivated.set(false);
             //Unhandle loggers
@@ -331,7 +331,7 @@ public abstract class TaskLauncher implements InitActive {
             this.logAppender.close();
             System.setOut(System.out);
             System.setErr(System.err);
-            logger_dev.info("Terminated loggers for task " + this.taskId);
+            logger_dev.debug("Terminated loggers for task " + this.taskId);
         }
     }
 
