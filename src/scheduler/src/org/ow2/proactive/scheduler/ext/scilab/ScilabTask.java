@@ -57,6 +57,7 @@ import javax.management.NotificationListener;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.security.SecureRandom;
@@ -446,6 +447,12 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
 
         newPath = (scilabConfig.getScilabHome() + os.fileSeparator() + scilabConfig.getScilabLibDir()) +
             newPath;
+
+        File thirdpartyFolder = new File(scilabConfig.getScilabHome() + os.fileSeparator() +
+            scilabConfig.getScilabLibDir() + os.fileSeparator() + ".." + os.fileSeparator() + "thirdparty");
+        if (thirdpartyFolder.exists()) {
+            newPath = thirdpartyFolder.getPath() + os.pathSeparator() + newPath;
+        }
 
         return newPath;
     }

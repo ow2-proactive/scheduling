@@ -306,7 +306,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Scilab Environment Job " + lastJobId++);
         job.setPriority(priority);
-        job.setCancelJobOnError(true);
+        job.setCancelJobOnError(false);
         job.setDescription("Set of parallel scilab tasks");
         // the external log files as the output is forwarded into Scilab directly,
         // in debug mode you might want to read these files though

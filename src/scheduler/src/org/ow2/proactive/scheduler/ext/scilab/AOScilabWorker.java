@@ -98,6 +98,9 @@ public class AOScilabWorker implements Serializable {
         try {
             if (debug) {
                 System.out.println("Scilab Initialization...");
+                System.out.println("PATH=" + System.getenv("PATH"));
+                System.out.println("LD_LIBRARY_PATH=" + System.getenv("LD_LIBRARY_PATH"));
+                System.out.println("java.library.path=" + System.getProperty("java.library.path"));
             }
             System.out.println("Starting a new Scilab engine:");
             System.out.println(config);
@@ -123,6 +126,18 @@ public class AOScilabWorker implements Serializable {
             pw.println("java.class.path=" + System.getProperty("java.class.path"));
 
             NoClassDefFoundError ne = new NoClassDefFoundError(error_message.toString());
+            ne.initCause(e);
+            throw ne;
+        } catch (Throwable e) {
+            StringWriter error_message = new StringWriter();
+            PrintWriter pw = new PrintWriter(error_message);
+            pw.println("Error initializing Scilab in " + java.net.InetAddress.getLocalHost());
+            pw.println("PATH=" + System.getenv("PATH"));
+            pw.println("LD_LIBRARY_PATH=" + System.getenv("LD_LIBRARY_PATH"));
+            pw.println("java.library.path=" + System.getProperty("java.library.path"));
+            pw.println("java.class.path=" + System.getProperty("java.class.path"));
+
+            IllegalStateException ne = new IllegalStateException(error_message.toString());
             ne.initCause(e);
             throw ne;
         }
