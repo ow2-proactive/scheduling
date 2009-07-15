@@ -37,7 +37,10 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -54,11 +57,13 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
 @PolicyRestriction(supportedInfrastructures = { "org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure" })
-public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive {
+public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive {
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
     private int activeTask = 0;
 
+    @Configurable(description = "period of recalculating required number of nodes")
+    private int policyPeriod = 10000;
     @Configurable
     private int minNodes = 0;
     @Configurable
@@ -75,6 +80,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private int pendingNodesNumberRel = 0;
     private int releaseNodesNumber = 0;
     private transient Timer timer;
+    private transient Object monitor = new Object();
     private SchedulerLoadingPolicy thisStub;
 
     public SchedulerLoadingPolicy() {
@@ -88,10 +94,12 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         super.configure(policyParameters);
 
         try {
-            minNodes = Integer.parseInt(policyParameters[4].toString());
-            maxNodes = Integer.parseInt(policyParameters[5].toString());
-            loadingFactor = Integer.parseInt(policyParameters[6].toString());
-            releasePeriod = Integer.parseInt(policyParameters[7].toString());
+            int index = 4;
+            policyPeriod = Integer.parseInt(policyParameters[index++].toString());
+            minNodes = Integer.parseInt(policyParameters[index++].toString());
+            maxNodes = Integer.parseInt(policyParameters[index++].toString());
+            loadingFactor = Integer.parseInt(policyParameters[index++].toString());
+            releasePeriod = Integer.parseInt(policyParameters[index++].toString());
         } catch (RuntimeException e) {
             throw new RMException(e);
         }
@@ -100,6 +108,34 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     public void initActivity(Body body) {
         thisStub = (SchedulerLoadingPolicy) PAActiveObject.getStubOnThis();
         PAActiveObject.setImmediateService("getTotalNodeNumber");
+    }
+
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+
+        long timeStamp = System.currentTimeMillis();
+        long delta = 0;
+
+        // recalculating nodes number only once per policy period
+        while (body.isActive()) {
+
+            service.blockingServeOldest(policyPeriod);
+
+            delta += System.currentTimeMillis() - timeStamp;
+            timeStamp = System.currentTimeMillis();
+
+            if (delta > policyPeriod) {
+                synchronized (monitor) {
+                    if (nodeSource != null) {
+                        try {
+                            updateNumberOfNodes();
+                        } catch (BodyTerminatedRequestException e) {
+                        }
+                    }
+                }
+                delta = 0;
+            }
+        }
     }
 
     public BooleanWrapper activate() {
@@ -132,7 +168,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         return nodeSource.getRMCore().getNbAllRMNodes();
     }
 
-    private synchronized void refreshPolicyState() {
+    private void refreshPolicyState() {
+
         // recalculating the current node number in resource manager and the node source
         currentNodeNumberInResourceManager = thisStub.getTotalNodeNumber().intValue();
         int newNodeNumberInNodeSource = nodeSource.getNodesCount();
@@ -150,7 +187,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                         "currentNodeNumberInNodeSource" + currentNodeNumberInNodeSource +
                         ", newNodeNumberInNodeSource=" + newNodeNumberInNodeSource +
                         ", pendingNodesNumberAcq=" + pendingNodesNumberAcq + ", pendingNodesNumberRel=" +
-                        pendingNodesNumberRel);
+                        pendingNodesNumberRel + ", activeTask=" + activeTask);
                     pendingNodesNumberRel = 0;
                 }
             } else if (newNodeNumberInNodeSource > currentNodeNumberInNodeSource) {
@@ -164,7 +201,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                             ", pendingNodesNumberAcq=" +
                             pendingNodesNumberAcq +
                             ", pendingNodesNumberRel=" +
-                            pendingNodesNumberRel);
+                            pendingNodesNumberRel + ", activeTask=" + activeTask);
             }
         }
 
@@ -185,7 +222,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                 logger.warn("Incorrect node source state: [pending node acquisition requests < 0] : " +
                     "currentNodeNumberInNodeSource" + currentNodeNumberInNodeSource +
                     ", newNodeNumberInNodeSource=" + newNodeNumberInNodeSource + ", pendingNodesNumberAcq=" +
-                    pendingNodesNumberAcq + ", pendingNodesNumberRel=" + pendingNodesNumberRel);
+                    pendingNodesNumberAcq + ", pendingNodesNumberRel=" + pendingNodesNumberRel +
+                    ", activeTask=" + activeTask);
                 pendingNodesNumberAcq = 0;
             }
         }
@@ -199,7 +237,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                         ", pendingNodesNumberAcq=" +
                         pendingNodesNumberAcq +
                         ", pendingNodesNumberRel=" +
-                        pendingNodesNumberRel);
+                        pendingNodesNumberRel + ", activeTask=" + activeTask);
             pendingNodesNumberRel = 0;
         }
         if (currentNodeNumberInNodeSource == maxNodes && pendingNodesNumberAcq > 0) {
@@ -210,7 +248,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                         ", pendingNodesNumberAcq=" +
                         pendingNodesNumberAcq +
                         ", pendingNodesNumberRel=" +
-                        pendingNodesNumberRel);
+                        pendingNodesNumberRel + ", activeTask=" + activeTask);
             pendingNodesNumberAcq = 0;
         }
 
@@ -222,7 +260,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         logger.debug("Policy State: currentNodeNumberInNodeSource=" + currentNodeNumberInNodeSource +
             ", currentNodeNumberInResourceManager=" + currentNodeNumberInResourceManager +
             ", pendingNodesNumberAcq=" + pendingNodesNumberAcq + ", pendingNodesNumberRel=" +
-            pendingNodesNumberRel);
+            pendingNodesNumberRel + ", activeTask=" + activeTask);
 
         int potentialNodeNumberInResourceManager = currentNodeNumberInResourceManager +
             pendingNodesNumberAcq - pendingNodesNumberRel;
@@ -275,68 +313,67 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     private void acquireNNodes(int number) {
         if (pendingNodesNumberRel > 0) {
-            logger.debug("Waiting for nodes to be removed. Acquire request will not be sent.");
+            logger.debug("Waiting for nodes to be removed. Acquire request ignored.");
             return;
         }
 
+        // cancel the timer properly
+        releaseNodesNumber = 0;
+
         logger.debug("Acquiring " + number + " nodes");
         super.acquireNodes(number);
-
-        if (timer != null) {
-            synchronized (timer) {
-                timer.cancel();
-            }
-        }
 
         pendingNodesNumberAcq += number;
     }
 
     private void removeNodes(int number) {
+
         if (number < 0) {
             throw new RuntimeException("Negative nodes number " + number);
         }
         if (number == 0)
             return;
 
-        if (timer != null) {
-            synchronized (timer) {
-                timer.cancel();
-            }
+        if (timer == null) {
+            timer = new Timer(true);
+        }
+
+        if (releaseNodesNumber > 0) {
+            logger.debug("Timer has already been scheduled");
+            releaseNodesNumber = Math.max(number, releaseNodesNumber);
+            return;
         }
 
         logger.debug("Setup timer to remove " + number + " nodes");
         releaseNodesNumber = number;
 
-        timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             int maxNumberOfAttempts = 100;
 
             public void run() {
-                synchronized (timer) {
-                    refreshPolicyState();
-
+                synchronized (monitor) {
                     if (releaseNodesNumber == 0) {
                         logger.debug("Timer finished releasing nodes");
                         timer.cancel();
+                        timer = null;
                         return;
                     }
 
                     if (maxNumberOfAttempts > 0 && pendingNodesNumberAcq > 0) {
                         maxNumberOfAttempts--;
-                        logger.debug("Waiting for nodes to be acquired. Release request will not be sent.");
+                        logger.debug("Waiting for nodes to be acquired. Release request ignored.");
                         return;
                     } else if (pendingNodesNumberAcq > 0) {
                         logger
                                 .warn("Some nodes have not been acquired for a long time. It prevents policy to release nodes.");
                         logger
-                                .warn("Probably maximum number of nodes in policy configuration exeeds physical capasycy of the infrastructure");
+                                .warn("Probably maximum number of nodes in policy configuration exeeds the physical capacity of the infrastructure");
                         logger.warn("Reseting pending acquiring nodes number");
                         pendingNodesNumberAcq = 0;
                     }
 
                     releaseNodesNumber--;
                     pendingNodesNumberRel++;
-                    logger.debug("Releasing node");
                     thisStub.removeNodes(1, preemptive);
                 }
             }
@@ -355,7 +392,6 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     public void jobSubmittedEvent(JobState jobState) {
         activeTask += jobState.getTotalNumberOfTasks();
         logger.debug("Job submitted. Current number of tasks " + activeTask);
-        updateNumberOfNodes();
     }
 
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
@@ -363,7 +399,6 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             case TASK_RUNNING_TO_FINISHED:
                 activeTask--;
                 logger.debug("Task finished. Current number of tasks " + activeTask);
-                updateNumberOfNodes();
                 break;
         }
     }

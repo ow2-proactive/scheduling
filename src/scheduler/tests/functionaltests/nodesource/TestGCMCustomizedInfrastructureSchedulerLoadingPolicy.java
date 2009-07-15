@@ -54,7 +54,8 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
 
     protected Object[] getPolicyParams() {
         return new Object[] { SchedulerTHelper.schedulerDefaultURL, SchedulerTHelper.username,
-                SchedulerTHelper.password, "true", "0", // min modes
+                SchedulerTHelper.password, "false", "2000",// policy period
+                "0", // min modes
                 "1", // max modes
                 "1", // nodes per task
                 "1000" // releasing period
@@ -94,7 +95,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
 
-        // nodes should be removed in 1 sec after job completion
+        // nodes should be removed after scheduler becomes idle
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 1);
         SchedulerTHelper.waitForFinishedJob(jobId);
