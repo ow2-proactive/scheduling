@@ -32,15 +32,14 @@
 package org.ow2.proactive.scheduler.util.classloading;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -289,9 +288,14 @@ public class TaskClassServer {
         String path = convertNameToPath(classname, false);
         ZipEntry entry = file.getEntry(path);
         if (entry != null) {
-            InputStream inStream = file.getInputStream(entry);
-            result = new byte[inStream.available()];
-            inStream.read(result);
+            final InputStream inStream = file.getInputStream(entry);
+            final ByteArrayOutputStream bos = new ByteArrayOutputStream(); // ByteArrayOutputStream.close() is noop
+            final byte[] data = new byte[1024];
+            int count;
+            while ((count = inStream.read(data, 0, 1024)) > -1) {
+                bos.write(data, 0, count);
+            }
+            result = bos.toByteArray();
             inStream.close();
             return result;
         } else {
