@@ -59,7 +59,7 @@ public class SimpleTaskLogs implements TaskLogs {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     // logs on standard output
     @Cascade(CascadeType.ALL)

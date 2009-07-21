@@ -54,14 +54,14 @@ import org.ow2.proactive.scripting.GenerationScript;
  * @author The ProActive Team
  */
 @Entity
-@Table(name = "NATIVE_EXECUTABLE_CONTAINER")
+@Table(name = "NATIVE_EXEC_CONTAINER")
 @AccessType("field")
 @Proxy(lazy = false)
 public class NativeExecutableContainer implements ExecutableContainer {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     // actual executable data
     @Column(name = "CLASSPATH", columnDefinition = "BLOB")

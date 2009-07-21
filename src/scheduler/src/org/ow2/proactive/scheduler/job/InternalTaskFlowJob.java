@@ -53,14 +53,14 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @since ProActive Scheduling 0.9
  */
 @Entity
-@Table(name = "INTERNAL_TASKFLOW_JOB")
+@Table(name = "INTERNAL_TF_JOB")
 @AccessType("field")
 @Proxy(lazy = false)
 public class InternalTaskFlowJob extends InternalJob {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /**
      * ProActive empty constructor.

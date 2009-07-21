@@ -62,7 +62,7 @@ public final class BigString implements Serializable {
     @GeneratedValue
     @Column(name = "ID")
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     @Column(name = "VALUE", length = Integer.MAX_VALUE)
     @Lob

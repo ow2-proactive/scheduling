@@ -71,7 +71,7 @@ public class GenerationScript extends Script<String> {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /**
      * The variable name which must be set after the evaluation

@@ -60,7 +60,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 0.9
  */
 @Entity
-@Table(name = "INTERNAL_NATIVE_TASK")
+@Table(name = "INTERNAL_NTV_TASK")
 @AccessType("field")
 @Proxy(lazy = false)
 public class InternalNativeTask extends InternalTask {
@@ -69,7 +69,7 @@ public class InternalNativeTask extends InternalTask {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /**
      * ProActive empty constructor.

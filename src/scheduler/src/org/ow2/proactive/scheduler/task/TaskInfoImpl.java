@@ -70,7 +70,7 @@ public class TaskInfoImpl implements TaskInfo {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** id of the task */
     @Cascade(CascadeType.ALL)

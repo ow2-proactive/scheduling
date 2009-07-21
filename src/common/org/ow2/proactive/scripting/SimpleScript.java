@@ -64,7 +64,7 @@ public class SimpleScript extends Script {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** Hibernate default constructor*/
     @SuppressWarnings("unused")

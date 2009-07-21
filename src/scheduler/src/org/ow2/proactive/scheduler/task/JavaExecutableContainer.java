@@ -65,7 +65,7 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
  * @author The ProActive Team
  */
 @Entity
-@Table(name = "JAVA_EXECUTABLE_CONTAINER")
+@Table(name = "JAVA_EXEC_CONTAINER")
 @AccessType("field")
 @Proxy(lazy = false)
 public class JavaExecutableContainer implements ExecutableContainer {
@@ -73,7 +73,7 @@ public class JavaExecutableContainer implements ExecutableContainer {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     @Column(name = "EXECUTABLE_CLASS")
     private String userExecutableClassName;

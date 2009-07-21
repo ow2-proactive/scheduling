@@ -63,7 +63,7 @@ public class JobEnvironment implements Serializable {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     // job classpath
     // used for resolving classes only on user side !

@@ -61,7 +61,7 @@ public class IntegerWrapper implements Serializable {
     @GeneratedValue
     @Column(name = "ID")
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     @Column(name = "VALUE")
     private Integer value;

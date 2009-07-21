@@ -68,7 +68,7 @@ public class InternalProActiveTask extends InternalTask {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /**
      * ProActive empty constructor

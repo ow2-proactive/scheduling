@@ -65,7 +65,7 @@ public final class TaskIdImpl implements TaskId {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /**
      * Multiplicative factor for job id (taskId will be :

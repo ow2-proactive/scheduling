@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -591,7 +592,12 @@ public class DatabaseManager {
                         query = session.createQuery(squery);
                         logger_dev.debug("Created query : " + squery);
                         //In SQL language, hibernate id is stored as a BigInteger -> in HQL as a long.
-                        long lvalue = ((BigInteger) values[1]).longValue();
+                        long lvalue;
+                        try {
+				lvalue = ((BigInteger) values[1]).longValue();
+                        } catch(ClassCastException e){
+				lvalue = ((BigDecimal) values[1]).longValue();
+                        }
                         query.setParameter(OBJECTID_REQUEST_FIELD, lvalue);
                         logger_dev.debug("Set parameter '" + OBJECTID_REQUEST_FIELD + "=" + lvalue);
                         value = query.uniqueResult();

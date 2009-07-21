@@ -98,7 +98,7 @@ public abstract class InternalTask extends TaskState {
     @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
-    private List<InternalTask> idependences = null;
+    private List<InternalTask> ideps = null;
 
     /** Informations about the launcher and node */
     //These informations are not required during task process
@@ -159,18 +159,18 @@ public abstract class InternalTask extends TaskState {
      * @param task a super task of this task.
      */
     public void addDependence(InternalTask task) {
-        if (idependences == null) {
-            idependences = new ArrayList<InternalTask>();
+        if (ideps == null) {
+            ideps = new ArrayList<InternalTask>();
         }
 
-        idependences.add(task);
+        ideps.add(task);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskState#hasDependences()
      */
     public boolean hasDependences() {
-        return (idependences != null && idependences.size() > 0);
+        return (ideps != null && ideps.size() > 0);
     }
 
     /**
@@ -264,10 +264,10 @@ public abstract class InternalTask extends TaskState {
      */
     public List<InternalTask> getIDependences() {
         //set to null if needed
-        if (idependences != null && idependences.size() == 0) {
-            idependences = null;
+        if (ideps != null && ideps.size() == 0) {
+            ideps = null;
         }
-        return idependences;
+        return ideps;
     }
 
     /**
@@ -275,12 +275,12 @@ public abstract class InternalTask extends TaskState {
      */
     public List<TaskState> getDependences() {
         //set to null if needed
-        if (idependences == null || idependences.size() == 0) {
-            idependences = null;
+        if (ideps == null || ideps.size() == 0) {
+            ideps = null;
             return null;
         }
-        List<TaskState> tmp = new ArrayList<TaskState>(idependences.size());
-        for (TaskState ts : idependences) {
+        List<TaskState> tmp = new ArrayList<TaskState>(ideps.size());
+        for (TaskState ts : ideps) {
             tmp.add(ts);
         }
         return tmp;

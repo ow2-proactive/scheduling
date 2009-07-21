@@ -70,7 +70,7 @@ public class UpdatableProperties<T> implements Serializable {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** The value of this property. */
     @Any(metaColumn = @Column(name = "VALUE_TYPE", length = 5))

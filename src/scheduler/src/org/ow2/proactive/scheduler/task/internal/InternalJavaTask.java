@@ -82,7 +82,7 @@ public class InternalJavaTask extends InternalTask {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** Whether user wants to execute a task in a separate JVM */
     @Column(name = "FORK")

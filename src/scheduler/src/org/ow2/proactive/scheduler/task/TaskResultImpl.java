@@ -93,7 +93,7 @@ public class TaskResultImpl implements TaskResult {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** The task identification of the result */
     @Cascade(CascadeType.ALL)

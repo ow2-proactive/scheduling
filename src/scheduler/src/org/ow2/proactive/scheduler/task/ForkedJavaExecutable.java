@@ -73,7 +73,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ExecutableCo
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.EAGER, targetEntity = JavaExecutableContainer.class)

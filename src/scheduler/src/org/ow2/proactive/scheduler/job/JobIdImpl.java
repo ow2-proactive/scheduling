@@ -58,7 +58,7 @@ public final class JobIdImpl implements JobId {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** Default job name */
     public static final String DEFAULT_JOB_NAME = SchedulerConstants.JOB_DEFAULT_NAME;

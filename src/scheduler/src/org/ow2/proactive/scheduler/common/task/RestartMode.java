@@ -71,7 +71,7 @@ public class RestartMode implements java.io.Serializable {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     @Column(name = "INDEX_")
     private int index;

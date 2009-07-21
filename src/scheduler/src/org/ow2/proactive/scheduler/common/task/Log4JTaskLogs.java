@@ -64,7 +64,7 @@ public class Log4JTaskLogs implements TaskLogs {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** Prefix for job logger */
     public static final String JOB_LOGGER_PREFIX = "logger.scheduler.";

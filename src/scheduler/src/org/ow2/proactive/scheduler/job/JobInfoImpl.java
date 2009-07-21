@@ -73,7 +73,7 @@ public class JobInfoImpl implements JobInfo {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** job id  : must be initialize to a value in order to create temp taskId */
     @Cascade(CascadeType.ALL)

@@ -76,7 +76,7 @@ public class JobResultImpl implements JobResult {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /** Referenced JobId */
     @Cascade(CascadeType.ALL)

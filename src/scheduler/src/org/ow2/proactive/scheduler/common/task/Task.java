@@ -85,7 +85,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 public abstract class Task extends CommonAttribute {
 
     /** Number of nodes asked by the user. */
-    @Column(name = "NODES_NEEDED")
+    @Column(name = "NEEDED_NODES")
     protected int numberOfNodesNeeded = 1;
 
     /** Name of the task. */
@@ -106,12 +106,12 @@ public abstract class Task extends CommonAttribute {
      * selection script : can be launched before getting a node in order to
      * verify some computer specificity.
      */
-    @ManyToAny(metaColumn = @Column(name = "SELECTION_SCRIPT", length = 5))
+    @ManyToAny(metaColumn = @Column(name = "S_SCRIPT", length = 5))
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = { @MetaValue(targetEntity = SelectionScript.class, value = "SS") })
     @JoinTable(joinColumns = @JoinColumn(name = "SS_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
-    protected List<SelectionScript> selectionScripts;
+    protected List<SelectionScript> sScripts;
 
     /**
      * PreScript : can be used to launch script just before the task
@@ -134,7 +134,7 @@ public abstract class Task extends CommonAttribute {
      */
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.EAGER, targetEntity = SimpleScript.class)
-    protected Script<?> cleaningScript;
+    protected Script<?> cScript;
 
     /** Tell whether this task has a precious result or not. */
     @Column(name = "PRECIOUS_RESULT")
@@ -312,7 +312,7 @@ public abstract class Task extends CommonAttribute {
      * @return the cleaningScript of this task.
      */
     public Script<?> getCleaningScript() {
-        return cleaningScript;
+        return cScript;
     }
 
     /**
@@ -322,7 +322,7 @@ public abstract class Task extends CommonAttribute {
      *            the cleaningScript to set.
      */
     public void setCleaningScript(Script<?> cleaningScript) {
-        this.cleaningScript = cleaningScript;
+        this.cScript = cleaningScript;
     }
 
     /**
@@ -337,10 +337,10 @@ public abstract class Task extends CommonAttribute {
      * @return the selection Script.
      */
     public List<SelectionScript> getSelectionScripts() {
-        if (selectionScripts == null || selectionScripts.size() == 0) {
+        if (sScripts == null || sScripts.size() == 0) {
             return null;
         } else {
-            return selectionScripts;
+            return sScripts;
         }
     }
 
@@ -348,7 +348,7 @@ public abstract class Task extends CommonAttribute {
      * To set a list of selection scripts. These are the scripts that will select a node.
      */
     public void setSelectionScripts(List<SelectionScript> selScriptsList) {
-        this.selectionScripts = selScriptsList;
+        this.sScripts = selScriptsList;
     }
 
     /**
@@ -358,10 +358,10 @@ public abstract class Task extends CommonAttribute {
      *            the selectionScript to add.
      */
     public void addSelectionScript(SelectionScript selectionScript) {
-        if (this.selectionScripts == null) {
-            this.selectionScripts = new ArrayList<SelectionScript>();
+        if (this.sScripts == null) {
+            this.sScripts = new ArrayList<SelectionScript>();
         }
-        this.selectionScripts.add(selectionScript);
+        this.sScripts.add(selectionScript);
     }
 
     /**

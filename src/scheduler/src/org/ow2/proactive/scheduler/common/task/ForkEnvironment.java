@@ -62,7 +62,7 @@ public class ForkEnvironment implements Serializable {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long hibernateId;
+    private long hId;
 
     /**
      * Path to directory with Java installed, to this path '/bin/java' will be added.
