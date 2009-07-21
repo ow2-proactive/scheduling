@@ -594,9 +594,9 @@ public class DatabaseManager {
                         //In SQL language, hibernate id is stored as a BigInteger -> in HQL as a long.
                         long lvalue;
                         try {
-				lvalue = ((BigInteger) values[1]).longValue();
-                        } catch(ClassCastException e){
-				lvalue = ((BigDecimal) values[1]).longValue();
+                            lvalue = ((BigInteger) values[1]).longValue();
+                        } catch (ClassCastException e) {
+                            lvalue = ((BigDecimal) values[1]).longValue();
                         }
                         query.setParameter(OBJECTID_REQUEST_FIELD, lvalue);
                         logger_dev.debug("Set parameter '" + OBJECTID_REQUEST_FIELD + "=" + lvalue);

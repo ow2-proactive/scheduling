@@ -823,9 +823,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
 
             } catch (ActiveObjectCreationException e1) {
-                logger_dev.error("", e1);
                 //Something goes wrong with the active object creation (createLauncher)
-                logger.warn("Active object creation exception : " + e1.getMessage());
+                logger.warn("", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
                     resourceManager.freeNodes(nodeSet);
@@ -836,9 +835,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     return;
                 }
             } catch (Exception e1) {
-                logger_dev.error("", e1);
                 //if we are here, it is that something append while launching the current task.
-                logger.warn("Current node (" + node + ") has failed : " + e1.getMessage(), e1);
+                logger.warn("", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
                     resourceManager.freeNodes(nodeSet);
@@ -1485,12 +1483,17 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             throw new UnknowJobException("The job " + jobId + " does not exist !");
         }
 
+        logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
+        //result = null if not in DB (ie: not yet available)
+        JobResult result = null;
         try {
-            logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
-            //result = null if not in DB (ie: not yet available)
-            JobResult result = DatabaseManager.recover(job.getJobResult().getClass(),
+            result = DatabaseManager.recover(job.getJobResult().getClass(),
                     new Condition("id", ConditionComparator.EQUALS_TO, job.getJobResult().getJobId())).get(0);
+        } catch (IndexOutOfBoundsException e) {
+            throw new SchedulerException("Cannot retrieve the result of job '" + jobId + "' !", e);
+        }
 
+        try {
             if (!job.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
 
                 //remember that this job is to be removed
@@ -1969,7 +1972,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //List<InternalJob> recovering = DatabaseManager.recover(InternalJob.class, condition);
         List<InternalJob> recovering = DatabaseManager.recoverAllJobs();
 
-        logger_dev.info("Number of job to recover : " + recovering.size());
+        logger.info("Found " + recovering.size() + " jobs to retrieve, please wait...");
 
         if (recovering.size() == 0) {
             logger_dev.info("No Job to recover.");
