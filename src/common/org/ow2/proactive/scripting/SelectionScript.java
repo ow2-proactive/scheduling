@@ -43,6 +43,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -101,8 +102,9 @@ public class SelectionScript extends Script<Boolean> {
     /**
      * Hash digest of the script
      */
-    @Column(name = "S_SCRIPT_ID", columnDefinition = "BLOB")
+    @Column(name = "S_SCRIPT_ID", length = Integer.MAX_VALUE, columnDefinition = "BLOB")
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
+    @Lob
     protected byte[] id_;
 
     /** ProActive needed constructor */

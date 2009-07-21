@@ -41,6 +41,7 @@ import java.io.Serializable;
 import java.net.URL;
 
 import javax.persistence.Column;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 import javax.script.Bindings;
@@ -85,11 +86,13 @@ public abstract class Script<E> implements Serializable {
     protected String scriptEngine = null;
 
     /** The script to evaluate */
-    @Column(name = "SCRIPT", columnDefinition = "CLOB")
+    @Column(name = "SCRIPT", length = Integer.MAX_VALUE)
+    @Lob
     protected String script = null;
 
     /** Id of this script */
-    @Column(name = "SCRIPT_ID", columnDefinition = "CLOB")
+    @Column(name = "SCRIPT_ID", length = Integer.MAX_VALUE)
+    @Lob
     protected String id = null;
 
     /** The parameters of the script */

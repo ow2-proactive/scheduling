@@ -38,6 +38,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.AccessType;
@@ -66,14 +67,16 @@ public class JobEnvironment implements Serializable {
 
     // job classpath
     // used for resolving classes only on user side !
-    @Column(name = "CLASSPATH", columnDefinition = "BLOB")
+    @Column(name = "CLASSPATH", length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
+    @Lob
     private String[] jobClasspath;
 
     // jar file containing the job classpath
     @Unloadable
-    @Column(name = "CLASSPATH_CONTENT", columnDefinition = "BLOB")
+    @Column(name = "CLASSPATH_CONTENT", length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
+    @Lob
     private byte[] jobClasspathContent;
 
     // true if the classpath contains jar files

@@ -164,7 +164,14 @@ public enum PASchedulerProperties {
     /* ********************** HIBERNATE PROPERTIES ********************* */
     /* ***************************************************************** */
     /** Hibernate configuration file (relative to home directory) */
-    SCHEDULER_DB_HIBERNATE_CONFIG("pa.scheduler.db.hibernate.configuration", PAPropertiesType.STRING);
+    SCHEDULER_DB_HIBERNATE_CONFIG("pa.scheduler.db.hibernate.configuration", PAPropertiesType.STRING),
+
+    /**
+     * Drop database before creating a new one
+     * If this value is true, the database will be dropped and then re-created
+     * If this value is false, database will be updated from the existing one.
+     */
+    SCHEDULER_DB_HIBERNATE_DROPDB("pa.scheduler.db.hibernate.dropdb", PAPropertiesType.BOOLEAN);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

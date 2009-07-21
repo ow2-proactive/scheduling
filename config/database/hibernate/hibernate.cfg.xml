@@ -10,14 +10,30 @@
         <!-- Database connection settings.
         INFO :  To change the database provider, change the driver (connection.driver_class)
 			the URL (connection.url), and don't forget the dialect (<property name="dialect">) -->
+
+		<!-- JAVA EMBEDDED DATABASE : DERBY -->
+        <!--
         <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
         <property name="connection.url">jdbc:derby:../../SCHEDULER_DB;create=true</property>
+        <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
+        -->
+
+        <!-- MYSQL -->
+        <property name="connection.driver_class">org.gjt.mm.mysql.Driver</property>
+        <property name="connection.url">jdbc:mysql://jilette.activeeon.com:3306/SCHEDULER_DB</property>
+        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <!-- ORACLE -->
+        <!--
+        <property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+        <property name="connection.url">jdbc:oracle:thin:@slave1.activeeon.com:1521/XE</property>
+        <property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>
+        -->
+
+        <!-- Username and password -->
         <property name="connection.username">scheduler</property>
         <property name="connection.password"></property>
 
-        <!-- SQL dialect  -->
-        <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
-       
         <!-- JDBC connection pool (use the built-in) -->
         <property name="connection.pool_size">10</property>
 
@@ -28,7 +44,7 @@
         <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
 
         <!-- Echo all executed SQL to stdout. -->
-        <property name="show_sql">false</property>
+        <property name="show_sql">no</property>
 
         <!-- Behavior of the database schema on startup : validate | update | create | create-drop -->
         <property name="hbm2ddl.auto">update</property>

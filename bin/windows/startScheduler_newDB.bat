@@ -1,12 +1,11 @@
 @echo off
 echo.
 
-IF EXIST ..\..\SCHEDULER_DB (
-    RMDIR /S /Q ..\..\SCHEDULER_DB
-    DEL ..\..\.logs\derby.log
-)
 SETLOCAL ENABLEDELAYEDEXPANSION
-
-call startScheduler.bat %*
+call init.bat scheduler-log4j-server
+%JAVA_CMD% -Dpa.scheduler.db.hibernate.dropdb=true -Dderby.stream.error.file="%PA_SCHEDULER%\.logs\derby.log" org.ow2.proactive.scheduler.util.SchedulerStarter %*
 
 ENDLOCAL
+
+:end
+echo.

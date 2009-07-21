@@ -37,6 +37,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.AccessType;
@@ -63,7 +64,8 @@ public final class BigString implements Serializable {
     @SuppressWarnings("unused")
     private long hibernateId;
 
-    @Column(name = "VALUE", columnDefinition = "CLOB")
+    @Column(name = "VALUE", length = Integer.MAX_VALUE)
+    @Lob
     private String value;
 
     /** Hibernate default constructor */

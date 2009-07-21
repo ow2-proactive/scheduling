@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.common.job;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -84,7 +85,8 @@ public abstract class Job extends CommonAttribute {
     protected String logFile = null;
 
     /** Short description of this job */
-    @Column(name = "DESCRIPTION", columnDefinition = "CLOB")
+    @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE)
+    @Lob
     protected String description = "No description";
 
     /** Project name for this job */

@@ -1,11 +1,12 @@
 #!/bin/sh
 
-if [ -d ../../SCHEDULER_DB ]
-then
-rm -rf ../../SCHEDULER_DB
-rm ../../.logs/derby.log
-fi
-
+CLASSPATH=.
 workingDir=`dirname $0`
+. $workingDir/env.sh scheduler-log4j-server
 
-. $workingDir/startScheduler.sh $@
+yjp=-agentlib:yjpagent
+opt="-Xms128m -Xmx2048m"
+
+eval $JAVACMD -Dpa.scheduler.db.hibernate.dropdb=true -Dderby.stream.error.file=\"$PA_SCHEDULER/.logs/derby.log\" $opt org.ow2.proactive.scheduler.util.SchedulerStarter $@
+
+echo

@@ -38,6 +38,7 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -92,11 +93,13 @@ public abstract class Task extends CommonAttribute {
     protected String name = SchedulerConstants.TASK_DEFAULT_NAME;
 
     /** Description of the task. */
-    @Column(name = "DESCRIPTION", columnDefinition = "CLOB")
+    @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE)
+    @Lob
     protected String description = null;
 
     /** Description of the result of the task */
-    @Column(name = "RESULTPREVIEW", columnDefinition = "CLOB")
+    @Column(name = "RESULTPREVIEW", length = Integer.MAX_VALUE)
+    @Lob
     protected String resultPreview;
 
     /**

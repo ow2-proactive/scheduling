@@ -37,6 +37,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.AccessType;
@@ -67,13 +68,15 @@ public class ForkEnvironment implements Serializable {
      * Path to directory with Java installed, to this path '/bin/java' will be added.
      * If the path is null only 'java' command will be called
      */
-    @Column(name = "JAVA_HOME", columnDefinition = "CLOB")
+    @Column(name = "JAVA_HOME", length = Integer.MAX_VALUE)
+    @Lob
     private String javaHome = null;
 
     /**
      * Parameters passed to Java (not an application) (example: memory settings or properties)
      */
-    @Column(name = "JVM_PARAMETERS", columnDefinition = "CLOB")
+    @Column(name = "JVM_PARAMETERS", length = Integer.MAX_VALUE)
+    @Lob
     private String jvmParameters = null;
 
     /**

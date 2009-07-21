@@ -35,7 +35,7 @@ import java.sql.Types;
 
 
 /**
- * Hibernate natively maps cloc columns to java.sql.Clob.<br />
+ * Hibernate natively maps clob columns to java.sql.Clob.<br />
  * However, it's sometimes useful to read the whole clob into memory and deal with it as a String array.<br />
  * CharacterLargeOBject is made to fix this issue.
  *

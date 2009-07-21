@@ -43,6 +43,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -101,8 +102,9 @@ public class TaskResultImpl implements TaskResult {
 
     /** The value of the result if no exception occurred as a byte array */
     @Unloadable
-    @Column(name = "SERIALIZED_VALUE", updatable = false, columnDefinition = "BLOB")
+    @Column(name = "SERIALIZED_VALUE", updatable = false, length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
+    @Lob
     public byte[] serializedValue = null;
     /** The value of the result if no exception occurred */
     @Transient
@@ -110,8 +112,9 @@ public class TaskResultImpl implements TaskResult {
 
     /** The exception thrown by the task as a byte array */
     @Unloadable
-    @Column(name = "SERIALIZED_EXCEPTION", updatable = false, columnDefinition = "BLOB")
+    @Column(name = "SERIALIZED_EXCEPTION", updatable = false, length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
+    @Lob
     public byte[] serializedException = null;
     /** The exception thrown by the task */
     @Transient

@@ -344,7 +344,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 this.lfs.initialize();
                 logger_dev.info("Initialized log forwarding service at " + this.lfs.getServerURI());
             }
-
+            //starting scheduling policy
             this.policy = (Policy) Class.forName(policyFullName).newInstance();
             logger_dev.info("Instanciated policy : " + policyFullName);
             logger.info("Scheduler Core ready !");
@@ -453,7 +453,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //Fix SCHEDULING-337, it could remains a better solution to avoid race condition in DB
             //body.setImmediateService("getTaskResult");
             body.setImmediateService("getJobResult");
-            logger_dev.debug("Core immediate services : isSubmitPossible, getJobResult");
+            body.setImmediateService("getState");
+            logger_dev.debug("Core immediate services : isSubmitPossible, getJobResult, getState");
 
             //set the filter for serveAll method (user action are privileged)
             RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenLog",
@@ -1199,7 +1200,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 errorOccurred = res.hadException();
             }
 
-            logger_dev.info("Task '" + taskId + "' terminate with" + (errorOccurred ? "" : "out") + " error");
+            logger_dev
+                    .info("Task '" + taskId + "' terminated with" + (errorOccurred ? "" : "out") + " error");
 
             //if an error occurred
             if (errorOccurred) {
@@ -1953,6 +1955,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private void recover() {
         //Start Hibernate
         logger.info("Starting Hibernate...");
+        boolean drop = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
+        logger.info("Drop DB : " + drop);
+        if (drop) {
+            DatabaseManager.setProperty("hibernate.hbm2ddl.auto", "create");
+        }
         DatabaseManager.build();
         logger.info("Hibernate successfully started !");
 

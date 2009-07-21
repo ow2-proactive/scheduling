@@ -35,6 +35,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.AccessType;
@@ -62,12 +63,14 @@ public class SimpleTaskLogs implements TaskLogs {
 
     // logs on standard output
     @Cascade(CascadeType.ALL)
-    @Column(name = "STANDARD_LOGS", columnDefinition = "CLOB")
+    @Column(name = "STANDARD_LOGS", length = Integer.MAX_VALUE)
+    @Lob
     private String standardLogs;
 
     // logs on error output
     @Cascade(CascadeType.ALL)
-    @Column(name = "ERROR_LOGS", columnDefinition = "CLOB")
+    @Column(name = "ERROR_LOGS", length = Integer.MAX_VALUE)
+    @Lob
     private String errorlogs;
 
     /** Hibernate constructor */
