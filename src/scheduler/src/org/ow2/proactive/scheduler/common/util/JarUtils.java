@@ -114,6 +114,7 @@ public class JarUtils {
                 jos.write(data, 0, byteCount);
             }
             jos.closeEntry();
+            fis.close();
         } catch (ZipException e) {
             // TODO Other exceptions ?
             // Duplicate entry : ignore it.
