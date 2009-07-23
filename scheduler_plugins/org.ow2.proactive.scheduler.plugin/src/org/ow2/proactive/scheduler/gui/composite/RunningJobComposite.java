@@ -118,11 +118,13 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
      */
     @Override
     public void clear() {
-        for (TableEditor te : tableEditors)
+        for (TableEditor te : tableEditors) {
             te.dispose();
+        }
         tableEditors.clear();
-        for (ProgressBar pb : progressBars)
+        for (ProgressBar pb : progressBars) {
             pb.dispose();
+        }
         progressBars.clear();
     }
 
@@ -158,7 +160,12 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
         for (int i = 0; i < cols.length; i++) {
             String title = cols[i].getText();
             if (title.equals(COLUMN_PROGRESS_BAR_TITLE)) {
-                ProgressBar bar = new ProgressBar(table, SWT.NONE);
+                ProgressBar bar;
+                if (job.getTotalNumberOfTasks() == 1) {
+                    bar = new ProgressBar(table, SWT.INDETERMINATE);
+                } else {
+                    bar = new ProgressBar(table, SWT.NONE);
+                }
                 bar.setMaximum(job.getTotalNumberOfTasks());
                 bar.setSelection(job.getNumberOfFinishedTasks());
                 TableEditor editor = new TableEditor(table);
@@ -288,11 +295,12 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                     Table table = getTable();
                     TableItem[] items = table.getItems();
                     TableItem item = null;
-                    for (TableItem it : items)
+                    for (TableItem it : items) {
                         if (((JobId) (it.getData())).equals(taskInfo.getJobId())) {
                             item = it;
                             break;
                         }
+                    }
 
                     TableColumn[] cols = table.getColumns();
                     JobState job = JobsController.getLocalView().getJobById(taskInfo.getJobId());
