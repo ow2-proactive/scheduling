@@ -216,7 +216,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * Return the task classserver for the job jid.<br>
      * return null if the classServer is undefine for the given jobId.
      * 
-     * 
      * @param jid the job id 
      * @return the task classserver for the job jid
      */
@@ -438,7 +437,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         //Scheduler started
         ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info(
-                "Scheduler successfully created on " +
+                "Scheduler successfully started on " +
                     Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis())));
 
         if (status != SchedulerStatus.KILLED) {
@@ -1970,9 +1969,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //Condition condition = new Condition("jobInfo.removedTime", ConditionComparator.LESS_EQUALS_THAN,(long) 0);
         //list of internal job to recover
         //List<InternalJob> recovering = DatabaseManager.recover(InternalJob.class, condition);
-        List<InternalJob> recovering = DatabaseManager.recoverAllJobs();
-
-        logger.info("Found " + recovering.size() + " jobs to retrieve, please wait...");
+        RecoveringThread rt = new RecoveringThread();
+        List<InternalJob> recovering = DatabaseManager.recoverAllJobs(rt);
+        rt.interrupt();
 
         if (recovering.size() == 0) {
             logger_dev.info("No Job to recover.");

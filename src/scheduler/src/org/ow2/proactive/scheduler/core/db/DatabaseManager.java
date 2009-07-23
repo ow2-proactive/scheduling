@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.core.RecoverCallback;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -410,11 +411,34 @@ public class DatabaseManager {
      * This method is specially design to recover all jobs that have to be recovered.
      * It is also a way to get them without taking care of conditions.
      * This method also ensure that every returned jobs have their @unloadable fields unloaded.
+     * 
+     * @return The list of unloaded job entities.
+     */
+    public static List<InternalJob> recoverAllJobs() {
+        return recoverAllJobs(null);
+    }
+
+    /**
+     * This method is specially design to recover all jobs that have to be recovered.
+     * It is also a way to get them without taking care of conditions.
+     * This method also ensure that every returned jobs have their @unloadable fields unloaded.
      *
+     * @param callback use a callback to be notified of the recovering process.
+     * 			this method will first call the init method to set the number of job to recover,
+     * 			then it will call the jobRecovered method each time a job is recovered.
      * @return The list of unloaded job entities.
      */
     @SuppressWarnings("unchecked")
-    public static List<InternalJob> recoverAllJobs() {
+    public static List<InternalJob> recoverAllJobs(RecoverCallback callback) {
+        if (callback == null) {
+            callback = new RecoverCallback() {
+                public void init(int nb) {
+                }
+
+                public void jobRecovered() {
+                }
+            };
+        }
         List<InternalJob> jobs = new ArrayList<InternalJob>();
         //class to recover
         Class<?> egClass = InternalJob.class;
@@ -433,6 +457,8 @@ public class DatabaseManager {
             query.setParameter("C0", condition.getValue());
             logger_dev.debug("Set parameter " + "'C0' value=" + condition.getValue());
             List<JobId> ids = (List<JobId>) query.list();
+            logger.info("Found " + ids.size() + " jobs to retrieve");
+            callback.init(ids.size());
             logger_dev.info("Creating queries for each job to recover");
             //for each ID get the entity
             for (JobId jid : ids) {
@@ -462,6 +488,7 @@ public class DatabaseManager {
                 }
                 jobs.add(job);
                 logger_dev.info("Job " + jid + " added to the final list");
+                callback.jobRecovered();
             }
             return jobs;
         } catch (Exception e) {
