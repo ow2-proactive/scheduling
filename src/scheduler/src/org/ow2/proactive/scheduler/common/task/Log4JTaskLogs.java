@@ -99,8 +99,7 @@ public class Log4JTaskLogs implements TaskLogs {
     private static final String nl = System.getProperty("line.separator");
 
     /** Hibernate constructor */
-    @SuppressWarnings("unused")
-    private Log4JTaskLogs() {
+    public Log4JTaskLogs() {
     }
 
     /**

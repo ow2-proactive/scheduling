@@ -74,8 +74,7 @@ public class SimpleTaskLogs implements TaskLogs {
     private String errorlogs;
 
     /** Hibernate constructor */
-    @SuppressWarnings("unused")
-    private SimpleTaskLogs() {
+    public SimpleTaskLogs() {
     }
 
     /**

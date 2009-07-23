@@ -1970,8 +1970,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //list of internal job to recover
         //List<InternalJob> recovering = DatabaseManager.recover(InternalJob.class, condition);
         RecoveringThread rt = new RecoveringThread();
-        List<InternalJob> recovering = DatabaseManager.recoverAllJobs(rt);
-        rt.interrupt();
+        List<InternalJob> recovering = new ArrayList<InternalJob>();
+        try {
+            recovering = DatabaseManager.recoverAllJobs(rt);
+        } finally {
+            rt.interrupt();
+        }
 
         if (recovering.size() == 0) {
             logger_dev.info("No Job to recover.");

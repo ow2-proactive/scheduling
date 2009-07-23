@@ -48,7 +48,7 @@ public class RecoveringThread extends Thread implements RecoverCallback {
         while (!isInterrupted() && jobsRecovered < jobsToRecover) {
             try {
                 display(threeChar(100 * jobsRecovered / jobsToRecover), true);
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
             }
         }

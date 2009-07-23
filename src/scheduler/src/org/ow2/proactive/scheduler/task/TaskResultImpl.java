@@ -105,17 +105,17 @@ public class TaskResultImpl implements TaskResult {
     @Column(name = "SERIALIZED_VALUE", updatable = false, length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
     @Lob
-    public byte[] serializedValue = null;
+    private byte[] serializedValue = null;
     /** The value of the result if no exception occurred */
     @Transient
-    public transient Serializable value = null;
+    private transient Serializable value = null;
 
     /** The exception thrown by the task as a byte array */
     @Unloadable
     @Column(name = "SERIALIZED_EXCEPTION", updatable = false, length = Integer.MAX_VALUE)
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
     @Lob
-    public byte[] serializedException = null;
+    private byte[] serializedException = null;
     /** The exception thrown by the task */
     @Transient
     private transient Throwable exception = null;
@@ -128,7 +128,7 @@ public class TaskResultImpl implements TaskResult {
             @MetaValue(targetEntity = SimpleTaskLogs.class, value = "STL") })
     @JoinColumn(name = "OUTPUT_ID", updatable = false)
     @Cascade(CascadeType.ALL)
-    public TaskLogs output = null;
+    private TaskLogs output = null;
 
     /** Description definition of this result */
     @Unloadable

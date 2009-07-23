@@ -68,7 +68,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 @Entity
 @Table(name = "FORKED_JAVA_EXECUTABLE")
 @AccessType("field")
-@Proxy(lazy = false)
+@Proxy(lazy = true)
 public class ForkedJavaExecutable extends JavaExecutable implements ExecutableContainer {
     @Id
     @GeneratedValue
@@ -85,8 +85,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ExecutableCo
     private static final int TIMEOUT = 1000;
 
     /** Hibernate default constructor */
-    @SuppressWarnings("unused")
-    private ForkedJavaExecutable() {
+    public ForkedJavaExecutable() {
     }
 
     /**

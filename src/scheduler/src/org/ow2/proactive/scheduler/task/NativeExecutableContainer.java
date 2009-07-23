@@ -56,7 +56,7 @@ import org.ow2.proactive.scripting.GenerationScript;
 @Entity
 @Table(name = "NATIVE_EXEC_CONTAINER")
 @AccessType("field")
-@Proxy(lazy = false)
+@Proxy(lazy = true)
 public class NativeExecutableContainer implements ExecutableContainer {
     @Id
     @GeneratedValue
@@ -74,8 +74,7 @@ public class NativeExecutableContainer implements ExecutableContainer {
     private GenerationScript generated;
 
     /** Hibernate default constructor */
-    @SuppressWarnings("unused")
-    private NativeExecutableContainer() {
+    public NativeExecutableContainer() {
     }
 
     /**

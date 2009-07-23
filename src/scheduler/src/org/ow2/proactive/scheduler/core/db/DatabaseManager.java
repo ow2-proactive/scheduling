@@ -457,8 +457,9 @@ public class DatabaseManager {
             query.setParameter("C0", condition.getValue());
             logger_dev.debug("Set parameter " + "'C0' value=" + condition.getValue());
             List<JobId> ids = (List<JobId>) query.list();
-            logger.info("Found " + ids.size() + " jobs to retrieve");
-            callback.init(ids.size());
+            int idsSize = ids.size();
+            logger.info("Found " + idsSize + " jobs to retrieve");
+            callback.init(idsSize);
             logger_dev.info("Creating queries for each job to recover");
             //for each ID get the entity
             for (JobId jid : ids) {
@@ -468,7 +469,6 @@ public class DatabaseManager {
                 query.setParameter("C0", jid);
                 logger_dev.debug("Set parameter " + "'C0' value=" + jid);
                 InternalJob job = (InternalJob) query.uniqueResult();
-
                 try {
                     Collection<TaskResult> results = job.getJobResult().getAllResults().values();
                     //unload taskResult

@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.task.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -116,7 +117,7 @@ public abstract class InternalTask extends TaskState {
 
     /** Contains the user executable */
     @Unloadable
-    @Any(fetch = FetchType.EAGER, metaColumn = @Column(name = "EXEC_CONTAINER_TYPE", updatable = false, length = 5))
+    @Any(fetch = FetchType.LAZY, metaColumn = @Column(name = "EXEC_CONTAINER_TYPE", updatable = false, length = 5))
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = JavaExecutableContainer.class, value = "JEC"),
             @MetaValue(targetEntity = NativeExecutableContainer.class, value = "NEC"),
