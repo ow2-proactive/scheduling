@@ -95,10 +95,10 @@ public class DatabaseManager {
     private static SessionFactory sessionFactory;
     //Hibernate configuration
     private static Configuration configuration;
-    //Hibernate external forced session
-    //if a user has manually open a session, this value is not null
-    //so no new session must be created until this value to be null again.
-    private static Session externalForcedSession = null;
+    //Next variable is used to start a session manually outside of this class.
+    //It can be used to make more than one action in a single transaction.
+    //this object will store transaction by thread.
+    private static ThreadLocal<Session> globalSession = new ThreadLocal<Session>();
 
     static {
         //Create configuration from hibernate.cfg.xml using XML file for mapping
@@ -154,6 +154,7 @@ public class DatabaseManager {
                 logger_dev.info("Building Hibernate session Factory (configuration File : " +
                     configurationFile + " )");
                 sessionFactory = configuration.buildSessionFactory();
+                globalSession = new ThreadLocal<Session>();
             }
         } catch (Throwable ex) {
             logger_dev.error("Initial SessionFactory creation failed.", ex);
@@ -172,6 +173,9 @@ public class DatabaseManager {
             sessionFactory.close();
         } catch (Exception e) {
             logger_dev.error("Error while closing database", e);
+        } finally {
+            globalSession = null;
+            sessionFactory = null;
         }
     }
 
@@ -186,8 +190,12 @@ public class DatabaseManager {
      */
     public static void forceStartTransaction() {
         synchronized (sessionlock) {
-            externalForcedSession = DatabaseManager.getSessionFactory().openSession();
-            externalForcedSession.beginTransaction();
+            Session s = globalSession.get();
+            if (s == null) {
+                s = DatabaseManager.getSessionFactory().openSession();
+                s.beginTransaction();
+                globalSession.set(s);
+            }
         }
     }
 
@@ -197,9 +205,16 @@ public class DatabaseManager {
      */
     public static void forceCommitTransaction() {
         synchronized (sessionlock) {
-            externalForcedSession.getTransaction().commit();
-            externalForcedSession.close();
-            externalForcedSession = null;
+            Session s = globalSession.get();
+            if (s == null) {
+                throw new RuntimeException("No current opened session to commit");
+            }
+            try {
+                s.getTransaction().commit();
+                s.close();
+            } finally {
+                globalSession.set(null);
+            }
         }
     }
 
@@ -209,11 +224,15 @@ public class DatabaseManager {
      */
     public static void forceRollbackTransaction() {
         synchronized (sessionlock) {
+            Session s = globalSession.get();
+            if (s == null) {
+                throw new RuntimeException("No current opened session to rollback");
+            }
             try {
-                externalForcedSession.getTransaction().rollback();
+                s.getTransaction().rollback();
+                s.close();
             } finally {
-                externalForcedSession.close();
-                externalForcedSession = null;
+                globalSession.set(null);
             }
         }
     }
@@ -225,13 +244,16 @@ public class DatabaseManager {
      * @return the new opened session
      */
     private static Session beginTransaction() {
+        Session s = globalSession.get();
         //if a session has been manually opened by a user, use it
-        if (externalForcedSession != null) {
-            return externalForcedSession;
+        logger_dev.debug("Open new session, global session is " + ((s == null) ? "null" : "set"));
+        if (s != null) {
+            return s;
         }
-        Session session = DatabaseManager.getSessionFactory().openSession();
-        session.beginTransaction();
-        return session;
+        //if no session is opened, open a new one dedicated to the current thread
+        s = DatabaseManager.getSessionFactory().openSession();
+        s.beginTransaction();
+        return s;
     }
 
     /**
@@ -241,7 +263,7 @@ public class DatabaseManager {
      */
     private static void commitTransaction(Session session) {
         //if a session has been manually opened by a user, don't commit, wait for user to commit
-        if (externalForcedSession != null) {
+        if (globalSession.get() != null) {
             return;
         }
         session.getTransaction().commit();
@@ -256,7 +278,7 @@ public class DatabaseManager {
      */
     private static void rollbackTransaction(Session session) {
         //if a session has been manually opened by a user, don't rollback, wait for user to commit
-        if (externalForcedSession != null) {
+        if (globalSession.get() != null) {
             return;
         }
         session.getTransaction().rollback();

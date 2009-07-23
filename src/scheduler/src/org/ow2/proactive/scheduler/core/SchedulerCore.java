@@ -1485,37 +1485,42 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             throw new SchedulerException("The job " + jobId + " does not exist !");
         }
 
-        logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
-        //result = null if not in DB (ie: not yet available)
-        JobResult result = DatabaseManager.recover(job.getJobResult().getClass(),
-                new Condition("id", ConditionComparator.EQUALS_TO, job.getJobResult().getJobId())).get(0);
+        try {
+            logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
+            //result = null if not in DB (ie: not yet available)
+            JobResult result = DatabaseManager.recover(job.getJobResult().getClass(),
+                    new Condition("id", ConditionComparator.EQUALS_TO, job.getJobResult().getJobId())).get(0);
 
-        if (!job.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
+            if (!job.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
 
-            //remember that this job is to be removed
-            job.setToBeRemoved();
-            DatabaseManager.synchronize(job.getJobInfo());
+                //remember that this job is to be removed
+                job.setToBeRemoved();
+                DatabaseManager.synchronize(job.getJobInfo());
 
-            try {
-                //remove job after the given delay
-                TimerTask tt = new TimerTask() {
-                    @Override
-                    public void run() {
-                        schedulerStub.remove(job.getId());
-                    }
-                };
-                timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
-                logger_dev.info("Job '" + jobId + "' will be removed in " +
-                    (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
-            } catch (Exception e) {
-                logger_dev.error("", e);
+                try {
+                    //remove job after the given delay
+                    TimerTask tt = new TimerTask() {
+                        @Override
+                        public void run() {
+                            schedulerStub.remove(job.getId());
+                        }
+                    };
+                    timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+                    logger_dev.info("Job '" + jobId + "' will be removed in " +
+                        (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+                } catch (Exception e) {
+                    logger_dev.error("", e);
+                }
             }
-        }
 
-        if (result != null) {
-            ((JobResultImpl) result).setJobInfo(job.getJobInfo());
+            if (result != null) {
+                ((JobResultImpl) result).setJobInfo(job.getJobInfo());
+            }
+            return result;
+        } catch (Throwable t) {
+            logger.warn("Thrown to user", t);
+            throw new SchedulerException(t);
         }
-        return result;
     }
 
     /**
