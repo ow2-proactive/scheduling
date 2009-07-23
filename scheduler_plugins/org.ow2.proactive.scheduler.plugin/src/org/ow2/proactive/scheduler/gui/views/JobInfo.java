@@ -140,12 +140,18 @@ public class JobInfo extends ViewPart {
         int runningTasks = 0;
         int finishedTasks = 0;
         int totalTasks = 0;
+        long pendingDuration = 0;
+        long runningDuration = 0;
+        long totalDuration = 0;
 
         for (JobState job : jobs) {
             pendingTasks += job.getJobInfo().getNumberOfPendingTasks();
             runningTasks += job.getJobInfo().getNumberOfRunningTasks();
             finishedTasks += job.getJobInfo().getNumberOfFinishedTasks();
             totalTasks += job.getJobInfo().getTotalNumberOfTasks();
+            pendingDuration += (job.getJobInfo().getStartTime() - job.getJobInfo().getSubmittedTime());
+            runningDuration += (job.getJobInfo().getFinishedTime() - job.getJobInfo().getStartTime());
+            totalDuration += (job.getJobInfo().getFinishedTime() - job.getJobInfo().getSubmittedTime());
         }
 
         setVisible(true);
@@ -161,6 +167,14 @@ public class JobInfo extends ViewPart {
         propertiesValue.add(finishedTasks);
         propertiesName.add("Total tasks number");
         propertiesValue.add(totalTasks);
+
+        // Duration ******************************************************
+        propertiesName.add("Pending duration");
+        propertiesValue.add(Tools.getFormattedDuration(0, pendingDuration));
+        propertiesName.add("Execution duration");
+        propertiesValue.add(Tools.getFormattedDuration(0, runningDuration));
+        propertiesName.add("Total duration");
+        propertiesValue.add(Tools.getFormattedDuration(0, totalDuration));
 
         fill(propertiesName, propertiesValue);
     }
