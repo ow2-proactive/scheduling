@@ -367,6 +367,12 @@ public class UserController {
         opt.setArgs(0);
         actionGroup.addOption(opt);
 
+        opt = new Option("script", "sf", true, control + "Execute the given script (javascript is supported)");
+        opt.setArgName("filePath");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        actionGroup.addOption(opt);
+
         opt = new Option("test", false, control +
             "Test if the Scheduler is successfully started by committing some examples");
         opt.setRequired(false);
@@ -430,9 +436,11 @@ public class UserController {
                     newline + "\t" + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
         } else if (cmd.hasOption("jobstate")) {
-            UserSchedulerModel.jobState(cmd.getOptionValues("jobstate")[0]);
+            UserSchedulerModel.jobState(cmd.getOptionValue("jobstate"));
         } else if (cmd.hasOption("jmxinfo")) {
             UserSchedulerModel.JMXinfo();
+        } else if (cmd.hasOption("script")) {
+            UserSchedulerModel.exec(cmd.getOptionValue("script"));
         } else if (cmd.hasOption("test")) {
             UserSchedulerModel.test();
         } else {

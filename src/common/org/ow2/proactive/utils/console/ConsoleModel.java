@@ -33,6 +33,7 @@ package org.ow2.proactive.utils.console;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -169,7 +170,11 @@ public abstract class ConsoleModel {
             ScriptEngineManager manager = new ScriptEngineManager();
             // Engine selection
             engine = manager.getEngineByExtension("js");
-            engine.getContext().setWriter(console.writer());
+            if (console == null) {
+                engine.getContext().setWriter(new PrintWriter(System.out));
+            } else {
+                engine.getContext().setWriter(console.writer());
+            }
             initialized = true;
 
         }
@@ -187,13 +192,13 @@ public abstract class ConsoleModel {
             }
             //Evaluate the command
             if (cmd == null) {
-                console.error("*ERROR* - Standard input stream has been terminated !");
+                error("*ERROR* - Standard input stream has been terminated !");
                 terminated = true;
             } else {
                 engine.eval(cmd);
             }
         } catch (ScriptException e) {
-            console.error("*SYNTAX ERROR* - " + format(e.getMessage()));
+            error("*SYNTAX ERROR* - " + format(e.getMessage()));
         } catch (Exception e) {
             handleExceptionDisplay("Error while evaluating command", e);
         }

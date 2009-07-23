@@ -341,6 +341,13 @@ public class AdminController {
         preeemptiveRemovalOpt.setRequired(false);
         options.addOption(preeemptiveRemovalOpt);
 
+        Option script = new Option("sf", "script", true, control +
+            "Execute the given script (javascript is supported)");
+        script.setArgName("filePath");
+        script.setArgs(1);
+        script.setRequired(false);
+        options.addOption(script);
+
         return actionGroup;
     }
 
@@ -413,6 +420,8 @@ public class AdminController {
             AdminRMModel.shutdown(cmd.hasOption("f"));
         } else if (cmd.hasOption("jmxinfo")) {
             AdminRMModel.JMXinfo();
+        } else if (cmd.hasOption("script")) {
+            AdminRMModel.exec(cmd.getOptionValue("script"));
         } else {
             model.setDisplayOnStdStream(false);
             return true;

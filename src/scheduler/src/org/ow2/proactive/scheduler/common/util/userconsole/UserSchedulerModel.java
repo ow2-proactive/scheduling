@@ -145,8 +145,8 @@ public class UserSchedulerModel extends ConsoleModel {
                     "Get the current state of the given job (parameter is an int or a string representing the jobId)"));
         commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
         commands
-                .add(new Command("exec(commandFilePath)",
-                    "Execute the content of the given script file (parameter is a string representing a command-file path)"));
+                .add(new Command("exec(scriptFilePath)",
+                    "Execute the content of the given script file (parameter is a string representing a script-file path)"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exit Scheduler controller"));
         }

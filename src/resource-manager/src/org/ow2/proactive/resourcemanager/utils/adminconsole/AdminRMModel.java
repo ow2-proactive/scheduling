@@ -117,8 +117,8 @@ public class AdminRMModel extends ConsoleModel {
             "Shutdown the Resource Manager (RM shutdown immediately if parameter is true)"));
         commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
         commands
-                .add(new Command("exec(commandFilePath)",
-                    "Execute the content of the given script file (parameter is a string representing a command-file path)"));
+                .add(new Command("exec(scriptFilePath)",
+                    "Execute the content of the given script file (parameter is a string representing a script-file path)"));
         commands.add(new Command("setLogsDir(logsDir)",
             "Set the directory where the log are located, (default is RM_HOME/.logs"));
         commands.add(new Command("viewlogs(nbLines)",

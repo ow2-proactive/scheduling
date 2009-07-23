@@ -259,7 +259,6 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * @param myEventsOnly a boolean that indicates if you want to receive every event or just the one concerning your jobs.
      * 			This won't affect the scheduler state event that will be sent anyway.
      * @param events An array of events that you want to receive from the scheduler.
-     * @return the scheduler current state containing the different lists of jobs.
      * @throws SchedulerException if an exception occurs while serving the request.
      * @throws AuthenticationException if you are not authenticated.
      */
