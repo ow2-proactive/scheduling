@@ -47,4 +47,8 @@ function viewDevlogs(nbLines){
 	AdminSchedulerModel.viewDevlogs(""+nbLines);
 }
 
+function changePolicy(newPolicyName){
+	AdminSchedulerModel.changePolicy(""+newPolicyName);
+}
+
 var scheduler = AdminSchedulerModel.getAdminScheduler();

@@ -40,6 +40,7 @@ import java.util.ArrayList;
 
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.util.userconsole.UserSchedulerModel;
 import org.ow2.proactive.utils.console.Command;
 
@@ -109,6 +110,8 @@ public class AdminSchedulerModel extends UserSchedulerModel {
         commands.add(new Command("kill()", "Kill every tasks and jobs and shutdown Scheduler"));
         commands.add(new Command("linkrm(rmURL)",
             "Reconnect a Resource Manager (parameter is a string representing the new rmURL)"));
+        commands.add(new Command("changePolicy(fullName)",
+            "Change the current scheduling policy, (argument is the new policy full name)"));
         commands.add(new Command("setLogsDir(logsDir)",
             "Set the directory where the log are located, (default is SCHEDULER_HOME/.logs"));
         commands.add(new Command("viewlogs(nbLines)",
@@ -391,6 +394,20 @@ public class AdminSchedulerModel extends UserSchedulerModel {
         } catch (Exception e) {
         }
         return toret.toString();
+    }
+
+    public static void changePolicy(String newPolicyFullName) {
+        getModel().changePolicy_(newPolicyFullName);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void changePolicy_(String newPolicyFullName) {
+        try {
+            Class<? extends Policy> klass = (Class<? extends Policy>) Class.forName(newPolicyFullName);
+            ((AdminSchedulerInterface) scheduler).changePolicy(klass);
+        } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
     }
 
     public static AdminSchedulerInterface getAdminScheduler() {

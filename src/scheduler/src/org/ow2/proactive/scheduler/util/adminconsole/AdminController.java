@@ -129,6 +129,12 @@ public class AdminController extends UserController {
         opt.setArgs(1);
         group.addOption(opt);
 
+        opt = new Option("policy", true, control + "Change the current scheduling policy");
+        opt.setArgName("fullName");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        group.addOption(opt);
+
         options.addOptionGroup(group);
 
         return group;
@@ -154,6 +160,8 @@ public class AdminController extends UserController {
                 AdminSchedulerModel.kill();
             } else if (cmd.hasOption("linkrm")) {
                 AdminSchedulerModel.linkRM(cmd.getOptionValue("linkrm"));
+            } else if (cmd.hasOption("policy")) {
+                AdminSchedulerModel.changePolicy(cmd.getOptionValue("policy"));
             } else {
                 model.setDisplayOnStdStream(false);
                 return true;
