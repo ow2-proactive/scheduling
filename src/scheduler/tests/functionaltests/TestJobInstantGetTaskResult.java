@@ -45,7 +45,10 @@ import functionaltests.executables.ResultAsArray;
 
 
 /**
- *
+ * This class test a particular behavior.
+ * It will submit one job of 50 tasks, then listen to the task events.
+ * Each terminate tasks event will instantly generate a call to getTaskResult (to the core).
+ * This could lead to concurrent access to database.
  *
  * @author The ProActive Team
  * @date 12 jun 09
