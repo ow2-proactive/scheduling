@@ -77,6 +77,10 @@ public enum PAResourceManagerProperties {
      */
     RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PAPropertiesType.STRING),
 
+    /** path to the Amazon EC2 account credentials properties file,
+     *  mandatory when using the EC2 Infrastructure */
+    RM_EC2_PATH_PROPERTY_NAME("pa.rm.ec2.properties", PAPropertiesType.STRING),
+
     /** Resource Manager home directory */
     RM_HOME("pa.rm.home", PAPropertiesType.STRING),
 

@@ -91,6 +91,7 @@
                 <include name="ProActive/**/*.jar"/>
                 <include name="common/**/*.jar"/>
                 <include name="hibernate/**/*.jar"/>
+		<include name="ec2/**/*.jar"/>
         </fileset>
     </path>
 
@@ -101,6 +102,8 @@
 			<include name="resource-manager/**/*.jar"/>
 			<!-- Hibernate libs -->
 			<include name="hibernate/**/*.jar"/>
+			<!-- Amazon EC2 libs -->
+			<include name="ec2/**/*.jar"/>
 		</fileset>
 		<pathelement location="${cl.common.dir}" />
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
@@ -132,6 +135,7 @@
 			<include name="common/**/*.jar"/>
 			<include name="resource-manager/**/*.jar"/>
 			<include name="hibernate/**/*.jar"/>
+		        <include name="ec2/**/*.jar"/>
 		</fileset>		
 		<pathelement location="${cl.common.dir}" />
 		<pathelement location="${cl.scheduler.dir}" />

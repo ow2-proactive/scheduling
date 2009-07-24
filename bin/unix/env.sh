@@ -68,7 +68,7 @@ else
 	LOG4J_FILE=file:${PA_SCHEDULER}/config/log4j/$1
 fi
 
-JAVACMD="$JAVA_HOME/bin/java -Djava.security.manager -Dproactive.configuration=\"$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml\" -Djava.security.policy=\"$PA_SCHEDULER/config/scheduler.java.policy\" -Dlog4j.configuration=\"$LOG4J_FILE\" -Dproactive.home=\"$PA_SCHEDULER\" -Dpa.scheduler.home=\"$PA_SCHEDULER\" -Dpa.rm.home=\"$PA_SCHEDULER\""
+JAVACMD="$JAVA_HOME/bin/java -Djava.security.manager -Dproactive.configuration=\"$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml\" -Djava.security.policy=\"$PA_SCHEDULER/config/scheduler.java.policy\" -Dlog4j.configuration=\"$LOG4J_FILE\" -Dproactive.home=\"$PA_SCHEDULER\" -Dpa.scheduler.home=\"$PA_SCHEDULER\" -Dpa.rm.home=\"$PA_SCHEDULER\" -Dproactive.http.jetty.xml=\"$PA_SCHEDULER/config/deployment/jetty.xml\""
 
 #echo $JAVACMD
 

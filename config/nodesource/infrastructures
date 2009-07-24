@@ -6,3 +6,5 @@ org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastru
 # - is able to deploy/undeploy a single node
 # - uses GCM descriptor with "HOST" java variable contract
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure
+
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.EC2Infrastructure

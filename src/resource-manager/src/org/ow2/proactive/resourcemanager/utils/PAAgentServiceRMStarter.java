@@ -62,24 +62,27 @@ public final class PAAgentServiceRMStarter {
     /**
      * Creates a new instance of this class and calls registersInRm method. The
      * arguments must be as follows: arg[0] = username, arg[1] = password,
-     * arg[2] = rmUrl, arg[3] = nodeName (optional)
+     * arg[2] = rmUrl, arg[3] = nodeName (optional), args[4] = nodeSourceName (optional)
      * 
      * @param args
      *            The arguments needed to join the Resource Manager
      */
     public static void main(final String args[]) {
-        if (args.length < 3 || args.length > 4) {
-            System.out.println("Usage: java PAAgentServiceRMStarter username password rmUrl nodename");
+        if (args.length < 3 || args.length > 5) {
+            System.out
+                    .println("Usage: java PAAgentServiceRMStarter username password rmUrl [nodename] [nodeSourceName]");
             return;
         }
         final String username = args[0];
         final String password = args[1];
         final String rmUrl = args[2];
         // If the nodename was specified use it
-        final String nodename = (args.length == 4 ? args[3] : PAAGENT_DEFAULT_NODE_NAME);
+        final String nodename = (args.length >= 4 ? args[3] : PAAGENT_DEFAULT_NODE_NAME);
+        // If specified, nodeSource to which the node will try to connect
+        final String nsName = (args.length >= 5 ? args[4] : null);
         // Use given args
         final PAAgentServiceRMStarter starter = new PAAgentServiceRMStarter();
-        if (starter.registerInRM(username, password, rmUrl, nodename)) {
+        if (starter.registerInRM(username, password, rmUrl, nodename, nsName)) {
             System.out.println("Connected to the Resource Manager at " + rmUrl + "\n");
         } else {
             System.out.println("The Resource Manager at " + rmUrl +
@@ -95,7 +98,7 @@ public final class PAAgentServiceRMStarter {
      * adds the created node to the Resource Manager
      */
     private boolean registerInRM(final String username, final String password, final String rmUrl,
-            final String nodename) {
+            final String nodename, final String nodeSourceName) {
         // 1 - Create a node on localhost
         Node n = null;
         try {
@@ -137,7 +140,11 @@ public final class PAAgentServiceRMStarter {
         }
         // 4 - Add the created node to the Resource Manager
         try {
-            admin.addNode(n.getNodeInformation().getURL());
+            if (nodeSourceName != null) {
+                admin.addNode(n.getNodeInformation().getURL(), nodeSourceName);
+            } else {
+                admin.addNode(n.getNodeInformation().getURL());
+            }
         } catch (Throwable t) {
             System.out.println("Could not add the local node the Resource Manager at " + rmUrl);
             t.printStackTrace();

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<Configure id="Server" class="org.mortbay.jetty.Server">
+
+	<!--
+		The HashSessionIdManager class by default will use the java.security.SecureRandom random
+		number generator. It uses the operating system's source to provide entropy.
+	 -->
+	<Set name="sessionIdManager">
+		<New class="org.mortbay.jetty.servlet.HashSessionIdManager">
+			<Arg>
+				<New class="java.util.Random" />
+			</Arg>
+		</New>
+	</Set>
+
+</Configure>

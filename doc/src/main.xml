@@ -17,6 +17,7 @@
 	  <!ENTITY RM_deployment SYSTEM "resourcemanager/rm_deployment.xml">
 	  <!ENTITY RM_admin SYSTEM "resourcemanager/rm_admin.xml">
 	  <!ENTITY RM_API SYSTEM "resourcemanager/rm_api.xml">
+	  <!ENTITY RM_EC2 SYSTEM "resourcemanager/rm_ec2.xml">
 	  <!ENTITY RM_plugin SYSTEM "resourcemanager_plugin/rm_plugin.xml">
 	  
 	  <!ENTITY Matlab SYSTEM "matlab/matlab.xml">
@@ -49,6 +50,7 @@
 		&RM_deployment;
 		&RM_admin;
 		&RM_plugin;
+		&RM_EC2;
 		&RM_API;
 	</part>
 
