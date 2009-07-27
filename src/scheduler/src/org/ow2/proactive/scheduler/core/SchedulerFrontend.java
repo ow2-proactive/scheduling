@@ -114,13 +114,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             .getValueAsInt() * 1000;
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
-    private Map<UniqueID, UserIdentificationImpl> identifications = new HashMap<UniqueID, UserIdentificationImpl>();
+    private Map<UniqueID, UserIdentificationImpl> identifications;
 
     /** List of connected user */
-    private SchedulerUsers connectedUsers = new SchedulerUsers();
+    private SchedulerUsers connectedUsers;
 
     /** List used to mark the user that does not respond anymore */
-    private Set<UniqueID> dirtyList = new HashSet<UniqueID>();
+    private Set<UniqueID> dirtyList;
 
     /** Implementation of Resource Manager */
     private transient ResourceManagerProxy resourceManager;
@@ -135,13 +135,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     private transient SchedulerCore scheduler;
 
     /** Direct link to the current job to submit. */
-    private InternalJobWrapper currentJobToSubmit = new InternalJobWrapper();
+    private InternalJobWrapper currentJobToSubmit;
 
     /** Job identification management */
     private Map<JobId, IdentifiedJob> jobs;
 
     /** scheduler listeners */
-    private Map<UniqueID, SchedulerEventListener> schedulerListeners = new ConcurrentHashMap<UniqueID, SchedulerEventListener>();
+    private Map<UniqueID, SchedulerEventListener> schedulerListeners;
 
     /** Session timer */
     private Timer sessionTimer;
@@ -172,12 +172,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName)
             throws ActiveObjectCreationException, NodeException {
+        this.identifications = new HashMap<UniqueID, UserIdentificationImpl>();
+        this.connectedUsers = new SchedulerUsers();
+        this.dirtyList = new HashSet<UniqueID>();
+        this.currentJobToSubmit = new InternalJobWrapper();
+        this.schedulerListeners = new ConcurrentHashMap<UniqueID, SchedulerEventListener>();
+
         logger_dev.info("Creating scheduler Front-end...");
         resourceManager = imp;
         policyFullName = policyFullClassName;
         logger_dev.debug("Policy used is " + policyFullClassName);
         jobs = new HashMap<JobId, IdentifiedJob>();
-        sessionTimer = new Timer();
+        sessionTimer = new Timer("SessionTimer");
     }
 
     /**

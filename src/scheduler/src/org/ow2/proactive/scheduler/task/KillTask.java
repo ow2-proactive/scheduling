@@ -65,7 +65,7 @@ public class KillTask {
      * Starting a timer for killing an executable when the walltime is over
      */
     public void schedule() {
-        timer = new Timer();
+        timer = new Timer("KillTask");
         timer.schedule(new KillProcess(), walltime);
     }
 

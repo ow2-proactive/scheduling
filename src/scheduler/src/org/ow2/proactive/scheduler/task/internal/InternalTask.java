@@ -34,7 +34,6 @@ package org.ow2.proactive.scheduler.task.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
