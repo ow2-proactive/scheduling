@@ -176,38 +176,40 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private Policy policy;
 
     /** list of all jobs managed by the scheduler */
-    private Map<JobId, InternalJob> jobs = new HashMap<JobId, InternalJob>();
+    private Map<JobId, InternalJob> jobs;
 
     /** list of pending jobs among the managed jobs */
-    private Vector<InternalJob> pendingJobs = new Vector<InternalJob>();
+    private Vector<InternalJob> pendingJobs;
 
     /** list of running jobs among the managed jobs */
-    private Vector<InternalJob> runningJobs = new Vector<InternalJob>();
+    private Vector<InternalJob> runningJobs;
 
     /** list of finished jobs among the managed jobs */
-    private Vector<InternalJob> finishedJobs = new Vector<InternalJob>();
+    private Vector<InternalJob> finishedJobs;
 
     /** Scheduler current status */
-    private SchedulerStatus status = SchedulerStatus.STOPPED;
+    private SchedulerStatus status;
 
     /** Thread that will ping the running nodes */
     private Thread pinger;
 
     /** Timer used for remove result method (transient because Timer is not serializable) */
-    private transient Timer timer = new Timer();
+    private Timer removeJobTimer;
+    /** Timer used for restarting tasks */
+    private Timer restartTaskTimer;
 
     /** Log forwarding service for nodes */
     private LogForwardingService lfs;
 
     /** Jobs that must be logged into the corresponding appenders */
-    private Hashtable<JobId, AsyncAppender> jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
+    private Hashtable<JobId, AsyncAppender> jobsToBeLogged;
     /** jobs that must be logged into a file */
     //TODO cdelbe : file are logged on core side...
-    private Hashtable<JobId, FileAppender> jobsToBeLoggedinAFile = new Hashtable<JobId, FileAppender>();
+    private Hashtable<JobId, FileAppender> jobsToBeLoggedinAFile;
     private static final String FILEAPPENDER_SUFFIX = "_FILE";
 
     /** Currently running tasks for a given jobId*/
-    private Hashtable<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks = new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
+    private Hashtable<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks;
 
     /** ClassLoading */
     // contains taskCLassServer for currently running jobs
@@ -333,6 +335,17 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     public SchedulerCore(ResourceManagerProxy imp, SchedulerFrontend frontend, String policyFullName,
             InternalJobWrapper jobSubmitLink) {
         try {
+            this.jobs = new HashMap<JobId, InternalJob>();
+            this.pendingJobs = new Vector<InternalJob>();
+            this.runningJobs = new Vector<InternalJob>();
+            this.finishedJobs = new Vector<InternalJob>();
+            this.removeJobTimer = new Timer("RemoveJobTimer");
+            this.restartTaskTimer = new Timer("RestartTaskTimer");
+            this.status = SchedulerStatus.STOPPED;
+            this.jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
+            this.jobsToBeLoggedinAFile = new Hashtable<JobId, FileAppender>();
+            this.currentlyRunningTasks = new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
+
             this.resourceManager = imp;
             this.frontend = frontend;
             this.currentJobToSubmit = jobSubmitLink;
@@ -432,8 +445,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         try {
             //Start DB and rebuild the scheduler if needed.
             recover();
-        } catch (Exception e) {
-            ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Hibernate ", e);
+        } catch (Throwable e) {
+            ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info("Cannot start Scheduler ", e);
             kill();
             return;
         }
@@ -477,7 +490,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         service.serveAll(filter);
                         //schedule
                         schedule();
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         //this point is reached in case of big problem, sometimes unknown
                         logger
                                 .error(
@@ -1248,7 +1261,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                     //the job is not restarted directly
                     RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
-                    new Timer().schedule(jtt, job.getNextWaitingTime(descriptor.getMaxNumberOfExecution() -
+                    restartTaskTimer.schedule(jtt, job.getNextWaitingTime(descriptor
+                            .getMaxNumberOfExecution() -
                         descriptor.getNumberOfExecutionLeft()));
 
                     return;
@@ -1505,7 +1519,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             schedulerStub.remove(job.getId());
                         }
                     };
-                    timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+                    removeJobTimer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
                     logger_dev.info("Job '" + jobId + "' will be removed in " +
                         (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
                 } catch (Exception e) {
@@ -2137,7 +2151,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                 schedulerStub.remove(job.getId());
                             }
                         };
-                        timer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
+                        removeJobTimer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
                         logger.debug("Job " + job.getId() + " will be removed in " +
                             (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
                     } catch (Exception e) {
