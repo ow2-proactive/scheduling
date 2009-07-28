@@ -160,8 +160,9 @@ public abstract class AbstractJobComposite extends Composite {
 
             Vector<JobId> jobsId = getJobs();
             int i = 0;
-            for (JobId jobId : jobsId)
+            for (JobId jobId : jobsId) {
                 addJobInTable(jobId, i++);
+            }
 
             // Turn drawing back on
             table.setRedraw(true);
