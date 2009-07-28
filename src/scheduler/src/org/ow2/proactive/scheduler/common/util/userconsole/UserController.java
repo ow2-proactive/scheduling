@@ -369,6 +369,12 @@ public class UserController {
         //        opt.setArgs(0);
         //        actionGroup.addOption(opt);
 
+        opt = new Option("script", "sf", true, control + "Execute the given script (javascript is supported)");
+        opt.setArgName("filePath");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        actionGroup.addOption(opt);
+
         options.addOptionGroup(actionGroup);
 
         return actionGroup;
@@ -423,6 +429,8 @@ public class UserController {
                 printf("Missing arguments for job priority. Arguments must be <jobId> <newPriority>\n\t"
                     + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
+        } else if (cmd.hasOption("script")) {
+            exec(cmd.getOptionValue("script"));
         }
         //        else if (cmd.hasOption("jmxinfo")) {
         //            JMXinfo();

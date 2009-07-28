@@ -361,6 +361,13 @@ public class AdminController {
         preeemptiveRemovalOpt.setRequired(false);
         options.addOption(preeemptiveRemovalOpt);
 
+        Option script = new Option("sf", "script", true, control +
+            "Execute the given script (javascript is supported)");
+        script.setArgName("filePath");
+        script.setArgs(1);
+        script.setRequired(false);
+        options.addOption(script);
+
         return actionGroup;
     }
 
@@ -437,10 +444,12 @@ public class AdminController {
             }
         } else if (cmd.hasOption("shutdown")) {
             shutdown(cmd.hasOption("f"));
+        } else if (cmd.hasOption("script")) {
+            exec(cmd.getOptionValue("script"));
         }
         //        else if (cmd.hasOption("jmxinfo")) {
         //            JMXinfo();
-        //        } 
+        //        }
         else {
             intercativeMode = true;
             return intercativeMode;
