@@ -117,6 +117,10 @@ public class IOTools {
     }
 
     public static class RedirectionThread implements Runnable, Serializable {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 10L;
         private InputStream is;
         private OutputStream os;
 
@@ -145,6 +149,10 @@ public class IOTools {
      * @author The ProActive Team
      */
     public static class LoggingThread implements Runnable, Serializable {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 10L;
         private String appendMessage;
         /**  */
         public Boolean goon = true;
@@ -214,13 +222,15 @@ public class IOTools {
             String line = null;
             boolean first_line = true;
             while ((line = getLineOrDie()) != null && goon) {
-                if (first_line && line.trim().length() > 0) {
-                    first_line = false;
-                    out.println(appendMessage + line);
-                    out.flush();
-                } else if (!first_line) {
-                    out.println(appendMessage + line);
-                    out.flush();
+                synchronized (out) {
+                    if (first_line && line.trim().length() > 0) {
+                        first_line = false;
+                        out.println(appendMessage + line);
+                        out.flush();
+                    } else if (!first_line) {
+                        out.println(appendMessage + line);
+                        out.flush();
+                    }
                 }
             }
 
@@ -230,6 +240,12 @@ public class IOTools {
                 br.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+
+        public void setStream(PrintStream st) {
+            synchronized (out) {
+                out = st;
             }
         }
     }

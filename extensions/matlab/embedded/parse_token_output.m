@@ -43,8 +43,15 @@ function out = parse_token_output(in)
 if ~isa(in, 'ptolemy.data.Token')
     error('in parameter should be a ptolemy.data.Token');
 end
-if isa(in, 'ptolemy.data.StringToken') || isa(in, 'ptolemy.data.MatrixToken') || isa(in, 'ptolemy.data.ComplexToken') || isa(in, 'ptolemy.data.ComplexMatrixToken') || isa(in, 'ptolemy.data.ScalarToken')
-    out = eval(in.toString());
+if isa(in, 'ptolemy.data.StringToken')
+    chr = char(in.toString());
+    if chr(1) == '"'
+        chr = ['''' chr(2:end-1) ''''];
+    end
+    out = eval(chr);
+end
+if isa(in, 'ptolemy.data.MatrixToken') || isa(in, 'ptolemy.data.ComplexToken') || isa(in, 'ptolemy.data.ComplexMatrixToken') || isa(in, 'ptolemy.data.ScalarToken')
+    out = eval(char(in.toString()));
 end
 if isa(in, 'ptolemy.data.RecordToken') 
     out = struct;

@@ -94,6 +94,11 @@ import ptolemy.data.Token;
 public class AOMatlabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
 
     /**
+     *
+     */
+    private static final long serialVersionUID = 10L;
+
+    /**
      * URL to the scheduler
      */
     private String schedulerUrl;
@@ -169,7 +174,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
 
         this.scheduler = auth.logAsUser(user, passwd);
 
-        this.scheduler.addEventListener(stubOnThis, false, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+        this.scheduler.addSchedulerEventListener(stubOnThis, false, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                 SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN, SchedulerEvent.SHUTTING_DOWN);
 
     }
@@ -381,7 +386,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Matlab Environment Job " + lastGenJobId++);
         job.setPriority(priority);
-        job.setCancelJobOnError(true);
+        job.setCancelJobOnError(false);
         job.setDescription("Set of parallel matlab tasks");
 
         for (int i = 0; i < mainScripts.length; i++) {
@@ -404,7 +409,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
                 } catch (InvalidScriptException e1) {
                     throw new RuntimeException(e1);
                 }
-                schedulerTask.addSelectionScript(sscript);
+                schedulerTask.setSelectionScript(sscript);
             }
 
             try {
@@ -700,6 +705,11 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      *         Internal class for filtering requests in the queue
      */
     protected class FindNotWaitFilter implements RequestFilter {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 10L;
 
         /**
          * Creates the filter
