@@ -345,7 +345,16 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
-     * To set a list of selection scripts. These are the scripts that will select a node.
+     * Set a selection script. It is the script that will be in charge of selecting a node.
+     */
+    public void setSelectionScript(SelectionScript selScript) {
+        List<SelectionScript> selScriptsList = new ArrayList<SelectionScript>();
+        selScriptsList.add(selScript);
+        setSelectionScripts(selScriptsList);
+    }
+
+    /**
+     * Set a list of selection scripts. These are the scripts that will be in charge of selecting a node.
      */
     public void setSelectionScripts(List<SelectionScript> selScriptsList) {
         this.sScripts = selScriptsList;
