@@ -67,7 +67,7 @@ import java.util.*;
 
 /**
  * This class represents a Matlab-specific Task inside the Scheduler
- * 
+ *
  * @author The ProActive Team
  */
 public class MatlabTask extends JavaExecutable implements NotificationListener {
@@ -80,17 +80,17 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
     protected boolean debug;
 
     /**
-     *  This hostname, for debugging purpose
+     * This hostname, for debugging purpose
      */
     protected static String host = null;
 
     /**
-     *  the index when the input is the result of a SplitTask
+     * the index when the input is the result of a SplitTask
      */
     protected int index = -1;
 
     /**
-     *  the lines of inputScript
+     * the lines of inputScript
      */
     protected String inputScript = null;
 
@@ -100,12 +100,12 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
     protected String nodeName = null;
 
     /**
-     *  The lines of the Matlab script
+     * The lines of the Matlab script
      */
     protected ArrayList<String> scriptLines = null;
 
     /**
-     *  The URI to which the spawned JVM(Node) is registered
+     * The URI to which the spawned JVM(Node) is registered
      */
     protected static Map<String, MatlabJVMInfo> jvmInfos = new HashMap<String, MatlabJVMInfo>();
 
@@ -123,12 +123,12 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
      */
     //protected static LoggingThread esLogger = null;
     /**
-     *  tool to build the JavaCommand
+     * tool to build the JavaCommand
      */
     private DummyJVMProcess javaCommandBuilder;
 
     /**
-     *  holds the Matlab environment information on this machine
+     * holds the Matlab environment information on this machine
      */
     protected static MatlabConfiguration matlabConfig = null;
 
@@ -137,9 +137,11 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
      */
     // protected static AOMatlabWorker matlabWorker = null;
     /**
-     *  the OS where this JVM is running
+     * the OS where this JVM is running
      */
     private static OperatingSystem os = OperatingSystem.getOperatingSystem();
+
+    private static boolean threadstarted = false;
 
     /**
      *  The process holding the spawned JVM
@@ -164,8 +166,9 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
 
     /**
      * Convenience constructor
+     *
      * @param inputScript script that will be launched and will produce an input to the main script
-     * @param mainScript main script to execute
+     * @param mainScript  main script to execute
      */
     public MatlabTask(String inputScript, String mainScript) {
         this.inputScript = inputScript;
@@ -218,29 +221,43 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
                     }
                 }));
             }
+        } else {
 
-            // We define the loggers which will write on standard output what comes from the java process
-            LoggingThread lt1 = new LoggingThread(p.getInputStream(), "[" + host + " OUT]", System.out);
-            LoggingThread lt2 = new LoggingThread(p.getErrorStream(), "[" + host + " ERR]", System.err);
-            IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, p.getOutputStream());
+            if (!threadstarted) {
+                if (debug) {
+                    System.out.println("[" + host + " MATLAB TASK] Starting the Threads");
+                }
+                // We define the loggers which will write on standard output what comes from the java process
+                LoggingThread lt1 = new LoggingThread(jvminfo.getProcess().getInputStream(), "[" + host +
+                    " OUT]", new PrintStream(new File("D:\\test_out.txt")));// new PrintStream(new File("D:\\test_out.txt")));//System.out);
+                LoggingThread lt2 = new LoggingThread(jvminfo.getProcess().getErrorStream(), "[" + host +
+                    " ERR]", new PrintStream(new File("D:\\test_err.txt")));// new PrintStream(new File("D:\\test_err.txt")));//System.err);
+                //IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, jvminfo.getProcess().getOutputStream());
 
-            jvminfo.setLogger(lt1);
-            jvminfo.setEsLogger(lt2);
-            jvminfo.setIoThread(rt1);
+                jvminfo.setLogger(lt1);
+                jvminfo.setEsLogger(lt2);
+                //jvminfo.setIoThread(rt1);
 
-            // We start the loggers thread
+                // We start the loggers thread
 
-            Thread t1 = new Thread(lt1, "OUT Matlab");
-            t1.setDaemon(true);
-            t1.start();
+                Thread t1 = new Thread(lt1, "OUT Matlab");
+                t1.setDaemon(true);
+                t1.start();
 
-            Thread t2 = new Thread(lt2, "ERR Matlab");
-            t2.setDaemon(true);
-            t2.start();
+                Thread t2 = new Thread(lt2, "ERR Matlab");
+                t2.setDaemon(true);
+                t2.start();
 
-            Thread t3 = new Thread(rt1, "Redirecting I/O Matlab");
-            t3.setDaemon(true);
-            t3.start();
+                //                Thread t3 = new Thread(rt1, "Redirecting I/O Matlab");
+                //                t3.setDaemon(true);
+                //                t3.start();
+
+                threadstarted = true;
+
+            } else {
+                jvminfo.getLogger().setStream(System.out);
+                jvminfo.getEsLogger().setStream(System.err);
+            }
 
         }
 
@@ -317,6 +334,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
 
     /**
      * Deploy an Active Object on the given Node uri
+     *
      * @throws Throwable
      */
     protected AOMatlabWorker deploy(String className) throws Throwable {
@@ -343,12 +361,14 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
 
     /**
      * Internal version of the execute method
+     *
      * @param results results from preceding tasks
      * @return result of the task
      * @throws Throwable
      */
     protected Serializable executeInternal(TaskResult... results) throws Throwable {
 
+        boolean releaseEngine = inputScript.indexOf("PROACTIVE_INITIALIZATION_CODE") == -1;
         MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
         AOMatlabWorker sw = jvminfo.getWorker();
         if (sw == null) {
@@ -374,14 +394,28 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
         if (debug) {
             System.out.println("[" + host + " MatlabTask] Executing");
         }
+        Serializable res = null;
+        try {
 
-        // We execute the task on the worker
-        Serializable res = sw.execute(index, results);
-        // We wait for the result
-        res = (Serializable) PAFuture.getFutureValue(res);
+            // We execute the task on the worker
+            res = sw.execute(index, results);
+            // We wait for the result
+            res = (Serializable) PAFuture.getFutureValue(res);
 
-        if (debug) {
-            System.out.println("[" + host + " MatlabTask] Received result");
+            if (debug) {
+                System.out.println("[" + host + " MatlabTask] Received result");
+            }
+            if (releaseEngine) {
+                if (debug) {
+                    System.out.println("[" + host + " MatlabTask] Terminating Matlab engine");
+                }
+                sw.terminate();
+            }
+
+        } catch (Exception e) {
+            System.out.println("[" + host + " MatlabTask] Terminating Matlab engine");
+            sw.terminate();
+            throw e;
         }
 
         return res;
@@ -389,6 +423,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
 
     /**
      * Starts the java process on the given Node uri
+     *
      * @return process
      * @throws Throwable
      */
@@ -503,6 +538,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
 
     /**
      * Utility function to add MATLAB directories to the given path-like string
+     *
      * @param path path-like string
      * @return an augmented path
      */
@@ -536,8 +572,8 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
 
     /**
      * An utility class to build the Java command
-     * @author The ProActive Team
      *
+     * @author The ProActive Team
      */
     public static class DummyJVMProcess extends JVMProcessImpl implements Serializable {
 

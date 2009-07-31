@@ -48,18 +48,18 @@ toolboxmap = java.util.HashMap();
 // for each job's used toolboxes. It contains only references to popular toolboxes,
 // For any toolbox not present in this list, a key/value pair must be added
 // The key is the toolbox directory name in MATLAB_ROOT/toolbox
-// The value is the matlab code to be executed in order to trigger a licence 
+// The value is the matlab code to be executed in order to trigger a licence
 // *****************************************************************************************
 // Standard Matlab
 toolboxmap.put("matlab", "a=1;");
 // Simulink
-toolboxmap.put("simulink", "opts = simset(\'MaxDataPoints\', 100, \'Refine\', 2);[txtRpt, sRpt] = sldiagnostics(\'vdp\');");
+toolboxmap.put("simulink", "res=new_system('toto');");
 // Control System
 toolboxmap.put("control", "s = tf(\'s\');");
 // Fixed Point
 // The fixed point toolbox has a very weird licencing scheme, it takes no toolbox licence
 // if the logging mode is not activated, here the command simulates that a licence is being taken
-// If you want to use fixed point without the logging, replace the matlab command below with a dummy commmand like "a=1;" 
+// If you want to use fixed point without the logging, replace the matlab command below with a dummy commmand like "a=1;"
 toolboxmap.put("fixedpoint", "pref = fipref(\'LoggingMode\',\'on\');a = fi;");
 // Image Processing
 toolboxmap.put("images", "s = imcomplement(uint8([ 255 10 75; 44 225 100]));");
@@ -108,11 +108,16 @@ if (!logFile.exists()) {
 }
 logWriter = java.io.PrintStream(java.io.BufferedOutputStream(java.io.FileOutputStream(logFile, true)));
 
+nodeDir = java.io.File(tmpPath,nodeName);
+if (!nodeDir.exists()) {
+	nodeDir.mkdir();
+}
+
 
 selected = false;
 host = java.net.InetAddress.getLocalHost().getHostName();
 
-logWriter.println("Executing selection script on " + host);
+logWriter.println(java.util.Date()+" : Executing selection script on " + host);
 
 if (System.getProperty("os.name").startsWith("Windows")) {
     try {
@@ -155,6 +160,35 @@ else {
 }
 if (selected) {
 
+    // we first try to see if Matlab is available
+    if (windows) {
+  	  cmd_options = ["-automation","-r"];
+    }
+    else {
+	  cmd_options = ["-nodisplay", "-nosplash", "-r"];
+    }
+
+    testF = java.io.File(nodeDir,"matlabTest.lock");
+
+    logWriter.println(java.util.Date()+" Trying to start a Matlab session");
+    cmd_array = [command];
+    cmd_array = cmd_array.concat(cmd_options);
+    cmd_array = cmd_array.concat("delete('"+testF.toString()+"');quit;");
+    rt = java.lang.Runtime.getRuntime();
+    process = rt.exec(cmd_array);
+    process.waitFor();
+    if (testF.exists()) {
+        selected = false;
+        logWriter.println(java.util.Date()+" Unsufficient licence coin for matlab. " + java.net.InetAddress.getLocalHost().getHostName());
+    }
+    try {
+       process.destroy();
+    }
+    catch(err) {
+    }
+    if (selected) {
+
+
     // we build the matlab code that will be run to trigger the licence token acquisitions
     fullcode = "";
     allargs = "";
@@ -168,25 +202,27 @@ if (selected) {
     }
     fullcode += finalcode;
     if (allargs != "") {
-        logWriter.println("Testing licence coin for " + allargs + " : " + host );
+        logWriter.println(java.util.Date()+" : Testing licence coin for " + allargs + " : " + host );
     }
 
-    task = MatlabTask("i=0;",fullcode);
+    task = MatlabTask("i='PROACTIVE_INITIALIZATION_CODE';",fullcode);
 
     try {
         task.execute([]);
         selected = true;
     }
     catch(err) {
-        logWriter.println("Error occured : "+err.message );
+        logWriter.println(java.util.Date()+" : Error occured : "+err.message );
         selected = false;
     }
 
-    
+
     if (selected) {
-        logWriter.println("Good : " + java.net.InetAddress.getLocalHost().getHostName());
+        logWriter.println(java.util.Date()+" : Good : " + java.net.InetAddress.getLocalHost().getHostName());
     }
+  }
 }
-else logWriter.println("No Matlab installed or system error: " + java.net.InetAddress.getLocalHost().getHostName());
+else logWriter.println(java.util.Date()+" : No Matlab installed or system error: " + java.net.InetAddress.getLocalHost().getHostName());
 
 logWriter.close();
+

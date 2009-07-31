@@ -40,14 +40,18 @@ import ptolemy.matlab.Engine.ConversionParameters;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.TimeUnit;
 
 
 /**
  * This class is an interface to the Matlab Engine
- * @author The ProActive Team
  *
+ * @author The ProActive Team
  */
 public class MatlabEngine {
     /**
@@ -65,7 +69,31 @@ public class MatlabEngine {
     /**
      * Is the engine currently used by a thread ?
      */
-    private static Lock lock = new ReentrantLock();
+    private static Lock lock = new Lock() {
+        public void lock() {
+
+        }
+
+        public void lockInterruptibly() throws InterruptedException {
+
+        }
+
+        public boolean tryLock() {
+            return false;
+        }
+
+        public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+            return false;
+        }
+
+        public void unlock() {
+
+        }
+
+        public Condition newCondition() {
+            return null;
+        }
+    };
 
     /**
      * Ptolemy engine customization
@@ -96,6 +124,13 @@ public class MatlabEngine {
                 } else {
                     engineHandle = eng.open(configuration.getMatlabCommandName() + " -automation", true);
                 }
+                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    public void run() {
+                        eng.close(engineHandle);
+                        eng = null;
+                    }
+                }));
+
                 // highly verbose exceptions
             } catch (UnsatisfiedLinkError e) {
                 StringWriter error_message = new StringWriter();
@@ -136,6 +171,7 @@ public class MatlabEngine {
 
     /**
      * Acquire a connection to the matlab engine
+     *
      * @return an engine connection
      */
     public synchronized static Connection acquire() {
@@ -152,6 +188,7 @@ public class MatlabEngine {
 
     /**
      * Clears the engine's workspace
+     *
      * @throws IllegalActionException
      */
     private static void clear() throws IllegalActionException {
@@ -161,6 +198,7 @@ public class MatlabEngine {
 
     /**
      * Evaluate the given string in the workspace
+     *
      * @param command
      * @throws IllegalActionException
      */
@@ -173,6 +211,7 @@ public class MatlabEngine {
 
     /**
      * Extract a variable from the workspace
+     *
      * @param variableName name of the variable
      * @return value of the variable
      * @throws IllegalActionException
@@ -184,8 +223,9 @@ public class MatlabEngine {
 
     /**
      * Push a variable in to the workspace
+     *
      * @param variableName name of the variable
-     * @param token value
+     * @param token        value
      * @throws IllegalActionException
      */
     private static void put(String variableName, Token token) throws IllegalActionException {
@@ -205,8 +245,8 @@ public class MatlabEngine {
 
     /**
      * Public access to the engine, locking the engine is necessary to have a public access
-     * @author The ProActive Team
      *
+     * @author The ProActive Team
      */
     public static class Connection {
 
@@ -217,6 +257,7 @@ public class MatlabEngine {
 
         /**
          * Evaluate the given string in the workspace
+         *
          * @param command
          * @throws IllegalActionException
          */
@@ -228,6 +269,7 @@ public class MatlabEngine {
 
         /**
          * Extract a variable from the workspace
+         *
          * @param variableName name of the variable
          * @return value of the variable
          * @throws IllegalActionException
@@ -240,8 +282,9 @@ public class MatlabEngine {
 
         /**
          * Push a variable in to the workspace
+         *
          * @param variableName name of the variable
-         * @param token value
+         * @param token        value
          * @throws IllegalActionException
          */
         public void put(String variableName, Token token) throws IllegalActionException {
@@ -252,6 +295,7 @@ public class MatlabEngine {
 
         /**
          * Clears the engine's workspace
+         *
          * @throws IllegalActionException
          */
         public void clear() throws IllegalActionException {
