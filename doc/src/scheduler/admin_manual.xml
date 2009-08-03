@@ -79,6 +79,7 @@
 				a database that will be used to save scheduling process in case of crash.
 				It allows the ProActive Scheduler to restart with a consistent state.
 				The ProActive Scheduler will either use an existing database or create a new one if it cannot find one.
+				(Supported databases are Java DERBY and MySQL)
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -207,6 +208,14 @@ PASchedulerProperties.updateProperties("your_property_file");
 							If not set a random one is used. Use this property if you use a firewall and want a specific port.
 						</para>
 					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.core.usersessiontime</emphasis>:
+							user is automatically disconnect after this time if no request is made to the scheduler, it can be used to restrict
+							the duration of a session.
+							Negative number indicates that session is infinite (value specified in second)
+						</para>
+					</listitem>
 				</itemizedlist>
 				<para>
 					<emphasis>Jobs properties</emphasis>
@@ -289,7 +298,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 					</listitem>
 				</itemizedlist>
 				<para>
-					<emphasis>Tasks properties</emphasis>
+					<emphasis>Authentication properties</emphasis>
 				</para>
 				<itemizedlist>
 					<listitem>
@@ -361,6 +370,14 @@ PASchedulerProperties.updateProperties("your_property_file");
 						<para>
 							<emphasis role="italics">pa.scheduler.db.hibernate.configuration</emphasis>:
 							Hibernate main configuration file (default is config/database/hibernate/hibernate.cfg.xml)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.db.hibernate.dropdb</emphasis>:
+							Drop database before creating a new one : default false
+							If this value is true, the database will be dropped and then re-created
+							If this value is false, database will be updated from the existing one.
 						</para>
 					</listitem>
 				</itemizedlist>
