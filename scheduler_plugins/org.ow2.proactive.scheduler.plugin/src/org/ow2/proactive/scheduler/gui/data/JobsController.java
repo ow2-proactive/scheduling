@@ -244,7 +244,7 @@ public class JobsController implements SchedulerEventListener {
      */
     private synchronized void usersUpdateInternal() {
         for (SchedulerUsersListener listener : schedulerUsersListeners)
-            listener.update(users);
+            listener.update(users.getUsers());
     }
 
     // -------------------------------------------------------------------- //

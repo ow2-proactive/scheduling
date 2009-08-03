@@ -160,14 +160,22 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
         for (int i = 0; i < cols.length; i++) {
             String title = cols[i].getText();
             if (title.equals(COLUMN_PROGRESS_BAR_TITLE)) {
+                //                ProgressBar bar;
+                //                if (job.getNumberOfFinishedTasks() > 0) {
+                //                    bar = new ProgressBar(table, SWT.NONE);
+                //                    bar.setMaximum(job.getTotalNumberOfTasks());
+                //                    bar.setSelection(job.getNumberOfFinishedTasks());
+                //                } else {
+                //                    bar = new ProgressBar(table, SWT.INDETERMINATE);
+                //                }
                 ProgressBar bar;
                 if (job.getTotalNumberOfTasks() == 1) {
                     bar = new ProgressBar(table, SWT.INDETERMINATE);
                 } else {
                     bar = new ProgressBar(table, SWT.NONE);
+                    bar.setMaximum(job.getTotalNumberOfTasks());
+                    bar.setSelection(job.getNumberOfFinishedTasks());
                 }
-                bar.setMaximum(job.getTotalNumberOfTasks());
-                bar.setSelection(job.getNumberOfFinishedTasks());
                 TableEditor editor = new TableEditor(table);
                 editor.grabHorizontal = true;
                 editor.grabVertical = true;
@@ -308,6 +316,16 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
                         String title = cols[i].getText();
                         if ((title != null) &&
                             (title.equals(COLUMN_PROGRESS_BAR_TITLE) && (!item.isDisposed()))) {
+                            //                            if (job.getNumberOfFinishedTasks() == 1 && job.getTotalNumberOfTasks() > 1) {
+                            //                                ProgressBar bar = (ProgressBar) item.getData("bar");
+                            //                                bar.dispose();
+                            //                                TableEditor editor = (TableEditor) item.getData("editor");
+                            //                                bar = new ProgressBar(table, SWT.NONE);
+                            //                                bar.setMaximum(job.getTotalNumberOfTasks());
+                            //                                editor.setEditor(bar, item, i);
+                            //                                item.setData("bar", bar);
+                            //                                progressBars.add(bar);
+                            //                            }
                             ((ProgressBar) item.getData("bar")).setSelection(job.getNumberOfFinishedTasks());
                         } else if ((title != null) && (title.equals(COLUMN_PROGRESS_TEXT_TITLE))) {
                             item.setText(i, job.getNumberOfFinishedTasks() + "/" +
