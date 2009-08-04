@@ -456,7 +456,7 @@ public abstract class AbstractJobComposite extends Composite {
                             } else {
                                 fillBackgroundColor(item, job.getStatus(), items[itemIndex].getBackground());
                             }
-                            if (job.getStatus().equals(JobStatus.RUNNING)) {
+                            if (JobStatus.RUNNING.equals(job.getStatus())) {
                                 item.setText(i, job.getStatus() + " (" + job.getNumberOfRunningTasks() + ")");
                             } else {
                                 item.setText(i, job.getStatus().toString());
