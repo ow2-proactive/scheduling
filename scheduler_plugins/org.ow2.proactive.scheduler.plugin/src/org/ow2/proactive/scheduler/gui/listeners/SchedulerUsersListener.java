@@ -31,9 +31,11 @@
  */
 package org.ow2.proactive.scheduler.gui.listeners;
 
-import org.ow2.proactive.scheduler.common.SchedulerUsers;
+import java.util.Collection;
+
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 
 
 public interface SchedulerUsersListener {
-    public void update(SchedulerUsers users);
+    public void update(Collection<UserIdentification> users);
 }

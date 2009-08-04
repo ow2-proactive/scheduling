@@ -30,9 +30,15 @@
  */
 package org.ow2.proactive.scheduler.gui.views;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
@@ -101,8 +107,7 @@ public class Users extends ViewPart implements SchedulerUsersListener {
      *
      * @param job a job
      */
-    public void update(SchedulerUsers userss) {
-        final SchedulerUsers users = userss;
+    public void update(final Collection<UserIdentification> users) {
         if (!table.isDisposed()) {
             table.getDisplay().asyncExec(new Runnable() {
                 public void run() {
@@ -112,10 +117,9 @@ public class Users extends ViewPart implements SchedulerUsersListener {
                     // We remove all the table entries and then add the new entries
                     table.removeAll();
 
-                    Collection<UserIdentification> tmp = users.getUsers();
-
-                    for (UserIdentification user : tmp)
+                    for (UserIdentification user : users) {
                         createItem(user);
+                    }
 
                     // Turn drawing back on
                     table.setRedraw(true);
@@ -132,7 +136,7 @@ public class Users extends ViewPart implements SchedulerUsersListener {
         for (int i = 0; i < cols.length; i++) {
             String title = cols[i].getText();
             if (title.equals(COLUMN_ADMIN_TITLE)) {
-                item.setText(i, user.isAdmin() ? "Yes" : "");
+                item.setText(i, user.isAdmin() ? "Yes" : "No");
             } else if (title.equals(COLUMN_CONNECTED_AT_TITLE)) {
                 item.setText(i, Tools.getFormattedDate(user.getConnectionTime()));
             } else if (title.equals(COLUMN_HOSTNAME_TITLE)) {
@@ -203,39 +207,64 @@ public class Users extends ViewPart implements SchedulerUsersListener {
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
-        TableColumn tc1 = new TableColumn(table, SWT.LEFT);
-        TableColumn tc2 = new TableColumn(table, SWT.CENTER);
-        TableColumn tc3 = new TableColumn(table, SWT.LEFT);
-        TableColumn tc4 = new TableColumn(table, SWT.LEFT);
-        TableColumn tc5 = new TableColumn(table, SWT.LEFT);
-        TableColumn tc6 = new TableColumn(table, SWT.LEFT);
+        List<TableColumn> cols = new ArrayList<TableColumn>();
+        for (int i = 0; i < 6; i++) {
+            TableColumn tc = new TableColumn(table, SWT.LEFT);
+            tc.setMoveable(true);
+            tc.setData(ID, i);
+            tc.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    sort(event);
+
+                }
+            });
+            cols.add(tc);
+        }
 
         // setText
-        tc1.setText(COLUMN_NAME_TITLE);
-        tc2.setText(COLUMN_ADMIN_TITLE);
-        tc3.setText(COLUMN_SUBMITTED_JOBS_TITLE);
-        tc4.setText(COLUMN_HOSTNAME_TITLE);
-        tc5.setText(COLUMN_CONNECTED_AT_TITLE);
-        tc6.setText(COLUMN_LAST_SUBMITTED_JOB_TITLE);
+        cols.get(0).setText(COLUMN_NAME_TITLE);
+        cols.get(1).setText(COLUMN_ADMIN_TITLE);
+        cols.get(2).setText(COLUMN_SUBMITTED_JOBS_TITLE);
+        cols.get(3).setText(COLUMN_HOSTNAME_TITLE);
+        cols.get(4).setText(COLUMN_CONNECTED_AT_TITLE);
+        cols.get(5).setText(COLUMN_LAST_SUBMITTED_JOB_TITLE);
         // setWidth
-        tc1.setWidth(120);
-        tc2.setWidth(55);
-        tc3.setWidth(120);
-        tc4.setWidth(170);
-        tc5.setWidth(140);
-        tc6.setWidth(140);
-        // setMoveable
-        tc1.setMoveable(true);
-        tc2.setMoveable(true);
-        tc3.setMoveable(true);
-        tc4.setMoveable(true);
-        tc5.setMoveable(true);
-        tc6.setMoveable(true);
+        cols.get(0).setWidth(120);
+        cols.get(1).setWidth(55);
+        cols.get(2).setWidth(120);
+        cols.get(3).setWidth(170);
+        cols.get(4).setWidth(140);
+        cols.get(5).setWidth(140);
 
         SchedulerUsers users = JobsController.getLocalView().getUsers();
-        if (users != null)
-            update(users);
+        if (users != null) {
+            update(users.getUsers());
+        }
         JobsController.getLocalView().addSchedulerUsersListener(this);
+    }
+
+    private void sort(SelectionEvent event) {
+        Collection<UserIdentification> col = JobsController.getLocalView().getUsers().getUsers();
+        List<UserIdentification> users = new ArrayList<UserIdentification>();
+        for (UserIdentification ui : col) {
+            users.add(ui);
+        }
+        if ((TableColumn) event.widget == table.getSortColumn()) {
+            //same column -> change order
+            table.setSortDirection(table.getSortDirection() == SWT.UP ? SWT.DOWN : SWT.UP);
+        } else {
+            //different column -> order = DOWN
+            table.setSortDirection(SWT.DOWN);
+        }
+        //set new sort column
+        table.setSortColumn((TableColumn) event.widget);
+        //get id of the column
+        int id = (Integer) ((TableColumn) event.widget).getData(ID);
+        //sort
+        Collections.sort(users, new UserComparator(table.getSortDirection(), id));
+        //update gui
+        update(users);
     }
 
     /**
@@ -254,4 +283,53 @@ public class Users extends ViewPart implements SchedulerUsersListener {
         JobsController.getLocalView().removeSchedulerUsersListener(this);
         super.dispose();
     }
+}
+
+class UserComparator implements Comparator<UserIdentification> {
+
+    private int sortOrder;
+    private int type;
+
+    /**
+     * Create a new instance of UserComparator
+     *
+     * @param upOrder a integer representing the sort order : values can be SWT.DOWN, SWT.UP
+     * @param type an integer representing the column number to sort
+     */
+    public UserComparator(int sortOrder, int type) {
+        this.sortOrder = sortOrder;
+        this.type = type;
+    }
+
+    public int compare(UserIdentification o1, UserIdentification o2) {
+        switch (type) {
+            case 1:
+                boolean b1 = o1.isAdmin();
+                boolean b2 = o2.isAdmin();
+                int ret = (b1 == b2) ? 0 : (b1) ? -1 : 1;
+                return (sortOrder == SWT.UP) ? (ret * -1) : (ret);
+            case 2:
+                int i1 = o1.getSubmitNumber();
+                int i2 = o2.getSubmitNumber();
+                return (sortOrder == SWT.UP) ? (i2 - i1) : (i1 - i2);
+            case 4:
+                long l1 = o1.getConnectionTime();
+                long l2 = o2.getConnectionTime();
+                return (int) ((sortOrder == SWT.UP) ? (l2 - l1) : (l1 - l2));
+            case 5:
+                l1 = o1.getLastSubmitTime();
+                l2 = o2.getLastSubmitTime();
+                return (int) ((sortOrder == SWT.UP) ? (l2 - l1) : (l1 - l2));
+            case 0:
+                String s1 = o1.getUsername();
+                String s2 = o2.getUsername();
+                return (sortOrder == SWT.UP) ? s1.compareTo(s2) : s2.compareTo(s1);
+            case 3:
+                s1 = o1.getHostName();
+                s2 = o2.getHostName();
+                return (sortOrder == SWT.UP) ? s1.compareTo(s2) : s2.compareTo(s1);
+        }
+        return 0;
+    }
+
 }
