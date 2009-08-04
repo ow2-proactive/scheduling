@@ -1080,7 +1080,7 @@ job.setTask(aTask);
 			<section xml:id="Submit_a_job_GUI"><info><title>Submit a job using the Graphical User Interface (Scheduler Eclipse Plugin)</title></info>
 				<para>
 				To submit a job using the graphical tools, you have first to create a job XML Descriptor.
-				Once done, please refer to
+				Once done, please refer to 
 				<xref linkend="Scheduler_Eclipse_Plugin"/>.
 				</para>
 			</section>
@@ -1158,7 +1158,7 @@ job.setTask(aTask);
 				<programlisting language="java">
 //join an existing ProActive Scheduler retrieving an authentication interface.
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
-//connect and log to the Scheduler. Valid username and password are define by the administrator.
+//connect and log to the Scheduler. Valid username and password are defined by the administrator.
 UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 // submitting a new job and get the associated id
 JobId myJobId = scheduler.submit(job);
@@ -1167,6 +1167,17 @@ JobId myJobId = scheduler.submit(job);
 					As you can see, submitting a job will return a Job ID. This is the identification code of
 					the submitted Job. It is useful to save it in order to retrieve future information on this job.
 				</para>
+				<para>
+					If you want to get a job from a XML job file descriptor, just add the following line before submitting :
+				</para>
+				<programlisting language="java">
+//join an existing ProActive Scheduler as below
+...
+//create the job, 'filePath' is the path of the XML job descriptor
+Job job = JobFactory.getFactory().createJob(filePath);
+//then submit it
+scheduler.submit(job);
+				</programlisting>
 			</section>
 		</section>
 		<section xml:id="get_result"><info><title>Get a job result</title></info>
@@ -1287,7 +1298,7 @@ SchedulerEventListener mySchedulerEventListener = new SchedulerEventListener () 
 	//Implement other methods...
 }
 //add the listener to the scheduler specified which events you want to receive.
-scheduler.addSchedulerEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 			</programlisting>
 			<para>
 				This example shows you how to listen to the scheduler events (only finished job event
