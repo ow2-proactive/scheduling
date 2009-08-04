@@ -278,10 +278,11 @@ public class JobResultImpl implements JobResult {
         StringBuilder toReturn = new StringBuilder("\n");
 
         for (TaskResult res : allResults.values()) {
+            toReturn.append("\t" + res.getTaskId().getReadableName() + " : ");
             try {
-                toReturn.append("\t" + res.value() + "\n");
+                toReturn.append(res.value() + "\n");
             } catch (Throwable e) {
-                toReturn.append("\t" + res.getException().getMessage() + "\n");
+                toReturn.append(res.getException().getMessage() + "\n");
             }
         }
 
