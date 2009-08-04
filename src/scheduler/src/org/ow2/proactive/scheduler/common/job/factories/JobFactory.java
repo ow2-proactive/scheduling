@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import java.net.URI;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -113,5 +115,14 @@ public abstract class JobFactory {
      * @throws JobCreationException if an exception occurred during job creation.
      */
     public abstract Job createJob(String filePath) throws JobCreationException;
+
+    /**
+     * Creates a job using the given job descriptor.
+     *
+     * @param filePath the path to an XML job descriptor as an URI.
+     * @return a Job instance created with the given XML file.
+     * @throws JobCreationException if an exception occurred during job creation.
+     */
+    public abstract Job createJob(URI filePath) throws JobCreationException;
 
 }

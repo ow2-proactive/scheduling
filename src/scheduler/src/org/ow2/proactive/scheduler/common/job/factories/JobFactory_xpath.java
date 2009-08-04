@@ -37,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -187,12 +188,7 @@ public class JobFactory_xpath extends JobFactory {
     }
 
     /**
-     * Creates a job using the given job descriptor
-     *
-     * @param filePath
-     *            the path to a job descriptor
-     * @return a Job instance
-     * @throws JobCreationException
+     * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.lang.String)
      */
     public Job createJob(String filePath) throws JobCreationException {
         Job job = null;
@@ -202,7 +198,30 @@ public class JobFactory_xpath extends JobFactory {
             if (!f.exists()) {
                 throw new FileNotFoundException("This file has not been found : " + filePath);
             }
-            validate(filePath);
+            validate(f);
+            Node rootNode = transformVariablesAndGetDOM(new FileInputStream(f));
+            job = createJob(rootNode);
+        } catch (Exception e) {
+            logger.debug("", e);
+            throw new JobCreationException("Exception occured during Job creation", e);
+
+        }
+        logger.info("Job successfully created !");
+        return job;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.net.URI)
+     */
+    public Job createJob(URI filePath) throws JobCreationException {
+        Job job = null;
+
+        try {
+            File f = new File(filePath);
+            if (!f.exists()) {
+                throw new FileNotFoundException("This file has not been found : " + filePath);
+            }
+            validate(f);
             Node rootNode = transformVariablesAndGetDOM(new FileInputStream(f));
             job = createJob(rootNode);
         } catch (Exception e) {
@@ -219,8 +238,8 @@ public class JobFactory_xpath extends JobFactory {
      *
      * @param filePath
      */
-    private void validate(String filePath) throws URISyntaxException, VerifierConfigurationException,
-            SAXException, IOException {
+    private void validate(File file) throws URISyntaxException, VerifierConfigurationException, SAXException,
+            IOException {
         // We use sun multi validator (msv)
         VerifierFactory vfactory = new com.sun.msv.verifier.jarv.TheFactoryImpl();
 
@@ -229,7 +248,7 @@ public class JobFactory_xpath extends JobFactory {
         Verifier verifier = schema.newVerifier();
         ValidatingErrorHandler veh = new ValidatingErrorHandler();
         verifier.setErrorHandler(veh);
-        verifier.verify(filePath);
+        verifier.verify(file);
         if (veh.mistakes > 0) {
             System.err.println(veh.mistakes + " mistakes.");
             throw new SAXException(veh.mistakesStack.toString());

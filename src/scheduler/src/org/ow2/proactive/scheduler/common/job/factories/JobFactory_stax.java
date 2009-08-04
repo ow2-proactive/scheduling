@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -182,11 +183,34 @@ public class JobFactory_stax extends JobFactory {
         try {
             //Check if the file exist
             File f = new File(filePath);
+            return createJob(f);
+        } catch (Exception e) {
+            throw new JobCreationException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.net.URI)
+     */
+    public Job createJob(URI filePath) throws JobCreationException {
+        clean();
+        try {
+            //Check if the file exist
+            File f = new File(filePath);
+            return createJob(f);
+        } catch (Exception e) {
+            throw new JobCreationException(e.getMessage(), e);
+        }
+    }
+
+    private Job createJob(File f) throws JobCreationException {
+        try {
+            //Check if the file exist
             if (!f.exists()) {
-                throw new FileNotFoundException("This file has not been found : " + filePath);
+                throw new FileNotFoundException("This file has not been found : " + f.getAbsolutePath());
             }
             //validate content using the proper XML schema
-            validate(filePath);
+            validate(f);
             XMLStreamReader xmlsr = xmlif.createXMLStreamReader(new FileReader(f));
             //Create the job starting at the first cursor position of the XML Stream reader
             createJob(xmlsr);
@@ -212,10 +236,10 @@ public class JobFactory_stax extends JobFactory {
     /**
      * Validate the given job descriptor using the internal RELAX_NG Schema.
      *
-     * @param filePath the path of the file to validate
+     * @param file the file to validate
      */
-    private void validate(String filePath) throws URISyntaxException, VerifierConfigurationException,
-            SAXException, IOException {
+    private void validate(File file) throws URISyntaxException, VerifierConfigurationException, SAXException,
+            IOException {
         // We use sun multi validator (msv)
         VerifierFactory vfactory = new com.sun.msv.verifier.jarv.TheFactoryImpl();
         InputStream schemaStream = this.getClass().getResourceAsStream(SCHEMA_LOCATION);
@@ -224,7 +248,7 @@ public class JobFactory_stax extends JobFactory {
         ValidatingErrorHandler veh = new ValidatingErrorHandler();
         verifier.setErrorHandler(veh);
         try {
-            verifier.verify(filePath);
+            verifier.verify(file);
         } catch (SAXException e) {
             //nothing to do, check after
         }
