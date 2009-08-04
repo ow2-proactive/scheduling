@@ -386,7 +386,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 						<listitem>
 							<para>
 								<emphasis>The scheduling policy</emphasis> that will be started with the Scheduler
-								(using "-p org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy" option).
+								(using "-p org.ow2.proactive.scheduler.policy.PriorityPolicy" option).
 								By default, it will use the <emphasis>PriorityPolicy</emphasis> provided with the package.
 							</para>
 						</listitem>
@@ -397,7 +397,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 					the 'PriorityPolicy' scheduling policy:
 				</para>
 				<para>
-					<code>startScheduler.[sh|bat] -u //toto/ -p org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy</code>
+					<code>startScheduler.[sh|bat] -u //toto/ -p org.ow2.proactive.scheduler.policy.PriorityPolicy</code>
 				</para>
 				<para>
 					By default, the "config/authentication/" directory has to contain the two authentication files (group and login).
@@ -418,7 +418,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("//toto/"));
 AdminScheduler.createScheduler(
 	rmp,
-	"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
+	"org.ow2.proactive.scheduler.policy.PriorityPolicy");
 				</programlisting>
 				<para>where arguments are respectively :</para>
 				<orderedlist>
@@ -454,7 +454,7 @@ AdminScheduler.createScheduler(
 	"login",
 	"password",
 	rmp,
-	"org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
+	"org.ow2.proactive.scheduler.policy.PriorityPolicy");
 				</programlisting>
 				<para>
 					where arguments are the sames plus a <emphasis>login</emphasis> and a <emphasis>password</emphasis>
@@ -617,7 +617,7 @@ AdminSchedulerInterface scheduler = auth.logAsAdmin("admin_username", "admin_pas
 				</para>
 				<programlisting language="java">
 //scheduler is the AdminSchedulerInterface returned in the previous sections
-scheduler.changePolicy(org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy.class);
+scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 				</programlisting>
 			</section>
 		</section>
