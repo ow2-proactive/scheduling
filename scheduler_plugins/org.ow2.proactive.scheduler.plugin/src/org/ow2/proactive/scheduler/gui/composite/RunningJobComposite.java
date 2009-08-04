@@ -517,18 +517,18 @@ class DotTask extends TimerTask {
     }
 
     public void restartTask() {
-	try {
-	        //shift values
-	        for (int i = index; i < tasks.length - 1; i++) {
-	            tasks[i] = tasks[i + 1];
-	        }
-	        //set last to 0;
-	        this.tasks[tasks.length - 1] = 0;
-	        index--;
-	        run();
-	} catch (Exception e){
-		e.printStackTrace();
-	}
+        try {
+            //shift values
+            for (int i = index; i < tasks.length - 1; i++) {
+                tasks[i] = tasks[i + 1];
+            }
+            //set last to 0;
+            this.tasks[tasks.length - 1] = 0;
+            index--;
+            run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static int findX() {
