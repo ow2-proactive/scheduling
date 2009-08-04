@@ -61,10 +61,6 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * @since ProActive Scheduling 0.9
  *
  */
-/**
- * @author gsigety
- *
- */
 @PublicAPI
 public class RMFactory {
 
