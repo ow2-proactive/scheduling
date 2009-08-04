@@ -234,7 +234,7 @@ public class TaskComposite extends Composite {
         tc8.setText(COLUMN_NODEFAILURE_TITLE);
         tc9.setText(COLUMN_DESCRIPTION_TITLE);
         // setWidth
-        tc1.setWidth(60);
+        tc1.setWidth(68);
         tc2.setWidth(110);
         tc3.setWidth(100);
         tc4.setWidth(150);

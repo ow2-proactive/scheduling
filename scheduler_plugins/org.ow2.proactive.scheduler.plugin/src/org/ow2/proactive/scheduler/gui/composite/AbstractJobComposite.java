@@ -300,10 +300,10 @@ public abstract class AbstractJobComposite extends Composite {
         tc4.setText(COLUMN_STATE_TITLE);
         tc5.setText(COLUMN_OWNER_TITLE);
         // setWidth
-        tc1.setWidth(30);
+        tc1.setWidth(40);
         tc2.setWidth(70);
         tc3.setWidth(100);
-        tc4.setWidth(100);
+        tc4.setWidth(90);
         tc5.setWidth(45);
         // setMoveable
         tc1.setMoveable(true);
@@ -410,7 +410,11 @@ public abstract class AbstractJobComposite extends Composite {
         for (int i = 0; i < cols.length; i++) {
             String title = cols[i].getText();
             if (title.equals(COLUMN_STATE_TITLE)) {
-                item.setText(i, job.getStatus().toString());
+                if (job.getStatus().equals(JobStatus.RUNNING)) {
+                    item.setText(i, job.getStatus() + " (" + job.getNumberOfRunningTasks() + ")");
+                } else {
+                    item.setText(i, job.getStatus().toString());
+                }
             } else if (title.equals(COLUMN_ID_TITLE)) {
                 item.setText(i, job.getId().toString());
             } else if (title.equals(COLUMN_PRIORITY_TITLE)) {
@@ -452,7 +456,11 @@ public abstract class AbstractJobComposite extends Composite {
                             } else {
                                 fillBackgroundColor(item, job.getStatus(), items[itemIndex].getBackground());
                             }
-                            item.setText(i, job.getStatus().toString());
+                            if (job.getStatus().equals(JobStatus.RUNNING)) {
+                                item.setText(i, job.getStatus() + " (" + job.getNumberOfRunningTasks() + ")");
+                            } else {
+                                item.setText(i, job.getStatus().toString());
+                            }
                             break;
                         }
                     }
