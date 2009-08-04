@@ -339,8 +339,12 @@ public abstract class TaskLauncher implements InitActive {
      * Flush out and err streams.
      */
     protected void flushStreams() {
-        this.redirectedStdout.flush();
-        this.redirectedStderr.flush();
+        if (this.redirectedStdout != null) {
+            this.redirectedStdout.flush();
+        }
+        if (this.redirectedStderr != null) {
+            this.redirectedStderr.flush();
+        }
     }
 
     /**
