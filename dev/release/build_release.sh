@@ -112,6 +112,9 @@ rm -rf classes/
 rm -rf docs/tmp/
 rm -rf doc-src/*_snippets/
 
+# Replace RCP version pattern with current version
+find scheduler_plugins -type f -name "*" -exec sed -i "s/11\.22\.33/$VERSION/" {} \;
+
 sed -i "s/{version}/$VERSION/" README.txt
 
 cd ${TMP}
