@@ -70,7 +70,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         try {
             authentication = SchedulerConnection.join(url);
             userInterface = authentication.logAsUser(userName, password);
-            state = userInterface.addSchedulerEventListener(getSchedulerListener(), true, getEventsList());
+            state = userInterface.addSchedulerEventListener(getSchedulerListener(), false, getEventsList());
         } catch (Exception e) {
             e.printStackTrace();
             return new BooleanWrapper(false);
