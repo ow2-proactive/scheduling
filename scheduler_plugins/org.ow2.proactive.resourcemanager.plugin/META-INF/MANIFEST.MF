@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Resource Manager Plug-in
 Bundle-SymbolicName: org.ow2.proactive.resourcemanager.gui;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 11.22.33
 Bundle-Activator: org.ow2.proactive.resourcemanager.gui.Activator
 Bundle-Vendor: ProActive
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.ow2.proactive.scheduler.lib,
- org.eclipse.ui.editors
+ org.eclipse.ui.editors,
+ org.ow2.proactive.scheduler.lib;bundle-version="11.22.33"
 Eclipse-LazyStart: true
 Eclipse-RegisterBuddy: org.ow2.proactive.scheduler.lib
 Bundle-ClassPath: .,

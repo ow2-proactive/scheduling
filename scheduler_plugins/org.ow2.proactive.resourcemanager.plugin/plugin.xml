@@ -58,6 +58,17 @@
       </view>
    </extension>
    <extension
+         id="resourcemanager"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.ow2.proactive.resourcemanager.application"
+            name="Resource Manager">
+         <property
+               name="aboutText"
+               value="%About.text"/>
+      </product>
+   </extension>
+   <extension
          point="org.eclipse.ui.commands">
       <category
             description="connection category"
@@ -215,6 +226,16 @@
                   icon="classes/org/ow2/proactive/resourcemanager/gui/icons/rm_shutdown.png"
                   label="Shutdown"
                   tooltip="Shutdown connected Resource Manager">
+            </command>
+         </menu>
+         <menu
+               id="HelpMenu"
+               label="Help">
+            <command
+                  commandId="org.eclipse.ui.help.aboutAction"
+                  label="About Resource Manager"
+                  style="push"
+                  tooltip="About ProActive Resource Manager">
             </command>
          </menu>
       </menuContribution>
