@@ -67,6 +67,7 @@ import org.ow2.proactive.scheduler.task.NativeExecutable;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -149,7 +150,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
      * @see org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher#doTask(org.ow2.proactive.scheduler.common.TaskTerminateNotification, org.ow2.proactive.scheduler.task.ExecutableContainer, org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
-            TaskResult... results) {
+            NodeSet nodes, TaskResult... results) {
         try {
             init();
             //fake native executable used only to instanciate threadReader.

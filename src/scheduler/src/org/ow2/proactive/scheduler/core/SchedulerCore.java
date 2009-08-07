@@ -729,9 +729,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     node = nodeSet.get(0);
                     TaskLauncher launcher = null;
 
-                    //if the job is a ProActive job and if all nodes can be launched at the same time
-                    if ((currentJob.getType() == JobType.PROACTIVE) &&
-                        (nodeSet.size() >= internalTask.getNumberOfNodesNeeded())) {
+                    //enough nodes to be launched at same time for a communicating task
+                    if (nodeSet.size() >= internalTask.getNumberOfNodesNeeded()) {
+
                         nodeSet.remove(0);
                         launcher = internalTask.createLauncher(node);
                         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
@@ -749,29 +749,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             this.jobsToBeLoggedinAFile.containsKey(currentJob.getId())) {
                             launcher.activateLogs(this.lfs.getAppenderProvider());
                         }
+
                         logger_dev.info("Starting deployment of task '" + internalTask.getName() +
                             "' for job '" + currentJob.getId() + "'");
-                        ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask.getName(),
-                                ((ProActiveTaskLauncher) launcher).doTask((SchedulerCore) PAActiveObject
-                                        .getStubOnThis(), (JavaExecutableContainer) internalTask
-                                        .getExecutableContainer(), nodes));
-                    } else if (currentJob.getType() != JobType.PROACTIVE) {
-                        nodeSet.remove(0);
-                        launcher = internalTask.createLauncher(node);
-                        activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-                        this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
-                                launcher);
-                        // activate loggers for this task if needed
-                        if (this.jobsToBeLogged.containsKey(currentJob.getId()) ||
-                            this.jobsToBeLoggedinAFile.containsKey(currentJob.getId())) {
-                            launcher.activateLogs(this.lfs.getAppenderProvider());
-                        }
 
+                        TaskResult[] params = null;
                         //if job is TASKSFLOW, preparing the list of parameters for this task.
                         int resultSize = taskDescriptor.getParents().size();
                         if ((currentJob.getType() == JobType.TASKSFLOW) && (resultSize > 0)) {
-                            TaskResult[] params = new TaskResult[resultSize];
-
+                            params = new TaskResult[resultSize];
                             for (int i = 0; i < resultSize; i++) {
                                 //get parent task number i
                                 InternalTask parentTask = currentJob.getIHMTasks().get(
@@ -784,19 +770,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                     DatabaseManager.load(params[i]);
                                 }
                             }
-                            logger_dev.info("Starting deployment of task '" + internalTask.getName() +
-                                "' for job '" + currentJob.getId() + "'");
-                            //TODO if the next task is a native task, it's no need to pass params
-                            ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask
-                                    .getName(), launcher.doTask((SchedulerCore) PAActiveObject
-                                    .getStubOnThis(), internalTask.getExecutableContainer(), params));
-                        } else {
-                            logger_dev.info("Starting deployment of task '" + internalTask.getName() +
-                                "' for job '" + currentJob.getId() + "'");
-                            ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask
-                                    .getName(), launcher.doTask((SchedulerCore) PAActiveObject
-                                    .getStubOnThis(), internalTask.getExecutableContainer()));
                         }
+
+                        //TODO if the next task is a native task, it's no need to pass params
+                        ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask.getName(),
+                                launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(), internalTask
+                                        .getExecutableContainer(), nodes, params));
+
+                        logger_dev.info("Starting deployment of task '" + internalTask.getName() +
+                            "' for job '" + currentJob.getId() + "'");
                     }
 
                     //if a task has been launched

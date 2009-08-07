@@ -418,4 +418,20 @@ public abstract class Task extends CommonAttribute {
     public boolean isWallTime() {
         return wallTime > 0;
     }
+
+    /**
+     * Set the number of nodes needed for this task.<br />
+     * This number represents the total number of nodes that you need. You may remember that
+     * (Default number is 1)
+     *
+     * @param numberOfNodesNeeded the number Of Nodes Needed to set.
+     */
+    public void setNumberOfNeededNodes(int numberOfNodesNeeded) {
+        if (this.numberOfNodesNeeded < 1) {
+            this.numberOfNodesNeeded = 1;
+        }
+
+        this.numberOfNodesNeeded = numberOfNodesNeeded;
+    }
+
 }

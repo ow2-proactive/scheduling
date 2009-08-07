@@ -257,6 +257,13 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
+     * @param numberOfNodesNeeded the numberOfNodesNeeded to set
+     */
+    public void setNumberOfNeededNodes(int numberOfNodesNeeded) {
+        this.numberOfNodesNeeded = numberOfNodesNeeded;
+    }
+
+    /**
      * To get the dependences of this task as internal tasks.
      * Return null if this task has no dependence.
      *

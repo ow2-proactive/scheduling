@@ -137,6 +137,7 @@ public class JobFactory_stax extends JobFactory {
     private static final String ATTRIBUTE_TASK_FORK = "fork";
 
     //NATIVE TASK ATTRIBUTES
+    private static final String ATTRIBUTE_TASK_NB_NODES = "nodesNumber";
     private static final String ATTRIBUTE_TASK_COMMAND_VALUE = "value";
     private static final String ATTRIBUTE_TASK_WORKDING_DIR = "workingDir";
 
@@ -360,7 +361,7 @@ public class JobFactory_stax extends JobFactory {
                             //with the neededNodes property
                             if (cursorJob.getAttributeCount() > 0) {
                                 ProActiveTask paTask = new ProActiveTask();
-                                paTask.setNumberOfNodesNeeded(Integer
+                                paTask.setNumberOfNeededNodes(Integer
                                         .parseInt(cursorJob.getAttributeValue(0)));
                                 ((ProActiveJob) job).setTask(paTask);
                             }
@@ -918,6 +919,15 @@ public class JobFactory_stax extends JobFactory {
     private void setNativeExecutable(NativeTask nativeTask, XMLStreamReader cursorExec)
             throws JobCreationException {
         try {
+
+            for (int i = 0; i < cursorExec.getAttributeCount(); i++) {
+                String attrName = cursorExec.getAttributeLocalName(i);
+                if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_NB_NODES)) {
+                    nativeTask.setNumberOfNeededNodes(Integer.parseInt(replace(cursorExec
+                            .getAttributeValue(i))));
+                }
+            }
+
             //one step ahead to go to the command (static or dynamic)
             while (cursorExec.next() != XMLEvent.START_ELEMENT)
                 ;

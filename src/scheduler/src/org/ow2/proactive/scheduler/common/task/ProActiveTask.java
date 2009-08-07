@@ -40,7 +40,7 @@ import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
 
 /**
  * Use this class to build a ProActive task that will use a {@link ProActiveExecutable} and be integrated in a {@link ProActiveJob}.<br>
- * You have to specify the number of nodes you need during the execution using the {@link #setNumberOfNodesNeeded(int)} method.<br>
+ * You have to specify the number of nodes you need during the execution using the {@link #setNumberOfNeededNodes(int)} method.<br>
  * You can also specify arguments to give to the task using the {@link JavaTask#addArgument(String, String)} as the java task does it.
  *
  * @author The ProActive Team
@@ -71,22 +71,4 @@ public class ProActiveTask extends JavaTask {
         throw new RuntimeException(
             "ProActiveTask.addDependences(List<Task>) Should be never used in this context !");
     }
-
-    /**
-     * Set the number of nodes needed for this task.<br />
-     * This number represents the total number of nodes that you need. You may remember that
-     * one node is used to start your task. So if you ask for 11 nodes, 10 would be given to your
-     * ProActive executable task.
-     * (Default number is 1)
-     *
-     * @param numberOfNodesNeeded the number Of Nodes Needed to set.
-     */
-    public void setNumberOfNodesNeeded(int numberOfNodesNeeded) {
-        if (this.numberOfNodesNeeded < 1) {
-            this.numberOfNodesNeeded = 1;
-        }
-
-        this.numberOfNodesNeeded = numberOfNodesNeeded;
-    }
-
 }

@@ -92,21 +92,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      */
     @Override
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
-            TaskResult... results) {
-        throw new RuntimeException("This method should have NEVER been called in this context !!");
-    }
-
-    /**
-     * Execute the user ProActive task as an active object.
-     * This will provide the user the number of asked nodes.
-     *
-     * @param core The scheduler core to be notify
-     * @param executableContainer contains the ProActive task to execute.
-     * @param nodes the nodes that the user needs to run his ProActive task.
-     * @return a task result representing the result of this task execution.
-     */
-    public TaskResult doTask(TaskTerminateNotification core, JavaExecutableContainer executableContainer,
-            NodeSet nodes) {
+            NodeSet nodes, TaskResult... results) {
         nodesList = nodes;
 
         try {

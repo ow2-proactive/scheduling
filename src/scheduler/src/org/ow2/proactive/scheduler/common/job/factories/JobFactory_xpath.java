@@ -156,7 +156,7 @@ public class JobFactory_xpath extends JobFactory {
     private static final String TASK_ATTRIBUTE_FORK = "@fork";
 
     //NATIVE TASK ATTRIBUTES
-    private static final String ATTRIBUTE_TASK_COMMAND_VALUE = "@value";
+    private static final String ATTRIBUTE_TASK_NB_NODES = "@nodesNumber";
     private static final String ATTRIBUTE_TASK_WORKDING_DIR = "@workingDir";
 
     //SCRIPTS
@@ -657,11 +657,17 @@ public class JobFactory_xpath extends JobFactory {
 
     private Task createNativeTask(Node executable) throws XPathExpressionException, ClassNotFoundException,
             IOException, InvalidScriptException {
+
+        NativeTask desc = new NativeTask();
+
+        desc.setNumberOfNeededNodes(Integer.parseInt(replace((String) xpath.evaluate(ATTRIBUTE_TASK_NB_NODES,
+                executable, XPathConstants.STRING))));
+
         Node scNode = (Node) xpath.evaluate(addPrefixes(SCRIPT_STATICCOMMAND), executable,
                 XPathConstants.NODE);
         Node dcNode = (Node) xpath.evaluate(addPrefixes(SCRIPT_DYNAMICCOMMAND), executable,
                 XPathConstants.NODE);
-        NativeTask desc = new NativeTask();
+
         if (scNode != null) {
             ArrayList<String> cmd = new ArrayList<String>();
             // static command
@@ -770,7 +776,7 @@ public class JobFactory_xpath extends JobFactory {
         int neededNodes = ((Double) xpath.evaluate(
                 addPrefixes("/job/proActive/" + TASK_ATTRIBUTE_NEEDEDNODES), process, XPathConstants.NUMBER))
                 .intValue();
-        desc.setNumberOfNodesNeeded(neededNodes);
+        desc.setNumberOfNeededNodes(neededNodes);
         logger.debug(TASK_ATTRIBUTE_NEEDEDNODES + " = " + neededNodes);
 
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,

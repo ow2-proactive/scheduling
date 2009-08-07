@@ -56,6 +56,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -104,7 +105,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ExecutableCo
      */
     public Serializable execute(TaskResult... results) throws Throwable {
         TaskResult result = taskLauncher.doTask(null /* no need here to pass schedulerCore object */,
-                executableContainer, results);
+                executableContainer, new NodeSet(), results);
         while (!isKilled()) {
             try {
                 /* the below method throws an exception if timeout expires */

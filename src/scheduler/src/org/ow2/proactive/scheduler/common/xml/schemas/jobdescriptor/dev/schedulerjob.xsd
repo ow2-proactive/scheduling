@@ -564,8 +564,20 @@
         <xs:element ref="jd:staticCommand"/>
         <xs:element ref="jd:dynamicCommand"/>
       </xs:choice>
+      <xs:attribute name="nodesNumber" type="xs:positiveInteger">
+        <xs:annotation>
+          <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <xs:attributeGroup name="nodesNumber_t">
+    <xs:attribute name="nodesNumber" use="required" type="xs:positiveInteger">
+      <xs:annotation>
+        <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
   <xs:element name="staticCommand">
     <xs:annotation>
       <xs:documentation>A native command statically defined in the descriptor </xs:documentation>

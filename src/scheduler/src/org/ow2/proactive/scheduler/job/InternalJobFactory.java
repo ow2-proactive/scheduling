@@ -126,8 +126,8 @@ public class InternalJobFactory implements Serializable {
         }
 
         if (userTask.getExecutableClassName() != null) {
-            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(), userTask
-                    .getExecutableClassName(), toBigStringMap(userTask.getArguments()));
+            job = new InternalProActiveJob(userTask.getExecutableClassName(), toBigStringMap(userTask
+                    .getArguments()));
         } else {
             throw new SchedulerException(
                 "You must specify your own executable ProActive task to be launched (in the application task) !");
@@ -318,6 +318,7 @@ public class InternalJobFactory implements Serializable {
         taskToSet.setSelectionScripts(task.getSelectionScripts());
         taskToSet.setResultPreview(task.getResultPreview());
         taskToSet.setWallTime(task.getWallTime());
+        taskToSet.setNumberOfNeededNodes(task.getNumberOfNodesNeeded());
         //Properties with priority between job and tasks
         if (task.getCancelJobOnErrorProperty().isSet()) {
             taskToSet.setCancelJobOnError(task.isCancelJobOnError());
