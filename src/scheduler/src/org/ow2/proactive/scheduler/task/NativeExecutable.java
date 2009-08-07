@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.task;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Map;
@@ -67,6 +68,9 @@ public class NativeExecutable extends Executable {
 
     /** Environment variables */
     private String[] envp;
+
+    /** external process launching directory*/
+    private File workingDir = null;
 
     /**
      * HM of environment variables used for
@@ -155,7 +159,7 @@ public class NativeExecutable extends Executable {
         //WARNING : if this.command is unknown, it will create a defunct process
         //it's due to a known java bug
         try {
-            process = Runtime.getRuntime().exec(this.command, this.envp);
+            process = Runtime.getRuntime().exec(this.command, this.envp, this.workingDir);
         } catch (Exception e) {
             //in this case, the error is certainly due to the user (ie : command not found)
             //we have to inform him about the cause.
@@ -210,5 +214,9 @@ public class NativeExecutable extends Executable {
             //processTreeKiller seems not to kill current process...
             process.destroy();
         }
+    }
+
+    public void setWorkingDir(File workingDir) {
+        this.workingDir = workingDir;
     }
 }

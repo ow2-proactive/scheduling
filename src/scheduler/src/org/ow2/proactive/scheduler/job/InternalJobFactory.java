@@ -275,7 +275,7 @@ public class InternalJobFactory implements Serializable {
             throw new SchedulerException(msg);
         }
         InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
-                .getCommandLine(), task.getGenerationScript()));
+                .getCommandLine(), task.getGenerationScript(), task.getWorkingDir()));
         //set task common properties
         setTaskCommonProperties(userJob, task, nativeTask);
         return nativeTask;

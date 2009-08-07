@@ -154,6 +154,11 @@ public class JobFactory_xpath extends JobFactory {
     private static final String TASK_ATTRIBUTE_NEEDEDNODES = "@neededNodes";
     private static final String TASK_ATTRIBUTE_WALLTIME = "@walltime";
     private static final String TASK_ATTRIBUTE_FORK = "@fork";
+
+    //NATIVE TASK ATTRIBUTES
+    private static final String ATTRIBUTE_TASK_COMMAND_VALUE = "@value";
+    private static final String ATTRIBUTE_TASK_WORKDING_DIR = "@workingDir";
+
     //SCRIPTS
     private static final String TASK_TAG_SELECTION = "selection";
     private static final String TASK_TAG_PRE = "pre";
@@ -660,8 +665,10 @@ public class JobFactory_xpath extends JobFactory {
         if (scNode != null) {
             ArrayList<String> cmd = new ArrayList<String>();
             // static command
-            String[] cmds = Tools.parseCommandLine((String) xpath.evaluate(SCRIPT_ATTRIBUTE_VALUE, scNode,
-                    XPathConstants.STRING));
+            desc.setWorkingDir((replace((String) xpath.evaluate(ATTRIBUTE_TASK_WORKDING_DIR, scNode,
+                    XPathConstants.STRING))));
+            String[] cmds = Tools.parseCommandLine(replace((String) xpath.evaluate(SCRIPT_ATTRIBUTE_VALUE,
+                    scNode, XPathConstants.STRING)));
             for (String s : cmds) {
                 cmd.add(s);
             }
@@ -671,8 +678,8 @@ public class JobFactory_xpath extends JobFactory {
             if (args != null) {
                 for (int i = 0; i < args.getLength(); i++) {
                     Node arg = args.item(i);
-                    String value = (String) xpath
-                            .evaluate(SCRIPT_ATTRIBUTE_VALUE, arg, XPathConstants.STRING);
+                    String value = replace((String) xpath.evaluate(SCRIPT_ATTRIBUTE_VALUE, arg,
+                            XPathConstants.STRING));
 
                     if (value != null) {
                         cmd.add(value);
@@ -682,6 +689,9 @@ public class JobFactory_xpath extends JobFactory {
             desc.setCommandLine(cmd.toArray(new String[] {}));
         } else {
             // dynamic command
+            desc.setWorkingDir(replace((String) xpath.evaluate(ATTRIBUTE_TASK_WORKDING_DIR, dcNode,
+                    XPathConstants.STRING)));
+
             Node scriptNode = (Node) xpath.evaluate(
                     addPrefixes(SCRIPT_TAG_GENERATION + "/" + TASK_TAG_SCRIPT), dcNode, XPathConstants.NODE);
             Script<?> script = createScript(scriptNode);
@@ -828,11 +838,11 @@ public class JobFactory_xpath extends JobFactory {
             }
         } else {
             // code
-            String engine = (String) xpath.evaluate(SCRIPT_ATTRIBUTE_LANGUAGE, codeNode,
-                    XPathConstants.STRING);
+            String engine = replace((String) xpath.evaluate(SCRIPT_ATTRIBUTE_LANGUAGE, codeNode,
+                    XPathConstants.STRING));
 
             if (((engine != null) && (!engine.equals(""))) && (node.getTextContent() != null)) {
-                String script = node.getTextContent();
+                String script = replace(node.getTextContent());
 
                 try {
                     return new SimpleScript(script, engine);

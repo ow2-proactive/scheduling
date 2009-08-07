@@ -73,6 +73,10 @@ public class NativeExecutableContainer implements ExecutableContainer {
     @OneToOne(fetch = FetchType.EAGER, targetEntity = GenerationScript.class)
     private GenerationScript generated;
 
+    /** working dir (launching dir, pwd... of the native executable) */
+    @Column(name = "WORKING_DIR")
+    private String workingDir;
+
     /** Hibernate default constructor */
     public NativeExecutableContainer() {
     }
@@ -83,9 +87,10 @@ public class NativeExecutableContainer implements ExecutableContainer {
      * @param command the command to be executed.
      * @param generated the script that generates the command (can be null).
      */
-    public NativeExecutableContainer(String[] command, GenerationScript generated) {
+    public NativeExecutableContainer(String[] command, GenerationScript generated, String workingDir) {
         this.command = command;
         this.generated = generated;
+        this.workingDir = workingDir;
     }
 
     /**
@@ -100,6 +105,10 @@ public class NativeExecutableContainer implements ExecutableContainer {
      */
     public void init(ExecutableContainerInitializer initializer) {
         // Nothing to do for now...
+    }
+
+    public String getWorkingDir() {
+        return workingDir;
     }
 
 }

@@ -32,6 +32,7 @@
  */
 package functionaltests;
 
+import java.io.IOException;
 import java.net.URL;
 
 import org.junit.Assert;
@@ -832,4 +833,9 @@ public class SchedulerTHelper {
         }
         return monitorsHandler;
     }
+
+    public static void setExecutable(String filesList) throws IOException {
+        Runtime.getRuntime().exec("chmod u+x " + filesList);
+    }
+
 }

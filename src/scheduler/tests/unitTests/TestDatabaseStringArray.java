@@ -83,7 +83,7 @@ public class TestDatabaseStringArray {
         je.setJobClasspath(sa);
         DatabaseManager.register(je);
         GenerationScript gs = new GenerationScript(URLbegin + "samples/scripts/misc/set.js", "js");
-        NativeExecutableContainer nec = new NativeExecutableContainer(sa, gs);
+        NativeExecutableContainer nec = new NativeExecutableContainer(sa, gs, URLbegin);
         DatabaseManager.register(nec);
         TaskResultImpl tri = new TaskResultImpl();
         tri.setJobClasspath(sa);

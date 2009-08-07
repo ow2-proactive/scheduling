@@ -135,6 +135,11 @@ public class JobFactory_stax extends JobFactory {
     private static final String ELEMENT_TASK_PARAMETER = "parameter";
     private static final String ATTRIBUTE_TASK_WALLTIME = "walltime";
     private static final String ATTRIBUTE_TASK_FORK = "fork";
+
+    //NATIVE TASK ATTRIBUTES
+    private static final String ATTRIBUTE_TASK_COMMAND_VALUE = "value";
+    private static final String ATTRIBUTE_TASK_WORKDING_DIR = "workingDir";
+
     //SCRIPTS
     private static final String ELEMENT_SCRIPT_SELECTION = "selection";
     private static final String ELEMENT_SCRIPT_PRE = "pre";
@@ -918,10 +923,21 @@ public class JobFactory_stax extends JobFactory {
                 ;
             ArrayList<String> command = new ArrayList<String>();
             if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_SCRIPT_STATICCOMMAND)) {
-                String[] parsedCommandLine = Tools.parseCommandLine(replace(cursorExec.getAttributeValue(0)));
-                for (String pce : parsedCommandLine) {
-                    command.add(pce);
+
+                for (int i = 0; i < cursorExec.getAttributeCount(); i++) {
+                    String attrName = cursorExec.getAttributeLocalName(i);
+                    if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_COMMAND_VALUE)) {
+                        String[] parsedCommandLine = Tools.parseCommandLine(replace(cursorExec
+                                .getAttributeValue(i)));
+                        for (String pce : parsedCommandLine) {
+                            command.add(pce);
+                        }
+                    }
+                    if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_WORKDING_DIR)) {
+                        nativeTask.setWorkingDir(replace(cursorExec.getAttributeValue(i)));
+                    }
                 }
+
                 int eventType;
                 while (cursorExec.hasNext()) {
                     eventType = cursorExec.next();
@@ -940,6 +956,13 @@ public class JobFactory_stax extends JobFactory {
                     }
                 }
             } else if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_SCRIPT_DYNAMICCOMMAND)) {
+                for (int i = 0; i < cursorExec.getAttributeCount(); i++) {
+                    String attrName = cursorExec.getAttributeLocalName(i);
+                    if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_WORKDING_DIR)) {
+                        nativeTask.setWorkingDir(replace(cursorExec.getAttributeValue(i)));
+                    }
+                }
+
                 //one step ahead to go to the generation tag
                 while (cursorExec.next() != XMLEvent.START_ELEMENT)
                     ;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:dev" ns="urn:proactive:jobdescriptor:dev" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar ns="urn:proactive:jobdescriptor:dev" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <ref name="job"/>
   </start>
@@ -481,9 +481,18 @@
         <data type="string"/>
       </attribute>
       <optional>
+        <ref name="workingDir_t"/>
+      </optional>
+      <optional>
         <ref name="commandArguments"/>
       </optional>
     </element>
+  </define>
+  <define name="workingDir_t">
+    <attribute name="workingDir">
+      <doc:documentation>working dir for native command to execute (ie launching dir, pwd...)</doc:documentation>
+      <data type="string"/>
+    </attribute>
   </define>
   <define name="commandArguments">
     <element name="arguments">
@@ -503,6 +512,9 @@
   <define name="dynamicCommand">
     <element name="dynamicCommand">
       <doc:documentation>A command generated dynamically </doc:documentation>
+      <optional>
+        <ref name="workingDir_t"/>
+      </optional>
       <ref name="generation"/>
     </element>
   </define>

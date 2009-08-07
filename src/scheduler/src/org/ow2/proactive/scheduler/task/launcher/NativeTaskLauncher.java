@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -46,6 +47,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutable;
+import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
@@ -109,6 +111,14 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             this.currentExecutable = executableContainer.getExecutable();
             NativeExecutable toBeLaunched = (NativeExecutable) this.currentExecutable;
+
+            String wDir = ((NativeExecutableContainer) executableContainer).getWorkingDir();
+            if (wDir != null && !"".equals(wDir)) {
+                File wDirFile = new File(wDir);
+                if (wDirFile.exists() && wDirFile.isDirectory()) {
+                    toBeLaunched.setWorkingDir(wDirFile);
+                }
+            }
 
             //launch generation script
             if (toBeLaunched.getGenerationScript() != null) {
