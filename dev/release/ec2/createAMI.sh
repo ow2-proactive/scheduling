@@ -10,7 +10,8 @@
 # instances using AMIs created with this script
 # can be used in the ProActive Resource Manager
 # using the EC2 Infrasture Manager.
-#
+# This script can create only Linux images,
+# refer to the documentation for Windows image creation
 #
 #
 # To create an AMI, this script will:
@@ -74,6 +75,11 @@ echo -e "                    before continuing. This allows the user to run comm
 echo -e "                    on the instance with SSH to customize it."
 echo -e "                    When running the script in non-interactive mode,"
 echo -e "                    this options will be ignored."
+echo -e " \033[1m-r\033[0m, \033[1m--no-runtime\033[0m"
+echo -e "                    Do not make a ProActive runtime start at boot"
+echo -e "                    on the instance; use this if you do not want"
+echo -e "                    to automatically register to a remote Resource Manager,"
+echo -e "                    or if you want to bundle a ProActive Programming archive."
 echo -e " \033[1m-x\033[0m, \033[1m--x86_64\033[0m"
 echo -e "                    Use this switch when bundling an x86_64 AMI"
 echo -e "                    instead of the default i386. The initial AMI"
@@ -83,7 +89,7 @@ echo -e "                    instance, which is much more expensive than the"
 echo -e "                    default, small."
 echo -e " \033[1m-p\033[0m, \033[1m--sched-path\033[0m \033[4mPATH\033[0m"
 echo -e "                    Path to the ProActive Scheduler sources,"
-echo -e "                    defaults to \$PWD/../.., assuming this script"
+echo -e "                    defaults to \$PWD/../../.., assuming this script"
 echo -e "                    is in its default location."
 echo -e "                    \033[4mPATH\033[0m can also be a zip, tar.bz2,"
 echo -e "                    tar.gz or tar archive, located on the local"
@@ -135,6 +141,9 @@ INSTANCE_TYPE=m1.small
 # from the instance, instead of archiving and sending it
 PA_HTTP=false
 JDK_HTTP=false
+
+# do not autostart PA runtime if true
+NO_RUNTIME=false
 
 #
 # Builds archive from directory, or echoes path if already a valid archive
@@ -263,6 +272,8 @@ while [ $# -gt 0 ]; do
 	--overwrite)       OVERWRITE=true;                 shift 1 ;;
 	-c)                HTTP_CHECK=false;               shift 1 ;;
 	--no-http-check)   HTTP_CHECK=false;               shift 1 ;;
+	-r)                NO_RUNTIME=true;                shift 1 ;;
+	--no-runtime)      NO_RUNTIME=true;                shift 1 ;;
 	-h)                print_help;                     exit 0;;
 	--help)            print_help;                     exit 0;;
 	*)                 echo "$0: invalid option $1" >&2;
@@ -278,7 +289,7 @@ if [ "$AMI" = "" ]; then
 fi
 
 if [ "$SCHEDULER_PATH" = "" ]; then
-    SCHEDULER_PATH=$(get_absolute ../..)
+    SCHEDULER_PATH=$(get_absolute ../../..)
 fi
 
 if [ "$JAVA_PATH" = "" ]; then
@@ -518,8 +529,14 @@ if [ "$ARCH" = "x86_64" ] ; then
     RARGS="$RARGS -x64"
 fi
 
+if $NO_RUNTIME ; then
+    RARGS="$RARGS -nr"
+fi
+
 scp -i $EC2_SSH -o StrictHostKeyChecking=no \
-    $EC2_ARCHIVE $FILES data/installAMI.sh \
+    $EC2_ARCHIVE $FILES installAMI.sh \
+    $SCHEDULER_PATH/scripts/ec2/runNode.sh \
+    $SCHEDULER_PATH/scripts/ec2/params.py \
     root@$INSTANCE_URL:/tmp/
 
 scp -i $EC2_SSH -o StrictHostKeyChecking=no \

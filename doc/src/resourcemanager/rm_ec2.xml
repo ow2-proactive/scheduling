@@ -26,10 +26,7 @@
 	  once your AWS account and local configuration are setup.
       </para></listitem>
     </itemizedlist>
-    <para>
-      Advanced users might want to create their own AMI, as described in <xref linkend="EC2_AMI"/>.
-      The default ProActive public AMI should, however, be sufficient for most users.
-    </para>
+
   </section>
 
   <section xml:id="EC2_Start"><info><title>AWS Account</title></info>
@@ -39,7 +36,7 @@
       your environment.
     </para>
 
-    <itemizedlist>
+    <orderedlist>
       <listitem><para>
 	  First, you need to create and AWS account at
 	  <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://aws.amazon.com/">http://aws.amazon.com/</link>.
@@ -61,17 +58,17 @@
 	  in the file located in <emphasis>/config/deployment/ec2.properties</emphasis>.
 	  Those thee parameters should never change, except if you need for some reason to
 	  handle multiple EC2 accounts.
-	  Other properties in the configuration file can be left to their default values for now:
+	  Other properties in the configuration file are:
 	  <itemizedlist>
 	    <listitem><para>
 		<emphasis>AMI:</emphasis> Defines which AMI will be deployed on instances.
-		Defaults to a public official image, but custom images can also be created
-		as described in <xref linkend="EC2_AMI"/>. The value to provide is the unique AMI Id,
-		ami-XXX.
+		The value to provide is the unique AMI Id, ami-XXX.
+		If no default value is provided, you need to find a public ProActive AMI corresponding
+		to the release you are using.
 	    </para></listitem>
 	    <listitem><para>
 		<emphasis>INSTANCE_TYPE:</emphasis> One of m1.small, m1.large, m1.xlarge, c1.medium, c1.xlarge,
-		which defines what kind of hardware the instance will be running on. m1 instances or memory focused,
+		which defines what kind of hardware the instance will be running on. m1 instances are memory focused,
 		whereas c1 instances are for more cpu intensive tasks. This property defaults to m1.small,
 		the cheapest and slowest of all.
 		<warning><para>
@@ -87,7 +84,7 @@
 	    </para></listitem>
 	  </itemizedlist>
       </para></listitem>
-    </itemizedlist>
+    </orderedlist>
 
   </section>
 
@@ -95,18 +92,28 @@
   <section xml:id="EC2_Depl"><info><title>Deploying Nodes</title></info>
     <para>
       Using a Scheduler and Resource Manager with an EC2 NodeSource requires
-      some specific configuration. EC2 instances, indeed, are located on a private
+      specific configuration. EC2 instances, indeed, are located on a private
       network, behind a NAT device: this allows fast communications between two EC2 instances,
       but this is an issue when using the RMI protocol.
       The workaround is to use a PAMR router, or the HTTP protocol.
-      HTTP is the simplest way, and scripts to start a Resource Manager and Scheduler with
-      the appropriate configuration are located in <emphasis>/scripts/ec2</emphasis>.
-      Those scripts are ready to use, except for the <emphasis>proactive.http.port</emphasis>
-      property which should be changed if the default ports are filtered or already used.
     </para>
     <para>
-      Run both <emphasis>startRM.sh</emphasis> and <emphasis>startScheduler.sh</emphasis> scripts,
-      an EC2 NodeSource can now be added using the Resource Manager's GUI:
+      HTTP is the simplest way; all you need to specify is a configuration file with the following properties,
+      for both Resource Manager <emphasis>and</emphasis> Scheduler.
+      <screen><![CDATA[
+        <prop key="proactive.net.nolocal" value="true"/>
+        <prop key="proactive.communication.protocol" value="http" />
+        <prop key="proactive.http.port" value="PORT" />
+        <prop key="proactive.net.noprivate" value="true" />
+        <prop key="proactive.useIPaddress" value="true" />
+]]></screen>
+      Note that you need to specify a different port for both configurations.
+      Sample configurations can be found in <emphasis>/samples/ec2</emphasis>.
+    </para>
+    <para>
+      Using this configuration, you can start a Resource Manager and a Scheduler using the <emphasis>/bin/unix/startRM.sh</emphasis>
+      and <emphasis>/bin/unix/startScheduler.sh</emphasis> scripts.
+      An EC2 NodeSource can now be added using the Resource Manager's GUI:
       <figure xml:id="RM_EC2_NS"><info><title>EC2 NodeSource creation dialog</title></info>
 	<mediaobject>
 	  <imageobject>
@@ -136,210 +143,10 @@
     </para>
     <para>
       Once the Resource Manager is up and running with its EC2 NodeSource,
-      new jobs can be added by using <emphasis>/scripts/ec2/adminScheduler.sh</emphasis>,
+      new jobs can be added by using <emphasis>/bin/unix/adminScheduler.sh</emphasis>,
       or the Scheduler GUI.
     </para>
   </section>
 
-  <section xml:id="EC2_AMI"><info><title>AMI Creation</title></info>
-    <para>
-      If the default public image doesn't fit your needs, you can bundle your own AMI.
-      The advantages of doing so is that you can:
-      <itemizedlist>
-	<listitem><para>
-	    Use a specific initial image for licencing, performance or architecture concerns.
-	</para></listitem>
-	<listitem><para>
-	    Install custom versions of ProActive Scheduling, for compatibility concerns,
-	    because you want to use your own modified version, or maybe to try a pre-release.
-	</para></listitem>
-	<listitem><para>
-	    Install a specific JDK, for performances, compatibility or licencing concerns.
-	</para></listitem>
-	<listitem><para>
-	    Customize the image by installing arbitrary software or services,
-	    or tuning it to your needs.
-	</para></listitem>
-      </itemizedlist>
-    </para>
-    <para>
-      The procedure is more complex than just using an existing image, but some of the steps has been automated.
-      You will need, however, to setup your environment properly first:
-    </para>
-
-    <itemizedlist>
-      <listitem><para>
-	  To create an AMI, you need an S3 account. This Amazon Service allows you to store online data,
-	  this is where AMI are uploaded and made available to users.
-	  Sign up for Amazon S3 at
-	  <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://aws.amazon.com/s3/">http://aws.amazon.com/s3/</link>.
-      </para></listitem>
-      <listitem><para>
-	  On the AWS website, find the menu called <emphasis>Your Web Services Account</emphasis>,
-	  and select <emphasis>AWS Access Identifiers</emphasis>.
-	  You are now going to generate an <emphasis>X.509</emphasis> certificate, which consists
-	  in a public (cert-xxx.pem) and private key (pk-xxx.pem).
-	  Download those keys on you local drive, and be sure to set the right permissions
-	  (chmod 600).
-      </para></listitem>
-      <listitem><para>
-	  You need to get the command line tools to interact with EC2,
-	  which consist in two packages:
-	  <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://developer.amazonwebservices.com/connect/entry.jspa?externalID=368&amp;categoryID=88">
-	    the EC2 AMI tools</link> and
-	  <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://developer.amazonwebservices.com/connect/entry.jspa?externalID=351&amp;categoryID=88">
-	    the EC2 API tools</link>.
-	  The scripts for both tools need to be located in the same directory, ie. the content of ~/api-tools/bin and ~/ami-tools/bin need to end up in
-	  the same ~/ec2-tools/bin, so that the $EC2_HOME environment variable, which all those scripts use, is set to ~/ec2-tools/.
-      </para></listitem>
-      <listitem><para>
-	  Now you need to setup your shell environment (for example in your ~/.bashrc) so that the EC2 command line tools
-	  can work properly:
-	  <screen><![CDATA[
-export EC2_HOME=/path/to/api/and/ami/ec2-tools/
-export EC2_PRIVATE_KEY=/home/foo/.ec2/pk-xxx.pem
-export EC2_CERT=/home/foo/.ec2/cert-xxx.pem
-export PATH=$PATH:$EC2_HOME/bin
-]]></screen>
-      </para></listitem>
-      <listitem><para>
-	  You can now generate an RSA key, that will allow direct SSH connections to instances you create.
-	  <screen><![CDATA[
-ec2-add-keypair foo-ec2-keypair > /home/foo/.ec2/id_rsa-foo-ec2-keypair
-chmod 600 /home/foo/.ec2/id_rsa-foo-ec2-keypair
-]]></screen>
-	  Your key is now registered on EC2 as <emphasis>foo-ec2-keypair</emphasis>.
-
-	  Add the following to your environment:
-	  <screen><![CDATA[
-export EC2_KEYPAIR=foo-ec2-keypair
-export EC2_SSH=/home/foo/.ec2/id_rsa-foo-ec2-keypair
-]]></screen>
-      </para></listitem>
-      <listitem><para>
-	  Now, you need to create you own Bucket. A Bucket is basically a folder on Amazon S3,
-	  where you are going to put your new AMI.
-	  You need to get the S3 command tools and follow the instructions at
-	  <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://aws.amazon.com/s3/">http://s3tools.org/s3cmd/</link>.
-	  Once your bucket is created, add the following to your environment:
-	  <screen><![CDATA[
-export BUCKET="bucket-name"
-]]></screen>
-      </para></listitem>
-      <listitem><para>
-	  Add to your environment values for <emphasis>AWS_AKEY</emphasis>,
-	  <emphasis>AWS_SKEY</emphasis> and <emphasis>EC2_USER</emphasis>, which you already put
-	  in the file <emphasis>/config/deployment/ec2.properties</emphasis> as described in
-	  <xref linkend="EC2_Start"/>.
-      </para></listitem>
-    </itemizedlist>
-
-    <para>
-      Now that your environment is set, you can run the AMI creation script, which is located in
-      <emphasis>/scripts/ec2/createAMI.sh</emphasis>. Its purpose is to create an AMI that will
-      embed Scheduler, launch a ProActive runtime at boot and register it to
-      a remote Resource Manager given dynamic parameters.
-      To achieve this, the scripts creates a new EC2 instance, sends archives containing the required
-      components on it, install them, and bundles a new image given the current state of the instance.
-    </para>
-    <para>
-      Here is a list of noteworthy options for <emphasis>createAMI.sh</emphasis>:
-      <itemizedlist>
-	<listitem><para>
-	    <emphasis>-a AMI</emphasis>, specify a custom initial AMI instead of the default Fedora 8.
-	    To create an AMI, this script boots a new instance with an initial AMI, installs all components
-	    on it, and then makes a snapshot of the modified instance to upload a new AMI.
-	    Using different initial images lead to different AMI: this scripts works fine with the default Fedora,
-	    and has been successfully tested with a Debian initial AMI. If the AMI specified with
-	    the -a switch is too different from the tested ones, the script may fail. Possible reasons include:
-	    <itemizedlist>
-	      <listitem><para>
-		  To start a ProActive runtime at boot, createAMI.sh adds a startup script in /etc/rc.local.
-		  If the AMI used does not run this file at startup, the node won't be up. You need to adapt
-		  <emphasis>/scripts/ec2/data/installAMI.sh</emphasis> by replacing the references to /etc/rc.local
-		  to whatever script is run last at boot.
-	      </para></listitem>
-	      <listitem><para>
-		  The <emphasis>/scripts/ec2/data/installAMI.sh</emphasis> script assumes some standart
-		  GNU tools are installed on the system.
-		  You may get a 'X: command not found' error if one of those tools is not present.
-		  Solution to this problem is to find an equivalent and adapt the script,
-		  or make the script install the right tool before it is needed.
-	      </para></listitem>
-	    </itemizedlist>
-	</para></listitem>
-	<listitem><para>
-	    <emphasis>-w</emphasis>, make the install script wait for user input after all components
-	    are installed on the instance, and just before bundling and uploading the new AMI.
-	    This allows the user to run custom commands on the instance through SSH, customizing
-	    the image just before its creation.
-	</para></listitem>
-	<listitem><para>
-	    <emphasis>-p SCHEDULING, -j JAVA</emphasis>, select alternative location for ProActive Scheduling
-	    and Java. To create the new AMI, this script will install archives containing ProActive Scheduling
-	    and Java. Default values are the JDK located at $JAVA_HOME if set, and the Scheduling version this
-	    script is located in. Alternatively, you can specify a .tar, .tar.gz, .tar.bz2 or .zip archive
-	    for -p and -j: this makes the script faster, as it doesn't need to create the archives itself,
-	    and also allows to use different versions, which can be useful for Scheduling as the Resource Manager
-	    and the instance's versions need to match. Note that you can also specify archives located
-	    on a remote HTTP, HTTPS or FTP server, ie. using <emphasis>-p http://example.org/my-repo/PA.zip</emphasis>.
-	</para></listitem>
-	<listitem><para>
-	    <emphasis>-x</emphasis>, bundle the AMI as x86_64 arch instead of default i386.
-	    Use this when specifying an x86_64 initial AMI with the -a option.
-	    As only Extra Large instances can run x86_64 AMIs, using this option
-	    will cause the script to cost more than using the regular i386 bundling.
-	</para></listitem>
-	<listitem><para>
-	    <emphasis>-h</emphasis>, print all available options.
-	</para></listitem>
-      </itemizedlist>
-    </para>
-    <section xml:id="EC2_AMI_Example"><info><title>Examples</title></info>
-      <para>
-	<screen><![CDATA[
-/home/bob/PA/scripts/ec2 $ ./createAMI.sh
-]]></screen>
-	The most basic example possible: no mandatory argument. The script will run in interactive mode,
-	asking the user to interact with it if needed, and bundle the instance with the ProActive Scheduling version
-	this script is located in.
-	<screen><![CDATA[
-/home/bob/PA/scripts/ec2 $ ./createAMI.sh -i -o -p /tmp/Scheduling.tar.gz -j http://java.sun.com/jdk16.zip -c -a ami-xxxxxxxx
-      ]]></screen>
-	In this more elaborate example, the script will:
-      <itemizedlist>
-	<listitem><para>
-	    Run in non-interactive mode with the <emphasis>-i</emphasis> switch;
-	    meaning no user input will be required, which is useful for automation.
-	</para></listitem>
-	<listitem><para>
-	    Overwrite existing files with the <emphasis>-o</emphasis> switch;
-	    if the script detects that a ProActive Scheduling archive has already been created at the default
-	    location, it will overwrite it and not use it.
-	</para></listitem>
-	<listitem><para>
-	    Use an alternative ProActive Scheduling archive with <emphasis>-p /tmp/Scheduling.tar.gz</emphasis>,
-	    instead of creating a new one.
-	</para></listitem>
-	<listitem><para>
-	    Use an alternative JDK archive located on a remote HTTP server with
-	    <emphasis>-j http://java.sun.com/jdk16.zip</emphasis>; making the script much faster:
-	    this archive will only be downloaded on the remote instance, no need to upload it
-	    ourselves.
-	</para></listitem>
-	<listitem><para>
-	    By default, the script checks the validity of remote archives when passed using the
-	    -j or -p option; using the <emphasis>-c</emphasis> switch overrides this behaviour:
-	    useful when the machine on which the script is executed is firewalled and cannot connect
-	    to the outside using the required port.
-	</para></listitem>
-	<listitem><para>
-	    Specify an alternative initial AMI to create the instance with the <emphasis>-a ami-xxxxxxxx</emphasis>
-	    option.
-	</para></listitem>
-      </itemizedlist>
-      </para>
-    </section>
-  </section>
 
 </chapter>
