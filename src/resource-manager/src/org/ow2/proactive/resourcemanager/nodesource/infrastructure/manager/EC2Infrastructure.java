@@ -51,8 +51,6 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
-import com.xerox.amazonws.ec2.InstanceType;
-
 
 /**
  *
@@ -108,7 +106,7 @@ public class EC2Infrastructure extends InfrastructureManager {
         if (ec2d.canGetMoreNodes()) {
             try {
                 int num = ec2d.getMaxInstances() - ec2d.getCurrentInstances();
-                this.ec2d.setNsName(nodeSource.getName());
+                ec2d.setNsName(nodeSource.getName());
                 ec2d.runInstances(imgd);
                 logger.info("Successfully acquired " + num + " EC2 instance" + ((num > 1) ? "s" : ""));
             } catch (Exception e) {
@@ -125,8 +123,8 @@ public class EC2Infrastructure extends InfrastructureManager {
     public void acquireNode() {
         if (ec2d.canGetMoreNodes()) {
             try {
-                ec2d.runInstances(1, 1, imgd);
                 this.ec2d.setNsName(nodeSource.getName());
+                ec2d.runInstances(1, 1, imgd);
                 logger.info("Successfully acquired an EC2 instance");
                 return;
             } catch (Exception e) {
