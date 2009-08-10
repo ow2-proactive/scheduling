@@ -916,6 +916,26 @@ user2:user
 				This conclude with the ProActive Scheduler chapter, let's now look at the ProActive Scheduler Eclipse Plugin.
 			</para>
 			</section>
+			<section xml:id="LDAP_fall-back"><info><title>Use fall back to file authentication</title></info>
+				<para>You can use simultaneously file-based authentication and LDAP-based authentication.
+				Then Scheduler can check user password and group membership in login and group files, as performed in FileLogin method,
+				if user or group is not found in LDAP. It uses pa.scheduler.core.defaultloginfilename  and
+				pa.scheduler.core.defaultgroupfilename files to authenticate user and check group membership.
+				There are two rules :
+				</para>
+				<itemizedlist>
+					<listitem><para>
+					If LDAP group membership checking fails, fall back to group membership checking with group file.
+					To activate this behavior set <emphasis>pa.ldap.group.membership.fallback</emphasis>
+					to <emphasis>true</emphasis>, in LDAP configuration file.</para>
+					</listitem>
+					<listitem><para>
+					If an user is not found in LDAP, fall back to authentication and group membership checking with login and group files.
+					To activate this behavior, set <emphasis>pa.ldap.authentication.fallback</emphasis> to <emphasis>true</emphasis>, in
+					LDAP configuration file.</para>
+					</listitem>
+				</itemizedlist>
+			</section>
 		</section>
 	</section>
 </chapter>

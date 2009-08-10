@@ -64,6 +64,38 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
     }
 
     /**
+     * Returns login file name from scheduler configuration file
+     * Used for authentication fall-back
+     * @return login file name from scheduler configuration file
+     */
+    protected String getLoginFileName() {
+        String loginFile = PASchedulerProperties.SCHEDULER_LOGIN_FILENAME.getValueAsString();
+        //test that login file path is an absolute path or not
+        if (!(new File(loginFile).isAbsolute())) {
+            //file path is relative, so we complete the path with the prefix RM_Home constant
+            loginFile = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + loginFile;
+        }
+
+        return loginFile;
+    }
+
+    /**
+     * Returns group file name from scheduler configuration file
+     * Used for group membership verification fall-back.
+     * @return group file name from scheduler configuration file
+     */
+    protected String getGroupFileName() {
+        String groupFile = PASchedulerProperties.SCHEDULER_GROUP_FILENAME.getValueAsString();
+        //test that group file path is an absolute path or not
+        if (!(new File(groupFile).isAbsolute())) {
+            //file path is relative, so we complete the path with the prefix RM_Home constant
+            groupFile = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + groupFile;
+        }
+
+        return groupFile;
+    }
+
+    /**
      * Returns logger for authentication
      *
      * @return logger for authentication
