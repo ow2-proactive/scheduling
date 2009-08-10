@@ -58,7 +58,7 @@ public class TestMultipleHostsRequest extends FunctionalTest {
     private static String executablePathPropertyName = "EXEC_PATH";
 
     private static String executablePath = TestMultipleHostsRequest.class.getResource(
-            "/functionaltests/executables/test_multiple_hosts_reservation.sh").getPath();
+            "/functionaltests/executables/test_multiple_hosts_request.sh").getPath();
 
     /**
      * Tests start here.

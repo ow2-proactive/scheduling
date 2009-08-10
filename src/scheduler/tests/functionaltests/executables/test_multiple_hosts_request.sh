@@ -2,12 +2,13 @@
 # $1 number of booked cores
 
 function check_node_file {
-HOSTNAME=`hostname`
+HOST_IP=`hostname | grep 'has address' | cut -d ' ' -f4`
 for i in `cat $PAS_NODEFILE`
 do
-	if [ "$i" != "$HOSTNAME" ]
+	NODE_IP=`hostname | grep 'has address' | cut -d ' ' -f4`
+	if [ "$NODE_IP" != "$HOST_IP" ]
 	then
-		echo "Error booked host name is invalid : $i, awaited : $HOSTNAME"
+		echo "Error booked host ip is invalid : $NODE_IP, awaited : $HOST_IP"
 		return 1
 	fi
 done
