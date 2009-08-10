@@ -229,9 +229,9 @@ public class CreateSourceDialog extends Dialog {
             char ch = name.charAt(i);
             if (i == 0) {
                 buffer.append(Character.toUpperCase(ch));
-            } else if (i > 0 && (Character.isUpperCase(ch) || Character.isDigit(ch)) {
+            } else if (i > 0 && (Character.isUpperCase(ch) || Character.isDigit(ch))) {
                 boolean nextCharInAupperCase = (i < name.length() - 1) &&
-                    (Character.isUpperCase(name.charAt(i + 1)) || Character.isDigit(name.charAt(i + 1));
+                    (Character.isUpperCase(name.charAt(i + 1)) || Character.isDigit(name.charAt(i + 1)));
                 if (!nextCharInAupperCase) {
                     buffer.append(" " + ch);
                 } else {
