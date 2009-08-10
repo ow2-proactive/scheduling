@@ -7,7 +7,7 @@ for i in `cat $PAS_NODEFILE`
 do
 	if [ "$i" != "$HOSTNAME" ]
 	then
-		echo "Error booked host name is invalid : $i"
+		echo "Error booked host name is invalid : $i, awaited : $HOSTNAME"
 		return 1
 	fi
 done

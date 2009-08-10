@@ -50,14 +50,14 @@ import functionalTests.FunctionalTest;
  *
  * @author The ProActive Team
  */
-public class TestMultipleHostsReservation extends FunctionalTest {
+public class TestMultipleHostsRequest extends FunctionalTest {
 
-    private static String jobDescriptor = TestMultipleHostsReservation.class.getResource(
+    private static String jobDescriptor = TestMultipleHostsRequest.class.getResource(
             "/functionaltests/descriptors/Job_native_4_hosts.xml").getPath();
 
     private static String executablePathPropertyName = "EXEC_PATH";
 
-    private static String executablePath = TestMultipleHostsReservation.class.getResource(
+    private static String executablePath = TestMultipleHostsRequest.class.getResource(
             "/functionaltests/executables/test_multiple_hosts_reservation.sh").getPath();
 
     /**
