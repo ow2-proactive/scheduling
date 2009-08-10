@@ -363,7 +363,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
      */
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [release cycle: " +
-            releaseCycle + "s refresh frequency: " + refreshTime + "s load factor: " + loadFactor +"]";
+            releaseCycle + "s refresh frequency: " + refreshTime + "s load factor: " + loadFactor + "]";
     }
 
     /**

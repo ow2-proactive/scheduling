@@ -32,7 +32,7 @@
 
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
 import java.util.Properties;
 import java.util.Random;
 
@@ -84,7 +84,7 @@ public class WindowsEC2RMStarter {
             String rmUser = "", rmPass = "", rmUrl = "", rmNodeName = "", rmNsName = "";
 
             Properties props = new Properties();
-            StringReader in = new StringReader(getUrl(userData));
+            ByteArrayInputStream in = new ByteArrayInputStream(getUrl(userData).getBytes());
             props.load(in);
 
             rmUser = props.getProperty("rmLogin");
