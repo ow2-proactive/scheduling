@@ -84,8 +84,8 @@
 				<task ref="task1"/>
 				<task ref="task2"/>
 			</depends>
-			<nativeExecutable>
-				<staticCommand value="${WORK_DIR2}/nativTask 1 2% 2">
+			<nativeExecutable nodesNumber="3">
+				<staticCommand value="${WORK_DIR2}/nativTask 1 2% 2" workingDir="task3workingDir">
 					<arguments>
 						<argument value="3"/>
 						<argument value="12"/>
@@ -106,8 +106,8 @@
 			<depends>
 				<task ref="task3"/>
 			</depends>
-			<nativeExecutable>
-				<dynamicCommand>
+			<nativeExecutable nodesNumber="10">
+				<dynamicCommand workingDir="task4workingDir">
 					<generation>
 						<script>
 							<file path="${WORK_DIR}/gene.js">

@@ -92,6 +92,14 @@ public class LDAPProperties {
     /** password for the truststore defined by pa.ldap.truststore.path */
     public static final String LDAP_TRUSTSTORE_PASSWD = "pa.ldap.truststore.passwd";
 
+    /**fall back property, check user/password and group in files if user is not found in LDAP.
+     * true or false */
+    public static final String FALLBACK_USER_AUTH = "pa.ldap.authentication.fallback";
+
+    /**group fall back property, check user group membership group file if user is not found in corresponding LDAP group.
+     * true or false */
+    public static final String FALLBACK_GROUP_MEMBERSHIP = "pa.ldap.group.membership.fallback";
+
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     /** memory entity of the properties file. */

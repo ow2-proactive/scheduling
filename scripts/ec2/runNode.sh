@@ -1,8 +1,9 @@
 #!/bin/bash
 #
-# ec2Env.sh
+# runNode.sh
 #
-# Sets the environment for runNode.sh
+# Start a ProActive Runtime on an EC2 Instance,
+# register it on a remote Resource Manager
 #
 
 PROACTIVE_HOME="/usr/share/ProActive/"
@@ -21,5 +22,8 @@ JARS=$JARS:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar"
 JARS=$JARS:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-client.jar"
 JARS=$JARS:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-worker.jar"
 
-export JARS
-export PA_SCHEDULER
+$JAVA_HOME/bin/java -cp $JARS \
+    -Dproactive.home=$PROACTIVE_HOME \
+    -Dpa.scheduler.home=$PA_SCHEDULER \
+    -Dpa.rm.home=$PA_SCHEDULER \
+    $(python params.py)

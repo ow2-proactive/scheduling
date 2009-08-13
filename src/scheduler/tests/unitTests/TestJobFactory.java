@@ -181,7 +181,6 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task3").getDependencesList().size(), 2);
         Assert.assertEquals(tfJob.getTask("task3").getDependencesList().get(0).getName(), "task1");
         Assert.assertEquals(tfJob.getTask("task3").getDependencesList().get(1).getName(), "task2");
-        Assert.assertEquals(tfJob.getTask("task3").getNumberOfNodesNeeded(), 1);
         Assert.assertEquals(tfJob.getTask("task3").getResultPreview(), null);
         Assert.assertEquals(tfJob.getTask("task3").getWallTime(), 10 * 60 * 1000 + 53 * 1000);
         Assert.assertEquals(tfJob.getTask("task3").isWallTime(), true);
@@ -193,6 +192,8 @@ public class TestJobFactory {
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[2], "2 2");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[3], "3");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[4], "12");
+        Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getWorkingDir(), "task3workingDir");
+        Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getNumberOfNodesNeeded(), 3);
         //Check task 4 properties
         Assert.assertEquals(tfJob.getTask("task4").getName(), "task4");
         Assert.assertEquals(tfJob.getTask("task4").isCancelJobOnError(), true);
@@ -206,12 +207,13 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task4").getCleaningScript(), null);
         Assert.assertEquals(tfJob.getTask("task4").getDependencesList().size(), 1);
         Assert.assertEquals(tfJob.getTask("task4").getDependencesList().get(0).getName(), "task3");
-        Assert.assertEquals(tfJob.getTask("task4").getNumberOfNodesNeeded(), 1);
         Assert.assertEquals(tfJob.getTask("task4").getResultPreview(), "tadzaam");
         Assert.assertEquals(tfJob.getTask("task4").getWallTime(), 0);
         Assert.assertEquals(tfJob.getTask("task4").isWallTime(), false);
         Assert.assertEquals(tfJob.getTask("task4").getGenericInformations().get("n11"), "v11");
         Assert.assertEquals(tfJob.getTask("task4").getGenericInformations().get("n22"), "v22");
+        Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getWorkingDir(), "task4workingDir");
+        Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getNumberOfNodesNeeded(), 10);
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getScript(),
                 "command=args[0]+\" 12\";\n");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getParameters()[0],

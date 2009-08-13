@@ -31,6 +31,9 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -38,6 +41,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -46,6 +50,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutable;
+import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
@@ -53,6 +58,7 @@ import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -71,9 +77,15 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     private static String COOKIE_ENV = "PROACTIVE_COOKIE";
 
+    private static String CORE_FILE_ENV = "PAS_NODEFILE";
+
+    private static String CORE_NB = "PAS_CORE_NB";
+
     private static String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n"
         + "A generation script must define a variable named 'command' which contains "
         + "the native command to launch. \n" + "Script details :\n";
+
+    private File nodesFiles = null;
 
     /**
      * ProActive Empty Constructor
@@ -100,15 +112,28 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @return a task result representing the result of this task execution.
      */
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
-            TaskResult... results) {
+            NodeSet nodes, TaskResult... results) {
         try {
             //execute pre-script
             if (pre != null) {
                 this.executePreScript(getNodes().get(0));
             }
 
+            //add launching nodes, i.e current node into list of nodes
+            if (nodes != null) {
+                nodes.add(getNodes().get(0));
+            }
+
             this.currentExecutable = executableContainer.getExecutable();
             NativeExecutable toBeLaunched = (NativeExecutable) this.currentExecutable;
+
+            String wDir = ((NativeExecutableContainer) executableContainer).getWorkingDir();
+            if (wDir != null && !"".equals(wDir)) {
+                File wDirFile = new File(wDir);
+                if (wDirFile.exists() && wDirFile.isDirectory()) {
+                    toBeLaunched.setWorkingDir(wDirFile);
+                }
+            }
 
             //launch generation script
             if (toBeLaunched.getGenerationScript() != null) {
@@ -129,7 +154,22 @@ public class NativeTaskLauncher extends TaskLauncher {
                 }
             }
 
-            setEnvironmentVariables(toBeLaunched);
+            //build a file containing list of cores for the jobs, if several cores have been booked
+            if (nodes != null && nodes.size() > 1) {
+                try {
+                    nodesFiles = File.createTempFile("pa_nodes", null);
+                    FileWriter outputWriter = new FileWriter(nodesFiles);
+                    for (Node n : nodes) {
+                        outputWriter.append(n.getNodeInformation().getVMInformation().getHostName() + "\n");
+                    }
+                    outputWriter.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            setEnvironmentVariables(toBeLaunched, nodes.size());
 
             if (isWallTime()) {
                 scheduleTimer();
@@ -154,6 +194,8 @@ public class NativeTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
+            if (this.nodesFiles != null)
+                this.nodesFiles.delete();
             if (isWallTime())
                 cancelTimer();
             this.finalizeTask(core);
@@ -188,7 +230,7 @@ public class NativeTaskLauncher extends TaskLauncher {
      * and the cookie environment variable used by ProcessTreeKiller
      * 
      */
-    private void setEnvironmentVariables(NativeExecutable executable) {
+    private void setEnvironmentVariables(NativeExecutable executable, int coresNumber) {
 
         //Set Model environment variable HashMap for the executable;
         //if this process must be killed bu ProcessTreeKiller
@@ -213,10 +255,18 @@ public class NativeTaskLauncher extends TaskLauncher {
 
         Map<String, String> systemEnvVariables = System.getenv();
 
-        String[] envVarsTab = new String[taskEnvVariables.size() + systemEnvVariables.size() + 1];
+        String[] envVarsTab;
+        int i = 0;
+        if (nodesFiles != null) {
+            envVarsTab = new String[taskEnvVariables.size() + systemEnvVariables.size() + 3];
+            envVarsTab[i++] = CORE_FILE_ENV + "=" + nodesFiles.getAbsolutePath();
+        } else {
+            envVarsTab = new String[taskEnvVariables.size() + systemEnvVariables.size() + 2];
+        }
+
+        envVarsTab[i++] = CORE_NB + "=" + coresNumber;
 
         //first we add to the returnTab the task environment variables
-        int i = 0;
         for (Map.Entry<String, String> entry : taskEnvVariables.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
@@ -245,5 +295,4 @@ public class NativeTaskLauncher extends TaskLauncher {
     public static String convertJavaenvNameToSysenvName(String javaenvName) {
         return javaenvName.toUpperCase().replace('.', '_');
     }
-
 }

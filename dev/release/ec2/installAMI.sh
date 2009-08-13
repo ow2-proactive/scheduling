@@ -17,6 +17,10 @@
 #                   to run custom commands before creating the AMI
 # -x64              Create a x86_64 AMI instead of i386, will work
 #                   only if the instance is a c1.xlarge or m1.xlarge
+# -nr               No Runtime: do not launch a ProActive runtime at boot;
+#                   use this if you want to install ProActive Programming
+#                   and not ProActive Scheduling on your instance
+#
 #
 # Note: the URLs can be HTTP, HTTPS or FTP; the archives have to be .tar.bz2,
 # .tar.gz, .tar or .zip (extensions need to match).
@@ -34,6 +38,7 @@ trap error ERR
 
 WAIT_END=false
 ARCH=i386
+NO_RUNTIME=false
 
 #
 # Arguments handling
@@ -44,6 +49,7 @@ while [ $# -gt 0 ]; do
 	-java)             JAVA_ARCHIVE=$2;               shift 2 ;;
 	-w)                WAIT_END=true;                 shift 1 ;;
 	-x64)              ARCH=x86_64;                   shift 1 ;;
+	-nr)               NO_RUNTIME=true;               shift 1 ;;
 	*)                 echo "$0: invalid option $1" >&2
     esac
 done
@@ -125,6 +131,8 @@ chmod 755 /root/ec2-cred.sh
 source /root/ec2-cred.sh
 export JAVA_HOME=/root/JDK
 echo "export JAVA_HOME=/root/JDK" >> /root/.bashrc
+echo "export PROACTIVE_HOME=/usr/share/ProActive/" >> /root/.bashrc
+
 
 cat <<EOF > /root/.java.policy
 grant {
@@ -134,40 +142,44 @@ EOF
 chmod 755 /root/.java.policy
 
 #
-# installing scripts
+# installing startup scripts
 #
-echo "Installing scripts..."
-cp /usr/share/ProActive/dist/scripts/ec2/data/runNode.sh \
-    /usr/share/ProActive/dist/scripts/ec2/data/env.sh \
-    /usr/share/EC2Node/
-chmod 755 /usr/share/EC2Node/*
 
-cat <<EOF > /usr/local/bin/startNode.sh
+if $NO_RUNTIME ; then
+    echo "Skipping startup scripts installation"
+else
+    echo "Installing scripts..."
+    cp /tmp/runNode.sh /tmp/params.py \
+	/usr/share/EC2Node/
+    chmod 755 /usr/share/EC2Node/*
+    
+    cat <<EOF > /usr/local/bin/startNode.sh
 #!/bin/bash
 
 cd /usr/share/EC2Node
 ./runNode.sh
 
 EOF
-chmod 755 /usr/local/bin/startNode.sh
+    chmod 755 /usr/local/bin/startNode.sh
+    # will make the scripts run at boot
+    # change /etc/rc.local to whatever script is run last at boot
+    # if the AMI used is not using this at startup.
+    # This should work fine for at least all Fedora
+    # and Debian GNU/Linux based systems
+    #
+    
+    # prefix all 'exit 0' with a startnode
+    sed 's/exit 0/\/usr\/local\/bin\/startNode.sh | logger -s -t \"ProActive\"; exit 0/g' \
+	</etc/rc.local >/etc/rc.local.new
+    cat /etc/rc.local.new > /etc/rc.local
+    
+    # add a startnode at the end of the script, in case there was no exit clause
+    echo "/usr/local/bin/startNode.sh | logger -s -t \"ProActive\"" >> /etc/rc.local
+    echo "exit 0" >> /etc/rc.local
+    
+    chmod a+x /etc/rc.local
+fi
 
-# will make the scripts run at boot
-# change /etc/rc.local to whatever script is run last at boot
-# if the AMI used is not using this at startup.
-# This should work fine for at least all Fedora
-# and Debian GNU/Linux based systems
-#
-
-# prefix all 'exit 0' with a startnode
-sed 's/exit 0/\/usr\/local\/bin\/startNode.sh | logger -s -t \"ProActive\"; exit 0/g' \
-    </etc/rc.local >/etc/rc.local.new
-cat /etc/rc.local.new > /etc/rc.local
-
-# add a startnode at the end of the script, in case there was no exit clause
-echo "/usr/local/bin/startNode.sh | logger -s -t \"ProActive\"" >> /etc/rc.local
-echo "exit 0" >> /etc/rc.local
-
-chmod a+x /etc/rc.local
 echo "All components were successfully installed."
 
 # cleanup
@@ -176,10 +188,10 @@ rm -Rf /tmp/*bz2 &>/dev/null
 
 # some customization
 cat <<EOF > /etc/motd
-  _ \              \        |  _)
- |   |  __| _ \   _ \   __| __| |\ \   / _ \
- ___/  |   (   | ___ \ (    |   | \ \ /  __/
-_|    _|  \___/_/    _\___|\__|_|  \_/ \___|
+  _ \              \        |  _)             .
+ |   |  __| _ \   _ \   __| __| |\ \   / _ \  .
+ ___/  |   (   | ___ \ (    |   | \ \ /  __/  .
+_|    _|  \___/_/    _\___|\__|_|  \_/ \___|  .
 
    Welcome to a ProActive EC2 Image ;-)
 

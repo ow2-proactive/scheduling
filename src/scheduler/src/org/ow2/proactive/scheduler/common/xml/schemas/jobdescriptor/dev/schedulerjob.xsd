@@ -564,8 +564,20 @@
         <xs:element ref="jd:staticCommand"/>
         <xs:element ref="jd:dynamicCommand"/>
       </xs:choice>
+      <xs:attribute name="nodesNumber" type="xs:positiveInteger">
+        <xs:annotation>
+          <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <xs:attributeGroup name="nodesNumber_t">
+    <xs:attribute name="nodesNumber" use="required" type="xs:positiveInteger">
+      <xs:annotation>
+        <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
   <xs:element name="staticCommand">
     <xs:annotation>
       <xs:documentation>A native command statically defined in the descriptor </xs:documentation>
@@ -573,8 +585,20 @@
     <xs:complexType>
       <xs:group minOccurs="0" ref="jd:commandArguments"/>
       <xs:attribute name="value" use="required" type="xs:string"/>
+      <xs:attribute name="workingDir" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>working dir for native command to execute (ie launching dir, pwd...)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <xs:attributeGroup name="workingDir_t">
+    <xs:attribute name="workingDir" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>working dir for native command to execute (ie launching dir, pwd...)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
   <xs:group name="commandArguments">
     <xs:sequence>
       <xs:element name="arguments">
@@ -596,10 +620,21 @@
       </xs:element>
     </xs:sequence>
   </xs:group>
-  <xs:element name="dynamicCommand" type="jd:generation">
+  <xs:element name="dynamicCommand">
     <xs:annotation>
       <xs:documentation>A command generated dynamically </xs:documentation>
     </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="jd:generation">
+          <xs:attribute name="workingDir" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>working dir for native command to execute (ie launching dir, pwd...)</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
   </xs:element>
   <xs:complexType name="generation">
     <xs:sequence>

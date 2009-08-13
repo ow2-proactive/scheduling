@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="job_native_4_hosts" priority="normal" cancelJobOnError="false">
+	<variables>
+		<!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
+		<variable name="WORK_DIR" value="${pa.scheduler.home}/classes/schedulerTests/functionaltests/executables"/>
+		<variable name="BOOKED_HOSTS_NB" value="4"/>
+	</variables>
+	<!-- description also test that description can contain more than 255 char -->
+	<description>functional tests : a native job that tests multiple hosts reservation</description>
+	<taskFlow>
+		<task name="task1">
+			<!-- Task human description -->
+			<description>Will display 10 dots every 1s</description>
+			<nativeExecutable nodesNumber="4">
+				<staticCommand 	value="${EXEC_PATH}">
+					<arguments>
+						<argument value="${BOOKED_HOSTS_NB}"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+	</taskFlow>
+</job>

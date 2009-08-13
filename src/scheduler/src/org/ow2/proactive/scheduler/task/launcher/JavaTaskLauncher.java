@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -78,7 +79,7 @@ public class JavaTaskLauncher extends TaskLauncher {
      * @return a task result representing the result of this task execution.
      */
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
-            TaskResult... results) {
+            NodeSet nodes, TaskResult... results) {
         try {
             //launch pre script
             if (pre != null) {

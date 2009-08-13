@@ -232,7 +232,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getDependences().size(), 2);
                 Assert.assertEquals(it.getDependences().get(0).getName(), "task1");
                 Assert.assertEquals(it.getDependences().get(1).getName(), "task2");
-                Assert.assertEquals(it.getNumberOfNodesNeeded(), 1);
+                Assert.assertEquals(3, it.getNumberOfNodesNeeded());
                 Assert.assertNull(it.getResultPreview());
                 Assert.assertEquals(it.getWallTime(), 10 * 60 * 1000 + 53 * 1000);
                 Assert.assertEquals(it.isWallTime(), true);
@@ -262,7 +262,7 @@ public class TestDatabaseCRUD {
                 Assert.assertNull(it.getCleaningScript());
                 Assert.assertEquals(it.getDependences().size(), 1);
                 Assert.assertEquals(it.getDependences().get(0).getName(), "task3");
-                Assert.assertEquals(it.getNumberOfNodesNeeded(), 1);
+                Assert.assertEquals(10, it.getNumberOfNodesNeeded());
                 Assert.assertEquals(it.getResultPreview(), "tadzaam");
                 Assert.assertEquals(it.getWallTime(), 0);
                 Assert.assertEquals(it.isWallTime(), false);

@@ -86,10 +86,8 @@ public class InternalProActiveJob extends InternalJob {
      * @param executableClassName
      * @param args the arguments attach to this job.
      */
-    public InternalProActiveJob(int numberOfNodesNeeded, String executableClassName,
-            Map<String, BigString> args) {
+    public InternalProActiveJob(String executableClassName, Map<String, BigString> args) {
         createTask(executableClassName, args);
-        getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
     }
 
     /**

@@ -217,7 +217,7 @@ public abstract class TaskLauncher implements InitActive {
      * @return a task result representing the result of this task execution.
      */
     public abstract TaskResult doTask(TaskTerminateNotification core, ExecutableContainer execContainer,
-            TaskResult... results);
+            NodeSet nodes, TaskResult... results);
 
     /**
      * Redirect stdout/err in the buffered appender.

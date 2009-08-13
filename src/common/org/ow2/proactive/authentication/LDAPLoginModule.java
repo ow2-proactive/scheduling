@@ -49,7 +49,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
-import javax.security.auth.spi.LoginModule;
 
 import org.apache.log4j.Logger;
 
@@ -57,10 +56,20 @@ import org.apache.log4j.Logger;
 /**
  * Authentication based on LDAP system.
  *
+ * This class extends FileLoginModule in order to use authentication fall back mechanism :
+ *
+ * If user entry is not found in LDAP and file authentication fall back is activated
+ * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_USER_AUTH}, it tries authentication (login/password and group membership
+ * with file login module.
+ *
+ * If no group is found in LDAP and group membership file checking fall back is activated
+ * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_GROUP_MEMBERSHIP}, its group membership is checked with file login module.
+ *
+ *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
-public abstract class LDAPLoginModule implements Loggable, LoginModule {
+public abstract class LDAPLoginModule extends FileLoginModule implements Loggable {
 
     /** connection logger */
     private final Logger logger = getLogger();
@@ -113,10 +122,13 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
     /** user password used to bind to LDAP (if authentication method is different from none) */
     private String BIND_PASSWD = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_PASSWD);
 
-    /**
-     * JAAS call back handler used to get authentication request parameters 
-     */
-    private CallbackHandler callbackHandler;
+    /**fall back property, check user/password and group in files if user in not found in LDAP */
+    private boolean fallbackUserAuth = Boolean.valueOf(ldapProperties
+            .getProperty(LDAPProperties.FALLBACK_USER_AUTH));
+
+    /**group fall back property, check user group membership group file if user in not found in corresponding LDAP group*/
+    private boolean fallbackGroupMembership = Boolean.valueOf(ldapProperties
+            .getProperty(LDAPProperties.FALLBACK_GROUP_MEMBERSHIP));
 
     /** authentication status */
     private boolean succeeded = false;
@@ -128,6 +140,15 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
      * Creates a new instance of LDAPLoginModule
      */
     public LDAPLoginModule() {
+        if (fallbackUserAuth) {
+            checkLoginFile();
+            checkGroupFile();
+            logger.info("Using Login file for fall back authentication at : " + loginFile);
+            logger.info("Using Group file for fall back group membership at : " + groupFile);
+        } else if (fallbackGroupMembership) {
+            checkGroupFile();
+            logger.info("Using Group file for fall back group membership at : " + groupFile);
+        }
 
         //initialize system properties for SSL/TLS connection
         String keyStore = ldapProperties.getProperty(LDAPProperties.LDAP_KEYSTORE_PATH);
@@ -151,7 +172,6 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
      * @param propertyName name of the property
      * @param propertyValue value of the property
      * @return true id the property is defined and its value equals the specified value.
-     *
      */
     private boolean alreadyDefined(String propertyName, String propertyValue) {
 
@@ -218,63 +238,108 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
      *                perform the authentication.
      */
     public boolean login() throws LoginException {
+        succeeded = false;
         if (callbackHandler == null) {
             throw new LoginException("Error: no CallbackHandler available "
                 + "to garner authentication information from the user");
         }
 
-        Callback[] callbacks = new Callback[] { new NoCallback() };
-        String username = null;
-        String password = null;
-        String reqGroup = null;
-        GroupHierarchy groupsHierarchy = null;
-        String userDN = null;
-        String[] hierarchyArray = null;
-
-        boolean passwordMatch = false;
         try {
+
+            Callback[] callbacks = new Callback[] { new NoCallback() };
 
             // gets the user name, password, group Membership, and group Hierarchy from call back handler
             callbackHandler.handle(callbacks);
             Map<String, Object> params = ((NoCallback) callbacks[0]).get();
-            username = (String) params.get("username");
-            password = (String) params.get("pw");
-            reqGroup = (String) params.get("group");
-            hierarchyArray = (String[]) params.get("groupsHierarchy");
-            groupsHierarchy = new GroupHierarchy(hierarchyArray);
+            String username = (String) params.get("username");
+            String password = (String) params.get("pw");
+            String reqGroup = (String) params.get("group");
+            String[] hierarchyArray = (String[]) params.get("groupsHierarchy");
+            GroupHierarchy groupsHierarchy = new GroupHierarchy(hierarchyArray);
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
+
+            if (username == null) {
+                logger.info("No username has been specified for authentication");
+                throw new FailedLoginException("No username has been specified for authentication");
+            }
+
+            if (hierarchyArray == null) {
+                logger.info("No group hierarchy has been specified for authentication");
+                throw new FailedLoginException("No group hierarchy has been specified for authentication");
+            }
+
+            if (hierarchyArray.length == 0) {
+                logger.info("No group hierarchy has been specified for authentication");
+                throw new FailedLoginException("No group hierarchy has been specified for authentication");
+            }
+
+            if (reqGroup == null) {
+                logger.info("No group has been specified for authentication");
+                throw new FailedLoginException("No group has been specified for authentication");
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("LDAP authentication requested for user : " + username);
+                String hierarchyRepresentation = "";
+                for (String s : hierarchyArray) {
+                    hierarchyRepresentation += (s + " ");
+                }
+                logger.debug("requested group : " + reqGroup + ", group hierarchy : " +
+                    hierarchyRepresentation);
+            }
+
+            succeeded = logUser(username, password, reqGroup, groupsHierarchy);
+            return succeeded;
+
         } catch (java.io.IOException ioe) {
             throw new LoginException(ioe.toString());
         } catch (UnsupportedCallbackException uce) {
             throw new LoginException("Error: " + uce.getCallback().toString() +
                 " not available to garner authentication information " + "from the user");
         }
+    }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("LDAP authentication requested for user : " + username);
-            String hierarchyRepresentation = "";
-            for (String s : hierarchyArray) {
-                hierarchyRepresentation += (s + " ");
-            }
-            logger.debug("requested group : " + reqGroup + ", group hierarchy : " + hierarchyRepresentation);
-        }
+    /**
+     * Check user and password from LDAP file. If user is authenticated,
+     * check group membership in LDAP groups.
+     *
+     * If user entry is not found in LDAP and file authentication fall back is activated
+     * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_USER_AUTH}, it tries authentication (login/password and group membership)
+     * with file login module.
+     *
+     * If no group is found in LDAP and group membership fall back is activated
+     * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_GROUP_MEMBERSHIP}, its group membership is checked with file login module.
+     *
+     * @param username user's login
+     * @param password user's password
+     * @param reqGroup requested level
+     * @param groupsHierarchy Group hierarchy used for authentication.
+     * @return true user login and password are correct, and requested group is authorized for the user
+     * @throws LoginException if authentication and group membership fails.
+     */
+    protected boolean logUser(String username, String password, String reqGroup,
+            GroupHierarchy groupsHierarchy) throws LoginException {
 
         // check the user name, get the RDN of the user
         // (null = not found)
+        String userDN = null;
+        boolean passwordMatch = false;
         try {
             userDN = getLDAPUserDN(username);
         } catch (NamingException e) {
             logger.error("", e);
-            succeeded = false;
             throw new FailedLoginException("Cannot connect to LDAP server");
         }
 
         if (userDN == null) {
-            succeeded = false;
-            logger.info("user entry not found in subtree " + USER_DN + " for login " + username);
-            throw new FailedLoginException("User name doesn't exists");
+            logger.info("user entry not found in subtree " + USER_DN + " for user " + username);
+            if (fallbackUserAuth) {
+                logger.info("fall back to file authentication for user : " + username);
+                return super.logUser(username, password, reqGroup, groupsHierarchy);
+            } else
+                throw new FailedLoginException("User name doesn't exists");
         } else {
             // Check if the password match the user name
             passwordMatch = checkLDAPPassword(userDN, password);
@@ -286,23 +351,23 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
             }
         } else {
             // authentication failed
-            logger.info("password verification failed");
-            succeeded = false;
+            logger.info("password verification failed for user : " + username);
             throw new FailedLoginException("Password Incorrect");
-        }
-
-        if (reqGroup == null) {
-            succeeded = false;
-            throw new FailedLoginException("No group has been specified for authentication");
         }
 
         boolean groupOk = checkLDAPGroupMemberShip(userDN, reqGroup, groupsHierarchy);
 
         if (!groupOk) {
-            logger.info("group membership verification failed");
-            throw new FailedLoginException("User doesn't belong to a group");
+            logger.info("LDAP group membership verification failed for user " + username);
+            if (this.fallbackGroupMembership) {
+                logger.info("fall back to file group membership checking for user : " + username +
+                    ", requested group : " + reqGroup);
+                String group = super.checkGroupMemberShip(username, reqGroup, groupsHierarchy);
+                logger.info("authentication succeeded for user '" + username + "' in group '" + group + "'");
+                return true;
+            } else
+                throw new FailedLoginException("User doesn't belong to a group");
         } else {
-            succeeded = true;
             return true;
         }
     }
@@ -562,4 +627,5 @@ public abstract class LDAPLoginModule implements Loggable, LoginModule {
      * @return name of the file with LDAP configuration.
      */
     protected abstract String getLDAPConfigFileName();
+
 }

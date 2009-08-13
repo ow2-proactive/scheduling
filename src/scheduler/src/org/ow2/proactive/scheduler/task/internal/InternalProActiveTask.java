@@ -101,12 +101,4 @@ public class InternalProActiveTask extends InternalTask {
 
         return launcher;
     }
-
-    /**
-     * @param numberOfNodesNeeded the numberOfNodesNeeded to set
-     */
-    public void setNumberOfNodesNeeded(int numberOfNodesNeeded) {
-        this.numberOfNodesNeeded = numberOfNodesNeeded;
-    }
-
 }
