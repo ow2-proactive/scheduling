@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveUserProperties>
+    <properties>
+		<prop key="proactive.net.nolocal" value="true"/>
+		<prop key="proactive.rmi.port" value="2500"/>
+		<prop key="proactive.communication.protocol" value="rmi"/>
+		<prop key="proactive.useIPaddress" value="false" />
+    </properties>
+    <javaProperties>
+    	<prop key="javax.net.ssl.trustStore" value="../../config/authentication/InriaTrustStore"/>
+    </javaProperties>
+</ProActiveUserProperties>
