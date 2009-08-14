@@ -1,9 +1,10 @@
-#include "jni.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "sciprint.h"
 #include "machine.h"
+
+#include "jni.h"
 
 JavaVM *jvm;       /* denotes a Java VM */
 JNIEnv *env;       /* pointer to native method interface */
@@ -18,6 +19,8 @@ jclass stringClass = NULL;
 int debugVal = 0;
 
 int checkException();
+
+void printException(jthrowable exc);
 
 void C2F(cinitEmbedded) (int *err)
 {
@@ -106,6 +109,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
 
     if (*debug) {
          printf("[ScilabEmbeddedc] sciSolve %d inputs, %d debug\n", *n, *debug);
+         sciprint("[ScilabEmbeddedc] sciSolve %d inputs, %d debug\n", *n, *debug);
     }
 
     // Initialization of the Java string array
@@ -147,6 +151,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
     }
     if (*debug) {
         printf("[ScilabEmbeddedc] Before allocating array of %d elements\n", arrayLength);
+        sciprint("[ScilabEmbeddedc] Before allocating array of %d elements\n", arrayLength);
     }
     *results = (char **) malloc((unsigned) ((arrayLength+1)* sizeof(char *)));
     if (*results == 0) {
@@ -156,7 +161,8 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
     }
     (*results)[arrayLength] = NULL;
     for (i = 0; i < arrayLength; i++) {
-        const jstring res = (jstring) (*env)->GetObjectArrayElement(env, resultsArray, (jsize) i);
+		jstring log, res , error;
+        res = (jstring) (*env)->GetObjectArrayElement(env, resultsArray, (jsize) i);
         if (res != NULL) {
             int resLength = (int) (*env)->GetStringUTFLength(env, res);
             (*results)[i] = (char *) malloc ((resLength+1)*sizeof(char));
@@ -167,16 +173,18 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
             }
             if (*debug) {
                 printf("[ScilabEmbeddedc] Before strcpy\n");
+                sciprint("[ScilabEmbeddedc] Before strcpy\n");
             }
 
             strcpy((*results)[i], (const char*) (*env)->GetStringUTFChars(env, res, NULL));
         }
         if (*debug) {
             printf("[ScilabEmbeddedc] Before log printing\n");
+            sciprint("[ScilabEmbeddedc] Before strcpy\n");
         }
 
-        // Printing the task log on the scilab console
-        const jstring log = (jstring) (*env)->GetObjectArrayElement(env, logsArray, (jsize) i);
+        // Printing the task log on the scilab console 
+        log = (jstring) (*env)->GetObjectArrayElement(env, logsArray, (jsize) i);
         if (log != NULL) {
             int logLength = (int) (*env)->GetStringUTFLength(env, log);
             if (logLength > 0) {
@@ -189,9 +197,10 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
         }
         if (*debug) {
             printf("[ScilabEmbeddedc] Before error printing\n");
+            sciprint("[ScilabEmbeddedc] Before error printing\n");
         }
         // Printing the task error message on the scilab console
-        const jstring error = (jstring) (*env)->GetObjectArrayElement(env, errorArray, (jsize) i);
+        error = (jstring) (*env)->GetObjectArrayElement(env, errorArray, (jsize) i);
         if (error != NULL) {
             int errorLength = (int) (*env)->GetStringUTFLength(env, error);
             if (errorLength > 0) {
@@ -207,6 +216,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
     }
     if (*debug) {
         printf("[ScilabEmbeddedc] Normal termination\n");
+        sciprint("[ScilabEmbeddedc] Normal termination\n");
     }
 
     *err = 0;
@@ -224,33 +234,97 @@ int checkException()
     return 0;
 }
 
-void printException(jthrowable exc) {
-     int messageLength ;
-     jstring message ;
-     char *charmessage ;
-     jclass java_class = (*env)->FindClass (env, "java/lang/Throwable");
-     jmethodID getMessageid = (*env)->GetMethodID(env, java_class, "getMessage", "()Ljava/lang/String;");
-     jmethodID getCauseid = (*env)->GetMethodID(env, java_class, "getCause", "()Ljava/lang/Throwable;");
-     if (getMessageid == 0 || getCauseid == 0) {
+void getStackTraceCause(char **causeMessage, char ***charElementMessage, int *stackLength, jthrowable exc) {
+    jobjectArray stackArray;
+    jstring message;
+    int messageLength;
+    int i;
+    jclass throwable_class = (*env)->FindClass (env, "java/lang/Throwable");
+    jclass stackElement_class = (*env)->FindClass (env, "java/lang/StackTraceElement");
+    jmethodID getStackTraceid = (*env)->GetMethodID(env, throwable_class, "getStackTrace", "()[Ljava/lang/StackTraceElement;");
+    jmethodID SEtoStringId = (*env)->GetMethodID(env, stackElement_class, "toString", "()Ljava/lang/String;");
+    jmethodID getMessageid = (*env)->GetMethodID(env, throwable_class, "getMessage", "()Ljava/lang/String;");
+
+    if (getMessageid == 0 || SEtoStringId == 0 || getStackTraceid == 0) {
         (*env)->ExceptionClear(env);
-        sciprint("[ScilabEmbeddedc] Couldn't get method getMessage or getCause\n");
+        sciprint("[ScilabEmbeddedc] Couldn't get method\n");
+        return;
+    }
+
+    stackArray = (jobjectArray) (*env)->CallObjectMethod(env, exc, getStackTraceid);
+    message = (jstring) (*env)->CallObjectMethod(env, exc, getMessageid);
+    if (message != NULL) {
+        messageLength = (*env)->GetStringUTFLength(env, message);
+        *causeMessage = (char *)malloc(sizeof(char)*(messageLength+1));
+        strcpy(*causeMessage,(*env)->GetStringUTFChars(env,message, NULL));
+    }
+    else {
+        *causeMessage = (char *)malloc(sizeof(char));
+        strcpy(*causeMessage,"");
+    }
+    *stackLength = (*env)->GetArrayLength(env, stackArray);
+    *charElementMessage = (char **)malloc((*stackLength)*sizeof(char *));
+    for (i = 0; i < *stackLength; i++) {
+         jobject stackElement;
+         jstring elementMessage;
+         int elementMessageLength;
+
+         stackElement = (jobject) (*env)->GetObjectArrayElement(env, stackArray, (jsize) i);
+         elementMessage = (jstring) (*env)->CallObjectMethod(env, stackElement, SEtoStringId);
+         elementMessageLength = (*env)->GetStringUTFLength(env, elementMessage);
+         (*charElementMessage)[i] = (char *)malloc(sizeof(char)*(elementMessageLength+1));
+         strcpy((*charElementMessage)[i],(*env)->GetStringUTFChars(env,elementMessage, NULL));
+
+    }
+}
+
+void printException(jthrowable exc) {
+     int i,j;
+     char **causeMessage;
+     // Stack
+     char ***charElementMessage;
+     int* stackLength;
+     int stackDepth;
+     jobject cause;
+
+
+     jclass throwable_class = (*env)->FindClass (env, "java/lang/Throwable");
+     jmethodID getCauseid = (*env)->GetMethodID(env, throwable_class, "getCause", "()Ljava/lang/Throwable;");
+     if (getCauseid == 0) {
+        (*env)->ExceptionClear(env);
+        sciprint("[ScilabEmbeddedc] Couldn't get method\n");
         return;
       }
-      message = (jstring) (*env)->CallObjectMethod(env, exc, getMessageid);
-      while (message == NULL) {
-        jobject cause = (*env)->CallObjectMethod(env, exc, getCauseid);
-        if (cause != NULL) {
-            message = (jstring) (*env)->CallObjectMethod(env, cause, getMessageid);
-        }
-        else {
-            jmethodID toStringid = (*env)->GetMethodID(env, java_class, "toString", "()Ljava/lang/String;");
-            message = (jstring) (*env)->CallObjectMethod(env, cause, toStringid);
-        }
+
+      // Finding stack depth
+      cause = (*env)->CallObjectMethod(env, exc, getCauseid);
+      stackDepth = 1;
+      while (cause != NULL) {
+          stackDepth++;
+          cause = (*env)->CallObjectMethod(env, cause, getCauseid);
       }
-      messageLength = (*env)->GetStringUTFLength(env, message);
-      charmessage = (char *)malloc(sizeof(char)*(messageLength+1));
-      strcpy(charmessage,(*env)->GetStringUTFChars(env,message, NULL));
-      (*env)->ExceptionDescribe(env);
-      (*env)->ExceptionClear(env);
-      sciprint("%s\n",charmessage);
+      causeMessage = (char **) malloc(sizeof(char *)*stackDepth);
+      charElementMessage = (char ***) malloc(sizeof(char **)*stackDepth);
+      stackLength = (int *) malloc(sizeof(int)*stackDepth);
+
+      cause = exc;
+
+      for (i=0; i < stackDepth; i++) {
+           getStackTraceCause(causeMessage+i,charElementMessage+i,stackLength+i,cause);
+           cause = (*env)->CallObjectMethod(env, cause, getCauseid);
+      }
+
+     (*env)->ExceptionDescribe(env);
+     (*env)->ExceptionClear(env);
+
+
+      for (i=0; i < stackDepth; i++) {
+          sciprint("%s\n",causeMessage[i]);
+          for (j = 0; j < stackLength[i]; j++) {
+            sciprint("  %s\n",charElementMessage[i][j]);
+          }
+          if (i < stackDepth -1) {
+            sciprint("\nCaused by:\n");
+          }
+      }
 }

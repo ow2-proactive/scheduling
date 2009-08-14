@@ -62,7 +62,7 @@ public class ScilabSolver {
     }
 
     public static String[][] solve(String[] inputScripts, String functionsDefinition, String mainScript,
-            String scriptURL, int priority, int debugVal) {
+            String scriptURL, int priority, int debugVal) throws Throwable {
         boolean debug = debugVal > 0;
         if (debug) {
             System.out.println("[ScilabSolver] In Solver");
@@ -90,9 +90,11 @@ public class ScilabSolver {
                 results[1][i] = sciResults.get(i).getLogs();
                 if (sciResults.get(i).getException() != null) {
                     results[2][i] = sciResults.get(i).getException().getMessage();
+                    throw sciResults.get(i).getException();
                 } else {
                     results[2][i] = null;
                 }
+
             }
         } else {
             System.out.println("[ScilabSolver] Solve returned NULL...");

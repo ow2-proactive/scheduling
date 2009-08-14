@@ -311,9 +311,9 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         // the external log files as the output is forwarded into Scilab directly,
         // in debug mode you might want to read these files though
         if (debug) {
-            System.out.println("[AOScilabEnvironment] Log file created at :" +
-                new File("Scilab_job_" + lastJobId + ".log"));
-            job.setLogFile("Scilab_job_" + lastJobId + ".log");
+            File logFile = new File(System.getProperty("java.io.tmpdir"), "Scilab_job_" + lastJobId + ".log");
+            System.out.println("[AOScilabEnvironment] Log file created at :" + logFile);
+            job.setLogFile(logFile.getPath());
         }
         if (debug) {
             System.out.println("[AOScilabEnvironment] function definition:");

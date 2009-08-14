@@ -19,6 +19,7 @@ if [ "$m1" != "" ]; then
 fi
 if [ "$scilab_home" != "" ]; then
     echo $scilab_home
+    echo ------------------------
     echo $lib_dir
     echo $scilab_home/share/scilab
 else

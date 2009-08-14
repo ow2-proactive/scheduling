@@ -391,9 +391,8 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
         // javaCommandBuilder.setJavaPath(System.getenv("JAVA_HOME") +
         //     "/bin/java");
         // we set as well the java.library.path property (precaution)
-        // "-Djava.library.path=\"" + libPath + "\"" +
-        javaCommandBuilder.setJvmOptions(" -Dproactive.rmi.port=" +
-            Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()));
+        javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
+            " -Dproactive.rmi.port=" + Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()));
 
         pb.command(javaCommandBuilder.getJavaCommand());
 
@@ -450,7 +449,7 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
 
         File thirdpartyFolder = new File(scilabConfig.getScilabHome() + os.fileSeparator() +
             scilabConfig.getScilabLibDir() + os.fileSeparator() + ".." + os.fileSeparator() + "thirdparty");
-        if (thirdpartyFolder.exists()) {
+        if (thirdpartyFolder.exists() && (os == OperatingSystem.unix)) {
             newPath = thirdpartyFolder.getPath() + os.pathSeparator() + newPath;
         }
 

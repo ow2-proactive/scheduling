@@ -25,12 +25,19 @@ function [] = PAinit()
 
      // Add ProActive Scheduler to the scilab classpath
      initcp = javaclasspath();
+     if strcmp(getos(),'Windows') == 0
+        for i=1:size(initcp,1)
+          initcp(i)=getlongpathname(strsubst(initcp(1),'%20',' '))
+        end
+     end
+       
 
      cp = [fullfile(schedulerdir,'dist','lib','ProActive_ResourceManager.jar'); initcp];
      cp = [fullfile(schedulerdir,'dist','lib','ProActive_Scheduler-core.jar'); cp];
      cp = [fullfile(schedulerdir,'dist','lib','ProActive_SRM-common.jar'); cp];
      cp = [fullfile(schedulerdir,'dist','lib','ProActive.jar'); cp];
      cp = [fullfile(schedulerdir,'dist','lib','javasci.jar'); cp];
+
      javaclasspath(cp);
 
      // Call the native JNI connection to the Scheduler classes

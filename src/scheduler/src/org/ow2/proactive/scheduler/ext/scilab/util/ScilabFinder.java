@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
+import org.ow2.proactive.scheduler.ext.common.util.ProcessResult;
 import org.ow2.proactive.scheduler.ext.scilab.exception.ScilabInitException;
 import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.util.Shell;
@@ -108,16 +109,18 @@ public class ScilabFinder {
             // End of this code
 
             // finally we launch the batch file
-            p1 = Runtime.getRuntime().exec(SCILAB_SCRIPT_WINDOWS);
+            p1 = Runtime.getRuntime().exec(new String[] { "cmd", "/c", batchFile.getName() }, null,
+                    batchFile.getParentFile());
         } else {
             throw new UnsupportedOperationException("Finding Scilab on " + os + " is not supported yet");
         }
 
-        List<String> lines = IOTools.getContentAsList(p1.getInputStream());
+        ProcessResult pres = IOTools.blockingGetProcessResult(p1);
+        String[] output = pres.getOutput();
 
         if (debug) {
             System.out.println("Result of script :");
-            for (String ln : lines) {
+            for (String ln : output) {
                 System.out.println(ln);
             }
         }
@@ -126,9 +129,14 @@ public class ScilabFinder {
         // 1st line : the full path to the scilab command
         // 2nd line : the name of the os-dependant arch dir
         if (p1.waitFor() == 0) {
-            String scilabHome = lines.get(0);
-            String scilabLibDir = lines.get(1);
-            String scilabSCIDir = lines.get(2);
+            int i = 0;
+            String line;
+            String scilabHome = null;
+            while (!(line = output[i++]).startsWith("----")) {
+                scilabHome = line;
+            }
+            String scilabLibDir = output[i++];
+            String scilabSCIDir = output[i++];
             answer = new ScilabConfiguration(scilabHome, scilabLibDir, scilabSCIDir);
 
         } else {
@@ -136,7 +144,7 @@ public class ScilabFinder {
             PrintWriter pw = new PrintWriter(error_message);
             pw.println("Error during find_scilab script execution:");
 
-            for (String l : lines) {
+            for (String l : output) {
                 pw.println(l);
             }
 
