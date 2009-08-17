@@ -708,9 +708,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     logger_dev.debug("Load and Initialize the executable container for task '" +
                         internalTask.getId() + "'");
                     ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
-                    if (InternalJavaTask.class.isAssignableFrom(internalTask.getClass())) {
-                        eci.setClassServer(getTaskClassServer(currentJob.getId()));
-                    }
+
+                    eci.setClassServer(getTaskClassServer(currentJob.getId()));
                     internalTask.getExecutableContainer().init(eci);
 
                     node = nodeSet.get(0);

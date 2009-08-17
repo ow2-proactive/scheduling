@@ -54,6 +54,7 @@ import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
+import org.ow2.proactive.scheduler.util.classloading.ComputeNodeClassLoader;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 
@@ -121,9 +122,11 @@ public class JavaExecutableContainer implements ExecutableContainer {
             // Instanciate the actual executable
             try {
                 TaskClassLoader tcl = new TaskClassLoader(this.getClass().getClassLoader(), this.classServer);
-                // the tcl becomes the context classloader
-                Thread.currentThread().setContextClassLoader(tcl);
-                Class<?> userExecutableClass = tcl.loadClass(this.userExecutableClassName);
+                // Add the task class loader to the system classloader
+                ComputeNodeClassLoader cncl = (ComputeNodeClassLoader) ClassLoader.getSystemClassLoader();
+                cncl.setTaskClassLoader(tcl);
+                Class<?> userExecutableClass = cncl.loadClass(this.userExecutableClassName);
+
                 userExecutable = (JavaExecutable) userExecutableClass.newInstance();
                 Map<String, String> tmp = new HashMap<String, String>();
                 for (Entry<String, BigString> e : this.args.entrySet()) {
@@ -131,7 +134,7 @@ public class JavaExecutableContainer implements ExecutableContainer {
                 }
                 userExecutable.setArgs(tmp);
             } catch (Throwable e) {
-                throw new ExecutableCreationException("Unable to instanciate JavaExecutable : " + e);
+                throw new ExecutableCreationException("Unable to instanciate JavaExecutable : ", e);
             }
         }
         return userExecutable;

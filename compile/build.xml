@@ -526,6 +526,8 @@
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/LogForwardingService.java" />
 				<include name="org/ow2/proactive/scheduler/util/classloading/TaskClassServer.java" />
 				<include name="org/ow2/proactive/scheduler/util/classloading/TaskClassLoader.java" />
+				<include name="org/ow2/proactive/scheduler/util/classloading/*.java" />
+				<include name="org/ow2/proactive/scheduler/util/classloading/resourcecache/*.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/JobPriority.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/TaskFlowJob.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/ProActiveJob.java" />
