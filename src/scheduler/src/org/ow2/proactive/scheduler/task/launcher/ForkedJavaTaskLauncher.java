@@ -223,11 +223,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             !"".equals(forkEnvironment.getJVMParameters())) {
             command.append(" " + forkEnvironment.getJVMParameters() + " ");
         }
-
-        command
-                .append("-Djava.system.class.loader=org.ow2.proactive.scheduler.util.classloading.ComputeNodeClassLoader ");
-        command
-                .append("-Djavax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom=com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl ");
     }
 
     private void setClasspath(StringBuffer command) {

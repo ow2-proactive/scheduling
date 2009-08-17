@@ -11,9 +11,6 @@
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 	<configuration>
-		<jvmarg value='-Djava.system.class.loader=org.ow2.proactive.scheduler.util.classloading.ComputeNodeClassLoader' />
-		<jvmarg value='-Djavax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom=com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl'/>
-	
 		<jvmarg value="-Dproactive.test=true"/>
 		<jvmarg value="-Dproactive.http.jetty.xml=${proactive.home}/config/deployment/jetty.xml"/>
 		<applicationClasspath>

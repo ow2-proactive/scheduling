@@ -12,11 +12,6 @@
 		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
 				<jvmarg value='-Dproactive.http.jetty.xml="${proactive.home}/config/deployment/jetty.xml"'/>
-				<jvmarg value='-Djava.system.class.loader=org.ow2.proactive.scheduler.util.classloading.ComputeNodeClassLoader' />
-				<jvmarg value='-Djavax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom=com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl'/>
-				<!--
-				<jvmarg value="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000" />
-				-->
 				<applicationClasspath>
 					<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
 					<!-- Script engines must be explicitly in application classpath -->

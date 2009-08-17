@@ -64,7 +64,6 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputSt
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
-import org.ow2.proactive.scheduler.util.classloading.ComputeNodeClassLoader;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -207,10 +206,6 @@ public abstract class TaskLauncher implements InitActive {
             core.terminate(taskId);
         }
         this.currentExecutable = null;
-
-        // Kill reset the current task class loader
-        ComputeNodeClassLoader cncl = (ComputeNodeClassLoader) ClassLoader.getSystemClassLoader();
-        cncl.setTaskClassLoader(null);
     }
 
     /**
