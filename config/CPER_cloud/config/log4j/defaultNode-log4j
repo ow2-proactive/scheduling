@@ -1,0 +1,28 @@
+# This file represents the log4j config file for nodes deployed from Resource Manager.
+# It is given as property in the default GCMA (config/deployment/GCMNodeSourceApplication.xml)
+
+# The default logging level is INFO
+# The root logger logs in console by default
+
+log4j.rootLogger=INFO,NodesOutput
+
+# avoid displaying additivity of the inherit loggers
+log4j.additivity.proactive.scheduler=false
+log4j.additivity.proactive.scheduler.dev=false
+log4j.additivity.proactive.scheduler.dev.admin=true
+
+# avoid displaying additivity of the inherit loggers
+log4j.additivity.proactive.resourceManager=false
+
+# CONSOLE uses PatternLayout
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=%m%n
+
+# File appender for verbose developer logging level (FILE3)
+log4j.appender.nodeDebug=org.apache.log4j.RollingFileAppender
+log4j.appender.nodeDebug.File=../../.logs/nodes.log
+log4j.appender.nodeDebug.MaxFileSize=10MB
+log4j.appender.nodeDebug.MaxBackupIndex=5
+log4j.appender.nodeDebug.layout=org.apache.log4j.PatternLayout
+log4j.appender.nodeDebug.layout.ConversionPattern=[%-1p %d{ISO8601}] [RM.%C{1}.%M] %m%n

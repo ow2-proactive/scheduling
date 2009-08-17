@@ -1,0 +1,74 @@
+# This file represents the log4j config file for the Resource Manager.
+
+log4j.rootLogger=DEBUG,RMDevFileAppender
+
+# avoid displaying additivity of the inherit loggers
+#log4j.additivity.proactive.scheduler=false
+#log4j.additivity.proactive.scheduler.dev=false
+#log4j.additivity.proactive.scheduler.dev.admin=true
+# define SCHEDULER loggers
+#log4j.logger.proactive.scheduler.dev=INFO,SchedulerDevFileAppender
+#log4j.logger.proactive.scheduler.dev.admin=INFO,SchedulerFileAppender
+#log4j.logger.proactive.scheduler.dev.admin.consol=INFO,CONSOLE
+#log4j.logger.proactive.scheduler.dev.core=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.core=DEBUG
+#log4j.logger.proactive.scheduler.dev.database=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.database=DEBUG
+#log4j.logger.proactive.scheduler.dev.util=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.util=DEBUG
+#log4j.logger.proactive.scheduler.dev.frontend=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.frontend=DEBUG
+#log4j.logger.proactive.scheduler.dev.connection=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.connection=DEBUG
+#log4j.logger.proactive.scheduler.dev.factory=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.factory=DEBUG
+#log4j.logger.proactive.scheduler.dev.RMproxy=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.RMproxy=DEBUG
+#log4j.logger.proactive.scheduler.dev.launcher=DEBUG
+#log4j.logger.proactive.scheduler.dev.script=DEBUG
+#log4j.logger.proactive.scheduler.dev.matlab=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.matlab=DEBUG
+#log4j.logger.proactive.scheduler.dev.scilab=DEBUG
+#log4j.logger.proactive.scheduler.dev.admin.scilab=DEBUG
+
+log4j.additivity.proactive=false
+log4j.logger.proactive=DEBUG,ProActiv
+
+# avoid displaying additivity of the inherit loggers
+log4j.additivity.proactive.resourceManager=false
+# define RESOURCE MANAGER loggers
+log4j.logger.proactive.resourceManager=DEBUG,RMDevFileAppender
+log4j.logger.proactive.resourceManager.core=DEBUG
+log4j.logger.proactive.resourceManager.user=DEBUG
+log4j.logger.proactive.resourceManager.monitoring=DEBUG
+log4j.logger.proactive.resourceManager.nodeSource=DEBUG
+log4j.logger.proactive.resourceManager.rmnode=DEBUG
+log4j.logger.proactive.resourceManager.rmfactory=DEBUG
+log4j.logger.proactive.resourceManager.rmlauncher=INFO,CONSOLE
+log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
+log4j.logger.proactive.resourceManager.policy=DEBUG
+
+log4j.appender.ProActiv=org.apache.log4j.RollingFileAppender
+log4j.appender.ProActiv.File=../../.logs/ProActive_RM.log
+log4j.appender.ProActiv.MaxFileSize=10MB
+log4j.appender.ProActiv.MaxBackupIndex=5
+log4j.appender.ProActiv.layout=org.apache.log4j.PatternLayout
+log4j.appender.ProActiv.layout.ConversionPattern=[%-1p %d{ISO8601}] [RM.%C{1}.%M] %m%n
+
+# File appender for verbose developer logging level (FILE3)
+log4j.appender.RMDevFileAppender=org.apache.log4j.RollingFileAppender
+log4j.appender.RMDevFileAppender.File=../../.logs/RM.log
+log4j.appender.RMDevFileAppender.MaxFileSize=10MB
+log4j.appender.RMDevFileAppender.MaxBackupIndex=5
+log4j.appender.RMDevFileAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.RMDevFileAppender.layout.ConversionPattern=[%-1p %d{ISO8601}] [RM.%C{1}.%M] %m%n
+
+# CONSOLE uses PatternLayout
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=%m%n
+
+# RM Appender configuration (CONSOLE)
+log4j.appender.resourceManagerAppender=org.apache.log4j.ConsoleAppender
+log4j.appender.resourceManagerAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.resourceManagerAppender.layout.ConversionPattern=[%-5p] [RESOURCE_MANAGER.%C{1}] %m%n

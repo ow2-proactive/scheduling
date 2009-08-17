@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMApplication xmlns="urn:gcm:application:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
+	
+	<environment>
+		<javaPropertyVariable name="proactive.home"/>
+		<!-- this variable will be replaced by a path of a GCMD to deploy, by RMAdmin -->
+		<javaPropertyVariable name="gcmd.file" /> 
+		<!-- deployee application specific info; how to do it otherwise?? -->
+		<descriptorDefaultVariable name="userHome" value="/home/cperUser"/>
+		<descriptorDefaultVariable name="scheduler.home" value="${userHome}/tools/Scheduler_CPER/"/>
+	</environment>
+	<application>
+		<proactive base="root" relpath="${proactive.home}">
+			<configuration>
+				<jvmarg value='-Dproactive.http.jetty.xml="${scheduler.home}/config/deployment/jetty.xml"'/>
+				<jvmarg value='-Djava.security.policy="${scheduler.home}/config/scheduler.java.policy"'/>
+				<applicationClasspath>
+					<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
+					<!-- Script engines must be explicitly in application classpath -->
+					<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
+					<!-- Needed explicitly by VFS (file transfer in pre/post script -->
+					<pathElement base="proactive" relpath="/dist/lib/commons-logging-1.0.4.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>
+					<!-- other apps can put here classes needed in task classpath: ProActive generated stubs, etc. -->
+					<pathElement relpath="${scheduler.home}/task_classpath/" base="root"/>
+				</applicationClasspath>
+				<securityPolicy base="proactive" relpath="config/scheduler.java.policy"/>
+				<log4jProperties base="proactive" relpath="config/log4j/defaultNode-log4j"/>
+			</configuration>
+			<virtualNode id="Workers">
+				<nodeProvider refid="workers" />
+			</virtualNode>
+		</proactive>
+	</application>
+
+	<resources>
+		<nodeProvider id="workers">
+			<file path="${gcmd.file}"/>
+		</nodeProvider>
+	</resources>
+</GCMApplication>

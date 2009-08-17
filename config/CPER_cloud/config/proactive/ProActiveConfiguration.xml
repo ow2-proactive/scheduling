@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveUserProperties>
+    <properties>
+		<prop key="proactive.communication.protocol" value="pamrssh"/>
+        <prop key="proactive.net.router.address" value="node0.cloud.sophia.inria.fr"/>
+        <prop key="proactive.net.router.port" value="8082"/>
+        <!-- no need to do ssh tunnelling inside the cloud -->
+        <prop key="proactive.net.router.tunneling.try_normal_first" value="true"/>
+        <!-- if you really want tunneling inside your cluster, set the above property to false, 
+			 uncomment the lines below and modify the ssh properties accordingly-->
+			<!--
+		<prop key="proactive.ssh.port" value="22"/>
+		<prop key="proactive.ssh.username" value="$username"/>
+		<prop key="proactive.ssh.key_directory" value="$ssh_keydir"/>
+		<prop key="proactive.tunneling.try_normal_first" value="false"/>
+			-->
+    </properties>
+</ProActiveUserProperties>
