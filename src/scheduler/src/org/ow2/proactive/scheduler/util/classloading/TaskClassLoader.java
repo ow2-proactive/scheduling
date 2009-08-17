@@ -38,7 +38,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Timer;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.ow2.proactive.scheduler.util.classloading.ComputeNodeClassLoader.CNEnumeration;
@@ -79,8 +78,6 @@ public class TaskClassLoader extends ClassLoader {
     // Can be null if no classpath has been set for the job
     final private TaskClassServer remoteServer;
 
-    final private Timer timer;
-
     /**
      * Create a new classloader.
      * @param parent the parent classloader.
@@ -94,8 +91,6 @@ public class TaskClassLoader extends ClassLoader {
         this.findClass = new ThreadLocal<HashSet<String>>();
         this.getResource = new ThreadLocal<HashSet<String>>();
         this.getResourceAsStream = new ThreadLocal<HashSet<String>>();
-
-        this.timer = new Timer("Timer for a Task class loader", true);
     }
 
     /* Overrides ClassLoader.loadClass to always delagate the call to findClass */
@@ -164,9 +159,9 @@ public class TaskClassLoader extends ClassLoader {
         InputStream is = this.getResourceAsStream(name);
         if (is != null) {
             Long id = counter.getAndIncrement();
+            Handler.cache.addResource(id.toString(), is);
             try {
-                Handler handler = new Handler(name, this.remoteServer, 10000, this.timer);
-                url = new URL(Handler.scheme, id.toString(), 0, name, handler);
+                url = new URL(Handler.scheme, "unused", id.toString());
             } catch (MalformedURLException e) {
                 // Miam miam miam, cannot happen
             }
