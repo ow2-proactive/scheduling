@@ -15,7 +15,7 @@
 		</script>
 	</pre>
 	<proActiveExecutable
-		class="org.ow2.proactive.scheduler.examples.ProActiveExample">
+		class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 		<parameters>
 			<parameter name="numberToFind" value="200"/>
 		</parameters>

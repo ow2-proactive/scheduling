@@ -10,10 +10,10 @@
 	<!-- description also test that description can contain more than 255 char -->
 	<description>functional tests : a native job that tests multiple hosts reservation</description>
 	<taskFlow>
-		<task name="task1">
+		<task name="task1" numberOfNodes="4">
 			<!-- Task human description -->
 			<description>Will display 10 dots every 1s</description>
-			<nativeExecutable nodesNumber="4">
+			<nativeExecutable>
 				<staticCommand 	value="${EXEC_PATH}">
 					<arguments>
 						<argument value="${BOOKED_HOSTS_NB}"/>

@@ -65,6 +65,7 @@ import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
+import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -175,8 +176,9 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
                         "org.ow2.proactive.scheduler.examples.WaitAndPrint");
-                Assert.assertEquals(((InternalJavaTask) it).isFork(), true);
-                Assert.assertNull(((InternalJavaTask) it).getForkEnvironment());
+                Assert.assertTrue(it.getExecutableContainer() instanceof ForkedJavaExecutableContainer);
+                Assert.assertNull(((ForkedJavaExecutableContainer) it.getExecutableContainer())
+                        .getForkEnvironment());
             } else if (it.getName().equals("task2")) {
                 //Check task 2 properties
                 Assert.assertEquals(it.getName(), "task2");
@@ -209,12 +211,12 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
                         "org.ow2.proactive.scheduler.examples.WaitAndPrint");
-                Assert.assertEquals(((InternalJavaTask) it).isFork(), true);
+                Assert.assertTrue(it.getExecutableContainer() instanceof ForkedJavaExecutableContainer);
                 Assert.assertEquals(((InternalJavaTask) it).isWallTime(), false);
-                Assert.assertEquals(((InternalJavaTask) it).getForkEnvironment().getJavaHome(),
-                        "/bin/java/jdk1.5");
-                Assert.assertEquals(((InternalJavaTask) it).getForkEnvironment().getJVMParameters(),
-                        "-dparam=12 -djhome=/bin/java/jdk1.5");
+                Assert.assertEquals(((ForkedJavaExecutableContainer) it.getExecutableContainer())
+                        .getForkEnvironment().getJavaHome(), "/bin/java/jdk1.5");
+                Assert.assertEquals(((ForkedJavaExecutableContainer) it.getExecutableContainer())
+                        .getForkEnvironment().getJVMParameters(), "-dparam=12 -djhome=/bin/java/jdk1.5");
             } else if (it.getName().equals("task3")) {
                 //Check task 3 properties
                 Assert.assertEquals(it.getName(), "task3");

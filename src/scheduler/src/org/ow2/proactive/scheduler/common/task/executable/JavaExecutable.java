@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -50,22 +52,39 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public abstract class JavaExecutable extends Executable {
 
+    private JavaExecutableInitializer execInitializer;
+
+    /**
+     * Initialize the executable using the given executable Initializer.
+     *
+     * @param execContainer the executable Initializer used to init the executable itself
+     *
+     * @throws Exception an exception if something goes wrong during executable initialization.
+     */
+    // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
+    private void internalInit(JavaExecutableInitializer execInitializer) throws Exception {
+        this.execInitializer = execInitializer;
+        init(execInitializer.getArguments());
+    }
+
     /**
      * Initialization default method for a java task.<br>
      * <p>
-     * By default, this method try so do some king of automatic assignment between the value given
+     * By default, this method try so do some kind of automatic assignment between the value given
      * in the args map and the field contains in your executable.<br>
      * Manage types are String, byte, short, int, long, boolean and the corresponding classes.<br><br>
      * For example, (when making your task) if you set as arguments the key="var", value="12"<br>
-     * just add an int (or Integer) field named "var" in your executable. The default {@link #init(Map)} method will
-     * store your arguments into the integer class field.  
+     * just add an int (or Integer, long, Long) field named "var" in your executable.
+     * The default {@link #init(Map)} method will store your arguments into the integer class field.
      * </p>
      * To avoid this default behavior, just override this method to make your own initialization.
      *
      * @param args a map containing the different parameter names and values given by the user task.
      */
-    @Override
     public void init(Map<String, String> args) throws Exception {
+        if (args == null) {
+            return;
+        }
         for (Entry<String, String> e : args.entrySet()) {
             try {
                 Field f = this.getClass().getDeclaredField(e.getKey());
@@ -88,6 +107,19 @@ public abstract class JavaExecutable extends Executable {
                 //field not set
             }
         }
+    }
+
+    /**
+     * Use this method for a multi-node task. It returns the list of nodes demanded by the user
+     * while describing the task.<br>
+     * In a task, one node is used to start the task itself, the other are returned by this method.<br>
+     * If user describe the task using the "numberOfNodes" property set to 5, then this method
+     * returns a list containing 4 nodes. The first one being used by the task itself.
+     *
+     * @return the list of nodes demanded by the user.
+     */
+    public NodeSet getNodes() {
+        return execInitializer.getNodes();
     }
 
 }

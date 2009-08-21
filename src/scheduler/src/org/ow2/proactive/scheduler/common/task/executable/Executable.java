@@ -32,7 +32,6 @@
 package org.ow2.proactive.scheduler.common.task.executable;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -57,9 +56,6 @@ public abstract class Executable {
     /** Executable state. True if the executable has been killed */
     private boolean killed = false;
 
-    /** Arguments of the task as a map */
-    private Map<String, String> args = null;
-
     /**
      * The content of this method will be executed once after being scheduled.<br>
      * This may generate a result as an {@link Object}. It can be whatever you want.<br>
@@ -70,30 +66,6 @@ public abstract class Executable {
      * @return any serializable object from the user.
      */
     public abstract Serializable execute(TaskResult... results) throws Throwable;
-
-    /**
-     * Initialize the task with the arguments given in the constructor.<br>
-     * If args is not empty, then the {@link #init(Map)} method is called.
-     * If args is empty, the {@link #init(Map)} method is not called.<br>
-     * It allows you to override the {@link #init(Map)} method in order to do your own initialization process with the arguments hashMap.
-     *
-     * @throws Exception an exception that the user can throw if something goes wrong.
-     */
-    public final void init() throws Exception {
-        if (args != null) {
-            init(args);
-        }
-    }
-
-    /**
-     * Initialize the task with the given arguments.<br>
-     * By default this method do nothing.
-     * You can override this method to make your own initialization.
-     *
-     * @param args the arguments as a map.
-     * @throws Exception an exception that the user can throw if something goes wrong.
-     */
-    public abstract void init(Map<String, String> args) throws Exception;
 
     /**
      * Kill executable, terminate preemptively its execution.
@@ -112,23 +84,4 @@ public abstract class Executable {
         return this.killed;
     }
 
-    /**
-     * Set the arguments map to this Executable task.
-     *
-     * @param args the arguments to set.
-     */
-    public final void setArgs(Map<String, String> args) {
-        if ((args != null) && (args.size() > 0)) {
-            this.args = args;
-        }
-    }
-
-    /**
-     * Get the arguments map of this Executable task.
-     *
-     * @return the arguments map of this Executable task.
-     */
-    public final Map<String, String> getArgs() {
-        return args;
-    }
 }

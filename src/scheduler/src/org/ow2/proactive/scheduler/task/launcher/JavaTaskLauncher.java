@@ -34,21 +34,21 @@ package org.ow2.proactive.scheduler.task.launcher;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
-import org.ow2.proactive.utils.NodeSet;
 
 
 /**
  * JavaTaskLauncher is the class that will start a Java Process.
  *
  * @author The ProActive Team
- *
- * $Id$
  */
 public class JavaTaskLauncher extends TaskLauncher {
 
@@ -79,27 +79,31 @@ public class JavaTaskLauncher extends TaskLauncher {
      * @return a task result representing the result of this task execution.
      */
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
-            NodeSet nodes, TaskResult... results) {
+            TaskResult... results) {
         try {
+
             //launch pre script
             if (pre != null) {
-                this.executePreScript(getNodes().get(0));
+                this.executePreScript(PAActiveObject.getNode());
             }
 
             // create the executable (will set the context class loader to the taskclassserver)
             currentExecutable = executableContainer.getExecutable();
-            //init task
-            currentExecutable.init();
 
-            if (isWallTime())
+            //init task
+            callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, executableContainer
+                    .createExecutableInitializer());
+
+            if (isWallTime()) {
                 scheduleTimer();
+            }
 
             //launch task            
             Serializable userResult = currentExecutable.execute(results);
 
             //launch post script
             if (post != null) {
-                this.executePostScript(getNodes().get(0));
+                this.executePostScript(PAActiveObject.getNode());
             }
 
             //return result

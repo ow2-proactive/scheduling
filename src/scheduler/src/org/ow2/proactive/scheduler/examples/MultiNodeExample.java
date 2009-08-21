@@ -33,7 +33,6 @@ package org.ow2.proactive.scheduler.examples;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -42,36 +41,28 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
 /**
- * ProActiveExample.
+ * Multi-nodes Example.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.1
  *
  */
-public class ProActiveExample extends ProActiveExecutable {
+public class MultiNodeExample extends JavaExecutable {
+    //default value : 5003
+    //if argument is set in descriptor, automatic assignment will be perform
+    //as it is a primitive type and the name of the field is the same as the argument
     private int numberToFind = 5003;
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.JavaExecutable#init(java.util.Map)
-     */
     @Override
-    public void init(Map<String, String> args) {
-        try {
-            numberToFind = Integer.parseInt(args.get("numberToFind").toString());
-        } catch (NumberFormatException e) { /* will stay to 5003 */
-        }
-    }
+    public Serializable execute(TaskResult... results) {
+        System.out.println("Multi-task started !!");
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable#execute(java.util.ArrayList)
-     */
-    @Override
-    public Serializable execute(ArrayList<Node> nodes) {
-        System.out.println("ProActive job started !!");
+        ArrayList<Node> nodes = getNodes();
 
         // create workers (on local node)
         Vector<Worker> workers = new Vector<Worker>();
@@ -97,7 +88,7 @@ public class ProActiveExample extends ProActiveExecutable {
     }
 
     private class Controller {
-        // Managed workers 
+        // Managed workers
         private Vector<Worker> workers;
 
         /**

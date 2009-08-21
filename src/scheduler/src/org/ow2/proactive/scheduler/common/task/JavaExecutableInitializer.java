@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -27,55 +27,63 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $PROACTIVE_INITIAL_DEV$
  */
-package org.ow2.proactive.scheduler.common.job;
+package org.ow2.proactive.scheduler.common.task;
 
-import org.objectweb.proactive.annotation.PublicAPI;
+import java.util.Map;
+
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
- * Class representing the type of the job.
- * Type are best describe below.
+ * JavaExecutableInitializer is the class used to store context of java executable initialization
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.0
  */
-@PublicAPI
-public enum JobType implements java.io.Serializable {
+public class JavaExecutableInitializer implements ExecutableInitializer {
+
+    /** Demanded nodes */
+    protected NodeSet nodes;
+
+    /** Arguments of the java task */
+    protected Map<String, String> arguments;
 
     /**
-     * Tasks can be executed one by one or all in same time but
-     * every task represents the same native or java task.
-     * Only the parameters given to the task will change.
+     * Get the nodes list
+     *
+     * @return the nodes list
      */
-    PARAMETER_SWEEPING("Parameter Sweeping"),
-    /**
-     * Tasks flow with dependences.
-     * Only the task that have their dependences finished
-     * can be executed.
-     */
-    TASKSFLOW("Tasks Flow");
-
-    private String name;
-
-    JobType(String name) {
-        this.name = name;
+    public NodeSet getNodes() {
+        return nodes;
     }
 
     /**
-     * @see java.lang.Enum#toString()
+     * Set the nodes list value to the given nodes value
+     *
+     * @param nodes the nodes to set
      */
-    @Override
-    public String toString() {
-        return name;
+    public void setNodes(NodeSet nodes) {
+        this.nodes = nodes;
     }
 
-    static JobType getJobType(String typeName) {
-        if (typeName.equalsIgnoreCase("taskFlow")) {
-            return TASKSFLOW;
-        } else {
-            return PARAMETER_SWEEPING;
-        }
+    /**
+     * Get the arguments of the executable
+     *
+     * @return the arguments of the executable
+     */
+    public Map<String, String> getArguments() {
+        return arguments;
     }
+
+    /**
+     * Set the arguments value to the given arguments value
+     *
+     * @param arguments the arguments to set
+     */
+    public void setArguments(Map<String, String> arguments) {
+        this.arguments = arguments;
+    }
+
 }

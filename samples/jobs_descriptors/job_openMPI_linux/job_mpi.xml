@@ -9,10 +9,10 @@
 	</variables>
 	<description>An mpi job that needs 10 cores</description>
 	<taskFlow>
-		<task name="task1">
+		<task name="task1" numberOfNodes="10">
 			<!-- Task human description -->
 			<description>Will display 10 dots every 2s</description>
-			<nativeExecutable nodesNumber="10">
+			<nativeExecutable>
 				<staticCommand value="${WORK_DIR}/mpi_launcher.sh" workingDir="${WORK_DIR}">
 					<arguments>
 						<argument value="2"/>

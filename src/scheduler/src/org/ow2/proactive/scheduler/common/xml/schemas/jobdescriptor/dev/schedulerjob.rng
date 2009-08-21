@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar ns="urn:proactive:jobdescriptor:dev" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:dev" ns="urn:proactive:jobdescriptor:dev" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <ref name="job"/>
   </start>
@@ -42,10 +42,7 @@
           <data type="anyURI"/>
         </attribute>
       </optional>
-      <choice>
-        <ref name="taskFlow"/>
-        <ref name="proActive"/>
-      </choice>
+      <ref name="taskFlow"/>
     </element>
   </define>
   <define name="jobName">
@@ -72,7 +69,7 @@
   <define name="variableName">
     <attribute name="name">
       <doc:documentation>Name of a variable</doc:documentation>
-      <data type="NCName"/>
+      <data type="string"/>
     </attribute>
   </define>
   <define name="variableValue">
@@ -84,31 +81,46 @@
   <define name="priority">
     <attribute name="priority">
       <doc:documentation>Priority of the job</doc:documentation>
-      <ref name="jobPriority"/>
+      <choice>
+        <ref name="jobPriority"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="cancelJobOnError_j">
     <attribute name="cancelJobOnError">
       <doc:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</doc:documentation>
-      <data type="boolean"/>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="restartTaskOnError_j">
     <attribute name="restartTaskOnError">
       <doc:documentation>For each task, where does the task restart if an error occurred ? (default=anywhere)</doc:documentation>
-      <ref name="restartTaskType"/>
+      <choice>
+        <ref name="restartTaskType"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="numberOfExecution_j">
     <attribute name="maxNumberOfExecution">
       <doc:documentation>Maximum number of execution for each task (default=1)</doc:documentation>
-      <data type="nonNegativeInteger"/>
+      <choice>
+        <data type="nonNegativeInteger"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="logFile">
     <attribute name="logFile">
       <doc:documentation>The path to a file where the logs of this job will be written </doc:documentation>
-      <data type="anyURI"/>
+      <choice>
+        <data type="anyURI"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="jobClasspath">
@@ -149,7 +161,7 @@
   <define name="infoName">
     <attribute name="name">
       <doc:documentation>Name of the information variable</doc:documentation>
-      <data type="NCName"/>
+      <data type="string"/>
     </attribute>
   </define>
   <define name="infoValue">
@@ -178,39 +190,14 @@
       </oneOrMore>
     </element>
   </define>
-  <define name="proActive">
-    <element name="proActive">
-      <doc:documentation>A job that will launch a proActive application </doc:documentation>
-      <ref name="neededNodes"/>
-      <ref name="taskProActive"/>
-    </element>
-  </define>
-  <define name="neededNodes">
-    <attribute name="neededNodes">
-      <doc:documentation>How many resources (ProActive nodes) does this job need ? </doc:documentation>
-      <data type="positiveInteger"/>
-    </attribute>
-  </define>
-  <define name="jobPriority">
-    <choice>
-      <value>highest</value>
-      <value>high</value>
-      <value>normal</value>
-      <value>low</value>
-      <value>lowest</value>
-    </choice>
-  </define>
-  <define name="restartTaskType">
-    <choice>
-      <value>anywhere</value>
-      <value>elsewhere</value>
-    </choice>
-  </define>
   <!-- +++++++++++++ task -->
   <define name="task">
     <element name="task">
       <doc:documentation>A task is the smallest computation unit for the scheduler </doc:documentation>
       <ref name="taskName"/>
+      <optional>
+        <ref name="nodesNumber_t"/>
+      </optional>
       <optional>
         <ref name="cancelJobOnError_t"/>
       </optional>
@@ -253,44 +240,19 @@
       </optional>
     </element>
   </define>
-  <define name="taskProActive">
-    <element name="task">
-      <doc:documentation>The task ProActive is a special task that can use more than one node for execution.</doc:documentation>
-      <ref name="taskName"/>
-      <optional>
-        <ref name="cancelJobOnError_t"/>
-      </optional>
-      <optional>
-        <ref name="restartTaskOnError_t"/>
-      </optional>
-      <optional>
-        <ref name="numberOfExecution_t"/>
-      </optional>
-      <optional>
-        <ref name="resultPreviewClass"/>
-      </optional>
-      <optional>
-        <ref name="taskDescription"/>
-      </optional>
-      <optional>
-        <ref name="genericInformation"/>
-      </optional>
-      <optional>
-        <ref name="selection"/>
-      </optional>
-      <optional>
-        <ref name="pre"/>
-      </optional>
-      <ref name="proActiveExecutable"/>
-      <optional>
-        <ref name="post"/>
-      </optional>
-    </element>
-  </define>
   <define name="taskName">
     <attribute name="name">
       <doc:documentation>Identification of this task (identifier) </doc:documentation>
       <data type="ID"/>
+    </attribute>
+  </define>
+  <define name="nodesNumber_t">
+    <attribute name="numberOfNodes">
+      <doc:documentation>number of cores needed for the task (identifier)</doc:documentation>
+      <choice>
+        <data type="positiveInteger"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="taskDescription">
@@ -302,13 +264,19 @@
   <define name="walltime">
     <attribute name="walltime">
       <doc:documentation>Defines walltime - maximum execution time of the task in second</doc:documentation>
-      <ref name="walltimePattern"/>
+      <choice>
+        <ref name="walltimePattern"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="cancelJobOnError_t">
     <attribute name="cancelJobOnError">
       <doc:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</doc:documentation>
-      <data type="boolean"/>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="restartTaskOnError_t">
@@ -320,19 +288,28 @@
   <define name="numberOfExecution_t">
     <attribute name="maxNumberOfExecution">
       <doc:documentation>Maximum number of execution for this task</doc:documentation>
-      <data type="nonNegativeInteger"/>
+      <choice>
+        <data type="nonNegativeInteger"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="preciousResult">
     <attribute name="preciousResult">
       <doc:documentation>Do we keep the result among the job results  </doc:documentation>
-      <data type="boolean"/>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="resultPreviewClass">
     <attribute name="resultPreviewClass">
       <doc:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</doc:documentation>
-      <ref name="classPattern"/>
+      <choice>
+        <ref name="classPattern"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="depends">
@@ -412,7 +389,7 @@
     <element name="code">
       <doc:documentation>Definition of a script by writing directly the code inside the descriptor </doc:documentation>
       <attribute name="language">
-        <data type="NCName"/>
+        <data type="string"/>
       </attribute>
       <text/>
     </element>
@@ -432,13 +409,19 @@
   <define name="path">
     <attribute name="path">
       <doc:documentation>File path to script definition  </doc:documentation>
-      <data type="anyURI"/>
+      <choice>
+        <data type="anyURI"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="url">
     <attribute name="url">
       <doc:documentation>Remote script definition, reachable at the given url </doc:documentation>
-      <data type="anyURI"/>
+      <choice>
+        <data type="anyURI"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="fileScriptArguments">
@@ -468,20 +451,11 @@
   <define name="nativeExecutable">
     <element name="nativeExecutable">
       <doc:documentation>A native command call, it can be statically described or generated by a script </doc:documentation>
-      <optional>
-        <ref name="nodesNumber_t"/>
-      </optional>
       <choice>
         <ref name="staticCommand"/>
         <ref name="dynamicCommand"/>
       </choice>
     </element>
-  </define>
-  <define name="nodesNumber_t">
-    <attribute name="nodesNumber">
-      <doc:documentation>number of cores needed for the task (identifier)</doc:documentation>
-      <data type="positiveInteger"/>
-    </attribute>
   </define>
   <define name="staticCommand">
     <element name="staticCommand">
@@ -551,13 +525,19 @@
   <define name="class">
     <attribute name="class">
       <doc:documentation>The fully qualified class name </doc:documentation>
-      <ref name="classPattern"/>
+      <choice>
+        <ref name="classPattern"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="fork">
     <attribute name="fork">
       <doc:documentation>Do we have to fork this task or not</doc:documentation>
-      <data type="boolean"/>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="forkEnvironment">
@@ -572,7 +552,10 @@
   <define name="javaHome">
     <attribute name="javaHome">
       <doc:documentation>Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</doc:documentation>
-      <data type="anyURI"/>
+      <choice>
+        <data type="anyURI"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="jvmParameters">
@@ -580,15 +563,6 @@
       <doc:documentation>Options passed to Java (not an application) (example: memory settings or properties) </doc:documentation>
       <data type="string"/>
     </attribute>
-  </define>
-  <define name="proActiveExecutable">
-    <element name="proActiveExecutable">
-      <doc:documentation>A ProActive application (java class) </doc:documentation>
-      <ref name="class"/>
-      <optional>
-        <ref name="javaParameters"/>
-      </optional>
-    </element>
   </define>
   <define name="javaParameters">
     <element name="parameters">
@@ -602,12 +576,30 @@
     <element name="parameter">
       <doc:documentation>A parameter in the form of key/value pair </doc:documentation>
       <attribute name="name">
-        <data type="NCName"/>
+        <data type="string"/>
       </attribute>
       <attribute name="value">
         <data type="string"/>
       </attribute>
     </element>
+  </define>
+  <!-- +++++++++++++ User define types -->
+  <define name="jobPriority">
+    <choice>
+      <value>highest</value>
+      <value>high</value>
+      <value>normal</value>
+      <value>low</value>
+      <value>lowest</value>
+      <ref name="variableRefType"/>
+    </choice>
+  </define>
+  <define name="restartTaskType">
+    <choice>
+      <value>anywhere</value>
+      <value>elsewhere</value>
+      <ref name="variableRefType"/>
+    </choice>
   </define>
   <define name="classPattern">
     <data type="string">
@@ -617,6 +609,11 @@
   <define name="walltimePattern">
     <data type="string">
       <param name="pattern">[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}</param>
+    </data>
+  </define>
+  <define name="variableRefType">
+    <data type="string">
+      <param name="pattern">$\{[A-Za-z0-9._]+\}</param>
     </data>
   </define>
 </grammar>

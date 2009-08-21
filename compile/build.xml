@@ -245,6 +245,8 @@
 		<element name="additionalClasspath" optional="yes" />
 		<sequential>
 
+			<delete dir="${base.dir}/SCHEDULER_DB" />
+			<delete dir="${junit.dir}" />
 			<mkdir dir="${junit.dir}" />
 			<junit printsummary="yes" forkmode="perTest" showoutput="${junit.showoutput}">
 				<jvmarg value="-Dproactive.home=${base.dir}" />
@@ -504,8 +506,11 @@
 				<include name="org/ow2/proactive/scheduler/task/ExecutableContainerInitializer.java" />
 				<include name="org/ow2/proactive/scheduler/task/JavaExecutableContainer.java" />
 				<include name="org/ow2/proactive/scheduler/task/ForkedJavaExecutable.java" />
+				<include name="org/ow2/proactive/scheduler/task/ForkedJavaExecutableContainer.java" />
+				<include name="org/ow2/proactive/scheduler/task/ForkedJavaExecutableInitializer.java" />
 				<include name="org/ow2/proactive/scheduler/task/KillTask.java" />
 				<include name="org/ow2/proactive/scheduler/task/NativeExecutableContainer.java" />
+				<include name="org/ow2/proactive/scheduler/task/NativeExecutableInitializer.java" />
 				<include name="org/ow2/proactive/scheduler/core/properties/PASchedulerProperties.java" />
 				<include name="org/ow2/proactive/scheduler/util/SchedulerDevLoggers.java" />
 				<include name="org/ow2/proactive/scheduler/util/process/EnvVars.java" />
@@ -529,7 +534,6 @@
 				<include name="org/ow2/proactive/scheduler/util/classloading/TaskClassLoader.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/JobPriority.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/TaskFlowJob.java" />
-				<include name="org/ow2/proactive/scheduler/common/job/ProActiveJob.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/JobResult.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/JobEnvironment.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/JobType.java" />
@@ -549,6 +553,8 @@
 				<include name="org/ow2/proactive/scheduler/common/task/RestartMode.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskDescriptor.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/JavaTask.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/ExecutableInitializer.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/JavaExecutableInitializer.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/ForkEnvironment.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskLogs.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/NativeTask.java" />
@@ -567,7 +573,6 @@
 				<include name="org/ow2/proactive/scheduler/common/task/SimpleTaskLogs.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskResult.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/executable/Executable.java" />
-				<include name="org/ow2/proactive/scheduler/common/task/executable/ProActiveExecutable.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/executable/JavaExecutable.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/CommonAttribute.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskStatus.java" />
@@ -583,7 +588,7 @@
 				<include name="org/ow2/proactive/scheduler/examples/JoinPreview.java" />
 				<include name="org/ow2/proactive/scheduler/examples/KillJob.java" />
 				<include name="org/ow2/proactive/scheduler/examples/MonteCarloAverage.java" />
-				<include name="org/ow2/proactive/scheduler/examples/ProActiveExample.java" />
+				<include name="org/ow2/proactive/scheduler/examples/MultiNodeExample.java" />
 				<include name="org/ow2/proactive/scheduler/examples/WaitAndPrint.java" />
 				<include name="org/ow2/proactive/scheduler/examples/DenoisePreview.java" />
 				<include name="org/ow2/proactive/scheduler/examples/AbortJob.java" />

@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.task.internal;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
@@ -61,6 +62,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 @Entity
 @Table(name = "INTERNAL_NTV_TASK")
+@MappedSuperclass
 @AccessType("field")
 @Proxy(lazy = false)
 public class InternalNativeTask extends InternalTask {
@@ -68,8 +70,7 @@ public class InternalNativeTask extends InternalTask {
 
     @Id
     @GeneratedValue
-    @SuppressWarnings("unused")
-    private long hId;
+    protected long hId;
 
     /**
      * ProActive empty constructor.

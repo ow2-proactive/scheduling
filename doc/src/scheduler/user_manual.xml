@@ -663,7 +663,7 @@ public void init(Map&lt;String, Object&gt; args) {
 					The <code>execute(nodes)</code> method shows what can be done
 					inside this kind of task. For more details about how to use the ProActive API,
 					see the appropriate documentation.
-					The complete example file can be found under 'samples/jobs_descriptors/Job_ProActive.xml'.
+					The complete example file can be found under 'samples/jobs_descriptors/Job_MultiNodes.xml'.
 				</para>
 				</section>
 			</section>
@@ -708,7 +708,7 @@ public void init(Map&lt;String, Object&gt; args) {
 //create a ProActive Task using the default constructor that we'll call 'aTask'
 ProActiveTask aTask = new ProActiveTask();
 //add executable class or instance
-pat.setExecutableClassName("org.ow2.proactive.scheduler.examples.ProActiveExample");
+pat.setExecutableClassName("org.ow2.proactive.scheduler.examples.MultiNodeExample");
 //then, set the desired options : (for example)
 aTask.setName("task 1");
 aTask.setDescription("This task will do

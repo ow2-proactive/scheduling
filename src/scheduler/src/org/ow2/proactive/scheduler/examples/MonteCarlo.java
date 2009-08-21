@@ -132,7 +132,6 @@ public class MonteCarlo extends JavaExecutable {
                 }
             }
         }
-
         return result;
     }
 }

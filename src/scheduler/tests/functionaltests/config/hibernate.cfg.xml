@@ -67,17 +67,17 @@
         <!-- INTERNAL TASK -->
         <mapping class="org.ow2.proactive.scheduler.task.internal.InternalTask"/>
         <mapping class="org.ow2.proactive.scheduler.task.internal.InternalJavaTask"/>
+        <mapping class="org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask"/>
         <mapping class="org.ow2.proactive.scheduler.task.internal.InternalNativeTask"/>
-        <mapping class="org.ow2.proactive.scheduler.task.internal.InternalProActiveTask"/>
         <!-- INTERNAL JOB -->
         <mapping class="org.ow2.proactive.scheduler.job.InternalJob"/>
 		<mapping class="org.ow2.proactive.scheduler.job.InternalTaskFlowJob"/>
-		<mapping class="org.ow2.proactive.scheduler.job.InternalProActiveJob"/>
 		<mapping class="org.ow2.proactive.scheduler.job.InternalParameterSweepingJob"/>
 		<!-- CONTAINER -->
-		<mapping class="org.ow2.proactive.scheduler.task.JavaExecutableContainer"/>
+		<mapping class="org.ow2.proactive.scheduler.task.ExecutableContainer"/>
 		<mapping class="org.ow2.proactive.scheduler.task.NativeExecutableContainer"/>
-		<mapping class="org.ow2.proactive.scheduler.task.ForkedJavaExecutable"/>
+		<mapping class="org.ow2.proactive.scheduler.task.JavaExecutableContainer"/>
+		<mapping class="org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer"/>
 		<!-- RESULTS -->
 		<mapping class="org.ow2.proactive.scheduler.job.JobResultImpl"/>
 		<mapping class="org.ow2.proactive.scheduler.task.TaskResultImpl"/>

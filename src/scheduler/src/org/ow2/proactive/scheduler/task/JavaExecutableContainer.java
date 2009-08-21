@@ -36,9 +36,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -51,6 +57,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
+import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
@@ -59,39 +66,42 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 
 
 /**
- * This class is a container for Java executable. The actual executable is instanciated on the worker node
+ * This class is a container for Java executable. The actual executable is instantiated on the worker node
  * in a dedicated classloader, which can download classes from the associated classServer.
+ *
  * @see TaskClassServer
  * @author The ProActive Team
  */
 @Entity
 @Table(name = "JAVA_EXEC_CONTAINER")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "EXEC_CONTAINER_TYPE", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("JEC")
 @AccessType("field")
 @Proxy(lazy = true)
-public class JavaExecutableContainer implements ExecutableContainer {
+public class JavaExecutableContainer extends ExecutableContainer {
 
     @Id
     @GeneratedValue
-    @SuppressWarnings("unused")
-    private long hId;
+    protected long hId;
 
     @Column(name = "EXECUTABLE_CLASS")
-    private String userExecutableClassName;
+    protected String userExecutableClassName;
 
     /** Arguments of the task as a map */
     @OneToMany(cascade = javax.persistence.CascadeType.ALL)
     @Cascade(CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
-    @JoinTable(name = "JAVA_EXECCONTAINER_ARGUMENTS")
-    private Map<String, BigString> args = new HashMap<String, BigString>();
+    @JoinTable(name = "JAVA_EXECCONTAINER_ARGUMENTS", joinColumns = @JoinColumn(name = "J_EXEC_CONTAINER_ID"))
+    protected Map<String, BigString> args = new HashMap<String, BigString>();
 
     // instanciated on demand : not DB managed
     @Transient
-    private JavaExecutable userExecutable;
+    protected JavaExecutable userExecutable;
 
     // can be null : not DB managed
     @Transient
-    private TaskClassServer classServer;
+    protected TaskClassServer classServer;
 
     /** Hibernate default constructor */
     public JavaExecutableContainer() {
@@ -119,11 +129,6 @@ public class JavaExecutableContainer implements ExecutableContainer {
                 Thread.currentThread().setContextClassLoader(tcl);
                 Class<?> userExecutableClass = tcl.loadClass(this.userExecutableClassName);
                 userExecutable = (JavaExecutable) userExecutableClass.newInstance();
-                Map<String, String> tmp = new HashMap<String, String>();
-                for (Entry<String, BigString> e : this.args.entrySet()) {
-                    tmp.put(e.getKey(), e.getValue().getValue());
-                }
-                userExecutable.setArgs(tmp);
             } catch (Throwable e) {
                 throw new ExecutableCreationException("Unable to instanciate JavaExecutable : " + e);
             }
@@ -137,6 +142,20 @@ public class JavaExecutableContainer implements ExecutableContainer {
     public void init(ExecutableContainerInitializer initializer) {
         // get the classserver if any (can be null)
         this.classServer = initializer.getClassServer();
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#createExecutableInitializer()
+     */
+    public JavaExecutableInitializer createExecutableInitializer() {
+        JavaExecutableInitializer jei = new JavaExecutableInitializer();
+        Map<String, String> tmp = new HashMap<String, String>();
+        for (Entry<String, BigString> e : this.args.entrySet()) {
+            tmp.put(e.getKey(), e.getValue().getValue());
+        }
+        jei.setArguments(tmp);
+        jei.setNodes(nodes);
+        return jei;
     }
 
 }

@@ -78,13 +78,13 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="task3" walltime="10:53">
+		<task name="task3" walltime="10:53" numberOfNodes="3">
 			<description>Dependent Tasks - Task 3</description>
 			<depends>
 				<task ref="task1"/>
 				<task ref="task2"/>
 			</depends>
-			<nativeExecutable nodesNumber="3">
+			<nativeExecutable>
 				<staticCommand value="${WORK_DIR2}/nativTask 1 2% 2" workingDir="task3workingDir">
 					<arguments>
 						<argument value="3"/>
@@ -98,7 +98,7 @@
 				</script>
 			</post>
 		</task>
-		<task name="task4" preciousResult="true" maxNumberOfExecution="3" restartTaskOnError="anywhere" cancelJobOnError="true" resultPreviewClass="tadzaam">
+		<task name="task4" numberOfNodes="10" preciousResult="true" maxNumberOfExecution="3" restartTaskOnError="anywhere" cancelJobOnError="true" resultPreviewClass="tadzaam">
 			<genericInformation>
 				<info name="n11" value="v11"/>
 				<info name="n22" value="v22"/>
@@ -106,7 +106,7 @@
 			<depends>
 				<task ref="task3"/>
 			</depends>
-			<nativeExecutable nodesNumber="10">
+			<nativeExecutable>
 				<dynamicCommand workingDir="task4workingDir">
 					<generation>
 						<script>

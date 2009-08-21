@@ -42,19 +42,18 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.ProActiveJob;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
+import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
-import org.ow2.proactive.scheduler.task.internal.InternalProActiveTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
@@ -87,9 +86,6 @@ public class InternalJobFactory implements Serializable {
             case PARAMETER_SWEEPING:
                 logger_dev.error("The type of the given job is not yet implemented !");
                 throw new SchedulerException("The type of the given job is not yet implemented !");
-            case PROACTIVE:
-                iJob = createJob((ProActiveJob) job);
-                break;
             case TASKSFLOW:
                 iJob = createJob((TaskFlowJob) job);
                 break;
@@ -106,39 +102,6 @@ public class InternalJobFactory implements Serializable {
             logger_dev.error("", e);
             throw new SchedulerException("Error while creating the internalJob !", e);
         }
-    }
-
-    /**
-     * Create an internal ProActive job with the given ProActive job (user)
-     *
-     * @param job
-     *            the user job that will be used to create the internal job.
-     * @return the created internal job.
-     * @throws SchedulerException
-     *             an exception if the factory cannot create the given job.
-     */
-    private static InternalJob createJob(ProActiveJob userJob) throws SchedulerException {
-        InternalProActiveJob job;
-        ProActiveTask userTask = userJob.getTask();
-
-        if (userTask == null) {
-            throw new SchedulerException("You must specify a ProActive task !");
-        }
-
-        if (userTask.getExecutableClassName() != null) {
-            job = new InternalProActiveJob(userTask.getExecutableClassName(), toBigStringMap(userTask
-                    .getArguments()));
-        } else {
-            throw new SchedulerException(
-                "You must specify your own executable ProActive task to be launched (in the application task) !");
-        }
-
-        InternalProActiveTask iajt = job.getTask();
-        userTask.setPreciousResult(true);
-        //set task common properties
-        setTaskCommonProperties(userJob, userTask, iajt);
-
-        return job;
     }
 
     /**
@@ -245,16 +208,21 @@ public class InternalJobFactory implements Serializable {
         InternalJavaTask javaTask;
 
         if (task.getExecutableClassName() != null) {
-            javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
-                toBigStringMap(task.getArguments())));
+            if (task.isWallTime() || task.isFork()) {
+                ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
+                        .getExecutableClassName(), toBigStringMap(task.getArguments()));
+                fjec.setForkEnvironment(task.getForkEnvironment());
+                javaTask = new InternalForkedJavaTask(fjec);
+            } else {
+                javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
+                    toBigStringMap(task.getArguments())));
+            }
         } else {
             String msg = "You must specify your own executable task class to be launched (in every task) !";
             logger_dev.info(msg);
             throw new SchedulerException(msg);
         }
 
-        javaTask.setFork(task.isFork());
-        javaTask.setForkEnvironment(task.getForkEnvironment());
         //set task common properties
         setTaskCommonProperties(userJob, task, javaTask);
         return javaTask;

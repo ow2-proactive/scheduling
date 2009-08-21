@@ -6,7 +6,7 @@ start = job
 
 
 job = ## Definition of a job for the scheduler 
-    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow | proActive ) }
+    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow ) }
 
 jobName = ## Identification of this job
     attribute name { xsd:string }
@@ -15,19 +15,19 @@ variables = ## Definition of variables which can be reused throughout this descr
 variable = ## Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}
     element variable { variableName, variableValue}
 variableName = ## Name of a variable
-    attribute name  { xsd:NCName }
+    attribute name  { xsd:string }
 variableValue = ## The patterns ${name_of_variable} will be replaced by this value
-    attribute value {xsd:string}
+    attribute value { xsd:string }
 priority = ## Priority of the job
-    attribute priority { jobPriority }
+    attribute priority { jobPriority | variableRefType}
 cancelJobOnError_j = ## For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)
-    attribute cancelJobOnError {xsd:boolean}
+    attribute cancelJobOnError {xsd:boolean | variableRefType}
 restartTaskOnError_j = ## For each task, where does the task restart if an error occurred ? (default=anywhere)
-    attribute restartTaskOnError {restartTaskType}
+    attribute restartTaskOnError {restartTaskType | variableRefType}
 numberOfExecution_j = ## Maximum number of execution for each task (default=1)
-    attribute maxNumberOfExecution {xsd:nonNegativeInteger}
+    attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}
 logFile = ## The path to a file where the logs of this job will be written 
-    attribute logFile {xsd:anyURI}
+    attribute logFile {xsd:anyURI | variableRefType}
 jobClasspath = ## The classPath where to find the dependences of your job. It must contain path element
 	element jobClasspath {pathElement+}
 pathElement = ## Path element (one pathElement for each classpath entry)
@@ -39,7 +39,7 @@ genericInformation = ## Definition of any information you would like to get in t
 info = ## Information that you can get in the policy through the job content
 	element info {infoName, infoValue}
 infoName = ## Name of the information variable
-	attribute name { xsd:NCName }
+	attribute name { xsd:string }
 infoValue = ## Value of the information variable
 	attribute value {xsd:string}
 projectName = ## Name of the project related to this job. It is also used in the policy to group some jobs together
@@ -48,39 +48,33 @@ jobDescription = ## Textual description of this job
     element description { text }
 taskFlow = ## A job composed of a flow of tasks with or without dependencies 
     element taskFlow { task+ }
-proActive = ## A job that will launch a proActive application 
-    element proActive {  neededNodes, taskProActive }
-neededNodes = ## How many resources (ProActive nodes) does this job need ? 
-    attribute neededNodes { xsd:positiveInteger }
 
-jobPriority = 'highest' | 'high' | 'normal' | 'low' | 'lowest'
-restartTaskType = 'anywhere' | 'elsewhere'
 
 # +++++++++++++ task
 task = ## A task is the smallest computation unit for the scheduler 
-    element task { taskName, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, selection?, pre?, executable , post?, cleaning?}
-taskProActive = ## The task ProActive is a special task that can use more than one node for execution.
-    element task { taskName, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, resultPreviewClass?, taskDescription?, genericInformation?, selection?, pre?, proActiveExecutable, post?}
+    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, selection?, pre?, executable , post?, cleaning?}
 taskName = ## Identification of this task (identifier) 
     attribute name { xsd:ID }
+nodesNumber_t = ## number of cores needed for the task (identifier)
+    attribute numberOfNodes { xsd:positiveInteger | variableRefType }
 taskDescription = ## Textual description of this task
     element description { text }
 walltime = ## Defines walltime - maximum execution time of the task in second
-	attribute walltime { walltimePattern }
+	attribute walltime { walltimePattern | variableRefType}
 cancelJobOnError_t = ## Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)
-    attribute cancelJobOnError {xsd:boolean}
+    attribute cancelJobOnError {xsd:boolean | variableRefType}
 restartTaskOnError_t = ## Where does the task restart if an error occurred ?
     attribute restartTaskOnError {restartTaskType}
 numberOfExecution_t = ## Maximum number of execution for this task
-    attribute maxNumberOfExecution {xsd:nonNegativeInteger}
+    attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}
 preciousResult = ## Do we keep the result among the job results  
-    attribute preciousResult { xsd:boolean }
+    attribute preciousResult { xsd:boolean | variableRefType}
 resultPreviewClass = ## A class implementing the ResultPreview interface which can be used to display the result of this task
-    attribute resultPreviewClass { classPattern }  
+    attribute resultPreviewClass { classPattern | variableRefType}
 depends = ## A list of dependencies for this task 
     element depends { dependsTask+ }
 dependsTask = ## A task from which this task depends 
-    element task { attribute ref { xsd:IDREF } }
+    element task { attribute ref { xsd:IDREF} }
 selection = ## A script used to select resources that can handle the task 
     element selection { selectionScript+ }
 pre = ## A script launched before the task execution in the task node
@@ -98,28 +92,27 @@ script = ## Definition of a standard script
 selectionScript = ## Definition of a specific script which is used for resource selection 
     element script { scriptType?, (codeScript | fileScript) }
 scriptType = ## Type of script for the infrastructure manager (default to dynamic)  
-    attribute type { 'dynamic' | 'static' }
+    attribute type { 'dynamic' | 'static'}
 codeScript = ## Definition of a script by writing directly the code inside the descriptor 
-    element code { attribute language { xsd:NCName }, text }
+    element code { attribute language { xsd:string }, text }
 fileScript = ## Definition of a script by loading a file 
     element file { ( path | url), fileScriptArguments? }
 path = ## File path to script definition  
-    attribute path { xsd:anyURI }
+    attribute path { xsd:anyURI | variableRefType}
 url = ## Remote script definition, reachable at the given url 
-    attribute url { xsd:anyURI }
+    attribute url { xsd:anyURI | variableRefType}
 fileScriptArguments = ## A list of arguments of this script 
     element arguments { fileScriptArgument+ } 
 fileScriptArgument = ## An argument of this script  
     element argument { attribute value { xsd:string } }
+
 
 # +++++++++++++ executables
 executable = ## The task executable is the actual code that will be run on the selected resource. It can be a native command or a Java class 
     ( nativeExecutable | javaExecutable )
     
 nativeExecutable = ## A native command call, it can be statically described or generated by a script 
-    element nativeExecutable { nodesNumber_t?, (staticCommand | dynamicCommand) }
-nodesNumber_t = ## number of cores needed for the task (identifier)
-    attribute nodesNumber { xsd:positiveInteger }
+    element nativeExecutable { (staticCommand | dynamicCommand) }
 staticCommand = ## A native command statically defined in the descriptor 
     element staticCommand { attribute value { xsd:string }, workingDir_t?, commandArguments? }
 workingDir_t = ## working dir for native command to execute (ie launching dir, pwd...)
@@ -134,22 +127,23 @@ generation = ## A command generated by a script
 javaExecutable = ## A Java class implementing the Executable interface 
     element javaExecutable { class, fork?, forkEnvironment?, javaParameters? }
 class = ## The fully qualified class name 
-    attribute class { classPattern }
+    attribute class { classPattern | variableRefType}
 fork = ## Do we have to fork this task or not
-	attribute fork { xsd:boolean }
+	attribute fork { xsd:boolean | variableRefType }
 forkEnvironment = ## Fork environment if needed
 	element forkEnvironment { javaHome?, jvmParameters}
 javaHome = ## Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called
-	attribute javaHome { xsd:anyURI }
+	attribute javaHome { xsd:anyURI | variableRefType}
 jvmParameters = ## Options passed to Java (not an application) (example: memory settings or properties) 
 	attribute jvmParameters { xsd:string }
-proActiveExecutable = ## A ProActive application (java class) 
-    element proActiveExecutable { class, javaParameters? }
 javaParameters = ## A list of parameters that will be given to the Java task through the init method 
     element parameters { javaParameter+ }
 javaParameter = ## A parameter in the form of key/value pair 
-    element parameter { attribute name { xsd:NCName }, attribute value { xsd:string } } 
+    element parameter { attribute name { xsd:string }, attribute value { xsd:string } }
 
-
-classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*"}
-walltimePattern = xsd:string { pattern="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}"}
+# +++++++++++++ User define types
+jobPriority = 'highest' | 'high' | 'normal' | 'low' | 'lowest' | variableRefType
+restartTaskType = 'anywhere' | 'elsewhere' | variableRefType
+classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*" }
+walltimePattern = xsd:string { pattern="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}" }
+variableRefType = xsd:string { pattern="$\{[A-Za-z0-9._]+\}" }

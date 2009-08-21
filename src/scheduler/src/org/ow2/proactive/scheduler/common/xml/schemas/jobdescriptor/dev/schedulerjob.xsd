@@ -10,41 +10,53 @@
         <xs:group minOccurs="0" ref="jd:jobDescription"/>
         <xs:element minOccurs="0" ref="jd:jobClasspath"/>
         <xs:element minOccurs="0" ref="jd:genericInformation"/>
-        <xs:choice>
-          <xs:element ref="jd:taskFlow"/>
-          <xs:element ref="jd:proActive"/>
-        </xs:choice>
+        <xs:element ref="jd:taskFlow"/>
       </xs:sequence>
       <xs:attributeGroup ref="jd:jobName"/>
-      <xs:attribute name="priority" type="jd:jobPriority">
+      <xs:attribute name="priority">
         <xs:annotation>
           <xs:documentation>Priority of the job</xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="jd:jobPriority jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="cancelJobOnError" type="xs:boolean">
+      <xs:attribute name="cancelJobOnError">
         <xs:annotation>
           <xs:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="restartTaskOnError" type="jd:restartTaskType">
+      <xs:attribute name="restartTaskOnError">
         <xs:annotation>
           <xs:documentation>For each task, where does the task restart if an error occurred ? (default=anywhere)</xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="jd:restartTaskType jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="maxNumberOfExecution" type="xs:nonNegativeInteger">
+      <xs:attribute name="maxNumberOfExecution">
         <xs:annotation>
           <xs:documentation>Maximum number of execution for each task (default=1)</xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="projectName" type="xs:string">
         <xs:annotation>
           <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="logFile" type="xs:anyURI">
+      <xs:attribute name="logFile">
         <xs:annotation>
           <xs:documentation>The path to a file where the logs of this job will be written </xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
       
     </xs:complexType>
@@ -76,7 +88,7 @@
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="variableName">
-    <xs:attribute name="name" use="required" type="xs:NCName">
+    <xs:attribute name="name" use="required" type="xs:string">
       <xs:annotation>
         <xs:documentation>Name of a variable</xs:documentation>
       </xs:annotation>
@@ -90,38 +102,53 @@
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="priority">
-    <xs:attribute name="priority" use="required" type="jd:jobPriority">
+    <xs:attribute name="priority" use="required">
       <xs:annotation>
         <xs:documentation>Priority of the job</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:jobPriority jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="cancelJobOnError_j">
-    <xs:attribute name="cancelJobOnError" use="required" type="xs:boolean">
+    <xs:attribute name="cancelJobOnError" use="required">
       <xs:annotation>
         <xs:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="restartTaskOnError_j">
-    <xs:attribute name="restartTaskOnError" use="required" type="jd:restartTaskType">
+    <xs:attribute name="restartTaskOnError" use="required">
       <xs:annotation>
         <xs:documentation>For each task, where does the task restart if an error occurred ? (default=anywhere)</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:restartTaskType jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="numberOfExecution_j">
-    <xs:attribute name="maxNumberOfExecution" use="required" type="xs:nonNegativeInteger">
+    <xs:attribute name="maxNumberOfExecution" use="required">
       <xs:annotation>
         <xs:documentation>Maximum number of execution for each task (default=1)</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="logFile">
-    <xs:attribute name="logFile" use="required" type="xs:anyURI">
+    <xs:attribute name="logFile" use="required">
       <xs:annotation>
         <xs:documentation>The path to a file where the logs of this job will be written </xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:element name="jobClasspath">
@@ -169,7 +196,7 @@
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="infoName">
-    <xs:attribute name="name" use="required" type="xs:NCName">
+    <xs:attribute name="name" use="required" type="xs:string">
       <xs:annotation>
         <xs:documentation>Name of the information variable</xs:documentation>
       </xs:annotation>
@@ -206,40 +233,6 @@
       <xs:group maxOccurs="unbounded" ref="jd:task"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="proActive">
-    <xs:annotation>
-      <xs:documentation>A job that will launch a proActive application </xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="jd:taskProActive">
-          <xs:attributeGroup ref="jd:neededNodes"/>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:attributeGroup name="neededNodes">
-    <xs:attribute name="neededNodes" use="required" type="xs:positiveInteger">
-      <xs:annotation>
-        <xs:documentation>How many resources (ProActive nodes) does this job need ? </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-  </xs:attributeGroup>
-  <xs:simpleType name="jobPriority">
-    <xs:restriction base="xs:token">
-      <xs:enumeration value="highest"/>
-      <xs:enumeration value="high"/>
-      <xs:enumeration value="normal"/>
-      <xs:enumeration value="low"/>
-      <xs:enumeration value="lowest"/>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:simpleType name="restartTaskType">
-    <xs:restriction base="xs:token">
-      <xs:enumeration value="anywhere"/>
-      <xs:enumeration value="elsewhere"/>
-    </xs:restriction>
-  </xs:simpleType>
   <!-- +++++++++++++ task -->
   <xs:group name="task">
     <xs:sequence>
@@ -259,85 +252,78 @@
             <xs:element minOccurs="0" ref="jd:cleaning"/>
           </xs:sequence>
           <xs:attributeGroup ref="jd:taskName"/>
-          <xs:attribute name="cancelJobOnError" type="xs:boolean">
+          <xs:attribute name="numberOfNodes">
+            <xs:annotation>
+              <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:positiveInteger jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="cancelJobOnError">
             <xs:annotation>
               <xs:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</xs:documentation>
             </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+            </xs:simpleType>
           </xs:attribute>
           <xs:attribute name="restartTaskOnError" type="jd:restartTaskType">
             <xs:annotation>
               <xs:documentation>Where does the task restart if an error occurred ?</xs:documentation>
             </xs:annotation>
           </xs:attribute>
-          <xs:attribute name="maxNumberOfExecution" type="xs:nonNegativeInteger">
+          <xs:attribute name="maxNumberOfExecution">
             <xs:annotation>
               <xs:documentation>Maximum number of execution for this task</xs:documentation>
             </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
+            </xs:simpleType>
           </xs:attribute>
-          <xs:attribute name="walltime" type="jd:walltimePattern">
+          <xs:attribute name="walltime">
             <xs:annotation>
               <xs:documentation>Defines walltime - maximum execution time of the task in second</xs:documentation>
             </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="jd:walltimePattern jd:variableRefType"/>
+            </xs:simpleType>
           </xs:attribute>
-          <xs:attribute name="preciousResult" type="xs:boolean">
+          <xs:attribute name="preciousResult">
             <xs:annotation>
               <xs:documentation>Do we keep the result among the job results  </xs:documentation>
             </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+            </xs:simpleType>
           </xs:attribute>
-          <xs:attribute name="resultPreviewClass" type="jd:classPattern">
+          <xs:attribute name="resultPreviewClass">
             <xs:annotation>
               <xs:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</xs:documentation>
             </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="jd:classPattern jd:variableRefType"/>
+            </xs:simpleType>
           </xs:attribute>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
   </xs:group>
-  <xs:complexType name="taskProActive">
-    <xs:sequence>
-      <xs:element name="task">
-        <xs:annotation>
-          <xs:documentation>The task ProActive is a special task that can use more than one node for execution.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-          <xs:sequence>
-            <xs:group minOccurs="0" ref="jd:taskDescription"/>
-            <xs:element minOccurs="0" ref="jd:genericInformation"/>
-            <xs:element minOccurs="0" ref="jd:selection"/>
-            <xs:element minOccurs="0" ref="jd:pre"/>
-            <xs:element ref="jd:proActiveExecutable"/>
-            <xs:element minOccurs="0" ref="jd:post"/>
-          </xs:sequence>
-          <xs:attributeGroup ref="jd:taskName"/>
-          <xs:attribute name="cancelJobOnError" type="xs:boolean">
-            <xs:annotation>
-              <xs:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute name="restartTaskOnError" type="jd:restartTaskType">
-            <xs:annotation>
-              <xs:documentation>Where does the task restart if an error occurred ?</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute name="maxNumberOfExecution" type="xs:nonNegativeInteger">
-            <xs:annotation>
-              <xs:documentation>Maximum number of execution for this task</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute name="resultPreviewClass" type="jd:classPattern">
-            <xs:annotation>
-              <xs:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-  </xs:complexType>
   <xs:attributeGroup name="taskName">
     <xs:attribute name="name" use="required" type="xs:ID">
       <xs:annotation>
         <xs:documentation>Identification of this task (identifier) </xs:documentation>
       </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="nodesNumber_t">
+    <xs:attribute name="numberOfNodes" use="required">
+      <xs:annotation>
+        <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:positiveInteger jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:group name="taskDescription">
@@ -350,17 +336,23 @@
     </xs:sequence>
   </xs:group>
   <xs:attributeGroup name="walltime">
-    <xs:attribute name="walltime" use="required" type="jd:walltimePattern">
+    <xs:attribute name="walltime" use="required">
       <xs:annotation>
         <xs:documentation>Defines walltime - maximum execution time of the task in second</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:walltimePattern jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="cancelJobOnError_t">
-    <xs:attribute name="cancelJobOnError" use="required" type="xs:boolean">
+    <xs:attribute name="cancelJobOnError" use="required">
       <xs:annotation>
         <xs:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="restartTaskOnError_t">
@@ -371,24 +363,33 @@
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="numberOfExecution_t">
-    <xs:attribute name="maxNumberOfExecution" use="required" type="xs:nonNegativeInteger">
+    <xs:attribute name="maxNumberOfExecution" use="required">
       <xs:annotation>
         <xs:documentation>Maximum number of execution for this task</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="preciousResult">
-    <xs:attribute name="preciousResult" use="required" type="xs:boolean">
+    <xs:attribute name="preciousResult" use="required">
       <xs:annotation>
         <xs:documentation>Do we keep the result among the job results  </xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="resultPreviewClass">
-    <xs:attribute name="resultPreviewClass" use="required" type="jd:classPattern">
+    <xs:attribute name="resultPreviewClass" use="required">
       <xs:annotation>
         <xs:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:classPattern jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:element name="depends">
@@ -494,7 +495,7 @@
       <xs:documentation>Definition of a script by writing directly the code inside the descriptor </xs:documentation>
     </xs:annotation>
     <xs:complexType mixed="true">
-      <xs:attribute name="language" use="required" type="xs:NCName"/>
+      <xs:attribute name="language" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="file">
@@ -503,30 +504,42 @@
     </xs:annotation>
     <xs:complexType>
       <xs:group minOccurs="0" ref="jd:fileScriptArguments"/>
-      <xs:attribute name="path" type="xs:anyURI">
+      <xs:attribute name="path">
         <xs:annotation>
           <xs:documentation>File path to script definition  </xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="url" type="xs:anyURI">
+      <xs:attribute name="url">
         <xs:annotation>
           <xs:documentation>Remote script definition, reachable at the given url </xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="path">
-    <xs:attribute name="path" use="required" type="xs:anyURI">
+    <xs:attribute name="path" use="required">
       <xs:annotation>
         <xs:documentation>File path to script definition  </xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="url">
-    <xs:attribute name="url" use="required" type="xs:anyURI">
+    <xs:attribute name="url" use="required">
       <xs:annotation>
         <xs:documentation>Remote script definition, reachable at the given url </xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:group name="fileScriptArguments">
@@ -564,20 +577,8 @@
         <xs:element ref="jd:staticCommand"/>
         <xs:element ref="jd:dynamicCommand"/>
       </xs:choice>
-      <xs:attribute name="nodesNumber" type="xs:positiveInteger">
-        <xs:annotation>
-          <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
     </xs:complexType>
   </xs:element>
-  <xs:attributeGroup name="nodesNumber_t">
-    <xs:attribute name="nodesNumber" use="required" type="xs:positiveInteger">
-      <xs:annotation>
-        <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-  </xs:attributeGroup>
   <xs:element name="staticCommand">
     <xs:annotation>
       <xs:documentation>A native command statically defined in the descriptor </xs:documentation>
@@ -656,25 +657,34 @@
         <xs:element minOccurs="0" ref="jd:parameters"/>
       </xs:sequence>
       <xs:attributeGroup ref="jd:class"/>
-      <xs:attribute name="fork" type="xs:boolean">
+      <xs:attribute name="fork">
         <xs:annotation>
           <xs:documentation>Do we have to fork this task or not</xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="class">
-    <xs:attribute name="class" use="required" type="jd:classPattern">
+    <xs:attribute name="class" use="required">
       <xs:annotation>
         <xs:documentation>The fully qualified class name </xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:classPattern jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="fork">
-    <xs:attribute name="fork" use="required" type="xs:boolean">
+    <xs:attribute name="fork" use="required">
       <xs:annotation>
         <xs:documentation>Do we have to fork this task or not</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:element name="forkEnvironment">
@@ -682,19 +692,25 @@
       <xs:documentation>Fork environment if needed</xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:attribute name="javaHome" type="xs:anyURI">
+      <xs:attribute name="javaHome">
         <xs:annotation>
           <xs:documentation>Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</xs:documentation>
         </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
       <xs:attributeGroup ref="jd:jvmParameters"/>
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="javaHome">
-    <xs:attribute name="javaHome" use="required" type="xs:anyURI">
+    <xs:attribute name="javaHome" use="required">
       <xs:annotation>
         <xs:documentation>Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:attributeGroup name="jvmParameters">
@@ -704,17 +720,6 @@
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:element name="proActiveExecutable">
-    <xs:annotation>
-      <xs:documentation>A ProActive application (java class) </xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="jd:parameters"/>
-      </xs:sequence>
-      <xs:attributeGroup ref="jd:class"/>
-    </xs:complexType>
-  </xs:element>
   <xs:element name="parameters">
     <xs:annotation>
       <xs:documentation>A list of parameters that will be given to the Java task through the init method </xs:documentation>
@@ -730,10 +735,54 @@
       <xs:documentation>A parameter in the form of key/value pair </xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="name" use="required" type="xs:string"/>
       <xs:attribute name="value" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+  <!-- +++++++++++++ User define types -->
+  <xs:simpleType name="jobPriority">
+    <xs:union memberTypes="jd:variableRefType">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="highest"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="high"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="low"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="lowest"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="restartTaskType">
+    <xs:union memberTypes="jd:variableRefType">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="anywhere"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="elsewhere"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
   <xs:simpleType name="classPattern">
     <xs:restriction base="xs:string">
       <xs:pattern value="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*"/>
@@ -742,6 +791,11 @@
   <xs:simpleType name="walltimePattern">
     <xs:restriction base="xs:string">
       <xs:pattern value="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="variableRefType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="$\{[A-Za-z0-9._]+\}"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

@@ -64,7 +64,6 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.ProActiveJob;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.Task;
@@ -414,18 +413,6 @@ public class SchedulerTHelper {
                 Assert.assertEquals(TaskStatus.FINISHED, ti.getStatus());
             }
 
-        } else if (jobToSubmit instanceof ProActiveJob) {
-
-            Task task = ((ProActiveJob) jobToSubmit).getTask();
-            log("Waiting for task running : " + task.getName());
-            TaskInfo ti = waitForEventTaskRunning(id, task.getName());
-            Assert.assertEquals(task.getName(), ti.getTaskId().getReadableName());
-            Assert.assertEquals(TaskStatus.RUNNING, ti.getStatus());
-
-            log("Waiting for task finished : " + task.getName());
-            ti = waitForEventTaskFinished(id, task.getName());
-            Assert.assertEquals(task.getName(), ti.getTaskId().getReadableName());
-            Assert.assertEquals(TaskStatus.FINISHED, ti.getStatus());
         }
 
         log("Waiting for job finished");

@@ -33,7 +33,6 @@ package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
 
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scripting.Script;
 
@@ -50,16 +49,14 @@ public class TaskLauncherInitializer implements Serializable {
 
     /** The task identification */
     private TaskId taskId;
-    /** The content of the security policy file to be sent to forked launcher */
-    private Script<?> pre;
     /** The script executed before the task */
-    private Script<?> post;
+    private Script<?> pre;
     /** The script executed after the task */
-    private String forkedPolicyContent;
+    private Script<?> post;
     /** The walltime defined for the task (it is considered as defined if it is > 0) */
     private long walltime;
-    /** Environment of a new dedicated JVM */
-    private ForkEnvironment forkEnvironment;
+    /** policy content to be prepared before being sent to node */
+    private String policyContent;
 
     /**
      * Get the taskId
@@ -116,24 +113,6 @@ public class TaskLauncherInitializer implements Serializable {
     }
 
     /**
-     * Get the forked Policy Content
-     *
-     * @return the forked Policy Content
-     */
-    public String getForkedPolicyContent() {
-        return forkedPolicyContent;
-    }
-
-    /**
-     * Set the forked Policy Content value to the given forkedPolicyContent value
-     * 
-     * @param forkedPolicyContent the forked Policy Content to set
-     */
-    public void setForkedPolicyContent(String forkedPolicyContent) {
-        this.forkedPolicyContent = forkedPolicyContent;
-    }
-
-    /**
      * Set the walltime value to the given walltime value
      * 
      * @param walltime the walltime to set
@@ -152,21 +131,20 @@ public class TaskLauncherInitializer implements Serializable {
     }
 
     /**
-     * Set the forkEnvironment value to the given forkEnvironment value
+     * Set the policyContent value to the given policyContent value
      * 
-     * @param forkEnvironment the forkEnvironment to set
+     * @param policyContent the policyContent to set
      */
-    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
-        this.forkEnvironment = forkEnvironment;
+    public void setPolicyContent(String policyContent) {
+        this.policyContent = policyContent;
     }
 
     /**
-     * Get the forkEnvironment
+     * Get the policyContent
      *
-     * @return the forkEnvironment
+     * @return the policyContent
      */
-    public ForkEnvironment getForkEnvironment() {
-        return forkEnvironment;
+    public String getPolicyContent() {
+        return policyContent;
     }
-
 }

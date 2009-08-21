@@ -33,23 +33,40 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
 
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.AccessType;
+import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
+import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
  * An executable container allows to instantiate the actual executable in a lazy manner, i.e.
  * on the worker node that will execute the actual executable.
+ *
  * @author The ProActive Team
  */
-public interface ExecutableContainer extends Serializable {
+@Table(name = "EXECUTABLE_CONTAINER")
+@MappedSuperclass
+@AccessType("field")
+@Proxy(lazy = false)
+public abstract class ExecutableContainer implements Serializable {
+
+    // node set : not DB managed
+    @Transient
+    protected NodeSet nodes;
 
     /**
      * Create and return the contained executable
      * @return the contained executable
      * @throws ExecutableCreationException if the executable cannot be created
      */
-    public Executable getExecutable() throws ExecutableCreationException;
+    public abstract Executable getExecutable() throws ExecutableCreationException;
 
     /**
      * Generic init method for executable containers.
@@ -58,5 +75,22 @@ public interface ExecutableContainer extends Serializable {
      *
      * @param job the job owning the contained executable
      */
-    public void init(ExecutableContainerInitializer initializer);
+    public abstract void init(ExecutableContainerInitializer initializer);
+
+    /**
+     * Create the executable initializer and returns it.
+     *
+     * @return the created executable initializer
+     */
+    public abstract ExecutableInitializer createExecutableInitializer();
+
+    /**
+     * Set the nodes value to the given nodes value
+     *
+     * @param nodes the nodes to set
+     */
+    public void setNodes(NodeSet nodes) {
+        this.nodes = nodes;
+    }
+
 }

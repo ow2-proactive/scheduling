@@ -92,7 +92,7 @@ public class DatabaseManager {
     //locks
     private static Object sessionlock = new Object();
     //Memory for id field name by class
-    private static Map<Class<?>, String> idFields = new HashMap<Class<?>, String>();
+    private static Map<Class<?>, Field> idFields = new HashMap<Class<?>, Field>();
     //Hibernate Session factory
     private static SessionFactory sessionFactory;
     //Hibernate configuration
@@ -511,7 +511,8 @@ public class DatabaseManager {
     public static void synchronize(Object o) {
         Class<?> clazz = o.getClass();
         checkIsEntity(clazz);
-        String hibernateId = getIdFieldName(clazz);
+        Field id = getIdField(clazz);
+        String hibernateId = id.getName();
         //prepare HQL request for update
         String hqlUpdate = "UPDATE " + clazz.getName() + " c SET ";
         String hql;
@@ -522,7 +523,6 @@ public class DatabaseManager {
         Session session = beginTransaction();
         try {
             //get id value to set it in the request
-            Field id = clazz.getDeclaredField(hibernateId);
             id.setAccessible(true);
             for (Field f : fields) {
                 if (f.isAnnotationPresent(Alterable.class)) {
@@ -570,12 +570,12 @@ public class DatabaseManager {
     public static void load(Object o) {
         Class<?> clazz = o.getClass();
         checkIsEntity(clazz);
-        String hibernateId = getIdFieldName(clazz);
+        Field fid = getIdField(clazz);
+        String hibernateId = fid.getName();
         Field[] fields = getDeclaredFields(clazz, true);
         Session session = DatabaseManager.getSessionFactory().openSession();
         try {
             //get hibernate ID field of the given object
-            Field fid = clazz.getDeclaredField(hibernateId);
             fid.setAccessible(true);
             //for each field in the given object
             for (Field f : fields) {
@@ -690,37 +690,37 @@ public class DatabaseManager {
             return clazz.getDeclaredFields();
         }
         List<Field> fields = new ArrayList<Field>();
-        for (; !clazz.equals(Object.class); clazz = clazz.getSuperclass()) {
+        do {
             for (Field f : clazz.getDeclaredFields()) {
                 fields.add(f);
             }
-        }
+        } while (!(clazz = clazz.getSuperclass()).equals(Object.class));
         return fields.toArray(new Field[] {});
     }
 
     /**
-     * Get the name of the @Id annoted field.<br />
+     * Get the name of the @Id annotated field.<br />
      * The given class must be an Hibernate entity with an @Id field.
      *
      * @param clazz the class where to find the ID field.
-     * @return the name of the @Id annoted field.
+     * @return the name of the @Id annotated field.
      * @throws DatabaseManagerException if ID field not found.
      */
-    private static String getIdFieldName(Class<?> clazz) throws DatabaseManagerException {
+    private static Field getIdField(Class<?> clazz) throws DatabaseManagerException {
         checkIsEntity(clazz);
         //check if this class has its ID field already saved in the map
-        String fieldIdName = idFields.get(clazz);
-        if (fieldIdName != null) {
+        Field fieldId = idFields.get(clazz);
+        if (fieldId != null) {
             //if so, return it
-            return fieldIdName;
+            return fieldId;
         }
         //if not, get the ID fields from all the fields
-        Field[] fields = getDeclaredFields(clazz, false);
+        Field[] fields = getDeclaredFields(clazz, true);
         for (Field f : fields) {
             if (f.isAnnotationPresent(Id.class)) {
                 //store the new ID in the map
-                idFields.put(clazz, f.getName());
-                return f.getName();
+                idFields.put(clazz, f);
+                return f;
             }
         }
         //If ID field not found...

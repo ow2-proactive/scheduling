@@ -58,12 +58,10 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.job.ProActiveJob;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.util.RegexpMatcher;
@@ -105,7 +103,6 @@ public class JobFactory_stax extends JobFactory {
     //JOBS
     private static final String ELEMENT_JOB = "job";
     private static final String ELEMENT_TASKFLOW = "taskFlow";
-    private static final String ELEMENT_PROACTIVE = "proActive";
     private static final String ATTRIBUTE_JOB_PRIORITY = "priority";
     private static final String ATTRIBUTE_JOB_PROJECTNAME = "projectName";
     private static final String ATTRIBUTE_JOB_LOGFILE = "logFile";
@@ -126,7 +123,6 @@ public class JobFactory_stax extends JobFactory {
     private static final String ELEMENT_TASK = "task";
     private static final String ELEMENT_JAVA_EXECUTABLE = "javaExecutable";
     private static final String ELEMENT_NATIVE_EXECUTABLE = "nativeExecutable";
-    private static final String ELEMENT_PROACTIVE_EXECUTABLE = "proActiveExecutable";
     private static final String ELEMENT_TASK_DEPENDENCES = "depends";
     private static final String ELEMENT_TASK_DEPENDENCES_TASK = "task";
     private static final String ATTRIBUTE_TASK_RESULTPREVIEW = "resultPreviewClass";
@@ -137,7 +133,7 @@ public class JobFactory_stax extends JobFactory {
     private static final String ATTRIBUTE_TASK_FORK = "fork";
 
     //NATIVE TASK ATTRIBUTES
-    private static final String ATTRIBUTE_TASK_NB_NODES = "nodesNumber";
+    private static final String ATTRIBUTE_TASK_NB_NODES = "numberOfNodes";
     private static final String ATTRIBUTE_TASK_COMMAND_VALUE = "value";
     private static final String ATTRIBUTE_TASK_WORKDING_DIR = "workingDir";
 
@@ -322,16 +318,18 @@ public class JobFactory_stax extends JobFactory {
             if (attrName.equals(JobFactory_stax.ATTRIBUTE_COMMON_NAME)) {
                 jtmp.setName(cursorJob.getAttributeValue(i));
             } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_JOB_PRIORITY)) {
-                jtmp.setPriority(JobPriority.findPriority(cursorJob.getAttributeValue(i)));
+                jtmp.setPriority(JobPriority.findPriority(replace(cursorJob.getAttributeValue(i))));
             } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_COMMON_CANCELJOBONERROR)) {
-                jtmp.setCancelJobOnError(Boolean.parseBoolean(cursorJob.getAttributeValue(i)));
+                jtmp.setCancelJobOnError(Boolean.parseBoolean(replace(cursorJob.getAttributeValue(i))));
             } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_JOB_LOGFILE)) {
+                //don't replace() here it is done at the end of the job
                 jtmp.setLogFile(cursorJob.getAttributeValue(i));
             } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_COMMON_RESTARTTASKONERROR)) {
-                jtmp.setRestartTaskOnError(RestartMode.getMode(cursorJob.getAttributeValue(i)));
+                jtmp.setRestartTaskOnError(RestartMode.getMode(replace(cursorJob.getAttributeValue(i))));
             } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_COMMON_MAXNUMBEROFEXECUTION)) {
-                jtmp.setMaxNumberOfExecution(Integer.parseInt(cursorJob.getAttributeValue(i)));
+                jtmp.setMaxNumberOfExecution(Integer.parseInt(replace(cursorJob.getAttributeValue(i))));
             } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_JOB_PROJECTNAME)) {
+                //don't replace() here it is done at the end of the job
                 jtmp.setProjectName(cursorJob.getAttributeValue(i));
             }
         }
@@ -354,17 +352,6 @@ public class JobFactory_stax extends JobFactory {
                             jtmp.setDescription(getDescription(cursorJob));
                         } else if (current.equals(JobFactory_stax.ELEMENT_TASKFLOW)) {
                             job = new TaskFlowJob();
-                            continu = false;
-                        } else if (current.equals(JobFactory_stax.ELEMENT_PROACTIVE)) {
-                            job = new ProActiveJob();
-                            //as the ProActive Job has only one task, set it now
-                            //with the neededNodes property
-                            if (cursorJob.getAttributeCount() > 0) {
-                                ProActiveTask paTask = new ProActiveTask();
-                                paTask.setNumberOfNeededNodes(Integer
-                                        .parseInt(cursorJob.getAttributeValue(0)));
-                                ((ProActiveJob) job).setTask(paTask);
-                            }
                             continu = false;
                         }
                         break;
@@ -527,12 +514,6 @@ public class JobFactory_stax extends JobFactory {
                     cursorTask.getLocalName().equals(JobFactory_stax.ELEMENT_TASK)) {
                     Task t;
                     switch (job.getType()) {
-                        case PROACTIVE:
-                            //fill the existing task
-                            t = createTask(cursorTask, ((ProActiveJob) job).getTask());
-                            //add task to the job
-                            ((ProActiveJob) job).setTask((ProActiveTask) t);
-                            break;
                         case TASKSFLOW:
                             //create new task
                             t = createTask(cursorTask);
@@ -580,18 +561,25 @@ public class JobFactory_stax extends JobFactory {
                 String attrName = cursorTask.getAttributeLocalName(i);
                 if (attrName.equals(JobFactory_stax.ATTRIBUTE_COMMON_NAME)) {
                     tmpTask.setName(cursorTask.getAttributeValue(i));
+                } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_NB_NODES)) {
+                    tmpTask
+                            .setNumberOfNeededNodes(Integer
+                                    .parseInt(replace(cursorTask.getAttributeValue(i))));
                 } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_COMMON_CANCELJOBONERROR)) {
-                    tmpTask.setCancelJobOnError(Boolean.parseBoolean(cursorTask.getAttributeValue(i)));
+                    tmpTask.setCancelJobOnError(Boolean
+                            .parseBoolean(replace(cursorTask.getAttributeValue(i))));
                 } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_COMMON_RESTARTTASKONERROR)) {
-                    tmpTask.setRestartTaskOnError(RestartMode.getMode(cursorTask.getAttributeValue(i)));
+                    tmpTask.setRestartTaskOnError(RestartMode
+                            .getMode(replace(cursorTask.getAttributeValue(i))));
                 } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_COMMON_MAXNUMBEROFEXECUTION)) {
-                    tmpTask.setMaxNumberOfExecution(Integer.parseInt(cursorTask.getAttributeValue(i)));
+                    tmpTask.setMaxNumberOfExecution(Integer
+                            .parseInt(replace(cursorTask.getAttributeValue(i))));
                 } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_RESULTPREVIEW)) {
-                    tmpTask.setResultPreview(cursorTask.getAttributeValue(i));
+                    tmpTask.setResultPreview(replace(cursorTask.getAttributeValue(i)));
                 } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_PRECIOUSRESULT)) {
-                    tmpTask.setPreciousResult(Boolean.parseBoolean(cursorTask.getAttributeValue(i)));
+                    tmpTask.setPreciousResult(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
                 } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_WALLTIME)) {
-                    tmpTask.setWallTime(Tools.formatDate(cursorTask.getAttributeValue(i)));
+                    tmpTask.setWallTime(Tools.formatDate(replace(cursorTask.getAttributeValue(i))));
                 }
             }
             int eventType;
@@ -621,9 +609,6 @@ public class JobFactory_stax extends JobFactory {
                         } else if (current.equals(JobFactory_stax.ELEMENT_NATIVE_EXECUTABLE)) {
                             toReturn = (taskToFill != null) ? taskToFill : new NativeTask();
                             setNativeExecutable((NativeTask) toReturn, cursorTask);
-                        } else if (current.equals(JobFactory_stax.ELEMENT_PROACTIVE_EXECUTABLE)) {
-                            toReturn = (taskToFill != null) ? taskToFill : new ProActiveTask();
-                            setProActiveExecutable((ProActiveTask) toReturn, cursorTask);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -645,6 +630,7 @@ public class JobFactory_stax extends JobFactory {
                 toReturn.setResultPreview(tmpTask.getResultPreview());
                 toReturn.setSelectionScripts(tmpTask.getSelectionScripts());
                 toReturn.setWallTime(tmpTask.getWallTime());
+                toReturn.setNumberOfNeededNodes(tmpTask.getNumberOfNodesNeeded());
                 //set the following properties only if it is needed.
                 if (tmpTask.getCancelJobOnErrorProperty().isSet()) {
                     toReturn.setCancelJobOnError(tmpTask.isCancelJobOnError());
@@ -875,41 +861,6 @@ public class JobFactory_stax extends JobFactory {
     }
 
     /**
-     * Add the proActive Executable to this ProActive Task.
-     * The cursor is currently at the beginning of the 'ELEMENT_PROACTIVE_EXECUTABLE' tag.
-     *
-     * @param paTask the task in which to add the ProActive Executable.
-     * @param cursorExec the streamReader with the cursor on the 'ELEMENT_PROACTIVE_EXECUTABLE' tag.
-     */
-    private void setProActiveExecutable(ProActiveTask paTask, XMLStreamReader cursorExec)
-            throws JobCreationException {
-        try {
-            //parsing executable attribute class that must exist
-            paTask.setExecutableClassName(cursorExec.getAttributeValue(0));
-            //parsing executable tags
-            int eventType;
-            while (cursorExec.hasNext()) {
-                eventType = cursorExec.next();
-                switch (eventType) {
-                    case XMLEvent.START_ELEMENT:
-                        if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_TASK_PARAMETER)) {
-                            paTask.addArgument(cursorExec.getAttributeValue(0), replace(cursorExec
-                                    .getAttributeValue(1)));
-                        }
-                        break;
-                    case XMLEvent.END_ELEMENT:
-                        if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_PROACTIVE_EXECUTABLE)) {
-                            return;
-                        }
-                        break;
-                }
-            }
-        } catch (Exception e) {
-            throw new JobCreationException(e.getMessage(), e);
-        }
-    }
-
-    /**
      * Add the Native Executable to this native Task.
      * The cursor is currently at the beginning of the 'ELEMENT_NATIVE_EXECUTABLE' tag.
      *
@@ -919,15 +870,6 @@ public class JobFactory_stax extends JobFactory {
     private void setNativeExecutable(NativeTask nativeTask, XMLStreamReader cursorExec)
             throws JobCreationException {
         try {
-
-            for (int i = 0; i < cursorExec.getAttributeCount(); i++) {
-                String attrName = cursorExec.getAttributeLocalName(i);
-                if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_NB_NODES)) {
-                    nativeTask.setNumberOfNeededNodes(Integer.parseInt(replace(cursorExec
-                            .getAttributeValue(i))));
-                }
-            }
-
             //one step ahead to go to the command (static or dynamic)
             while (cursorExec.next() != XMLEvent.START_ELEMENT)
                 ;
@@ -1011,7 +953,7 @@ public class JobFactory_stax extends JobFactory {
                 if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_CLASSNAME)) {
                     javaTask.setExecutableClassName(cursorExec.getAttributeValue(i));
                 } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_TASK_FORK)) {
-                    javaTask.setFork(Boolean.parseBoolean(cursorExec.getAttributeValue(i)));
+                    javaTask.setFork(Boolean.parseBoolean(replace(cursorExec.getAttributeValue(i))));
                 }
             }
             //parsing executable tags
@@ -1034,7 +976,7 @@ public class JobFactory_stax extends JobFactory {
                             }
                             javaTask.setForkEnvironment(forkEnv);
                         } else if (current.equals(JobFactory_stax.ELEMENT_TASK_PARAMETER)) {
-                            javaTask.addArgument(cursorExec.getAttributeValue(0), replace(cursorExec
+                            javaTask.addArgument(replace(cursorExec.getAttributeValue(0)), replace(cursorExec
                                     .getAttributeValue(1)));
                         }
                         break;
@@ -1193,9 +1135,6 @@ public class JobFactory_stax extends JobFactory {
             logger.debug("TASKS ------------------------------------------------");
             ArrayList<Task> tasks = new ArrayList<Task>();
             switch (job.getType()) {
-                case PROACTIVE:
-                    tasks.add(((ProActiveJob) job).getTask());
-                    break;
                 case TASKSFLOW:
                     tasks.addAll(((TaskFlowJob) job).getTasks());
                     break;
@@ -1235,9 +1174,6 @@ public class JobFactory_stax extends JobFactory {
                 } else if (t instanceof NativeTask) {
                     logger.debug("cmd   : " + ((NativeTask) t).getCommandLine());
                     logger.debug("gensc : " + ((NativeTask) t).getGenerationScript());
-                } else if (t instanceof ProActiveTask) {
-                    logger.debug("class : " + ((ProActiveTask) t).getExecutableClassName());
-                    logger.debug("args  : " + ((ProActiveTask) t).getArguments());
                 }
                 logger.debug("--------------------------------------------------");
             }

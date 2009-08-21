@@ -73,9 +73,9 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
-import org.ow2.proactive.scheduler.task.internal.InternalProActiveTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
@@ -105,7 +105,7 @@ public abstract class InternalJob extends JobState {
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
             @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
-            @MetaValue(targetEntity = InternalProActiveTask.class, value = "IPT") })
+            @MetaValue(targetEntity = InternalForkedJavaTask.class, value = "IFJT") })
     @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)

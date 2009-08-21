@@ -46,25 +46,25 @@ import functionalTests.FunctionalTest;
  * Connection to scheduler, with authentication
  * Register a monitor to Scheduler in order to receive events concerning
  * job submission.
- * 
- * Submit a job (test 1). 
+ *
+ * Submit a job (test 1).
  * After the job submission, the test monitor all jobs states changes, in order
  * to observe its execution :
  * job submitted (test 2),
  * job pending to running (test 3),
  * the task pending to running, and task running to finished (test 4),
  * job running to finished (test 5).
- * After it retrieves job's result and check that the 
+ * After it retrieves job's result and check that the
  * task result is available (test 6).
- * 
+ *
  * @author The ProActive Team
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobProActiveSubmission extends FunctionalTest {
+public class TestJobMultiNodesSubmission extends FunctionalTest {
 
-    private static String jobDescriptor = TestJobProActiveSubmission.class.getResource(
-            "/functionaltests/descriptors/Job_ProActive.xml").getPath();
+    private static String jobDescriptor = TestJobMultiNodesSubmission.class.getResource(
+            "/functionaltests/descriptors/Job_MultiNodes.xml").getPath();
 
     /**
      * Tests start here.

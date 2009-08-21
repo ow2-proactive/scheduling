@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -27,55 +27,20 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $PROACTIVE_INITIAL_DEV$
  */
-package org.ow2.proactive.scheduler.common.job;
+package org.ow2.proactive.scheduler.common.task;
 
-import org.objectweb.proactive.annotation.PublicAPI;
+import java.io.Serializable;
 
 
 /**
- * Class representing the type of the job.
- * Type are best describe below.
+ * ExecutableInitializer is used to initialized the executable.
+ * It is sent to the init method of each executable.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.0
  */
-@PublicAPI
-public enum JobType implements java.io.Serializable {
+public interface ExecutableInitializer extends Serializable {
 
-    /**
-     * Tasks can be executed one by one or all in same time but
-     * every task represents the same native or java task.
-     * Only the parameters given to the task will change.
-     */
-    PARAMETER_SWEEPING("Parameter Sweeping"),
-    /**
-     * Tasks flow with dependences.
-     * Only the task that have their dependences finished
-     * can be executed.
-     */
-    TASKSFLOW("Tasks Flow");
-
-    private String name;
-
-    JobType(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @see java.lang.Enum#toString()
-     */
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    static JobType getJobType(String typeName) {
-        if (typeName.equalsIgnoreCase("taskFlow")) {
-            return TASKSFLOW;
-        } else {
-            return PARAMETER_SWEEPING;
-        }
-    }
 }

@@ -77,12 +77,10 @@ import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.job.ProActiveJob;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.ProActiveTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.util.RegexpMatcher;
@@ -125,7 +123,7 @@ public class JobFactory_xpath extends JobFactory {
     //JOBS
     private static final String JOB_TAG = "job";
     private static final String JOB_TASKFLOW = "taskFlow";
-    private static final String JOB_PROACTIVE = "proActive";
+    private static final String JOB_PARAMETER_SWEEPING = "parameterSweeping";
     private static final String JOB_ATTRIBUTE_PRIORITY = "@priority";
     private static final String JOB_ATTRIBUTE_PROJECTNAME = "@projectName";
     private static final String JOB_ATTRIBUTE_LOGFILE = "@logFile";
@@ -145,18 +143,16 @@ public class JobFactory_xpath extends JobFactory {
     private static final String TASK_TAG = "task";
     private static final String JAVA_EXECUTABLE = "javaExecutable";
     private static final String NATIVE_EXECUTABLE = "nativeExecutable";
-    private static final String PROACTIVE_EXECUTABLE = "proActiveExecutable";
     private static final String TASK_DEPENDENCES_REF = "depends/task/@ref";
     private static final String TASK_ATTRIBUTE_RESULTPREVIEW = "@resultPreviewClass";
     private static final String TASK_ATTRIBUTE_PRECIOUSRESULT = "@preciousResult";
     private static final String TASK_ATTRIBUTE_CLASSNAME = "@class";
     private static final String TASK_TAG_PARAMETERS = "parameters/parameter";
-    private static final String TASK_ATTRIBUTE_NEEDEDNODES = "@neededNodes";
     private static final String TASK_ATTRIBUTE_WALLTIME = "@walltime";
     private static final String TASK_ATTRIBUTE_FORK = "@fork";
 
     //NATIVE TASK ATTRIBUTES
-    private static final String ATTRIBUTE_TASK_NB_NODES = "@nodesNumber";
+    private static final String ATTRIBUTE_TASK_NB_NODES = "@numberOfNodes";
     private static final String ATTRIBUTE_TASK_WORKDING_DIR = "@workingDir";
 
     //SCRIPTS
@@ -354,18 +350,16 @@ public class JobFactory_xpath extends JobFactory {
         if (tfNode != null) {
             jt = JobType.TASKSFLOW;
         }
-        Node paNode = (Node) xpath.evaluate(addPrefixes(JOB_PROACTIVE), jobNode, XPathConstants.NODE);
+        Node paNode = (Node) xpath
+                .evaluate(addPrefixes(JOB_PARAMETER_SWEEPING), jobNode, XPathConstants.NODE);
         if (paNode != null) {
-            jt = JobType.PROACTIVE;
+            jt = JobType.PARAMETER_SWEEPING;
         }
         if (jt == null) {
             throw new SAXException("Invalid XML : Job must have a valid type");
         }
 
         switch (jt) {
-            case PROACTIVE:
-                job = new ProActiveJob();
-                break;
             case TASKSFLOW:
                 job = new TaskFlowJob();
                 break;
@@ -473,8 +467,8 @@ public class JobFactory_xpath extends JobFactory {
                         XPathConstants.NODESET);
                 break;
             default:
-                list = (NodeList) xpath.evaluate(addPrefixes(JOB_PROACTIVE + "/" + TASK_TAG), jobNode,
-                        XPathConstants.NODESET);
+                list = (NodeList) xpath.evaluate(addPrefixes(JOB_PARAMETER_SWEEPING + "/" + TASK_TAG),
+                        jobNode, XPathConstants.NODESET);
         }
         if (list != null) {
             for (int i = 0; i < list.getLength(); i++) {
@@ -489,9 +483,6 @@ public class JobFactory_xpath extends JobFactory {
                 } else if ((process = (Node) xpath.evaluate(addPrefixes(NATIVE_EXECUTABLE), taskNode,
                         XPathConstants.NODE)) != null) { // NATIVE TASK
                     task = createNativeTask(process);
-                } else if ((process = (Node) xpath.evaluate(addPrefixes(PROACTIVE_EXECUTABLE), taskNode,
-                        XPathConstants.NODE)) != null) { // APPLICATION TASK
-                    task = createProActiveTask(process);
                 } else {
                     throw new RuntimeException("Unknow process !!");
                 }
@@ -506,8 +497,7 @@ public class JobFactory_xpath extends JobFactory {
                             .info("For javatask, setting a walltime implies the task to be forked, so your task will be forked anyway !");
                 }
                 switch (job.getType()) {
-                    case PROACTIVE:
-                        ((ProActiveJob) job).setTask((ProActiveTask) task);
+                    case PARAMETER_SWEEPING:
                         break;
                     default:
                         ((TaskFlowJob) job).addTask(task);
@@ -530,18 +520,17 @@ public class JobFactory_xpath extends JobFactory {
         // Dependencies
         HashMap<String, Task> depends = new HashMap<String, Task>();
 
-        for (Task td : tasks.keySet())
+        for (Task td : tasks.keySet()) {
             depends.put(td.getName(), td);
-        if (job.getType() != JobType.PROACTIVE) {
-            for (Entry<Task, ArrayList<String>> task : tasks.entrySet()) {
-                // task.getKey().setJobId(job.getId());
-                ArrayList<String> depListStr = task.getValue();
-                for (int i = 0; i < depListStr.size(); i++) {
-                    if (depends.containsKey(depListStr.get(i))) {
-                        task.getKey().addDependence(depends.get(depListStr.get(i)));
-                    } else {
-                        System.err.println("Can't resolve dependence : " + depListStr.get(i));
-                    }
+        }
+        for (Entry<Task, ArrayList<String>> task : tasks.entrySet()) {
+            // task.getKey().setJobId(job.getId());
+            ArrayList<String> depListStr = task.getValue();
+            for (int i = 0; i < depListStr.size(); i++) {
+                if (depends.containsKey(depListStr.get(i))) {
+                    task.getKey().addDependence(depends.get(depListStr.get(i)));
+                } else {
+                    System.err.println("Can't resolve dependence : " + depListStr.get(i));
                 }
             }
         }
@@ -591,6 +580,13 @@ public class JobFactory_xpath extends JobFactory {
             task.setWallTime(Tools.formatDate(wallTime));
             logger.debug(TASK_ATTRIBUTE_WALLTIME + " = " + wallTime + " ( " + Tools.formatDate(wallTime) +
                 "ms )");
+        }
+
+        // TASK NUMBER OF NODES
+        String non = (String) xpath.evaluate(ATTRIBUTE_TASK_NB_NODES, taskNode, XPathConstants.STRING);
+        if (non != "") {
+            task.setNumberOfNeededNodes(Integer.parseInt(non));
+            logger.debug(ATTRIBUTE_TASK_NB_NODES + " = " + task.getNumberOfNodesNeeded());
         }
 
         // TASK PRECIOUS RESULT
@@ -659,9 +655,6 @@ public class JobFactory_xpath extends JobFactory {
             IOException, InvalidScriptException {
 
         NativeTask desc = new NativeTask();
-
-        desc.setNumberOfNeededNodes(Integer.parseInt(replace((String) xpath.evaluate(ATTRIBUTE_TASK_NB_NODES,
-                executable, XPathConstants.STRING))));
 
         Node scNode = (Node) xpath.evaluate(addPrefixes(SCRIPT_STATICCOMMAND), executable,
                 XPathConstants.NODE);
@@ -742,43 +735,6 @@ public class JobFactory_xpath extends JobFactory {
         }
 
         //EXECUTABLE PARAMETERS
-        NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
-                XPathConstants.NODESET);
-        if (args != null) {
-            for (int i = 0; i < args.getLength(); i++) {
-                Node arg = args.item(i);
-                String name = (String) xpath
-                        .evaluate(GENERIC_INFO_ATTRIBUTE_NAME, arg, XPathConstants.STRING);
-                String value = (String) xpath.evaluate(GENERIC_INFO_ATTRIBUTE_VALUE, arg,
-                        XPathConstants.STRING);
-
-                if ((name != null) && (value != null)) {
-                    desc.getArguments().put(name, value);
-                }
-            }
-        }
-
-        for (Entry<String, String> entry : desc.getArguments().entrySet())
-            logger.debug("arg: " + entry.getKey() + " = " + entry.getValue());
-
-        return desc;
-    }
-
-    private ProActiveTask createProActiveTask(Node process) throws XPathExpressionException,
-            ClassNotFoundException, IOException {
-        ProActiveTask desc = new ProActiveTask();
-
-        desc.setExecutableClassName((String) xpath.compile(TASK_ATTRIBUTE_CLASSNAME).evaluate(process,
-                XPathConstants.STRING));
-        logger.debug(TASK_ATTRIBUTE_CLASSNAME + " = " + desc.getExecutableClassName());
-
-        // TASK NEEDED_NODES
-        int neededNodes = ((Double) xpath.evaluate(
-                addPrefixes("/job/proActive/" + TASK_ATTRIBUTE_NEEDEDNODES), process, XPathConstants.NUMBER))
-                .intValue();
-        desc.setNumberOfNeededNodes(neededNodes);
-        logger.debug(TASK_ATTRIBUTE_NEEDEDNODES + " = " + neededNodes);
-
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(TASK_TAG_PARAMETERS), process,
                 XPathConstants.NODESET);
         if (args != null) {

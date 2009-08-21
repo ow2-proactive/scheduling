@@ -37,7 +37,6 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.job.ProActiveJob;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -57,8 +56,8 @@ public class TestJobFactory {
 
     private static String jobTaskFlowDescriptor = TestJobFactory.class.getResource(
             "/unitTests/descriptors/Job_TaskFlow.xml").getPath();
-    private static String jobProActiveDescriptor = TestJobFactory.class.getResource(
-            "/unitTests/descriptors/Job_ProActive.xml").getPath();
+    private static String jobMultiNodesDescriptor = TestJobFactory.class.getResource(
+            "/unitTests/descriptors/Job_MultiNodes.xml").getPath();
 
     @Test
     public void run() throws Throwable {
@@ -222,41 +221,43 @@ public class TestJobFactory {
                 ((NativeTask) tfJob.getTask("task4")).getGenerationScript().execute().getResult(), URLbegin +
                     "samples/jobs_descriptors/job_native_linux/nativTask 12");
 
-        log("Test Job PROACTIVE");
-        ProActiveJob paJob = (ProActiveJob) JobFactory.getFactory().createJob(jobProActiveDescriptor);
+        log("Test Job MULTI_NODES");
+        TaskFlowJob mnJob = (TaskFlowJob) JobFactory.getFactory().createJob(jobMultiNodesDescriptor);
         //Check job properties
-        Assert.assertEquals(paJob.getDescription(), "No description");
-        Assert.assertEquals(paJob.getName(), "job_proActive");
-        Assert.assertEquals(paJob.getPriority(), JobPriority.LOW);
-        Assert.assertEquals(paJob.getLogFile(), "one/file/to/log");
-        Assert.assertEquals(paJob.getEnvironment().getJobClasspath()[0], "one/two/");
-        Assert.assertEquals(paJob.getEnvironment().getJobClasspath()[1], "three");
-        Assert.assertEquals(paJob.isCancelJobOnError(), false);
-        Assert.assertEquals(paJob.getMaxNumberOfExecution(), 1);
-        Assert.assertEquals(paJob.getRestartTaskOnError(), RestartMode.ANYWHERE);
-        Assert.assertEquals(paJob.getType(), JobType.PROACTIVE);
-        Assert.assertEquals(paJob.getGenericInformations().get("n1"), "v1");
-        Assert.assertEquals(paJob.getGenericInformations().get("n2"), "v2");
+        Assert.assertEquals(mnJob.getDescription(), "No description");
+        Assert.assertEquals(mnJob.getName(), "job_multiNodes");
+        Assert.assertEquals(mnJob.getPriority(), JobPriority.LOW);
+        Assert.assertEquals(mnJob.getLogFile(), "one/file/to/log");
+        Assert.assertEquals(mnJob.getEnvironment().getJobClasspath()[0], "one/two/");
+        Assert.assertEquals(mnJob.getEnvironment().getJobClasspath()[1], "three");
+        Assert.assertEquals(mnJob.isCancelJobOnError(), false);
+        Assert.assertEquals(mnJob.getMaxNumberOfExecution(), 1);
+        Assert.assertEquals(mnJob.getRestartTaskOnError(), RestartMode.ANYWHERE);
+        Assert.assertEquals(mnJob.getType(), JobType.TASKSFLOW);
+        Assert.assertEquals(mnJob.getGenericInformations().get("n1"), "v1");
+        Assert.assertEquals(mnJob.getGenericInformations().get("n2"), "v2");
         //Check task properties
-        Assert.assertEquals(paJob.getTask().getArguments().get("numberToFind"), "100");
-        Assert.assertEquals(paJob.getTask().isCancelJobOnError(), false);
-        Assert.assertEquals(paJob.getTask().getCleaningScript(), null);
-        Assert.assertEquals(paJob.getTask().getDependencesList(), null);
-        Assert.assertEquals(paJob.getTask().getDescription(),
-                "Will control the workers in order to find the prime number");
-        Assert.assertEquals(paJob.getTask().getExecutableClassName(),
-                "org.ow2.proactive.scheduler.examples.ProActiveExample");
-        Assert.assertEquals(paJob.getTask().getGenericInformations().get("n11"), "v11");
-        Assert.assertEquals(paJob.getTask().getGenericInformations().get("n22"), "v22");
-        Assert.assertEquals(paJob.getTask().getMaxNumberOfExecution(), 1);
-        Assert.assertEquals(paJob.getTask().getName(), "Controller");
-        Assert.assertEquals(paJob.getTask().getNumberOfNodesNeeded(), 3);
-        Assert.assertEquals(paJob.getTask().getPreScript(), null);
-        Assert.assertEquals(paJob.getTask().getPostScript(), null);
-        Assert.assertEquals(paJob.getTask().getRestartTaskOnError(), RestartMode.ANYWHERE);
-        Assert.assertEquals(paJob.getTask().getResultPreview(), "path.to.package.class");
-        Assert.assertEquals(paJob.getTask().getSelectionScripts(), null);
-        Assert.assertEquals(paJob.getTask().isPreciousResult(), true);
+        JavaTask jt = (JavaTask) mnJob.getTask("Controller");
+        Assert.assertEquals(jt.getArguments().get("numberToFind"), "100");
+        Assert.assertEquals(jt.isCancelJobOnError(), false);
+        Assert.assertEquals(jt.getCleaningScript(), null);
+        Assert.assertEquals(jt.getDependencesList(), null);
+        Assert
+                .assertEquals(jt.getDescription(),
+                        "Will control the workers in order to find the prime number");
+        Assert.assertEquals(jt.getExecutableClassName(),
+                "org.ow2.proactive.scheduler.examples.MultiNodeExample");
+        Assert.assertEquals(jt.getGenericInformations().get("n11"), "v11");
+        Assert.assertEquals(jt.getGenericInformations().get("n22"), "v22");
+        Assert.assertEquals(jt.getMaxNumberOfExecution(), 1);
+        Assert.assertEquals(jt.getName(), "Controller");
+        Assert.assertEquals(jt.getNumberOfNodesNeeded(), 3);
+        Assert.assertEquals(jt.getPreScript(), null);
+        Assert.assertEquals(jt.getPostScript(), null);
+        Assert.assertEquals(jt.getRestartTaskOnError(), RestartMode.ANYWHERE);
+        Assert.assertEquals(jt.getResultPreview(), "path.to.package.class");
+        Assert.assertEquals(jt.getSelectionScripts(), null);
+        Assert.assertTrue(jt.isPreciousResult());
 
         log("Test generated task name");
         TaskFlowJob job = new TaskFlowJob();

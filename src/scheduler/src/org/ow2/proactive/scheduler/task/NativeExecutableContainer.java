@@ -31,6 +31,9 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,13 +42,19 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.GenerationScript;
 
 
@@ -57,11 +66,13 @@ import org.ow2.proactive.scripting.GenerationScript;
 @Table(name = "NATIVE_EXEC_CONTAINER")
 @AccessType("field")
 @Proxy(lazy = true)
-public class NativeExecutableContainer implements ExecutableContainer {
+public class NativeExecutableContainer extends ExecutableContainer {
+
+    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+
     @Id
     @GeneratedValue
-    @SuppressWarnings("unused")
-    private long hId;
+    protected long hId;
 
     // actual executable data
     @Column(name = "CLASSPATH", columnDefinition = "BLOB")
@@ -97,7 +108,7 @@ public class NativeExecutableContainer implements ExecutableContainer {
      * @see org.ow2.proactive.scheduler.task.ExecutableContainer#getExecutable()
      */
     public Executable getExecutable() throws ExecutableCreationException {
-        return new NativeExecutable(command, generated);
+        return new NativeExecutable();
     }
 
     /**
@@ -107,8 +118,26 @@ public class NativeExecutableContainer implements ExecutableContainer {
         // Nothing to do for now...
     }
 
-    public String getWorkingDir() {
-        return workingDir;
+    /**
+     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#createExecutableInitializer()
+     */
+    public NativeExecutableInitializer createExecutableInitializer() {
+        NativeExecutableInitializer nei = new NativeExecutableInitializer();
+        nei.setCommand(command);
+        nei.setGenerationScript(generated);
+        nei.setWorkingDir(workingDir);
+        List<String> nodesHost = new ArrayList<String>();
+        for (Node nodeHost : nodes) {
+            nodesHost.add(nodeHost.getNodeInformation().getVMInformation().getHostName());
+        }
+        //add local node name
+        try {
+            nodesHost.add(PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
+        } catch (NodeException e) {
+            logger_dev.warn("Local node could not be added to the list of host !", e);
+        }
+        nei.setNodesHost(nodesHost);
+        return nei;
     }
 
 }

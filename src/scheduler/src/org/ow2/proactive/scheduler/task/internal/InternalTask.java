@@ -65,7 +65,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
+import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
@@ -94,7 +94,7 @@ public abstract class InternalTask extends TaskState {
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = InternalJavaTask.class, value = "IJT"),
             @MetaValue(targetEntity = InternalNativeTask.class, value = "INT"),
-            @MetaValue(targetEntity = InternalProActiveTask.class, value = "IPT") })
+            @MetaValue(targetEntity = InternalForkedJavaTask.class, value = "IFJT") })
     @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
@@ -120,7 +120,7 @@ public abstract class InternalTask extends TaskState {
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = JavaExecutableContainer.class, value = "JEC"),
             @MetaValue(targetEntity = NativeExecutableContainer.class, value = "NEC"),
-            @MetaValue(targetEntity = ForkedJavaExecutable.class, value = "FJE") })
+            @MetaValue(targetEntity = ForkedJavaExecutableContainer.class, value = "FJEC") })
     @JoinColumn(name = "EXEC_CONTAINER_ID", updatable = false)
     @Cascade(CascadeType.ALL)
     protected ExecutableContainer executableContainer = null;

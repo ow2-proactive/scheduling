@@ -583,13 +583,17 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         ArrayList<JobDescriptor> jobDescriptorList = new ArrayList<JobDescriptor>();
 
         for (InternalJob j : runningJobs) {
-            jobDescriptorList.add(j.getJobDescriptor());
+            if (j.getJobDescriptor().getEligibleTasks().size() > 0) {
+                jobDescriptorList.add(j.getJobDescriptor());
+            }
         }
 
         //if scheduler is paused it only finishes running jobs
         if (status != SchedulerStatus.PAUSED) {
             for (InternalJob j : pendingJobs) {
-                jobDescriptorList.add(j.getJobDescriptor());
+                if (j.getJobDescriptor().getEligibleTasks().size() > 0) {
+                    jobDescriptorList.add(j.getJobDescriptor());
+                }
             }
         }
 
@@ -635,9 +639,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 //last task to be launched
                 sentinel = internalTask;
                 if (internalTask.getNumberOfNodesNeeded() > freeResourcesNb) {
-                    //TODO what do we want for proActive job?
-                    //Wait until enough resources are free or <<- chosen for the moment
-                    //get the node until number of needed resources is reached?
+                    //TODO what do we want for multi-nodes task?
+                    //Improve scheduling policy to avoid starvation
                     break;
                 } else {
                     //update number of nodes to ask to the RM
@@ -769,10 +772,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             }
                         }
 
+                        //set nodes in the executable container
+                        internalTask.getExecutableContainer().setNodes(nodes);
+
                         //TODO if the next task is a native task, it's no need to pass params
                         ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask.getName(),
                                 launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(), internalTask
-                                        .getExecutableContainer(), nodes, params));
+                                        .getExecutableContainer(), params));
 
                         logger_dev.info("Starting deployment of task '" + internalTask.getName() +
                             "' for job '" + currentJob.getId() + "'");

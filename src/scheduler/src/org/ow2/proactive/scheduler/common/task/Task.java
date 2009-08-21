@@ -54,7 +54,6 @@ import org.hibernate.annotations.MetaValue;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.exception.DependenceFailedException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -167,9 +166,6 @@ public abstract class Task extends CommonAttribute {
     public void addDependence(Task task) {
         if (dependences == null) {
             dependences = new ArrayList<Task>();
-        }
-        if (task instanceof ProActiveTask) {
-            throw new DependenceFailedException("Cannot add a ProActive task in a dependence context !");
         }
         dependences.add(task);
     }

@@ -65,7 +65,7 @@ public interface TaskResult extends Serializable {
     public TaskId getTaskId();
 
     /**
-     * To get the value of the task.
+     * Get the value of the task. Throw the exception if the task generate
      *
      * @return the value of the task.
      * @throws Throwable If the value has generate an exception.
@@ -73,9 +73,10 @@ public interface TaskResult extends Serializable {
     public Serializable value() throws Throwable;
 
     /**
-     * To get the exception of the task.
+     * Retrieve the exception threw by the task.
+     * If the task didn't throw an exception, null is returned
      *
-     * @return the exception of the task.
+     * @return the exception threw by the task.
      */
     public Throwable getException();
 

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -27,14 +27,17 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $PROACTIVE_INITIAL_DEV$
  */
 package org.ow2.proactive.scheduler.task.internal;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
@@ -44,44 +47,45 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.launcher.ProActiveTaskLauncher;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.launcher.ForkedJavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
- * Description of an ProActive java task.
- * See also @see AbstractJavaTaskDescriptor
+ * Description of a java task at internal level.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 1.1
  */
 @Entity
-@Table(name = "INTERNAL_PA_TASK")
+@Table(name = "INTERNAL_FORKED_TASK")
+@MappedSuperclass
 @AccessType("field")
 @Proxy(lazy = false)
-public class InternalProActiveTask extends InternalTask {
+public class InternalForkedJavaTask extends InternalJavaTask {
+
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    private long hId;
+    /** Policy content for the forked VM (declared as static element to be done once) */
+    @Transient
+    private static StringBuilder policyContent = null;
 
     /**
      * ProActive empty constructor
      */
-    public InternalProActiveTask() {
+    public InternalForkedJavaTask() {
     }
 
     /**
-     * Create a new Java ProActive task descriptor using instantiated java task.
+     * Create a new Java task descriptor using instantiated java task.
      *
-     * @param execContainer contains the task to execute
+     * @param execContainer the forked Java Executable Container
      */
-    public InternalProActiveTask(JavaExecutableContainer execContainer) {
+    public InternalForkedJavaTask(ForkedJavaExecutableContainer execContainer) {
         this.executableContainer = execContainer;
     }
 
@@ -90,15 +94,39 @@ public class InternalProActiveTask extends InternalTask {
      */
     @Override
     public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
-        ProActiveTaskLauncher launcher;
 
-        logger_dev.info("Create ProActive task launcher");
         TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer();
-        launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(ProActiveTaskLauncher.class.getName(),
-                new Object[] { tli }, node);
-
+        tli.setPolicyContent(getJavaPolicy());
+        logger_dev.info("Create forked java task launcher");
+        TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
+                .getName(), new Object[] { tli }, node);
         setExecuterInformations(new ExecuterInformations(launcher, node));
 
         return launcher;
+    }
+
+    /**
+     * Return the content of the forked java policy or a default one if not found.
+     *
+     * @return the content of the forked java policy or a default one if not found.
+     */
+    private static String getJavaPolicy() {
+        if (policyContent == null) {
+            try {
+                policyContent = new StringBuilder("");
+                String forkedPolicyFilePath = PASchedulerProperties
+                        .getAbsolutePath(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_SECURITY_POLICY
+                                .getValueAsString());
+                BufferedReader brin = new BufferedReader(new FileReader(forkedPolicyFilePath));
+                String line;
+                while ((line = brin.readLine()) != null) {
+                    policyContent.append(line + "\n");
+                }
+            } catch (Exception e) {
+                logger_dev.error("Policy file not read, applying default basic permission", e);
+                policyContent = new StringBuilder("grant {\npermission java.security.BasicPermission;\n};\n");
+            }
+        }
+        return policyContent.toString();
     }
 }

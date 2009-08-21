@@ -32,8 +32,7 @@
 package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Appender;
@@ -52,6 +51,7 @@ import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -68,7 +68,6 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -209,6 +208,25 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
+     * Call the internal init private method on the current executable using the given argument.<br>
+     * This method first get the method "internalInit" (let's call it 'm') of the given <b>targetedClass</b>.<br>
+     * <b>parameterType</b> is the type of the argument to find the internal init method.<br>
+     * Then the targeted method of 'm' is switched to accessible, finally 'm' is invoked on the current executable
+     * with the given <b>argument</b>.
+     *
+     * @param targetedClass the class on which to look for the private 'internal init' method
+     * @param parameterType the type of the parameter describing the definition of the method to look for.
+     * @param argument the argument passed to the invocation of the found method on the current executable.
+     * @throws Exception reported if something wrong occurs.
+     */
+    protected void callInternalInit(Class<?> targetedClass, Class<?> parameterType,
+            ExecutableInitializer argument) throws Exception {
+        Method m = targetedClass.getDeclaredMethod("internalInit", parameterType);
+        m.setAccessible(true);
+        m.invoke(currentExecutable, argument);
+    }
+
+    /**
      * Execute the user task as an active object.
      *
      * @param core The scheduler core to be notify
@@ -217,7 +235,7 @@ public abstract class TaskLauncher implements InitActive {
      * @return a task result representing the result of this task execution.
      */
     public abstract TaskResult doTask(TaskTerminateNotification core, ExecutableContainer execContainer,
-            NodeSet nodes, TaskResult... results);
+            TaskResult... results);
 
     /**
      * Redirect stdout/err in the buffered appender.
@@ -263,12 +281,11 @@ public abstract class TaskLauncher implements InitActive {
     /**
      * Reset scheduler related variables value.
      */
-    // TODO cdelbe : reset to an empty string ? Useful ?
     protected void unsetEnv() {
-        System.setProperty("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME, "");
-        System.setProperty("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME, "");
-        System.setProperty("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME, "");
-        System.setProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME, "");
+        System.clearProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString());
+        System.clearProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString());
+        System.clearProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString());
+        System.clearProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString());
     }
 
     /**
@@ -351,7 +368,7 @@ public abstract class TaskLauncher implements InitActive {
      * Return a TaskLogs object that contains the logs produced by the executed tasks
      * @return a TaskLogs object that contains the logs produced by the executed tasks
      */
-    protected TaskLogs getLogs() {
+    public TaskLogs getLogs() {
         this.flushStreams();
         TaskLogs logs = new Log4JTaskLogs(this.logAppender.getStorage());
         return logs;
@@ -401,19 +418,6 @@ public abstract class TaskLauncher implements InitActive {
         }
         // flush postscript output
         this.flushStreams();
-    }
-
-    /**
-     * To get the node(s) on which this active object has been launched.
-     *
-     * @return the node(s) of this active object.
-     * @throws NodeException
-     */
-    public NodeSet getNodes() throws NodeException {
-        Collection<Node> nodes = new ArrayList<Node>();
-        nodes.add(PAActiveObject.getNode());
-
-        return new NodeSet(new ArrayList<Node>(nodes));
     }
 
     /**
