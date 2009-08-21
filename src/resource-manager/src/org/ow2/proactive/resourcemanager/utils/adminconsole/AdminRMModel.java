@@ -221,6 +221,7 @@ public class AdminRMModel extends ConsoleModel {
 
     private void listns_() {
         List<RMNodeSourceEvent> list = rm.getNodeSourcesList();
+        print("Source name \tSource description");
         for (RMNodeSourceEvent evt : list) {
             print(evt.getSourceName() + "\t" + evt.getSourceDescription());
         }
@@ -236,6 +237,7 @@ public class AdminRMModel extends ConsoleModel {
         if (list.size() == 0) {
             print("No nodes handled by Resource Manager");
         } else {
+            print("SourceName \thostName \tstate \t URL");
             for (RMNodeEvent evt : list) {
                 String state = null;
                 switch (evt.getNodeState()) {
