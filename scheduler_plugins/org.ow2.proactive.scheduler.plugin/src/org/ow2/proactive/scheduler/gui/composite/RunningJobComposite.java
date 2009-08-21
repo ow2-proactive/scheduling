@@ -478,15 +478,16 @@ class DotTask extends TimerTask {
             return;
         }
         if (job.getStatus() == JobStatus.RUNNING) {
-            double tmp = 0;
-            for (int i = 0; i < index; i++) {
-                if (tasks[i] < 100) {
-                    tasks[i] += ((100 - tasks[i]) / (FINISHED_TASK_REDUCE_FACTOR));
-                }
-                tmp += tasks[i];
-            }
             try {
-                for (int i = index; i < index + job.getNumberOfRunningTasks(); i++) {
+                double tmp = 0;
+                for (int i = 0; i < index; i++) {
+                    if (tasks[i] < 100) {
+                        tasks[i] += ((100 - tasks[i]) / (FINISHED_TASK_REDUCE_FACTOR));
+                    }
+                    tmp += tasks[i];
+                }
+                for (int i = index; i < index + job.getNumberOfRunningTasks() &&
+                    i < job.getTotalNumberOfTasks(); i++) {
                     if (tasks[i] < RUNNING_TASK_MAX_PERCENT) {
                         tasks[i] += ((100 - tasks[i]) / (RUNNING_TASK_REDUCE_FACTOR));
                     }
