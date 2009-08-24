@@ -9,15 +9,13 @@
 	</javaExecutable>
 </task>
 
-<task name="task2">
+<task name="task2" numberOfNodes="3">
 	<depends>
 		<task ref="task1"/>
 	</depends>
-	<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+	<javaExecutable class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
 		<parameters>
-			<parameter name="foo" value="false"/>
-			<parameter name="bar" value="12"/>
-			<parameter name="test" value="titi"/>
+			<parameter name="numberToFind" value="100"/>
 		</parameters>
 	</javaExecutable>
 </task>

@@ -60,7 +60,7 @@ public class MultiNodeExample extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) {
-        System.out.println("Multi-task started !!");
+        System.out.println("Multi-node started !!");
 
         ArrayList<Node> nodes = getNodes();
 

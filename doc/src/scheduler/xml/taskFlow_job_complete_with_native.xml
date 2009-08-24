@@ -21,7 +21,7 @@
 		<task name="task1_native" maxNumberOfExecution="2">
 			<description>Will display 10 dots every 1s</description>
 			<nativeExecutable>
-				<!-- Consider that the ${VAR_NAME} has been defined in the job description as describe in the job creation section -->
+				<!-- Consider that the ${WORK_DIR} has been defined in the job description as describe in the job creation section -->
 				<staticCommand
 					value="${WORK_DIR}/native_exec">
 					<arguments>

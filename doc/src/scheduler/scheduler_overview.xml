@@ -95,7 +95,7 @@
 			<para>
 				A <emphasis role="bold">Job</emphasis> is the entity to be submitted to the scheduler. It is
 				composed of one or more <emphasis role="bold">tasks</emphasis>.</para> 
-				<para>There are two types of jobs, described hereafter:
+				<para>There is one type of job, described hereafter:
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -104,21 +104,8 @@
 							according to a dependency tree. Tasks
 							inside this job can be either Java (A task written in Java extending
 							a given interface) or Native (Any native process).
-						</para>
-					</listitem>
-
-					<listitem>
-						<para>
-							<emphasis role="bold">PROACTIVE</emphasis> -
-							 represents a job that contains a ProActive
-							application (embedded in
-							<emphasis>only one ProActive Task</emphasis>).
-							Its execution starts with a given
-							predefined number of resources on which the user
-							can start the ProActive application. This
-							kind of job requires  the
-							ProActive API, in order to build a
-							ProActive application.
+							Each task can be a single process or an MPI application (Execution starts with a given
+							predefined number of resources on which the user can start the application).
 						</para>
 					</listitem>
 
@@ -132,7 +119,7 @@
 			</para>
 
 			<para>
-				A finished job contains all task results provided by the scheduler. 
+				A finished job contains all task results provided by the whole process. 
 				However, if you want to highlight a result which is more important,
 				you can mark its corresponding task as
 				<emphasis role="bold">precious</emphasis>
@@ -161,7 +148,7 @@
 			</para>
 
 			<para>
-				There are three types of tasks:
+				There are 2 types of tasks:
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -181,24 +168,6 @@
 							 or by a 'generation script' that can dynamically
 							generate the command line to be executed (for instance, according to the computing node's operating system
 							wherein the task is executed).
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis role="bold">PROACTIVE</emphasis> - its execution is defined by a Java class
-							extending the
-							<code>
-								org.ow2.proactive.scheduler.common.task.executable.ProActiveExecutable
-							</code>
-							class, which defines a ProActive application.
-							When writing ProActive applications for the 
-							Scheduler, programmers need to 
-							know how to use nodes (see <xref linkend="Create_ProActive_task"/>).
-							The Scheduler allows deployments
-							without knowledge of the underlying infrastructure. 
-							The infrastructure definition is done by the 
-							administrator of the Scheduler.  
-
 						</para>
 					</listitem>
 				</itemizedlist>

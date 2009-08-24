@@ -114,29 +114,18 @@
 			
 			<para>This example does not contain the job type definition. We detail the job type definition in the next sections.</para>
 			<para>
-				To create a ProActive Job, please refer to <xref linkend="Create_ProActive_job_xml" />. To create a Taskflow Job, please refer to <xref linkend="Create_TaskFlow_job_xml" />.
+				To create a TaskFlow Job, please refer to the next part.
 			</para>
 		</section>
 			
 		<section xml:id="Create_TaskFlow_job_xml"><info><title>Create a Task Flow job using an XML descriptor</title></info>
 			<para>
 				A Task Flow job is a job that can
-				contain one or several task(s) with needed dependencies.
+				contain one or several task(s) with optional dependencies.
 				To specify that a job is a Task Flow Job, you have to add the 'taskFlow' tag.
 				The previous would therefore be written as follows:
 			</para>
 			<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job.xml" /></textobject></programlisting>
-			<para>
-				The creation and addition of tasks is described in <xref linkend="Create_add_task" />.
-			</para>
-		</section>
-		
-		<section xml:id="Create_ProActive_job_xml"><info><title>Create a ProActive job using an XML descriptor</title></info>
-			<para>
-				To specify that a job is a ProActive job, you just have to add a 'proActive' tag into it.
-				The previous example would look like that:
-			</para>
-			<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job.xml" /></textobject></programlisting>
 			<para>
 				The creation and addition of tasks is described in <xref linkend="Create_add_task" />.
 			</para>
@@ -149,15 +138,6 @@
 			</para>
 			<programlisting language="java"> <textobject><textdata fileref="automatic_snippets/task_flow_job_creation.snip" /></textobject></programlisting>
 		</section>
-	
-
-		<section xml:id="Create_ProActive_job_java"><info><title>Create a ProActive job using the Java API</title></info>
-			<para>
-				To make a new instance of a ProActive job, you have to create a new 
-				<code>ProActiveJob</code> object:
-			</para>
-			<programlisting language="java"><![CDATA[ ProActiveJob job = new ProActiveJob();]]></programlisting>
-  		</section>
 		
 		<section xml:id="Parameters_job_java"><info><title>Set job parameters using the Java API</title></info>
 			<para>
@@ -184,7 +164,7 @@ job.setEnv(je);
 			</para>
 		</section>
 		
-		<section xml:id="flat_file_job"><info><title>Create a job in a simple flat file</title></info>
+		<section xml:id="flat_file_job"><info><title>Create a job from a simple flat file</title></info>
 			<para> ProActive Scheduler provides a way to define a job with a simple plain text file. This method is simpler than an XML file but presents less features.
 			</para>
 			<para>
@@ -292,7 +272,7 @@ public void init(Map&lt;String, Object&gt; args) {
 				<para>
 					The previous code is given as an example. The default behavior of the init() method is to associate declared
 					Java variables to their value, assuming that the variable names given in arguments (in the map) are the same as the Java declared ones.
-					Thus, The given code behaves exactly like the following code:
+					Thus, The following code behaves exactly like the previous one :
 					<programlisting language="java">
 private boolean foo;
 private int bar;
@@ -328,6 +308,100 @@ public Serializable execute(TaskResult... results) throws Throwable {
 					Finally, overriding the <code>init()</code> method can be useful if you want to retrieve personal arguments or do some
 					operations before starting the real execution of the task.
 				</para>
+				<para>
+					Moreover, the <code>getNodes()</code> method retrieves the list of nodes define in the description of the task.
+					It is a way to make MPI or ProActive application on the given resources.
+					Here's an example of a ProActive application made in a multi-nodes <code>JavaExecutable</code> :
+				</para>
+				<programlisting language="java">
+public class ProActiveExample extends JavaExecutable {
+
+	private int numberToFind = 5003;
+	
+	@Override
+    public Serializable execute(TaskResult... results) {
+        System.out.println("Multi-node started !!");
+
+        ArrayList&lt;Node&gt; nodes = getNodes();
+
+        // create workers (on local node)
+        Vector&lt;Worker&gt; workers = new Vector&lt;Worker&gt;();
+
+        for (Node node : nodes) {
+            try {
+                Worker w = (Worker) PAActiveObject.newActive(Worker.class.getName(), new Object[] {}, node);
+                workers.add(w);
+            } catch (ActiveObjectCreationException e) {
+                e.printStackTrace();
+            } catch (NodeException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // create controller
+        Controller controller = new Controller(workers);
+        int result = controller.findNthPrimeNumber(numberToFind);
+
+        System.out.println("last prime : " + result);
+
+        return result;
+    }
+
+    private class Controller {
+        // Managed workers
+        private Vector&lt;Worker&gt; workers;
+
+        /**
+         * Create a new instance of Controller.
+         *
+         * @param workers
+         */
+        public Controller(Vector&lt;Worker&gt; workers) {
+            this.workers = workers;
+        }
+
+        // start computation
+        /**
+         * Find the Nth prime number.
+         *
+         * @param nth the prime number to find
+         * @return the Nth prime number.
+         */
+        public int findNthPrimeNumber(int nth) {
+            long startTime = System.currentTimeMillis();
+            BooleanWrapper flase = new BooleanWrapper(false);
+            int found = 0;
+            int n = 2;
+
+            while (found &lt; nth) {
+                Vector&lt;BooleanWrapper&gt; answers = new Vector&lt;BooleanWrapper&gt;();
+
+                // send requests
+                for (Worker worker : workers) {
+                    BooleanWrapper resp = worker.isPrime(n);
+                    answers.add(resp);
+                }
+
+                PAFuture.waitForAll(answers);
+
+                if (!answers.contains(flase)) {
+                    workers.get(found % workers.size()).addPrimeNumber(n);
+                    System.out.println("---&gt;" + n);
+                    found++;
+                }
+
+                n++;
+            }
+
+            long stopTime = System.currentTimeMillis();
+            System.out.println("Total time (ms) " + (stopTime - startTime));
+
+            return n - 1;
+        }
+    }
+    
+}
+				</programlisting>
 			</section>
 			
 			<section xml:id="Create_java_task_xml"><info><title>Create and add a Java task using an XML descriptor</title></info>
@@ -349,11 +423,13 @@ public Serializable execute(TaskResult... results) throws Throwable {
 					This example also shows the definition of two tasks with dependencies. We can easily see that 'task 2' depends on
 					'task 1'. So 'task 2' will be executed only once 'task 1' has finished.
 					To put these two tasks inside your TaskFlow job, just put it between the 'taskFlow' tags.
+					You may also notice that the 'task 2' will use 3 nodes to be started. So the 'task 2' have to wait for
+					'task 1' to be terminated and 3 available nodes.
 					Here is a complete ready-to-be-scheduled TaskFlow job:
 				</para>
 				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/taskFlow_job_complete.xml"/></textobject></programlisting>
 				<para>
-					It is obviously possible to mix Java and Native task inside a taskFlow Job.
+					It is obviously possible to mix Java (with one or more nodes) and Native task inside a taskFlow Job.
 					Some other parameters and options can be set into a Java task. The two following examples expose some of them:
 				</para>
 				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/java_task_script.xml"/></textobject></programlisting>
@@ -447,6 +523,11 @@ env.setJavaHome("Your/java/home/path");
 env.setJVMParameters("-d12");
 aTask.setForkEnvironment(env);
 				</programlisting>
+				<para>
+					If the fork attribute is 'true', the java executable will be started on a brand new JVM
+					with new environment. If fork remains unset and a walltime is define, so the task will
+					automatically be forked. This allows the Scehduler to kill the java process at the end of walltime.
+				</para>
 				<para>
 					To have an exhaustive list of available options and theirs functions, please refer to
 					the task explanation section (see <xref linkend="Create_task_explanation"/>).
@@ -592,180 +673,10 @@ task2.setGenerationScript(gscript);
 			</section>
 		</section>
 		
-		<section xml:id="Create_ProActive_task"><info><title>Create and add a ProActive task</title></info>
-			<para>
-				<emphasis>Note</emphasis>: It is only possible to add a ProActive task in a ProActive Job.
-			</para>
-			<para>
-				To learn how to create a ProActive Job,
-				please refer to <xref linkend="Create_ProActive_job_xml"/> or <xref linkend="Create_ProActive_job_java"/>.
-				Once your ProActive Job created, it is only possible to add <emphasis>ONE</emphasis> ProActive task inside your job.
-			</para>
-			<section xml:id="define_executable_ProActive"><info><title>Define your own ProActive executable</title></info>
+		<section xml:id="Create_task_explanation"><info><title>Tasks options and explanations</title></info>
 				<para>
-					You can create your own ProActive executable by implementing scheduler executable interfaces.
-					In this sens, 'executable' means the executed process (that is a Java class in this case).
-					Here is an example on how to create your own ProActive executable:
-				</para>
-				<programlisting language="java">
-public class ProActiveExample extends ProActiveExecutable {
-
-	private int numberToFind = 5003;
-	
-	@Override
-	public Serializable execute(ArrayList&lt;Node&gt; nodes) {
-		System.out.println("ProActive job started !!");
-
-		// create workers (on local node)
-		Vector&lt;Worker&gt; workers = new Vector&lt;Worker&gt;();
-
-		for (Node node : nodes) {
-			try {
-				Worker w = (Worker)PAActiveObject.newActive(Worker.class.getName(),
-						new Object[] { }, node);
-				workers.add(w);
-			} catch (ActiveObjectCreationException e) {
-				e.printStackTrace();
-			} catch (NodeException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// create controller Controller controller = new Controller(workers);
-		int result = controller.findNthPrimeNumber(numberToFind);
-
-		System.out.println("last prime : " + result);
-
-		return result;
-	}
-}
-				</programlisting>
-				<para>
-					It is also possible to get a list of arguments that you can give to the executable at its start by
-					overriding the init method of the ProActiveExecutable class. How to give arguments to the task will be explain
-					later.
-					Let's see how you can give a foo, a bar and a test argument to the previous example:
-					<programlisting language="java">
-private boolean foo;
-private int bar;
-private String test;
-
-@Override
-public void init(Map&lt;String, Object&gt; args) {
-	foo = (Boolean)args.get("foo");
-	bar = (Integer)args.get("bar");
-	test = args.get("test");
-}
-					</programlisting>
-				</para>
-				<para>
-					This example uses the nodes given in parameters and start 'workers' on them. 
-					The <code>execute(nodes)</code> method shows what can be done
-					inside this kind of task. For more details about how to use the ProActive API,
-					see the appropriate documentation.
-					The complete example file can be found under 'samples/jobs_descriptors/Job_MultiNodes.xml'.
-				</para>
-				</section>
-			</section>
-			<section xml:id="Create_ProActive_task_xml"><info><title>Create and add a ProActive task using XML descriptor</title></info>
-				<para>
-					To understand the syntax of the ProActive task, please take a look at the following example:
-				</para>
-				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_simple.xml"/></textobject></programlisting>
-				<para>
-					The ProActive Task is composed of one 'proActiveExecutable' tag that specifies the 'ProActiveExecutable' Java class to use.
-					A set of parameters has also be defined to provide this executable with some information. These parameters will be
-					available into the <code>Map</code> of the <code>init(Map)</code> method into your <code>ProActiveExecutable</code>.
-					To put this task inside your ProActive job, just put it between the 'ProActive' tags.
-					For this job, it is necessarily to set the number of nodes you want for your ProActiveExecutable.
-					Instead of deploying resources as it has to be done in ProActive Suite, the resources are provided by the ProActive Scheduler.
-					Here is a complete ready-to-be-scheduled ProActive job:
-				</para>
-				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_job_complete.xml"/></textobject></programlisting>
-				<para>
-					Some other options can be set in a ProActive task. Here is a new example of what can be done with
-					an XML descriptor:
-				</para>
-				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/ProActive_task_script.xml"/></textobject></programlisting>
-				<para>
-					To have an exhaustive list of available options and their functionalities, please refer to
-					the task explanation section at <xref linkend="Create_task_explanation"/>.
-				</para>
-			</section>
-			<section xml:id="Create_ProActive_task_java"><info><title>Create and add a ProActive task using Java API</title></info>
-				<para>
-					To <emphasis>create a ProActive task</emphasis>, you have first to instantiate a
-					<emphasis>ProActiveTask</emphasis> object.
-					Then, you have to specify the class you want to start with, by mentioning a
-					Class of extending the ProActiveExecutable class (To make your own executable, see the
-					proper section <xref linkend="define_executable_ProActive"/>).
-					In addition, you can add arguments with which the task will be launched.
-					These launching arguments will be given to the ProActive executable as a Map.
-					Take a look at the example below to see how to use the task creation Java API
-					(see also Java Documentation of the Scheduler to learn more):
-				</para>
-				<programlisting language="java">
-//create a ProActive Task using the default constructor that we'll call 'aTask'
-ProActiveTask aTask = new ProActiveTask();
-//add executable class or instance
-pat.setExecutableClassName("org.ow2.proactive.scheduler.examples.MultiNodeExample");
-//then, set the desired options : (for example)
-aTask.setName("task 1");
-aTask.setDescription("This task will do
-something...");
-aTask.addGenericInformation("key","value");
-aTask.setResultPreview(UserDefinedResultPreview.class);
-//add arguments (optional)
-aTask.addArgument("foo",new Boolean(true));
-aTask.addArgument("bar",new Integer(12));
-aTask.addArgument("test","test1");
-//add number of nodes needed for the application
-      pat.setNumberOfNodesNeeded(10);
-
-//SCRIPTS EXAMPLE		
-//If the script to use is in a file or URL
-String[] args = new String("foo","bar");
-File scriptFile = new File("path/to/script_file");
-//URL scriptURL = new URL("url/to/script_file");
-Script script = new SimpleScript(scriptFile, args);
-// Script script = new SimpleScript(scriptURL, args);
-aTask.setPreScript(script);
-//If the script to use is in a Java string for example
-Script script = new SimpleScript("Script_content", "type_of_language");
-//where type_of_language can be any language supported by the underlying JRE
-aTask.setPreScript(script);
-
-//same construction for the post script
-aTask.setPostScript(script);
-
-//same construction for the cleaning script
-aTask.setCleaningScript(script);
-
-//same construction for the  selection script
-//the last parameter is still not used in the current implementation
-SelectionScript selScript = new SelectionScript(script, true);
-aTask.setSelectionScript(selScript);
-				</programlisting>
-				<para>
-					To complete your job by adding the task inside the job, add it as followed:
-				</para>
-				<programlisting language="java">
-//add the task to the job
-job.setTask(aTask);
-				</programlisting>
-				<para>
-					<emphasis>Note: </emphasis> you can add <emphasis>only one</emphasis> ProActive task in a ProActive job
-				</para>
-				<para>
-					To have an exhaustive list of available options and their functionalities, please refer to
-					the task explanation section at <xref linkend="Create_task_explanation"/>.
-				</para>
-			</section>
-			
-			<section xml:id="Create_task_explanation"><info><title>Tasks options and explanations</title></info>
-				<para>
-					As it has been shown in the different examples, it is possible to create 3 types of tasks.
-					These 3 types have some common features like name, description, scripts and so on.
+					As it has been shown in the different examples, it is possible to create 2 types of tasks.
+					These 2 types have some common features like name, description, scripts and so on.
 					Here are details on each of these common features:
 				</para>
 				<itemizedlist>
@@ -856,6 +767,39 @@ job.setTask(aTask);
 									</imageobject>
 								</mediaobject>
 							</figure>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>numberOfNodes</emphasis> (optional, default 1) - 
+							number of nodes needed by the task.
+							<itemizedlist>
+								<listitem>
+									<para>
+										For a java task, one node among the specified number is used to start the task. The other 
+										are available through the <code>getNodes()</code> method in the java executable.
+										So, if you need 4 nodes to make your application worked, just ask for 5 nodes. (numberOfNodes="5")
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										For Native task, every asked nodes are available through environment variables :
+										<itemizedlist>
+											<listitem>
+												<para>
+													'PAS_CORE_NB' : contains the number of nodes available for the task.
+												</para>
+											</listitem>
+											<listitem>
+												<para>
+													'PAS_NODEFILE' : is the path to a file that contains every available nodes URL (one URL by line)
+												</para>
+											</listitem>
+										</itemizedlist>
+										Use this environment variable in your own native process to get these informations back.
+									</para>
+								</listitem>
+							</itemizedlist>
 						</para>
 					</listitem>
 					<listitem>

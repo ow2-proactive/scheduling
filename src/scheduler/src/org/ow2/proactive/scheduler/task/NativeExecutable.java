@@ -83,6 +83,7 @@ public class NativeExecutable extends Executable {
      * used for kill the task
      */
     private static String COOKIE_ENV = "PROACTIVE_COOKIE";
+    /** Env var exported for the number and name of nodes */
     private static String CORE_FILE_ENV = "PAS_NODEFILE";
     private static String CORE_NB = "PAS_CORE_NB";
 
@@ -155,7 +156,7 @@ public class NativeExecutable extends Executable {
             nodesFiles = File.createTempFile("pa_nodes", null);
             FileWriter outputWriter = new FileWriter(nodesFiles);
             for (String nodeHost : nodes) {
-                outputWriter.append(nodeHost + "\n");
+                outputWriter.append(nodeHost + System.getProperty("line.separator"));
             }
             outputWriter.close();
         }
