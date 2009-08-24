@@ -99,6 +99,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
@@ -429,6 +430,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         currentJob.setTaskFinishedTimeModify(null);
         // and to database
         DatabaseManager.synchronize(currentJob.getJobInfo());
+        for (TaskState task : currentJob.getTasks()) {
+            DatabaseManager.synchronize(task.getTaskInfo());
+        }
     }
 
     /**
@@ -1245,7 +1249,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
 
-                    //the job is not restarted directly
+                    //the task is not restarted immediately
                     RestartJobTimerTask jtt = new RestartJobTimerTask(job, descriptor);
                     restartTaskTimer.schedule(jtt, job.getNextWaitingTime(descriptor
                             .getMaxNumberOfExecution() -
