@@ -38,7 +38,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -50,8 +49,6 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -68,7 +65,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMAdminImpl;
@@ -84,13 +80,9 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
-import org.ow2.proactive.scripting.ScriptException;
-import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.scripting.ScriptWithResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
@@ -133,6 +125,11 @@ import org.ow2.proactive.utils.NodeSet;
  * 
  * WARNING : you must instantiate this class as an Active Object !
  * 
+ * RmCore should be non-blocking which means <BR>
+ * - no direct access to nodes <BR>
+ * - all method calls to other active objects should be either asynchronous or immediate services <BR>
+ * - methods which have to return something depending on another active objects should use an automatic continuation <BR>
+ *
  * @see RMCoreInterface
  * @see RMCoreSourceInterface
  * 
@@ -172,10 +169,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     private ArrayList<RMNode> freeNodes;
 
     private SelectionManager selectionManager;
-
-    /** Timeout for selection script result */
-    private static final int MAX_VERIF_TIMEOUT = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT
-            .getValueAsInt();
 
     /** indicates that RMCore must shutdown */
     private boolean toShutDown = false;
@@ -227,7 +220,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         nodeSources = new HashMap<String, NodeSource>();
         allNodes = new HashMap<String, RMNode>();
         freeNodes = new ArrayList<RMNode>();
-        selectionManager = new ProbablisticSelectionManager();
     }
 
     /**
@@ -304,11 +296,18 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             monitoring = (RMMonitoringImpl) PAActiveObject.newActive(RMMonitoringImpl.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 
+            if (logger.isDebugEnabled()) {
+                logger.debug("active object SelectionManager");
+            }
+            selectionManager = (SelectionManager) PAActiveObject.newActive(ProbablisticSelectionManager.class
+                    .getName(), new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+
             // register objects which are allowed to call methods of RMCore
             registerTrustedService(authentication);
             registerTrustedService(admin);
             registerTrustedService(user);
             registerTrustedService(monitoring);
+            registerTrustedService(selectionManager);
 
             // callback from started nodes
             setPublicMethod("addNode");
@@ -390,7 +389,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         // the node can only come from a busy state or down state
         assert rmnode.isBusy();
         try {
-            rmnode.clean(); // cleaning the node, kill all active objects
             rmnode.setFree();
             this.freeNodes.add(rmnode);
 
@@ -401,31 +399,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             internalSetDown(rmnode);
             logger.debug("", e);
         }
-    }
-
-    /**
-     * Set a node state to busy. Set the node to busy, and move the node to the
-     * internal busy nodes list. An event informing the node state's change is
-     * thrown to RMMonitoring.
-     * 
-     * @param rmnode
-     *            node to set
-     * @throws NodeException
-     */
-    private void internalSetBusy(RMNode rmnode) throws NodeException {
-        assert rmnode.isFree();
-        assert this.freeNodes.contains(rmnode);
-        rmnode.clean();
-
-        try {
-            rmnode.setBusy();
-        } catch (NodeException e1) {
-            // A down node shouldn't be busied...
-            logger.debug("", e1);
-        }
-        this.freeNodes.remove(rmnode);
-        // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
     }
 
     /**
@@ -482,12 +455,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             logger.info("Releasing node " + rmnode.getNodeURL());
         }
         internalRemoveNodeFromCore(rmnode);
-        try {
-            rmnode.clean();
-            rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), false);
-        } catch (NodeException e) {
-            logger.error(e.getMessage());
-        }
+        rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), false);
     }
 
     /**
@@ -513,32 +481,17 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * node to the all nodes list Creating the RMNode object related to the
      * node, and put the node in free state.
      * 
-     * @param node
+     * @param rmnode
      *            node object to add
-     * @param VNodeName
-     *            name of the Virtual node if eventually the node has been
-     *            deployed by a GCM deployment descriptor.
-     * @param nodeSource
-     *            Stub of Active object node source responsible of the
-     *            management of this node.
      */
-    private void internalAddNodeToCore(Node node, String VNodeName, NodeSource nodeSource) {
-        RMNode rmnode = new RMNodeImpl(node, VNodeName, nodeSource);
-        try {
-            rmnode.clean();
-            rmnode.setFree();
-            this.freeNodes.add(rmnode);
-            this.allNodes.put(rmnode.getNodeURL(), rmnode);
-            // create the event
-            this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED));
-        } catch (NodeException e) {
-            // Exception on the node, we assume the node is down
-            internalSetDown(rmnode);
-            logger.debug("", e);
-        }
+    public void internalAddNodeToCore(RMNode rmnode) {
+        this.freeNodes.add(rmnode);
+        this.allNodes.put(rmnode.getNodeURL(), rmnode);
+        // create the event
+        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED));
         if (logger.isInfoEnabled()) {
             logger.info("New node added, node ID is : " + rmnode.getNodeURL() + ", node Source : " +
-                nodeSource.getName());
+                rmnode.getNodeSourceId());
         }
     }
 
@@ -566,20 +519,31 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      */
     public void addNode(String nodeUrl, String sourceName) throws RMException {
         if (nodeSources.containsKey(sourceName)) {
+            NodeSource nodeSource = this.nodeSources.get(sourceName);
 
             // Known URL, so do some cleanup before replacing it
             if (allNodes.containsKey(nodeUrl)) {
+
+                RMNode registeredNode = allNodes.get(nodeUrl);
+
+                if (!allNodes.get(nodeUrl).getNodeSourceId().equals(sourceName)) {
+                    // trying to already registered node to another node source
+                    // do nothing in this case
+                    return;
+                }
+
                 /**
                  *  two potential scenario
-                 *  - adding the node with the same url which was restarted. In this case it's the different node from
-                 *    proactive point of view. So remove old node from everywhere and add new one.
-                 *  - adding the same node twice. Do not do any actions in this case.
+                 *  - attempt to add node with the same url which was restarted. In this case it's the different node from
+                 *    proactive point of view. So remove the old node and add the new one.
+                 *  - attempt to add the same node twice. Do nothing in this case.
                  */
                 try {
+                    // node lookup could potentially block the rm core
+                    // but this is an exceptional and rare case
                     Node newNode = NodeFactory.getNode(nodeUrl);
-                    Node registeredNode = allNodes.get(nodeUrl).getNode();
 
-                    if (newNode.equals(registeredNode)) {
+                    if (newNode.equals(registeredNode.getNode())) {
                         return;
                     }
                 } catch (NodeException e) {
@@ -589,12 +553,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                 removeNode(nodeUrl, true, false);
             }
 
-            NodeSource nodeSource = this.nodeSources.get(sourceName);
-            if (nodeSource != null) {
-                Node nodeToAdd = nodeSource.acquireNode(nodeUrl);
-                // register internally the node to the Core
-                this.internalAddNodeToCore(nodeToAdd, "noVn", nodeSource);
-            }
+            nodeSource.acquireNode(nodeUrl);
         } else {
             throw new RMException("unknown node source " + sourceName);
         }
@@ -879,153 +838,8 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         } else {
 
             logger.info("Number of requested nodes is " + nb.intValue());
-            NodeSet result = new NodeSet();
-            // getting sorted by probability candidates nodes from selection manager
-            Collection<RMNode> candidatesNodes = selectionManager.findAppropriateNodes(selectionScriptList,
-                    freeNodes, exclusion);
-            boolean scriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
-
-            // if no script specified no execution is required
-            // in this case selection manager just return a list of free nodes
-            if (!scriptSpecified) {
-                for (RMNode rmnode : candidatesNodes) {
-                    if (result.size() == nb.intValue()) {
-                        break;
-                    }
-                    try {
-                        internalSetBusy(rmnode);
-                        result.add(rmnode.getNode());
-                    } catch (NodeException e) {
-                        internalSetDown(rmnode);
-                    }
-                }
-                return result;
-            }
-
-            // scripts were specified
-            // start execution on candidates set until we have enough
-            // candidates or test each node
-            Iterator<RMNode> nodesIterator = candidatesNodes.iterator();
-            HashMap<RMNode, List<ScriptWithResult>> scriptsExecutionResults;
-
-            while (nodesIterator.hasNext() && result.size() < nb.intValue()) {
-                scriptsExecutionResults = executeScripts(selectionScriptList, nodesIterator, nb.intValue() -
-                    result.size());
-                try {
-                    result.addAll(processScriptResults(scriptsExecutionResults));
-                } catch (ScriptException e) {
-                    freeNodes(result);
-                    throw e;
-                }
-            }
-
-            logger.info("Number of found nodes is " + result.size());
-            return result;
+            return selectionManager.findAppropriateNodes(nb, selectionScriptList, exclusion);
         }
-    }
-
-    /**
-     * Executes set of scripts on "number" nodes.
-     * Returns "future" script results for further analysis.
-     */
-    private HashMap<RMNode, List<ScriptWithResult>> executeScripts(List<SelectionScript> selectionScriptList,
-            Iterator<RMNode> nodesIterator, int number) {
-        HashMap<RMNode, List<ScriptWithResult>> scriptExecutionResults = new HashMap<RMNode, List<ScriptWithResult>>();
-        while (nodesIterator.hasNext() && scriptExecutionResults.keySet().size() < number) {
-            RMNode rmnode = nodesIterator.next();
-            scriptExecutionResults.put(rmnode, executeScripts(rmnode, selectionScriptList));
-        }
-        return scriptExecutionResults;
-    }
-
-    /**
-    * Executes set of scripts on a given node.
-    * Returns "future" script results for further analysis.
-    */
-    private List<ScriptWithResult> executeScripts(RMNode rmnode, List<SelectionScript> selectionScriptList) {
-        List<ScriptWithResult> scriptExecitionResults = new LinkedList<ScriptWithResult>();
-
-        for (SelectionScript script : selectionScriptList) {
-            if (selectionManager.scriptWillPassOnTheNode(script, rmnode)) {
-                // already executed static script
-                logger.info("Skipping script execution " + script.hashCode() + " on node " +
-                    rmnode.getNodeURL());
-                scriptExecitionResults.add(new ScriptWithResult(script, new ScriptResult<Boolean>(true)));
-                continue;
-            }
-
-            logger.info("Executing script " + script.hashCode() + " on node " + rmnode.getNodeURL());
-            ScriptResult<Boolean> scriptResult = rmnode.executeScript(script);
-
-            // if r is not a future, the script has not been executed
-            //TODO check if that code is always needed
-            // because exception in script handler creation/execution
-            // produce an exception in ScriptResult
-            if (MOP.isReifiedObject(scriptResult)) {
-                scriptExecitionResults.add(new ScriptWithResult(script, scriptResult));
-            } else {
-                scriptExecitionResults.add(new ScriptWithResult(script, null));
-                // script has not been executed on remote host
-                logger.info("Error occured executing selection script : " +
-                    scriptResult.getException().getMessage());
-            }
-        }
-
-        return scriptExecitionResults;
-    }
-
-    /**
-     * Processes script execution results, updating selection manager knowledge base.
-     * Returns a set of selected nodes. 
-     */
-    private NodeSet processScriptResults(HashMap<RMNode, List<ScriptWithResult>> scriptsExecutionResults) {
-
-        // deadline for scripts execution
-        long deadline = System.currentTimeMillis() + MAX_VERIF_TIMEOUT;
-
-        NodeSet result = new NodeSet();
-        for (RMNode rmnode : scriptsExecutionResults.keySet()) {
-            assert (scriptsExecutionResults.containsKey(rmnode));
-
-            // checking whether all scripts are passed or not for the node
-            boolean scriptPassed = true;
-            for (ScriptWithResult swr : scriptsExecutionResults.get(rmnode)) {
-                ScriptResult<Boolean> scriptResult = swr.getScriptResult();
-                try {
-                    // calculating time to wait script result
-                    long timeToWait = deadline - System.currentTimeMillis();
-                    if (timeToWait <= 0)
-                        timeToWait = 1; //ms
-                    PAFuture.waitFor(scriptResult, timeToWait);
-                } catch (ProActiveTimeoutException e) {
-                    // no script result was obtained
-                    scriptResult = null;
-                    throw new ScriptException("Time out expired in waiting ends of script execution: " +
-                        e.getMessage());
-                }
-
-                if (scriptResult != null && scriptResult.errorOccured()) {
-                    throw new ScriptException(scriptResult.getException());
-                }
-
-                // processing script result and updating knowledge base of 
-                // selection manager at the same time. Returns whether node is selected.
-                if (!selectionManager.processScriptResult(swr.getScript(), scriptResult, rmnode)) {
-                    scriptPassed = false;
-                }
-            }
-
-            if (scriptPassed) {
-                try {
-                    internalSetBusy(rmnode);
-                    result.add(rmnode.getNode());
-                } catch (NodeException e) {
-                    internalSetDown(rmnode);
-                }
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -1134,12 +948,48 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#setDownNode(java.lang.String)
+     * Set a node state to busy. Set the node to busy, and move the node to the
+     * internal busy nodes list. An event informing the node state's change is
+     * thrown to RMMonitoring.
+     *
+     * @param rmnode
+     *            node to set
+     * @throws NodeException
+     */
+    public void setBusyNode(String nodeUrl) throws NodeException {
+
+        RMNode rmnode = allNodes.get(nodeUrl);
+        if (rmnode == null) {
+            logger.error("Unknown node " + nodeUrl);
+            return;
+        }
+
+        assert rmnode.isFree();
+        assert this.freeNodes.contains(rmnode);
+
+        try {
+            rmnode.setBusy();
+        } catch (NodeException e1) {
+            // A down node shouldn't be busied...
+            logger.debug("", e1);
+        }
+        this.freeNodes.remove(rmnode);
+        // create the event
+        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
+    }
+
+    /**
+     * Sets a node state to down and updates all internal structures of rm core
+     * accordingly. Sends an event indicating that the node is down.
      */
     public void setDownNode(String nodeUrl) {
         RMNode rmnode = getNodebyUrl(nodeUrl);
         if (rmnode != null) {
             this.internalSetDown(rmnode);
+        } else {
+            // the nodes has been removed from core asynchronously
+            // when pinger of selection manager tried to access it
+            // do nothing in this case
         }
     }
 
@@ -1187,6 +1037,10 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      */
     public Logger getLogger() {
         return logger;
+    }
+
+    public ArrayList<RMNode> getFreeNodes() {
+        return freeNodes;
     }
 
 }

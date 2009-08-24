@@ -56,6 +56,8 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.utils.Pinger;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -130,6 +132,11 @@ public class NodeSource implements InitActive {
             pinger = (Pinger) PAActiveObject.newActive(Pinger.class.getName(), new Object[] { PAActiveObject
                     .getStubOnThis() });
             pinger.ping();
+
+            // these methods are called from the rm core
+            // mark them as immediate services in order to prevent the block of the core
+            PAActiveObject.setImmediateService("getName");
+            PAActiveObject.setImmediateService("getDescription");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -171,6 +178,8 @@ public class NodeSource implements InitActive {
         try {
             node = NodeFactory.getNode(nodeUrl);
             internalAddNode(node);
+            RMNode rmnode = new RMNodeImpl(node, "noVn", (NodeSource) PAActiveObject.getStubOnThis());
+            rmcore.internalAddNodeToCore(rmnode);
         } catch (NodeException e) {
             throw new RMException(e);
         }
@@ -366,4 +375,5 @@ public class NodeSource implements InitActive {
     public void executeInParallel(Runnable command) {
         threadPool.execute(command);
     }
+
 }

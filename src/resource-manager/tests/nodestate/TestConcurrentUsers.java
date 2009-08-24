@@ -104,7 +104,7 @@ public class TestConcurrentUsers extends FunctionalTDefaultRM {
         // client does not exist anymore
         log("Client does not exist anymore. Waiting for client crash detection.");
         // it should be detected by RM
-        // waiting fot node free event
+        // waiting for node free event
         receiver.waitForNEvent(1);
         assertTrue(admin.getTotalNodesNumber().intValue() == 1);
         assertTrue(admin.getFreeNodesNumber().intValue() == 1);

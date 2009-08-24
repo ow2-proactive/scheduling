@@ -40,6 +40,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -49,7 +50,7 @@ import org.ow2.proactive.utils.NodeSet;
 
 /**
  * An implementation of {@link SelectionManager} interface, based on 
- * probablistic approach. The purpose of selection manager is to choose the nodes for 
+ * probabilistic approach. The purpose of selection manager is to choose the nodes for
  * further selection scripts execution. The goal is to find optimal strategy
  * of nodes selection from the nodes pool to minimize scripts execution.
  * 
@@ -62,12 +63,19 @@ import org.ow2.proactive.utils.NodeSet;
  * are calculated for each nodes.
  *
  */
-public class ProbablisticSelectionManager implements SelectionManager {
+public class ProbablisticSelectionManager extends SelectionManager {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
 
     // contains an information about already executed scripts
     private HashMap<SelectionScript, HashMap<RMNode, Probability>> probabilities = new HashMap<SelectionScript, HashMap<RMNode, Probability>>();
+
+    public ProbablisticSelectionManager() {
+    }
+
+    public ProbablisticSelectionManager(RMCore rmcore) {
+        super(rmcore);
+    }
 
     /**
      * Find appropriate candidates nodes for script execution, taking into 
@@ -78,7 +86,7 @@ public class ProbablisticSelectionManager implements SelectionManager {
      * @param exclusionNodes - exclusion nodes list
      * @return candidates node list for script execution
      */
-    public Collection<RMNode> findAppropriateNodes(List<SelectionScript> selectionScriptList,
+    public Collection<RMNode> arrangeNodesForScriptExecution(List<SelectionScript> selectionScriptList,
             final Collection<RMNode> freeNodes, NodeSet exclusionNodes) {
 
         long startTime = System.currentTimeMillis();
@@ -156,7 +164,7 @@ public class ProbablisticSelectionManager implements SelectionManager {
      * @param rmnode - target node
      * @return true if script will pass on the node
      */
-    public boolean scriptWillPassOnTheNode(SelectionScript script, RMNode rmnode) {
+    public boolean isPassed(SelectionScript script, RMNode rmnode) {
         if (probabilities.containsKey(script) && probabilities.get(script).containsKey(rmnode)) {
             Probability p = probabilities.get(script).get(rmnode);
             logger.debug("Known static script " + script.hashCode() + " for node " + rmnode.getNodeURL());
@@ -233,6 +241,11 @@ public class ProbablisticSelectionManager implements SelectionManager {
             }
         }
         return false;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;
     }
 
 }

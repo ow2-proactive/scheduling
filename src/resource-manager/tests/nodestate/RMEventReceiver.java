@@ -164,7 +164,8 @@ public class RMEventReceiver implements InitActive, RunActive, RMEventListener {
             Request r = s.blockingRemoveOldest();
             s.serve(r);
             if (methodCalls.contains(r.getMethodName())) {
-                System.out.println(" EventReceived : " + r.getMethodName());
+                System.out.println(" EventReceived : " + r.getMethodName() + " " +
+                    r.getParameter(0).toString());
                 synchronized (this.nbEventReceived) {
                     this.nbEventReceived.add(1);
                     this.nbEventReceived.notify();
