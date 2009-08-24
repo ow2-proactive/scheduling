@@ -221,9 +221,26 @@ public class AdminRMModel extends ConsoleModel {
 
     private void listns_() {
         List<RMNodeSourceEvent> list = rm.getNodeSourcesList();
-        print("Source name \tSource description");
+        int[] nameSize = new int[] { 11, 9 };
         for (RMNodeSourceEvent evt : list) {
-            print(evt.getSourceName() + "\t" + evt.getSourceDescription());
+            if (evt.getSourceName().length() > nameSize[0]) {
+                nameSize[0] = evt.getSourceName().length();
+            }
+            if (evt.getSourceDescription().length() > nameSize[1]) {
+                nameSize[1] = evt.getSourceDescription().length();
+            }
+        }
+        nameSize[0] += 2;
+        nameSize[1] += 2;
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format(" %1$-" + nameSize[0] + "s", "SOURCE NAME"));
+        sb.append(String.format(" %1$-" + nameSize[1] + "s", "DESCRIPTION"));
+        print(sb.toString());
+        for (RMNodeSourceEvent evt : list) {
+            sb = new StringBuilder();
+            sb.append(String.format(" %1$-" + nameSize[0] + "s", evt.getSourceName()));
+            sb.append(String.format(" %1$-" + nameSize[1] + "s", evt.getSourceDescription()));
+            print(sb.toString());
         }
     }
 
@@ -237,23 +254,38 @@ public class AdminRMModel extends ConsoleModel {
         if (list.size() == 0) {
             print("No nodes handled by Resource Manager");
         } else {
-            print("SourceName \thostName \tstate \t URL");
+            int[] nameSize = new int[] { 11, 8, 5, 3 };
             for (RMNodeEvent evt : list) {
-                String state = null;
-                switch (evt.getNodeState()) {
-                    case DOWN:
-                        state = "DOWN";
-                        break;
-                    case FREE:
-                        state = "FREE";
-                        break;
-                    case BUSY:
-                        state = "BUSY";
-                        break;
-                    case TO_BE_RELEASED:
-                        state = "TO_BE_RELEASED";
+                if (evt.getNodeSource().length() > nameSize[0]) {
+                    nameSize[0] = evt.getNodeSource().length();
                 }
-                print(evt.getNodeSource() + "\t" + evt.getHostName() + "\t" + state + "\t" + evt.getNodeUrl());
+                if (evt.getHostName().length() > nameSize[1]) {
+                    nameSize[1] = evt.getHostName().length();
+                }
+                if (evt.getNodeState().toString().length() > nameSize[2]) {
+                    nameSize[2] = evt.getNodeState().toString().length();
+                }
+                if (evt.getNodeUrl().length() > nameSize[3]) {
+                    nameSize[3] = evt.getNodeUrl().length();
+                }
+            }
+            nameSize[0] += 2;
+            nameSize[1] += 2;
+            nameSize[2] += 2;
+            nameSize[3] += 2;
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format(" %1$-" + nameSize[0] + "s", "SOURCE NAME"));
+            sb.append(String.format(" %1$-" + nameSize[1] + "s", "HOSTNAME"));
+            sb.append(String.format(" %1$-" + nameSize[2] + "s", "STATE"));
+            sb.append(String.format(" %1$-" + nameSize[3] + "s", "URL"));
+            print(sb.toString());
+            for (RMNodeEvent evt : list) {
+                sb = new StringBuilder();
+                sb.append(String.format(" %1$-" + nameSize[0] + "s", evt.getNodeSource()));
+                sb.append(String.format(" %1$-" + nameSize[1] + "s", evt.getHostName()));
+                sb.append(String.format(" %1$-" + nameSize[2] + "s", evt.getNodeState()));
+                sb.append(String.format(" %1$-" + nameSize[3] + "s", evt.getNodeUrl()));
+                print(sb.toString());
             }
         }
     }
