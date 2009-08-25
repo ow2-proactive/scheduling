@@ -165,6 +165,7 @@ public class NodeSource implements InitActive {
         if (logger.isInfoEnabled()) {
             logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
         }
+        infrastructureManager.registerAcquiredNode(node);
         nodes.put(node.getNodeInformation().getURL(), node);
     }
 

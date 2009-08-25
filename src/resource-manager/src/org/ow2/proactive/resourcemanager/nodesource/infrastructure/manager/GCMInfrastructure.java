@@ -300,10 +300,9 @@ public class GCMInfrastructure extends InfrastructureManager {
      */
     public synchronized void receiveDeployedNode(Node node, String vnodeName) {
         try {
-            registerAcquiredNode(node);
-            nodesCount++;
+            nodeSource.getRMCore().addNode(node.getNodeInformation().getURL(), nodeSource.getName());
         } catch (RMException e) {
-            e.printStackTrace();
+            logger.error("Could not add the node " + node.getNodeInformation().getURL(), e);
         }
     }
 
@@ -340,4 +339,10 @@ public class GCMInfrastructure extends InfrastructureManager {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void registerAcquiredNode(Node node) throws RMException {
+        nodesCount++;
+    }
 }

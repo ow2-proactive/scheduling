@@ -94,16 +94,12 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * Registers available node in resource manager.
+     * Notifies an infrastructure manager (IM) that node which belongs to it is registering in the core.
+     * So the IM could maintain its internal structure up to date.
+     * Throwing an exception inside this method prevents node to be registered in RMCore
      *
      * @param node an available node to register
      * @throws RMException if any problems occurred
      */
-    protected void registerAcquiredNode(Node node) throws RMException {
-        if (nodeSource != null) {
-            nodeSource.getRMCore().addNode(node.getNodeInformation().getURL(), nodeSource.getName());
-        } else {
-            throw new RMException("Node source is not set for this infrastructure.");
-        }
-    }
+    public abstract void registerAcquiredNode(Node node) throws RMException;
 }

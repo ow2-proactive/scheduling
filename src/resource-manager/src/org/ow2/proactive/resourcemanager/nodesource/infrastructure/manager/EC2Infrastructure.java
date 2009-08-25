@@ -307,4 +307,10 @@ public class EC2Infrastructure extends InfrastructureManager {
         return "EC2 Infrastructure";
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void registerAcquiredNode(Node node) throws RMException {
+    }
+
 }
