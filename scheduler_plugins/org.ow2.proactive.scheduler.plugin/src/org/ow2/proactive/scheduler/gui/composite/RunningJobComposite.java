@@ -293,7 +293,7 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
     /**
      * @see org.ow2.proactive.scheduler.gui.listeners.EventTasksListener#runningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskInfo)
      */
-    public void runningTaskEvent(TaskInfo info) {
+    public void runningTaskEvent(final TaskInfo info) {
         super.stateUpdate(info.getJobId());
         switch (info.getStatus()) {
             case WAITING_ON_FAILURE:
@@ -301,13 +301,17 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
             case FAULTY:
             case ABORTED:
             case FAILED:
-                TableItem[] items = getTable().getItems();
-                for (TableItem it : items) {
-                    if (((JobId) (it.getData())).equals(info.getJobId())) {
-                        ((DotTask) it.getData("dotTask")).restartTask();
-                        break;
+                getDisplay().syncExec(new Runnable() {
+                    public void run() {
+                        TableItem[] items = getTable().getItems();
+                        for (TableItem it : items) {
+                            if (((JobId) (it.getData())).equals(info.getJobId())) {
+                                ((DotTask) it.getData("dotTask")).restartTask();
+                                break;
+                            }
+                        }
                     }
-                }
+                });
         }
     }
 
@@ -477,38 +481,37 @@ class DotTask extends TimerTask {
             this.cancel();
             return;
         }
-        if (job.getStatus() == JobStatus.RUNNING) {
-            try {
-                double tmp = 0;
-                for (int i = 0; i < index; i++) {
-                    if (tasks[i] < 100) {
-                        tasks[i] += ((100 - tasks[i]) / (FINISHED_TASK_REDUCE_FACTOR));
-                    }
-                    tmp += tasks[i];
+        try {
+            double tmp = 0;
+            for (int i = 0; i < index; i++) {
+                if (tasks[i] < 100) {
+                    tasks[i] += ((100 - tasks[i]) / (FINISHED_TASK_REDUCE_FACTOR));
                 }
-                for (int i = index; i < index + job.getNumberOfRunningTasks() &&
-                    i < job.getTotalNumberOfTasks(); i++) {
-                    if (tasks[i] < RUNNING_TASK_MAX_PERCENT) {
-                        tasks[i] += ((100 - tasks[i]) / (RUNNING_TASK_REDUCE_FACTOR));
-                    }
-                    tmp += tasks[i];
+                tmp += tasks[i];
+            }
+            for (int i = index; i < index + job.getNumberOfRunningTasks() && i < job.getTotalNumberOfTasks(); i++) {
+                if (tasks[i] < RUNNING_TASK_MAX_PERCENT) {
+                    tasks[i] += ((100 - tasks[i]) / (RUNNING_TASK_REDUCE_FACTOR));
                 }
-                final int sum = (int) tmp;
+                tmp += tasks[i];
+            }
+            final int sum = (int) tmp;
 
-                display.syncExec(new Runnable() {
-                    public void run() {
-                        try {
-                            ((ProgressBar) item.getData("bar")).setSelection(sum);
+            display.syncExec(new Runnable() {
+                public void run() {
+                    try {
+                        ((ProgressBar) item.getData("bar")).setSelection(sum);
+                        if (job.getStatus() == JobStatus.RUNNING) {
                             item.setText(colId, JobStatus.RUNNING + " (" + job.getNumberOfRunningTasks() +
                                 ")");
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -525,7 +528,6 @@ class DotTask extends TimerTask {
             }
             //set last to 0;
             this.tasks[tasks.length - 1] = 0;
-            index--;
             run();
         } catch (Exception e) {
             e.printStackTrace();

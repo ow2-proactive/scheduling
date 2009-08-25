@@ -116,16 +116,12 @@ public class TaskView extends ViewPart {
      * To update only one line of the jobs informations displayed in the view. use this method to
      * avoid flicker
      * 
-     * @param taskInfo information about the task
-     * 
      * @param task the task to update
      */
-    public void lineUpdate(TaskInfo taskInfo, TaskState task) {
-        final TaskInfo aTaskInfo = taskInfo;
-        final TaskState aTask = task;
+    public void lineUpdate(final TaskState task) {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                taskComposite.changeLine(aTaskInfo.getTaskId(), aTask);
+                taskComposite.changeLine(task);
             }
         });
     }

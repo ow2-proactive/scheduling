@@ -516,7 +516,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
                 instance = getInstanceWithException();
             } catch (Throwable t) {
                 Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on get instance ", t);
-                t.printStackTrace();
+                //t.printStackTrace();
             }
         }
         return instance;

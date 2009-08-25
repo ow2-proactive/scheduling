@@ -264,6 +264,9 @@ public abstract class InternalJob extends JobState {
         logger_dev.debug(" ");
         setNumberOfPendingTasks(getNumberOfPendingTasks() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
+        if (getNumberOfRunningTasks() == 0) {
+            setStatus(JobStatus.STALLED);
+        }
     }
 
     /**

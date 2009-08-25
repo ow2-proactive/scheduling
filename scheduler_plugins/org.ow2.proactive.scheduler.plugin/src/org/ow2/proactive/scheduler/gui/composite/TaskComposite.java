@@ -638,16 +638,14 @@ public class TaskComposite extends Composite {
      * This method allow to replace only one line on the task table. This method identify the "good"
      * item with the taskId. The TaskState is use to fill item.
      * 
-     * @param taskId the taskId which must be updated
-     * 
      * @param taskState all informations for fill item
      */
-    public void changeLine(TaskId taskId, TaskState taskState) {
+    public void changeLine(TaskState taskState) {
         if (!table.isDisposed()) {
             TableItem[] items = table.getItems();
             int itemIndex = 0;
             for (TableItem item : items) {
-                if (((TaskId) item.getData()).equals(taskId)) {
+                if (((TaskId) item.getData()).equals(taskState.getId())) {
                     if (itemIndex == 0) {
                         fillItem(item, taskState, null);
                     } else {

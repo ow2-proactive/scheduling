@@ -577,7 +577,7 @@ public class JobsController implements SchedulerEventListener {
 
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
-                        taskView.lineUpdate(taskInfo, getTaskStateById(job, taskInfo.getTaskId()));
+                        taskView.lineUpdate(getTaskStateById(job, taskInfo.getTaskId()));
                     }
                 }
             });
@@ -612,7 +612,7 @@ public class JobsController implements SchedulerEventListener {
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
                         TaskId taskId = taskInfo.getTaskId();
-                        taskView.lineUpdate(taskInfo, getTaskStateById(job, taskId));
+                        taskView.lineUpdate(getTaskStateById(job, taskId));
 
                         if (taskId.equals(taskView.getIdOfSelectedTask())) {
                             TaskResult tr = TaskComposite.getTaskResult(job.getId(), taskId);
@@ -817,15 +817,16 @@ public class JobsController implements SchedulerEventListener {
                     org.ow2.proactive.scheduler.gui.views.JobInfo jobInfo = org.ow2.proactive.scheduler.gui.views.JobInfo
                             .getInstance();
                     if (jobInfo != null) {
-                        if (jobsId.size() == 1)
+                        if (jobsId.size() == 1) {
                             jobInfo.updateInfos(job);
-                        else
+                        } else {
                             jobInfo.updateInfos(getJobsByIds(jobsId));
+                        }
                     }
 
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
-                        taskView.lineUpdate(taskInfo, getTaskStateById(job, taskInfo.getTaskId()));
+                        taskView.lineUpdate(getTaskStateById(job, taskInfo.getTaskId()));
                     }
                 }
             });

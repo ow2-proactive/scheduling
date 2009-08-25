@@ -879,9 +879,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     if (td.getNumberOfExecutionOnFailureLeft() > 0) {
                         td.setStatus(TaskStatus.WAITING_ON_FAILURE);
                         job.newWaitingTask();
-                        if (job.getNumberOfRunningTasks() == 0) {
-                            job.setStatus(JobStatus.STALLED);
-                        }
                         frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                             SchedulerEvent.TASK_WAITING_FOR_RESTART, td.getTaskInfo()));
                         job.reStartTask(td);
@@ -1235,6 +1232,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //change status and update GUI
                     descriptor.setStatus(TaskStatus.WAITING_ON_ERROR);
                     job.newWaitingTask();
+
                     //store this task result in the job result.
                     ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), res, descriptor
                             .isPreciousResult());
