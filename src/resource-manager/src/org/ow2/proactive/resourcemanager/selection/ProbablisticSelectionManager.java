@@ -243,7 +243,9 @@ public class ProbablisticSelectionManager extends SelectionManager {
         return false;
     }
 
-    @Override
+    /**
+     * @see org.ow2.proactive.authentication.Loggable#getLogger()
+     */
     public Logger getLogger() {
         return logger;
     }
