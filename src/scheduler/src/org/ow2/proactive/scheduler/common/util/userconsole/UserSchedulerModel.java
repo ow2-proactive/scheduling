@@ -448,30 +448,58 @@ public class UserSchedulerModel extends ConsoleModel {
         try {
             JobState js = scheduler.getState(jobId);
             JobInfo ji = js.getJobInfo();
-            String state = "Job '" + ji.getJobId() + "' - name:" + ji.getJobId().getReadableName() +
-                " owner:" + js.getOwner() + "  status:" + ji.getStatus() + "  #tasks:" +
-                ji.getTotalNumberOfTasks();
-            state += newline + newline;
-            state += String.format("\t%1$-8s", "ID");
-            state += String.format(" %1$-20s", "Name");
-            state += String.format(" %1$-16s", "Status");
-            state += String.format(" %1$-24s", "HostName");
-            state += String.format(" %1$-14s", "Duration");
-            state += String.format(" %1$-14s", "#nodes killed");
-            state += newline;
-            for (TaskState ts : js.getTasks()) {
-                state += String.format("\t%1$-8s", ts.getId());
-                state += String.format(" %1$-20s", cutNchar(ts.getName(), 20));
-                state += String.format(" %1$-16s", ts.getStatus());
-                state += String.format(" %1$-24s", cutNchar(ts.getExecutionHostName(), 24));
-                state += String.format(" %1$-14s", Tools.getFormattedDuration(ts.getFinishedTime(), ts
-                        .getStartTime()));
-                state += String.format(" %1$-14s", (ts.getMaxNumberOfExecutionOnFailure() - ts
-                        .getNumberOfExecutionOnFailureLeft()) +
-                    "/" + ts.getMaxNumberOfExecutionOnFailure());
-                state += newline;
-            }
+            String state = "Job '" + ji.getJobId() + "'    name:" + ji.getJobId().getReadableName() +
+                "    owner:" + js.getOwner() + "    status:" + ji.getStatus() + "    #tasks:" +
+                ji.getTotalNumberOfTasks() + newline;
             print(state);
+            int[] namesSize = new int[] { 2, 4, 6, 8, 8, 13 };
+            String formattedDuration;
+            String nodesKilled;
+            for (TaskState ts : js.getTasks()) {
+                formattedDuration = Tools.getFormattedDuration(ts.getFinishedTime(), ts.getStartTime());
+                nodesKilled = (ts.getMaxNumberOfExecutionOnFailure() - ts.getNumberOfExecutionOnFailureLeft()) +
+                    "/" + ts.getMaxNumberOfExecutionOnFailure();
+                namesSize[0] = (ts.getId().toString().length() > namesSize[0]) ? ts.getId().toString()
+                        .length() : namesSize[0];
+                namesSize[1] = (cutNchar(ts.getName(), 20).length() > namesSize[1]) ? cutNchar(ts.getName(),
+                        20).length() : namesSize[1];
+                namesSize[2] = (ts.getStatus().toString().length() > namesSize[2]) ? ts.getStatus()
+                        .toString().length() : namesSize[2];
+                namesSize[3] = (cutNchar(ts.getExecutionHostName(), 24).length() > namesSize[3]) ? cutNchar(
+                        ts.getExecutionHostName(), 24).length() : namesSize[3];
+                namesSize[4] = (formattedDuration.length() > namesSize[4]) ? formattedDuration.length()
+                        : namesSize[4];
+                namesSize[5] = (nodesKilled.length() > namesSize[5]) ? nodesKilled.length() : namesSize[5];
+            }
+            namesSize[0] += 2;
+            namesSize[1] += 2;
+            namesSize[2] += 2;
+            namesSize[3] += 2;
+            namesSize[4] += 2;
+            namesSize[5] += 2;
+
+            StringBuilder stateSB = new StringBuilder();
+            stateSB.append(String.format("\t%1$-" + namesSize[0] + "s", "ID"));
+            stateSB.append(String.format(" %1$-" + namesSize[1] + "s", "NAME"));
+            stateSB.append(String.format(" %1$-" + namesSize[2] + "s", "STATUS"));
+            stateSB.append(String.format(" %1$-" + namesSize[3] + "s", "HOSTNAME"));
+            stateSB.append(String.format(" %1$-" + namesSize[4] + "s", "DURATION"));
+            stateSB.append(String.format(" %1$-" + namesSize[5] + "s", "#NODES KILLED"));
+            print(stateSB.toString());
+            for (TaskState ts : js.getTasks()) {
+                stateSB = new StringBuilder();
+                formattedDuration = Tools.getFormattedDuration(ts.getFinishedTime(), ts.getStartTime());
+                nodesKilled = (ts.getMaxNumberOfExecutionOnFailure() - ts.getNumberOfExecutionOnFailureLeft()) +
+                    "/" + ts.getMaxNumberOfExecutionOnFailure();
+                stateSB.append(String.format("\t%1$-" + namesSize[0] + "s", ts.getId()));
+                stateSB.append(String.format(" %1$-" + namesSize[1] + "s", cutNchar(ts.getName(), 20)));
+                stateSB.append(String.format(" %1$-" + namesSize[2] + "s", ts.getStatus()));
+                stateSB.append(String.format(" %1$-" + namesSize[3] + "s", cutNchar(
+                        ts.getExecutionHostName(), 24)));
+                stateSB.append(String.format(" %1$-" + namesSize[4] + "s", formattedDuration));
+                stateSB.append(String.format(" %1$-" + namesSize[5] + "s", nodesKilled));
+                print(stateSB.toString());
+            }
         } catch (Exception e) {
             handleExceptionDisplay("Error on job " + jobId, e);
         }
