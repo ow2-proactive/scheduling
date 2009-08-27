@@ -79,6 +79,9 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class NodeSource implements InitActive {
 
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
+    private static final int NODE_LOOKUP_TIMEOUT = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT
+            .getValueAsInt();
+
     /** Default name */
     public static final String DEFAULT_NAME = "Default";
 
@@ -96,6 +99,7 @@ public class NodeSource implements InitActive {
     private HashMap<String, Node> downNodes = new HashMap<String, Node>();
 
     private transient BoundedNonRejectedThreadPool threadPool;
+    private transient NodeLookupThread nodeLookupThread;
 
     /**
      * Creates a new instance of NodeSource.
@@ -134,6 +138,7 @@ public class NodeSource implements InitActive {
             pinger = (Pinger) PAActiveObject.newActive(Pinger.class.getName(), new Object[] { PAActiveObject
                     .getStubOnThis() });
             pinger.ping();
+            nodeLookupThread = new NodeLookupThread();
 
             // these methods are called from the rm core
             // mark them as immediate services in order to prevent the block of the core
@@ -168,8 +173,7 @@ public class NodeSource implements InitActive {
     private void internalAddNode(Node node) throws RMException {
         String nodeUrl = node.getNodeInformation().getURL();
         if (this.nodes.containsKey(nodeUrl)) {
-            throw new RMException("The node " + nodeUrl + "with the same URL is already in node source " +
-                name + ". Remove this node first");
+            throw new RMException("The node " + nodeUrl + " already added to the node source " + name);
         }
 
         if (logger.isInfoEnabled()) {
@@ -186,6 +190,14 @@ public class NodeSource implements InitActive {
      */
     public BooleanWrapper acquireNode(String nodeUrl) {
 
+        // lookup for a new Node
+        Node nodeToAdd = null;
+        try {
+            nodeToAdd = lookupNode(nodeUrl, NODE_LOOKUP_TIMEOUT);
+        } catch (Exception e) {
+            throw new AddingNodesException(e);
+        }
+
         // Known URL, so do some cleanup before replacing it
         boolean isDown = false;
         if (nodes.containsKey(nodeUrl) || (isDown = downNodes.containsKey(nodeUrl))) {
@@ -195,16 +207,10 @@ public class NodeSource implements InitActive {
              *    proactive point of view. So remove old node from everywhere and add new one.
              *  - adding the same node twice. Do not do any actions in this case.
              */
-            try {
-                Node newNode = NodeFactory.getNode(nodeUrl);
-                Node registeredNode = isDown ? downNodes.get(nodeUrl) : nodes.get(nodeUrl);
-
-                if (newNode.equals(registeredNode)) {
-                    logger.warn("The node " + nodeUrl + " already exist");
-                    return new BooleanWrapper(true);
-                }
-            } catch (NodeException e) {
-                logger.info(e.getMessage());
+            Node registeredNode = isDown ? downNodes.get(nodeUrl) : nodes.get(nodeUrl);
+            if (nodeToAdd != null && nodeToAdd.equals(registeredNode)) {
+                logger.warn("The node " + nodeUrl + " already exist");
+                return new BooleanWrapper(true);
             }
 
             BooleanWrapper result = rmcore.internalRemoveNodeFromCore(nodeUrl);
@@ -214,18 +220,126 @@ public class NodeSource implements InitActive {
             }
         }
 
+        // if any exception occurs in internalAddNode(node) do not add the node to the core
         try {
-            Node node = NodeFactory.getNode(nodeUrl);
-            // if any exception occurs in internalAddNode(node) do not add the node to the core
-            internalAddNode(node);
-
-            RMNode rmnode = new RMNodeImpl(node, "noVn", (NodeSource) PAActiveObject.getStubOnThis());
-            rmcore.internalAddNodeToCore(rmnode);
-        } catch (Exception e) {
+            internalAddNode(nodeToAdd);
+        } catch (RMException e) {
             throw new AddingNodesException(e);
         }
 
+        RMNode rmnode = new RMNodeImpl(nodeToAdd, "noVn", (NodeSource) PAActiveObject.getStubOnThis());
+        rmcore.internalAddNodeToCore(rmnode);
+
         return new BooleanWrapper(true);
+    }
+
+    /**
+     * Dedicated thread for nodes lookup
+     */
+    private class NodeLookupThread extends Thread {
+        private Node node;
+        private String nodeUrl;
+
+        private boolean shutDown = false;
+        private Object monitor = new Object();
+        private boolean isAlive = true;
+        private boolean timeoutReached = false;
+
+        public NodeLookupThread() {
+            setDaemon(true);
+            start();
+        }
+
+        public void run() {
+            while (!shutDown) {
+                synchronized (monitor) {
+                    try {
+                        monitor.notifyAll();
+                        monitor.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+
+                if (shutDown) {
+                    synchronized (monitor) {
+                        monitor.notifyAll();
+                    }
+                    return;
+                }
+
+                try {
+                    isAlive = false;
+                    // looking for a node
+                    if (nodeUrl != null) {
+                        node = NodeFactory.getNode(nodeUrl);
+
+                        synchronized (monitor) {
+                            if (timeoutReached) {
+                                node = null;
+                            }
+                        }
+                    }
+                } catch (NodeException e) {
+                    logger.info(e.getMessage());
+                }
+                isAlive = true;
+            }
+        }
+
+        public Node lookup(String nodeUrl, long timeout) throws Exception {
+
+            synchronized (monitor) {
+                this.nodeUrl = nodeUrl;
+                timeoutReached = false;
+
+                monitor.notifyAll();
+                monitor.wait(timeout);
+
+                if (node == null) {
+                    timeoutReached = true;
+                    throw new NodeException("Cannot lookup node " + nodeUrl);
+                } else {
+                    Node n = node;
+                    node = null;
+                    return n;
+                }
+            }
+        }
+
+        public void shutDown() {
+            shutDown = true;
+            synchronized (monitor) {
+                monitor.notifyAll();
+            }
+        }
+
+        public boolean isThreadAlive() {
+            return isAlive;
+        }
+    }
+
+    /**
+     * Lookups a node with specified timeout.
+     *
+     * @param nodeUrl a url of the node
+     * @param timeout to wait in ms
+     * @return node is it was successfully obtained
+     * @throws Exception if node was not looked up
+     */
+    private Node lookupNode(String nodeUrl, long timeout) throws Exception {
+
+        if (!nodeLookupThread.isThreadAlive()) {
+            logger.debug("Lookup thread is dead - recreating it");
+            // do all what is possible to stop the thread
+            nodeLookupThread.shutDown();
+            nodeLookupThread.interrupt();
+
+            // creating a new one
+            nodeLookupThread = new NodeLookupThread();
+        }
+
+        logger.debug("Looking up for the node " + nodeUrl + " with " + timeout + " ms timeout");
+        return nodeLookupThread.lookup(nodeUrl, timeout);
     }
 
     /**
@@ -351,6 +465,7 @@ public class NodeSource implements InitActive {
             e.printStackTrace();
         }
 
+        nodeLookupThread.shutDown();
         pinger.shutdown();
         rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this, RMEventType.NODESOURCE_REMOVED));
         // object should be terminated NON preemptively

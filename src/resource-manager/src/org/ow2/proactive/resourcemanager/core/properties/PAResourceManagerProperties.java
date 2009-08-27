@@ -69,6 +69,9 @@ public enum PAResourceManagerProperties {
     /**  Timeout in ms for selection script execution */
     RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PAPropertiesType.INTEGER),
 
+    /**  Timeout in ms for node lookup */
+    RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PAPropertiesType.INTEGER),
+
     /** GCM application template file path, used to perform GCM deployments */
     RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PAPropertiesType.STRING),
 
