@@ -231,16 +231,13 @@ public class GCMInfrastructure extends InfrastructureManager {
     /**
      * Starts deployment of specified GCM application
      * @param app application to deploy
+     * @throws ProActiveException
      */
-    protected void deployGCMD(GCMApplication app) throws AddingNodesException {
+    protected void deployGCMD(GCMApplication app) throws ProActiveException {
         Map<String, GCMVirtualNode> virtualNodes = app.getVirtualNodes();
         for (Entry<String, GCMVirtualNode> entry : virtualNodes.entrySet()) {
-            try {
-                entry.getValue().subscribeNodeAttachment(this, "receiveDeployedNode", true);
-                app.startDeployment();
-            } catch (ProActiveException e) {
-                throw new AddingNodesException(e);
-            }
+            entry.getValue().subscribeNodeAttachment(this, "receiveDeployedNode", true);
+            app.startDeployment();
         }
     }
 
@@ -299,11 +296,7 @@ public class GCMInfrastructure extends InfrastructureManager {
      * @param vnodeName virtual node name of the node.
      */
     public synchronized void receiveDeployedNode(Node node, String vnodeName) {
-        try {
-            nodeSource.getRMCore().addNode(node.getNodeInformation().getURL(), nodeSource.getName());
-        } catch (RMException e) {
-            logger.error("Could not add the node " + node.getNodeInformation().getURL(), e);
-        }
+        nodeSource.getRMCore().addNode(node.getNodeInformation().getURL(), nodeSource.getName());
     }
 
     /**

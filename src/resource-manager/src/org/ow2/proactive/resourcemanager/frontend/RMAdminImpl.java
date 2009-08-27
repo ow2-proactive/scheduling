@@ -172,28 +172,24 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
     }
 
     /**
-     * Adds nodes to the specified node source.
-     *
-     * @param sourceName a name of the node source
-     * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
-     * @throws RMException if any errors occurred
+     * {@inheritDoc}
      */
-    public void addNodes(String sourceName, Object... parameters) throws RMException {
-        rmcore.addNodes(sourceName, parameters);
+    public BooleanWrapper addNodes(String sourceName, Object... parameters) {
+        return rmcore.addNodes(sourceName, parameters);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#addNode(java.lang.String)
+     * {@inheritDoc}
      */
-    public void addNode(String nodeUrl) throws RMException {
-        this.rmcore.addNode(nodeUrl);
+    public BooleanWrapper addNode(String nodeUrl) {
+        return rmcore.addNode(nodeUrl);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#addNode(java.lang.String, java.lang.String)
+     * {@inheritDoc}
      */
-    public void addNode(String nodeUrl, String sourceName) throws RMException {
-        this.rmcore.addNode(nodeUrl, sourceName);
+    public BooleanWrapper addNode(String nodeUrl, String sourceName) {
+        return rmcore.addNode(nodeUrl, sourceName);
     }
 
     /**

@@ -32,10 +32,13 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
@@ -140,14 +143,20 @@ public final class PAAgentServiceRMStarter {
         }
         // 4 - Add the created node to the Resource Manager
         try {
+            BooleanWrapper result;
             if (nodeSourceName != null) {
-                admin.addNode(n.getNodeInformation().getURL(), nodeSourceName);
+                result = admin.addNode(n.getNodeInformation().getURL(), nodeSourceName);
             } else {
-                admin.addNode(n.getNodeInformation().getURL());
+                result = admin.addNode(n.getNodeInformation().getURL());
             }
-        } catch (Throwable t) {
+
+            if (result.booleanValue()) {
+                System.out.println("Node " + n.getNodeInformation().getURL() + " added");
+            }
+
+        } catch (AddingNodesException ex) {
             System.out.println("Could not add the local node the Resource Manager at " + rmUrl);
-            t.printStackTrace();
+            ex.printStackTrace();
             return false;
         }
         // 5 - Start a new pinger thread

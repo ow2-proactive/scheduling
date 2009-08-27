@@ -86,29 +86,27 @@ public interface RMCoreInterface {
     /**
      * Add a deployed node to the default static nodes source of the RM
      * @param nodeUrl URL of the node.
-     * @throws RMException if the new node cannot be added, notably if the adding node
-     * is requested on a dynamic node source.
+     * @return true if new node is added successfully, false otherwise
      */
-    public void addNode(String nodeUrl) throws RMException;
+    public BooleanWrapper addNode(String nodeUrl);
 
     /**
      * Add nodes to a StaticNodeSource represented by sourceName.
      * SourceName must exist and must be a static source
      * @param nodeUrl URL of an existing node to add.
      * @param sourceName name of the static node source that perform the deployment.
-     * @throws RMException if the new node cannot be added, notably if the adding node
-     * is requested on a dynamic node source. 
+     * @return true if new node is added successfully, false otherwise
      */
-    public void addNode(String nodeUrl, String sourceName) throws RMException;
+    public BooleanWrapper addNode(String nodeUrl, String sourceName);
 
     /**
      * Adds nodes to the specified node source.
      *
      * @param sourceName a name of the node source
      * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
-     * @throws RMException if any errors occurred
+     * @return true if new nodes is added successfully, false otherwise
      */
-    public void addNodes(String sourceName, Object[] parameters) throws RMException;
+    public BooleanWrapper addNodes(String sourceName, Object[] parameters);
 
     /**
      * Remove a node from the Core and from its node source.

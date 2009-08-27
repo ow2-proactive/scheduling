@@ -52,6 +52,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
@@ -90,8 +91,9 @@ public class NodeSource implements InitActive {
     private Pinger pinger;
     private boolean toShutdown = false;
 
+    // all nodes except down
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
-    private LinkedList<Node> downNodes = new LinkedList<Node>();
+    private HashMap<String, Node> downNodes = new HashMap<String, Node>();
 
     private transient BoundedNonRejectedThreadPool threadPool;
 
@@ -147,26 +149,34 @@ public class NodeSource implements InitActive {
      * to handle changes.
      *
      * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
-     * @throws RMException if any errors occurred
      */
-    public void addNodes(Object... parameters) throws RMException {
-        infrastructureManager.addNodesAcquisitionInfo(parameters);
+    public BooleanWrapper addNodes(Object... parameters) {
+        try {
+            infrastructureManager.addNodesAcquisitionInfo(parameters);
+            rmcore.getMonitoring().nodeSourceEvent(
+                    new RMNodeSourceEvent(this, RMEventType.NODESOURCE_NODES_ACQUISTION_INFO_ADDED));
+
+            return new BooleanWrapper(true);
+        } catch (RMException e) {
+            throw new AddingNodesException(e.getMessage());
+        }
     }
 
     /**
      * Updates internal node source structures.
      */
     private void internalAddNode(Node node) throws RMException {
-        if (this.nodes.containsKey(node)) {
-            throw new RMException("a node with the same URL is already in this node Source,"
-                + "remove this node, before adding a node with a a same URL");
+        String nodeUrl = node.getNodeInformation().getURL();
+        if (this.nodes.containsKey(nodeUrl)) {
+            throw new RMException("The node " + nodeUrl + "with the same URL is already in node source " +
+                name + ". Remove this node first");
         }
 
         if (logger.isInfoEnabled()) {
             logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
         }
         infrastructureManager.registerAcquiredNode(node);
-        nodes.put(node.getNodeInformation().getURL(), node);
+        nodes.put(nodeUrl, node);
     }
 
     /**
@@ -174,17 +184,48 @@ public class NodeSource implements InitActive {
      *
      * @param nodeUrl the url of the node
      */
-    public Node acquireNode(String nodeUrl) throws RMException {
-        Node node;
+    public BooleanWrapper acquireNode(String nodeUrl) {
+
+        // Known URL, so do some cleanup before replacing it
+        boolean isDown = false;
+        if (nodes.containsKey(nodeUrl) || (isDown = downNodes.containsKey(nodeUrl))) {
+            /**
+             *  two potential scenario
+             *  - adding the node with the same url which was restarted. In this case it's the different node from
+             *    proactive point of view. So remove old node from everywhere and add new one.
+             *  - adding the same node twice. Do not do any actions in this case.
+             */
+            try {
+                Node newNode = NodeFactory.getNode(nodeUrl);
+                Node registeredNode = isDown ? downNodes.get(nodeUrl) : nodes.get(nodeUrl);
+
+                if (newNode.equals(registeredNode)) {
+                    logger.warn("The node " + nodeUrl + " already exist");
+                    return new BooleanWrapper(true);
+                }
+            } catch (NodeException e) {
+                logger.info(e.getMessage());
+            }
+
+            BooleanWrapper result = rmcore.internalRemoveNodeFromCore(nodeUrl);
+            if (result.booleanValue()) {
+                logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
+                this.removeNode(nodeUrl, false);
+            }
+        }
+
         try {
-            node = NodeFactory.getNode(nodeUrl);
+            Node node = NodeFactory.getNode(nodeUrl);
+            // if any exception occurs in internalAddNode(node) do not add the node to the core
             internalAddNode(node);
+
             RMNode rmnode = new RMNodeImpl(node, "noVn", (NodeSource) PAActiveObject.getStubOnThis());
             rmcore.internalAddNodeToCore(rmnode);
-        } catch (NodeException e) {
-            throw new RMException(e);
+        } catch (Exception e) {
+            throw new AddingNodesException(e);
         }
-        return node;
+
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -208,7 +249,7 @@ public class NodeSource implements InitActive {
      * @param forever if true removes the node from underlying infrastructure forever without
      * an ability to re-acquire node in the future
      */
-    public void removeNode(String nodeUrl, boolean forever) {
+    public BooleanWrapper removeNode(String nodeUrl, boolean forever) {
 
         //verifying if node is already in the list,
         //node could have fallen between remove request and the confirm
@@ -221,20 +262,14 @@ public class NodeSource implements InitActive {
                 logger.error(e.getCause().getMessage());
             }
         } else {
-            Node downNode = null;
-            for (Node dn : downNodes) {
-                if (dn.getNodeInformation().getURL().equals(nodeUrl)) {
-                    downNode = dn;
-                    break;
-                }
-            }
-
+            Node downNode = downNodes.get(nodeUrl);
             if (downNode != null) {
                 logger.info("[" + name + "] removing down node : " + nodeUrl);
                 downNodes.remove(downNode);
             } else {
                 logger.error("[" + name + "] removing node : " + nodeUrl +
                     " which is not belong to this node source");
+                return new BooleanWrapper(false);
             }
         }
 
@@ -243,6 +278,7 @@ public class NodeSource implements InitActive {
             finishNodeSourceShutdown();
         }
 
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -337,6 +373,8 @@ public class NodeSource implements InitActive {
      * @return a list of down nodes
      */
     public LinkedList<Node> getDownNodes() {
+        LinkedList<Node> downNodes = new LinkedList<Node>();
+        downNodes.addAll(this.downNodes.values());
         return downNodes;
     }
 
@@ -356,8 +394,9 @@ public class NodeSource implements InitActive {
     public void detectedPingedDownNode(String nodeUrl) {
         logger.info("[" + name + "] Detected down node " + nodeUrl);
         Node downNode = nodes.remove(nodeUrl);
-        if (downNode != null)
-            downNodes.add(downNode);
+        if (downNode != null) {
+            downNodes.put(nodeUrl, downNode);
+        }
         rmcore.setDownNode(nodeUrl);
     }
 

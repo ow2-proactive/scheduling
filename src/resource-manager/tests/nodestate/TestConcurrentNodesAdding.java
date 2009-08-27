@@ -95,7 +95,7 @@ public class TestConcurrentNodesAdding extends FunctionalTDefaultRM {
         for (int i = 0; i < nodeNumber; i++) {
             String url = nodeURL + "node" + i;
             log("Adding node " + i);
-            admin.addNode(url);
+            admin.addNode(url).booleanValue();
             log("Removing node " + i);
             admin.removeNode(url, true);
         }

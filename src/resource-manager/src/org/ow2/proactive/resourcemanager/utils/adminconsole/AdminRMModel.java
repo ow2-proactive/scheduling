@@ -40,8 +40,12 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
@@ -323,16 +327,22 @@ public class AdminRMModel extends ConsoleModel {
     private void gcmdeploy_(String fileName, String nodeSourceName) {
         try {
             File gcmDeployFile = new File(fileName);
+            BooleanWrapper result;
             if (nodeSourceName != null) {
-                rm.addNodes(nodeSourceName, new Object[] { FileToBytesConverter
+                result = rm.addNodes(nodeSourceName, new Object[] { FileToBytesConverter
                         .convertFileToByteArray(gcmDeployFile) });
             } else {
-                rm.addNodes(NodeSource.DEFAULT_NAME, new Object[] { FileToBytesConverter
+                result = rm.addNodes(NodeSource.DEFAULT_NAME, new Object[] { FileToBytesConverter
                         .convertFileToByteArray(gcmDeployFile) });
             }
-            print("GCM deployment '" + fileName + "' request sent to Resource Manager");
-        } catch (Exception e) {
+
+            if (result.booleanValue()) {
+                print("GCM deployment '" + fileName + "' request sent to Resource Manager");
+            }
+        } catch (IOException e) {
             handleExceptionDisplay("Error while load GCMD file '" + fileName, e);
+        } catch (AddingNodesException e) {
+            handleExceptionDisplay(e.getMessage(), e);
         }
     }
 
@@ -343,13 +353,17 @@ public class AdminRMModel extends ConsoleModel {
 
     private void addnode_(String nodeName, String nodeSourceName) {
         try {
+            BooleanWrapper result;
             if (nodeSourceName != null) {
-                rm.addNode(nodeName, nodeSourceName);
+                result = rm.addNode(nodeName, nodeSourceName);
             } else {
-                rm.addNode(nodeName);
+                result = rm.addNode(nodeName);
             }
-            print("Adding node '" + nodeName + "' request sent to Resource Manager");
-        } catch (Exception e) {
+
+            if (result.booleanValue()) {
+                print("Adding node '" + nodeName + "' request sent to Resource Manager");
+            }
+        } catch (AddingNodesException e) {
             handleExceptionDisplay("Error while adding node '" + nodeName + "'", e);
         }
     }

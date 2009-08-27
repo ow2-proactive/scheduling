@@ -51,7 +51,6 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -65,6 +64,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
+import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMAdminImpl;
@@ -127,7 +127,7 @@ import org.ow2.proactive.utils.NodeSet;
  * 
  * RmCore should be non-blocking which means <BR>
  * - no direct access to nodes <BR>
- * - all method calls to other active objects should be either asynchronous or immediate services <BR>
+ * - all method calls to other active objects should be either asynchronous or non-blocking immediate services <BR>
  * - methods which have to return something depending on another active objects should use an automatic continuation <BR>
  *
  * @see RMCoreInterface
@@ -507,73 +507,44 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     // ----------------------------------------------------------------------
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#addingNodeAdminRequest(java.lang.String)
+     * {@inheritDoc}
      */
-    public void addNode(String nodeUrl) throws RMException {
-        addNode(nodeUrl, NodeSource.DEFAULT_NAME);
+    public BooleanWrapper addNode(String nodeUrl) {
+        return addNode(nodeUrl, NodeSource.DEFAULT_NAME);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#addingNodeAdminRequest(java.lang.String,
-     *      java.lang.String)
+     * {@inheritDoc}
      */
-    public void addNode(String nodeUrl, String sourceName) throws RMException {
+    public BooleanWrapper addNode(String nodeUrl, String sourceName) {
         if (nodeSources.containsKey(sourceName)) {
             NodeSource nodeSource = this.nodeSources.get(sourceName);
 
             // Known URL, so do some cleanup before replacing it
             if (allNodes.containsKey(nodeUrl)) {
 
-                RMNode registeredNode = allNodes.get(nodeUrl);
-
                 if (!allNodes.get(nodeUrl).getNodeSourceId().equals(sourceName)) {
                     // trying to already registered node to another node source
                     // do nothing in this case
-                    return;
+                    throw new AddingNodesException("An attempt to add a node " + nodeUrl +
+                        " registered in one node source to another one");
                 }
-
-                /**
-                 *  two potential scenario
-                 *  - attempt to add node with the same url which was restarted. In this case it's the different node from
-                 *    proactive point of view. So remove the old node and add the new one.
-                 *  - attempt to add the same node twice. Do nothing in this case.
-                 */
-                try {
-                    // node lookup could potentially block the rm core
-                    // but this is an exceptional and rare case
-                    Node newNode = NodeFactory.getNode(nodeUrl);
-
-                    if (newNode.equals(registeredNode.getNode())) {
-                        return;
-                    }
-                } catch (NodeException e) {
-                    logger.info(e.getMessage());
-                }
-
-                removeNode(nodeUrl, true, false);
             }
-
-            nodeSource.acquireNode(nodeUrl);
+            return nodeSource.acquireNode(nodeUrl);
         } else {
-            throw new RMException("unknown node source " + sourceName);
+            throw new AddingNodesException("Unknown node source " + sourceName);
         }
     }
 
     /**
-     * Adds nodes to the specified node source.
-     *
-     * @param sourceName a name of the node source
-     * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
-     * @throws RMException if any errors occurred
+     * {@inheritDoc}
      */
-    public void addNodes(String sourceName, Object[] parameters) throws RMException {
+    public BooleanWrapper addNodes(String sourceName, Object[] parameters) {
         NodeSource ns = nodeSources.get(sourceName);
         if (ns == null) {
-            throw new RMException("Incorrect node source name " + sourceName);
+            throw new AddingNodesException("Unknown node source " + sourceName);
         }
-        ns.addNodes(parameters);
-        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(ns,
-            RMEventType.NODESOURCE_NODES_ACQUISTION_INFO_ADDED));
+        return ns.addNodes(parameters);
     }
 
     /**
@@ -595,7 +566,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                 internalSetToRelease(rmnode);
             }
         } else {
-            logger.warn("Attempt to remove non existing node " + nodeUrl);
+            logger.warn("An attempt to remove non existing node " + nodeUrl);
         }
     }
 
@@ -891,7 +862,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getMonitoring()
      */
-    public RMMonitoring getMonitoring() {
+    public RMMonitoringImpl getMonitoring() {
         return this.monitoring;
     }
 
@@ -990,6 +961,22 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             // the nodes has been removed from core asynchronously
             // when pinger of selection manager tried to access it
             // do nothing in this case
+        }
+    }
+
+    /**
+     * Removed a node with given url from the internal structures of the core.
+     *
+     * @param nodeUrl down node to be removed
+     * @return true if the nodes was successfully removed, false otherwise
+     */
+    public BooleanWrapper internalRemoveNodeFromCore(String nodeUrl) {
+        RMNode rmnode = getNodebyUrl(nodeUrl);
+        if (rmnode != null) {
+            internalRemoveNodeFromCore(rmnode);
+            return new BooleanWrapper(true);
+        } else {
+            return new BooleanWrapper(false);
         }
     }
 

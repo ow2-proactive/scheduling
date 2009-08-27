@@ -48,7 +48,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
@@ -154,9 +157,17 @@ public class AddNodeByDeployDescDialog extends Dialog {
                     try {
                         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
                             ddText.getText()));
-                        RMStore.getInstance().getRMAdmin().addNodes(sourceNameCombo.getText(),
-                                new Object[] { GCMDeploymentData });
-                        shell.close();
+                        BooleanWrapper result = RMStore.getInstance().getRMAdmin().addNodes(
+                                sourceNameCombo.getText(), new Object[] { GCMDeploymentData });
+
+                        if (result.booleanValue()) {
+                            shell.close();
+                        }
+                    } catch (AddingNodesException e) {
+                        MessageDialog.openError(shell, "Error",
+                                "Error while adding nodes to RM with specified GCMD");
+                        Activator.log(IStatus.ERROR, "Failed to add nodes to RM with GCMD", e);
+                        e.printStackTrace();
                     } catch (Exception e) {
                         MessageDialog.openError(shell, "Error", "Failed to open GCM deployment file : " +
                             ddText.getText() + "see stack trace in the log file");

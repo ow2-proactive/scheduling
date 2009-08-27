@@ -39,10 +39,13 @@ import nodestate.FunctionalTDefaultRM;
 import nodestate.RMEventReceiver;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -98,10 +101,13 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTDefaultRM {
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
     }
 
-    protected void addNodes(String sourceName) throws Exception {
-        admin.addNodes(sourceName, new Object[] { GCMDeploymentData });
-        // waiting for adding nodes acquisition info event
-        receiver.waitForNEvent(1);
+    protected BooleanWrapper addNodes(String sourceName) throws Exception {
+        BooleanWrapper result = admin.addNodes(sourceName, new Object[] { GCMDeploymentData });
+        if (result.booleanValue()) {
+            // waiting for adding nodes acquisition info event
+            receiver.waitForNEvent(1);
+        }
+        return result;
     }
 
     /** Actions to be Perform by this test.
@@ -159,9 +165,10 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTDefaultRM {
 
         log("Test 4 - adding nodes to non existing node source");
         try {
-            addNodes(source1);
+            BooleanWrapper result = addNodes(source1);
+            PAFuture.waitFor(result);
             assertTrue(false);
-        } catch (Exception e) {
+        } catch (AddingNodesException e) {
             System.out.println("Expected exception");
         }
 

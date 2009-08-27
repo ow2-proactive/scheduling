@@ -37,6 +37,8 @@ import java.io.File;
 
 import nodestate.FunctionalTDefaultRM;
 
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -81,9 +83,14 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == defaultDescriptorNodesNb);
     }
 
-    protected void addNodes(String sourceName) throws Exception {
-        admin.addNodes(sourceName, new Object[] { GCMDeploymentData, hostsListData });
-        // waiting for adding nodes acquisition info event
-        receiver.waitForNEvent(1);
+    protected BooleanWrapper addNodes(String sourceName) throws Exception {
+        BooleanWrapper result = admin.addNodes(sourceName, new Object[] { GCMDeploymentData, hostsListData });
+
+        if (result.booleanValue()) {
+            // waiting for adding nodes acquisition info event
+            receiver.waitForNEvent(1);
+        }
+
+        return result;
     }
 }

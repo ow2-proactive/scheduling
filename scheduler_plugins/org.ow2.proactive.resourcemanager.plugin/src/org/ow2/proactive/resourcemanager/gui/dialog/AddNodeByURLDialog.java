@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
@@ -125,9 +126,11 @@ public class AddNodeByURLDialog extends Dialog {
                     MessageDialog.openError(shell, "Error", "You didn't enter an url");
                 else {
                     try {
-                        RMStore.getInstance().getRMAdmin().addNode(urlText.getText(),
+                        BooleanWrapper result = RMStore.getInstance().getRMAdmin().addNode(urlText.getText(),
                                 sourceNameCombo.getText());
-                        shell.close();
+                        if (result.booleanValue()) {
+                            shell.close();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         String message = e.getMessage();

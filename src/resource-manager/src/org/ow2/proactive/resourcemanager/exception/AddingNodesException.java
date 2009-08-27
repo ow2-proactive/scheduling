@@ -47,7 +47,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
  * @since ProActive Scheduling 0.9
  *
  */
-public class AddingNodesException extends Exception {
+public class AddingNodesException extends RuntimeException {
 
     /**
      * Attaches a message to the Exception

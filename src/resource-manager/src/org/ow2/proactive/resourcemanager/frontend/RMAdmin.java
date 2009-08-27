@@ -113,26 +113,25 @@ public interface RMAdmin extends RMUser, Serializable {
      *
      * @param sourceName a name of the node source
      * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
-     * @throws RMException if any errors occurred
+     * @return true if new nodes is added successfully, false otherwise
      */
-    public void addNodes(String sourceName, Object... parameters) throws RMException;
+    public BooleanWrapper addNodes(String sourceName, Object... parameters);
 
     /**
      * Add an already deployed node to the default static nodes source of the RM
      * @param nodeUrl URL of the node to add.
-     * @throws RMException if a exception occurs during the node registration.
+     * @return true if new node is added successfully, false otherwise
      */
-    public void addNode(String nodeUrl) throws RMException;
+    public BooleanWrapper addNode(String nodeUrl);
 
     /**
      * Add nodes to a StaticNodeSource represented by sourceName.
      * SourceName must exist and must be a static source
      * @param nodeUrl URL of the node to add.
      * @param sourceName name of the static node source that will handle the node
-     * @throws RMException if a exception occurs during the node registration,
-     * notably if the node source doesn't exist
+     * @return true if new node is added successfully, false otherwise
      */
-    public void addNode(String nodeUrl, String sourceName) throws RMException;
+    public BooleanWrapper addNode(String nodeUrl, String sourceName);
 
     /**
      * Removes a node from the RM.
