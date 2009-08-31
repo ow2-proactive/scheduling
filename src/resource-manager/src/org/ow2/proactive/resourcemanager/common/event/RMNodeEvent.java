@@ -31,6 +31,9 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -83,6 +86,12 @@ public class RMNodeEvent extends RMEvent {
     /** State of the associated node */
     private NodeState nodeState;
 
+    /** Time of the last status update */
+    private Calendar stateChangeTime;
+
+    /** date formatter */
+    private SimpleDateFormat dateFormatter = new SimpleDateFormat();
+
     /**
      * ProActive empty constructor
      */
@@ -101,6 +110,7 @@ public class RMNodeEvent extends RMEvent {
         this.VMName = rmnode.getDescriptorVMName();
         this.nodeState = rmnode.getState();
         this.type = type;
+        this.stateChangeTime = rmnode.getStateChangeTime();
     }
 
     /**
@@ -178,6 +188,14 @@ public class RMNodeEvent extends RMEvent {
      */
     public NodeState getNodeState() {
         return nodeState;
+    }
+
+    /**
+     * Gets the time when state changed the last time
+     * @return the time when state changed the last time
+     */
+    public String getStateChangeTime() {
+        return dateFormatter.format(stateChangeTime.getTime());
     }
 
     /**

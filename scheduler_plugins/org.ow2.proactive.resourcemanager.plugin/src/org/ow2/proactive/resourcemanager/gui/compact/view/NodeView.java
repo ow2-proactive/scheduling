@@ -68,11 +68,13 @@ public class NodeView extends View {
     public String toString() {
 
         String nodeName = element.getName();
+        String since = ((Node) element).getState() + " since: " + ((Node) element).getStateChangeTime();
         String vmName = element.getParent().getName();
         String hostName = element.getParent().getParent().getName();
         String nodeSourceName = element.getParent().getParent().getParent().getName();
 
         String tooltip = "Node: " + nodeName + "\n";
+        tooltip += since + "\n";
         tooltip += "VM: " + vmName + "\n";
         tooltip += "Host: " + hostName + "\n";
         tooltip += "Node Source: " + nodeSourceName;
@@ -86,7 +88,9 @@ public class NodeView extends View {
     }
 
     public void update() {
-        if (label != null)
+        if (label != null) {
             label.setImage(images[((Node) element).getState().ordinal()]);
+            label.setToolTipText(toString());
+        }
     }
 }

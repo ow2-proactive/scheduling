@@ -104,7 +104,8 @@ public class RMModel {
                 }
             }
 
-            newNode = new Node(nodeEvent.getNodeUrl(), nodeEvent.getNodeState());
+            newNode = new Node(nodeEvent.getNodeUrl(), nodeEvent.getNodeState(), nodeEvent
+                    .getStateChangeTime());
             vm.addChild(newNode);
 
             if (parentToRefresh == null) {
@@ -181,7 +182,7 @@ public class RMModel {
             TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
             node = (Node) find(vm, nodeEvent.getNodeUrl());
             previousState = node.getState();
-            node.setState(nodeEvent.getNodeState());
+            node.setState(nodeEvent);
         }
         switch (previousState) {
             case FREE:

@@ -33,6 +33,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -108,6 +109,9 @@ public class RMNodeImpl implements RMNode, Serializable {
 
     /** State of the node */
     private NodeState status;
+
+    /** Time of the last status update */
+    private Calendar stateChangeTime = Calendar.getInstance();
 
     /** Create an RMNode Object.
      * A Created node begins to be free.
@@ -202,6 +206,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     public void setBusy() throws NodeException {
         if (this.status != NodeState.DOWN) {
             this.status = NodeState.BUSY;
+            stateChangeTime = Calendar.getInstance();
         } else {
             throw new NodeException("The node is down");
         }
@@ -214,6 +219,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     public void setFree() throws NodeException {
         if (this.status != NodeState.DOWN) {
             this.status = NodeState.FREE;
+            stateChangeTime = Calendar.getInstance();
         } else {
             throw new NodeException("The node is down");
         }
@@ -224,6 +230,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public void setDown() {
         this.status = NodeState.DOWN;
+        stateChangeTime = Calendar.getInstance();
     }
 
     /**
@@ -233,6 +240,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     public void setToRelease() throws NodeException {
         if (this.status != NodeState.DOWN) {
             this.status = NodeState.TO_BE_RELEASED;
+            stateChangeTime = Calendar.getInstance();
         } else {
             throw new NodeException("The node is down");
         }
@@ -406,5 +414,12 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public NodeState getState() {
         return status;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Calendar getStateChangeTime() {
+        return stateChangeTime;
     }
 }

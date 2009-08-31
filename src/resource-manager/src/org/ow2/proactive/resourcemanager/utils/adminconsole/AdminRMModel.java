@@ -258,7 +258,7 @@ public class AdminRMModel extends ConsoleModel {
         if (list.size() == 0) {
             print("No nodes handled by Resource Manager");
         } else {
-            int[] nameSize = new int[] { 11, 8, 5, 3 };
+            int[] nameSize = new int[] { 11, 8, 5, 8, 3 };
             for (RMNodeEvent evt : list) {
                 if (evt.getNodeSource().length() > nameSize[0]) {
                     nameSize[0] = evt.getNodeSource().length();
@@ -269,26 +269,32 @@ public class AdminRMModel extends ConsoleModel {
                 if (evt.getNodeState().toString().length() > nameSize[2]) {
                     nameSize[2] = evt.getNodeState().toString().length();
                 }
-                if (evt.getNodeUrl().length() > nameSize[3]) {
-                    nameSize[3] = evt.getNodeUrl().length();
+                if (evt.getStateChangeTime().toString().length() > nameSize[3]) {
+                    nameSize[3] = evt.getStateChangeTime().toString().length();
+                }
+                if (evt.getNodeUrl().length() > nameSize[4]) {
+                    nameSize[4] = evt.getNodeUrl().length();
                 }
             }
             nameSize[0] += 2;
             nameSize[1] += 2;
             nameSize[2] += 2;
             nameSize[3] += 2;
+            nameSize[4] += 2;
             StringBuilder sb = new StringBuilder();
             sb.append(String.format(" %1$-" + nameSize[0] + "s", "SOURCE NAME"));
             sb.append(String.format(" %1$-" + nameSize[1] + "s", "HOSTNAME"));
             sb.append(String.format(" %1$-" + nameSize[2] + "s", "STATE"));
-            sb.append(String.format(" %1$-" + nameSize[3] + "s", "URL"));
+            sb.append(String.format(" %1$-" + nameSize[3] + "s", "SINCE"));
+            sb.append(String.format(" %1$-" + nameSize[4] + "s", "URL"));
             print(sb.toString());
             for (RMNodeEvent evt : list) {
                 sb = new StringBuilder();
                 sb.append(String.format(" %1$-" + nameSize[0] + "s", evt.getNodeSource()));
                 sb.append(String.format(" %1$-" + nameSize[1] + "s", evt.getHostName()));
                 sb.append(String.format(" %1$-" + nameSize[2] + "s", evt.getNodeState()));
-                sb.append(String.format(" %1$-" + nameSize[3] + "s", evt.getNodeUrl()));
+                sb.append(String.format(" %1$-" + nameSize[3] + "s", evt.getStateChangeTime()));
+                sb.append(String.format(" %1$-" + nameSize[4] + "s", evt.getNodeUrl()));
                 print(sb.toString());
             }
         }

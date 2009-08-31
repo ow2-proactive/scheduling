@@ -32,6 +32,7 @@
 package org.ow2.proactive.resourcemanager.gui.data.model;
 
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 
 
 /**
@@ -39,10 +40,12 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
  */
 public class Node extends TreeLeafElement {
     private NodeState state = null;
+    private String stateChangeTime;
 
-    public Node(String name, NodeState state) {
+    public Node(String name, NodeState state, String stateChangeTime) {
         super(name, TreeElementType.NODE);
         this.state = state;
+        this.stateChangeTime = stateChangeTime;
     }
 
     /**
@@ -59,7 +62,12 @@ public class Node extends TreeLeafElement {
      *
      * @param state the state to set
      */
-    public void setState(NodeState state) {
-        this.state = state;
+    public void setState(RMNodeEvent event) {
+        this.state = event.getNodeState();
+        this.stateChangeTime = event.getStateChangeTime();
+    }
+
+    public String getStateChangeTime() {
+        return stateChangeTime;
     }
 }

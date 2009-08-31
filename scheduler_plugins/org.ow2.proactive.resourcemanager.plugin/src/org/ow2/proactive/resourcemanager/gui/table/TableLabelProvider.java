@@ -43,7 +43,8 @@ public class TableLabelProvider extends ColumnLabelProvider {
     private static final int NS_COLUMN_NUMBER = 0;
     private static final int HOST_COLUMN_NUMBER = 1;
     private static final int STATE_COLUMN_NUMBER = 2;
-    private static final int URL_COLUMN_NUMBER = 3;
+    private static final int SINCE_COLUMN_NUMBER = 3;
+    private static final int URL_COLUMN_NUMBER = 4;
 
     private int columnIndex;
 
@@ -85,6 +86,9 @@ public class TableLabelProvider extends ColumnLabelProvider {
                     break;
                 case URL_COLUMN_NUMBER:
                     str = node.getName();
+                    break;
+                case SINCE_COLUMN_NUMBER:
+                    str = node.getStateChangeTime();
                     break;
             }
             return str;
