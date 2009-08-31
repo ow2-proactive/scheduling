@@ -650,6 +650,10 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             Object[] infrastructureParameters, String policyType, Object[] policyParameters)
             throws RMException {
 
+        if (this.nodeSources.containsKey(nodeSourceName)) {
+            throw new RMException("Node Source name " + nodeSourceName + " is already exist");
+        }
+
         logger.info("Creating a Node source : " + nodeSourceName);
 
         InfrastructureManager im = InfrastructureManagerFactory.create(infrastructureType,
@@ -665,13 +669,9 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             throw new RMException(e);
         }
 
-        if (this.nodeSources.containsKey(nodeSourceName)) {
-            throw new RMException("Node Source name " + nodeSourceName + " is already exist");
-        } else {
-            registerTrustedService(policy);
-            nodeSourceRegister(nodeSource, nodeSourceName);
-            nodeSource.activate();
-        }
+        registerTrustedService(policy);
+        nodeSourceRegister(nodeSource, nodeSourceName);
+        nodeSource.activate();
 
         logger.info("Node source : " + nodeSourceName + " has been successfully created");
         return nodeSource;

@@ -137,7 +137,6 @@ public class NodeSource implements InitActive {
         try {
             pinger = (Pinger) PAActiveObject.newActive(Pinger.class.getName(), new Object[] { PAActiveObject
                     .getStubOnThis() });
-            pinger.ping();
             nodeLookupThread = new NodeLookupThread();
 
             // these methods are called from the rm core
@@ -448,6 +447,7 @@ public class NodeSource implements InitActive {
     public void activate() {
         logger.info("[" + name + "] Activating the policy " + nodeSourcePolicy);
         nodeSourcePolicy.activate();
+        pinger.ping();
     }
 
     /**
