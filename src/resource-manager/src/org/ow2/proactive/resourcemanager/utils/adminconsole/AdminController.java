@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.security.KeyException;
+import java.security.PublicKey;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -59,6 +61,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorClient;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -94,6 +97,7 @@ public class AdminController {
     protected CommandLine cmd = null;
     protected String user = null;
     protected String pwd = null;
+    protected Credentials credentials = null;
 
     protected RMAuthentication auth = null;
     protected AdminRMModel model;
@@ -173,27 +177,68 @@ public class AdminController {
                 logger.info("\t-> Connection established on " + url);
 
                 logger.info(newline + "Connecting admin to the RM");
+
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
-                    pwdMsg = user + "'s password: ";
-                } else {
-                    System.out.print("login: ");
-                    BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
-                    user = buf.readLine();
-                    pwdMsg = "password: ";
                 }
-
-                //ask password to User
-                char password[] = null;
-                try {
-                    password = PasswordField.getPassword(System.in, pwdMsg);
-                    if (password == null) {
-                        pwd = "";
-                    } else {
-                        pwd = String.valueOf(password);
+                if (cmd.hasOption("uc")) {
+                    if (cmd.hasOption("c")) {
+                        System.setProperty(Credentials.credentialsPathProperty, cmd.getOptionValue("c"));
                     }
-                } catch (IOException ioe) {
-                    logger.error("", ioe);
+                    try {
+                        this.credentials = Credentials.getCredentials();
+                    } catch (KeyException e) {
+                        logger.error("Could not retreive credentials... Try to adjust the System property: " +
+                            Credentials.credentialsPathProperty);
+                        throw e;
+                    }
+                } else {
+                    if (cmd.hasOption("l")) {
+                        pwdMsg = user + "'s password: ";
+                    } else {
+                        System.out.print("login: ");
+                        BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+                        user = buf.readLine();
+                        pwdMsg = "password: ";
+                    }
+
+                    //ask password to User
+                    char password[] = null;
+                    try {
+                        password = PasswordField.getPassword(System.in, pwdMsg);
+                        if (password == null) {
+                            pwd = "";
+                        } else {
+                            pwd = String.valueOf(password);
+                        }
+                    } catch (IOException ioe) {
+                        logger.error("", ioe);
+                    }
+
+                    PublicKey pubKey = null;
+                    try {
+                        // first attempt at getting the pubkey : ask the RM
+                        RMAuthentication auth = RMConnection.join(url);
+                        pubKey = auth.getPublicKey();
+                        System.out.println("Retrieved public key from Resource Manager at " + url);
+                    } catch (Exception e) {
+                        try {
+                            // second attempt : try default location
+                            pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
+                            System.out.println("Using public key at " + Credentials.getPubKeyPath());
+                        } catch (Exception exc) {
+                            System.out
+                                    .println("Could not find a public key. Contact the administrator of the Resource Manager.");
+                            exc.printStackTrace();
+                            System.exit(0);
+                        }
+                    }
+                    try {
+                        this.credentials = Credentials.createCredentials(user, pwd, pubKey);
+                    } catch (KeyException e) {
+                        logger.error("Could not create credentials... " + e);
+                        throw e;
+                    }
                 }
 
                 //connect to the scheduler
@@ -246,16 +291,17 @@ public class AdminController {
     }
 
     protected void connect() throws LoginException {
-        RMAdmin rm = auth.logAsAdmin(user, pwd);
+        RMAdmin rm = auth.logAsAdmin(credentials);
         model.connectRM(rm);
-        logger.info("\t-> Admin '" + user + "' successfully connected" + newline);
+        String userStr = (user != null) ? "'" + user + "' " : "";
+        logger.info("\t-> Admin " + userStr + " successfully connected" + newline);
     }
 
     protected void connectJMXClient(String hostName) {
         try {
             PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(
                 "service:jmx:rmi:///jndi/rmi://" + hostName + "/JMXRMAgent_admin");
-            cli.connect(user, pwd);
+            cli.connect(credentials, user);
             MBeanServerConnection conn = cli.getConnection();
             ObjectName on = new ObjectName("RMFrontend:name=RMBean_admin");
             model.setJMXInfo(new MBeanInfoViewer(conn, on));
@@ -347,6 +393,17 @@ public class AdminController {
         script.setArgs(1);
         script.setRequired(false);
         options.addOption(script);
+
+        Option useCreds = new Option("uc", "use-creds", false, "Use credentials retreived from disk");
+        useCreds.setRequired(false);
+        useCreds.setArgs(0);
+        options.addOption(useCreds);
+
+        Option opt = new Option("c", "credentials", true, "Path to the credentials (" +
+            Credentials.getCredentialsPath() + ").");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        options.addOption(opt);
 
         return actionGroup;
     }

@@ -301,6 +301,32 @@ PASchedulerProperties.updateProperties("your_property_file");
 					<emphasis>Authentication properties</emphasis>
 				</para>
 				<itemizedlist>
+
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.auth.jaas.path</emphasis>:
+							Jaas module configuration, describing which authentication method are available.
+							(default is config/authentication/jaas.config)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.auth.privkey.path</emphasis>:
+							Scheduler private key, to decrypt credentials encrypted on client side
+							with the related public key. Once decrypted, credentials are passed to the appropriate Jaas module.
+							(default is config/authentication/keys/priv.key)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.auth.pubkey.path</emphasis>:
+							Scheduler public key, used to encrypt clear credentials on user side before making
+							them transit on the network. Needs to be known on server side so that the Scheduler can offer
+							the key to clients asking for it.
+							(default is config/authentication/keys/pub.key);
+						</para>
+					</listitem>
+
 					<listitem>
 						<para>
 							<emphasis role="italics">pa.ldap.config.path</emphasis>:
@@ -497,12 +523,13 @@ AdminScheduler.createScheduler(
 					<listitem>
 						<para>
 							First, the user submits a Job using his <emphasis role="bold">UserSchedulerInterface</emphasis>
-							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it:
+							retrieved by the <emphasis role="bold">logAsUser</emphasis> method. Let's remind it (see 
+							<xref linkend="Submit_a_job_java"/> for how to use Credentials):
 							<programlisting language="java">
 // connecting to the scheduler
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 // checking username and password
-UserSchedulerInterface scheduler = auth.logAsUser("username","password");
+UserSchedulerInterface scheduler = auth.logAsUser(Credentials.getCredentials());
 // submitting a new job and get the associated id
 JobId myJobId = scheduler.submit(job);
 							</programlisting>
@@ -582,11 +609,12 @@ SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 							<para>
 								Then, with the <emphasis role="bold">SchedulerAuthenticationInterface</emphasis>,
 								users can be connected as user or administrator roles using the
-								<emphasis role="bold">logAsUser</emphasis> or <emphasis role="bold">logAsAdmin</emphasis> methods.
+								<emphasis role="bold">logAsUser</emphasis> or <emphasis role="bold">logAsAdmin</emphasis> methods
+								(see <xref linkend="Submit_a_job_java"/> for how to use Credentials).
 							</para>
 							<programlisting language="java">
-UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
-// OR AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");
+UserSchedulerInterface scheduler = auth.logAsUser(Credentials.getCredentials());
+// OR AdminSchedulerInterface scheduler = auth.logAsAdmin(Credentials.getCredentials());
 							</programlisting>
 						</listitem>
 						<listitem>
@@ -620,11 +648,12 @@ UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
 				<para>
 					And now, to administer the ProActive Scheduler, just connect to it if it is not already done and use the
 					<emphasis role="bold">AdminSchedulerInterface</emphasis> to manage it. Take a look at the JavaDocumentation
-					to get more details and features. Let's remind how to connect the Scheduler as an administrator:
+					to get more details and features. Let's remind how to connect the Scheduler as an administrator (see 
+					<xref linkend="Submit_a_job_java"/> for how to use Credentials):
 				</para>
 				<programlisting language="java">
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
-AdminSchedulerInterface scheduler = auth.logAsAdmin("admin_username", "admin_password");
+AdminSchedulerInterface scheduler = auth.logAsAdmin(Credentials.getCredentials());
 				</programlisting>
 				<para>
 					Then, use the returned 'scheduler' object to communicate with the ProActive Scheduler as an administrator. One interesting thing
@@ -748,6 +777,49 @@ public class PriorityPolicy implements PolicyInterface {
 			 change priority of any job, with 5 priority levels: lowest, low, normal, high and highest.</para>
 			 </listitem>
 		</itemizedlist>
+
+		<section xml:id="Sched_authent_crypto"><info><title>KeyPair authentication</title></info>
+
+		  <para>
+		    Regardless of which method is actually used to perform the authentication,
+		    credentials need to be passed from the client to the Scheduler, through the network.
+		    The data will be encrypted with an AES symmetric secret key to allow unlimited credentials size,
+		    and the AES key itself will be encrypted with an RSA keypair.
+
+		    <figure xml:id="scheduler_crypto_pic"><info><title>Credentials encryption</title></info>
+		      <mediaobject>
+			<imageobject>
+			  <imagedata width="100%" align="center" fileref="scheduler/pics/schedulerCrypto.png" format="PNG"/>
+			</imageobject>
+		      </mediaobject>
+		    </figure>		  
+		  </para>
+		  
+		  
+		  <para>
+		    The Keypair can be generated with the <emphasis>keyGen.[sh|bat]</emphasis> script:
+		    <screen><![CDATA[
+bin/unix $ ./keyGen.sh -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
+]]></screen>
+		    Accordingly, the Scheduler configuration must be set so that, when started:
+		    <itemizedlist>
+		      <listitem><para>
+			  <emphasis>pa.scheduler.auth.privkey.path=</emphasis>$HOME/.proactive/priv.key
+		      </para></listitem>
+		      <listitem><para>
+			  <emphasis>pa.scheduler.auth.pubkey.path=</emphasis>$HOME/.proactive/pub.key
+		      </para></listitem>
+		    </itemizedlist>
+		    Although no encryption should be performed on server side, the public key should be known from the Scheduler :
+		    indeed, a client can request the public key to the Scheduler so that it may encrypt its credentials to perform
+		    authentication. This method doesn't require the Scheduler's administrator to manually propagate public keys
+		    to all its users.
+		    Users can encrypt their credentials with the <emphasis>createCred.[sh|bat]</emphasis> script.
+		    See <xref linkend="Submit_a_job_java"/> for client-side configuration.
+		  </para>
+		</section>
+		
+		
 		<section xml:id="Sched_authent_select"><info><title>Select authentication method</title></info>
 			<para>
 			So that the Scheduler can manage users authentication and authorization, it has to store users account/password, and check login and password at users' connection.

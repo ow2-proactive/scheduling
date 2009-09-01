@@ -32,6 +32,7 @@
 package org.ow2.proactive.jmx.connector;
 
 import java.io.IOException;
+import java.security.KeyException;
 import java.util.HashMap;
 
 import javax.management.MBeanServerConnection;
@@ -39,6 +40,8 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.security.auth.login.LoginException;
+
+import org.ow2.proactive.authentication.crypto.Credentials;
 
 
 /**
@@ -63,7 +66,7 @@ public class PAAuthenticationConnectorClient {
      * @throws LoginException 
      */
     public void connect() throws LoginException, IOException {
-        this.connect(null, null);
+        throw new LoginException("Anonymous connection is not accepted");
     }
 
     /**
@@ -75,16 +78,36 @@ public class PAAuthenticationConnectorClient {
      * @throws LoginException 
      */
     public void connect(String username, String password) throws IOException, LoginException {
+        try {
+            Credentials creds = Credentials
+                    .createCredentials(username, password, Credentials.getPubKeyPath());
+            connect(creds, username);
+        } catch (KeyException e) {
+            throw new LoginException("Could not encrypt credentials, try to adjust the System property: " +
+                Credentials.pubkeyPathProperty + "  " + e.getMessage());
+        }
+    }
+
+    /**
+     * Connect to the JMX Connector
+     *  
+     * @param cred encapsulates encrypted credentials
+     * @param username optional username, execution will go on if null
+     * @throws IOException
+     * @throws LoginException 
+     */
+    public void connect(Credentials cred, String username) throws IOException, LoginException {
         /*  build the jMX URL */
         JMXServiceURL jmxUrl = new JMXServiceURL(url);
         // Create the enviroment Map
         HashMap<String, Object> env = new HashMap<String, Object>();
-        // If the connector server need the credentials
-        if (!(username == null || password == null)) {
-            String[] creds = { username, password };
-            // Put the credentials in the enviroment
-            env.put(JMXConnector.CREDENTIALS, creds);
-        }
+
+        Object[] creds = new Object[2];
+        creds[0] = cred;
+        creds[1] = username;
+
+        env.put(JMXConnector.CREDENTIALS, creds);
+
         /* connect to the connector server, passing the enviroment  */
         this.connector = JMXConnectorFactory.connect(jmxUrl, env);
         /* retrieve the JMX Connection that will enable the remote calls onto the remote MBean server */

@@ -86,6 +86,16 @@ public enum PASchedulerProperties {
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */
 
+    /** path to the Jaas configuration file which defines what modules are available for
+     * internal authentication */
+    SCHEDULER_AUTH_JAAS_PATH("pa.scheduler.auth.jaas.path", PAPropertiesType.STRING),
+
+    /** path to the private key file which is used to decrypt credentials passed to the jaas module */
+    SCHEDULER_AUTH_PRIVKEY_PATH("pa.scheduler.auth.privkey.path", PAPropertiesType.STRING),
+
+    /** path to the public key file which is used to encrypt credentials for authentication */
+    SCHEDULER_AUTH_PUBKEY_PATH("pa.scheduler.auth.pubkey.path", PAPropertiesType.STRING),
+
     /** 
      * LDAP Authentication configuration file path, used to set LDAP configuration properties
      * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)
@@ -154,11 +164,8 @@ public enum PASchedulerProperties {
     /* ************************** RM PROPERTIES ************************ */
     /* ***************************************************************** */
 
-    /** Scheduler user name for RM authentication */
-    RESOURCE_MANAGER_USER("pa.scheduler.resourcemanager.authentication.username", PAPropertiesType.STRING),
-
-    /** Scheduler password for RM authentication */
-    RESOURCE_MANAGER_PASSWORD("pa.scheduler.resourcemanager.authentication.password", PAPropertiesType.STRING),
+    /** Path to the Scheduler credentials file for RM authentication */
+    RESOURCE_MANAGER_CREDS("pa.scheduler.resourcemanager.authentication.credentials", PAPropertiesType.STRING),
 
     /* ***************************************************************** */
     /* ********************** HIBERNATE PROPERTIES ********************* */

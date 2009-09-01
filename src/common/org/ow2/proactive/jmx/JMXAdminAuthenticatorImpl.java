@@ -39,6 +39,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXProperties;
 
 
@@ -71,26 +72,26 @@ public class JMXAdminAuthenticatorImpl implements JMXAuthenticator {
      */
     public Subject authenticate(Object credentials) {
         // Verify that credentials is of type String[]
-        if (!(credentials instanceof String[])) {
-            // Special case for null so we get a more informative message
-            if (credentials == null) {
-                throw new SecurityException("Credentials required");
-            }
-            throw new SecurityException("Credentials should be String[]");
+        if (!(credentials instanceof Object[])) {
+            throw new SecurityException("Credentials should be Object[]");
+        } else if (!(((Object[]) credentials)[0] instanceof Credentials)) {
+            throw new SecurityException("Received Invalid credentials");
         }
-        final String[] aCredentials = (String[]) credentials;
-        // Perform authentication
-        String username = (String) aCredentials[0];
-        String password = (String) aCredentials[1];
+        Object[] ocred = (Object[]) credentials;
+        Credentials cred = (Credentials) ocred[0];
+        String username = (String) ocred[1];
+        if (username == null) {
+            username = "jmx-client";
+        }
+
         try {
             // Try to authenticate as Admin based on the authenticationType parameter
-            authentication.loginAs(JMXProperties.JMX_ADMIN, new String[] { JMXProperties.JMX_ADMIN },
-                    username, password);
+            authentication.loginAs(JMXProperties.JMX_ADMIN, new String[] { JMXProperties.JMX_ADMIN }, cred);
         } catch (LoginException le) {
             throw new SecurityException("Invalid credentials for " + JMXProperties.JMX_ADMIN);
         }
         // Authentication as (Admin/User) successfully, return a new JMX Subject principal
-        return new Subject(true, Collections.singleton(new JMXPrincipal((String) aCredentials[0])),
+        return new Subject(true, Collections.singleton(new JMXPrincipal((String) username)),
             Collections.EMPTY_SET, Collections.EMPTY_SET);
     }
 }

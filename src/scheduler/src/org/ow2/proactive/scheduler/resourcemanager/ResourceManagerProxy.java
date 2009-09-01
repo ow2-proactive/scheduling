@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.resourcemanager;
 
 import java.net.URI;
+import java.security.KeyException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +52,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -288,9 +290,14 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     public void initActivity(Body body) {
         if (auth != null) {
             try {
-                user = auth.logAsUser(PASchedulerProperties.RESOURCE_MANAGER_USER.getValueAsString(),
-                        PASchedulerProperties.RESOURCE_MANAGER_PASSWORD.getValueAsString());
+                Credentials creds = Credentials.getCredentials(PASchedulerProperties
+                        .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
+                user = auth.logAsUser(creds);
             } catch (LoginException e) {
+                throw new RuntimeException(e);
+            } catch (KeyException e) {
+                logger.error("Could not retrieve Credentials at " +
+                    PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString(), e);
                 throw new RuntimeException(e);
             }
         }

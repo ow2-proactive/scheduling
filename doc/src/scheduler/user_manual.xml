@@ -1102,11 +1102,59 @@ task2.setGenerationScript(gscript);
 				<programlisting language="java">
 //join an existing ProActive Scheduler retrieving an authentication interface.
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
-//connect and log to the Scheduler. Valid username and password are defined by the administrator.
-UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+//connect and log to the Scheduler. Valid username and password are defined by the administrator
+UserSchedulerInterface scheduler = null;
+try {
+    // (1) preferred authentication method
+    scheduler = auth.logAsUser(Credentials.getCredentials());
+} catch (KeyException e) {
+    try {
+        // (2) valid authentication method
+        PublicKey pubKey = auth.getPubKey();
+        if (pubKey == null) {
+             pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
+        }
+        scheduler = auth.logAsUser(Credentials.createCredentials("username", "password", pubKey));
+    } catch (KeyException e) {
+        // (3) deprecated authentication method 
+        scheduler = auth.logAsUser("username", "password");
+    }
+}
 // submitting a new job and get the associated id
 JobId myJobId = scheduler.submit(job);
 				</programlisting>
+				<para>
+				  Connecting to the Scheduler implicates using a keypair infrastructure to establish a secure channel on 
+				  which the credentials (username and password) will be sent securely. There are three ways to connect
+				  to the Scheduler, as described in the example above:
+				  <orderedlist>
+				    <listitem><para>
+					Retreive the Credentials from disk: supposes the script <emphasis>createCred.[sh|bat]</emphasis> was previously used to generate those credentials. 
+					It requires knowing the location of the public key corresponding to the private key that will be used for decryption on server side.
+					To obtain the key, you can either have it on your local drive, or ask the remote Scheduler:
+				      </para>
+				      <para>
+					<screen><![CDATA[
+# use local public key to generate credentials for user 'demo'
+/bin/unix $ ./createCred.sh -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
+# use rmi://example.com/SCHEDULER's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
+/bin/unix $ ./createCred.sh -U rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+]]></screen>
+					Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; ie using
+					<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>.
+				    </para></listitem>
+				    <listitem><para>
+					Create the encrypted Credentials on client side: as safe as the previous method, but requires user input, which prevents automation,
+					or storing clear credentials on the disk, which can result to security breaches. This method also requires knowing the public key,
+					which should be offered by the Scheduler through the Authentication object with the getPubKey() method.
+					If the Scheduler doesn't know the public key, it can be stored locally on client side and designated by the
+					<emphasis>pa.common.auth.pubkey</emphasis> Java property; ie using <emphasis>java -Dpa.common.auth.pubkey=$HOME/.proactive/pub.key</emphasis>.
+				    </para></listitem>
+				    <listitem><para>
+					If you can not retreive the public key, you can use the old deprecated API, which sends clear credentials on the network, and requires user input.
+				    </para></listitem>
+				  </orderedlist>
+				</para>
 				<para>
 					As you can see, submitting a job will return a Job ID. This is the identification code of
 					the submitted Job. It is useful to save it in order to retrieve future information on this job.
@@ -1200,7 +1248,7 @@ scheduler.submit(job);
 				</para>
 				<programlisting language="java">
 // get the user interface
-UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+UserSchedulerInterface scheduler = auth.logAsUser(Credentials.getCredentials());
 // get the result of the job
 JobResult myResult = scheduler.getJobResult(myJobId);
 //look at inside the JobResult to retrieve TaskResult...
@@ -1315,6 +1363,33 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 						</para>
 					</listitem>
 				</itemizedlist>
+				<para>
+				  To use the controller, you can either type your login and password in interactive mode, or use the <emphasis>--use-cred</emphasis> option
+				  to attempt retreiving encrypted credentials from disk.
+				  In both cases, the credentials need to be encrypted when transiting on the network: you need to have the Scheduler's public key, corresponding
+				  to the private key that will be used to decrypt the credentials.
+				  <orderedlist>
+				    <listitem><para>
+					In interactive mode, this public key will be asked by the controller to the remote Scheduler it is attempting to contact:
+					if the Scheduler does not know it or is unable to forward it to the controller, is must be specified through the
+					<emphasis>pa.common.auth.pubkey property</emphasis>, ie. using 
+					<emphasis>java -Dpa.common.auth.pubkey=$HOME/.proactive/my_encrypted_credentials</emphasis>.
+				    </para></listitem>
+				    <listitem><para>
+					In batch mode, this public key will be used when encrypting the credentials with the createCred.[sh|bat] script: 
+					<screen><![CDATA[
+# use local public key to generate credentials for user 'demo'
+/bin/unix $ ./createCred.sh -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
+# use rmi://example.com/SCHEDULER's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
+/bin/unix $ ./createCred.sh -U rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+]]></screen>
+					When running the controller, Credentials will now be retreived when properly designated by the
+					<emphasis>pa.common.auth.credentials</emphasis> property; ie. using
+					<emphasis>java -Dpa.common.auth.pubkey=$HOME/.proactive/my_encrypted_credentials</emphasis>,
+					or when using the <emphasis>--credentials PATH</emphasis> option.
+				    </para></listitem>
+				  </orderedlist>
+				</para>
 				<para>
 					Once the command launched, it will terminate by displaying a successful message or the cause of
 					a possible failure as an exception.

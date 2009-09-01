@@ -32,6 +32,9 @@
 package org.ow2.proactive.authentication;
 
 import java.io.Serializable;
+import java.security.PublicKey;
+
+import javax.security.auth.login.LoginException;
 
 
 /**
@@ -49,5 +52,13 @@ public interface Authentication extends Loggable, Serializable {
      * @return true if it is activated.
      */
     public boolean isActivated();
+
+    /**
+     * Request this Authentication's public key for credentials encryption
+     *
+     * @return this Authentication's public key
+     * @throws LoginException the key could not be retrieved
+     */
+    public PublicKey getPublicKey() throws LoginException;
 
 }

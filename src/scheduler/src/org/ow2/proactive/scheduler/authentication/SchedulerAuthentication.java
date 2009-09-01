@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
+import java.security.KeyException;
+
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -39,6 +41,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
@@ -84,6 +87,11 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
      * @param frontend the scheduler front-end on which to connect the user after authentication success.
      */
     public SchedulerAuthentication(SchedulerFrontend frontend) {
+        super(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_JAAS_PATH
+                .getValueAsString()), PASchedulerProperties
+                .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()),
+                PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH
+                        .getValueAsString()));
         this.frontend = frontend;
     }
 
@@ -95,16 +103,58 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
     }
 
     /**
+     * 
+     * Kept for compatibility reasons, should be removed in future versions.
+     * <p>
+     * Prefer its secure counterpart,
+     * {@link org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsUser(Credentials)}
+     * 
      * @see org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
      */
+    @Deprecated
     public UserSchedulerInterface logAsUser(String user, String password) throws LoginException {
+        try {
+            // encrypting the data here is useless, only done to conform to the
+            // signature of the real method
+            return logAsUser(Credentials.createCredentials(user, password, publicKeyPath));
+        } catch (KeyException e) {
+            logger_dev.error("", e);
+            throw new LoginException("Could not encrypt credentials: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 
+     * Kept for compatibility reasons, should be removed in future versions.
+     * <p>
+     * Prefer its secure counterpart,
+     * {@link org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsAdmin(Credentials)}
+     * 
+     * @see org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
+     */
+    @Deprecated
+    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException {
+        try {
+            // encrypting the data here is useless, only done to conform to the
+            // signature of the real method
+            return logAsAdmin(Credentials.createCredentials(user, password, publicKeyPath));
+        } catch (KeyException e) {
+            logger_dev.error("", e);
+            throw new LoginException("Could not encrypt credentials: " + e.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UserSchedulerInterface logAsUser(Credentials cred) throws LoginException {
+
+        String user = loginAs("user", new String[] { "user", "admin" }, cred);
+
         logger_dev.info("user : " + user);
-
-        loginAs("user", new String[] { "user", "admin" }, user, password);
-
         UserScheduler us = new UserScheduler();
         us.schedulerFrontend = this.frontend;
-        //add this user to the scheduler front-end
+        // add this user to the scheduler front-end
         UserIdentificationImpl ident = new UserIdentificationImpl(user);
         ident.setHostName(getSenderHostName());
         try {
@@ -119,16 +169,16 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
+     * {@inheritDoc}
      */
-    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException {
-        logger_dev.info("admin : " + user);
+    public AdminSchedulerInterface logAsAdmin(Credentials cred) throws LoginException {
 
-        loginAs("admin", new String[] { "admin" }, user, password);
+        String user = loginAs("admin", new String[] { "admin" }, cred);
 
+        logger_dev.info("user : " + user);
         AdminScheduler as = new AdminScheduler();
         as.schedulerFrontend = this.frontend;
-        //add this user to the scheduler front-end
+        // add this user to the scheduler front-end
         UserIdentificationImpl ident = new UserIdentificationImpl(user, true);
         ident.setHostName(getSenderHostName());
         try {
@@ -144,7 +194,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
 
     /**
      * get the host name of the sender
-     *
+     * 
      * @return the host name of the sender
      */
     private String getSenderHostName() {

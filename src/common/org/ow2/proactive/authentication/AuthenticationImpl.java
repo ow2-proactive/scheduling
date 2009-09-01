@@ -31,8 +31,9 @@
  */
 package org.ow2.proactive.authentication;
 
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.File;
+import java.security.KeyException;
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.authentication.crypto.Credentials;
 
 
 /**
@@ -61,24 +63,54 @@ public abstract class AuthenticationImpl implements Authentication {
     protected abstract String getLoginMethod();
 
     /**
-     * Default constructor which loads jaas.config and stores it in global system property
+     * Path to the private key file for used for authentication
+     */
+    protected String privateKeyPath;
+
+    /**
+     * Path to the private key file for used for authentication
+     */
+    protected String publicKeyPath;
+
+    /**
+     * Empty constructor
      */
     public AuthenticationImpl() {
-        URL jaasConfig = AuthenticationImpl.class.getResource("jaas.config");
+    }
 
-        if (jaasConfig == null) {
-            throw new RuntimeException("The file 'jaas.config' has not been found");
+    /**
+     * Default constructor
+     * <p>
+     * Loads jaas.config and stores it in global system property,
+     * also locates keypair used for authentication:
+     * public key is used to encrypt credentials to make the old deprecated API still compatible,
+     * private key is used to decrypt credentials in the new API.
+     * 
+     * @param jaasPath path to the jaas configuration file
+     * @param privPath path to the private key file
+     * @param pubPath path to the public key file
+     * 
+     */
+    public AuthenticationImpl(String jaasPath, String privPath, String pubPath) {
+        File jaasFile = new File(jaasPath);
+        if (jaasFile.exists() && !jaasFile.isDirectory()) {
+            System.setProperty("java.security.auth.login.config", jaasPath);
+        } else {
+            throw new RuntimeException("Could not find Jaas configuration at: " + jaasPath);
         }
-        try {
-            // is used when jaas.config is in classes directory
-            String jaasConfigPath = jaasConfig.toURI().getPath();
-            if (jaasConfigPath == null) {
-                // is used when jaas.config is inside jar file
-                jaasConfigPath = jaasConfig.toString();
-            }
-            System.setProperty("java.security.auth.login.config", jaasConfigPath);
-        } catch (URISyntaxException e) {
-            getLogger().error(e.getMessage(), e);
+
+        File privFile = new File(privPath);
+        if (privFile.exists() && !privFile.isDirectory()) {
+            this.privateKeyPath = privPath;
+        } else {
+            throw new RuntimeException("Could not find private key file at: " + privPath);
+        }
+
+        File pubFile = new File(pubPath);
+        if (pubFile.exists() && !pubFile.isDirectory()) {
+            this.publicKeyPath = pubPath;
+        } else {
+            throw new RuntimeException("Could not find public key file at: " + pubPath);
         }
     }
 
@@ -87,17 +119,26 @@ public abstract class AuthenticationImpl implements Authentication {
      * 
      * @param role the role of the user to connect, can be admin or user
      * @param groups the group in which the user is
-     * @param username the user name of the user
-     * @param password the password of the user
+     * @param cred encrypted username and password
+     * @return the name of the user logged
      * @throws LoginException if username or password is incorrect.
      */
-    public void loginAs(String role, String[] groups, String username, String password) throws LoginException {
+    public String loginAs(String role, String[] groups, Credentials cred) throws LoginException {
 
         if (activated == false) {
             throw new LoginException("Authentication active object is not activated.");
         }
 
-        if (username == null | username.equals("")) {
+        String[] credentials = null;
+        try {
+            credentials = cred.decrypt(privateKeyPath);
+        } catch (KeyException e) {
+            throw new LoginException("Could not decrypt credentials: " + e);
+        }
+        String username = credentials[0];
+        String password = credentials[1];
+
+        if (username == null || username.equals("")) {
             throw new LoginException("Bad user name (user is null or empty)");
         }
 
@@ -126,6 +167,30 @@ public abstract class AuthenticationImpl implements Authentication {
             //Nature of exception is hidden for user, we don't want to inform
             //user about the reason of non authentication
             throw new LoginException("Authentication failed");
+        }
+        return username;
+    }
+
+    /**
+     * Request this AuthenticationImpl's public key
+     * <p>
+     * The public key provided by this method can be used to create encrypted credentials with
+     * {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, PublicKey)},
+     * which can then be used for further calls to {@link #loginAs(String, String[], Credentials)}.
+     * The private key corresponding to this public key will be used for decryption.
+     * 
+     * @return this AuthenticationImpl's public key
+     * @throws LoginException the key could not be retrieved
+     */
+    public PublicKey getPublicKey() throws LoginException {
+        if (activated == false) {
+            throw new LoginException("Authentication active object is not activated.");
+        }
+        try {
+            return Credentials.getPublicKey(this.publicKeyPath);
+        } catch (KeyException e) {
+            getLogger().error(e);
+            throw new LoginException("Could not retrieve public key");
         }
     }
 

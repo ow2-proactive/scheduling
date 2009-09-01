@@ -87,6 +87,16 @@ public enum PAResourceManagerProperties {
     /** Resource Manager home directory */
     RM_HOME("pa.rm.home", PAPropertiesType.STRING),
 
+    /** path to the Jaas configuration file which defines what modules are available for
+     * internal authentication */
+    RM_AUTH_JAAS_PATH("pa.rm.auth.jaas.path", PAPropertiesType.STRING),
+
+    /** path to the private key file which is used to decrypt credentials passed to the jaas module */
+    RM_AUTH_PRIVKEY_PATH("pa.rm.auth.privkey.path", PAPropertiesType.STRING),
+
+    /** path to the public key file which is used to encrypt credentials for authentication */
+    RM_AUTH_PUBKEY_PATH("pa.rm.auth.pubkey.path", PAPropertiesType.STRING),
+
     /** Resource Manager authentication method */
     RM_LOGIN_METHOD("pa.rm.authentication.loginMethod", PAPropertiesType.STRING),
 

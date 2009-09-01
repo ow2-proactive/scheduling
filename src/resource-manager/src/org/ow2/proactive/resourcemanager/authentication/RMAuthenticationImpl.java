@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
+import java.security.KeyException;
+
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -41,6 +43,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -70,31 +73,47 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     }
 
     public RMAuthenticationImpl(RMCoreInterface rmcore) {
+        super(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_JAAS_PATH
+                .getValueAsString()), PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PRIVKEY_PATH.getValueAsString()),
+                PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PUBKEY_PATH
+                        .getValueAsString()));
         this.rmcore = rmcore;
     }
 
     /**
      * Performs user authentication
      */
+    @Deprecated
     public RMUser logAsUser(String user, String password) throws LoginException {
-
-        loginAs("user", new String[] { "user", "admin" }, user, password);
-
-        // login successful
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        RMUserImpl userImpl = (RMUserImpl) rmcore.getUser();
-        if (!userImpl.connect(id)) {
-            throw new LoginException(ERROR_ALREADY_CONNECTED);
+        try {
+            // encrypting the data here is useless, only done to conform to the
+            // signature of the real method
+            return logAsUser(Credentials.createCredentials(user, password, publicKeyPath));
+        } catch (KeyException e) {
+            throw new LoginException("Could not encrypt credentials: " + e.getMessage());
         }
-        return userImpl;
     }
 
     /**
      * Performs admin authentication
      */
+    @Deprecated
     public RMAdmin logAsAdmin(String user, String password) throws LoginException {
+        try {
+            // encrypting the data here is useless, only done to conform to the
+            // signature of the real method
+            return logAsAdmin(Credentials.createCredentials(user, password, publicKeyPath));
+        } catch (KeyException e) {
+            throw new LoginException("Could not encrypt credentials: " + e.getMessage());
+        }
+    }
 
-        loginAs("admin", new String[] { "admin" }, user, password);
+    /**
+     * Performs admin authentication
+     */
+    public RMAdmin logAsAdmin(Credentials cred) throws LoginException {
+        loginAs("admin", new String[] { "admin" }, cred);
 
         // login successful
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
@@ -103,6 +122,21 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
             throw new LoginException(ERROR_ALREADY_CONNECTED);
         }
         return admin;
+    }
+
+    /**
+     * Performs user authentication
+     */
+    public RMUser logAsUser(Credentials cred) throws LoginException {
+        loginAs("user", new String[] { "user", "admin" }, cred);
+
+        // login successful
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+        RMUserImpl userImpl = (RMUserImpl) rmcore.getUser();
+        if (!userImpl.connect(id)) {
+            throw new LoginException(ERROR_ALREADY_CONNECTED);
+        }
+        return userImpl;
     }
 
     /**
@@ -132,5 +166,4 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     protected String getLoginMethod() {
         return PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString();
     }
-
 }

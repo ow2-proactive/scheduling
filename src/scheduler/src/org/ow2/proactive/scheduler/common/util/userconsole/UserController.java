@@ -34,6 +34,8 @@ package org.ow2.proactive.scheduler.common.util.userconsole;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.KeyException;
+import java.security.PublicKey;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -56,6 +58,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
+import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorClient;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -93,6 +97,7 @@ public class UserController {
     protected CommandLine cmd = null;
     protected String user = null;
     protected String pwd = null;
+    protected Credentials credentials = null;
 
     protected SchedulerAuthenticationInterface auth = null;
     protected UserSchedulerModel model;
@@ -169,27 +174,69 @@ public class UserController {
                 logger.info("\t-> Connection established on " + url);
 
                 logger.info(newline + "Connecting admin to the Scheduler");
+
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
-                    pwdMsg = user + "'s password: ";
-                } else {
-                    System.out.print("login: ");
-                    BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
-                    user = buf.readLine();
-                    pwdMsg = "password: ";
                 }
 
-                //ask password to User
-                char password[] = null;
-                try {
-                    password = PasswordField.getPassword(System.in, pwdMsg);
-                    if (password == null) {
-                        pwd = "";
-                    } else {
-                        pwd = String.valueOf(password);
+                if (cmd.hasOption("uc")) {
+                    if (cmd.hasOption("c")) {
+                        System.setProperty(Credentials.credentialsPathProperty, cmd.getOptionValue("c"));
                     }
-                } catch (IOException ioe) {
-                    logger.error("" + ioe);
+                    try {
+                        this.credentials = Credentials.getCredentials();
+                    } catch (KeyException e) {
+                        logger.error("Could not retreive credentials... Try to adjust the System property: " +
+                            Credentials.credentialsPathProperty + " or use the -c option.");
+                        throw e;
+                    }
+                } else {
+                    if (cmd.hasOption("l")) {
+                        pwdMsg = user + "'s password: ";
+                    } else {
+                        System.out.print("login: ");
+                        BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+                        user = buf.readLine();
+                        pwdMsg = "password: ";
+                    }
+
+                    //ask password to User
+                    char password[] = null;
+                    try {
+                        password = PasswordField.getPassword(System.in, pwdMsg);
+                        if (password == null) {
+                            pwd = "";
+                        } else {
+                            pwd = String.valueOf(password);
+                        }
+                    } catch (IOException ioe) {
+                        logger.error("" + ioe);
+                    }
+
+                    PublicKey pubKey = null;
+                    try {
+                        // first attempt at getting the pubkey : ask the scheduler
+                        SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
+                        pubKey = auth.getPublicKey();
+                        System.out.println("Retrieved public key from Scheduler at " + url);
+                    } catch (Exception e) {
+                        try {
+                            // second attempt : try default location
+                            pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
+                            System.out.println("Using public key at " + Credentials.getPubKeyPath());
+                        } catch (Exception exc) {
+                            System.out
+                                    .println("Could not find a public key. Contact the administrator of the Scheduler.");
+                            exc.printStackTrace();
+                            System.exit(0);
+                        }
+                    }
+                    try {
+                        this.credentials = Credentials.createCredentials(user, pwd, pubKey);
+                    } catch (KeyException e) {
+                        logger.error("Could not create credentials... " + e);
+                        throw e;
+                    }
                 }
 
                 //connect to the scheduler
@@ -240,16 +287,18 @@ public class UserController {
     }
 
     protected void connect() throws LoginException {
-        UserSchedulerInterface scheduler = auth.logAsUser(user, pwd);
+        UserSchedulerInterface scheduler;
+        scheduler = auth.logAsUser(this.credentials);
         model.connectScheduler(scheduler);
-        logger.info("\t-> User '" + user + "' successfully connected" + newline);
+        String userStr = (user != null) ? "'" + user + "' " : "";
+        logger.info("\t-> User " + userStr + "successfully connected" + newline);
     }
 
     protected void connectJMXClient(String hostname) throws JMXProviderException {
         try {
             PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(
                 "service:jmx:rmi:///jndi/rmi://" + hostname + "/JMXSchedulerAgent");
-            cli.connect();
+            cli.connect(credentials, user);
             MBeanServerConnection conn = cli.getConnection();
             ObjectName on = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean");
             model.setJMXInfo(new MBeanInfoViewer(conn, on));
@@ -378,6 +427,17 @@ public class UserController {
         opt.setRequired(false);
         opt.setArgs(0);
         actionGroup.addOption(opt);
+
+        opt = new Option("uc", "use-creds", false, "Use credentials retreived from disk");
+        opt.setRequired(false);
+        opt.setArgs(0);
+        options.addOption(opt);
+
+        opt = new Option("c", "credentials", true, "Path to the credentials (" +
+            Credentials.getCredentialsPath() + ").");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        options.addOption(opt);
 
         options.addOptionGroup(actionGroup);
 

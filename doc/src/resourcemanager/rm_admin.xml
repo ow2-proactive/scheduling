@@ -116,6 +116,48 @@
 			 <listitem><para><emphasis>user level </emphasis>: enables to query Resource Manager state and node lists.</para>
 			 </listitem>
 		</itemizedlist>
+
+		<section xml:id="RM_authent_crypto"><info><title>KeyPair authentication</title></info>
+
+		  <para>
+		    Regardless of which method is actually used to perform the authentication,
+		    credentials need to be passed from the client to the Resource Manager, through the network.
+		    The data will be encrypted with an AES symmetric secret key to allow unlimited credentials size,
+		    and the AES key itself will be encrypted with an RSA keypair.
+
+		    <figure xml:id="RM_crypto_pic"><info><title>Credentials encryption</title></info>
+		      <mediaobject>
+			<imageobject>
+			  <imagedata width="100%" align="center" fileref="resourcemanager/pics/rmCrypto.png" format="PNG"/>
+			</imageobject>
+		      </mediaobject>
+		    </figure>		  
+		  </para>
+		  
+		  
+		  <para>
+		    The Keypair can be generated with the <emphasis>keyGen.[sh|bat]</emphasis> script:
+		    <screen><![CDATA[
+bin/unix $ ./keyGen.sh -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
+]]></screen>
+		    Accordingly, the Scheduler configuration must be set so that, when started:
+		    <itemizedlist>
+		      <listitem><para>
+			  <emphasis>pa.rm.auth.privkey.path=</emphasis>$HOME/.proactive/priv.key
+		      </para></listitem>
+		      <listitem><para>
+			  <emphasis>pa.rm.auth.pubkey.path=</emphasis>$HOME/.proactive/pub.key
+		      </para></listitem>
+		    </itemizedlist>
+		    Although no encryption should be performed on server side, the public key should be known from the Scheduler :
+		    indeed, a client can request the public key to the Scheduler so that it may encrypt its credentials to perform
+		    authentication. This method doesn't require the Scheduler's administrator to manually propagate public keys
+		    to all its users.
+		    Users can encrypt their credentials with the <emphasis>createCred.[sh|bat]</emphasis> script.
+		    See <xref linkend="RM_API_start"/> for client-side configuration.
+		  </para>
+		</section>
+
 		<section xml:id="rm_authent_select"><info><title>Select authentication method</title></info>
 			<para>
 			Resource Manager manage users authentication and authorization, it has to store users account/password, and check login and password at connection.

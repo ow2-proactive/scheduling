@@ -138,7 +138,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     }
 
     /**
-     * {@inheritedDoc}
+     * {@inheritDoc}
      */
     public void initActivity(Body body) {
         PAActiveObject.setImmediateService("getTotalNodeNumber");

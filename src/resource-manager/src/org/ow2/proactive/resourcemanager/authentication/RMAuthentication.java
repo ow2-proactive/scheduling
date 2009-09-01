@@ -34,6 +34,7 @@ package org.ow2.proactive.resourcemanager.authentication;
 import javax.security.auth.login.LoginException;
 
 import org.ow2.proactive.authentication.Authentication;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
@@ -49,12 +50,24 @@ public interface RMAuthentication extends Authentication {
     /**
      * Performs user authentication
      */
+    @Deprecated
     public RMUser logAsUser(String user, String password) throws LoginException;
 
     /**
      * Performs admin authentication
      */
+    @Deprecated
     public RMAdmin logAsAdmin(String user, String password) throws LoginException;
+
+    /**
+     * Performs user authentication
+     */
+    public RMUser logAsUser(Credentials cred) throws LoginException;
+
+    /**
+     * Performs admin authentication
+     */
+    public RMAdmin logAsAdmin(Credentials cred) throws LoginException;
 
     /**
      * Performs monitor authentication.
