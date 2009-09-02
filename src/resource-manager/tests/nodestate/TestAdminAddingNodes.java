@@ -180,7 +180,7 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         log("Test 5");
 
         //put the the node to busy state
-        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(1), null);
+        NodeSet nodes = admin.getAtMostNodes(1, null);
         PAFuture.waitFor(nodes);
 
         //wait the node busy event
@@ -213,7 +213,7 @@ public class TestAdminAddingNodes extends FunctionalTDefaultRM {
         log("Test 6");
 
         //put the the node to busy state
-        nodes = admin.getAtMostNodes(new IntWrapper(1), null);
+        nodes = admin.getAtMostNodes(1, null);
         PAFuture.waitFor(nodes);
 
         //wait the node busy event

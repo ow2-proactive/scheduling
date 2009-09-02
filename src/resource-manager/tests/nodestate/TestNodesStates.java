@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -91,7 +90,7 @@ public class TestNodesStates extends FunctionalTDefaultRM {
         // and give back to RM
         log("Test 1");
 
-        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), null);
+        NodeSet nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, null);
 
         PAFuture.waitFor(nodes);
         assertTrue(nodes.size() == defaultDescriptorNodesNb);
@@ -125,7 +124,7 @@ public class TestNodesStates extends FunctionalTDefaultRM {
         // user give back to RM the "toRelease" node, node is now removed
         log("Test 3");
 
-        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), null);
+        nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, null);
         PAFuture.waitFor(nodes);
 
         receiver.waitForNEvent(defaultDescriptorNodesNb);
@@ -215,7 +214,7 @@ public class TestNodesStates extends FunctionalTDefaultRM {
         // node must detected down by RM
         log("Test 6");
 
-        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb - 3), null);
+        nodes = admin.getAtMostNodes(defaultDescriptorNodesNb - 3, null);
         PAFuture.waitFor(nodes);
 
         receiver.waitForNEvent(defaultDescriptorNodesNb - 3);

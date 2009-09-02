@@ -94,6 +94,7 @@ public interface RMUser {
      * @param selectionScript : script to be verified by the returned nodes.
      * @return an array list of nodes.
      */
+    @Deprecated
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript);
 
     /**
@@ -105,6 +106,7 @@ public interface RMUser {
      * @param exclusion the exclusion nodes that cannot be returned
      * @return an array list of nodes.
      */
+    @Deprecated
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion);
 
     /**
@@ -117,6 +119,7 @@ public interface RMUser {
      * @param exclusion the exclusion nodes that cannot be returned
      * @return an array list of nodes.
      */
+    @Deprecated
     public NodeSet getAtMostNodes(IntWrapper nbNodes, List<SelectionScript> selectionScriptsList,
             NodeSet exclusion);
 
@@ -128,7 +131,51 @@ public interface RMUser {
      * @param selectionScript : script to be verified by the returned nodes.
      * @return an array list of nodes.
      */
+    @Deprecated
     public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript);
+
+    /**
+     * Provides nbNodes nodes verifying a selection script.
+     * If the Resource manager (RM) don't have nb free nodes
+     * it returns the max of valid free nodes
+     * @param nbNodes the number of nodes.
+     * @param selectionScript : script to be verified by the returned nodes.
+     * @return an array list of nodes.
+     */
+    public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript);
+
+    /**
+     * Provides nbNodes nodes verifying a selection script AND the exclusion nodes.
+     * If the Resource manager (RM) don't have enough free nodes
+     * it returns the maximum amount of valid free nodes
+     * @param nbNodes the number of nodes.
+     * @param selectionScript : script to be verified by the returned nodes.
+     * @param exclusion the exclusion nodes that cannot be returned
+     * @return an array list of nodes.
+     */
+    public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript, NodeSet exclusion);
+
+    /**
+     * Provides nbNodes nodes verifying several selection scripts AND the exclusion nodes.
+     * If the Resource manager (RM) don't have enough free nodes
+     * it returns the maximum amount of valid free nodes
+     * @param nbNodes the number of nodes.
+     * @param selectionScriptsList : a list of scripts to be verified. Returned nodes
+     * verify ALL selection scripts of this list. 
+     * @param exclusion the exclusion nodes that cannot be returned
+     * @return an array list of nodes.
+     */
+    public NodeSet getAtMostNodes(int nbNodes, List<SelectionScript> selectionScriptsList, NodeSet exclusion);
+
+    /**
+     * Provides exactly nbNodes nodes verifying the selection script.
+     * If the Resource manager (RM) don't have nb free nodes
+     * it returns an empty node set.
+     * @param nbNodes the number of nodes.
+     * @param selectionScript : script to be verified by the returned nodes.
+     * @return an array list of nodes.
+     */
+    public NodeSet getExactlyNodes(int nbNodes, SelectionScript selectionScript);
 
     /**
      * Release the node got by an user previously.

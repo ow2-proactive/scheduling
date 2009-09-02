@@ -11,7 +11,7 @@ public class GetAllNodes {
         try {
             auth = RMConnection.join(null);
             RMUser admin = auth.logAsUser("demo", "demo");
-            admin.getAtMostNodes(admin.getFreeNodesNumber(), null);
+            admin.getAtMostNodes(admin.getFreeNodesNumber().intValue(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }

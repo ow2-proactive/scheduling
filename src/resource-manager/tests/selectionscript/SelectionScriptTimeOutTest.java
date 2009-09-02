@@ -94,7 +94,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTDefaultRM {
         SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath),
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
-        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(2), sScript);
+        NodeSet nodes = admin.getAtMostNodes(2, sScript);
 
         //wait node selection
         try {

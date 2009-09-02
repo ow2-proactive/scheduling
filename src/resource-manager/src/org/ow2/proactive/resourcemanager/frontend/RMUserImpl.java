@@ -185,36 +185,63 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      org.ow2.proactive.scripting.SelectionScript)
+     * {@inheritDoc}
      */
+    @Deprecated
     public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
+        return getAtMostNodes(nbNodes.intValue(), selectionScript);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
+        return getAtMostNodes(nbNodes.intValue(), selectionScript, exclusion);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public NodeSet getAtMostNodes(IntWrapper nbNodes, List<SelectionScript> selectionScriptsList,
+            NodeSet exclusion) {
+        return getAtMostNodes(nbNodes.intValue(), selectionScriptsList, exclusion);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
+        return getExactlyNodes(nbNodes.intValue(), selectionScript);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript) {
         return identifyNodes(rmcore.getAtMostNodes(nbNodes, selectionScript, null));
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      org.ow2.proactive.scripting.SelectionScript,
-     *      org.ow2.proactive.utils.NodeSet)
+     * {@inheritDoc}
      */
-    public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
+    public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
         return identifyNodes(rmcore.getAtMostNodes(nbNodes, selectionScript, exclusion));
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      java.util.List, org.ow2.proactive.utils.NodeSet)
+     * {@inheritDoc}
      */
-    public NodeSet getAtMostNodes(IntWrapper nbNodes, List<SelectionScript> selectionScriptsList,
-            NodeSet exclusion) {
+    public NodeSet getAtMostNodes(int nbNodes, List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
         return identifyNodes(rmcore.getAtMostNodes(nbNodes, selectionScriptsList, exclusion));
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      org.ow2.proactive.scripting.SelectionScript)
+     * {@inheritDoc}
      */
-    public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
+    public NodeSet getExactlyNodes(int nbNodes, SelectionScript selectionScript) {
         if (logger.isInfoEnabled()) {
             logger.info("Nb nodes : " + nbNodes);
         }

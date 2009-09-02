@@ -94,7 +94,7 @@ public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
         // and remove preemptively a node
         log("Test 1");
 
-        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), null);
+        NodeSet nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, null);
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == defaultDescriptorNodesNb);
@@ -142,7 +142,7 @@ public class TestPreemptiveRemoval extends FunctionalTDefaultRM {
         // remove preemptively a toRelease node
         log("Test 3");
 
-        nodes = admin.getAtMostNodes(new IntWrapper(2), null);
+        nodes = admin.getAtMostNodes(2, null);
 
         PAFuture.waitFor(nodes);
         assertTrue(nodes.size() == 2);

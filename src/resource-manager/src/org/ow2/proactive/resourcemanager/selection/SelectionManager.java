@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.authentication.RestrictedService;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -228,8 +227,7 @@ public abstract class SelectionManager extends RestrictedService implements Init
         return result;
     }
 
-    public NodeSet findAppropriateNodes(IntWrapper nb, List<SelectionScript> selectionScriptList,
-            NodeSet exclusion) {
+    public NodeSet findAppropriateNodes(int nb, List<SelectionScript> selectionScriptList, NodeSet exclusion) {
 
         ArrayList<RMNode> freeNodes = rmcore.getFreeNodes();
         NodeSet result = new NodeSet();
@@ -242,7 +240,7 @@ public abstract class SelectionManager extends RestrictedService implements Init
         // in this case selection manager just return a list of free nodes
         if (!scriptSpecified) {
             for (RMNode rmnode : candidatesNodes) {
-                if (result.size() == nb.intValue()) {
+                if (result.size() == nb) {
                     break;
                 }
                 try {
@@ -262,9 +260,8 @@ public abstract class SelectionManager extends RestrictedService implements Init
         Iterator<RMNode> nodesIterator = candidatesNodes.iterator();
         HashMap<RMNode, List<ScriptWithResult>> scriptsExecutionResults;
 
-        while (nodesIterator.hasNext() && result.size() < nb.intValue()) {
-            scriptsExecutionResults = executeScripts(selectionScriptList, nodesIterator, nb.intValue() -
-                result.size());
+        while (nodesIterator.hasNext() && result.size() < nb) {
+            scriptsExecutionResults = executeScripts(selectionScriptList, nodesIterator, nb - result.size());
             try {
                 result.addAll(processScriptsResults(scriptsExecutionResults));
             } catch (ScriptException e) {

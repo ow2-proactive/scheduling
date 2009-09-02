@@ -43,7 +43,6 @@ import nodestate.RMEventReceiver;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
@@ -175,7 +174,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTDefaultRM {
         scriptsList.add(sScript1);
         scriptsList.add(sScript2);
 
-        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), scriptsList, null);
+        NodeSet nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, scriptsList, null);
 
         //wait node selection
         PAFuture.waitFor(nodes);
@@ -196,7 +195,7 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTDefaultRM {
 
         log("Test 2");
 
-        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), scriptsList, nodes);
+        nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, scriptsList, nodes);
 
         //wait node selection
         PAFuture.waitFor(nodes);

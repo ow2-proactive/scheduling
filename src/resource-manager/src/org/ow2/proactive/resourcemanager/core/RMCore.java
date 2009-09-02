@@ -784,11 +784,9 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      org.ow2.proactive.scripting.SelectionScript,
-     *      org.ow2.proactive.utils.NodeSet)
+     * {@inheritDoc}
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion) {
+    public NodeSet getAtMostNodes(int nb, SelectionScript selectionScript, NodeSet exclusion) {
         ArrayList<SelectionScript> list = null;
         if (selectionScript != null) {
             list = new ArrayList<SelectionScript>();
@@ -798,26 +796,24 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getAtMostNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      java.util.List, org.ow2.proactive.utils.NodeSet)
+     * {@inheritDoc}
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, List<SelectionScript> selectionScriptList, NodeSet exclusion) {
+    public NodeSet getAtMostNodes(int nb, List<SelectionScript> selectionScriptList, NodeSet exclusion) {
 
         // if RM is in shutdown state, it doesn't give nodes
         if (this.toShutDown) {
             return new NodeSet();
         } else {
 
-            logger.info("Number of requested nodes is " + nb.intValue());
+            logger.info("Number of requested nodes is " + nb);
             return selectionManager.findAppropriateNodes(nb, selectionScriptList, exclusion);
         }
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getExactlyNodes(org.objectweb.proactive.core.util.wrapper.IntWrapper,
-     *      org.ow2.proactive.scripting.SelectionScript)
+     * {@inheritDoc}
      */
-    public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript) {
+    public NodeSet getExactlyNodes(int nb, SelectionScript selectionScript) {
         // not implemented
         return null;
     }

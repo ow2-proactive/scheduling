@@ -177,7 +177,7 @@ public interface RMCoreInterface {
      * @param exclusion a set of node that must not be returned
      * @return an array list of nodes.
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript, NodeSet exclusion);
+    public NodeSet getAtMostNodes(int nb, SelectionScript selectionScript, NodeSet exclusion);
 
     /**
      * Get a set of nodes that verify a list of selection scripts, with
@@ -194,7 +194,7 @@ public interface RMCoreInterface {
      * @param exclusion a set of node that must not be returned
      * @return a set of node that must not be returned.
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, List<SelectionScript> selectionScriptList, NodeSet exclusion);
+    public NodeSet getAtMostNodes(int nb, List<SelectionScript> selectionScriptList, NodeSet exclusion);
 
     /**
      * Returns an exactly number of nodes
@@ -203,7 +203,7 @@ public interface RMCoreInterface {
      * @param selectionScript  that nodes must verify.
      * @return an array list of nodes.
      */
-    public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript);
+    public NodeSet getExactlyNodes(int nb, SelectionScript selectionScript);
 
     /**
      * Free a node after a work.

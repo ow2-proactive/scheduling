@@ -36,17 +36,16 @@ import static junit.framework.Assert.assertTrue;
 import java.io.File;
 import java.util.HashMap;
 
+import nodestate.FunctionalTDefaultRM;
+import nodestate.RMEventReceiver;
+
 import org.junit.Assert;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
-
-import nodestate.FunctionalTDefaultRM;
-import nodestate.RMEventReceiver;
 
 
 /**
@@ -133,7 +132,7 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
 
         log("Test 1");
 
-        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(1), sScript);
+        NodeSet nodes = admin.getAtMostNodes(1, sScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
@@ -154,7 +153,7 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
 
         log("Test 2");
 
-        nodes = admin.getAtMostNodes(new IntWrapper(3), sScript);
+        nodes = admin.getAtMostNodes(3, sScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
@@ -184,7 +183,7 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
         receiver.waitForNEvent(1);
         assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
 
-        nodes = admin.getAtMostNodes(new IntWrapper(3), sScript);
+        nodes = admin.getAtMostNodes(3, sScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
@@ -211,7 +210,7 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
         receiver.waitForNEvent(2);
         assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 2);
 
-        nodes = admin.getAtMostNodes(new IntWrapper(3), sScript);
+        nodes = admin.getAtMostNodes(3, sScript);
 
         //wait node selection
         PAFuture.waitFor(nodes);
@@ -225,7 +224,7 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
         SelectionScript badScript = new SelectionScript(new File(badSelectionScriptpath), new String[] {},
             true);
 
-        nodes = admin.getAtMostNodes(new IntWrapper(3), badScript);
+        nodes = admin.getAtMostNodes(3, badScript);
 
         //wait node selection
         try {
@@ -242,7 +241,7 @@ public class dynamicSelectionScriptTest extends FunctionalTDefaultRM {
         SelectionScript noSelectedScript = new SelectionScript(new File(withoutSelectedSelectionScriptpath),
             new String[] {}, true);
 
-        nodes = admin.getAtMostNodes(new IntWrapper(3), noSelectedScript);
+        nodes = admin.getAtMostNodes(3, noSelectedScript);
 
         //wait node selection
         try {

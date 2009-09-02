@@ -41,7 +41,6 @@ import nodestate.RMEventReceiver;
 import org.junit.Assert;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -104,7 +103,7 @@ public class NonBlockingCoreTest extends FunctionalTDefaultRM {
         long startTime = System.currentTimeMillis();
         RMAuthentication auth = RMConnection.waitAndJoin(null);
         RMUser user = auth.logAsUser(username, password);
-        user.getAtMostNodes(new IntWrapper(2), sScript);
+        user.getAtMostNodes(2, sScript);
 
         String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";

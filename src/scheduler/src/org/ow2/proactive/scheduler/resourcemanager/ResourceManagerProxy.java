@@ -223,7 +223,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @return A node set that contains between 0 and nbNodes nodes matching the given script.
      */
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript) {
-        return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScript);
+        return user.getAtMostNodes(nbNodes, selectionScript);
     }
 
     /**
@@ -236,7 +236,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @return A node set that contains between 0 and nbNodes nodes matching the given script.
      */
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
-        return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScript, exclusion);
+        return user.getAtMostNodes(nbNodes, selectionScript, exclusion);
     }
 
     /**
@@ -250,7 +250,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @return an array list of nodes.
      */
     public NodeSet getAtMostNodes(int nbNodes, List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
-        return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScriptsList, exclusion);
+        return user.getAtMostNodes(nbNodes, selectionScriptsList, exclusion);
     }
 
     /**
@@ -262,7 +262,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @return the exact number of nodes demanded matching the selection script
      */
     public NodeSet getExactlyNodes(int nbNodes, SelectionScript selectionScript) {
-        return user.getExactlyNodes(new IntWrapper(nbNodes), selectionScript);
+        return user.getExactlyNodes(nbNodes, selectionScript);
     }
 
     // PROXY SPECIFIC METHODS ********************************

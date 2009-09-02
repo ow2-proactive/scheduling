@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -112,11 +111,11 @@ public class SimpleResourceManager implements GenericResourceManager, NodeCreati
         }
     }
 
-    public Vector<Node> getAtMostNNodes(IntWrapper maxNodeNb) {
+    public Vector<Node> getAtMostNNodes(int maxNodeNb) {
         Vector<Node> nodesToSend = new Vector<Node>();
 
         //exits the loop when there are no more free 
-        while (!freeNodes.isEmpty() && (nodesToSend.size() < maxNodeNb.intValue())) {
+        while (!freeNodes.isEmpty() && (nodesToSend.size() < maxNodeNb)) {
             nodesToSend.add(freeNodes.remove(0));
         }
 

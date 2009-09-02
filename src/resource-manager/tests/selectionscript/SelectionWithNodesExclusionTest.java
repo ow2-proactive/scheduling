@@ -45,7 +45,6 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
@@ -113,7 +112,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
 
         log("Test 1");
 
-        NodeSet nodeSetWithNodeToExclude = admin.getAtMostNodes(new IntWrapper(1), null);
+        NodeSet nodeSetWithNodeToExclude = admin.getAtMostNodes(1, null);
 
         //wait for node selection
         PAFuture.waitFor(nodeSetWithNodeToExclude);
@@ -133,8 +132,8 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         //get nodes with the previous node excluded
-        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb),
-                new ArrayList<SelectionScript>(), nodeSetWithNodeToExclude);
+        NodeSet nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, new ArrayList<SelectionScript>(),
+                nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
@@ -162,8 +161,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
             new String[] {}, true);
 
         //get nodes with the previous node excluded
-        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), dummyDynamicScript,
-                nodeSetWithNodeToExclude);
+        nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, dummyDynamicScript, nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
@@ -190,8 +188,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
             new String[] {}, false);
 
         //get nodes with the previous node excluded
-        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), dummyStaticScript,
-                nodeSetWithNodeToExclude);
+        nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, dummyStaticScript, nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
@@ -245,7 +242,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         nodeSetWithNodeToExclude.add(node1ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), checkPropDynamicSScript,
+        nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, checkPropDynamicSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -281,7 +278,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         nodeSetWithNodeToExclude.add(node2ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), checkPropStaticSScript,
+        nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, checkPropStaticSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -310,7 +307,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTDefaultRM {
         nodeSetWithNodeToExclude.add(node1ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), checkPropStaticSScript,
+        nodes = admin.getAtMostNodes(defaultDescriptorNodesNb, checkPropStaticSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection

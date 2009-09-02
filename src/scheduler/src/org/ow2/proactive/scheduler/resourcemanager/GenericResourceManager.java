@@ -34,7 +34,6 @@ package org.ow2.proactive.scheduler.resourcemanager;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.wrapper.*;
 
 
 /**This is the interface that should be implemented regarding any resource manager submitted to the scheduler.
@@ -51,7 +50,7 @@ public interface GenericResourceManager {
      * @return a maximum of NB nodes if available
      *
      */
-    Vector<Node> getAtMostNNodes(IntWrapper maxNodeNb);
+    Vector<Node> getAtMostNNodes(int maxNodeNb);
 
     /**
      * Returns the nodes to the resource manager

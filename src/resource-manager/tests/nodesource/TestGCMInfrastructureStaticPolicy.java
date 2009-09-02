@@ -42,7 +42,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
@@ -151,7 +150,7 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTDefaultRM {
         assertTrue(admin.getFreeNodesNumber().intValue() == 2 * defaultDescriptorNodesNb);
 
         // releasing some nodes
-        NodeSet ns = admin.getAtMostNodes(new IntWrapper(defaultDescriptorNodesNb), null);
+        NodeSet ns = admin.getAtMostNodes(defaultDescriptorNodesNb, null);
         receiver.waitForNEvent(defaultDescriptorNodesNb);
         for (Node n : ns)
             admin.removeNode(n.getNodeInformation().getURL(), true, false);

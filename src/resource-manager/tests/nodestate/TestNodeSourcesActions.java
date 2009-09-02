@@ -38,7 +38,6 @@ import java.io.File;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
@@ -97,7 +96,7 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
         assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         //book 3 nodes
-        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(3), null);
+        NodeSet nodes = admin.getAtMostNodes(3, null);
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 3);
@@ -157,7 +156,7 @@ public class TestNodeSourcesActions extends FunctionalTDefaultRM {
         assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
 
         //book 3 nodes
-        nodes = admin.getAtMostNodes(new IntWrapper(3), null);
+        nodes = admin.getAtMostNodes(3, null);
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == 3);

@@ -5,7 +5,6 @@ import static junit.framework.Assert.assertTrue;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -50,7 +49,7 @@ public class TestConcurrentUsers extends FunctionalTDefaultRM {
 
         log("Test 1 - releasing of the foreign node");
         // acquiring a node
-        final NodeSet ns = admin.getAtMostNodes(new IntWrapper(1), null);
+        final NodeSet ns = admin.getAtMostNodes(1, null);
         // waiting for node busy event
         receiver.waitForNEvent(1);
         assertTrue(ns.size() == 1);
