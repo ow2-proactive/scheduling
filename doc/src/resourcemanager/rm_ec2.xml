@@ -142,7 +142,7 @@
 	    credentials to log in. Those can be found in 
 	    <emphasis>/config/authentication/login.cfg</emphasis> when using default configuration.
 	</para></listitem>
-	<para><listitem>
+	<listitem><para>
 	    Node Port: As stated before, the EC2 node will expose itself with the HTTP protocol.
 	    You can configure which port it will use, useful if the machine on which the RM is started
 	    has restrictive firewall rules for outgoing connections.
