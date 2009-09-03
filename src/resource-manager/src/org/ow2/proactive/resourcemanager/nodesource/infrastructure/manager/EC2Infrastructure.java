@@ -78,6 +78,8 @@ public class EC2Infrastructure extends InfrastructureManager {
     protected String rmLogin;
     @Configurable(password = true)
     protected String rmPass;
+    @Configurable
+    protected String nodeHttpPort = "80";
 
     /**
      * Deployment data
@@ -143,13 +145,14 @@ public class EC2Infrastructure extends InfrastructureManager {
      *            parameters[1]: Fully qualified URL of the Resource Manager (proto://IP:port)
      *            parameters[2]: RM login
      *            parameters[3]: RM passw
+     *            parameters[4]: HTTP node port
      * @throws RMException
      *             when the configuration could not be set
      */
     public void addNodesAcquisitionInfo(Object... parameters) throws RMException {
 
         /** parameters look fine */
-        if (parameters != null && parameters.length == 4) {
+        if (parameters != null && parameters.length == 5) {
             try {
                 //                File ff = new File(parameters[0].toString());
                 byte[] configFile = (byte[]) parameters[0];
@@ -169,8 +172,18 @@ public class EC2Infrastructure extends InfrastructureManager {
             }
             String rml = parameters[2].toString();
             String rmp = parameters[3].toString();
+            String nodep = parameters[4].toString();
 
-            this.ec2d.setUserData(rmu, rml, rmp);
+            try {
+                int pp = Integer.parseInt(nodep);
+                if (pp < 10 || pp > 65535) {
+                    throw new Exception("Out of range");
+                }
+            } catch (Exception e) {
+                throw new RMException("Invalid value for parameter Node Port", e);
+            }
+
+            this.ec2d.setUserData(rmu, rml, rmp, nodep);
         }
         /**
          * missing or absent parameters, aborting

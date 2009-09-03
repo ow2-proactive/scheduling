@@ -122,6 +122,9 @@ public class EC2Deployer implements java.io.Serializable {
     /** Name of the NodeSource bound to the EC2Infrastructure this Deployer bound to */
     private String nsName;
 
+    /** HTTP port number on which the EC2 node will expose itself to the RM */
+    private String nodePort;
+
     /**
      * Constructs a new node deployer for Amazon EC2
      */
@@ -373,6 +376,7 @@ public class EC2Deployer implements java.io.Serializable {
             userData += "rmLogin=" + rmLogin + "\n";
             userData += "rmPass=" + rmPass + "\n";
             userData += "nodeSource=" + nsName + "\n";
+            userData += "nodePort=" + nodePort + "\n";
         } catch (Exception exc) {
             userData = "";
         }
@@ -496,10 +500,11 @@ public class EC2Deployer implements java.io.Serializable {
      * @param rmPass
      *            pw of the RM for authentication
      */
-    public void setUserData(String rmUrl, String rmLogin, String rmPass) {
+    public void setUserData(String rmUrl, String rmLogin, String rmPass, String nodePort) {
         this.rmUrl = rmUrl;
         this.rmLogin = rmLogin;
         this.rmPass = rmPass;
+        this.nodePort = nodePort;
     }
 
     /**

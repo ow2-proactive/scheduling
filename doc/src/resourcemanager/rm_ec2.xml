@@ -98,7 +98,10 @@
       The workaround is to use a PAMR router, or the HTTP protocol.
     </para>
     <para>
-      HTTP is the simplest way; all you need to specify is a configuration file with the following properties,
+      For that reason, the HTTP protocol is forced for communications going from the RM to the EC2 nodes.
+      On the other way, from EC2 to the RM, using HTTP communications is also the simplest, also RMISSH is 
+      possible but requires manual configuration for deploying RSA keys.
+      To configure your RM with HTTP, all you need to specify is a configuration file with the following properties,
       for both Resource Manager <emphasis>and</emphasis> Scheduler.
       <screen><![CDATA[
         <prop key="proactive.net.nolocal" value="true"/>
@@ -138,6 +141,11 @@
 	    RM login and password: to register on the Resource Manager, nodes need those
 	    credentials to log in. Those can be found in 
 	    <emphasis>/config/authentication/login.cfg</emphasis> when using default configuration.
+	</para></listitem>
+	<para><listitem>
+	    Node Port: As stated before, the EC2 node will expose itself with the HTTP protocol.
+	    You can configure which port it will use, useful if the machine on which the RM is started
+	    has restrictive firewall rules for outgoing connections.
 	</para></listitem>
       </itemizedlist>
     </para>

@@ -81,7 +81,7 @@ public class WindowsEC2RMStarter {
             System.setProperty("pa.scheduler.home", args[0]);
             System.setProperty("pa.rm.home", args[0]);
 
-            String rmUser = "", rmPass = "", rmUrl = "", rmNodeName = "", rmNsName = "";
+            String rmUser = "", rmPass = "", rmUrl = "", rmNodeName = "", rmNsName = "", nodePort = "";
 
             Properties props = new Properties();
             ByteArrayInputStream in = new ByteArrayInputStream(getUrl(userData).getBytes());
@@ -92,17 +92,10 @@ public class WindowsEC2RMStarter {
             rmUrl = props.getProperty("rmUrl");
             rmNodeName = getNodeName();
             rmNsName = props.getProperty("nodeSource");
-
-            int port = 0;
-            try {
-                String paPort = rmUrl.split(":")[2].replace("/", "");
-                port = Integer.parseInt(paPort);
-            } catch (Exception e) {
-                throw new Exception("Could not find port number in url: " + rmUrl, e);
-            }
+            nodePort = props.getProperty("nodePort", "80");
 
             System.setProperty("proactive.communication.protocol", "http");
-            System.setProperty("proactive.http.port", "" + port);
+            System.setProperty("proactive.http.port", "" + nodePort);
             System.setProperty("proactive.hostname", getUrl(publicIp));
 
             PAAgentServiceRMStarter.main(new String[] { rmUser, rmPass, rmUrl, rmNodeName, rmNsName });

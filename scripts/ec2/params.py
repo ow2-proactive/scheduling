@@ -28,19 +28,17 @@ if len(res) != 1:
     raise NameError("Could not extract RM Url from user-data.")
 rmUrl = res[0]
 
-# only http proto is accepted for now
-pat = re.compile(r'[\s]*http://.*')
-if pat.match(rmUrl) == None:
-    raise NameError("Unsupported protocol for "+rmUrl+", try http.")
+# node should expose itself through HTTP because of the network architecture
 proto = "http"
 port_prop = "proactive.http.port"
 
-pat = re.compile(r'.*[:]([0-9]+)[/]?[\s]*')
-res = pat.findall(rmUrl)
+# node HTTP port
+pat = re.compile(r'[\s]*nodePort[\s]*=[\s]*(.+)[\s]*')
+res =  pat.findall(data)
 if len(res) != 1:
-    raise NameError("Cound not extract port from RM Url: "+rmUrl+".")
+    # no HTTP port specified, trying 80
+    port = 80
 port = res[0]
-
 
 # RM login
 pat = re.compile(r'[\s]*rmLogin[\s]*=[\s]*(.+)[\s]*')
