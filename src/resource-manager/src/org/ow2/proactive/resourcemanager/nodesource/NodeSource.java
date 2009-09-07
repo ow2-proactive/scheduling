@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -455,7 +456,8 @@ public class NodeSource implements InitActive {
     protected void finishNodeSourceShutdown() {
         logger.info("[" + name + "] Shutdown finalization");
 
-        rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this, RMEventType.NODESOURCE_REMOVED));
+        PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this,
+            RMEventType.NODESOURCE_REMOVED)));
 
         nodeSourcePolicy.shutdown();
 

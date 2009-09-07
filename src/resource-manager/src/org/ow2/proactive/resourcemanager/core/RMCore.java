@@ -888,12 +888,15 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#nodeSourceUnregister(java.lang.String,
      *      org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
-    public void nodeSourceUnregister(String sourceId, RMNodeSourceEvent evt) {
+    public BooleanWrapper nodeSourceUnregister(String sourceId, RMNodeSourceEvent evt) {
         NodeSource nodeSource = this.nodeSources.remove(sourceId);
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Node Source removed : " + sourceId);
+        if (nodeSource == null) {
+            logger.warn("Attempt to remove non-existing node source " + sourceId);
+            new BooleanWrapper(false);
         }
+
+        logger.info("Node Source removed : " + sourceId);
         // create the event
         this.monitoring.nodeSourceEvent(evt);
         unregisterTrustedService(nodeSource);
@@ -912,6 +915,8 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                 logger.debug("", e);
             }
         }
+
+        return new BooleanWrapper(true);
     }
 
     /**
