@@ -31,9 +31,13 @@
  */
 package functionaltests.nodesource;
 
+import java.io.File;
+
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure;
-import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 import functionaltests.RMTHelper;
 
@@ -41,30 +45,52 @@ import functionaltests.RMTHelper;
 /**
  *
  * Test checks the correct behavior of node source consisted of customized GCM infrastructure manager
- * and ReleaseResourcesWhenSchedulerIdle acquisition policy.
+ * and static acquisition policy. It performs the same scenario as for regular GCM infrastructure.
  *
  * NOTE: The way how customized GCM infrastructure is used here is not quite correct. It uses local host
  * to deploy several nodes so it wont be able to remove them correctly one by one. But for the scenario
  * in this test it's not required.
- *
  */
-public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
-        TestGCMInfrastructureReleaseWhenIdlePolicy {
+public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastructureStaticPolicy {
 
-    protected String getDescriptor() {
-        return TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
-                "/functionaltests/nodesource/1node.xml").getPath();
+    protected byte[] hostsListData;
+
+    protected void init() throws Exception {
+        // using localhost deployment for customized infrastructure
+        String oneNodeescriptor = RMTHelper.class.getResource("/functionaltests/nodesource/1node.xml")
+                .getPath();
+        GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
+        String hostList = RMTHelper.class.getResource("/functionaltests/nodesource/hostslist").getPath();
+        hostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostList)));
+    }
+
+    protected void createEmptyNodeSource(String sourceName) throws Exception {
+        RMTHelper.getAdminInterface().createNodesource(sourceName,
+                GCMCustomisedInfrastructure.class.getName(), null, StaticPolicy.class.getName(), null);
+
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
 
-        byte[] hosts = "localhost1 localhost2 localhost3 localhost4 localhost5".getBytes();
         // creating node source
         RMTHelper.getAdminInterface().createNodesource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(), new Object[] { GCMDeploymentData, hosts },
-                ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
+                GCMCustomisedInfrastructure.class.getName(),
+                new Object[] { GCMDeploymentData, hostsListData }, StaticPolicy.class.getName(), null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        for (int i = 0; i < defaultDescriptorNodesNb; i++) {
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        }
+    }
 
+    protected BooleanWrapper addNodes(String sourceName) throws Exception {
+        BooleanWrapper result = RMTHelper.getAdminInterface().addNodes(sourceName,
+                new Object[] { GCMDeploymentData, hostsListData });
+        if (result.booleanValue()) {
+            // waiting for adding nodes acquisition info event
+            RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_NODES_ACQUISTION_INFO_ADDED, sourceName);
+        }
+        return result;
     }
 }

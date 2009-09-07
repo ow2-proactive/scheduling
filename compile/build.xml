@@ -165,6 +165,7 @@
 
 			<classpath refid="scheduler.libs"/>
 			<classpath path="${cl.rm.dir}"/>
+			<classpath path="${cl.rm.tests.dir}"/>
 			<classpath path="${cl.scheduler.dir}"/>
 			<include name="**/*.java"/>
 		</javac>

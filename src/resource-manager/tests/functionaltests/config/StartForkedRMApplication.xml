@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMApplication xmlns="urn:gcm:application:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
+
+	<environment>
+		<javaPropertyVariable name="java.home" />
+		<javaPropertyVariable name="proactive.home" />
+		<javaPropertyVariable name="user.dir" />
+
+		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
+	</environment>
+	<application>
+		<proactive base="root" relpath="${proactive.home}">
+			<configuration>
+				<java base="root" relpath="${java.home}/bin/java" />
+				<jvmarg value="-Dclover.initstring=${proactive.home}/compile/ProActiveCoverage.db" />
+				<jvmarg value="-Dproactive.test=true" />
+				<jvmarg value="${jvmargDefinedByTest}" />
+				<applicationClasspath>
+					<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
+					<!-- Script engines must be explicitly in application classpath -->
+					<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
+					<pathElement base="proactive" relpath="/classes/schedulerTests/"/>
+					<pathElement base="proactive" relpath="/classes/resource-managerTests/"/>
+
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_tests.jar" />
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar" />
+
+					<!-- <pathElement base="proactive" relpath="lib/common/relaxngDatatype.jar" />
+					<pathElement base="proactive" relpath="lib/common/jsr173_1.0_api.jar" />
+					<pathElement base="proactive" relpath="lib/common/xsdlib.jar" />
+					<pathElement base="proactive" relpath="lib/common/derby.jar" />
+					<pathElement base="proactive" relpath="lib/common/msv.jar" />
+					<pathElement base="proactive" relpath="lib/common/derbytools.jar" />
+					<pathElement base="proactive" relpath="lib/common/wstx-lgpl-3.9.2.jar" />
+					<pathElement base="proactive" relpath="lib/common/isorelax.jar" />
+
+					<pathElement base="proactive" relpath="lib/hibernate/annotation/hibernate-commons-annotations.jar" />
+					<pathElement base="proactive" relpath="lib/hibernate/annotation/ejb3-persistence.jar" />
+					<pathElement base="proactive" relpath="lib/hibernate/annotation/hibernate-annotations.jar" />
+					<pathElement base="proactive" relpath="lib/hibernate/core/slf4j-api-1.5.6.jar" />
+					<pathElement base="proactive" relpath="lib/hibernate/core/hibernate-core.jar" />
+					<pathElement base="proactive" relpath="lib/hibernate/core/jta-1.1.jar" />
+					<pathElement base="proactive" relpath="lib/hibernate/core/slf4j-log4j12-1.5.6.jar" />
+					<pathElement base="proactive" relpath="lib/hibernate/core/antlr-2.7.6.jar" />
+					<pathElement base="proactive" relpath="lib/hibernate/core/dom4j-1.6.1.jar" /> -->
+				</applicationClasspath>
+			</configuration>
+			<virtualNode id="VN" />
+		</proactive>
+	</application>
+
+	<resources>
+		<nodeProvider id="gcmd">
+			<file path="StartForkedRMDeployment.xml" />
+		</nodeProvider>
+	</resources>
+</GCMApplication>

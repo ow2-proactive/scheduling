@@ -35,11 +35,14 @@ import static junit.framework.Assert.assertTrue;
 
 import java.net.InetAddress;
 
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy;
 
+import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
 
 
@@ -71,18 +74,20 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
 
         byte[] hosts = InetAddress.getLocalHost().getHostName().getBytes();
         // creating node source
-        admin.createNodesource(sourceName, GCMCustomisedInfrastructure.class.getName(), new Object[] {
-                GCMDeploymentData, hosts }, SchedulerLoadingPolicy.class.getName(), getPolicyParams());
+        RMTHelper.getAdminInterface().createNodesource(sourceName,
+                GCMCustomisedInfrastructure.class.getName(), new Object[] { GCMDeploymentData, hosts },
+                SchedulerLoadingPolicy.class.getName(), getPolicyParams());
 
-        receiver.waitForNEvent(1);
-        assertTrue(receiver.cleanNgetNodeSourcesCreatedEvents().size() == 1);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     @org.junit.Test
     public void action() throws Exception {
+
         init();
 
-        receiver.cleanEventLists();
+        RMAdmin admin = RMTHelper.getAdminInterface();
+
         String source1 = "Node source 1";
 
         SchedulerTHelper.log("Test 1");
@@ -91,13 +96,13 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         JobId jobId = SchedulerTHelper.testJobSubmission(jobDescriptor);
+
         // waiting for acquiring nodes
-        receiver.waitForNEvent(1);
-        assertTrue(receiver.cleanNgetNodesAddedEvents().size() == 1);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         // nodes should be removed after scheduler becomes idle
-        receiver.waitForNEvent(1);
-        assertTrue(receiver.cleanNgetNodesremovedEvents().size() == 1);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+
         SchedulerTHelper.waitForFinishedJob(jobId);
 
         SchedulerTHelper.log("Test 2");
