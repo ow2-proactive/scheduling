@@ -184,13 +184,13 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     }
 
     /**
-     * Disactivates the policy and clears the timer.
+     * Shutdown the policy and clears the timer.
      */
-    public BooleanWrapper disactivate() {
+    public void shutdown() {
         synchronized (timer) {
             timer.cancel();
         }
-        return new BooleanWrapper(true);
+        super.shutdown();
     }
 
     /**

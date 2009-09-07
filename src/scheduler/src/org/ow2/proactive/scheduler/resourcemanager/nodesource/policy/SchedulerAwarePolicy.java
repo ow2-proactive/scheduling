@@ -89,15 +89,14 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         return new BooleanWrapper(true);
     }
 
-    public BooleanWrapper disactivate() {
+    public void shutdown() {
         try {
             userInterface.removeEventListener();
             userInterface.disconnect();
         } catch (Exception e) {
             logger.error("", e);
-            return new BooleanWrapper(false);
         }
-        return new BooleanWrapper(true);
+        super.shutdown();
     }
 
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {

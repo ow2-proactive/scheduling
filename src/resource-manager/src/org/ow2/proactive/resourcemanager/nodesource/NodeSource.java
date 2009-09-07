@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -455,7 +454,10 @@ public class NodeSource implements InitActive {
      */
     protected void finishNodeSourceShutdown() {
         logger.info("[" + name + "] Shutdown finalization");
-        PAFuture.waitFor(nodeSourcePolicy.disactivate());
+
+        rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this, RMEventType.NODESOURCE_REMOVED));
+
+        nodeSourcePolicy.shutdown();
 
         try {
             threadPool.shutdown();
@@ -467,7 +469,6 @@ public class NodeSource implements InitActive {
 
         nodeLookupThread.shutDown();
         pinger.shutdown();
-        rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this, RMEventType.NODESOURCE_REMOVED));
         // object should be terminated NON preemptively
         // pinger thread can wait for last results (getNodes)
         PAActiveObject.terminateActiveObject(false);

@@ -66,22 +66,20 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
     }
 
     /**
-     * Disactivates the policy. Clears all policy states.
-     * @return true if the policy has been disactivated successfully, false otherwise.
+     * {@inheritDoc}
      */
-    public BooleanWrapper disactivate() {
+    public void shutdown() {
         if (rmShuttingDown) {
             // do not try to unregister monitor in this case
-            return new BooleanWrapper(true);
+            return;
         }
 
         try {
             rmMonitoring.removeRMEventListener();
         } catch (RMException e) {
             e.printStackTrace();
-            return new BooleanWrapper(false);
         }
-        return new BooleanWrapper(true);
+        super.shutdown();
     }
 
     /**

@@ -34,6 +34,7 @@ package org.ow2.proactive.resourcemanager.nodesource.policy;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -77,10 +78,11 @@ public abstract class NodeSourcePolicy implements Serializable {
     public abstract BooleanWrapper activate();
 
     /**
-     * Disactivates the policy. Clears all policy states.
-     * @return true if the policy has been disactivated successfully, false otherwise.
+     * Shutdown the policy
      */
-    public abstract BooleanWrapper disactivate();
+    public void shutdown() {
+        PAActiveObject.terminateActiveObject(false);
+    }
 
     /**
      * Policy description for UI

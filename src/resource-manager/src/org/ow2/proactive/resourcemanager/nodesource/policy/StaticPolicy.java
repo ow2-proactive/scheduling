@@ -66,18 +66,6 @@ public class StaticPolicy extends RMAwareNodeSourcePolicy {
     }
 
     /**
-     * Disactivates static policy. Removes listener from RMMonitoring if RM is not shutdown mode.
-     */
-    public BooleanWrapper disactivate() {
-        BooleanWrapper activationStatus = super.disactivate();
-
-        if (!activationStatus.booleanValue()) {
-            return activationStatus;
-        }
-        return new BooleanWrapper(true);
-    }
-
-    /**
      * Description for the UI
      */
     public String getDescription() {
