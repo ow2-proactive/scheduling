@@ -707,13 +707,10 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
 
-        List<BooleanWrapper> shutdownStatus = new LinkedList<BooleanWrapper>();
         for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
             removeAllNodes(entry.getKey(), preempt);
-            shutdownStatus.add(entry.getValue().shutdown());
+            entry.getValue().shutdown();
         }
-
-        PAFuture.waitForAll(shutdownStatus);
         return new BooleanWrapper(true);
     }
 

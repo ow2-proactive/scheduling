@@ -396,17 +396,14 @@ public class NodeSource implements InitActive {
 
     /**
      * Shutdowns the node source and releases all its nodes.
-     * @return true if shutdown is successful
      */
-    public BooleanWrapper shutdown() {
+    public void shutdown() {
         logger.info("[" + name + "] removal request");
         toShutdown = true;
 
         if (nodes.size() == 0) {
             finishNodeSourceShutdown();
         }
-
-        return new BooleanWrapper(true);
     }
 
     /**
