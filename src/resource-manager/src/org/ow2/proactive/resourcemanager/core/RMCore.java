@@ -47,7 +47,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -172,6 +171,8 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
 
     /** indicates that RMCore must shutdown */
     private boolean toShutDown = false;
+
+    private boolean shutedDown = false;
 
     /** nodes to deploy during startup of resource manager */
     private Collection<String> localGCMDeploymentFiles = null;
@@ -334,8 +335,17 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 public void run() {
                     RMCore.this.registerTrustedService(PAActiveObject.getBodyOnThis().getID());
-                    if (!RMCore.this.toShutDown) {
-                        PAFuture.waitFor(rmcoreStub.shutdown(true));
+                    rmcoreStub.shutdown(true);
+
+                    synchronized (nodeRM) {
+                        if (!shutedDown) {
+                            try {
+                                // wait for rmcore shutdown (5 min at most)
+                                nodeRM.wait(5 * 60 * 60);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
             });
@@ -702,7 +712,12 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#shutdown(boolean)
      */
-    public BooleanWrapper shutdown(boolean preempt) {
+    public synchronized void shutdown(boolean preempt) {
+
+        // this method could be called twice from shutdown hook and user action
+        if (toShutDown)
+            return;
+
         logger.info("RMCore shutdown request");
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
@@ -711,7 +726,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             removeAllNodes(entry.getKey(), preempt);
             entry.getValue().shutdown();
         }
-        return new BooleanWrapper(true);
     }
 
     // ----------------------------------------------------------------------
@@ -907,6 +921,10 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             PAActiveObject.terminateActiveObject(true);
             try {
                 Thread.sleep(2000);
+                synchronized (nodeRM) {
+                    nodeRM.notifyAll();
+                    shutedDown = true;
+                }
                 this.nodeRM.getProActiveRuntime().killRT(true);
             } catch (Exception e) {
                 logger.debug("", e);

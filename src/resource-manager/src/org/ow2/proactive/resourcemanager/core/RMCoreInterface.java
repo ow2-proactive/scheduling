@@ -149,10 +149,8 @@ public interface RMCoreInterface {
      * @param preempt if set to true, Resource manager wait its RM User give back all the busy
      * nodes before performing the shutdown 
      *
-     * @return true if shutdown is successful. Make possible to perform synchronous call.
-     *
      */
-    public BooleanWrapper shutdown(boolean preempt);
+    public void shutdown(boolean preempt);
 
     /**
      * Stops and removes a NodeSource active object with their nodes from the Resource Manager

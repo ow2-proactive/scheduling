@@ -229,9 +229,9 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#shutdown(boolean)
      */
-    public BooleanWrapper shutdown(boolean preempt) throws ProActiveException {
+    public void shutdown(boolean preempt) throws ProActiveException {
         pinger.stopThread();
-        return rmcore.shutdown(preempt);
+        rmcore.shutdown(preempt);
     }
 
     /**

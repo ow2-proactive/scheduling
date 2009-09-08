@@ -167,7 +167,7 @@ public interface RMAdmin extends RMUser, Serializable {
      * @exception ProActiveException
      *
      */
-    public BooleanWrapper shutdown(boolean preempt) throws ProActiveException;
+    public void shutdown(boolean preempt) throws ProActiveException;
 
     /**
      * Gets a list of nodes handled by Resource Manager
