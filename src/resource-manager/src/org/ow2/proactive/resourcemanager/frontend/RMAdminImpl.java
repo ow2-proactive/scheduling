@@ -272,4 +272,11 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
     public ArrayList<String> getSupportedNodeSourcePolicies() {
         return NodeSourcePolicyFactory.getSupportedPolicies();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Class<?> lookupClass(String name) throws ClassNotFoundException {
+        return Class.forName(name);
+    }
 }

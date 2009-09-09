@@ -173,7 +173,7 @@ public class CreateSourceDialog extends Dialog {
 
         for (String className : supportedInfrastructures) {
             try {
-                Class<?> cls = Class.forName(className);
+                Class<?> cls = admin.lookupClass(className);
                 infrastructure.addComboValue(beautifyName(cls.getSimpleName()), cls);
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -184,7 +184,7 @@ public class CreateSourceDialog extends Dialog {
 
         for (String className : supportedPolicies) {
             try {
-                Class<?> cls = Class.forName(className);
+                Class<?> cls = admin.lookupClass(className);
                 policy.addComboValue(beautifyName(cls.getSimpleName()), cls);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();

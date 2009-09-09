@@ -197,4 +197,15 @@ public interface RMAdmin extends RMUser, Serializable {
      * @return a list of supported node source policies
      */
     public ArrayList<String> getSupportedNodeSourcePolicies();
+
+    /**
+     * Lookups class on the rm core side.
+     * This method is used for pluggable policies and infrastructure managers classes.
+     * The client instead of having this classes obtain them from the resource manager.
+     *
+     * @param name of the class
+     * @return loaded class if exist
+     * @throws ClassNotFoundException if non-existing class requested
+     */
+    public Class<?> lookupClass(String name) throws ClassNotFoundException;
 }
