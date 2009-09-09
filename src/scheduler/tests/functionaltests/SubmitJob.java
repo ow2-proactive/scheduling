@@ -1,6 +1,7 @@
 package functionaltests;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -29,7 +30,8 @@ public class SubmitJob implements SchedulerEventListener {
             //get the authentication interface using the SchedulerConnection
             SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("rmi://localhost/");
             //get the user interface using the retrieved SchedulerAuthenticationInterface
-            user = auth.logAsUser(SchedulerTHelper.username, SchedulerTHelper.password);
+            user = auth.logAsUser(Credentials.createCredentials(SchedulerTHelper.username,
+                    SchedulerTHelper.password, auth.getPublicKey()));
 
             //let the client be notified of its own 'job termination' -> job running to finished event
             user.addEventListener((SubmitJob) PAActiveObject.getStubOnThis(), true,

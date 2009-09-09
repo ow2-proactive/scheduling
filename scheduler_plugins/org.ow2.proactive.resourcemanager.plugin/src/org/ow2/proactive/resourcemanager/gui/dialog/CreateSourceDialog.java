@@ -43,12 +43,15 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.ConfigurablePanel;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.NodeSourceName;
-import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 
 
 /**
@@ -92,9 +95,20 @@ public class CreateSourceDialog extends Dialog {
                         validateForm();
 
                         RMAdmin admin = RMStore.getInstance().getRMAdmin();
+                        RMAuthentication auth = RMConnection.join(RMStore.getInstance().getURL() +
+                            RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
+                        Object[] policyParams = policy.getParameters();
+                        for (int i = 0; i < policyParams.length; i++) {
+                            if (policyParams[i] instanceof Credentials.CredData) {
+                                Credentials.CredData cd = (Credentials.CredData) policyParams[i];
+                                Credentials creds = Credentials.createCredentials(cd.login, cd.pass, auth
+                                        .getPublicKey());
+                                policyParams[i] = creds;
+                            }
+                        }
                         admin.createNodesource(name.getNodeSourceName(), infrastructure.getSelectedClass()
                                 .getName(), infrastructure.getParameters(), policy.getSelectedClass()
-                                .getName(), policy.getParameters());
+                                .getName(), policyParams);
 
                         shell.close();
                     } catch (Exception e) {

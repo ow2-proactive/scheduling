@@ -23,6 +23,7 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -465,7 +466,8 @@ public class RMTHelper {
             user.disconnect();
             user = null;
         }
-        admin = authInt.logAsAdmin(username, password);
+        Credentials cred = Credentials.createCredentials(username, password, authInt.getPublicKey());
+        admin = authInt.logAsAdmin(cred);
     }
 
     /**
@@ -478,7 +480,8 @@ public class RMTHelper {
             admin.disconnect();
             admin = null;
         }
-        user = authInt.logAsUser(username, password);
+        Credentials cred = Credentials.createCredentials(username, password, authInt.getPublicKey());
+        user = authInt.logAsUser(cred);
     }
 
     private static RMMonitorsHandler getMonitorsHandler() {

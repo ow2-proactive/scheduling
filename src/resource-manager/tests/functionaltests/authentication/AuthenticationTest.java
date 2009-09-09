@@ -33,6 +33,7 @@ package functionaltests.authentication;
 
 import static junit.framework.Assert.assertTrue;
 
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
@@ -70,7 +71,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized as an admin with correct user name and password");
 
         try {
-            RMAdmin admin = auth.logAsAdmin(adminName, adminPwd);
+            Credentials cred = Credentials.createCredentials(adminName, adminPwd, auth.getPublicKey());
+            RMAdmin admin = auth.logAsAdmin(cred);
             admin.disconnect();
             RMTHelper.log("Passed: successful authentication");
         } catch (Exception e) {
@@ -83,7 +85,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized as a user with correct user name and password");
 
         try {
-            RMUser user = auth.logAsUser(userName, userPwd);
+            Credentials cred = Credentials.createCredentials(userName, userPwd, auth.getPublicKey());
+            RMUser user = auth.logAsUser(cred);
             user.disconnect();
             RMTHelper.log("Passed: successful authentication");
         } catch (Exception e) {
@@ -96,7 +99,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized as a user with correct administrator name and password");
 
         try {
-            RMUser user = auth.logAsUser(adminName, adminPwd);
+            Credentials cred = Credentials.createCredentials(adminName, adminPwd, auth.getPublicKey());
+            RMUser user = auth.logAsUser(cred);
             user.disconnect();
             RMTHelper.log("Passed: successful authentication");
         } catch (Exception e) {
@@ -110,7 +114,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized as an admin with incorrect user name and password");
 
         try {
-            auth.logAsAdmin(adminName, "b");
+            Credentials cred = Credentials.createCredentials(adminName, "b", auth.getPublicKey());
+            auth.logAsAdmin(cred);
             RMTHelper.log("Error: successful authentication");
             assertTrue(false);
         } catch (Exception e) {
@@ -121,7 +126,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized as a user with incorrect user name and password");
 
         try {
-            auth.logAsUser(userName, "b");
+            Credentials cred = Credentials.createCredentials(userName, "b", auth.getPublicKey());
+            auth.logAsUser(cred);
             RMTHelper.log("Error: successful authentication");
             assertTrue(false);
         } catch (Exception e) {
@@ -132,7 +138,8 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to authorized as an admin with correct user name and password");
 
         try {
-            auth.logAsAdmin(userName, userPwd);
+            Credentials cred = Credentials.createCredentials(userName, userPwd, auth.getPublicKey());
+            auth.logAsAdmin(cred);
             RMTHelper.log("Error: successful authentication");
             assertTrue(false);
         } catch (Exception e) {
@@ -143,8 +150,9 @@ public class AuthenticationTest extends FunctionalTest {
         RMTHelper.log("Trying to connect twice from one active object");
 
         try {
-            auth.logAsAdmin(adminName, adminPwd);
-            auth.logAsAdmin(adminName, adminPwd);
+            Credentials cred = Credentials.createCredentials(adminName, adminPwd, auth.getPublicKey());
+            auth.logAsAdmin(cred);
+            auth.logAsAdmin(cred);
             RMTHelper.log("Error: second authentication was successful");
             assertTrue(false);
         } catch (Exception e) {
@@ -152,5 +160,4 @@ public class AuthenticationTest extends FunctionalTest {
         }
 
     }
-
 }

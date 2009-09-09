@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
@@ -57,7 +58,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
 
     @Configurable
     protected String url = "";
-    @Configurable
+    @Configurable(login = true)
     protected String userName = "";
     @Configurable(password = true)
     protected String password = "";
@@ -71,8 +72,8 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         SchedulerAuthenticationInterface authentication;
         try {
             authentication = SchedulerConnection.join(params[0].toString());
-            userInterface = authentication.logAsUser(params[1].toString(), params[2].toString());
-            preemptive = Boolean.parseBoolean(params[3].toString());
+            userInterface = authentication.logAsUser((Credentials) params[1]);
+            preemptive = Boolean.parseBoolean(params[2].toString());
         } catch (Throwable t) {
             throw new RMException(t);
         }

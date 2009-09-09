@@ -35,10 +35,13 @@ import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
 
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -62,9 +65,12 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
     protected static String jobDescriptor = TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
             "/functionaltests/descriptors/Job_PI.xml").getPath();
 
-    protected Object[] getPolicyParams() {
-        return new Object[] { SchedulerTHelper.schedulerDefaultURL, SchedulerTHelper.username,
-                SchedulerTHelper.password, "true", "30000" };
+    protected Object[] getPolicyParams() throws Exception {
+        SchedulerAuthenticationInterface auth = SchedulerConnection
+                .join(SchedulerTHelper.schedulerDefaultURL);
+        Credentials creds = Credentials.createCredentials(SchedulerTHelper.username,
+                SchedulerTHelper.password, auth.getPublicKey());
+        return new Object[] { SchedulerTHelper.schedulerDefaultURL, creds, "true", "30000" };
     }
 
     protected String getDescriptor() {

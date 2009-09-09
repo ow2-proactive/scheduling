@@ -5,6 +5,7 @@ import junit.framework.Assert;
 
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -60,7 +61,9 @@ public class TestConcurrentUsers extends FunctionalTest {
             public void run() {
                 try {
                     RMAuthentication auth = RMConnection.join(null);
-                    RMAdmin admin = auth.logAsAdmin(RMTHelper.username, RMTHelper.password);
+                    Credentials cred = Credentials.createCredentials(RMTHelper.username, RMTHelper.password,
+                            auth.getPublicKey());
+                    RMAdmin admin = auth.logAsAdmin(cred);
                     admin.freeNode(ns.get(0));
                 } catch (Exception e) {
                 }

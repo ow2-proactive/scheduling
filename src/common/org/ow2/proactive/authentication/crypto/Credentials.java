@@ -127,12 +127,12 @@ public class Credentials implements Serializable {
      * Dummy class used to properly separate login and pass:
      * will be serialized and encrypted
      */
-    private static class CredData implements Serializable {
+    public static class CredData implements Serializable {
         public CredData() {
         }
 
-        public String login;
-        public String pass;
+        public String login = null;
+        public String pass = null;
     }
 
     /**

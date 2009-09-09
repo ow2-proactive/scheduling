@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -794,8 +795,8 @@ public class SchedulerTHelper {
             adminSchedInterface.disconnect();
             adminSchedInterface = null;
         }
-
-        userschedInterface = authInt.logAsUser(username, password);
+        Credentials cred = Credentials.createCredentials(username, password, authInt.getPublicKey());
+        userschedInterface = authInt.logAsUser(cred);
         initEventReceiver(userschedInterface);
     }
 
@@ -810,7 +811,8 @@ public class SchedulerTHelper {
             userschedInterface.disconnect();
             userschedInterface = null;
         }
-        adminSchedInterface = authInt.logAsAdmin(username, password);
+        Credentials cred = Credentials.createCredentials(username, password, authInt.getPublicKey());
+        adminSchedInterface = authInt.logAsAdmin(cred);
         initEventReceiver(adminSchedInterface);
     }
 

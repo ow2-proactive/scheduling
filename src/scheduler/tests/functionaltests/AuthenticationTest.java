@@ -33,6 +33,9 @@ package functionaltests;
 
 import static junit.framework.Assert.assertTrue;
 
+import java.security.PublicKey;
+
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
@@ -73,12 +76,14 @@ public class AuthenticationTest extends FunctionalTest {
     public void action() throws Exception {
 
         SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
+        PublicKey pubKey = auth.getPublicKey();
 
         SchedulerTHelper.log("Test 1");
         SchedulerTHelper.log("Trying to authorized as an admin with correct user name and password");
 
         try {
-            AdminSchedulerInterface admin = auth.logAsAdmin(adminName, adminPwd);
+            Credentials cred = Credentials.createCredentials(adminName, adminPwd, pubKey);
+            AdminSchedulerInterface admin = auth.logAsAdmin(cred);
             admin.disconnect();
             SchedulerTHelper.log("Passed: successfull authentication");
         } catch (Exception e) {
@@ -91,7 +96,8 @@ public class AuthenticationTest extends FunctionalTest {
         SchedulerTHelper.log("Trying to authorized as a user with correct user name and password");
 
         try {
-            UserSchedulerInterface user = auth.logAsUser(userName, userPwd);
+            Credentials cred = Credentials.createCredentials(userName, userPwd, pubKey);
+            UserSchedulerInterface user = auth.logAsUser(cred);
             user.disconnect();
             SchedulerTHelper.log("Passed: successfull authentication");
         } catch (Exception e) {
@@ -104,7 +110,8 @@ public class AuthenticationTest extends FunctionalTest {
         SchedulerTHelper.log("Trying to authorized as a user with correct administrator name and password");
 
         try {
-            UserSchedulerInterface user = auth.logAsUser(adminName, adminPwd);
+            Credentials cred = Credentials.createCredentials(adminName, adminPwd, pubKey);
+            UserSchedulerInterface user = auth.logAsUser(cred);
             user.disconnect();
             SchedulerTHelper.log("Passed: successfull authentication");
         } catch (Exception e) {
@@ -118,7 +125,8 @@ public class AuthenticationTest extends FunctionalTest {
         SchedulerTHelper.log("Trying to authorized as an admin with incorrect user name and password");
 
         try {
-            auth.logAsAdmin(adminName, "b");
+            Credentials cred = Credentials.createCredentials(adminName, "b", pubKey);
+            auth.logAsAdmin(cred);
             SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);
         } catch (Exception e) {
@@ -129,7 +137,8 @@ public class AuthenticationTest extends FunctionalTest {
         SchedulerTHelper.log("Trying to authorized as a user with incorrect user name and password");
 
         try {
-            auth.logAsUser(userName, "b");
+            Credentials cred = Credentials.createCredentials(userName, "b", pubKey);
+            auth.logAsUser(cred);
             SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);
         } catch (Exception e) {
@@ -140,7 +149,8 @@ public class AuthenticationTest extends FunctionalTest {
         SchedulerTHelper.log("Trying to authorized as an admin with correct user name and password");
 
         try {
-            auth.logAsAdmin(userName, userPwd);
+            Credentials cred = Credentials.createCredentials(userName, userPwd, pubKey);
+            auth.logAsAdmin(cred);
             SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);
         } catch (Exception e) {

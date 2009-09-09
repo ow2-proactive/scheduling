@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.security.KeyException;
+
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -38,6 +40,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -145,8 +148,16 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
         createScheduler(rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("//localhost/");
-
-        return auth.logAsAdmin(login, password);
+        Credentials creds = null;
+        try {
+            Credentials.createCredentials(login, password, auth.getPublicKey());
+        } catch (LoginException e) {
+            logger.error("Could not recover public key from Scheduler, check your configuration" + e);
+            throw new LoginException("Could not encrypt credentials");
+        } catch (KeyException e) {
+            throw new LoginException("Could not encrypt credentials");
+        }
+        return auth.logAsAdmin(creds);
     }
 
     /**

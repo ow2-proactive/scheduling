@@ -57,6 +57,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.gui.dialog.CreateSourceDialog;
 import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -69,7 +70,7 @@ public class ConfigurablePanel extends Group {
         private Label nameLabel;
         private Text text;
         private Label descriptionLabel;
-        boolean isFile = false;
+        boolean isFile = false, isLogin = false, isPassword = false;
 
         public Property(Composite parent, Field f, Object instance) throws Exception {
             super(parent, SWT.LEFT);
@@ -80,7 +81,8 @@ public class ConfigurablePanel extends Group {
 
             Configurable configurable = f.getAnnotation(Configurable.class);
             String description = configurable.description();
-            boolean isPasswd = configurable.password();
+            isPassword = configurable.password();
+            isLogin = configurable.login();
             isFile = configurable.fileBrowser();
 
             setLayout(new FormLayout());
@@ -88,7 +90,7 @@ public class ConfigurablePanel extends Group {
             nameLabel = new Label(this, SWT.LEFT);
             nameLabel.setText(CreateSourceDialog.beautifyName(name));
 
-            int passwdMask = isPasswd ? SWT.PASSWORD : 0;
+            int passwdMask = isPassword ? SWT.PASSWORD : 0;
             text = new Text(this, SWT.LEFT | SWT.BORDER | passwdMask);
             text.setText(value);
 
@@ -246,9 +248,20 @@ public class ConfigurablePanel extends Group {
 
     public Object[] getParameters() throws IOException {
         List<Object> params = new ArrayList<Object>();
+        Credentials.CredData cdata = new Credentials.CredData();
         for (Property p : properties) {
             if (p.isFile) {
                 params.add(FileToBytesConverter.convertFileToByteArray(new File(p.getValue())));
+            } else if (p.isLogin) {
+                cdata.login = p.getValue();
+            } else if (p.isPassword) {
+                if (cdata.login != null) {
+                    cdata.pass = p.getValue();
+                    params.add(cdata);
+                } else {
+                    // login & pass need to be consecutive
+                    cdata.login = null;
+                }
             } else {
                 params.add(p.getValue());
             }

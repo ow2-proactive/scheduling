@@ -96,7 +96,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         super.configure(policyParameters);
 
         try {
-            int index = 4;
+            int index = 3;
             policyPeriod = Integer.parseInt(policyParameters[index++].toString());
             minNodes = Integer.parseInt(policyParameters[index++].toString());
             maxNodes = Integer.parseInt(policyParameters[index++].toString());

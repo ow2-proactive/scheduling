@@ -42,6 +42,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -433,9 +434,13 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             schedulerURL = dialogResult.getUrl();
             sai = SchedulerConnection.join(schedulerURL);
             if (logAsAdmin) {
-                scheduler = sai.logAsAdmin(userName, dialogResult.getPassword());
+                Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
+                        .getPublicKey());
+                scheduler = sai.logAsAdmin(creds);
             } else {
-                scheduler = sai.logAsUser(userName, dialogResult.getPassword());
+                Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
+                        .getPublicKey());
+                scheduler = sai.logAsUser(creds);
             }
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
             startPinger();

@@ -69,7 +69,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
     public void configure(Object... policyParameters) throws RMException {
         super.configure(policyParameters);
         try {
-            idleTime = Long.parseLong(policyParameters[4].toString());
+            idleTime = Long.parseLong(policyParameters[3].toString());
         } catch (RuntimeException e) {
             throw new RMException(e);
         }

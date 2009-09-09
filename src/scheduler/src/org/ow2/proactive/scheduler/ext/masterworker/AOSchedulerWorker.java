@@ -32,6 +32,7 @@
 package org.ow2.proactive.scheduler.ext.masterworker;
 
 import java.io.Serializable;
+import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -50,6 +51,7 @@ import org.objectweb.proactive.extensions.masterworker.core.ResultInternImpl;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -136,8 +138,16 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         SchedulerAuthenticationInterface auth;
         try {
             auth = SchedulerConnection.join(schedulerUrl);
-
-            this.scheduler = auth.logAsUser(user, password);
+            Credentials creds = null;
+            try {
+                creds = Credentials.createCredentials(user, password, auth.getPublicKey());
+            } catch (KeyException e) {
+                throw new LoginException("" + e);
+            } catch (LoginException e) {
+                throw new LoginException(
+                    "Could not retrieve public key, contact the Scheduler admininistrator" + e);
+            }
+            this.scheduler = auth.logAsUser(creds);
         } catch (LoginException e) {
             throw new ProActiveRuntimeException(e);
         } catch (SchedulerException e1) {

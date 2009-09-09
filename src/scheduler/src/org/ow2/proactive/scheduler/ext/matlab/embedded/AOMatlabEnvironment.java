@@ -41,6 +41,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,6 +61,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -167,7 +169,16 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      */
     public void login(String user, String passwd) throws LoginException, SchedulerException {
 
-        this.scheduler = auth.logAsUser(user, passwd);
+        Credentials creds = null;
+        try {
+            creds = Credentials.createCredentials(user, passwd, auth.getPublicKey());
+        } catch (KeyException e) {
+            throw new LoginException("" + e);
+        } catch (LoginException e) {
+            throw new LoginException("Could not retrieve public key, contact the Scheduler admininistrator" +
+                e);
+        }
+        this.scheduler = auth.logAsUser(creds);
 
         this.scheduler.addEventListener(stubOnThis, false, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                 SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN, SchedulerEvent.SHUTTING_DOWN);

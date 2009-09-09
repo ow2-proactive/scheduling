@@ -31,13 +31,13 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.UnknownHostException;
+import java.security.KeyException;
 
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
@@ -83,7 +83,10 @@ public class SimpleHelloWorld {
             //Now you are connected you must log on with a couple of username/password matching an entry in login and group files.
             //(groups.cfg, login.cfg in the same directory)
             //you can also log on as admin if your username is in admin group. (it provides you more power ;) )
-            UserSchedulerInterface scheduler = auth.logAsUser("user1", "pwd1");
+            //your need to create encrypted credentials so that it cannot be intercepted by network sniffers;
+            //the scheduler will offer the public key required for encryption
+            Credentials cred = Credentials.createCredentials("user1", "pwd1", auth.getPublicKey());
+            UserSchedulerInterface scheduler = auth.logAsUser(cred);
 
             //if this point is reached, that's we are connected to the scheduler under "user1".
             //@snippet-start taskflow_params
@@ -160,6 +163,9 @@ public class SimpleHelloWorld {
             e.printStackTrace();
         } catch (LoginException e) {
             //there was a problem during scheduler authentication
+            e.printStackTrace();
+        } catch (KeyException e) {
+            //credentials could not be encrypted
             e.printStackTrace();
         }
         System.exit(0);

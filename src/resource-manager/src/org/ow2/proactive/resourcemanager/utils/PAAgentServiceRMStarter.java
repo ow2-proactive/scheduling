@@ -36,6 +36,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
@@ -132,7 +133,8 @@ public final class PAAgentServiceRMStarter {
         // 3 - Log as admin with the provided username and password
         RMAdmin admin = null;
         try {
-            admin = auth.logAsAdmin(username, password);
+            Credentials creds = Credentials.createCredentials(username, password, auth.getPublicKey());
+            admin = auth.logAsAdmin(creds);
             if (admin == null) {
                 throw new RuntimeException("The RMAdmin instance is null");
             }

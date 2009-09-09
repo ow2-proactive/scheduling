@@ -37,6 +37,7 @@ import java.io.File;
 
 import org.junit.Assert;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -96,7 +97,9 @@ public class NonBlockingCoreTest extends FunctionalTest {
         //mandatory to use RMUser AO, otherwise, getAtMostNode we be send in RMAdmin request queue
         RMAuthentication auth = RMConnection.waitAndJoin(null);
 
-        RMUser user = auth.logAsUser(RMTHelper.username, RMTHelper.password);
+        Credentials cred = Credentials.createCredentials(RMTHelper.username, RMTHelper.password, auth
+                .getPublicKey());
+        RMUser user = auth.logAsUser(cred);
         user.getAtMostNodes(2, sScript);
 
         String hostName = ProActiveInet.getInstance().getHostname();

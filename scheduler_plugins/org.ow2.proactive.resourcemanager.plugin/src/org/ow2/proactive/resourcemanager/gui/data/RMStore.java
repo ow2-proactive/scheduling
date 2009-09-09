@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.resourcemanager.gui.data;
 
+import java.security.KeyException;
+
 import javax.security.auth.login.LoginException;
 
 import org.eclipse.core.runtime.IStatus;
@@ -39,6 +41,7 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -49,7 +52,6 @@ import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
-import org.ow2.proactive.resourcemanager.gui.views.ControllerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
@@ -98,9 +100,21 @@ public class RMStore {
 
             try {
                 if (isAdmin) {
-                    loggerUser = auth.logAsAdmin(login, password);
+                    Credentials creds = null;
+                    try {
+                        creds = Credentials.createCredentials(login, password, auth.getPublicKey());
+                    } catch (KeyException e) {
+                        throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
+                    }
+                    loggerUser = auth.logAsAdmin(creds);
                 } else {
-                    loggerUser = auth.logAsUser(login, password);
+                    Credentials creds = null;
+                    try {
+                        creds = Credentials.createCredentials(login, password, auth.getPublicKey());
+                    } catch (KeyException e) {
+                        throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
+                    }
+                    loggerUser = auth.logAsUser(creds);
                 }
             } catch (LoginException e) {
                 Activator.log(IStatus.INFO, "Login exception for user " + login, e);

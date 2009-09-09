@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.KeyException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,6 +60,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
 
@@ -129,7 +131,18 @@ public class SchedulerAuthenticationGUIHelper {
         if (auth == null) {
             return null;
         } else {
-            return auth.getAuth().logAsUser(auth.getUsername(), auth.getPassword());
+            SchedulerAuthenticationInterface schedAuth = auth.getAuth();
+            Credentials cred = null;
+            try {
+                cred = Credentials.createCredentials(auth.getUsername(), auth.getPassword(), schedAuth
+                        .getPublicKey());
+            } catch (LoginException e) {
+                throw new LoginException("Could not retrieve public key from Scheduler " + schedulerURL +
+                    ", contact the administrator" + e);
+            } catch (KeyException e) {
+                throw new LoginException("Could not encrypt credentials " + e);
+            }
+            return schedAuth.logAsUser(cred);
         }
     }
 
@@ -149,7 +162,18 @@ public class SchedulerAuthenticationGUIHelper {
         if (auth == null) {
             return null;
         } else {
-            return auth.getAuth().logAsAdmin(auth.getUsername(), auth.getPassword());
+            SchedulerAuthenticationInterface schedAuth = auth.getAuth();
+            Credentials cred = null;
+            try {
+                cred = Credentials.createCredentials(auth.getUsername(), auth.getPassword(), schedAuth
+                        .getPublicKey());
+            } catch (LoginException e) {
+                throw new LoginException("Could not retrieve public key from Scheduler " + schedulerURL +
+                    ", contact the administrator" + e);
+            } catch (KeyException e) {
+                throw new LoginException("Could not encrypt credentials " + e);
+            }
+            return schedAuth.logAsAdmin(cred);
         }
     }
 

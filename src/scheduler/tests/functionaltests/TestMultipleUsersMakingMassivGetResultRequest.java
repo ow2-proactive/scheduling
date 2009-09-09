@@ -31,6 +31,7 @@
  */
 package functionaltests;
 
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -89,8 +90,9 @@ public class TestMultipleUsersMakingMassivGetResultRequest extends FunctionalTes
                         //connect the scheduler
                         SchedulerTHelper.log(Thread.currentThread().getName() +
                             " -> Connecting the scheduler");
-                        UserSchedulerInterface user = auth.logAsUser(SchedulerTHelper.username,
-                                SchedulerTHelper.password);
+                        Credentials cred = Credentials.createCredentials(SchedulerTHelper.username,
+                                SchedulerTHelper.password, auth.getPublicKey());
+                        UserSchedulerInterface user = auth.logAsUser(cred);
                         SchedulerTHelper.log(Thread.currentThread().getName() + " -> Connected");
                         long start = System.currentTimeMillis();
                         int submitted = 1;

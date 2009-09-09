@@ -54,6 +54,11 @@ public @interface Configurable {
     String description() default "";
 
     /**
+     * Login field.
+     */
+    boolean login() default false;
+
+    /**
      * Password field. Should not be displayed as a plain text
      */
     boolean password() default false;

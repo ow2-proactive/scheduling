@@ -35,10 +35,13 @@ import static junit.framework.Assert.assertTrue;
 
 import java.net.InetAddress;
 
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy;
 
@@ -55,9 +58,12 @@ import functionaltests.SchedulerTHelper;
 public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy {
 
-    protected Object[] getPolicyParams() {
-        return new Object[] { SchedulerTHelper.schedulerDefaultURL, SchedulerTHelper.username,
-                SchedulerTHelper.password, "false", "2000",// policy period
+    protected Object[] getPolicyParams() throws Exception {
+        SchedulerAuthenticationInterface auth = SchedulerConnection
+                .join(SchedulerTHelper.schedulerDefaultURL);
+        Credentials creds = Credentials.createCredentials(SchedulerTHelper.username,
+                SchedulerTHelper.password, auth.getPublicKey());
+        return new Object[] { SchedulerTHelper.schedulerDefaultURL, creds, "false", "2000",// policy period
                 "0", // min modes
                 "1", // max modes
                 "1", // nodes per task

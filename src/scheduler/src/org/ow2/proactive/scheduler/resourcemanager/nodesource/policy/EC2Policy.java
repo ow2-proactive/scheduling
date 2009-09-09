@@ -119,7 +119,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     public void configure(Object... params) throws RMException {
         super.configure(params);
         try {
-            int index = 4;
+            int index = 3;
             refreshTime = Integer.parseInt(params[index++].toString());
             loadFactor = Integer.parseInt(params[index++].toString());
             releaseCycle = Integer.parseInt(params[index++].toString());
