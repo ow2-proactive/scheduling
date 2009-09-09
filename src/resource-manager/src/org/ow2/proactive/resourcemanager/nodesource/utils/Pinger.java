@@ -138,6 +138,9 @@ public class Pinger extends RestrictedService implements InitActive {
                 break;
             }
         }
+
+        nodeSource.finishNodeSourceShutdown();
+        PAActiveObject.terminateActiveObject(true);
     }
 
     /**

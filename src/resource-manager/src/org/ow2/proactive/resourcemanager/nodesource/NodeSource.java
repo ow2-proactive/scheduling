@@ -93,6 +93,7 @@ public class NodeSource implements InitActive {
     private RMCore rmcore;
     private Pinger pinger;
     private boolean toShutdown = false;
+    private int numberOfShutdownServices = 0;
 
     // all nodes except down
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
@@ -388,7 +389,7 @@ public class NodeSource implements InitActive {
 
         if (toShutdown && nodes.size() == 0) {
             // shutdown all pending nodes
-            finishNodeSourceShutdown();
+            shutdownNodeSourceServices();
         }
 
         return new BooleanWrapper(true);
@@ -402,7 +403,7 @@ public class NodeSource implements InitActive {
         toShutdown = true;
 
         if (nodes.size() == 0) {
-            finishNodeSourceShutdown();
+            shutdownNodeSourceServices();
         }
     }
 
@@ -448,9 +449,9 @@ public class NodeSource implements InitActive {
     }
 
     /**
-     * Finalizes node source shutdown. Stops pinger, policy and terminates node source active object.
+     * Initiates node source services shutdown, such as pinger, policy, thread pool.
      */
-    protected void finishNodeSourceShutdown() {
+    protected void shutdownNodeSourceServices() {
         logger.info("[" + name + "] Shutdown finalization");
 
         PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this,
@@ -468,9 +469,16 @@ public class NodeSource implements InitActive {
 
         nodeLookupThread.shutDown();
         pinger.shutdown();
-        // object should be terminated NON preemptively
-        // pinger thread can wait for last results (getNodes)
-        PAActiveObject.terminateActiveObject(false);
+    }
+
+    /**
+     * Terminates a node source active object when shutdown confirmation is received from the pinger and the policy. 
+     */
+    public void finishNodeSourceShutdown() {
+        if (++numberOfShutdownServices == 2) {
+            // got confirmation from pinger and policy
+            PAActiveObject.terminateActiveObject(false);
+        }
     }
 
     /**

@@ -81,6 +81,7 @@ public abstract class NodeSourcePolicy implements Serializable {
      * Shutdown the policy
      */
     public void shutdown() {
+        nodeSource.finishNodeSourceShutdown();
         PAActiveObject.terminateActiveObject(false);
     }
 
