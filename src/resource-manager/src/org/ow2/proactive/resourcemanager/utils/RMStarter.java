@@ -46,8 +46,14 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -134,19 +140,22 @@ public class RMStarter {
                 String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
                     File.separator + "config/deployment/Local4JVMDeployment.xml";
                 deploymentDescriptors.add(gcmDeployFile);
-                // starting resource manager and deploy given infrastructure
-                RMFactory.startLocal(deploymentDescriptors);
-            } else {
-                if (cmd.hasOption("d")) {
-                    for (String desc : gcmdList) {
-                        deploymentDescriptors.add(desc);
-                    }
-                    // starting resource manager and deploy given infrastructure
-                    RMFactory.startLocal(deploymentDescriptors);
-                } else {
-                    // starting clean resource manager
-                    RMFactory.startLocal();
+            } else if (cmd.hasOption("d")) {
+                for (String desc : gcmdList) {
+                    deploymentDescriptors.add(desc);
                 }
+            }
+
+            // starting clean resource manager
+            RMFactory.startLocal();
+
+            RMAuthentication auth = RMConnection.waitAndJoin(null);
+            RMAdmin admin = auth.logAsAdmin(Credentials.getCredentials(PAResourceManagerProperties
+                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+            for (String deploymentDescriptor : deploymentDescriptors) {
+                byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
+                    deploymentDescriptor));
+                admin.addNodes(NodeSource.DEFAULT_NAME, new Object[] { GCMDeploymentData });
             }
 
             logger.info("(Once started, press 'e' to shutdown)");

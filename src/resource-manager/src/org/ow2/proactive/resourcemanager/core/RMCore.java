@@ -31,12 +31,9 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,7 +80,6 @@ import org.ow2.proactive.resourcemanager.selection.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -174,9 +170,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
 
     private boolean shutedDown = false;
 
-    /** nodes to deploy during startup of resource manager */
-    private Collection<String> localGCMDeploymentFiles = null;
-
     JMXMonitoringHelper jmxHelper = new JMXMonitoringHelper();
 
     /**
@@ -221,27 +214,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         nodeSources = new HashMap<String, NodeSource>();
         allNodes = new HashMap<String, RMNode>();
         freeNodes = new ArrayList<RMNode>();
-    }
-
-    /**
-     * Creates the RMCore object with further deployment of given data.
-     * 
-     * @param id
-     *            Name for RMCOre.
-     * @param nodeRM
-     *            Name of the ProActive Node object containing RM active
-     *            objects.
-     * @param gcmDeploymentData
-     *            data to deploy.
-     * @throws ActiveObjectCreationException
-     *             if creation of the active object failed.
-     * @throws NodeException
-     *             if a problem occurs on the target node.
-     */
-    public RMCore(String id, Node nodeRM, Collection<String> localGCMDeploymentFiles)
-            throws ActiveObjectCreationException, NodeException {
-        this(id, nodeRM);
-        this.localGCMDeploymentFiles = localGCMDeploymentFiles;
     }
 
     /**
@@ -317,18 +289,8 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                 logger.debug("instantiation of the node source " + NodeSource.DEFAULT_NAME);
             }
 
-            NodeSource ns = createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class.getName(),
-                    null, StaticPolicy.class.getName(), null);
-
-            // TODO remove GCM reference from RMCore
-            // deployment of required nodes 
-            if (localGCMDeploymentFiles != null) {
-                for (String gcmDeploymentFile : localGCMDeploymentFiles) {
-                    File gcmDeployFile = new File(gcmDeploymentFile);
-                    ns.addNodes(FileToBytesConverter.convertFileToByteArray(gcmDeployFile));
-                }
-                localGCMDeploymentFiles = null; // don't need it anymore
-            }
+            createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class.getName(), null,
+                    StaticPolicy.class.getName(), null);
 
             // adding shutdown hook
             final RMCore rmcoreStub = (RMCore) PAActiveObject.getStubOnThis();
@@ -359,8 +321,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
 
             authentication.setActivated(true);
 
-        } catch (IOException e) {
-            logger.error("", e);
         } catch (ActiveObjectCreationException e) {
             logger.error("", e);
         } catch (NodeException e) {

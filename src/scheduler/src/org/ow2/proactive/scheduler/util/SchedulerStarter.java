@@ -54,8 +54,11 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
@@ -63,6 +66,7 @@ import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -163,16 +167,25 @@ public class SchedulerStarter {
                             //Starting a local RM using default deployment descriptor
                             RMFactory.setOsJavaProperty();
                             logger.info("Trying to start a local Resource Manager");
-                            RMFactory.startLocal(java.util.Collections.singletonList(deploymentFile));
+                            RMFactory.startLocal();
 
                             logger_dev.info("Trying to join the local Resource Manager");
                             //wait for the RM to be created
-                            RMConnection.waitAndJoin(null);
+                            RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
 
                             logger_dev
                                     .info("Trying to connect the local Resource Manager using Scheduler identity");
                             //get the proxy on the Resource Manager
                             imp = ResourceManagerProxy.getProxy(uri);
+
+                            //add the local nodes
+                            RMAdmin rmAdmin = rmAuth.logAsAdmin(Credentials
+                                    .getCredentials(PAResourceManagerProperties
+                                            .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
+                                                    .getValueAsString())));
+                            byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
+                                deploymentFile));
+                            rmAdmin.addNodes("Default", new Object[] { GCMDeploymentData });
 
                             logger.info("Resource Manager created on " +
                                 Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(imp)));

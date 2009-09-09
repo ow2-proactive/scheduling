@@ -100,34 +100,6 @@ public class RMFactory {
     }
 
     /**
-     * Creates Resource manager on local host with the further deployment of infrastructure from given deployment descriptor.
-     * 
-     * @param localGCMDeploymentDescriptors list of local gcm deployment descriptors which will be processed during core startup
-     * 
-     * @throws NodeException If the RM's node can't be created
-     * @throws ActiveObjectCreationException If RMCore cannot be created
-     * @throws AlreadyBoundException if a node with the same RMNode's name is already exist. 
-     * @throws IOException If node and RMCore fails.
-     */
-    public static void startLocal(Collection<String> localGCMDeploymentDescriptors) throws NodeException,
-            ActiveObjectCreationException, AlreadyBoundException, IOException {
-        String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
-        if (rmcore == null) {
-            Node nodeRM = NodeFactory.createLocalNode(RM_NODE_NAME, false, null, null, null);
-            rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
-                    new Object[] { RMCoreName, nodeRM, localGCMDeploymentDescriptors }, nodeRM);
-
-            if (logger.isInfoEnabled()) {
-                logger.info("New RM core localy started");
-            }
-        } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("RM Core already localy running");
-            }
-        }
-    }
-
-    /**
      * Main function, create the resource Manager.
      * @param args command line arguments
      */

@@ -122,7 +122,10 @@ public enum PAResourceManagerProperties {
     RM_NODESOURCE_POLICY_FILE("pa.rm.nodesource.policies", PAPropertiesType.STRING),
 
     /** Max number of threads in node source for parallel task execution */
-    RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PAPropertiesType.INTEGER);
+    RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PAPropertiesType.INTEGER),
+
+    /** Path to the Resource Manager credentials for adding local nodes */
+    RM_CREDS("pa.rm.credentials", PAPropertiesType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
