@@ -108,10 +108,10 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
      * 
      * @param params
      *            <ul>
-     *            <li>params[0..3] : used by super
-     *            <li>params[4]: refresh time: number of seconds before the policy updates its state
-     *            <li>params[5]: loadFactor: number of tasks per node at best, for the whole RM
-     *            <li>params[6]: releaseCycle: number of seconds before a node can be released
+     *            <li>params[0..2] : used by super
+     *            <li>params[3]: refresh time: number of seconds before the policy updates its state
+     *            <li>params[4]: loadFactor: number of tasks per node at best, for the whole RM
+     *            <li>params[5]: releaseCycle: number of seconds before a node can be released
      *            </ul>
      * @throws RMException
      *             invalid parameters, policy creation fails
@@ -235,8 +235,8 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
         logger.info("Policy state: RM=" + rmNodeNumber + " NS=" + nsNodeNumber + " pending=" + pendingNodes +
             " required=" + requiredNodes + " tasks=" + activeTask);
 
-        if (requiredNodes < nodeNumber) {
-            int diff = nodeNumber - requiredNodes;
+        if (requiredNodes < rmNodeNumber && nodeNumber > 0) {
+            int diff = Math.min(nodeNumber, rmNodeNumber - requiredNodes);
             for (String nodeUrl : nodes.keySet()) {
                 long acq = nodes.get(nodeUrl).getTimeInMillis() / 1000;
                 long now = Calendar.getInstance().getTimeInMillis() / 1000;
@@ -245,14 +245,15 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
                 int delay = Math.max(refreshTime, 10);
                 if ((dt + delay) % releaseCycle <= delay) {
                     nodeSource.getRMCore().removeNode(nodeUrl, super.preemptive, true);
-                }
-                if (diff-- == 0) {
-                    break;
+                    diff--;
+                    if (diff == 0) {
+                        break;
+                    }
                 }
             }
-        } else if (requiredNodes > nodeNumber) {
-            if (pendingNodes + nodeNumber < requiredNodes) {
-                for (int i = 0; i < requiredNodes - (pendingNodes + nodeNumber); i++) {
+        } else if (requiredNodes > rmNodeNumber) {
+            if (pendingNodes + rmNodeNumber < requiredNodes) {
+                for (int i = 0; i < requiredNodes - (pendingNodes + rmNodeNumber); i++) {
                     nodeSource.acquireNode();
                     pendingNodes++;
                 }
