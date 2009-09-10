@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -52,6 +54,8 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
@@ -62,6 +66,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive {
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+
+    private Map<JobId, Integer> activeTasks = new HashMap<JobId, Integer>();
     private int activeTask = 0;
 
     @Configurable(description = "period of recalculating required number of nodes")
@@ -391,17 +397,43 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             " Min Nodes: " + minNodes + " Job Per Node: " + loadingFactor + "]";
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void jobSubmittedEvent(JobState jobState) {
-        activeTask += jobState.getTotalNumberOfTasks();
+        int nbTasks = jobState.getTotalNumberOfTasks();
+        activeTasks.put(jobState.getId(), nbTasks);
+        activeTask += nbTasks;
         logger.debug("Job submitted. Current number of tasks " + activeTask);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+        switch (notification.getEventType()) {
+            case JOB_RUNNING_TO_FINISHED:
+                int tasksLeft = activeTasks.remove(notification.getData().getJobId());
+                activeTask -= tasksLeft;
+                break;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
         switch (notification.getEventType()) {
             case TASK_RUNNING_TO_FINISHED:
+                JobId id = notification.getData().getJobId();
+                activeTasks.put(id, activeTasks.get(id) - 1);
                 activeTask--;
                 logger.debug("Task finished. Current number of tasks " + activeTask);
                 break;
         }
     }
+
 }
