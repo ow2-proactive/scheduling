@@ -383,10 +383,10 @@ public class EC2Deployer implements java.io.Serializable {
 
         try {
             if (imgd.getArchitecture().equals("x86_64")) {
-                if (instanceType != InstanceType.XLARGE && instanceType != InstanceType.XLARGE_HCPU) {
+                if (instanceType != InstanceType.XLARGE && instanceType != InstanceType.XLARGE_HCPU && instanceType!= InstanceType.LARGE) {
                     logger.debug("AMI " + imgd.getImageId() + " is x86_64 Arch," +
-                        " forcing Extra Large instance type.");
-                    instanceType = InstanceType.XLARGE;
+                        " forcing Large instance type.");
+                    instanceType = InstanceType.LARGE;
                 }
             }
 
