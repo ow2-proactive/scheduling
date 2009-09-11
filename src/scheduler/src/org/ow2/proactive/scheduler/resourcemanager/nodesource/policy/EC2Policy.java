@@ -46,10 +46,13 @@ import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestExcepti
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
+import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.PolicyRestriction;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
@@ -80,7 +83,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  */
 
 @PolicyRestriction(supportedInfrastructures = { "org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.EC2Infrastructure" })
-public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunActive {
+public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunActive, RMEventListener {
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
@@ -98,6 +101,9 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
 
     private int nodeNumber = 0;
     private int pendingNodes = 0;
+
+    private boolean rmShuttingDown = false;
+    private RMMonitoring rmMonitoring;
 
     private HashMap<String, Calendar> nodes = new HashMap<String, Calendar>();
 
@@ -202,6 +208,9 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
         thisStub = (EC2Policy) PAActiveObject.getStubOnThis();
         PAActiveObject.setImmediateService("getTotalNodeNumber");
 
+        rmMonitoring = nodeSource.getRMCore().getMonitoring();
+        rmMonitoring.addRMEventListener((RMEventListener) thisStub);
+
         logger.info("Policy activated. Current number of tasks " + activeTask);
         return new BooleanWrapper(true);
     }
@@ -301,6 +310,40 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
                 activeTasks.put(id, activeTasks.get(id) - 1);
                 activeTask--;
                 logger.debug("Task finished. Current number of tasks " + activeTask);
+                break;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BooleanWrapper disactivate() {
+        if (rmShuttingDown) {
+            return new BooleanWrapper(true);
+        }
+
+        try {
+            rmMonitoring.removeRMEventListener();
+        } catch (RMException e) {
+            logger.error("" + e);
+            return new BooleanWrapper(false);
+        }
+        return new BooleanWrapper(true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void nodeSourceEvent(RMNodeSourceEvent event) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void rmEvent(RMEvent event) {
+        switch (event.getEventType()) {
+            case SHUTTING_DOWN:
+                rmShuttingDown = true;
                 break;
         }
     }
