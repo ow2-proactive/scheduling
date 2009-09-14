@@ -65,6 +65,8 @@ public class Pinger extends RestrictedService implements InitActive {
      * pinger is stopped */
     private boolean active;
 
+    private Thread pingerThread;
+
     public Pinger() {
     }
 
@@ -81,13 +83,16 @@ public class Pinger extends RestrictedService implements InitActive {
 
     public void initActivity(Body body) {
         PAActiveObject.setImmediateService("setPingFrequency");
+        PAActiveObject.setImmediateService("shutdown");
+        pingerThread = Thread.currentThread();
     }
 
     /**
      * shutdown the Pinger thread .
      */
-    public synchronized void shutdown() {
-        this.active = false;
+    public void shutdown() {
+        active = false;
+        pingerThread.interrupt();
     }
 
     /**
@@ -115,7 +120,7 @@ public class Pinger extends RestrictedService implements InitActive {
                 try {
                     Thread.sleep(pingFrequency);
                 } catch (InterruptedException ex) {
-                    active = false;
+                    break;
                 }
                 if (!this.isActive()) {
                     break;
@@ -162,7 +167,7 @@ public class Pinger extends RestrictedService implements InitActive {
      * Sets a ping frequency
      * @param a new frequency
      */
-    public void setPingFrequency(int frequency) {
+    public synchronized void setPingFrequency(int frequency) {
         pingFrequency = frequency;
     }
 }

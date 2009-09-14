@@ -90,6 +90,7 @@ public class NodeSource implements InitActive {
 
     private InfrastructureManager infrastructureManager;
     private NodeSourcePolicy nodeSourcePolicy;
+    private String description;
     private RMCore rmcore;
     private Pinger pinger;
     private boolean toShutdown = false;
@@ -140,6 +141,10 @@ public class NodeSource implements InitActive {
                     .getStubOnThis() });
             nodeLookupThread = new NodeLookupThread();
 
+            // description could be requested when the policy does not exist anymore
+            // so initializing it here
+            description = "Infrastructure:" + infrastructureManager + ", Policy: " + nodeSourcePolicy;
+
             // these methods are called from the rm core
             // mark them as immediate services in order to prevent the block of the core
             PAActiveObject.setImmediateService("getName");
@@ -156,6 +161,11 @@ public class NodeSource implements InitActive {
      * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
      */
     public BooleanWrapper addNodes(Object... parameters) {
+        if (toShutdown) {
+            throw new AddingNodesException("[" + name +
+                "] addNodes request discarded because node source is shutting down");
+        }
+
         try {
             infrastructureManager.addNodesAcquisitionInfo(parameters);
             rmcore.getMonitoring().nodeSourceEvent(
@@ -176,9 +186,7 @@ public class NodeSource implements InitActive {
             throw new RMException("The node " + nodeUrl + " already added to the node source " + name);
         }
 
-        if (logger.isInfoEnabled()) {
-            logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
-        }
+        logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
         infrastructureManager.registerAcquiredNode(node);
         nodes.put(nodeUrl, node);
     }
@@ -189,6 +197,11 @@ public class NodeSource implements InitActive {
      * @param nodeUrl the url of the node
      */
     public BooleanWrapper acquireNode(String nodeUrl) {
+
+        if (toShutdown) {
+            throw new AddingNodesException("[" + name +
+                "] addNode request discarded because node source is shutting down");
+        }
 
         // lookup for a new Node
         Node nodeToAdd = null;
@@ -346,6 +359,12 @@ public class NodeSource implements InitActive {
      * Requests one node to be acquired from the underlying infrastructure.
      */
     public void acquireNode() {
+
+        if (toShutdown) {
+            logger.warn("[" + name + "] acquireNode request discarded because node source is shutting down");
+            return;
+        }
+
         infrastructureManager.acquireNode();
     }
 
@@ -353,6 +372,13 @@ public class NodeSource implements InitActive {
      * Requests all nodes to be acquired from the infrastructure.
      */
     public void acquireAllNodes() {
+
+        if (toShutdown) {
+            logger.warn("[" + name +
+                "] acquireAllNodes request discarded because node source is shutting down");
+            return;
+        }
+
         infrastructureManager.acquireAllNodes();
     }
 
@@ -428,7 +454,7 @@ public class NodeSource implements InitActive {
      * @return string representation of the node source
      */
     public String getDescription() {
-        return "Infrastructure:" + infrastructureManager + ", Policy: " + nodeSourcePolicy;
+        return description;
     }
 
     /**
@@ -454,9 +480,6 @@ public class NodeSource implements InitActive {
     protected void shutdownNodeSourceServices() {
         logger.info("[" + name + "] Shutdown finalization");
 
-        PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this,
-            RMEventType.NODESOURCE_REMOVED)));
-
         nodeSourcePolicy.shutdown();
 
         try {
@@ -476,6 +499,9 @@ public class NodeSource implements InitActive {
      */
     public void finishNodeSourceShutdown() {
         if (++numberOfShutdownServices == 2) {
+            PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this,
+                RMEventType.NODESOURCE_REMOVED)));
+
             // got confirmation from pinger and policy
             PAActiveObject.terminateActiveObject(false);
         }
@@ -515,6 +541,13 @@ public class NodeSource implements InitActive {
      * @see org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource#detectedPingedDownNode(java.lang.String)
      */
     public void detectedPingedDownNode(String nodeUrl) {
+
+        if (toShutdown) {
+            logger.warn("[" + name +
+                "] detectedPingedDownNode request discarded because node source is shutting down");
+            return;
+        }
+
         logger.info("[" + name + "] Detected down node " + nodeUrl);
         Node downNode = nodes.remove(nodeUrl);
         if (downNode != null) {
