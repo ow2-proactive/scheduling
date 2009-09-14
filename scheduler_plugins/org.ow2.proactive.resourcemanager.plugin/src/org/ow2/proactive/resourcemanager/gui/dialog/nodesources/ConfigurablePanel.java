@@ -259,9 +259,14 @@ public class ConfigurablePanel extends Group {
                     cdata.pass = p.getValue();
                     params.add(cdata);
                 } else {
-                    // login & pass need to be consecutive
-                    cdata.login = null;
+                	// no login field before password field
+                	params.add(p.getValue());
                 }
+            } else if (cdata.login != null) {
+            	// login field was not followed by password field
+            	params.add(cdata.login);
+            	params.add(p.getValue());
+            	cdata.login = null;
             } else {
                 params.add(p.getValue());
             }
