@@ -53,20 +53,35 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 public final class PAAgentServiceRMStarter {
 
     /**
-     * The starter will try to connect to the Resource Manager
-     * before killing itself
-     * that means that it will try to connect during
-     * RM_WAIT_ON_JOIN_TIMEOUT_IN_MS milliseconds */
+     * The starter will try to connect to the Resource Manager before killing
+     * itself that means that it will try to connect during
+     * RM_WAIT_ON_JOIN_TIMEOUT_IN_MS milliseconds
+     */
     private static final int RM_WAIT_ON_JOIN_TIMEOUT_IN_MS = 60000;
-    /** The ping delay used in RMPinger that pings the RM and exists if the Resource Manager is down */
+    /**
+     * The ping delay used in RMPinger that pings the RM and exists if the
+     * Resource Manager is down
+     */
     private static final long PING_DELAY = 30000;
     /** The default name of the node */
     private static final String PAAGENT_DEFAULT_NODE_NAME = "PA-AGENT_NODE";
 
+    /** The number of attempts to register to the RM before quitting */
+    private static int NB_OF_REGISTER_ATTEMPTS = 10;
+
+    /** The delay, in milliseconds, between two register attempts */
+    private static int REGISTER_ATTEMPSTS_DELAY = 5000;
+
+    /** The node to be registered in RM */
+    private Node localNode;
+
+    private RMAdmin admin;
+
     /**
      * Creates a new instance of this class and calls registersInRm method. The
      * arguments must be as follows: arg[0] = username, arg[1] = password,
-     * arg[2] = rmUrl, arg[3] = nodeName (optional), args[4] = nodeSourceName (optional)
+     * arg[2] = rmUrl, arg[3] = nodeName (optional), args[4] = nodeSourceName
+     * (optional)
      * 
      * @param args
      *            The arguments needed to join the Resource Manager
@@ -86,28 +101,47 @@ public final class PAAgentServiceRMStarter {
         final String nsName = (args.length >= 5 ? args[4] : null);
         // Use given args
         final PAAgentServiceRMStarter starter = new PAAgentServiceRMStarter();
-        if (starter.registerInRM(username, password, rmUrl, nodename, nsName)) {
-            System.out.println("Connected to the Resource Manager at " + rmUrl + "\n");
-        } else {
-            System.out.println("The Resource Manager at " + rmUrl +
-                " is unreachable ! The application will exit.");
+
+        if (!starter.startLocalNode(nodename)) {
+            System.out.println("Local node could not be created. Application will exit. ");
             System.exit(1);
         }
+
+        boolean registered = false;
+        int register_attempts = 0;
+
+        while ((!registered) && (register_attempts < NB_OF_REGISTER_ATTEMPTS)) {
+            register_attempts++;
+            registered = starter.registerInRM(username, password, rmUrl, nsName);
+
+            if (registered) {
+                System.out.println("Connected to the Resource Manager at " + rmUrl + "\n");
+            } else { // not yet registered
+                System.out.println("Attempt number " + register_attempts + " out of " +
+                    NB_OF_REGISTER_ATTEMPTS + " to register to the Resource Manager at " + rmUrl +
+                    " has failed.");
+                try {
+                    Thread.sleep(REGISTER_ATTEMPSTS_DELAY);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }// while
+
+        if (!registered) {
+            System.out.println("The Resource Manager at " + " is unreachable ! " + NB_OF_REGISTER_ATTEMPTS +
+                " attempts have been performed. The application will exit.");
+            System.exit(1);
+        }// if not registered
     }
 
-    /**
-     * Registers a in ResourceManager at given URL in parameter and handles all
-     * errors/exceptions. Tries to joins the Resource Manager with a specified
-     * timeout then logs as admin with the provided username and password and
-     * adds the created node to the Resource Manager
-     */
-    private boolean registerInRM(final String username, final String password, final String rmUrl,
-            final String nodename, final String nodeSourceName) {
-        // 1 - Create a node on localhost
-        Node n = null;
+    /**Creates a node on localhost
+     * */
+    private boolean startLocalNode(final String nodename) {
         try {
-            n = NodeFactory.createLocalNode(nodename, false, null, null, null);
-            if (n == null) {
+            localNode = NodeFactory.createLocalNode(nodename, false, null, null, null);
+            if (localNode == null) {
                 throw new RuntimeException("The node returned by the NodeFactory is null");
             }
         } catch (Throwable t) {
@@ -115,6 +149,19 @@ public final class PAAgentServiceRMStarter {
             t.printStackTrace();
             return false;
         }
+        return true;
+
+    }
+
+    /**
+     * Registers the local node in the ResourceManager at given URL in parameter and handles all
+     * errors/exceptions. Tries to joins the Resource Manager with a specified
+     * timeout then logs as admin with the provided username and password and
+     * adds the created node to the Resource Manager
+     */
+    private boolean registerInRM(final String username, final String password, final String rmUrl,
+            final String nodeSourceName) {
+
         // Create the full url to contact the Resource Manager
         final String fullUrl = rmUrl.endsWith("/") ? rmUrl + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION
                 : rmUrl + "/" + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
@@ -131,29 +178,30 @@ public final class PAAgentServiceRMStarter {
             return false;
         }
         // 3 - Log as admin with the provided username and password
-        RMAdmin admin = null;
-        try {
-            Credentials creds = Credentials.createCredentials(username, password, auth.getPublicKey());
-            admin = auth.logAsAdmin(creds);
-            if (admin == null) {
-                throw new RuntimeException("The RMAdmin instance is null");
+        if (admin == null)
+            try {
+                Credentials creds = Credentials.createCredentials(username, password, auth.getPublicKey());
+                admin = auth.logAsAdmin(creds);
+                if (admin == null) {
+                    throw new RuntimeException("The RMAdmin instance is null");
+                }
+            } catch (Throwable t) {
+                System.out.println("Could not log as admin into the Resource Manager at " + rmUrl);
+                t.printStackTrace();
+                return false;
             }
-        } catch (Throwable t) {
-            System.out.println("Could not log as admin into the Resource Manager at " + rmUrl);
-            t.printStackTrace();
-            return false;
-        }
+
         // 4 - Add the created node to the Resource Manager
         try {
             BooleanWrapper result;
             if (nodeSourceName != null) {
-                result = admin.addNode(n.getNodeInformation().getURL(), nodeSourceName);
+                result = admin.addNode(localNode.getNodeInformation().getURL(), nodeSourceName);
             } else {
-                result = admin.addNode(n.getNodeInformation().getURL());
+                result = admin.addNode(localNode.getNodeInformation().getURL());
             }
 
             if (result.booleanValue()) {
-                System.out.println("Node " + n.getNodeInformation().getURL() + " added");
+                System.out.println("Node " + localNode.getNodeInformation().getURL() + " added");
             }
 
         } catch (AddingNodesException ex) {
