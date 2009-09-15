@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.crypto.Credentials.CredData;
 import org.ow2.proactive.resourcemanager.gui.dialog.CreateSourceDialog;
 import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -248,25 +248,29 @@ public class ConfigurablePanel extends Group {
 
     public Object[] getParameters() throws IOException {
         List<Object> params = new ArrayList<Object>();
-        Credentials.CredData cdata = new Credentials.CredData();
+        String previous = null;
+        
         for (Property p : properties) {
             if (p.isFile) {
                 params.add(FileToBytesConverter.convertFileToByteArray(new File(p.getValue())));
             } else if (p.isLogin) {
-                cdata.login = p.getValue();
+                previous = p.getValue();
             } else if (p.isPassword) {
-                if (cdata.login != null) {
+                if (previous != null) {
+                    CredData cdata = new CredData();
+                    cdata.login = previous;
                     cdata.pass = p.getValue();
                     params.add(cdata);
+                    previous = null;
                 } else {
                 	// no login field before password field
                 	params.add(p.getValue());
                 }
-            } else if (cdata.login != null) {
+            } else if (previous != null) {
             	// login field was not followed by password field
-            	params.add(cdata.login);
+            	params.add(previous);
             	params.add(p.getValue());
-            	cdata.login = null;
+            	previous = null;
             } else {
                 params.add(p.getValue());
             }
