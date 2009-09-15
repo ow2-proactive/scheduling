@@ -29,15 +29,17 @@ public class RMMonitorEventReceiver implements RMEventListener {
     }
 
     public void nodeEvent(RMNodeEvent event) {
-        System.out.println("RMMonitorEventReceiver.nodeEvent()");
+        System.out.println("Event: " + event);
         monitorsHandler.handleNodeEvent(event);
     }
 
     public void nodeSourceEvent(RMNodeSourceEvent event) {
+        System.out.println("Event: " + event);
         monitorsHandler.handleNodesourceEvent(event);
     }
 
     public void rmEvent(RMEvent event) {
+        System.out.println("Event: " + event);
         monitorsHandler.handleSchedulerStateEvent(event.getEventType());
     }
 

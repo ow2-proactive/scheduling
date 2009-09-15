@@ -405,6 +405,19 @@ public class RMTHelper {
     }
 
     /**
+     * Kills the node with specified url
+     * @param url of the node
+     * @throws NodeException if node cannot be looked up
+     */
+    public static void killNode(String url) throws NodeException {
+        Node node = NodeFactory.getNode(url);
+        try {
+            node.getProActiveRuntime().killRT(false);
+        } catch (Exception e) {
+        }
+    }
+
+    /**
      * Wait for an event on any node: added, removed....
      * If a corresponding event has been already thrown by RM, returns immediately,
      * otherwise wait for reception of the corresponding event.

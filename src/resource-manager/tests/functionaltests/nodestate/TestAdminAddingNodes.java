@@ -120,11 +120,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
         assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
         //kill the node
-        Node node2 = NodeFactory.getNode(node2URL);
-        try {
-            node2.getProActiveRuntime().killRT(false);
-        } catch (Exception e) {
-        }
+        RMTHelper.killNode(node2URL);
 
         RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
 
@@ -149,25 +145,25 @@ public class TestAdminAddingNodes extends FunctionalTest {
         RMTHelper.log("Test 4");
 
         //put a large ping frequency in order to avoid down nodes detection
-        admin.setDefaultNodeSourcePingFrequency(100000);
+        admin.setDefaultNodeSourcePingFrequency(Integer.MAX_VALUE);
 
         //wait the end of last ping sequence
         Thread.sleep(PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt() + 500);
 
         //node2 is free, kill the node
-        node2 = NodeFactory.getNode(node2URL);
-        try {
-            node2.getProActiveRuntime().killRT(false);
-        } catch (Exception e) {
-        }
+        RMTHelper.killNode(node2URL);
 
         //create another node with the same URL, and add it to Resource manager
-
         RMTHelper.createNode(node2Name);
         admin.addNode(node2URL);
 
         //wait for removal of the previous free node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
+        try {
+            NodeFactory.getNode(node2URL);
+        } catch (Exception e) {
+            assertTrue("Runtime of the new node was killed", false);
+        }
 
         //wait the node added event, node added is free
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
@@ -188,11 +184,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
         Assert.assertEquals(admin.getFreeNodesNumber().intValue(), 0);
 
         //node2 is busy, kill the node
-        node2 = NodeFactory.getNode(node2URL);
-        try {
-            node2.getProActiveRuntime().killRT(false);
-        } catch (Exception e) {
-        }
+        RMTHelper.killNode(node2URL);
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
@@ -200,6 +192,11 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //wait for removal of the previous free node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
+        try {
+            NodeFactory.getNode(node2URL);
+        } catch (Exception e) {
+            assertTrue("Runtime of the new node was killed", false);
+        }
 
         //wait the node added event, node added is free
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
@@ -230,11 +227,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
         assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         //node2 is to release, kill the node
-        node2 = NodeFactory.getNode(node2URL);
-        try {
-            node2.getProActiveRuntime().killRT(false);
-        } catch (Exception e) {
-        }
+        RMTHelper.killNode(node2URL);
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
@@ -242,6 +235,11 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //wait for removal of the previous down node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
+        try {
+            NodeFactory.getNode(node2URL);
+        } catch (Exception e) {
+            assertTrue("Runtime of the new node was killed", false);
+        }
 
         //wait the node added event, node added is free
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
@@ -252,17 +250,15 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //add the same node twice and check that RM will not kill the node. If it does
         //second attempt will fail
-        admin.addNode(node2URL);
         BooleanWrapper result = admin.addNode(node2URL);
-        if (!result.booleanValue()) {
-            assertTrue("Cannot add the same node twice", false);
+        if (result.booleanValue()) {
+            assertTrue("Successfully added the same node twice - incorrect", false);
         }
 
         boolean timeouted = false;
         try {
             RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL, 5000);
         } catch (ProActiveTimeoutException e) {
-            // TODO Auto-generated catch block
             timeouted = true;
         }
 

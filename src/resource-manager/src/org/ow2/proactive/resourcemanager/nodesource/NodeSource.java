@@ -211,25 +211,46 @@ public class NodeSource implements InitActive {
             throw new AddingNodesException(e);
         }
 
-        // Known URL, so do some cleanup before replacing it
-        boolean isDown = false;
-        if (nodes.containsKey(nodeUrl) || (isDown = downNodes.containsKey(nodeUrl))) {
-            /**
-             *  two potential scenario
-             *  - adding the node with the same url which was restarted. In this case it's the different node from
-             *    proactive point of view. So remove old node from everywhere and add new one.
-             *  - adding the same node twice. Do not do any actions in this case.
-             */
-            Node registeredNode = isDown ? downNodes.get(nodeUrl) : nodes.get(nodeUrl);
-            if (nodeToAdd != null && nodeToAdd.equals(registeredNode)) {
-                logger.warn("The node " + nodeUrl + " already exist");
-                return new BooleanWrapper(true);
-            }
+        // cannot lookup node
+        if (nodeToAdd == null) {
+            throw new AddingNodesException("Cannot lookup node " + nodeUrl);
+        }
 
+        // the node with specified url was successfully looked up
+        // now checking if this node has been registered before in the node source
+        if (downNodes.containsKey(nodeUrl)) {
+            // it was registered but detected as down node,
+            // so basically the node was restarted.
+            // adding a new node and removing old one from the down list
+            logger.debug("Removing existing node from down nodes list");
             BooleanWrapper result = rmcore.internalRemoveNodeFromCore(nodeUrl);
             if (result.booleanValue()) {
                 logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
-                this.removeNode(nodeUrl, false);
+                // just removing it from down nodes list
+                removeNode(nodeUrl, false);
+            }
+        } else if (nodes.containsKey(nodeUrl)) {
+            // adding a node which exists in node source
+
+            Node existingNode = nodes.get(nodeUrl);
+
+            if (nodeToAdd.equals(existingNode)) {
+                // adding the same node twice
+                // don't do anything
+                logger.debug("An attempt to add the same node twice " + nodeUrl + " - ignoring");
+                return new BooleanWrapper(false);
+            } else {
+                // adding another node with the same url
+                // replacing the old node by the new one
+                logger
+                        .debug("Removing existing node from the RM without request propagation to the infrastructure manager");
+                BooleanWrapper result = rmcore.internalRemoveNodeFromCore(nodeUrl);
+                if (result.booleanValue()) {
+                    logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
+                    // removing it from the nodes list but don't propagate
+                    // the request the the infrastructure because the restarted node will be killed
+                    nodes.remove(nodeUrl);
+                }
             }
         }
 
@@ -336,7 +357,7 @@ public class NodeSource implements InitActive {
      *
      * @param nodeUrl a url of the node
      * @param timeout to wait in ms
-     * @return node is it was successfully obtained
+     * @return node if it was successfully obtained, null otherwise
      * @throws Exception if node was not looked up
      */
     private Node lookupNode(String nodeUrl, long timeout) throws Exception {
@@ -402,10 +423,9 @@ public class NodeSource implements InitActive {
                 logger.error(e.getCause().getMessage());
             }
         } else {
-            Node downNode = downNodes.get(nodeUrl);
+            Node downNode = downNodes.remove(nodeUrl);
             if (downNode != null) {
                 logger.info("[" + name + "] removing down node : " + nodeUrl);
-                downNodes.remove(downNode);
             } else {
                 logger.error("[" + name + "] removing node : " + nodeUrl +
                     " which is not belong to this node source");
