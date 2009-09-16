@@ -97,12 +97,6 @@ public class EC2Deployer implements java.io.Serializable {
     /** Current number of deployed instances */
     private int currentInstances;
 
-    /** Instances already deployed on an another runtime */
-    private boolean deployed;
-
-    /** If we want to force to kill instances */
-    private boolean bound;
-
     /** Url of the RM, from the instance's viewpoint */
     private String rmUrl;
 
@@ -131,8 +125,6 @@ public class EC2Deployer implements java.io.Serializable {
     public EC2Deployer() {
         this.instanceIds = new ArrayList<String>();
         this.active = false;
-        this.deployed = false;
-        this.bound = true;
         this.minInstances = 1;
         this.maxInstances = 1;
         this.instanceType = InstanceType.DEFAULT;
@@ -254,11 +246,9 @@ public class EC2Deployer implements java.io.Serializable {
     /**
      * Gets a set of instances
      *
-     * @param mine
-     *            Get only mine
      * @return a set of instances
      */
-    public List<Instance> getInstances(boolean mine) {
+    public List<Instance> getInstances() {
 
         Jec2 ec2req = getEC2Wrapper();
 
@@ -269,27 +259,11 @@ public class EC2Deployer implements java.io.Serializable {
         List<ReservationDescription> res = null;
         List<Instance> instances = new ArrayList<Instance>();
 
-        if (mine) {
-            try {
-                res = ec2req.describeInstances(params);
-            } catch (EC2Exception e) {
-                logger.error("Unable to get instances list: " + e.getCause());
-                return null;
-            } catch (Exception e) {
-                logger.error("Unable to get instances list: " + e.getCause());
-                return null;
-            }
-        } else {
-            try {
-                String pp[] = new String[instanceIds.size()];
-                for (int i = 0; i < instanceIds.size(); i++) {
-                    pp[i] = instanceIds.get(i);
-                }
-                res = ec2req.describeInstances(params);
-            } catch (EC2Exception e) {
-                logger.error("Unable to get instances list", e);
-                return null;
-            }
+        try {
+            res = ec2req.describeInstances(params);
+        } catch (EC2Exception e) {
+            logger.error("Unable to get instances list", e);
+            return null;
         }
 
         for (ReservationDescription rdesc : res) {
@@ -300,15 +274,34 @@ public class EC2Deployer implements java.io.Serializable {
     }
 
     /**
+     * Attempts to terminate all instances deployed by this EC2Deployer
+     * 
+     * @return the number of terminated instances
+     */
+    public int terminateAll() {
+        Jec2 ec2req = getEC2Wrapper();
+        int t = 0;
+        for (String id : this.instanceIds) {
+            try {
+                ec2req.terminateInstances(new String[] { id });
+                logger.debug("Successfully terminated orphan EC2 node: " + id);
+                t++;
+            } catch (EC2Exception e) {
+            }
+        }
+        return t;
+    }
+
+    /**
      * Launch a new instance with the provided AMI id
      *
      * @param imageId
      *            an unique AMI id
-     * @return true on success, false otherwise
+     * @return the Reservation's id
      * @throws ProActiveException
      *             acquisition failed
      */
-    public boolean runInstances(String imageId) throws ProActiveException {
+    public String runInstances(String imageId) throws ProActiveException {
         return this.runInstances(this.minInstances, this.maxInstances, imageId);
     }
 
@@ -321,16 +314,15 @@ public class EC2Deployer implements java.io.Serializable {
      *            maximal number of instances to deploy
      * @param imageId
      *            an unique AMI id
-     * @return true on success, false otherwise
+     * @return the Reservation's id
      * @throws ProActiveException
      *             acquisition failed
      */
-    public boolean runInstances(int minNumber, int maxNumber, String imageId) throws ProActiveException {
+    public String runInstances(int minNumber, int maxNumber, String imageId) throws ProActiveException {
         ImageDescription imgd = getAvailableImages(imageId, true);
 
         if (imgd == null) {
-            logger.error("Could not find AMI : " + imageId);
-            return false;
+            throw new ProActiveException("Could not find AMI : " + imageId);
         }
 
         return this.runInstances(minNumber, maxNumber, imgd);
@@ -345,21 +337,16 @@ public class EC2Deployer implements java.io.Serializable {
      *            maximal number of instances to deploy
      * @param imgd
      *            an image description containing AMI id
-     * @return true on success, false otherwise
+     * @return the Reservation's id
      * @throws ProActiveException
      *             acquisition failed
      */
-    public boolean runInstances(int min, int max, ImageDescription imgd) throws ProActiveException {
+    public String runInstances(int min, int max, ImageDescription imgd) throws ProActiveException {
 
         Jec2 ec2req = getEC2Wrapper();
 
         if (ec2req == null)
-            return false;
-
-        if (this.deployed) {
-            logger.debug("Node are deployed from another runtime");
-            return true;
-        }
+            throw new ProActiveException();
 
         if (this.currentInstances + min > this.maxInstances)
             max = this.maxInstances - this.currentInstances;
@@ -383,7 +370,8 @@ public class EC2Deployer implements java.io.Serializable {
 
         try {
             if (imgd.getArchitecture().equals("x86_64")) {
-                if (instanceType != InstanceType.XLARGE && instanceType != InstanceType.XLARGE_HCPU && instanceType!= InstanceType.LARGE) {
+                if (instanceType != InstanceType.XLARGE && instanceType != InstanceType.XLARGE_HCPU &&
+                    instanceType != InstanceType.LARGE) {
                     logger.debug("AMI " + imgd.getImageId() + " is x86_64 Arch," +
                         " forcing Large instance type.");
                     instanceType = InstanceType.LARGE;
@@ -394,14 +382,17 @@ public class EC2Deployer implements java.io.Serializable {
                     new ArrayList<String>(), userData, this.AWS_KPINFO, instanceType);
             int number = rdesc.getInstances().size();
 
-            this.instanceIds.add(rdesc.getRequestId());
+            for (Instance inst : rdesc.getInstances()) {
+                this.instanceIds.add(inst.getInstanceId());
+            }
             currentInstances += number;
 
             logger.debug("Created " + number + " instance" + ((number != 1) ? "s" : ""));
+
+            return rdesc.getRequestId();
         } catch (EC2Exception e) {
             throw new ProActiveException(e);
         }
-        return true;
     }
 
     /**
@@ -421,12 +412,7 @@ public class EC2Deployer implements java.io.Serializable {
         if (ec2req == null)
             return false;
 
-        if (!this.bound) {
-            logger.debug("Instances are not attached to this runtime");
-            return false;
-        }
-
-        List<Instance> instances = this.getInstances(false);
+        List<Instance> instances = this.getInstances();
 
         for (Instance i : instances) {
             try {
@@ -539,7 +525,7 @@ public class EC2Deployer implements java.io.Serializable {
      */
     public String toString() {
         return "EC2Deployer :: " + "User[" + this.AWS_USER + "] " + "Status[" +
-            ((this.active) ? "active" : "unactive") + "] " + "Bound[" + ((this.bound) ? "yes" : "no") + "] ";
+            ((this.active) ? "active" : "unactive") + "] ";
         //  	"Instances[" + this.getInstances(true).size() + "]";
     }
 }

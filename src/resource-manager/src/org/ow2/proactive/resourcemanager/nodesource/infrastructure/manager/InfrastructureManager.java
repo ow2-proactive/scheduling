@@ -102,4 +102,10 @@ public abstract class InfrastructureManager implements Serializable {
      * @throws RMException if any problems occurred
      */
     public abstract void registerAcquiredNode(Node node) throws RMException;
+
+    /**
+     * Notify this infrastructure it is going to be shut down along with
+     * its nodesource. All necessary cleanup should be done here.
+     */
+    public abstract void shutDown();
 }

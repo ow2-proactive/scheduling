@@ -501,6 +501,7 @@ public class NodeSource implements InitActive {
         logger.info("[" + name + "] Shutdown finalization");
 
         nodeSourcePolicy.shutdown();
+        infrastructureManager.shutDown();
 
         try {
             threadPool.shutdown();

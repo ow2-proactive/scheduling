@@ -165,11 +165,6 @@ public class EC2Infrastructure extends InfrastructureManager {
                 logger.debug("Expected File as 1st parameter for EC2Infrastructure: " + e.getMessage());
             }
             String rmu = parameters[1].toString();
-            if (!rmu.matches("(http|rmi|rmissh)[:][/]{2}" + "(([0-9]{1,3}[.]){3}[0-9]{1,3})[:][0-9]+[/]?")) {
-                throw new RMException(
-                    "Expected fully qualified URL for parameter RM Url for EC2Infrastructure.\n"
-                        + "i.e. protocol://IP:port/");
-            }
             String rml = parameters[2].toString();
             String rmp = parameters[3].toString();
             String nodep = parameters[4].toString();
@@ -324,6 +319,20 @@ public class EC2Infrastructure extends InfrastructureManager {
      * {@inheritDoc}
      */
     public void registerAcquiredNode(Node node) throws RMException {
+    }
+
+    /**
+     * Cleanup deployed instances,
+     * so that instances that did not register to the nodesource be removed as well
+     * 
+     * @see org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager#shutDown()
+     */
+    @Override
+    public void shutDown() {
+        int ret = this.ec2d.terminateAll();
+        if (ret > 0) {
+            logger.info("Terminated " + ret + " orphan EC2 nodes.");
+        }
     }
 
 }

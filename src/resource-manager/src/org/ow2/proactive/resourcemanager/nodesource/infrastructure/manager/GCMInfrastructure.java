@@ -338,4 +338,11 @@ public class GCMInfrastructure extends InfrastructureManager {
     public void registerAcquiredNode(Node node) throws RMException {
         nodesCount++;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void shutDown() {
+    }
 }
