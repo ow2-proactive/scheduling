@@ -194,7 +194,23 @@
 		</copy>
     </target>
 	
-	<target name="deploy.common" depends="-deployCopy, compile.common" description="Populate Common dist/ with all needed files">
+	<target name="deploy.common.client" depends="-deployCopy, compile.common" description="Creates common client jar">
+		<jar destfile="${deploy.lib.dir}/${scheduler.common.client.jar}" index="true">
+			<fileset dir="${cl.common.dir}">
+				<include name="org/ow2/proactive/authentication/Loggable.class" />
+				<include name="org/ow2/proactive/authentication/Connection.class" />
+				<include name="org/ow2/proactive/authentication/Authentication.class" />
+				<include name="org/ow2/proactive/authentication/crypto/**" />
+				<include name="org/ow2/proactive/scripting/**" />
+				<include name="org/ow2/proactive/utils/**" />
+			</fileset>
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
+        </jar>
+	</target>
+
+	<target name="deploy.common" depends="-deployCopy, compile.common" description="Creates common core jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.common.jar}" index="true">
 			<fileset dir="${cl.common.dir}" includes="**" />
 			<indexjars>
@@ -203,7 +219,7 @@
         </jar>
 	</target>
 
-	<target name="deploy.rm" depends="-deployCopy, compile.rm, deploy.common" description="Populate Resourcemanager dist/ with all needed files">
+	<target name="deploy.rm" depends="-deployCopy, compile.rm, deploy.common" description="Creates resource manager core jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.rm.jar}" index="true">
 			<fileset dir="${cl.rm.dir}" includes="**" />
 			<indexjars>
@@ -212,7 +228,30 @@
         </jar>
 	</target>
 
-	<target name="deploy.scheduler" depends="-deployCopy, deploy.rm, compile.scheduler"  description="Populate Scheduler and Resource Manager dist/ with all needed files">
+	<target name="deploy.rm.client" depends="-deployCopy, compile.rm, deploy.common.client" description="Creates resource manager client jar">
+		<jar destfile="${deploy.lib.dir}/${scheduler.rm.client.jar}" index="true">
+			<fileset dir="${cl.rm.dir}">
+				<include name="org/ow2/proactive/resourcemanager/authentication/RMAuthentication.class" />
+				<include name="org/ow2/proactive/resourcemanager/common/**" />
+				<include name="org/ow2/proactive/resourcemanager/exception/**" />
+				<include name="org/ow2/proactive/resourcemanager/nodesource/NodeSource.class" />
+				<include name="org/ow2/proactive/resourcemanager/utils/adminconsole/**" />
+				<include name="org/ow2/proactive/resourcemanager/frontend/RMAdmin.class" />
+				<include name="org/ow2/proactive/resourcemanager/frontend/RMConnection.class" />
+				<include name="org/ow2/proactive/resourcemanager/frontend/RMMonitoring.class" />
+				<include name="org/ow2/proactive/resourcemanager/frontend/RMUser.class" />
+				<include name="org/ow2/proactive/resourcemanager/frontend/RMEventListener.class" />
+				<!-- RMNode is needed because it is used in RMNodeEvent-->
+				<include name="org/ow2/proactive/resourcemanager/rmnode/RMNode.class" />
+				<include name="org/ow2/proactive/resourcemanager/nodesource/policy/Configurable.class" />
+			</fileset>
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
+        </jar>
+	</target>
+
+	<target name="deploy.scheduler" depends="-deployCopy, compile.scheduler, deploy.common, deploy.rm"  description="Creates scheduler core jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.core.jar}" manifest="${basedir}/Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
 			<indexjars>
@@ -221,7 +260,7 @@
         </jar>
 	</target>
 
-	<target name="deploy.scheduler.client" depends="deploy.scheduler" description="Generate a client side Scheduler library">
+	<target name="deploy.scheduler.client" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler client jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/Manifest-base.mf" index="true">
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
@@ -233,7 +272,7 @@
 	        </jar>
 	</target>
 
-	<target name="deploy.all" depends="deploy.common, deploy.scheduler, deploy.rm, deploy.scheduler.client, deploy.scheduler.worker" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
+	<target name="deploy.all" depends="deploy.common, deploy.common.client, deploy.scheduler, deploy.rm, deploy.scheduler.client, deploy.scheduler.worker, deploy.rm.client" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
 
 
 	<!-- ************
@@ -437,7 +476,7 @@
 		<delete dir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" />
 	</target>
 
-	<target name="scheduler.libCopy" depends="deploy.all" description="Copy all required libraries to scheduler/rm plugins">
+	<target name="scheduler.libCopy" depends="deploy.rm.client, deploy.scheduler.client" description="Copy all required libraries to scheduler/rm plugins">
 		<copy todir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" includeemptydirs="no">
 			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/><!--,${scheduler.core.jar}, ${scheduler.worker.jar}-->
 		</copy>

@@ -76,7 +76,9 @@
 	<!--  =============================================================== -->
 
 	<property name="scheduler.common.jar"        value="ProActive_SRM-common.jar" />
+	<property name="scheduler.common.client.jar" value="ProActive_SRM-common-client.jar" />
 	<property name="scheduler.rm.jar"            value="ProActive_ResourceManager.jar" />
+	<property name="scheduler.rm.client.jar"     value="ProActive_ResourceManager-client.jar" />
 	<property name="scheduler.core.jar"          value="ProActive_Scheduler-core.jar" />
 	<property name="scheduler.client.jar"        value="ProActive_Scheduler-client.jar" />
 	<property name="scheduler.worker.jar"        value="ProActive_Scheduler-worker.jar" />

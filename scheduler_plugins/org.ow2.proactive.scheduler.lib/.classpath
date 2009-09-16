@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common-client.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-net-1.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-vfs-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jruby-engine.jar"/>
@@ -11,9 +13,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/script-js.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-6.1.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-util-6.1.11.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager.jar" sourcepath="/Proactive-Scheduling-Git"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-client.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ajo.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-2.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/axis.jar"/>
