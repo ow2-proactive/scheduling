@@ -69,15 +69,12 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
      * {@inheritDoc}
      */
     public void shutdown() {
-        if (rmShuttingDown) {
-            // do not try to unregister monitor in this case
-            return;
-        }
-
-        try {
-            rmMonitoring.removeRMEventListener();
-        } catch (RMException e) {
-            e.printStackTrace();
+        if (!rmShuttingDown) {
+            try {
+                rmMonitoring.removeRMEventListener();
+            } catch (RMException e) {
+                e.printStackTrace();
+            }
         }
         super.shutdown();
     }
