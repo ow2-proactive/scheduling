@@ -249,7 +249,7 @@ public class ConfigurablePanel extends Group {
     public Object[] getParameters() throws IOException {
         List<Object> params = new ArrayList<Object>();
         String previous = null;
-        
+
         for (Property p : properties) {
             if (p.isFile) {
                 params.add(FileToBytesConverter.convertFileToByteArray(new File(p.getValue())));
@@ -263,14 +263,14 @@ public class ConfigurablePanel extends Group {
                     params.add(cdata);
                     previous = null;
                 } else {
-                	// no login field before password field
-                	params.add(p.getValue());
+                    // no login field before password field
+                    params.add(p.getValue());
                 }
             } else if (previous != null) {
-            	// login field was not followed by password field
-            	params.add(previous);
-            	params.add(p.getValue());
-            	previous = null;
+                // login field was not followed by password field
+                params.add(previous);
+                params.add(p.getValue());
+                previous = null;
             } else {
                 params.add(p.getValue());
             }
