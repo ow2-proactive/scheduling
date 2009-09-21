@@ -36,9 +36,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.rmi.dgc.VMID;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
@@ -50,6 +55,8 @@ import org.ow2.proactive.resourcemanager.nodesource.ec2.EC2Deployer;
 import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
+
+import com.xerox.amazonws.ec2.ReservationDescription.Instance;
 
 
 /**
@@ -86,6 +93,16 @@ public class EC2Infrastructure extends InfrastructureManager {
      */
     protected EC2Deployer ec2d;
 
+    /** used to schedule the instance timeout checker */
+    private transient Timer timer = null;
+    /** requested instances waiting for the timeout checker's confirmation */
+    private List<Instance> instances = new ArrayList<Instance>();
+
+    /** delay after which a requested EC2 instance is considered lost in ms */
+    private static final long timeoutDelay = 60000 * 45; // 45mn
+    /** timeout checker frequency in ms */
+    private static final long timeoutCheckerFreq = 60000 * 10; // 10mn
+
     /**
      * Image descriptor to use will try the first available if null
      */
@@ -105,17 +122,24 @@ public class EC2Infrastructure extends InfrastructureManager {
      * {@inheritDoc}
      */
     public void acquireAllNodes() {
-        if (ec2d.canGetMoreNodes()) {
-            try {
-                int num = ec2d.getMaxInstances() - ec2d.getCurrentInstances();
-                ec2d.setNsName(nodeSource.getName());
-                ec2d.runInstances(imgd);
-                logger.info("Successfully acquired " + num + " EC2 instance" + ((num > 1) ? "s" : ""));
-            } catch (Exception e) {
-                logger.error("Unable to acquire all EC2 instances", e);
+        if (timer == null) {
+            timer = new Timer(true);
+            timer.schedule(new NodeChecker(), timeoutCheckerFreq, timeoutCheckerFreq);
+        }
+
+        synchronized (this.ec2d) {
+            if (ec2d.canGetMoreNodes()) {
+                try {
+                    int num = ec2d.getMaxInstances() - ec2d.getCurrentInstances();
+                    ec2d.setNsName(nodeSource.getName());
+                    this.instances.addAll(ec2d.runInstances(imgd));
+                    logger.info("Successfully acquired " + num + " EC2 instance" + ((num > 1) ? "s" : ""));
+                } catch (Exception e) {
+                    logger.error("Unable to acquire all EC2 instances", e);
+                }
+            } else {
+                logger.info("Maximum simultaneous EC2 reservations already attained");
             }
-        } else {
-            logger.info("Maximum simultaneous EC2 reservations already attained");
         }
     }
 
@@ -123,17 +147,24 @@ public class EC2Infrastructure extends InfrastructureManager {
      * {@inheritDoc}
      */
     public void acquireNode() {
-        if (ec2d.canGetMoreNodes()) {
-            try {
-                this.ec2d.setNsName(nodeSource.getName());
-                ec2d.runInstances(1, 1, imgd);
-                logger.info("Successfully acquired an EC2 instance");
-                return;
-            } catch (Exception e) {
-                logger.error("Unable to acquire EC2 instance", e);
+        if (timer == null) {
+            timer = new Timer(true);
+            timer.schedule(new NodeChecker(), timeoutCheckerFreq, timeoutCheckerFreq);
+        }
+
+        synchronized (this.ec2d) {
+            if (ec2d.canGetMoreNodes()) {
+                try {
+                    this.ec2d.setNsName(nodeSource.getName());
+                    this.instances.addAll(ec2d.runInstances(1, 1, imgd));
+                    logger.info("Successfully acquired an EC2 instance");
+                    return;
+                } catch (Exception e) {
+                    logger.error("Unable to acquire EC2 instance", e);
+                }
+            } else {
+                logger.info("Maximum simultaneous EC2 reservations already attained");
             }
-        } else {
-            logger.info("Maximum simultaneous EC2 reservations already attained");
         }
     }
 
@@ -179,6 +210,7 @@ public class EC2Infrastructure extends InfrastructureManager {
             }
 
             this.ec2d.setUserData(rmu, rml, rmp, nodep);
+
         }
         /**
          * missing or absent parameters, aborting
@@ -193,26 +225,26 @@ public class EC2Infrastructure extends InfrastructureManager {
      */
     public void removeNode(Node node, boolean forever) throws RMException {
 
-        String hostname = node.getVMInformation().getHostName();
-        String ip = node.getVMInformation().getInetAddress().getHostAddress();
+        synchronized (this.ec2d) {
 
-        if (!isThereNodesInSameJVM(node)) {
+            InetAddress addr = node.getVMInformation().getInetAddress();
+            if (!isThereNodesInSameJVM(node)) {
+                logger.info("No node left, closing instance on URL :" + addr.toString());
 
-            logger.info("No node left, closing instance on URL :" + hostname + "/" + ip);
+                if (this.ec2d.terminateInstanceByAddr(addr)) {
+                    logger.info("Instance closed: " + addr.toString());
+                    return;
+                } else {
+                    logger.error("Could not close instance: " + addr.toString());
+                }
 
-            if (this.ec2d.terminateInstanceByAddr(hostname, ip)) {
-                logger.info("Instance closed: " + hostname + "/" + ip);
-                return;
             } else {
-                logger.error("Could not close instance: " + hostname + "/" + ip);
-            }
-
-        } else {
-            try {
-                node.getProActiveRuntime().killNode(node.getNodeInformation().getName());
-            } catch (ProActiveException e) {
-                logger.error("Could not kill node: " + node.getNodeInformation().getName() + " on " +
-                    hostname + "/" + ip);
+                try {
+                    node.getProActiveRuntime().killNode(node.getNodeInformation().getName());
+                } catch (ProActiveException e) {
+                    logger.error("Could not kill node: " + node.getNodeInformation().getName() + " on " +
+                        addr.toString());
+                }
             }
         }
     }
@@ -319,6 +351,30 @@ public class EC2Infrastructure extends InfrastructureManager {
      * {@inheritDoc}
      */
     public void registerAcquiredNode(Node node) throws RMException {
+        synchronized (this.ec2d) {
+            InetAddress nodeAddr = node.getVMInformation().getInetAddress();
+            List<Instance> ic = new ArrayList<Instance>();
+            ic.addAll(instances);
+
+            for (Instance inst : ic) {
+                try {
+                    String ec2Host = this.ec2d.getInstanceHostname(inst.getInstanceId());
+                    if (ec2Host.equals("")) {
+                        continue;
+                    }
+                    InetAddress ec2Addr = InetAddress.getByName(ec2Host);
+                    if (nodeAddr.equals(ec2Addr)) {
+                        instances.remove(inst);
+                        logger.info("Found requested EC2 instance: " + nodeAddr.toString());
+                        return;
+                    }
+                } catch (Exception e) {
+                    logger.error("Could not check node " + node.getNodeInformation().getURL() + ": " +
+                        e.getMessage());
+                }
+            }
+            logger.warn("New node " + nodeAddr.toString() + " was not a requested EC2 instance.");
+        }
     }
 
     /**
@@ -329,10 +385,49 @@ public class EC2Infrastructure extends InfrastructureManager {
      */
     @Override
     public void shutDown() {
-        int ret = this.ec2d.terminateAll();
-        if (ret > 0) {
-            logger.info("Terminated " + ret + " orphan EC2 nodes.");
+        timer.cancel();
+
+        synchronized (this.ec2d) {
+
+            int ret = this.ec2d.terminateAll();
+            if (ret > 0) {
+                logger.info("Terminated " + ret + " EC2 nodes.");
+            }
+
         }
     }
 
+    /**
+     * Checks requested EC2 instances successfully register to the nodesource
+     * before a given timeout period. Terminate the EC2 instance and redeploy 
+     * one to keep the nodesource's state consistent if a timeout is detected
+     */
+    private class NodeChecker extends TimerTask {
+
+        @Override
+        public void run() {
+            int redeploy = 0;
+
+            synchronized (ec2d) {
+                List<Instance> ic = new ArrayList<Instance>();
+                ic.addAll(instances);
+                for (Instance inst : ic) {
+                    long t1 = inst.getLaunchTime().getTimeInMillis();
+                    long t2 = System.currentTimeMillis();
+                    // this time difference is wildly inaccurate: t1 depends on amazon's clock, t2 the RM's
+                    if (t2 - t1 > timeoutDelay) {
+                        logger.info("Instance " + inst.getInstanceId() + " timed out, terminating.");
+                        ec2d.terminateInstance(inst);
+                        instances.remove(inst);
+                        redeploy++;
+
+                    }
+                }
+            }
+            while (redeploy > 0) {
+                acquireNode();
+                redeploy--;
+            }
+        }
+    }
 }

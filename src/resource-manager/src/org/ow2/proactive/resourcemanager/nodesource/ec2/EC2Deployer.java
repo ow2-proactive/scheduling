@@ -274,6 +274,34 @@ public class EC2Deployer implements java.io.Serializable {
     }
 
     /**
+     * Returns the hostname of a running instance
+     * If the instance is not running, will return an empty string
+     * 
+     * @param id the unique id of the instance
+     * @return the hostname of the running instance corresponding to the id, 
+     *         or an empty string
+     */
+    public String getInstanceHostname(String id) {
+        Jec2 ec2req = getEC2Wrapper();
+
+        if (ec2req == null)
+            return "";
+
+        try {
+            for (ReservationDescription desc : ec2req.describeInstances(new String[] {})) {
+                for (Instance inst : desc.getInstances()) {
+                    if (id.equals(inst.getInstanceId())) {
+                        return inst.getDnsName();
+                    }
+                }
+            }
+        } catch (EC2Exception e) {
+            return "";
+        }
+        return "";
+    }
+
+    /**
      * Attempts to terminate all instances deployed by this EC2Deployer
      * 
      * @return the number of terminated instances
@@ -301,7 +329,7 @@ public class EC2Deployer implements java.io.Serializable {
      * @throws ProActiveException
      *             acquisition failed
      */
-    public String runInstances(String imageId) throws ProActiveException {
+    public List<Instance> runInstances(String imageId) throws ProActiveException {
         return this.runInstances(this.minInstances, this.maxInstances, imageId);
     }
 
@@ -318,7 +346,8 @@ public class EC2Deployer implements java.io.Serializable {
      * @throws ProActiveException
      *             acquisition failed
      */
-    public String runInstances(int minNumber, int maxNumber, String imageId) throws ProActiveException {
+    public List<Instance> runInstances(int minNumber, int maxNumber, String imageId)
+            throws ProActiveException {
         ImageDescription imgd = getAvailableImages(imageId, true);
 
         if (imgd == null) {
@@ -341,7 +370,7 @@ public class EC2Deployer implements java.io.Serializable {
      * @throws ProActiveException
      *             acquisition failed
      */
-    public String runInstances(int min, int max, ImageDescription imgd) throws ProActiveException {
+    public List<Instance> runInstances(int min, int max, ImageDescription imgd) throws ProActiveException {
 
         Jec2 ec2req = getEC2Wrapper();
 
@@ -389,10 +418,27 @@ public class EC2Deployer implements java.io.Serializable {
 
             logger.debug("Created " + number + " instance" + ((number != 1) ? "s" : ""));
 
-            return rdesc.getRequestId();
+            return rdesc.getInstances();
         } catch (EC2Exception e) {
             throw new ProActiveException(e);
         }
+    }
+
+    /**
+     * Terminate a running instance
+     * 
+     * @param inst the instance to terminate
+     * @return true upon success, or false
+     */
+    public boolean terminateInstance(Instance inst) {
+        String host = getInstanceHostname(inst.getInstanceId());
+        InetAddress addr = null;
+        try {
+            addr = InetAddress.getByName(host);
+        } catch (UnknownHostException e) {
+            return false;
+        }
+        return terminateInstanceByAddr(addr);
     }
 
     /**
@@ -405,8 +451,7 @@ public class EC2Deployer implements java.io.Serializable {
      *
      * @return True on success, false otherwise
      */
-    public boolean terminateInstanceByAddr(String hostname, String ip) {
-
+    public boolean terminateInstanceByAddr(InetAddress addr) {
         Jec2 ec2req = getEC2Wrapper();
 
         if (ec2req == null)
@@ -416,9 +461,8 @@ public class EC2Deployer implements java.io.Serializable {
 
         for (Instance i : instances) {
             try {
-                String inetAddr = InetAddress.getByName(i.getDnsName()).getHostAddress();
-
-                if (ip.equals(inetAddr) || hostname.equals(inetAddr)) {
+                InetAddress inetAddr = InetAddress.getByName(i.getDnsName());
+                if (inetAddr.equals(addr)) {
                     try {
                         ec2req.terminateInstances(new String[] { i.getInstanceId() });
                         this.currentInstances--;
@@ -432,9 +476,7 @@ public class EC2Deployer implements java.io.Serializable {
             } catch (UnknownHostException e1) {
                 logger.error("Unable to resolve instance Inet Address: " + i.getDnsName(), e1);
             }
-
         }
-
         return false;
     }
 
