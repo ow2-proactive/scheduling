@@ -173,8 +173,9 @@ public class AdminController extends UserController {
 
     protected void connectJMXClient() throws JMXProviderException {
         try {
-            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(
-		auth.getJmxMonitoringUrl());
+            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(auth
+                    .getJmxMonitoringUrl() +
+                "_admin");
             cli.connect(credentials, user);
             MBeanServerConnection conn = cli.getConnection();
             ObjectName on = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean_admin");

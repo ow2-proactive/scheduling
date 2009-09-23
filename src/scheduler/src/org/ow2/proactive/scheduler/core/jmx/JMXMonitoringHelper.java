@@ -31,6 +31,9 @@
  */
 package org.ow2.proactive.scheduler.core.jmx;
 
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.server.ExportException;
 import java.util.Set;
 
 import javax.management.MBeanServer;
@@ -77,19 +80,18 @@ public class JMXMonitoringHelper implements SchedulerEventListener {
     private static String DEFAULT_JMX_CONNECTOR_URL = null;
 
     public static String getDefaultJmxConnectorUrl() {
-	if (DEFAULT_JMX_CONNECTOR_URL == null){
-		String hostname = "localhost";
-		try {
-			hostname = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()).getVMInformation().getHostName();
-		} catch (Throwable t){
-			logger_dev.warn("Cannot set host name in JMX default connector URL",t);
-		}
-		DEFAULT_JMX_CONNECTOR_URL =
-			"service:jmx:rmi:///jndi/rmi://" +
-			hostname + ":" +
-			PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt() + "/";
-	}
-	return DEFAULT_JMX_CONNECTOR_URL;
+        if (DEFAULT_JMX_CONNECTOR_URL == null) {
+            String hostname = "localhost";
+            try {
+                hostname = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis())
+                        .getVMInformation().getHostName();
+            } catch (Throwable t) {
+                logger_dev.warn("Cannot set host name in JMX default connector URL", t);
+            }
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi:///jndi/rmi://" + hostname + ":" +
+                PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt() + "/";
+        }
+        return DEFAULT_JMX_CONNECTOR_URL;
     }
 
     /** Scheduler's MBean */
@@ -126,6 +128,16 @@ public class JMXMonitoringHelper implements SchedulerEventListener {
      * method to create the MBeanServer Connectors for the Scheduler and to start them
      */
     public void createConnectors(AuthenticationImpl authentication) {
+        try {
+            LocateRegistry.createRegistry(PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt());
+        } catch (ExportException ee) {
+            //do nothing but continue starting JMX
+        } catch (RemoteException e) {
+            logger_dev.error("JMX : Cannot create registry on port " +
+                PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt(), e);
+            //do not start JMX service
+            return;
+        }
         // Reference to the JMX Scheduler Connector Server Using the RMI Protocol 
         PAAuthenticationConnectorServer rmiConnectorAnonym;
         PAAuthenticationConnectorServer rmiConnectorAdmin;

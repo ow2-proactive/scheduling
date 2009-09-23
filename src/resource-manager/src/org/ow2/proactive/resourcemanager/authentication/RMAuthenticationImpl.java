@@ -168,10 +168,11 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         return PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString();
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getJmxMonitoringUrl() {
-		return JMXMonitoringHelper.getDefaultJmxConnectorUrl() + PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME.getValueAsString();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public String getJmxMonitoringUrl() {
+        return JMXMonitoringHelper.getDefaultJmxConnectorUrl() +
+            PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME.getValueAsString();
+    }
 }

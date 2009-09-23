@@ -42,6 +42,7 @@ import java.security.PublicKey;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import javax.management.remote.JMXProviderException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.AlreadySelectedException;
@@ -58,7 +59,6 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -244,7 +244,7 @@ public class AdminController {
                 //connect to the scheduler
                 connect();
                 //connect JMX service
-                connectJMXClient(URIBuilder.getHostNameFromUrl(url));
+                connectJMXClient();
                 //start the command line or the interactive mode
                 start();
 
@@ -297,16 +297,17 @@ public class AdminController {
         logger.info("\t-> Admin " + userStr + " successfully connected" + newline);
     }
 
-    protected void connectJMXClient(String hostName) {
+    protected void connectJMXClient() throws JMXProviderException {
         try {
-            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(
-                "service:jmx:rmi:///jndi/rmi://" + hostName + "/JMXRMAgent_admin");
+            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(auth
+                    .getJmxMonitoringUrl() +
+                "_admin");
             cli.connect(credentials, user);
             MBeanServerConnection conn = cli.getConnection();
             ObjectName on = new ObjectName("RMFrontend:name=RMBean_admin");
             model.setJMXInfo(new MBeanInfoViewer(conn, on));
         } catch (Exception e) {
-            logger.error("Error while connection JMX : ", e);
+            logger.error("Error while connecting JMX : ", e);
         }
     }
 

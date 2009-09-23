@@ -294,8 +294,8 @@ public class UserController {
 
     protected void connectJMXClient() throws JMXProviderException {
         try {
-            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(
-		auth.getJmxMonitoringUrl());
+            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(auth
+                    .getJmxMonitoringUrl());
             cli.connect(credentials, user);
             MBeanServerConnection conn = cli.getConnection();
             ObjectName on = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean");

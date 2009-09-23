@@ -218,10 +218,11 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         return PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString();
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getJmxMonitoringUrl() {
-		return JMXMonitoringHelper.getDefaultJmxConnectorUrl() + PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME.getValueAsString();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public String getJmxMonitoringUrl() {
+        return JMXMonitoringHelper.getDefaultJmxConnectorUrl() +
+            PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME.getValueAsString();
+    }
 }

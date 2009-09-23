@@ -32,6 +32,9 @@
 package org.ow2.proactive.resourcemanager.core.jmx;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.server.ExportException;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -69,19 +72,18 @@ public class JMXMonitoringHelper implements Serializable {
     private static String DEFAULT_JMX_CONNECTOR_URL;
 
     public static String getDefaultJmxConnectorUrl() {
-	if (DEFAULT_JMX_CONNECTOR_URL == null){
-		String hostname = "localhost";
-		try {
-			hostname = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()).getVMInformation().getHostName();
-		} catch (Throwable t){
-			logger.warn("Cannot set host name in JMX default connector URL",t);
-		}
-		DEFAULT_JMX_CONNECTOR_URL =
-			"service:jmx:rmi:///jndi/rmi://" +
-			hostname + ":" +
-			PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + "/";
-	}
-	return DEFAULT_JMX_CONNECTOR_URL;
+        if (DEFAULT_JMX_CONNECTOR_URL == null) {
+            String hostname = "localhost";
+            try {
+                hostname = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis())
+                        .getVMInformation().getHostName();
+            } catch (Throwable t) {
+                logger.warn("Cannot set host name in JMX default connector URL", t);
+            }
+            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi:///jndi/rmi://" + hostname + ":" +
+                PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + "/";
+        }
+        return DEFAULT_JMX_CONNECTOR_URL;
     }
 
     /** RM`s MBeanServer */
@@ -116,6 +118,16 @@ public class JMXMonitoringHelper implements Serializable {
      * method to create the MBeanServer Connectors for the Scheduler and to start them
      */
     public void createConnectors(AuthenticationImpl authentication) {
+        try {
+            LocateRegistry.createRegistry(PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt());
+        } catch (ExportException ee) {
+            //do nothing but continue starting JMX
+        } catch (RemoteException e) {
+            logger.error("JMX : Cannot create registry on port " +
+                PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt(), e);
+            //do not start JMX service
+            return;
+        }
         PAAuthenticationConnectorServer rmiConnectorAnonym = new PAAuthenticationConnectorServer(
             getDefaultJmxConnectorUrl(), JMX_CONNECTOR_NAME, this.mbsAnonym, authentication, true, logger);
         PAAuthenticationConnectorServer rmiConnectorAdmin = new PAAuthenticationConnectorServer(
