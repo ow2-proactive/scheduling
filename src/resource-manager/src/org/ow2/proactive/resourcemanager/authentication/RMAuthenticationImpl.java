@@ -46,6 +46,7 @@ import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
+import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMAdminImpl;
@@ -166,4 +167,11 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     protected String getLoginMethod() {
         return PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString();
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getJmxMonitoringUrl() {
+		return JMXMonitoringHelper.getDefaultJmxConnectorUrl() + PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME.getValueAsString();
+	}
 }

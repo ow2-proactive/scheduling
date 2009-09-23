@@ -171,16 +171,16 @@ public class AdminController extends UserController {
         return false;
     }
 
-    protected void connectJMXClient(String hostname) throws JMXProviderException {
+    protected void connectJMXClient() throws JMXProviderException {
         try {
             PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(
-                "service:jmx:rmi:///jndi/rmi://" + hostname + "/JMXSchedulerAgent_admin");
+		auth.getJmxMonitoringUrl());
             cli.connect(credentials, user);
             MBeanServerConnection conn = cli.getConnection();
             ObjectName on = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean_admin");
             model.setJMXInfo(new MBeanInfoViewer(conn, on));
         } catch (Exception e) {
-            logger.error("Error while connection JMX : ", e);
+            logger.error("Error while connecting JMX : ", e);
         }
     }
 

@@ -292,6 +292,19 @@ public enum PASchedulerProperties {
     }
 
     /**
+     * Return true if this property is set, false otherwise.
+     *
+     * @return true if this property is set, false otherwise.
+     */
+    public boolean isSet() {
+        if (fileLoaded) {
+            return prop.containsKey(key);
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Returns the string to be passed on the command line
      *
      * The property surrounded by '-D' and '='

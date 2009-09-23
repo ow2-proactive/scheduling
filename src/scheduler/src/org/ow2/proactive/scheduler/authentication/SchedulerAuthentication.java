@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.UserScheduler;
+import org.ow2.proactive.scheduler.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -216,4 +217,11 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
     protected String getLoginMethod() {
         return PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString();
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getJmxMonitoringUrl() {
+		return JMXMonitoringHelper.getDefaultJmxConnectorUrl() + PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME.getValueAsString();
+	}
 }
