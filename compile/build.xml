@@ -476,7 +476,7 @@
 		<delete dir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" />
 	</target>
 
-	<target name="scheduler.libCopy" depends="deploy.rm.client, deploy.scheduler.client" description="Copy all required libraries to scheduler/rm plugins">
+	<target name="scheduler.libCopy" depends="deploy.rm, deploy.scheduler.client" description="Copy all required libraries to scheduler/rm plugins">
 		<copy todir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" includeemptydirs="no">
 			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/><!--,${scheduler.core.jar}, ${scheduler.worker.jar}-->
 		</copy>
