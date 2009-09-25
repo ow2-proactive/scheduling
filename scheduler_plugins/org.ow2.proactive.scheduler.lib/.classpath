@@ -101,6 +101,5 @@
 	<classpathentry exported="true" kind="lib" path="lib/ejb3-persistence.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-commons-annotations.jar"/>
-	<classpathentry kind="lib" path="/home/osmirnov/projects/proactive/proactive-scheduling-git-sandbox/scheduler_plugins/org.ow2.proactive.scheduler.lib/lib/ProActive_ResourceManager.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
