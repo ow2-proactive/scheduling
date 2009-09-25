@@ -31,9 +31,7 @@
  */
 package org.ow2.proactive.scheduler.util;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.rmi.AlreadyBoundException;
 
@@ -206,12 +204,12 @@ public class SchedulerStarter {
                     logger.warn(e);
                 }
 
-                logger.info("(Once started, press 'e' to shutdown)");
+                /*logger.info("(Once started, press 'e' to shutdown)");
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
                 while (!br.readLine().equals("e"))
                     ;
                 //and terminate scheduler JVM
-                System.exit(0);
+                System.exit(0);*/
             }
         } catch (MissingArgumentException e) {
             logger_dev.error(e.getLocalizedMessage());
