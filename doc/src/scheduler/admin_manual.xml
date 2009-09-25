@@ -205,7 +205,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 					<listitem>
 						<para>
 							<emphasis role="italics">pa.scheduler.core.jmx.port</emphasis>: Port number used by JMX.
-							If not set a random one is used. Use this property if you use a firewall and want a specific port.
+				This port is used only for JMX service and the RMI protocol. It will create a RMI registry if needed.
 						</para>
 					</listitem>
 					<listitem>
@@ -672,6 +672,10 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 				ProActive Scheduling provides a way to get informations or statistics through JMX using standard tools. Their are two different access.
 				Anonym access can be used to retrieve some general scheduling informations when Administrator access could be used to retrieve
 				the same informations plus some specified job statistics. Admin can also perform operations. 
+			<para>
+			</para>
+				It is possible to get the JMX url on which to connect to using the Authentication API of the Scheduler. This
+				will retreive the RMI based URL to connect the JMX service.
 				For example, using the JConsole, just connect using the following URL as a remote access :
 			</para>
 			<itemizedlist>
