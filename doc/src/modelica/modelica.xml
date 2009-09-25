@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ProActive_Scheduler_Modelica">
+    <info>
+        <title>Scheduling examples of Modelica simulations</title>
+    </info>
+    <section xml:id="Scheduler_Modelica_Overwiew">
+        <info>
+            <title>Presentation</title>
+        </info>
+        <section xml:id="Scheduler_Modelica_Motivations">
+            <info>
+                <title>Motivations</title>
+            </info>
+            <para>
+                <emphasis>Modelica</emphasis>
+                is an object oriented, equation based language, used to model complex physical systems.
+	        </para>
+            <para>
+                Similarly to ProActive Scheduler's Matlab and Scilab extensions, the Modelica extension comes in the following ways:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        The ability to write simple Modelica tasks workflows and
+                        submit these workflows to the ProActive Scheduler (with the possibility to define dependencies
+                        between tasks and transfering results from one task to the other).
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        A parallelization facility to parallelize scripts and retrieve results.
+                        Monitoring of these tasks will still be possible through the Scheduler interface.
+                    </para>
+                </listitem>
+              </itemizedlist>
+	       <!-- <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/modelica1.snip"/></textobject></programlisting> -->
+	    </section>
+    </section>
+    <section xml:id="Scheduler_Modelica_Installation_Prerequisite"><info><title>Installation</title></info>
+
+        <para>
+            Before trying to run modelica simulations, you
+            need to install Modelica in your environment.
+        </para>
+        <para>
+            Follow the instructions for the installation of the <emphasis> Open Modelica Compiler  </emphasis>
+            <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.ida.liu.se/labs/pelab/modelica/OpenModelica.html#Download">http://www.ida.liu.se/labs/pelab/modelica/OpenModelica.html#Download</uri>
+        </para>
+        <para>
+            Set the environment variable <emphasis>SENDDATALIBS</emphasis> with the following value:
+        </para>
+        <para>
+            <emphasis> -lsendData -lQtNetwork-mingw -lQtCore-mingw -lQtGui-mingw -luuid -lole32 -lws2_32  </emphasis>
+        </para>
+    </section>
+       
+    <section xml:id="Scheduler_Modelica_Jobs">
+			<info>
+				<title>Modelica Scheduler Jobs
+				</title>
+			</info>
+
+			<para>
+				We'll write a simple Modelica job example. This example
+				will assume that you are familiar with the example in
+				<xref linkend="Scheduler_Matlab_More_Complex"/>
+				. This example will solve numerically the Bouncing Ball problem.
+                 <programlisting><textobject><textdata fileref="../../src/scheduler/src/org/ow2/proactive/scheduler/examples/documentation/modelica/BouncingBall.mo"/></textobject></programlisting>
+			</para>
+            <section xml:id="Scheduler_Modelica_Jobs_Split"><info><title>Tasks split </title></info>
+                <para>The omc compiler is used in several steps, to make the source code, build and run the executable.</para>
+
+                <para>
+                    Generate the <emphasis> BouncingBall.makefile </emphasis>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/modelica_task_make.snip"/></textobject></programlisting>
+                </para>
+                <para>
+                    Compile the <emphasis> BouncingBall.makefile </emphasis> to generate the executable <emphasis>BouncingBall.exe</emphasis>
+                </para>
+                <para>Note that the argument containing the modelname (BouncingBall) is passed without extension</para>
+                <para>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/modelica_task_compile.snip"/></textobject></programlisting>                    
+                </para>
+                <para>
+                    Executing can be achieved directly by adding another task to the job
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/modelica_task_execute.snip"/></textobject></programlisting>
+                    or invoking the executable directly from the command line.
+                </para>
+            </section>
+            <section xml:id="Scheduler_Modelica_Jobs_MOS"><info><title>MOS file </title></info>
+               <para>Alternatively, one can create a mos-file that performs the above mentioned tasks</para>
+                <para><programlisting language="xml">
+                    loadModel(Modelica);
+                    loadFile("BouncingBall.mo");
+                    simulate(BouncingBall,stopTime = 2);
+                </programlisting>
+                </para>
+                <para>
+                    In this way, one is able to set the simulation parameters (e.g. stopTime) externally, otherwise the default would be startTime = 0, stopTime = 1.
+                </para>
+                <para>
+                    The xml job is built in a similar way as above. Now there will be only one task performing all the operations.
+                </para>
+                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/modelica_task_mos.snip"/></textobject></programlisting>
+
+                
+            </section>
+
+    </section>
+     <section xml:id="Scheduler_Modelica_Plot"> <info><title>Handling results </title></info>
+         <para>
+            The simulation results will be output in a file named <emphasis> BouncingBall_res.plt</emphasis>. Results (all the variables) will be plot by invoking the following command
+         </para>
+         <para>
+             <programlisting language="xml">
+             >> doPlot BouncingBall_res.plt
+             </programlisting>
+             
+         </para>
+
+     </section>
+
+
+ </chapter>

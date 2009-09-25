@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd" name="job_nativ" priority="normal" cancelJobOnError="false">
+  <variables>
+    <!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
+    <variable name="WORK_DIR" value="${pa.scheduler.home}/samples/jobs_descriptors/job_modelica"/>
+    <!-- Path to your modelica installation (the bin directory) -->
+    <variable name="MODELICA_BIN_DIR" value="C:/OpenModelica1.4.5/bin"></variable>
+  </variables>
+  <description>Will compile the .mos file</description>
+    <!-- @snippet-start modelica_task_mos -->
+    <taskFlow>
+        <task name="task1">
+            <description>runs the simulation</description>
+            <selection>
+                <!-- This job descriptor works only on windows -->
+				<script type="static">
+					<file path="${pa.scheduler.home}/samples/scripts/selection/checkWindows.js"/>
+				</script>
+			</selection>
+            <nativeExecutable>
+                <staticCommand value="${MODELICA_BIN_DIR}/omc" workingDir="${WORK_DIR}">
+                    <arguments>
+                        <argument value=" +s "></argument>
+                        <argument value="${WORK_DIR}/BouncingBall.mos"></argument>
+                    </arguments>
+                </staticCommand>
+            </nativeExecutable>
+        </task>
+        <!-- @snippet-end modelica_task_mos -->
+
+  </taskFlow>
+  </job>
