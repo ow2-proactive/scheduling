@@ -31,6 +31,10 @@
  */
 package org.ow2.proactive.jmx;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 
 import javax.management.remote.JMXAuthenticator;
@@ -75,7 +79,17 @@ public class JMXAdminAuthenticatorImpl implements JMXAuthenticator {
         if (!(credentials instanceof Object[])) {
             throw new SecurityException("Credentials should be Object[]");
         } else if (!(((Object[]) credentials)[0] instanceof Credentials)) {
-            throw new SecurityException("Received Invalid credentials");
+            // using third-party tools like jConsole will inevitably lead 
+            // to sending clear credentials at this point
+            try {
+                Object[] c = (Object[]) credentials;
+                String user = c[0].toString();
+                String password = c[1].toString();
+                credentials = (Object) new Object[] {
+                        Credentials.createCredentials(user, password, authentication.getPublicKey()), null };
+            } catch (Exception e) {
+                throw new SecurityException("Received Invalid credentials", e);
+            }
         }
         Object[] ocred = (Object[]) credentials;
         Credentials cred = (Credentials) ocred[0];
