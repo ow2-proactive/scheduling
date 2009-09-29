@@ -45,8 +45,12 @@
 	<property name="cl.rm.dir"           value="${classes.dir}/resource-manager" />
 	<property name="cl.rm.tests.dir"     value="${classes.dir}/resource-managerTests" />
 	
-	<property name="rcp.plugins.dir"     value="${base.dir}/scheduler_plugins/" />
-	<property name="scheduler.plugin.lib"	value="org.ow2.proactive.scheduler.lib" />
+	<!-- <property name="rcp.plugins.dir"     value="${base.dir}/scheduler_plugins/" /> -->
+	<!-- <property name="scheduler.plugin.lib"	value="org.ow2.proactive.scheduler.lib" /> -->
+	<property name="rcp.scheduler.dir"     value="${base.dir}/scheduler-rcp/" />
+	<property name="rcp.scheduler.lib"     value="org.ow2.proactive.scheduler.lib" />
+	<property name="rcp.rm.dir"     value="${base.dir}/rm-rcp/" />
+	<property name="rcp.rm.lib"     value="org.ow2.proactive.resourcemanager.lib" />
 	
 	<property name="proactive.path" 	value="org/ow2/proactive" />
 
@@ -54,10 +58,7 @@
 	<property name="proactive.ext.path" value="${proactive.path}/ext" />
 	<property name="scheduler.path"    value="${proactive.path}/scheduler"/>
 	<property name="rm.path"    		value="${proactive.path}/resourcemanager"/>
-	
-	<property name="scheduler-plugin.dir" value="${base.dir}/scheduler-plugins-src" />
-	<property name="resourcemanager-plugin.dir" value="${base.dir}/resource-manager-plugin-src" />
-		
+
 
 	<!-- Javac properties -->
 	<property name="debug" value="on" />

@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Resource Manager RCP
+Bundle-SymbolicName: org.ow2.proactive.resourcemanager;singleton:=true
+Bundle-Version: 11.22.33
+Bundle-Activator: org.ow2.proactive.resourcemanager.Activator
+Bundle-Vendor: ProActive Team
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime;bundle-version="3.4.0",
+ org.eclipse.ui.editors,
+ org.ow2.proactive.resourcemanager.lib;bundle-version="11.22.33",
+ org.ow2.proactive.resourcemanager.gui;bundle-version="11.22.33"
+Bundle-ActivationPolicy: lazy
+Export-Package: org.ow2.proactive.resourcemanager
+Bundle-ClassPath: bin/,
+ .
+Import-Package: org.objectweb.proactive.core.ssh.httpssh

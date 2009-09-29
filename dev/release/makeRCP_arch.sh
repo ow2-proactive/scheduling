@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # cmd example
-# ./makeRCP_arch.sh ../Public/RCP 1.0.2 ../Workspace/ProActiveScheduling.git/scheduler_plugins/org.ow2.proactive.scheduler/proactive-log4j ../Public/RCP
+# ./makeRCP_arch.sh ../Public/RCP 1.0.2 ../Workspace/ProActiveScheduling.git/rm-rcp/org.ow2.proactive.resourcemanager/proactive-log4j ../Public/RCP
 
 if [ $# -ne 4 ]
 then

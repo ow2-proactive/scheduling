@@ -417,7 +417,8 @@
 				<fileset dir="${src.scheduler.tests.dir}" includes="**/*.java" />
 				<fileset dir="${src.rm.dir}" includes="**/*.java" />
 				<fileset dir="${src.rm.tests.dir}" includes="**/*.java" />
-				<fileset dir="${rcp.plugins.dir}" includes="**/*.java" />
+				<fileset dir="${rcp.scheduler.dir}" includes="**/*.java" />
+				<fileset dir="${rcp.rm.dir}" includes="**/*.java" />
 			</sourcefileset>
 		</eclipse_format_m>
 	</target>
@@ -472,15 +473,28 @@
 		</copy>
 	</target>
 
-	<target name="scheduler.libClean" description="Clean all required libraries for scheduler/rm plugins">
-		<delete dir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" />
+	<target name="scheduler.libClean" description="Clean all required libraries for scheduler RCP">
+		<delete dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" />
 	</target>
 
-	<target name="scheduler.libCopy" depends="deploy.rm, deploy.scheduler.client" description="Copy all required libraries to scheduler/rm plugins">
-		<copy todir="${rcp.plugins.dir}/${scheduler.plugin.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/><!--,${scheduler.core.jar}, ${scheduler.worker.jar}-->
+	<target name="rm.libClean" description="Clean all required libraries for rm RCP">
+		<delete dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" />
+	</target>
+
+	<target name="scheduler.libCopy" depends="deploy.scheduler.client" description="Copy all required libraries to scheduler/rm plugins">
+		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="no">
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/><!-- exclude useless jar from Scheduler and RM -->
 		</copy>
 	</target>
+
+	<target name="rm.libCopy" depends="deploy.scheduler.client" description="Copy all required libraries to scheduler/rm plugins">
+		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/><!-- exclude useless jar from Scheduler and RM -->
+		</copy>
+	</target>
+
+	<target name="rcp.libClean" depends="scheduler.libClean,rm.libClean"  description="Clean RCPs lib directories"/>
+	<target name="rcp.libCopy" depends="scheduler.libCopy,rm.libCopy"  description="Copy needed libraries to RCPs lib directories"/>
 
 	<!-- ================================================================ -->
 	<!--  Scheduler Specific - Convert Schemas from Relax NG to XMLSchema -->

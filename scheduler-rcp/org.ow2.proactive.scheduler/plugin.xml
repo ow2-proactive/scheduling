@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.ow2.proactive.scheduler.Application">
+         </run>
+      </application>
+   </extension>
+
+  <extension
+        id="scheduler"
+        point="org.eclipse.core.runtime.products">
+     <product
+           application="org.ow2.proactive.scheduler.application"
+           name="ProActive Scheduler">
+        <property
+              name="aboutText"
+              value="%About.text"/>
+        <property
+              name="appName"
+              value="ProActive Scheduler"/>
+        <property
+              name="startupProgressRect"
+              value="10,10,435,15"/>
+        <property
+              name="startupForegroundColor"
+              value="EB791F"/>
+        <property
+              name="startupMessageRect"
+              value="10,30,435,20"/>
+        <property
+              name="aboutImage"
+              value="icons/alt_about.gif"/>
+        <property
+              name="windowImages"
+              value="icons/alt_window_16.gif,icons/alt_window_32.gif"/>
+        <property
+              name="preferenceCustomization"
+              value="plugin_customization.ini">
+        </property>
+     </product>
+  </extension>
+
+
+</plugin>
