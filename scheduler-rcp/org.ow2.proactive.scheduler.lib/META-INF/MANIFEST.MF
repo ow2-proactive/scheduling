@@ -106,8 +106,8 @@ Bundle-ClassPath: lib/activation.jar,
  lib/jython.jar,
  lib/script-api.jar,
  lib/script-js.jar,
- lib/ProActive_SRM-common.jar,
- lib/ProActive_Scheduler-core.jar
+ lib/ProActive_Scheduler-core.jar,
+ lib/ProActive_SRM-common.jar
 Export-Package: .,
  COM.claymoresystems.cert,
  COM.claymoresystems.crypto,

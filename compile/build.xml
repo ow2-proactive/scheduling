@@ -481,15 +481,15 @@
 		<delete dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" />
 	</target>
 
-	<target name="scheduler.libCopy" depends="deploy.scheduler.client" description="Copy all required libraries to scheduler/rm plugins">
+	<target name="scheduler.libCopy" depends="deploy.scheduler" description="Copy all required libraries to scheduler plugins">
 		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/><!-- exclude useless jar from Scheduler and RM -->
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${scheduler.rm.jar}, ${scheduler.rm.client.jar}, ${scheduler.client.jar}, ${scheduler.worker.jar}, ${scheduler.common.client.jar}"/>
 		</copy>
 	</target>
 
-	<target name="rm.libCopy" depends="deploy.scheduler.client" description="Copy all required libraries to scheduler/rm plugins">
+	<target name="rm.libCopy" depends="deploy.rm, deploy.scheduler.client" description="Copy all required libraries to RM plugins">
 		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar"/><!-- exclude useless jar from Scheduler and RM -->
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${scheduler.rm.client.jar}, ${scheduler.core.jar}, ${scheduler.worker.jar}, ${scheduler.common.client.jar}"/>
 		</copy>
 	</target>
 

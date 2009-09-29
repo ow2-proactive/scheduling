@@ -45,8 +45,6 @@
 	<property name="cl.rm.dir"           value="${classes.dir}/resource-manager" />
 	<property name="cl.rm.tests.dir"     value="${classes.dir}/resource-managerTests" />
 	
-	<!-- <property name="rcp.plugins.dir"     value="${base.dir}/scheduler_plugins/" /> -->
-	<!-- <property name="scheduler.plugin.lib"	value="org.ow2.proactive.scheduler.lib" /> -->
 	<property name="rcp.scheduler.dir"     value="${base.dir}/scheduler-rcp/" />
 	<property name="rcp.scheduler.lib"     value="org.ow2.proactive.scheduler.lib" />
 	<property name="rcp.rm.dir"     value="${base.dir}/rm-rcp/" />
