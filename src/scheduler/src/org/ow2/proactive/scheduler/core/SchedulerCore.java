@@ -874,6 +874,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     }
 
                     td.decreaseNumberOfExecutionOnFailureLeft();
+                    DatabaseManager.synchronize(td.getTaskInfo());
                     logger_dev.info("Number of retry on Failure left for the task '" + td.getId() + "' : " +
                         td.getNumberOfExecutionOnFailureLeft());
                     if (td.getNumberOfExecutionOnFailureLeft() > 0) {
