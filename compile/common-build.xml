@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Common" default="deploy.common" basedir=".">
+<project default="deploy.common" basedir=".">
 	<!--
 		Available properties are:
 			-Dtest='unitTests/**/*.class'		Override the default testsuite for junit* targets
@@ -194,7 +194,8 @@
 				<fileset dir="${src.scheduler.tests.dir}" includes="**/*.java" />
 				<fileset dir="${src.rm.dir}" includes="**/*.java" />
 				<fileset dir="${src.rm.tests.dir}" includes="**/*.java" />
-				<fileset dir="${rcp.plugins.dir}" includes="**/*.java" />
+				<fileset dir="${rcp.scheduler.dir}" includes="**/*.java" />
+				<fileset dir="${rcp.rm.dir}" includes="**/*.java" />
 			</sourcefileset>
 		</eclipse_format_m>
 	</target>

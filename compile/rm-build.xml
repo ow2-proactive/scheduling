@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ResourceManager" default="deploy.rm" basedir=".">
+<project default="deploy.rm" basedir=".">
 	<import file="rm-env.xml" />
 	<import file="common-build.xml" />
 
@@ -95,6 +95,20 @@
 			testclasspath="rm.test.classpath"
 			log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/rm-log4j"
 		/>
+	</target>
+
+	<!-- ************
+			RCP
+		-->
+
+	<target name="rcp.libClean.rm" description="Clean all required libraries for rm RCP">
+		<delete dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" />
+	</target>
+
+	<target name="rcp.libCopy.rm" depends="deploy.rm, deploy.scheduler.client" description="Copy all required libraries to RM plugins">
+		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${scheduler.rm.client.jar}, ${scheduler.core.jar}, ${scheduler.worker.jar}, ${scheduler.common.client.jar}"/>
+		</copy>
 	</target>
 
 	<import file="../doc/rm-doc.xml" optional="true"/>

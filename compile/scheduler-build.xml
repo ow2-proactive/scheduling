@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Scheduler" default="deploy.scheduler" basedir=".">
+<project default="deploy.scheduler" basedir=".">
 	<import file="common-build.xml" />
 	<import file="scheduler-env.xml" />
 	<import file="rm-build.xml" />
@@ -271,6 +271,20 @@
 
 		<delete dir="${worker.dir.tmp}" />
 		<delete dir="${cl.scheduler.worker.dir}" />
+	</target>
+
+	<!-- ************
+			RCP
+		-->
+
+	<target name="rcp.libClean.scheduler" description="Clean all required libraries for scheduler RCP">
+		<delete dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" />
+	</target>
+
+	<target name="rcp.libCopy.scheduler" depends="deploy.all" description="Copy all required libraries to scheduler plugins">
+		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="no">
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${scheduler.rm.jar}, ${scheduler.rm.client.jar}, ${scheduler.client.jar}, ${scheduler.worker.jar}, ${scheduler.common.client.jar}"/>
+		</copy>
 	</target>
 
 	<!-- ************

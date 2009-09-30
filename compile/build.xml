@@ -79,26 +79,7 @@
 		RCP plugins
 	-->
 
-	<target name="scheduler.libClean" description="Clean all required libraries for scheduler RCP">
-		<delete dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" />
-	</target>
+	<target name="rcp.libClean.all" depends="rcp.libClean.scheduler,rcp.libClean.rm"  description="Clean RCPs lib directories"/>
+	<target name="rcp.libCopy.all" depends="rcp.libCopy.scheduler,rcp.libCopy.rm"  description="Copy needed libraries to RCPs lib directories"/>
 
-	<target name="rm.libClean" description="Clean all required libraries for rm RCP">
-		<delete dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" />
-	</target>
-
-	<target name="scheduler.libCopy" depends="deploy.scheduler" description="Copy all required libraries to scheduler plugins">
-		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${scheduler.rm.jar}, ${scheduler.rm.client.jar}, ${scheduler.client.jar}, ${scheduler.worker.jar}, ${scheduler.common.client.jar}"/>
-		</copy>
-	</target>
-
-	<target name="rm.libCopy" depends="deploy.rm, deploy.scheduler.client" description="Copy all required libraries to RM plugins">
-		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${scheduler.rm.client.jar}, ${scheduler.core.jar}, ${scheduler.worker.jar}, ${scheduler.common.client.jar}"/>
-		</copy>
-	</target>
-
-	<target name="rcp.libClean" depends="scheduler.libClean,rm.libClean"  description="Clean RCPs lib directories"/>
-	<target name="rcp.libCopy" depends="scheduler.libCopy,rm.libCopy"  description="Copy needed libraries to RCPs lib directories"/>
 </project>
