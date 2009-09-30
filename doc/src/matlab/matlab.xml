@@ -721,16 +721,23 @@
                 </listitem>
                 <listitem>
                     <para>
-                        Create a <emphasis>java.opts</emphasis> file in the directory where the matlab software session is started. Create as well a <emphasis>matlab.java.policy</emphasis> file in the same directory. The matlab.java.policy must have the same content as the .java.policy file above. The java.opts file should contain:
+                        Create a <emphasis>java.opts</emphasis> file in the bin/_arch_ directory of your matlab installation. _arch_ is a directory found in MATLAB_HOME/bin which countains executables for your specific environment (i.e. "win32" for Windows 32 bit, "glnxa64" for Linux 64-bit etc). Create as well a <emphasis>matlab.java.policy</emphasis> file in the same directory. The matlab.java.policy must have the same content as the .java.policy file above. The java.opts file should contain:
                     </para>
-                    <screen>-Djava.security.manager -Djava.security.policy="matlab.java.policy"</screen>
+                    <screen>-Djava.security.manager -Djava.security.policy=/full/path/to/the/matlab.java.policy/file</screen>
+                    <para>WARNING: be very careful on the format of the java.opts file. as the content of this file is read to add command line arguments to the Java Virtual Machine run with Matlab, the format is very sensible and depends on the Operating System. On some systems, Matlab doesn't accept if you simply write the two options -D... on a single line. You'll have to write them separately in two lines. If even this doesn't work, you can try adding a backslash at the end of the first line. You can make sure that Matlab correctly read the file by typing the following command at the Matlab prompt : java.lang.System.getProperty('java.security.policy'). If the command returns the path to the matlab.java.policy file, then everything is fine.</para>
                     <para>
-                        Pros of this method is that it allows users to specify that only the matlab jvm has relaxed permission and not every jvms run on the computer. Cons is that it needs to be done each time the matlab session is started.
+                        Pros of this method is that it allows users to specify that only the matlab jvm has relaxed permission and not every jvms run on the computer. Cons is that it needs write access to the directories where matlab is installed, and it's bit more complicated to set up than the other method.
                     </para>
                 </listitem>
             </itemizedlist>
-
-
+            <para>
+                Finally, on Windows systems, it is strongly recommended to add the different ProActive jar (library) files to the collection of libraries used by Matlab at startup. It has been often observed on Windows that Matlab fails to load the ProActive libraries dynamically after being started. Adding the libraries statically before Matlab starts solve this problem.
+                In order to do that, you'll need to edit the file "classpath.txt" located in MATLAB_HOME/toolbox/local directory and add the following lines at the end:
+            </para>
+            <screen>path_to_scheduler\dist\lib\ProActive.jar
+path_to_scheduler\dist\lib\ProActive_Scheduler-core.jar
+path_to_scheduler\dist\lib\ProActive_ResourceManager.jar
+path_to_scheduler\dist\lib\ProActive_SRM-common.jar</screen>
         </section>
         <section xml:id="SciMat_Embedded_Usage">
             <info>
@@ -750,6 +757,9 @@
                         Add the scripts contained in <emphasis>SCHEDULER/extensions/matlab/embedded</emphasis> to your Matlab path :
                     </para>
                     <screen>&gt;&gt; addpath('/mypath-to-scheduler/extensions/matlab/embedded');</screen>
+                    <para>
+                        Alternatively and for repeated use, you can add this line at the end of the matlabrc.m file - used by Matlab at startup - and located in  the MATLAB_HOME/toolbox/local folder.
+                    </para>
                 </listitem>
                 <listitem>
                     <para>
