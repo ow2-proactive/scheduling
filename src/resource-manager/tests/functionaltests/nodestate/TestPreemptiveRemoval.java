@@ -91,7 +91,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
         // and remove preemptively a node
         RMTHelper.log("Test 1");
 
-        NodeSet nodes = admin.getAtMostNodes(new IntWrapper(RMTHelper.defaultNodesNumber), null);
+        NodeSet nodes = admin.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
         PAFuture.waitFor(nodes);
 
         assertTrue(nodes.size() == RMTHelper.defaultNodesNumber);
@@ -155,7 +155,7 @@ public class TestPreemptiveRemoval extends FunctionalTest {
         // remove preemptively a toRelease node
         RMTHelper.log("Test 3");
 
-        nodes = admin.getAtMostNodes(new IntWrapper(2), null);
+        nodes = admin.getAtMostNodes(2, null);
 
         PAFuture.waitFor(nodes);
         assertTrue(nodes.size() == 2);
