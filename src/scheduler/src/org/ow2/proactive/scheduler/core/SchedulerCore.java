@@ -429,9 +429,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         // used when a job has failed
         currentJob.setTaskFinishedTimeModify(null);
         // and to database
-        DatabaseManager.synchronize(currentJob.getJobInfo());
+        DatabaseManager.getInstance().synchronize(currentJob.getJobInfo());
         for (TaskState task : currentJob.getTasks()) {
-            DatabaseManager.synchronize(task.getTaskInfo());
+            DatabaseManager.getInstance().synchronize(task.getTaskInfo());
         }
     }
 
@@ -568,7 +568,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         frontend.terminate();
         //closing data base
         logger.debug("Closing Scheduler data base !");
-        DatabaseManager.close();
+        DatabaseManager.getInstance().close();
         //terminate this active object
         PAActiveObject.terminateActiveObject(false);
         logger.info("Scheduler is now shutdown !");
@@ -720,7 +720,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
 
                     // load and Initialize the executable container
-                    DatabaseManager.load(internalTask);
+                    DatabaseManager.getInstance().load(internalTask);
                     logger_dev.debug("Load and Initialize the executable container for task '" +
                         internalTask.getId() + "'");
 
@@ -771,7 +771,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                 //if this result has been unloaded, (extremely rare but possible)
                                 if (params[i].getOutput() == null) {
                                     //get the result and load the content from database
-                                    DatabaseManager.load(params[i]);
+                                    DatabaseManager.getInstance().load(params[i]);
                                 }
                             }
                         }
@@ -783,9 +783,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask.getName(),
                                 launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(), internalTask
                                         .getExecutableContainer(), params));
-
-                        logger_dev.info("Starting deployment of task '" + internalTask.getName() +
-                            "' for job '" + currentJob.getId() + "'");
                     }
 
                     //if a task has been launched
@@ -874,7 +871,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     }
 
                     td.decreaseNumberOfExecutionOnFailureLeft();
-                    DatabaseManager.synchronize(td.getTaskInfo());
+                    DatabaseManager.getInstance().synchronize(td.getTaskInfo());
                     logger_dev.info("Number of retry on Failure left for the task '" + td.getId() + "' : " +
                         td.getNumberOfExecutionOnFailureLeft());
                     if (td.getNumberOfExecutionOnFailureLeft() > 0) {
@@ -933,7 +930,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         job.setJobResult(jobResult);
 
         //Add to data base
-        DatabaseManager.register(job);
+        DatabaseManager.getInstance().register(job);
 
         //If register OK : add job to core
         jobs.put(job.getId(), job);
@@ -962,10 +959,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         //unload job environment that potentially contains classpath as byte[]
-        DatabaseManager.unload(job.getEnvironment());
+        DatabaseManager.getInstance().unload(job.getEnvironment());
         //unload heavy object
         for (InternalTask it : job.getITasks()) {
-            DatabaseManager.unload(it);
+            DatabaseManager.getInstance().unload(it);
         }
         logger_dev.info("JobEnvironment and internalTask unloaded for job '" + job.getId() + "'");
         frontend.jobSubmitted(job);
@@ -1057,9 +1054,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             }
 
             //add the result in database
-            DatabaseManager.update(job.getJobResult());
+            DatabaseManager.getInstance().update(job.getJobResult());
             //unload the result to improve memory usage
-            DatabaseManager.unload(taskResult);
+            DatabaseManager.getInstance().unload(taskResult);
             //move the job from running to finished
             runningJobs.remove(job);
             finishedJobs.add(job);
@@ -1111,7 +1108,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
         try {
             //first unload the executable container that we don't need until next execution (if re-execution)
-            DatabaseManager.unload(descriptor);
+            DatabaseManager.getInstance().unload(descriptor);
             //The task is terminated but it's possible to have to
             //wait for the future of the task result (TaskResult).
             //accessing to the taskResult could block current execution but for a very little time.
@@ -1142,10 +1139,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
-                    DatabaseManager.startTransaction();
-                    DatabaseManager.synchronize(job.getJobInfo());
-                    DatabaseManager.synchronize(descriptor.getTaskInfo());
-                    DatabaseManager.commitTransaction();
+                    DatabaseManager.getInstance().startTransaction();
+                    DatabaseManager.getInstance().synchronize(job.getJobInfo());
+                    DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
+                    DatabaseManager.getInstance().commitTransaction();
                     //free execution node even if it is dead
                     try {
                         resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes());
@@ -1178,10 +1175,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
                     job.reStartTask(descriptor);
                     //update job and task info
-                    DatabaseManager.startTransaction();
-                    DatabaseManager.synchronize(job.getJobInfo());
-                    DatabaseManager.synchronize(descriptor.getTaskInfo());
-                    DatabaseManager.commitTransaction();
+                    DatabaseManager.getInstance().startTransaction();
+                    DatabaseManager.getInstance().synchronize(job.getJobInfo());
+                    DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
+                    DatabaseManager.getInstance().commitTransaction();
                     //free execution node even if it is dead
                     resourceManager.freeNodes(descriptor.getExecuterInformations().getNodes(), descriptor
                             .getCleaningScript());
@@ -1239,11 +1236,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             .isPreciousResult());
                     //and update database
                     //update job and task info
-                    DatabaseManager.startTransaction();
-                    DatabaseManager.synchronize(job.getJobInfo());
-                    DatabaseManager.synchronize(descriptor.getTaskInfo());
-                    DatabaseManager.update(job.getJobResult());
-                    DatabaseManager.commitTransaction();
+                    DatabaseManager.getInstance().startTransaction();
+                    DatabaseManager.getInstance().synchronize(job.getJobInfo());
+                    DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
+                    DatabaseManager.getInstance().update(job.getJobResult());
+                    DatabaseManager.getInstance().commitTransaction();
                     //send event to user
                     frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                         SchedulerEvent.TASK_WAITING_FOR_RESTART, descriptor.getTaskInfo()));
@@ -1268,20 +1265,21 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 descriptor.getName() + "'");
 
             //and update database
-            DatabaseManager.startTransaction();
-            DatabaseManager.synchronize(job.getJobInfo());
-            DatabaseManager.synchronize(descriptor.getTaskInfo());
-            DatabaseManager.update(job.getJobResult());
-            DatabaseManager.commitTransaction();
+            DatabaseManager.getInstance().startTransaction();
+            DatabaseManager.getInstance().synchronize(job.getJobInfo());
+            DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
+            DatabaseManager.getInstance().update(job.getJobResult());
+            DatabaseManager.getInstance().commitTransaction();
 
             //clean the result to improve memory usage
             if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {
-                DatabaseManager.unload(res);
+                DatabaseManager.getInstance().unload(res);
             }
             for (TaskDescriptor td : currentTD.getParents()) {
                 if (td.getChildrenCount() == 0) {
                     try {
-                        DatabaseManager.unload(job.getJobResult().getResult(td.getId().getReadableName()));
+                        DatabaseManager.getInstance().unload(
+                                job.getJobResult().getResult(td.getId().getReadableName()));
                     } catch (RuntimeException e) {
                         //should never append
                         logger_dev.error("", e);
@@ -1305,10 +1303,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 terminateJobHandling(job.getId());
 
                 //and to data base
-                DatabaseManager.synchronize(job.getJobInfo());
+                DatabaseManager.getInstance().synchronize(job.getJobInfo());
                 //clean every task result
                 for (TaskResult tr : job.getJobResult().getAllResults().values()) {
-                    DatabaseManager.unload(tr);
+                    DatabaseManager.getInstance().unload(tr);
                 }
                 //send event to client
                 frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
@@ -1457,13 +1455,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         // if taskResult is not awaited, task is terminated
         TaskLogs logs = null;
         // try to look in the DB
-        DatabaseManager.load(tr);
+        DatabaseManager.getInstance().load(tr);
         logs = tr.getOutput();
         // avoid race condition if any...
         if (logs == null) {
             // the logs has been deleted and stored in the DB during the previous getOutput
             // should not be null now !
-            DatabaseManager.load(tr);
+            DatabaseManager.getInstance().load(tr);
             logs = tr.getOutput();
         }
         if (logs instanceof Log4JTaskLogs) {
@@ -1492,7 +1490,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //result = null if not in DB (ie: not yet available)
         JobResult result = null;
         try {
-            result = DatabaseManager.recover(job.getJobResult().getClass(),
+            result = DatabaseManager.getInstance().recover(job.getJobResult().getClass(),
                     new Condition("id", ConditionComparator.EQUALS_TO, job.getJobResult().getJobId())).get(0);
         } catch (IndexOutOfBoundsException e) {
             throw new SchedulerException("Cannot retrieve the result of job '" + jobId + "' !", e);
@@ -1503,7 +1501,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                 //remember that this job is to be removed
                 job.setToBeRemoved();
-                DatabaseManager.synchronize(job.getJobInfo());
+                DatabaseManager.getInstance().synchronize(job.getJobInfo());
 
                 try {
                     //remove job after the given delay
@@ -1561,8 +1559,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //extract full copy from DB to avoid load, unload operation
         //Hibernate hold every taskResults even the faulty one, can be interesting to have history
         //So get the result of the task is getting the last one.
-        List<? extends TaskResult> results = DatabaseManager.recover(result.getClass(), new Condition("id",
-            ConditionComparator.EQUALS_TO, result.getTaskId()));
+        List<? extends TaskResult> results = DatabaseManager.getInstance().recover(result.getClass(),
+                new Condition("id", ConditionComparator.EQUALS_TO, result.getTaskId()));
         result = results.get(results.size() - 1);
 
         if ((result != null)) {
@@ -1585,7 +1583,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
             //and to data base
-            DatabaseManager.synchronize(job.getJobInfo());
+            DatabaseManager.getInstance().synchronize(job.getJobInfo());
             // close log buffer
             AsyncAppender jobLog = this.jobsToBeLogged.remove(jobId);
             if (jobLog != null) {
@@ -1599,7 +1597,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             boolean rfdb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
             logger_dev.info("Remove job '" + jobId + "' also from  dataBase : " + rfdb);
             if (rfdb) {
-                DatabaseManager.delete(job);
+                DatabaseManager.getInstance().delete(job);
             }
             logger.info("Job " + jobId + " removed !");
             //send event to front-end
@@ -1894,7 +1892,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 .info("Request sent to change priority on job '" + jobId + "' - new priority : " + priority);
         InternalJob job = jobs.get(jobId);
         job.setPriority(priority);
-        DatabaseManager.synchronize(job.getJobInfo());
+        DatabaseManager.getInstance().synchronize(job.getJobInfo());
         frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
             SchedulerEvent.JOB_CHANGE_PRIORITY, job.getJobInfo()));
     }
@@ -1966,9 +1964,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         boolean drop = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
         logger.info("Drop DB : " + drop);
         if (drop) {
-            DatabaseManager.setProperty("hibernate.hbm2ddl.auto", "create");
+            DatabaseManager.getInstance().setProperty("hibernate.hbm2ddl.auto", "create");
         }
-        DatabaseManager.build();
+        DatabaseManager.getInstance().build();
         logger.info("Hibernate successfully started !");
 
         //create condition of recovering : recover only non-removed job
@@ -1978,7 +1976,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         RecoveringThread rt = new RecoveringThread();
         List<InternalJob> recovering = new ArrayList<InternalJob>();
         try {
-            recovering = DatabaseManager.recoverAllJobs(rt);
+            recovering = DatabaseManager.getInstance().recoverAllJobs(rt);
         } finally {
             rt.interrupt();
         }
@@ -2097,7 +2095,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     }
             }
             //unload job environment once handled
-            DatabaseManager.unload(job.getEnvironment());
+            DatabaseManager.getInstance().unload(job.getEnvironment());
         }
 
         //------------------------------------------------------------------------

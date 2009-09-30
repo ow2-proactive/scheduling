@@ -63,7 +63,7 @@ public class TestDatabaseStringArray {
     public void before() throws Exception {
         PASchedulerProperties.updateProperties(functionalTestSchedulerProperties);
         //build hibernate session
-        DatabaseManager.build();
+        DatabaseManager.getInstance().build();
     }
 
     @Test
@@ -78,22 +78,22 @@ public class TestDatabaseStringArray {
             sa[k] = sb.toString();
         }
         SimpleScript ss = new SimpleScript(new File(URLbegin + "samples/scripts/misc/set.js"), sa);
-        DatabaseManager.register(ss);
+        DatabaseManager.getInstance().register(ss);
         JobEnvironment je = new JobEnvironment();
         je.setJobClasspath(sa);
-        DatabaseManager.register(je);
+        DatabaseManager.getInstance().register(je);
         GenerationScript gs = new GenerationScript(URLbegin + "samples/scripts/misc/set.js", "js");
         NativeExecutableContainer nec = new NativeExecutableContainer(sa, gs, URLbegin);
-        DatabaseManager.register(nec);
+        DatabaseManager.getInstance().register(nec);
         TaskResultImpl tri = new TaskResultImpl();
         tri.setJobClasspath(sa);
-        DatabaseManager.register(tri);
+        DatabaseManager.getInstance().register(tri);
         //if no exception occurs, test is OK
     }
 
     @After
     public void after() throws Exception {
-        DatabaseManager.close();
+        DatabaseManager.getInstance().close();
     }
 
 }

@@ -98,7 +98,7 @@ public class TestDatabaseCRUD {
     public void before() throws Exception {
         PASchedulerProperties.updateProperties(functionalTestSchedulerProperties);
         //build hibernate session
-        DatabaseManager.build();
+        DatabaseManager.getInstance().build();
         //create a job
         System.setProperty("jobName", "Job_TaskFlow");
         tfJob = (TaskFlowJob) JobFactory.getFactory().createJob(jobTaskFlowDescriptor);
@@ -121,10 +121,10 @@ public class TestDatabaseCRUD {
         ((JobResultImpl) itfJob.getJobResult()).addTaskResult("task2", new TaskResultImpl(TaskIdImpl
                 .nextId(itfJob.getJobInfo().getJobId()), "salut", null), true);
         //register the job
-        DatabaseManager.register(itfJob);
+        DatabaseManager.getInstance().register(itfJob);
         //list of internal job to recover
         log("Test  READ");
-        List<InternalJob> recovering = DatabaseManager.recoverAllJobs();
+        List<InternalJob> recovering = DatabaseManager.getInstance().recoverAllJobs();
         Assert.assertTrue(recovering.size() == 1);
         itfJob = (InternalTaskFlowJob) recovering.get(0);
 
@@ -165,7 +165,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.isWallTime(), true);
                 Assert.assertEquals(it.getGenericInformations().size(), 0);
                 Assert.assertNull(it.getExecutableContainer());
-                DatabaseManager.load(it);
+                DatabaseManager.getInstance().load(it);
                 Field f = JavaExecutableContainer.class.getDeclaredField("args");
                 f.setAccessible(true);
                 Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
@@ -198,7 +198,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.isWallTime(), false);
                 Assert.assertEquals(it.getGenericInformations().size(), 0);
                 Assert.assertNull(it.getExecutableContainer());
-                DatabaseManager.load(it);
+                DatabaseManager.getInstance().load(it);
                 Field f = JavaExecutableContainer.class.getDeclaredField("args");
                 f.setAccessible(true);
                 Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
@@ -240,7 +240,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.isWallTime(), true);
                 Assert.assertEquals(it.getGenericInformations().size(), 0);
                 Assert.assertNull(it.getExecutableContainer());
-                DatabaseManager.load(it);
+                DatabaseManager.getInstance().load(it);
                 Field f = NativeExecutableContainer.class.getDeclaredField("command");
                 f.setAccessible(true);
                 Assert.assertEquals(((String[]) f.get(it.getExecutableContainer())).length, 5);
@@ -271,7 +271,7 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getGenericInformations().get("n11"), "v11");
                 Assert.assertEquals(it.getGenericInformations().get("n22"), "v22");
                 Assert.assertNull(it.getExecutableContainer());
-                DatabaseManager.load(it);
+                DatabaseManager.getInstance().load(it);
                 Field f = NativeExecutableContainer.class.getDeclaredField("generated");
                 f.setAccessible(true);
                 Assert.assertEquals(((GenerationScript) f.get(it.getExecutableContainer())).getScript(),
@@ -290,7 +290,7 @@ public class TestDatabaseCRUD {
         Assert.assertNotNull(itfJob.getJobResult().getResult("task2"));
         //before loading
         Assert.assertNull(itfJob.getJobResult().getResult("task2").value());
-        DatabaseManager.load(itfJob.getJobResult().getResult("task2"));
+        DatabaseManager.getInstance().load(itfJob.getJobResult().getResult("task2"));
         //after loading
         Assert.assertNotNull(itfJob.getJobResult().getResult("task2").value());
         Assert.assertEquals("salut", itfJob.getJobResult().getResult("task2").value());
@@ -298,12 +298,12 @@ public class TestDatabaseCRUD {
         log("Test UPDATE");
         //unload
         for (InternalTask it : itfJob.getITasks()) {
-            DatabaseManager.unload(it);
+            DatabaseManager.getInstance().unload(it);
             Assert.assertEquals(it.getExecutableContainer(), null);
         }
         //load
         for (InternalTask it : itfJob.getITasks()) {
-            DatabaseManager.load(it);
+            DatabaseManager.getInstance().load(it);
             if (it.getName().equals("task1")) {
                 Field f = JavaExecutableContainer.class.getDeclaredField("args");
                 f.setAccessible(true);
@@ -355,7 +355,7 @@ public class TestDatabaseCRUD {
         TaskId id = infoMem.getTaskId();
         new Condition("taskId", ConditionComparator.EQUALS_TO, id);
         //check MEM vs DB instance
-        TaskInfo infoDB = DatabaseManager.recover(TaskInfo.class,
+        TaskInfo infoDB = DatabaseManager.getInstance().recover(TaskInfo.class,
                 new Condition("taskId", ConditionComparator.EQUALS_TO, id)).get(0);
         Assert.assertEquals(infoDB.getExecutionHostName(), infoMem.getExecutionHostName());
         Assert.assertEquals(infoDB.getFinishedTime(), infoMem.getFinishedTime());
@@ -371,9 +371,9 @@ public class TestDatabaseCRUD {
         infoMem.setStatus(TaskStatus.RUNNING);
         infoMem.setTaskId(TaskIdImpl.nextId(id.getJobId()));
         //synchronize update with database
-        DatabaseManager.synchronize(infoMem);
+        DatabaseManager.getInstance().synchronize(infoMem);
         //re-check MEM vs DB instance
-        infoDB = DatabaseManager.recover(TaskInfo.class,
+        infoDB = DatabaseManager.getInstance().recover(TaskInfo.class,
                 new Condition("taskId", ConditionComparator.EQUALS_TO, id)).get(0);
         Assert.assertEquals(infoDB.getExecutionHostName(), infoMem.getExecutionHostName());
         Assert.assertEquals(infoDB.getExecutionHostName(), "toto");
@@ -388,23 +388,23 @@ public class TestDatabaseCRUD {
         Assert.assertTrue(!infoDB.getTaskId().equals(infoMem.getTaskId()));
         log("Test DELETE");
         infoMem.setTaskId(id);
-        DatabaseManager.delete(itfJob);
-        Assert.assertEquals(DatabaseManager.recover(InternalJob.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(InternalTask.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(JobInfo.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(TaskInfo.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(JobId.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(TaskId.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(ForkEnvironment.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(JobEnvironment.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(BigString.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(BooleanWrapper.class).size(), 0);
-        Assert.assertEquals(DatabaseManager.recover(IntegerWrapper.class).size(), 0);
+        DatabaseManager.getInstance().delete(itfJob);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(InternalJob.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(InternalTask.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(JobInfo.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(TaskInfo.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(JobId.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(TaskId.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(ForkEnvironment.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(JobEnvironment.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(BigString.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(BooleanWrapper.class).size(), 0);
+        Assert.assertEquals(DatabaseManager.getInstance().recover(IntegerWrapper.class).size(), 0);
     }
 
     @After
     public void after() throws Exception {
-        DatabaseManager.close();
+        DatabaseManager.getInstance().close();
     }
 
     private void log(String s) {
