@@ -4,12 +4,12 @@
 	<section xml:id="rm-config"><info><title>Resource manager configuration file</title></info>
 	<para>
 		Resource manager has a set of properties that can be changed regarding to your computing infrastructure and your needs.
-		These properties are set in <emphasis>PAResourceManagerProperties.ini</emphasis> in the <emphasis>config</emphasis> directory:
+		These properties are set in <emphasis>settings.ini</emphasis> in the <emphasis>config/rm</emphasis> directory:
 	</para>
 	<para>
-		You can define these variables in <emphasis>PAResourceManagerProperties.ini</emphasis> in the <emphasis>config</emphasis> directory or define/override them
+		You can define these variables in <emphasis>settings.ini</emphasis> in the <emphasis>config/rm</emphasis> directory or define/override them
 		 in the the java command line using the -D option (ex: java -Dpa.rm.node.source.ping.frequency=45000 ...).
-		 Such a property can be added in the provided scripts (startRM.[sh|bat] for example).
+		 Such a property can be added in the provided scripts (rm-start[.bat] for example).
 	</para>
 	<itemizedlist>
 		<listitem>
@@ -40,7 +40,7 @@
 				Path of default GCM Application descriptor, used for all GCM deployments.
 				If this file path is a relative, path is evaluated from the Resource manager dir (variable <emphasis role="italics">pa.rm.home</emphasis>), otherwise path is directly interpreted.
 				See <xref linkend="RM_GCM"/> part.
-				Default is <emphasis>config/deployment/GCMNodeSourceApplication.xml</emphasis>.
+				Default is <emphasis>config/rm/deployment/GCMNodeSourceApplication.xml</emphasis>.
 			</para>
 		</listitem>
 		<listitem>
@@ -62,14 +62,14 @@
 			<para>
 				<emphasis role="italics">pa.rm.nodesource.infrastructures</emphasis>: 
 				Path to a file containing the list of supported infrastructures in the resource manager.
-				Default is <emphasis>config/nodesource/infrastructures</emphasis>.
+				Default is <emphasis>config/rm/nodesource/infrastructures</emphasis>.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
 				<emphasis role="italics">pa.rm.nodesource.policies</emphasis>: 
 				Path to a file containing the list of supported node acquisition policies in the resource manager.
-				Default is <emphasis>config/nodesource/policies</emphasis>.
+				Default is <emphasis>config/rm/nodesource/policies</emphasis>.
 			</para>
 		</listitem>
 				<listitem>
@@ -136,9 +136,9 @@
 		  
 		  
 		  <para>
-		    The Keypair can be generated with the <emphasis>keyGen.[sh|bat]</emphasis> script:
+		    The Keypair can be generated with the <emphasis>key-gen[.bat]</emphasis> script:
 		    <screen><![CDATA[
-bin/unix $ ./keyGen.sh -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
+bin/unix $ ./key-gen -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 ]]></screen>
 		    Accordingly, the Scheduler configuration must be set so that, when started:
 		    <itemizedlist>
@@ -153,7 +153,7 @@ bin/unix $ ./keyGen.sh -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 		    indeed, a client can request the public key to the Scheduler so that it may encrypt its credentials to perform
 		    authentication. This method doesn't require the Scheduler's administrator to manually propagate public keys
 		    to all its users.
-		    Users can encrypt their credentials with the <emphasis>createCred.[sh|bat]</emphasis> script.
+		    Users can encrypt their credentials with the <emphasis>create-cred[.bat]</emphasis> script.
 		    See <xref linkend="RM_API_start"/> for client-side configuration.
 		  </para>
 		</section>
@@ -161,7 +161,7 @@ bin/unix $ ./keyGen.sh -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 		<section xml:id="rm_authent_select"><info><title>Select authentication method</title></info>
 			<para>
 			Resource Manager manage users authentication and authorization, it has to store users account/password, and check login and password at connection.
-			This storage of users accounts can be managed in two ways: by files, or by LDAP. A Resource Manager property (PAResourceManagerProperties.ini)
+			This storage of users accounts can be managed in two ways: by files, or by LDAP. A Resource Manager property (in config/rm/settings.ini)
 			specifies which kind of authentication will be used:
 			</para>
 				<programlisting language="java">
@@ -204,7 +204,7 @@ user2:user
 				</programlisting>
 				</listitem>			
 			</itemizedlist>
-			<para>You can change the default paths of these two files. Edit file <emphasis>config/PAResourceManagerProperties.ini</emphasis> and change
+			<para>You can change the default paths of these two files. Edit file <emphasis>config/rm/settings.ini</emphasis> and change
 			the two properties:
 			</para>
 			<itemizedlist>
@@ -225,7 +225,7 @@ user2:user
 				and configuration of SSL/TLS if you want a secured connection between Resource Manager and LDAP. 
 			</para>
 			<para>
-			<emphasis>PAResourceManagerProperties.ini</emphasis> in <emphasis>config</emphasis> directory, defines a path to a configuration file that contains all LDAP connection and authentication properties.
+			<emphasis>settings.ini</emphasis> in <emphasis>config/rm</emphasis> directory, defines a path to a configuration file that contains all LDAP connection and authentication properties.
 			Default value for this property defines a default configuration file;  <emphasis>config/authentication/ldap.cfg</emphasis>. Specify your LDAP properties in this file. Properties are explained below.
 			</para>
 			<section xml:id="RM_LDAP_users_URL"><info><title>Set LDAP url</title></info>
@@ -347,7 +347,7 @@ user2:user
 		</section>
 	</section>
 	<section xml:id="rm_admin_console"><info><title>Resource Manager administrator console</title></info>
-	<para><emphasis>adminRM.[sh|bat]</emphasis>, in bin/[os] directory, provides a way to manage Resource Manager in command line mode.
+	<para><emphasis>rm-admin[.bat]</emphasis>, in bin/[os] directory, provides a way to manage Resource Manager in command line mode.
 	A set of argument has to be provided:
 	</para>
 	<itemizedlist>

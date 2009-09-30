@@ -15,7 +15,7 @@ greater is located.
 
 * Start a command shell and go into the bin/[os] directory of your installed 
 scheduler home path. You can start the scheduler by launching the 
-startScheduler.[sh|bat] script. If ran without argument, it starts a Resource 
+scheduler-start[.bat] script. If ran without argument, it starts a Resource
 Manager on the local host and deploy 4 nodes. Scheduler finishes its starting 
 sequence when the following line is displayed:
 	 Scheduler successfully created on rmi://hostname:port/
@@ -23,11 +23,11 @@ At this point, ProActive Scheduler is started with 4 free nodes.
 
 A database is used to store ProActive Scheduler activities and to
 offer fault tolerance.The database is configured in the
-'hibernate.cfg.xml' file in the 'config/database/hibernate' directory.
+'hibernate.cfg.xml' file in the 'config/scheduler/database/hibernate' directory.
 
 * You can now submit a job. To do so, use the command-line controller.
 Just start the userScheduler.[sh|bat] script with proper parameters:
-~> userScheduler.[sh|bat] --submit ../../samples/jobs_descriptors/Job_PI.xml
+~> scheduler-user[.bat] --submit ../../samples/jobs_descriptors/Job_PI.xml
 
 You will be requested for login and password, and then the Job_PI.xml is
 submitted to the scheduler (use for instance demo:demo). You may find many 

@@ -85,7 +85,7 @@ public class SchedulerStarter {
     public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
             .getValueAsString();
     public static final String deploymentFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-        File.separator + "config/deployment/Local4JVMDeployment.xml";
+        File.separator + "config/rm/deployment/Local4JVMDeployment.xml";
 
     /**
      * Start the scheduler creation process.
@@ -235,7 +235,7 @@ public class SchedulerStarter {
             logger.info("");
             HelpFormatter hf = new HelpFormatter();
             hf.setWidth(120);
-            hf.printHelp("startScheduler" + Tools.shellExtension(), options, true);
+            hf.printHelp("scheduler-start" + Tools.shellExtension(), options, true);
             System.exit(10);
         }
 

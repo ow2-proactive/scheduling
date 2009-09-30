@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<property name="scheduler.file.set" value="../doc/toolchain" />
+	<property name="scheduler.src.dir" value="../doc/src" />
+	<import file="toolchain/doc_paths.xml" />
+
+	<!-- ================================================================ -->
+	<!--            Create docs, which is the javadoc + manual            -->
+	<!--  =============================================================== -->
+	<target name="doc.Scheduler.docs" depends="doc.Scheduler.javadoc.all, doc.Scheduler.manual, doc.Scheduler.doc.zips" description="Generate the Scheduler Programming javadoc, manual, and zip archives" />
+
+	<!-- ================================================================ -->
+	<!--            Create docs, which is the javadoc + manual            -->
+	<!--  =============================================================== -->
+	<target name="doc.Scheduler.doc.zips" depends="doc.Scheduler.manualSingleHtmlZip, doc.Scheduler.manualHtmlZip, doc.Scheduler.javadoc.publishedZip, doc.Scheduler.javadoc.completeZip" description="Generate the Scheduler Programming javadoc and manual zip archives" />
+
+
+	<!-- ================================================================ -->
+	<!--                     Create javadoc                               -->
+	<!-- ================================================================ -->
+
+	<target name="doc.Scheduler.javadoc.all" depends="doc.Scheduler.javadoc.published,doc.Scheduler.javadoc.complete"/>
+
+	<!-- ==================================================================== -->
+	<!--          Make just the html files for the manual                     -->
+	<!-- ==================================================================== -->
+	<target name="doc.Scheduler.manualHtml" description="Generate the Scheduler Programming HTML manual">
+		<subant target="manualHtml" 			inheritall="true">
+			<property name="docs.src.dir"           value="${scheduler.src.dir}" />
+			<fileset dir="${scheduler.file.set}" 	includes="doc.xml"/>
+		</subant>
+	</target>
+	<!-- ==================================================================== -->
+	<!--   Make an archive from the files for the multiple html manual        -->
+	<!-- ==================================================================== -->
+	<target name="doc.Scheduler.manualHtmlZip" description="Generate the Scheduler Programming HTML manual zip" depends="doc.Scheduler.manualHtml" >
+		<subant target="manualHtmlZip" inheritall="true">
+			<property name="docs.src.dir"           value="${scheduler.src.dir}" />
+			<fileset dir="${scheduler.file.set}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--               Make just the pdf files for the manual                 -->
+	<!-- ==================================================================== -->
+	<target name="doc.Scheduler.manualPdf" description="Generate the Scheduler Programming PDF manual">
+		<subant target="manualPdf" inheritall="true">
+			<property name="docs.src.dir"           value="${scheduler.src.dir}" />
+			<fileset dir="${scheduler.file.set}" includes="doc.xml"/>
+		</subant>
+	</target>
+	<!-- ==================================================================== -->
+	<!--           Make only one huge html-file from the doc                  -->
+	<!-- ==================================================================== -->
+	<target name="doc.Scheduler.manualSingleHtml" description="Generate the Scheduler Programming single HTML manual">
+		<subant target="manualSingleHtml" inheritall="true">
+			<property name="docs.src.dir"           value="${scheduler.src.dir}" />
+			<fileset dir="${scheduler.file.set}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the files for the single html manual       -->
+	<!-- ==================================================================== -->
+	<target name="doc.Scheduler.manualSingleHtmlZip" description="Generate the Scheduler Programming single HTML manual zip" depends="doc.Scheduler.manualSingleHtml" >
+		<subant target="manualSingleHtmlZip" inheritall="true">
+			<property name="docs.src.dir"           value="${scheduler.src.dir}" />
+			<fileset dir="${scheduler.file.set}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the published javadoc       -->
+	<!-- ==================================================================== -->
+	<target name="doc.Scheduler.javadoc.publishedZip" description="Generate the Scheduler Programming published javadoc zip" depends="doc.Scheduler.javadoc.published">
+		<subant target="javadoc.publishedZip" inheritall="true">
+			<fileset dir="${scheduler.file.set}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the complete javadoc       -->
+	<!-- ==================================================================== -->
+	<target name="doc.Scheduler.javadoc.completeZip" description="Generate the Scheduler Programming complete javadoc zip" depends="doc.Scheduler.javadoc.complete">
+		<subant target="javadoc.completeZip" inheritall="true">
+			<fileset dir="${scheduler.file.set}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!-- Construct the manual from the XML files in {docs.src}                -->
+	<!-- ==================================================================== -->
+	<target name="doc.Scheduler.manual" description="Generate the Scheduler Programming manuals  (html, single html, pdf)" depends="doc.Scheduler.manualSingleHtml,doc.Scheduler.manualHtml,doc.Scheduler.manualPdf" />
+
+      <!-- javadoc paths are not include through subant-->
+      <path id="docs.utils.classpath.javadoc">
+	      <fileset dir="../doc/toolchain/lib">
+		      <include name="**/*.jar"/>
+	      </fileset>
+
+      </path>
+
+
+      <target name="doc.Scheduler.javadoc.complete"  depends="compile.all" description="Generate the Scheduler complete javadoc">
+        <javadoc
+            destdir="${docs.built.dir}/api_complete"
+            author="true"
+            version="true"
+            source="${source}"
+            use="true"
+            windowtitle="Scheduler and Resource Manager Complete API"
+            breakiterator="yes"
+            additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
+
+            <classpath>
+                <path refid="scheduler.libs"/>
+                <path refid="rm.libs"/>
+                <pathelement path="${cl.scheduler.dir}"/>
+                <pathelement path="${cl.rm.dir}"/>
+            </classpath>
+
+            <packageset dir="${src.scheduler.dir}" />
+            <packageset dir="${src.rm.dir}" />
+
+
+	    <link href="http://proactive.inria.fr/release-doc/pa/api_complete/"/>
+            <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+            <doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+
+            <group title="Scheduler">
+                <package name="org.ow2.proactive.scheduler*" />
+            </group>
+
+            <group title="Resource Manager">
+                <package name="org.ow2.proactive.resourcemanager*" />
+            </group>
+        </javadoc>
+    </target>
+
+    <property name="javadoc.published.core" value="${docs.tmp.dir}/publishedCoreClasses"/>
+    <target name="doc.Scheduler.javadoc.published" depends="compile.all" description="Generate the Scheduler published javadoc">
+        <mkdir dir="${docs.tmp.dir}" />
+        <javadoc source="${source}"	classpathref="scheduler.libs">
+            <doclet name="doc.PublishedAPIDoclet">
+		<path refid="docs.utils.classpath.javadoc"/>
+                <param name="-file" value="${javadoc.published.core}"/>
+            </doclet>
+            <packageset dir="${src.scheduler.dir}"/>
+            <packageset dir="${src.rm.dir}" />
+        </javadoc>
+
+
+        <javadoc
+            destdir="${docs.built.dir}/api_published"
+            author="true"
+            version="true"
+            source="${source}"
+            use="true"
+            windowtitle="Scheduler and Resource Manager User API"
+            breakiterator="yes"
+            additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
+
+            <classpath>
+                <path refid="scheduler.libs"/>
+                <path refid="rm.libs"/>
+                <pathelement path="${cl.scheduler.dir}"/>
+                <pathelement path="${cl.rm.dir}"/>
+            </classpath>
+
+
+            <fileset dir="${src.scheduler.dir}" includesfile="../doc/tmp/publishedCoreClasses"/>
+            <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+            <doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+
+            <group title="Scheduler">
+                <package name="org.ow2.proactive.scheduler*" />
+            </group>
+
+            <group title="Resource Manager">
+                <package name="org.ow2.proactive.resourcemanager*" />
+            </group>
+
+        </javadoc>
+	<delete dir="${docs.tmp.dir}"/>
+    </target>
+</project>

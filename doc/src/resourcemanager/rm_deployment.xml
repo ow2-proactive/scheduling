@@ -12,7 +12,7 @@
 			</para></warning>
 			<section xml:id="RM_start"><info><title>Launch the Resource Manager</title></info>
 				<para>  
-					To start the Resource Manager, run the <emphasis>startRM.[sh|bat]</emphasis>
+					To start the Resource Manager, run the <emphasis>rm-start[.bat]</emphasis>
 					script in 'bin/[os]/' directory. By default, Resource Manager will be started empty (without computing nodes).
 					You can specify some arguments:
 					<itemizedlist>
@@ -86,7 +86,7 @@
 					So, a GCM Application descriptor is always the same and there is no need to change it. It is not mandatory to explore deeply the GCMA definition
 					for using GCM deployment with ProActive Resource manager.
 					The following GCMA is defined in the <emphasis>GCMNodeSourceApplication.xml</emphasis> file,
-					stored in <emphasis>config/deployment</emphasis> directory. 
+					stored in <emphasis>config/rm/deployment</emphasis> directory.
 					</para>
 					<programlisting language="xml"><textobject><textdata fileref="resourcemanager/xml/gcma.xml"/></textobject></programlisting>
 					<para>
@@ -150,7 +150,7 @@
 					<section xml:id="RM_GCMD_default"><info><title>Deployment of nodes on local machine</title></info>
 						<para>
 						By default Resource Manager deploys 4 ProActive nodes on the local machine. This deployment is performed by the GCM deployment descriptor
-						<emphasis>Local4JVMDeployment[os].xml</emphasis>, stored in <emphasis>config/deployment</emphasis> directory:
+						<emphasis>Local4JVMDeployment[os].xml</emphasis>, stored in <emphasis>config/rm/deployment</emphasis> directory:
 						</para>
 						<programlisting language="xml"><textobject><textdata fileref="resourcemanager/xml/gcmdLocal.xml"/></textobject></programlisting>
 						<para>
@@ -187,7 +187,7 @@
 						for authentication.
 						</para>
 						<para>
-						You can use as a template, the file <emphasis>deployment_ssh_host_list.xml</emphasis> in the <emphasis>config/deployment</emphasis> directory:
+						You can use as a template, the file <emphasis>deployment_ssh_host_list.xml</emphasis> in the <emphasis>config/rm/deployment</emphasis> directory:
 						</para>
 						<programlisting language="xml"><textobject><textdata fileref="resourcemanager/xml/gcmd_ssh.xml"/></textobject></programlisting>
 						<para>
@@ -218,12 +218,12 @@
 						To start the Resource Manager with your own GCM deployment descriptor, run the <emphasis>startRM.[sh|bat]</emphasis>
 						script in 'bin/[os]/' directory and put in paramter the path of your GCM Deployment file. If you want to deploy Resource Manager
 						with the deployment_ssh_host_list.xml file defined above, type in the 'bin/[os]/' directory:
-						<literal>startRM.sh -d ../../config/deployment/deployment_ssh_host_list.xml</literal>
+						<literal>rm-start -d ../../config/rm/deployment/deployment_ssh_host_list.xml</literal>
 						</para>
 						<para>
 						Resource Manager starts and deploys computing nodes on hosts defined in the GCM deployment file. You can put in parameters of this
 						command several deployment descriptors. Resource Manager automatically associates GCMD files in parameters with the GCMA
-						<emphasis>GCMNodeSourceApplication.xml</emphasis>, stored in <emphasis>config/deployment</emphasis> directory. 
+						<emphasis>GCMNodeSourceApplication.xml</emphasis>, stored in <emphasis>config/rm/deployment</emphasis> directory.
 						</para>
 					</section>
 					<section xml:id="RM_launch_with_gcmd_custom_path"><info><title>Customize in GCMD resource Manager Path and Java path of your
@@ -238,7 +238,7 @@
 						<para>
 						To illustrate this aspect, a new GCM Deployment file that deploys two computing nodes on hosts named 
 						'computer1' and 'computer2', where Java executable is not installed in the same paths for the two hosts, is defined. Look at the
-						<emphasis>deployment_ssh.xml</emphasis> descriptor in the <emphasis>config/deployment</emphasis> directory:
+						<emphasis>deployment_ssh.xml</emphasis> descriptor in the <emphasis>config/rm/deployment</emphasis> directory:
 						</para>
 						<programlisting language="xml"><textobject><textdata fileref="resourcemanager/xml/gcmd_custom.xml"/></textobject></programlisting>	
 					</section>

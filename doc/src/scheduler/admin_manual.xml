@@ -83,7 +83,7 @@
 				<itemizedlist>
 					<listitem>
 						<para>
-							The database get its properties in the <emphasis>/database/hibernate/hibernate.cfg.xml</emphasis> configuration file.
+							The database get its properties in the <emphasis>config/scheduler/database/hibernate/hibernate.cfg.xml</emphasis> configuration file.
 							Here is an example of configuration:
 						</para>
 						<programlisting>
@@ -120,7 +120,7 @@
 			</para>
 			<para>
 				It is also possible to configure some properties that rely on the Scheduler. The file
-				<emphasis>PASchedulerProperties.ini</emphasis> in the <emphasis>config</emphasis> directory contains
+				<emphasis>settings.ini</emphasis> in the <emphasis>config/scheduler</emphasis> directory contains
 				every property that can be modified by administrator. The <emphasis>PASchedulerProperties</emphasis> class
 				provide a way to override this file with your own one. If you do so, every overridden properties will be used.
 				It is not necessary to specify every properties inside your own file.
@@ -133,7 +133,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 				The last method to override a property is to specify it into the the java command line using the -d option.
 				You just have to name the property as it is done in the properties file, and give it a value.
 				(ex: java -dpa.scheduler.core.nodepingfrequency=30000...). Such a property can be added in the provided scripts
-				(startScheduler.[sh|bat] for example).
+				(scheduler-start[.bat] for example).
 			</para>
 			<para>
 				The priority order between two definition of a same property is as follows:
@@ -148,7 +148,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<para>
 					<emphasis>Note: </emphasis> some properties require a file path. File path can be given relative to the Scheduler home directory
 					(i.e. to the application root directory) OR with an absolute path. Also note that each property can be overridden by
-					using the JVM properties when starting the Scheduler. (i.e. startScheduler.[sh|bat] -Dpa.scheduler.core.timeout=1000)
+					using the JVM properties when starting the Scheduler. (i.e. scheduler-start[.bat] -Dpa.scheduler.core.timeout=1000)
 				</para>
 				<para>
 					<emphasis>Scheduler properties</emphasis>
@@ -194,7 +194,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 					<listitem>
 						<para>
 							<emphasis role="italics">pa.scheduler.forkedtask.security.policy</emphasis>: Forked java task default security policy path.
-							Uses to define the policy of the forked task (default is config/forkedJavaTask/forkedTask.java.policy).
+							Uses to define the policy of the forked task (default is config/scheduler/forkedJavaTask/forkedTask.java.policy).
 						</para>
 					</listitem>
 					<listitem>
@@ -395,7 +395,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 					<listitem>
 						<para>
 							<emphasis role="italics">pa.scheduler.db.hibernate.configuration</emphasis>:
-							Hibernate main configuration file (default is config/database/hibernate/hibernate.cfg.xml)
+							Hibernate main configuration file (default is config/scheduler/database/hibernate/hibernate.cfg.xml)
 						</para>
 					</listitem>
 					<listitem>
@@ -410,14 +410,14 @@ PASchedulerProperties.updateProperties("your_property_file");
 			</section>
 			<section xml:id="Start_scheduler_sh"><info><title>Start the Scheduler using shell command</title></info>
 				<para>
-					To start a local scheduler, run the <emphasis>startScheduler.[sh|bat]</emphasis>
+					To start a local scheduler, run the <emphasis>scheduler-start[.bat]</emphasis>
 					script in 'bin/[os]/' directory. Without arguments, the ProActive Scheduler will start on the local
 					host and will try to connect to a started local Resources Manager with the default database configuration file.
 					If no Resources Manager exists, it will create its own Resources Manager.
 					Note that the database will be created if it does not exist.
 				</para>
 				<para>
-					<emphasis>startScheduler.[sh|bat]</emphasis> can be started with 2 optional arguments (use -h option to see 
+					<emphasis>scheduler-start[.bat]</emphasis> can be started with 2 optional arguments (use -h option to see
 					a description of the available options):
 					<itemizedlist>
 						<listitem>
@@ -440,15 +440,15 @@ PASchedulerProperties.updateProperties("your_property_file");
 					the 'PriorityPolicy' scheduling policy:
 				</para>
 				<para>
-					<code>startScheduler.[sh|bat] -u //toto/ -p org.ow2.proactive.scheduler.policy.PriorityPolicy</code>
+					<code>scheduler-start[.bat] -u //toto/ -p org.ow2.proactive.scheduler.policy.PriorityPolicy</code>
 				</para>
 				<para>
 					By default, the "config/authentication/" directory has to contain the two authentication files (group and login).
-					The "config/database/hibernate" directory has to contain the "hibernate.cfg.xml" configuration file.
+					The "config/scheduler/database/hibernate" directory has to contain the "hibernate.cfg.xml" configuration file.
 				</para>
 				<para>
 					It is also possible to launch the ProActive Scheduler with only one of these options or without option at all. For more
-					informations, use -h (or --help) option (i.e. "startScheduler.[sh|bat] -h").
+					informations, use -h (or --help) option (i.e. "scheduler-start[.bat] -h").
 				</para>
 			</section>
 			<section xml:id="Start_scheduler_java"><info><title>Start the Scheduler using the Java API</title></info>
@@ -485,7 +485,7 @@ AdminScheduler.createScheduler(
 					This files contains username, password and their groups.
 					A LDAP authentication module is also available to replace authentication files (login.cfg and group.cfg) security
 					module by a LDAP security module.
-					To do so, just go into the <emphasis>PASchedulerProperties.ini</emphasis> configuration file and change the value
+					To do so, just go into the <emphasis>config/scheduler/settings.ini</emphasis> configuration file and change the value
 					of the property <emphasis>pa.scheduler.core.authentication.loginMethod</emphasis> to "SchedulerLDAPLoginMethod".
 					Information about your own LDAP configuration can be set in the <emphasis>ldap.cfg</emphasis> into the "config/authentication" directory.
 				</para>
@@ -560,7 +560,7 @@ JobId myJobId = scheduler.submit(job);
 				<para>
 					The admin Scheduler controller is an interface which allows to administer the ProActive Scheduler without the
 					java API. It is also possible to see exceptions coming from the scheduler to know what happened.
-					To start a admin controller, run the <emphasis>adminScheduler.[sh|bat]</emphasis>
+					To start a admin controller, run the <emphasis>scheduler-admin[.bat]</emphasis>
 					script in 'unix/[os]/' directory. It works in the same manner as the user controller (<xref linkend="scheduler_controller"/>)
 					but some administration functions have been added. Note that the admin controller uses administrator rights to allow
 					the connection to the scheduler.
@@ -570,11 +570,11 @@ JobId myJobId = scheduler.submit(job);
 				To understand how to use it, please refers to the <xref linkend="scheduler_controller"/> section.
 			</para>
 			<para>
-				Here is the displayed help when using <emphasis>adminScheduler.[sh|bat] -h</emphasis> command:
+				Here is the displayed help when using <emphasis>scheduler-admin[.bat] -h</emphasis> command:
 				<figure xml:id="scheduler_controller_admin_help"><info><title>Scheduler admin controller help</title></info>
 					<mediaobject>
 						<imageobject>
-							<imagedata width="100%" align="center" fileref="scheduler/pics/schedulerControllerAdminHelp.png" format="PNG"/>
+							<imagedata width="100%" align="center" fileref="scheduler/pics/scheduler-admin-h.png" format="PNG"/>
 						</imageobject>
 					</mediaobject>
 				</figure>
@@ -802,9 +802,9 @@ public class PriorityPolicy implements PolicyInterface {
 		  
 		  
 		  <para>
-		    The Keypair can be generated with the <emphasis>keyGen.[sh|bat]</emphasis> script:
+		    The Keypair can be generated with the <emphasis>key-gen[.bat]</emphasis> script:
 		    <screen><![CDATA[
-bin/unix $ ./keyGen.sh -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
+bin/unix $ ./key-gen -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 ]]></screen>
 		    Accordingly, the Scheduler configuration must be set so that, when started:
 		    <itemizedlist>
@@ -819,7 +819,7 @@ bin/unix $ ./keyGen.sh -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 		    indeed, a client can request the public key to the Scheduler so that it may encrypt its credentials to perform
 		    authentication. This method doesn't require the Scheduler's administrator to manually propagate public keys
 		    to all its users.
-		    Users can encrypt their credentials with the <emphasis>createCred.[sh|bat]</emphasis> script.
+		    Users can encrypt their credentials with the <emphasis>create-cred[.bat]</emphasis> script.
 		    See <xref linkend="Submit_a_job_java"/> for client-side configuration.
 		  </para>
 		</section>
@@ -828,7 +828,7 @@ bin/unix $ ./keyGen.sh -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 		<section xml:id="Sched_authent_select"><info><title>Select authentication method</title></info>
 			<para>
 			So that the Scheduler can manage users authentication and authorization, it has to store users account/password, and check login and password at users' connection.
-			This storage of users accounts can be managed in two ways: by files, or by LDAP. A Scheduler property (PASchedulerProperties.ini)
+			This storage of users accounts can be managed in two ways: by files, or by LDAP. A Scheduler property (in config/scheculer/settings.ini)
 			specifies which kind of authentication will be used:
 			</para>
 				<programlisting language="java">
@@ -871,7 +871,7 @@ user2:user
 				</programlisting>
 				</listitem>			
 			</itemizedlist>
-			<para>You can change the default paths of these two files. Edit file <emphasis>config/PASchedulerProperties.ini</emphasis> and change
+			<para>You can change the default paths of these two files. Edit file <emphasis>config/scheduler/settings.ini</emphasis> and change
 			the two properties:
 			</para>
 			<itemizedlist>
@@ -891,7 +891,7 @@ user2:user
 				and configuration of SSL/TLS if you want a secured connection between Scheduler and LDAP. All LDAP connection parameters are set in <emphasis>config/authentication/ldap.cfg</emphasis>.
 			</para>
 			<para>
-			<emphasis>PASchedulerProperties.ini</emphasis> in <emphasis>config</emphasis> directory, defines a path to a configuration file that contains all LDAP connection and authentication properties.
+			<emphasis>settings.ini</emphasis> in <emphasis>config/scheduler</emphasis> directory, defines a path to a configuration file that contains all LDAP connection and authentication properties.
 			Default value for this property defines a default configuration file;  <emphasis>config/authentication/ldap.cfg</emphasis>. Specify your LDAP properties in this file. Properties are explained below. 
 			</para>
 			<section xml:id="LDAP_users_URL"><info><title>Set LDAP url</title></info>
@@ -935,7 +935,7 @@ user2:user
 				</para>
 				<para>
 					If you specify an authentication method different from 'none' (anonymous connection to LDAP),
-					you must specify a login/password for authentication. There are two properties in PASchedulerProperties.ini to set:
+					you must specify a login/password for authentication. There are two properties in config/scheduler/settings.ini to set:
 					<itemizedlist>
 						<listitem><para><emphasis>pa.ldap.bind.login</emphasis> - set user name for authentication.</para>
 						</listitem>

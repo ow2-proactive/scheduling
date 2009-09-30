@@ -1,0 +1,10 @@
+#!/bin/sh
+
+CLASSPATH=.
+workingDir=`dirname $0`
+. $workingDir/env rm-log4j-server
+
+opt="-Xms128m -Xmx2048m"
+eval $JAVACMD $opt org.ow2.proactive.resourcemanager.utils.RMStarter $@
+
+echo

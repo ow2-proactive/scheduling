@@ -1,0 +1,15 @@
+. common
+
+function build() {
+	echo "********************** Building the scheduler ************************"
+	cd compile || warn_and_exit "Cannot move in compile"
+	./build clean
+	./build -Dversion="${VERSION}" deploy.all
+	./build -Dversion="${VERSION}" doc.Scheduler.manualPdf
+}
+
+init_env ProActiveScheduler $*
+copy_to_tmp
+clean_repository
+replace_version
+build_archive

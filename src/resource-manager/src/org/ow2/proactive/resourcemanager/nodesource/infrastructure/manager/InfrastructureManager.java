@@ -50,7 +50,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
  * - define a way to acquire a single node from underlying infrastructure in {@link InfrastructureManager#acquireNode()}
  * - define a way to acquire all available nodes from the infrastructure in the method {@link InfrastructureManager#acquireAllNodes()}
  * - register available nodes in the resource manager using {@link InfrastructureManager#registerAcquiredNode(Node)}, so they till be taken into account.
- * - add the name of new class to the resource manager configuration file (config/nodesource/infrastructures).
+ * - add the name of new class to the resource manager configuration file (config/rm/nodesource/infrastructures).
  *
  */
 public abstract class InfrastructureManager implements Serializable {

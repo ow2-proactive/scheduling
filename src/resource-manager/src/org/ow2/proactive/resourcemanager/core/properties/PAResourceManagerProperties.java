@@ -135,7 +135,7 @@ public enum PAResourceManagerProperties {
     private static final boolean fileLoaded;
 
     static {
-        String propertiesPath = "config/PAResourceManagerProperties.ini";
+        String propertiesPath = "config/rm/settings.ini";
         if (System.getProperty("pa.rm.properties.filepath") != null) {
             propertiesPath = System.getProperty("pa.rm.properties.filepath");
         }

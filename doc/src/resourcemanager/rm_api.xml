@@ -46,16 +46,16 @@ try {
 		  to the Resource Manager, as described in the example above:
 		  <orderedlist>
 		    <listitem><para>
-			Retreive the Credentials from disk: supposes the script <emphasis>createCred.[sh|bat]</emphasis> was previously used to generate those credentials. 
+			Retreive the Credentials from disk: supposes the script <emphasis>create-cred[.bat]</emphasis> was previously used to generate those credentials.
 			It requires knowing the location of the public key corresponding to the private key that will be used for decryption on server side.
 			To obtain the key, you need to contact the administrator of the Scheduler.
 		      </para>
 		      <para>
 			<screen><![CDATA[
 # use local public key to generate credentials for user 'demo'
-/bin/unix $ ./createCred.sh -P $HOME/.proactive/rm_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
+/bin/unix $ ./create-cred -P $HOME/.proactive/rm_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
 # use rmi://example.com/RMAUTHENTICATION's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
-/bin/unix $ ./createCred.sh -U rmi://example.com/RMAUTHENTICATION -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+/bin/unix $ ./create-cred -U rmi://example.com/RMAUTHENTICATION -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
 ]]></screen>
 			Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; ie using
 			<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>.
@@ -95,7 +95,7 @@ admin.shutdown(true); //performs preemptive shutdown	</programlisting>
 		static node acquisition policy will be created.
 		</para>
 		<programlisting language="java">
-String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config/deployment/Local4JVMDeployment.xml";
+String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config/rm/deployment/Local4JVMDeployment.xml";
 RMFactory.startLocal(Collections.singleton(gcmDeployFile));
 		</programlisting>
 		<para>

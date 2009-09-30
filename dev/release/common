@@ -1,0 +1,142 @@
+#! /bin/sh
+
+function warn_and_exit {
+	echo "$1" 1>&2
+	exit 1
+}
+
+function warn_print_usage_and_exit {
+	echo "$1" 1>&2
+	echo "" 1>&2
+	echo "Usage: $0 SCHEDULER_DIR VERSION JAVA_HOME" 1>&2
+	exit 1
+}
+
+function init_env() {
+	echo "********************** Initializing environment ************************"
+	TMP=/tmp
+
+	# /mnt/scratch is a tmpfs mount point for faster builds on schubby
+	if [ -w "/mnt/scratch" ] ; then
+		TMP=/mnt/scratch
+	fi
+
+	RELEASE_BASENAME=$1
+	shift
+
+	SCHEDULER_DIR=$1
+	VERSION=$2
+	JAVA_HOME=$3
+	if [ ! -z "$4" ] ; then
+		TMP=$4
+	fi
+
+	TMP_DIR=""
+
+	echo " [i] SCHEDULER_DIR: $SCHEDULER_DIR"
+	echo " [i] VERSION:       $VERSION"
+	echo " [i] JAVA_HOME:     $JAVA_HOME"
+	echo " [i] TMP:           $TMP"
+
+	if [ -z "$SCHEDULER_DIR" ] ; then
+		warn_print_usage_and_exit "SCHEDULER_DIR is not defined"
+	fi
+
+	if [ -z "$VERSION" ] ; then
+		warn_print_usage_and_exit "VERSION is not defined"
+	fi
+
+	if [ -z "$JAVA_HOME" ] ; then
+		warn_print_usage_and_exit "JAVA_HOME is not defined"
+	fi
+
+	export JAVA_HOME=${JAVA_HOME}
+}
+
+function copy_to_tmp() {
+	echo "********************** Copying the product to tmp dir ************************"
+	TMP_DIR="${TMP}/$RELEASE_BASENAME-${VERSION}"
+	output=$(mkdir ${TMP_DIR} 2>&1)
+	if [ "$?" -ne 0 ] ; then
+		if [ -e ${TMP_DIR} ] ; then
+			echo " [w] ${TMP_DIR} already exists. Delete it !"
+			rm -rf ${TMP_DIR}
+			mkdir ${TMP_DIR}
+			if [ "$?" -ne 0 ] ; then
+				warn_and_exit "Cannot create ${TMP_DIR}: $output"
+			fi
+		else
+			warn_and_exit "Cannot create ${TMP_DIR}"
+		fi
+	fi
+
+	echo Copying files to $TMP_DIR
+	cp -Rf ${SCHEDULER_DIR}/* ${TMP_DIR}
+	cp -Rf ${SCHEDULER_DIR}/.classpath ${TMP_DIR}
+	cp -Rf ${SCHEDULER_DIR}/.project ${TMP_DIR}
+}
+
+function build_and_clean() {
+	echo "********************** Cleaning the product ************************"
+
+	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
+	if [ "$(find src/ -name "*.java" | xargs grep serialVersionUID | grep -v `echo $VERSION | sed 's@\(.\)\.\(.\)\..@\1\2@'` | wc -l)" -gt 0 ] ; then
+		if [ -z "${RELAX}" ] ; then
+			warn_and_exit " [E] serialVersionUID are NOT defined"
+		fi
+	fi
+
+	# Subversion
+	find . -type d -a -name ".svn" -exec rm -rf {} \;
+
+	# Remove database directory if exist
+	find . -type d -name "SCHEDULER_DB" -exec rm -rf {} \;
+	# Remove logs directory
+	rm -rf ${SCHEDULER_DIR}/.logs
+
+	# Building the product
+	build
+
+	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
+	echo " [i] Clean"
+
+	# Clean RCP plugins
+	find ./scheduler_plugins/ -name "*.jar" -exec rm -rf {} \;
+	find ./scheduler_plugins/ -name "*.class" -exec rm -rf {} \;
+
+	# Git
+	rm -rf .git
+
+	# Remove useless parts of ProActive
+	rm ./doc-src/ProActiveRefBook.doc
+	find . -type f -a -name "*.svg" -exec rm {} \; # svg are converted in png by hands
+
+	# Remove non GPL stuff
+	rm -rf ./compile/lib/clover.*
+
+	# Remove temporary files
+	rm compile/junit*properties
+	rm -rf classes/
+	rm -rf docs/tmp/
+	rm -rf doc-src/*_snippets/
+
+	# Remove dev directory
+	rm -rf dev/
+}
+
+function replace_version() {
+	echo "********************** Replacing version ************************"
+	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
+	# Replace RCP version pattern with current version
+	find scheduler-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/$VERSION/" {} \;
+	find rm-rcp -type f -name "*" -exec sed -i "s/11\.22\.33/$VERSION/" {} \;
+
+	sed -i "s/{version}/$VERSION/" README.txt
+}
+
+function build_archive() {
+	echo "********************** Building archive ************************"
+	cd ${TMP} || warn_and_exit "Cannot move in ${TMP}"
+	tar cvfz $RELEASE_BASENAME-${VERSION}.tar.gz $RELEASE_BASENAME-${VERSION}
+	zip -r   $RELEASE_BASENAME-${VERSION}.zip    $RELEASE_BASENAME-${VERSION}
+}

@@ -233,7 +233,7 @@ public class Tools implements Serializable {
         if (System.getProperty("os.name").contains("Windows")) {
             return ".bat";
         } else {
-            return ".sh";
+            return "";
         }
     }
 }

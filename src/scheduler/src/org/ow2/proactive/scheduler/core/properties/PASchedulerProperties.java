@@ -188,7 +188,7 @@ public enum PASchedulerProperties {
     private static final boolean fileLoaded;
 
     static {
-        String propertiesPath = "config/PASchedulerProperties.ini";
+        String propertiesPath = "config/scheduler/settings.ini";
         if (System.getProperty("pa.scheduler.properties.filepath") != null) {
             propertiesPath = System.getProperty("pa.scheduler.properties.filepath");
         }

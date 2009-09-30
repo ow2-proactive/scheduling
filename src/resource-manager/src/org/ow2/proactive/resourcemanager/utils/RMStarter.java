@@ -92,7 +92,7 @@ public class RMStarter {
         logger.info("");
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(120);
-        hf.printHelp("startRM", options, true);
+        hf.printHelp("rm-start", options, true);
         logger.info("\n Notice : Without argument, Resource Manager starts without any computing node.");
         System.exit(1);
     }
@@ -136,7 +136,7 @@ public class RMStarter {
             Collection<String> deploymentDescriptors = new LinkedList<String>();
             if (cmd.hasOption("localNodes")) {
                 String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                    File.separator + "config/deployment/Local4JVMDeployment.xml";
+                    File.separator + "config/rm/deployment/Local4JVMDeployment.xml";
                 deploymentDescriptors.add(gcmDeployFile);
             } else if (cmd.hasOption("d")) {
                 for (String desc : gcmdList) {

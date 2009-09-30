@@ -1,0 +1,33 @@
+. common
+
+function build() {
+	echo "********************** Building the resource manager ************************"
+	cd compile || warn_and_exit "Cannot move in compile"
+	mv rm-build.xml build.xml
+	./build clean
+	./build -Dversion="${VERSION}" deploy.rm deploy.rm.client
+	./build -Dversion="${VERSION}" doc.rm.manualPdf
+}
+
+function separate_rm() {
+	echo "********************** Separating the resource manager ************************"
+	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
+	#removing all files related to the scheduler
+	rm -rf ./.project
+	rm -rf ./.classpath
+	rm -rf ./README.txt
+	rm -rf ./extensions
+	rm -rf ./samples/jobs_descriptors
+	rm -rf ./samples/munin
+	find . -name "scheduler*" -exec rm -rf {} \;
+	find . -name "matlab*" -exec rm -rf {} \;
+	find . -name "scilab*" -exec rm -rf {} \;
+	mv RM-README.txt README.txt
+};
+
+init_env ProActiveResourceManager $*
+copy_to_tmp
+build_and_clean
+separate_rm
+replace_version
+build_archive

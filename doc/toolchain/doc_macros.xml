@@ -126,6 +126,8 @@
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<macrodef name="manualSingleHtml" description="Make only the big html file in the manual">
+		<!--<attribute name="mainFile" value="${docs.mainFile}" />-->
+
 		<sequential>
 		  <docbookPreProcess output.docs.dir="${docs.html.single.dir}" />
 		  <docbookTransform docbookInputFile="${docs.mainFile}" 

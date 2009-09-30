@@ -46,7 +46,7 @@
 				 into your installed scheduler home path.</para>
 			</listitem>
 			<listitem><para>
-				Then launch the <emphasis>startScheduler_newDB.[sh|bat]</emphasis> script to create the database
+				Then launch the <emphasis>scheduler-start-clean[.bat]</emphasis> script to create the database
 				and launch the Scheduler.
 				This database is used to store ProActive Scheduler activities and to offer fault tolerance.
 				The scheduler will start and connect to the Resources Manager that either you have already launched
@@ -58,9 +58,9 @@
 			</listitem>
 			<listitem>
 				<para>
-					What you can do now is submitting a job. To do so, just start the <emphasis>userScheduler.[sh|bat]</emphasis> script with
+					What you can do now is submitting a job. To do so, just start the <emphasis>scheduler-user[.bat]</emphasis> script with
 					proper parameters (in the same directory). Using
-					<emphasis>userScheduler.sh -submit ../../samples/jobs_descriptors/Job_8_tasks.xml</emphasis>,
+					<emphasis>scheduler-user[.bat] -submit ../../samples/jobs_descriptors/Job_8_tasks.xml</emphasis>,
 					this will request for login and password and then, submit this job to the scheduler. The default login and password, 
 					is <emphasis>user1 pwd1</emphasis>.
 				</para>

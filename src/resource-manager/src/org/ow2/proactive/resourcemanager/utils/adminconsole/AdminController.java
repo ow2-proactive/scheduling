@@ -92,7 +92,7 @@ public class AdminController {
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
     protected static AdminController shell;
 
-    private String commandName = "adminRM";
+    private String commandName = "rm-admin";
 
     protected CommandLine cmd = null;
     protected String user = null;
@@ -510,7 +510,7 @@ public class AdminController {
         if (System.getProperty("os.name").contains("Windows")) {
             return ".bat";
         } else {
-            return ".sh";
+            return "";
         }
     }
 

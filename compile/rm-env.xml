@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="compile">
+	<import file="common-env.xml" />
+
+	<property name="src.rm.dir"          value="${src.dir}/resource-manager/src" />
+	<property name="src.rm.tests.dir"    value="${src.dir}/resource-manager/tests" />
+	<property name="doc.name" 			 value="ResourceManager" />
+
+	<!-- ================================================================ -->
+	<!--                   		Class  paths                              -->
+	<!--  =============================================================== -->
+
+	<property name="cl.rm.dir"           value="${classes.dir}/resource-manager" />
+	<property name="cl.rm.tests.dir"     value="${classes.dir}/resource-managerTests" />
+
+	<property name="rm.path"    		value="${proactive.path}/resourcemanager"/>
+
+	<property name="resourcemanager-plugin.dir" value="${base.dir}/resource-manager-plugin-src" />
+
+
+	<!-- ================================================================ -->
+    <!--                    		jar  names                            -->
+	<!--  =============================================================== -->
+
+	<property name="rm.jar"            value="ProActive_ResourceManager.jar" />
+	<property name="rm.client.jar"     value="ProActive_ResourceManager-client.jar" />
+
+
+	<!-- ================================================================ -->
+	<!--                   define the different classpaths                -->
+	<!--  =============================================================== -->
+
+	<path id="rm.libs">
+		<fileset dir="${lib.dir}">
+			<include name="ProActive/**/*.jar"/>
+			<include name="common/**/*.jar"/>
+			<include name="hibernate/**/*.jar"/>
+			<!-- Amazon EC2 libs -->
+			<include name="ec2/**/*.jar"/>
+		</fileset>
+		<pathelement location="${cl.common.dir}" />
+		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
+	</path>
+
+	<path id="rm.classpath">
+		<path refid="common.libs"/>
+		<fileset dir="${lib.dir}">
+		    <include name="ec2/**/*.jar"/>
+		</fileset>
+		<pathelement location="${cl.common.dir}" />
+		<pathelement location="${cl.rm.dir}" />
+	</path>
+
+	<path id="rm.test.classpath">
+		<path refid="rm.classpath"/>
+		<pathelement location="${cl.rm.tests.dir}" />
+		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
+	</path>
+
+    <if name="test">
+            <fileset dir="${cl.rm.tests.dir}" id="rm.testsuite">
+                            <include name="${test}" />
+                            <exclude name="**/*$*.class" />
+            </fileset>
+    <else>
+            <fileset dir="${cl.rm.tests.dir}" id="rm.testsuite">
+                    <include name="**/*Test*.class" />
+                    <exclude name="**/*$*.class"/>
+            </fileset>
+    </else>
+    </if>
+</project>

@@ -54,7 +54,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * - implement {@link NodeSourcePolicy#configure(Object...)} and setup there all policy parameters which are available through UI
  * - define activation and disactivation policy behavior by implementing corresponding methods
  * - define how policy should react on nodes adding request initiated by user in {@link NodeSourcePolicy#handleUserChanges()}
- * - add the name of new policy class to the resource manager configuration file (config/nodesource/policies).
+ * - add the name of new policy class to the resource manager configuration file (config/rm/nodesource/policies).
  *
  */
 public abstract class NodeSourcePolicy implements Serializable {

@@ -90,8 +90,6 @@ public class UserController {
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
     protected static UserController shell;
 
-    protected String commandName = "userScheduler";
-
     protected CommandLine cmd = null;
     protected String user = null;
     protected String pwd = null;
@@ -276,12 +274,16 @@ public class UserController {
             hf.setWidth(135);
             String note = newline + "NOTE : if no " + control +
                 "command is specified, the controller will start in interactive mode.";
-            hf.printHelp(commandName + Tools.shellExtension(), "", options, note, true);
+            hf.printHelp(getCommandName() + Tools.shellExtension(), "", options, note, true);
             System.exit(2);
         }
 
         // if execution reaches this point this means it must exit
         System.exit(0);
+    }
+
+    protected String getCommandName() {
+        return "scheduler-user";
     }
 
     protected void connect() throws LoginException {

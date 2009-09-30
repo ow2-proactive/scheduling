@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Common" default="deploy.common" basedir=".">
+	<!--
+		Available properties are:
+			-Dtest='unitTests/**/*.class'		Override the default testsuite for junit* targets
+			-Dversion="3.2.1"					Tag a build with this version
+	-->
+
+	<!--
+		Create a timestamp for this build
+		If ${version} is defined its value is used as string version for this build
+		Otherwise the timestamp is used
+	-->
+
+	<!-- ************
+		Imports
+	-->
+
+	<property file="${user.home}/.proactive/build.properties" />
+	<import file="common-env.xml" />
+
+
+	<!-- ************
+		Taskdefs
+	-->
+
+	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
+
+	<!-- ************
+		Classpath
+	-->
+
+	<tstamp>
+		<format property="TODAY" pattern="yyyy-MM-dd" />
+	</tstamp>
+
+	<if name="version">
+		<property name="isRelease" value="true" />
+
+		<else>
+			<property name="version" value="${TODAY}" />
+		</else>
+	</if>
+
+	<!-- ************
+		Compilation
+	-->
+
+	 <target name="compile.common" description="Compile commmon stuffs">
+                <mkdir dir="${cl.common.dir}"/>
+
+				<copy toDir="${cl.common.dir}">
+						<fileset dir="${src.common}" excludes="**/*.java"/>
+				</copy>
+
+                <javac
+                        srcdir="${src.common}"
+                        destdir="${cl.common.dir}"
+                        deprecation="on"
+                        source="${source}"
+                        debug="${debug}"  >
+
+                        <classpath refid="common.libs"/>
+                        <include name="**/*.java"/>
+                </javac>
+      </target>
+
+
+    <!-- ************
+		Deploy
+	-->
+
+	<target name="-deployCopy" >
+		<mkdir dir="${deploy.lib.dir}"/>
+		<copy todir="${deploy.lib.dir}" flatten="yes">
+			<fileset dir="${lib.dir}" includes="**/*.jar"/>
+        </copy>
+        <copy todir="${deploy.lib.dir}" flatten="no">
+            <fileset dir="${lib.dir}/ProActive" includes="**/*.so"/>
+            <fileset dir="${lib.dir}/ProActive" includes="**/*.dll"/>
+        </copy>
+        <copy todir="${deploy.dir}/scripts">
+		   <fileset dir="${scripts.dir}"/>
+		</copy>
+    </target>
+
+	<target name="deploy.common.client" depends="-deployCopy, compile.common" description="Creates common client jar">
+		<jar destfile="${deploy.lib.dir}/${srm.common.client.jar}" index="true">
+			<fileset dir="${cl.common.dir}">
+				<include name="org/ow2/proactive/authentication/Loggable.class" />
+				<include name="org/ow2/proactive/authentication/Connection.class" />
+				<include name="org/ow2/proactive/authentication/Authentication.class" />
+				<include name="org/ow2/proactive/authentication/crypto/**" />
+				<include name="org/ow2/proactive/scripting/**" />
+				<include name="org/ow2/proactive/utils/**" />
+			</fileset>
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
+        </jar>
+	</target>
+
+	<target name="deploy.common" depends="-deployCopy, compile.common" description="Creates common core jar">
+		<jar destfile="${deploy.lib.dir}/${srm.common.jar}" index="true">
+			<fileset dir="${cl.common.dir}" includes="**" />
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
+        </jar>
+	</target>
+
+	<!-- ************
+		ing
+	-->
+
+	<macrodef name="junitMacro">
+		<attribute name="testsuite"/>
+		<attribute name="testclasspath"/>
+		<attribute name="log4jconfig"/>
+		<element name="jvmargs" optional="yes" />
+		<element name="additionalClasspath" optional="yes" />
+		<sequential>
+
+			<delete dir="${base.dir}/SCHEDULER_DB" />
+			<mkdir dir="${junit.dir}" />
+			<junit printsummary="yes" forkmode="perTest" showoutput="${junit.showoutput}">
+				<jvmarg value="-Dproactive.home=${base.dir}" />
+				<jvmarg value="-Dpa.scheduler.home=${base.dir}" />
+				<jvmarg value="-Dpa.rm.home=${base.dir}" />
+				<classpath>
+					<additionalClasspath />
+					<path refid="@{testclasspath}" />
+				</classpath>
+
+				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
+				<jvmarg value="@{log4jconfig}"/>
+				<jvmarg value="-Dproactive.http.jetty.xml=${base.dir}/config/rm/deployment/jetty.xml"/>
+				<jvmargs />
+
+				<!--
+					Remote Debug:
+					<jvmarg value="-Xdebug" />
+					<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000" />
+
+					Yourkit (don't forget to set your LD_LIBRARY_PATH):
+					<jvmarg value="-agentlib:yjpagent" />
+				-->
+
+				<formatter type="xml" />
+
+
+				<batchtest fork="yes" todir="${junit.dir}">
+					<fileset refid="@{testsuite}" />
+				</batchtest>
+			</junit>
+		</sequential>
+	</macrodef>
+
+	<target name="with.clover">
+		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar" />
+		<clover-setup initString="${compile.dir}/ProActiveCoverage.db" />
+	</target>
+
+	<macrodef name="eclipse_format_m">
+		<attribute name="loglevel" default="WARN" />
+		<element name="sourcefileset" optional="false" />
+
+		<sequential>
+			<taskdef name="javaformatter" classname="org.hibernate.tool.ant.JavaFormatterTask">
+				<classpath>
+					<fileset dir="${dev.dir}/lib">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+
+			<copy file="${compile.dir}/eclipse_formatter_config.xml" tofile="${compile.dir}/eclipse_formatter_config.properties" />
+
+			<replaceregexp file="${compile.dir}/eclipse_formatter_config.properties" match='^&lt;(.xml|/?profile).*' replace="" byline="true" />
+
+			<replaceregexp file="${compile.dir}/eclipse_formatter_config.properties" match='.*\"(.*)\".*\"(.*)\".*' replace="\1=\2" byline="true" />
+
+			<javaformatter configurationFile="eclipse_formatter_config.properties">
+				<sourcefileset />
+			</javaformatter>
+		</sequential>
+	</macrodef>
+
+	<target name="format" description="hibernate's eclipse-based source code formatter">
+		<eclipse_format_m>
+			<sourcefileset>
+				<fileset dir="${src.common}" includes="**/*.java" />
+				<fileset dir="${src.scheduler.dir}" includes="**/*.java" />
+				<fileset dir="${src.scheduler.tests.dir}" includes="**/*.java" />
+				<fileset dir="${src.rm.dir}" includes="**/*.java" />
+				<fileset dir="${src.rm.tests.dir}" includes="**/*.java" />
+				<fileset dir="${rcp.plugins.dir}" includes="**/*.java" />
+			</sourcefileset>
+		</eclipse_format_m>
+	</target>
+
+	<!-- ************
+		Misc
+	-->
+
+	<target name="clean" description="Remove all generated files">
+		<delete dir="${classes.dir}" />
+		<delete dir="${release.dir}" />
+		<delete dir="${deploy.dir}" />
+		<delete dir="${classlibs.dir}" />
+		<delete dir="${test.classes.dir}" />
+		<delete file="tests.log" />
+		<delete dir="${junit.dir}" />
+		<!-- Database generated classes -->
+		<delete file="${base.dir}/.logs/derby.log" />
+		<subant target="doc.clean" inheritall="true">
+			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		</subant>
+	</target>
+
+
+	<target name="-init">
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${cl.examples.dir}" />
+		<mkdir dir="${cl.extra.dir}" />
+		<mkdir dir="${cl.extensions.dir}" />
+		<mkdir dir="${cl.proactive.dir}" />
+		<mkdir dir="${cl.test.dir}" />
+		<mkdir dir="${cl.utils.dir}" />
+		<mkdir dir="${cl.benchmarks.dir}" />
+
+		<echo message="--- Debugging is ${debug} ---" />
+	</target>
+
+	<target name="-configurationCopy" depends="-init">
+		<copy toDir="${cl.proactive.dir}">
+			<fileset dir="${src.proactive.dir}">
+				<include name="org/objectweb/proactive/core/config/proactive-log4j" />
+				<include name="org/**/*.xml" />
+				<include name="org/**/*.fractal" />
+				<include name="org/**/*.properties" />
+				<include name="org/**/*.xsd" />
+				<include name="org/**/*.png" />
+				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd" />
+				<include name="common/**/jaas.config" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="update_copyright_and_version" description="Update Copyright and Version in every text files">
+		<java classname="sources.UpdateCopyrightAndVersion" fork="false">
+			<classpath path="${lib.dir}/ProActive/ProActive_utils.jar" />
+			<!--  base dir -->
+			<arg value="${base.dir}" />
+			<!--  exclude dirs -->
+			<arg value="${docs.dir}" />
+			<arg value="${dist.dir}" />
+			<arg value="${classes.dir}" />
+			<arg value="${test.classes.dir}" />
+			<arg value="${lib.dir}" />
+			<arg value="${dev.dir}" />
+			<arg value="${extra.format.dir}"/>
+		<sysproperty key="copyright.update" value="${copyright.update}"/>
+		</java>
+	</target>
+</project>

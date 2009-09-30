@@ -76,7 +76,6 @@ public class AdminController extends UserController {
      * Convenience constructor to let the default one do nothing
      */
     protected AdminController(Object o) {
-        commandName = "adminScheduler";
         model = AdminSchedulerModel.getModel(true);
     }
 
@@ -185,4 +184,7 @@ public class AdminController extends UserController {
         }
     }
 
+    protected String getCommandName() {
+        return "scheduler-admin";
+    }
 }

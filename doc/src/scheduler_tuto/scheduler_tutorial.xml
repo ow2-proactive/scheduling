@@ -652,17 +652,17 @@ public class HelloTask extends JavaExecutable{
 	<section xml:id="launch_sched"><info><title>Launch the scheduler (easy way)</title></info>
 		
 	<para>
-	This way of doing enables you to launch a scheduler without manually launching a Resources Manager before and adding nodes to it. It uses either the <emphasis>startScheduler.sh</emphasis> script or the <emphasis>startScheduler_newDB.sh</emphasis> one.
+	This way of doing enables you to launch a scheduler without manually launching a Resources Manager before and adding nodes to it. It uses either the <emphasis>scheduler-start</emphasis> script or the <emphasis>scheduler-start-clean</emphasis> one.
 	Type the following command:
 	</para>
 	<para>
-	<code>$ startScheduler[_newDB].sh -u //localhost/</code>
+	<code>$ scheduler-start[-clean] -u //localhost/</code>
 	</para>
 	<para>
 	The <emphasis>"-u URL"</emphasis> option specifies the location of a running Resource Manager.
 	If you don't specify a URL for the RM, the Scheduler will first try to connect to a local Resource Manager (at the address <code>//localhost/</code>) 
 	and if it cannot find one, it will create a new one. 
-	You can choose either to use the previous database if you have already launched a scheduler before and to create a new one using the startScheduler_newDB.sh script.
+	You can choose either to use the previous database if you have already launched a scheduler before and to create a new one using the scheduler-start-clean script.
 	This script will launch the Scheduler service, and the Scheduler will connect 
 	to the Resource Manager which has been previously launched.
 	Once started, you can see on the standard output the line:
@@ -675,11 +675,11 @@ public class HelloTask extends JavaExecutable{
 	<section xml:id="launch_RM"><info><title>Launch the Resource Manager and then the Scheduler (flexible way)</title></info>
 		
 	<para>
-	Launching the Resource Manager before the Scheduler gives you more flexibility. To do this, you have first to use the <emphasis>startRM.sh</emphasis> script.
+	Launching the Resource Manager before the Scheduler gives you more flexibility. To do this, you have first to use the <emphasis>rm-start</emphasis> script.
 	Type:
 	</para>
 	<para>
-	<code>$ startRM.sh</code>
+	<code>$ rm-start</code>
 	</para>
 	<para>That will start a Resource Manager with no node.
 	Once started, you can see on the standard output the line:</para>
@@ -690,11 +690,11 @@ public class HelloTask extends JavaExecutable{
 	</para>
 	<para>
 	Then, you can add as many nodes as you want.
-	For this, you have to use both the <emphasis>startNode.sh</emphasis> and the <emphasis>adminRM.sh</emphasis> scripts.
+	For this, you have to use both the <emphasis>rm-start-node</emphasis> and the <emphasis>rm-admin</emphasis> scripts.
 	So, you first have to start a new node. Type the following command to start a node called 'MyNode':
 	</para>
 	<para>
-		<code>startNode.sh MyNode</code>
+		<code>rm-start-node MyNode</code>
 	</para>
 	<para>
 		You can see that your node has well been created and started when the line hereafter has been displayed:
@@ -708,7 +708,7 @@ public class HelloTask extends JavaExecutable{
 	Now, you are ready to add this node to the Resource Manager. Type:
 	</para>
 	<para>
-		<code>adminRm.sh -a rmi://hostname:port/MyNode</code>
+		<code>rm-admin -a rmi://hostname:port/MyNode</code>
 	</para>
 	<para>
 	In order to have the right to use this command, you have to use the login and the password of an administrator. By default, an administrator whose login is <emphasis>jl</emphasis> and whose password is also <emphasis>jl</emphasis> is defined. After this operation, you can see the line:</para>
@@ -722,7 +722,7 @@ public class HelloTask extends JavaExecutable{
 	You can also check all the nodes of your Resource Manager by typing:
 	</para>
 	<para>
-		<code>adminRm.sh -ln</code>
+		<code>rm-admin -ln</code>
 	</para>
 	<para>
 	Finally, it just remains to launch the Scheduler as it was done in <xref linkend="launch_sched"/>. The Scheduler will automatically look for an existing Resource Manager first. It will therefore find the one you have launched and use it. If you have launched the Resource Manager on a host different from those on which you want to start the Scheduler, you have to precise its URL to the startScheduler.sh script.
@@ -732,32 +732,32 @@ public class HelloTask extends JavaExecutable{
 	Please refer to the ProActive documentation at 
     <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/index.php?page=documentation">http://proactive.inria.fr/index.php?page=documentation</uri>
 	to have more information about deployment/acquisition of nodes with the ProActive library.
-	Such a deployment descriptor file is given in <code>[Scheduler_Home_Dir]/config/deployment/Local4JVMDeployment.xml</code>. It is the file which is used when you proceed by the easy way.
+	Such a deployment descriptor file is given in <code>[Scheduler_Home_Dir]/config/rm/deployment/Local4JVMDeployment.xml</code>. It is the file which is used when you proceed by the easy way.
 	You can create your own deployment file and, then type the following line (with you own file) to start the RM:
 	</para>
 	<para>
-		<code>adminRm.sh -d ../../config/deployment/Local4JVMDeployment.xml</code>
+		<code>rm-admin -d ../../config/rm/deployment/Local4JVMDeployment.xml</code>
 	</para>
 	<para>
 	This command is strictly equivalent to this one:
 	</para>
 	<para>
-		<code>adminRm.sh -localNodes</code>
+		<code>rm-admin -localNodes</code>
 	</para>
-	<note><para>The command <emphasis>adminRM.sh</emphasis> can also be used in iteractive mode. Just type <code>adminRM.sh</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
+	<note><para>The command <emphasis>rm-admin</emphasis> can also be used in iteractive mode. Just type <code>rm-admin</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
 	</section>
 
 	<section xml:id="submission"><info><title>Submit the job</title></info>
 		
 	<para>
-	Finally, submit your job using the <emphasis>userScheduler.sh</emphasis> script. This script can be used not only for submitting a job, but also, for instance, for retrieving a result (see <xref linkend="retrieve_result"/>).
-	Type <code>userScheduler.sh -h</code> to find out all you can do wiht this script. 
+	Finally, submit your job using the <emphasis>scheduler-user</emphasis> script. This script can be used not only for submitting a job, but also, for instance, for retrieving a result (see <xref linkend="retrieve_result"/>).
+	Type <code>scheduler-user -h</code> to find out all you can do wiht this script.
 	</para>
 	<para>
 	For submitting your job, type the following line:
 	</para>
 	<para>
-		<code>userScheduler.sh -l user1 -submit ../../samples/jobs_descriptors/Job_nativ.xml</code>
+		<code>scheduler-user -l user1 -submit ../../samples/jobs_descriptors/Job_nativ.xml</code>
 	</para>
 	<para>
 		The <emphasis>"-submit ../../samples/jobs_descriptors/Job_nativ.xml"</emphasis> option specifies that you want to submit a job whose xml description file is ../../samples/jobs_descriptors/Job_nativ.xml. As for the <emphasis>"-l user1"</emphasis> option, it specifies the login to use.
@@ -772,12 +772,12 @@ public class HelloTask extends JavaExecutable{
 		
 	<para>
 	When the scheduling of a job is finished, scheduler stores its result and waits for the user to retrieve it.
-	As it has already been said, the <emphasis>userScheduler.sh</emphasis> script is used to retrieve results.
+	As it has already been said, the <emphasis>scheduler-user</emphasis> script is used to retrieve results.
 	Launch on scheduler host this following command
 	(still into the <code>[Scheduler_Home_Dir]/bin/[OS]/</code> directory):	
 	</para>
 	<para>
-		<code>$ userScheduler.sh -l user1 -result ID</code> 
+		<code>$ scheduler-user -l user1 -result ID</code>
 	</para>
 	<para>
 		Type the user1's password.
@@ -796,13 +796,13 @@ public class HelloTask extends JavaExecutable{
 	You have two return codes of the native programs.
 	</para>
 	<para>
-	If you want to see the output of your job, you can use the <emphasis>userScheduler.sh</emphasis> script with the <emphasis>output</emphasis> option.
+	If you want to see the output of your job, you can use the <emphasis>scheduler-user</emphasis> script with the <emphasis>output</emphasis> option.
 	Type:
 	</para>
 	<para>
-		<code>$ userScheduler.sh -l user1 -output ID</code> 
+		<code>$ scheduler-user -l user1 -output ID</code>
 	</para>
-	<note><para>In the same way that for the command <emphasis>adminRM.sh</emphasis>, you can also use the command <emphasis>userScheduler.sh</emphasis> in interactive mode. Just type <code>userScheduler.sh</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
+	<note><para>In the same way that for the command <emphasis>rm-admin</emphasis>, you can also use the command <emphasis>scheduler-user</emphasis> in interactive mode. Just type <code>scheduler-user</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
 	</section>		
 	</section>
 	<section xml:id="sched_gui"><info><title>Using the GUI client application for job submission</title></info>

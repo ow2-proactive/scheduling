@@ -246,7 +246,7 @@
 			</section>
 			<section xml:id="rm_gui_gcm_customized_infrastructure"><info><title>GCM Customized infrastructure</title></info>
 				<para>If GCM Customized infrastructure is chosen, then select a GCM deployment template that describes how to deploy one node
-				to the host (for example see config/deployment/deployment_ssh_hosts_list_template.xml). The template has to use HOST
+				to the host (for example see config/rm/deployment/deployment_ssh_hosts_list_template.xml). The template has to use HOST
 				java variable. This variable will be defined at runtime by the infrastructure manager. Host list should be a file
 				containing host names.
 				</para>

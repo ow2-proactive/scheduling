@@ -185,7 +185,7 @@
 					<para>
 						New infrastructure manager or node source policy can be dynamically plugged into the Resource Manager.
 						In order to do that, it is just required to add new implemented classes in the class path and update
-						corresponding list in the configuration file (<code>[SCHEDULER_HOME]/config/nodesource</code>).
+						corresponding list in the configuration file (<code>[SCHEDULER_HOME]/config/rm/nodesource</code>).
 					</para>
 				</listitem>
 			</itemizedlist>

@@ -1030,8 +1030,8 @@ task2.setGenerationScript(gscript);
 			</section>
 			<section xml:id="Submit_a_job_sh"><info><title>Submit a job using the shell command</title></info>
 				<para>
-					Use the provided shell script <emphasis>userScheduler.[sh|bat]</emphasis> to submit a job using command line.
-					This script (bin/[os]/userScheduler.[sh|bat] used to submit a job) has 1 mandatory option and 2 optional :
+					Use the provided shell script <emphasis>scheduler-user[.bat]</emphasis> to submit a job using command line.
+					This script (bin/[os]/scheduler-user[.bat] used to submit a job) has 1 mandatory option and 2 optional :
 					<itemizedlist>
 						<listitem>
 							<para>
@@ -1073,7 +1073,7 @@ task2.setGenerationScript(gscript);
 				</para>
 				<para>
 					<emphasis>
-						userScheduler.[sh|bat] -submit ../../samples/jobs_descriptors/Job_with_dep.xml -l login -u //localhost:1099/
+						scheduler-user[.bat] -submit ../../samples/jobs_descriptors/Job_with_dep.xml -l login -u //localhost:1099/
 					</emphasis>
 					will submit the <literal>Job_with_dep</literal> job to a local
 					ProActive Scheduler on port 1099 with the username 'login', and only your password will be requested.
@@ -1081,18 +1081,18 @@ task2.setGenerationScript(gscript);
 				</para>
 				<para>
 					<emphasis>
-						userScheduler.[sh|bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/cmds_file.cmd -cmdf -l demo //localhost/ -jn myJob -o myJob.log
+						scheduler-user[.bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/cmds_file.cmd -cmdf -l demo //localhost/ -jn myJob -o myJob.log
 					</emphasis>
 					will submit a job defined in a flat file, containing 4 native commands. Job is named "myJob", and a log file named "myJob.log" will be created.
 				</para>
 				<para>
 					<emphasis>
-						userScheduler.[sh|bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/myCmd.sh 4 -cmd -l demo -u //localhost -s ../../samples/scripts/selection/select.rb
+						scheduler-user[.bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/myCmd.sh 4 -cmd -l demo -u //localhost -s ../../samples/scripts/selection/select.rb
 					</emphasis>
 					will submit the native command "myCmd.sh" with "4" as the only argument. A selection script is associated for this native command: "select.rb".
 				</para>
 				<para>
-					For more information, use -h (or --help) option (i.e. "userScheduler.[sh|bat] -h").
+					For more information, use -h (or --help) option (i.e. "scheduler-user[.bat] -h").
 				</para>
 			</section>
 			<section xml:id="Submit_a_job_java"><info><title>Submit a job using the Java API</title></info>
@@ -1129,16 +1129,16 @@ JobId myJobId = scheduler.submit(job);
 				  to the Scheduler, as described in the example above:
 				  <orderedlist>
 				    <listitem><para>
-					Retreive the Credentials from disk: supposes the script <emphasis>createCred.[sh|bat]</emphasis> was previously used to generate those credentials. 
+					Retreive the Credentials from disk: supposes the script <emphasis>create-cred[.bat]</emphasis> was previously used to generate those credentials.
 					It requires knowing the location of the public key corresponding to the private key that will be used for decryption on server side.
 					To obtain the key, you can either have it on your local drive, or ask the remote Scheduler:
 				      </para>
 				      <para>
 					<screen><![CDATA[
 # use local public key to generate credentials for user 'demo'
-/bin/unix $ ./createCred.sh -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
+/bin/unix $ ./create-cred -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
 # use rmi://example.com/SCHEDULER's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
-/bin/unix $ ./createCred.sh -U rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+/bin/unix $ ./create-cred -U rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
 ]]></screen>
 					Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; ie using
 					<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>.
@@ -1184,7 +1184,7 @@ scheduler.submit(job);
 			</section>
 			<section xml:id="get_result_sh"><info><title>Get a job result using the shell command</title></info>
 				<para>
-					To get the result of you job using a command line, launch the command <emphasis>userScheduler.[sh|bat] -result jobID</emphasis> script in the bin/[os]/ directory.
+					To get the result of you job using a command line, launch the command <emphasis>scheduler-user[.bat] -result jobID</emphasis> script in the bin/[os]/ directory.
 					This script has 2 optional options:
 					<itemizedlist>
 						<listitem>
@@ -1207,7 +1207,7 @@ scheduler.submit(job);
 					toString() Java method could have done it.
 				</para>
 				<para>
-					For more information, use -h (or --help) option (i.e. "userScheduler.[sh|bat] -h").
+					For more information, use -h (or --help) option (i.e. "scheduler-user[.bat] -h").
 				</para>
 			</section>
 			<section xml:id="get_result_java"><info><title>Get a job result using the Java API</title></info>
@@ -1309,11 +1309,11 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 			</para>
 			<section xml:id="scheduler_controller_non_interactive"><info><title>Command line mode</title></info>
 				<para>
-					Here is the displayed help when using <emphasis>userScheduler.[sh|bat] -h</emphasis> command:
+					Here is the displayed help when using <emphasis>scheduler-user[.bat] -h</emphasis> command:
 					<figure xml:id="scheduler_controller_help"><info><title>Scheduler controller help</title></info>
 						<mediaobject>
 							<imageobject>
-								<imagedata width="100%" align="center" fileref="scheduler/pics/schedulerControllerHelp.png" format="PNG"/>
+								<imagedata width="100%" align="center" fileref="scheduler/pics/scheduler-user-h.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1324,20 +1324,20 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -l demo -submit path/to/job/xml/descriptor</emphasis>: tries to connect user demo, prompts for
+							<emphasis>scheduler-user[.bat] -l demo -submit path/to/job/xml/descriptor</emphasis>: tries to connect user demo, prompts for
 							its password and submits the given XML descriptor file.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -l demo -cmd -jn test -submit ls -al</emphasis>: tries to connect user demo, prompts for
+							<emphasis>scheduler-user[.bat] -l demo -cmd -jn test -submit ls -al</emphasis>: tries to connect user demo, prompts for
 							its password and submits the given command line in a job named 'test'. In this case, the <emphasis role="italics">-cmd</emphasis> option forces
 							the argument of <emphasis role="italics">-submit</emphasis> option to be a command line.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -cmdf -s path/to/a/selection/script -submit path/to/a/text/file</emphasis>: prompts for a username and
+							<emphasis>scheduler-user[.bat] -cmdf -s path/to/a/selection/script -submit path/to/a/text/file</emphasis>: prompts for a username and
 							its password and submits the given commands file. It also includes the given selection script file.
 							In this case, the <emphasis role="italics">-cmdf</emphasis> option forces
 							the argument of <emphasis role="italics">-submit</emphasis> option to be a flat text file that contains
@@ -1346,19 +1346,19 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -output 12</emphasis>: prompts for a username and
+							<emphasis>scheduler-user[.bat] -output 12</emphasis>: prompts for a username and
 							its password and displays the output written by job 12 if it is finished.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -result 34</emphasis>: prompts for a username and
+							<emphasis>scheduler-user[.bat] -result 34</emphasis>: prompts for a username and
 							its password and displays the result of job 34 if it is finished.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>userScheduler.[sh|bat] -priority 56 Lowest</emphasis>: prompts for a username and
+							<emphasis>scheduler-user[.bat] -priority 56 Lowest</emphasis>: prompts for a username and
 							its password and requests the Scheduler to change job 56 priority to 'LOWEST'.
 						</para>
 					</listitem>
@@ -1379,9 +1379,9 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 					In batch mode, this public key will be used when encrypting the credentials with the createCred.[sh|bat] script: 
 					<screen><![CDATA[
 # use local public key to generate credentials for user 'demo'
-/bin/unix $ ./createCred.sh -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
+/bin/unix $ ./create-cred -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
 # use rmi://example.com/SCHEDULER's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
-/bin/unix $ ./createCred.sh -U rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+/bin/unix $ ./create-cred -U rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
 ]]></screen>
 					When running the controller, Credentials will now be retreived when properly designated by the
 					<emphasis>pa.common.auth.credentials</emphasis> property; ie. using
@@ -1398,8 +1398,8 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 			<section xml:id="scheduler_controller_interactive"><info><title>Interactive mode</title></info>
 				<para>
 					Another way to interact with the Scheduler is using the interactive mode of the controller. To start it in this mode,
-					just execute the bin/[os]/userScheduler.[sh|bat] command without specifying a 'ctl' option:
-					<emphasis>userScheduler.[sh|bat] -l demo -u rmi://localhost:1313/</emphasis> is an example which connects the controller
+					just execute the bin/[os]/scheduler-user[.bat] command without specifying a 'ctl' option:
+					<emphasis>scheduler-user[.bat] -l demo -u rmi://localhost:1313/</emphasis> is an example which connects the controller
 					to a local Scheduler on the port 1313 with 'demo' login.
 				</para>
 				<para>
@@ -1408,7 +1408,7 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 					<figure xml:id="scheduler_controller_i_help"><info><title>Scheduler controller interactive help</title></info>
 						<mediaobject>
 							<imageobject>
-								<imagedata width="100%" align="center" fileref="scheduler/pics/schedulerControllerIHelp.png" format="PNG"/>
+								<imagedata width="100%" align="center" fileref="scheduler/pics/scheduler-user-interractive-h.png" format="PNG"/>
 							</imageobject>
 						</mediaobject>
 					</figure>

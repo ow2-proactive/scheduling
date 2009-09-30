@@ -55,7 +55,7 @@
       <listitem><para>
 	  Use this information to fill in the properties <emphasis>AWS_AKEY</emphasis> (Access Key), 
 	  <emphasis>AWS_SKEY</emphasis> (Secret Key) and <emphasis>AWS_USER</emphasis> (numerical EC2 user ID)
-	  in the file located in <emphasis>/config/deployment/ec2.properties</emphasis>.
+	  in the file located in <emphasis>/config/rm/deployment/ec2.properties</emphasis>.
 	  Those thee parameters should never change, except if you need for some reason to
 	  handle multiple EC2 accounts.
 	  Other properties in the configuration file are:
@@ -114,8 +114,8 @@
       Sample configurations can be found in <emphasis>/samples/ec2</emphasis>.
     </para>
     <para>
-      Using this configuration, you can start a Resource Manager and a Scheduler using the <emphasis>/bin/unix/startRM.sh</emphasis>
-      and <emphasis>/bin/unix/startScheduler.sh</emphasis> scripts.
+      Using this configuration, you can start a Resource Manager and a Scheduler using the <emphasis>/bin/unix/rm-start</emphasis>
+      and <emphasis>/bin/unix/scheduler-start</emphasis> scripts.
       An EC2 NodeSource can now be added using the Resource Manager's GUI:
       <figure xml:id="RM_EC2_NS"><info><title>EC2 NodeSource creation dialog</title></info>
 	<mediaobject>
@@ -127,7 +127,7 @@
       You will need to specify:
       <itemizedlist>
 	<listitem><para>
-	    Configuration file: <emphasis>/config/deployment/ec2.properties</emphasis>,
+	    Configuration file: <emphasis>/config/rm/deployment/ec2.properties</emphasis>,
 	    which you earlier filled with your AWS credentials.
 	</para></listitem>
 	<listitem><para>
@@ -151,7 +151,7 @@
     </para>
     <para>
       Once the Resource Manager is up and running with its EC2 NodeSource,
-      new jobs can be added by using <emphasis>/bin/unix/adminScheduler.sh</emphasis>,
+      new jobs can be added by using <emphasis>/bin/unix/scheduler-admin</emphasis>,
       or the Scheduler GUI.
     </para>
   </section>
