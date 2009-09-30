@@ -171,7 +171,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     /**
      * {@inheritDoc}
      */
-    public String getJmxMonitoringUrl() {
+    public String getJMXConnectorURL() {
         return JMXMonitoringHelper.getDefaultJmxConnectorUrl() +
             PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME.getValueAsString();
     }

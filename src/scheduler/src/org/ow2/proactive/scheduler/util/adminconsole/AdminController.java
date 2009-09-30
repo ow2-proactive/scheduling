@@ -173,7 +173,7 @@ public class AdminController extends UserController {
     protected void connectJMXClient() throws JMXProviderException {
         try {
             PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(auth
-                    .getJmxMonitoringUrl() +
+                    .getJMXConnectorURL() +
                 "_admin");
             cli.connect(credentials, user);
             MBeanServerConnection conn = cli.getConnection();

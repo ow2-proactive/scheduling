@@ -62,10 +62,10 @@ public interface Authentication extends Loggable, Serializable {
     public PublicKey getPublicKey() throws LoginException;
 
     /**
-     * Return the JMX monitoring service URL used to contact this instance
+     * Return the JMX connector server URL used to contact this instance
      *
-     * @return the JMX monitoring service URL for this instance
+     * @return the JMX conector server URL for this instance
      */
-    public String getJmxMonitoringUrl();
+    public String getJMXConnectorURL();
 
 }
