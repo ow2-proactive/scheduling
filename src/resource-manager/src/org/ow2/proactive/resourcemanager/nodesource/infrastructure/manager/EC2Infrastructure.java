@@ -37,9 +37,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.rmi.dgc.VMID;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
@@ -228,7 +226,7 @@ public class EC2Infrastructure extends InfrastructureManager {
         synchronized (this.ec2d) {
 
             InetAddress addr = node.getVMInformation().getInetAddress();
-            if (!isThereNodesInSameJVM(node)) {
+            if (!isThereNodesInSameInstance(node)) {
                 logger.info("No node left, closing instance on URL :" + addr.toString());
 
                 if (this.ec2d.terminateInstanceByAddr(addr)) {
@@ -250,21 +248,20 @@ public class EC2Infrastructure extends InfrastructureManager {
     }
 
     /**
-     * Check if there are any other nodes handled by the NodeSource in the same JVM of the node
-     * passed in parameter.
+     * Check if there are any other nodes handled by the NodeSource in the same Instance
+     * of the node passed in parameter. Allows the release of unused instances,
+     * and avoids releasing instances with nodes still deployed
      *
      * @param node
-     *            Node to check if there any other node of the NodeSource in the same JVM
-     * @return true there is another node in the node's JVM handled by the nodeSource, false
+     *            Node to check if there any other node of the NodeSource in the same instance
+     * @return true there is another node in the node's instance handled by the nodeSource, false
      *         otherwise.
      */
-    public boolean isThereNodesInSameJVM(Node node) {
-        VMID nodeID = node.getVMInformation().getVMID();
-        String nodeToTestUrl = node.getNodeInformation().getURL();
-        Collection<Node> nodesList = nodeSource.getAliveNodes();
-        for (Node n : nodesList) {
-            if (!n.getNodeInformation().getURL().equals(nodeToTestUrl) &&
-                n.getVMInformation().getVMID().equals(nodeID)) {
+    public boolean isThereNodesInSameInstance(Node node) {
+        InetAddress addr1 = node.getVMInformation().getInetAddress();
+        for (Node n : nodeSource.getAliveNodes()) {
+            InetAddress addr2 = n.getVMInformation().getInetAddress();
+            if (addr1.equals(addr2)) {
                 return true;
             }
         }
