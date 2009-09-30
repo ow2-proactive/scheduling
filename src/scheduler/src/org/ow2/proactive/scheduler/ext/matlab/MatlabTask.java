@@ -224,14 +224,12 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
                 }
                 // We define the loggers which will write on standard output what comes from the java process
                 LoggingThread lt1 = new LoggingThread(jvminfo.getProcess().getInputStream(), "[" + host +
-                    " OUT]", new PrintStream(new File("D:\\test_out.txt")));// new PrintStream(new File("D:\\test_out.txt")));//System.out);
+                    " OUT]", System.out);// new PrintStream(new File("D:\\test_out.txt")));//System.out);
                 LoggingThread lt2 = new LoggingThread(jvminfo.getProcess().getErrorStream(), "[" + host +
-                    " ERR]", new PrintStream(new File("D:\\test_err.txt")));// new PrintStream(new File("D:\\test_err.txt")));//System.err);
-                //IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, jvminfo.getProcess().getOutputStream());
+                    " ERR]", System.err);// new PrintStream(new File("D:\\test_err.txt")));//System.err);
 
                 jvminfo.setLogger(lt1);
                 jvminfo.setEsLogger(lt2);
-                //jvminfo.setIoThread(rt1);
 
                 // We start the loggers thread
 
@@ -242,10 +240,6 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
                 Thread t2 = new Thread(lt2, "ERR Matlab");
                 t2.setDaemon(true);
                 t2.start();
-
-                //                Thread t3 = new Thread(rt1, "Redirecting I/O Matlab");
-                //                t3.setDaemon(true);
-                //                t3.start();
 
                 threadstarted = true;
 

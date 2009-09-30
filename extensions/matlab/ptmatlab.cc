@@ -56,6 +56,10 @@ typedef long long __int64;
 #include "ptmatlab.h"
 #include "engine.h"
 
+#ifdef _W64
+#include "BaseTsd.h"
+#endif
+
 // The following test is a kludge for a missing #define in the matlab
 // include files that would allow engine interface C code to test which
 // matlab version it is dealing with... This is a test for an earlier
@@ -72,7 +76,11 @@ typedef long long __int64;
 #endif
 
 // Declare an integer type that correctly casts a pointer
+#ifdef _WIN64
+typedef UINT_PTR ptrint;
+#else
 typedef long ptrint;
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

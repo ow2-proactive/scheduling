@@ -412,9 +412,19 @@ CYGWIN*)
     fi
     if !(test -f "$MINGW/bin/gcc.exe" -a -x "$MINGW/bin/gcc.exe"); then
 	    echo "$MINGW\bin\gcc.exe doesn't exist or is not executable"
-		exit 3
-	 fi
-	 PTCC=$MINGW/bin/gcc.exe
+          echo "Trying $MINGW\bin\x86_64-w64-mingw32-gcc.exe"
+          if !(test -f "$MINGW\bin\x86_64-w64-mingw32-gcc.exe" -a -x "$MINGW\bin\x86_64-w64-mingw32-gcc.exe"); then
+             echo "$MINGW\bin\x86_64-w64-mingw32-gcc.exe doesn't exist or is not executable"
+		 exit 3
+          else
+		PTMINGW=$(echo $(cygpath -u $MINGW))
+	 	PTCC=$PTMINGW/bin/x86_64-w64-mingw32-gcc.exe 
+	    fi
+    else
+    	 PTMINGW=$(echo $(cygpath -u $MINGW))
+	 PTCC=$PTMINGW/bin/gcc.exe
+    fi
+
 	 CFLAGS="-Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at"
 esac
 
@@ -627,7 +637,15 @@ else
 					esac
 					;;	
 				CYGWIN*)
-					MATLAB_LIBDIR=bin/win32
+					case "`uname`" in
+ 						*64)
+							MATLAB_LIBDIR=bin/win64
+							;;
+						*)
+							MATLAB_LIBDIR=bin/win32
+							;;
+					esac
+					
 					;;
 				SunOS*)
 					MATLAB_LIBDIR=extern/lib/sol2

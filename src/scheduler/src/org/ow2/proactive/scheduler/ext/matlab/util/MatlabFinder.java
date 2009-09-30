@@ -121,10 +121,7 @@ public class MatlabFinder {
             if (debug) {
                 System.out.println("Using script at " + batchFile.getAbsolutePath());
             }
-            //            while (!batchFile.exists()) {
-            //                Thread.sleep(100);
-            //            }
-            // finally we launch the batch file
+
             p1 = Runtime.getRuntime().exec(new String[] { "cmd", "/c", batchFile.getName() }, null,
                     batchFile.getParentFile());
         } else {
@@ -132,7 +129,6 @@ public class MatlabFinder {
         }
 
         ProcessResult pres = IOTools.blockingGetProcessResult(p1);
-        //ArrayList<String> lines = IOTools.getContentAsList(p1.getInputStream());
 
         if (debug) {
             System.out.println("Output of script :");
