@@ -99,7 +99,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-commons-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-client.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

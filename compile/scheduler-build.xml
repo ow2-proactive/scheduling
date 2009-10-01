@@ -283,7 +283,7 @@
 
 	<target name="rcp.libCopy.scheduler" depends="deploy.all" description="Copy all required libraries to scheduler plugins">
 		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${scheduler.rm.jar}, ${scheduler.rm.client.jar}, ${scheduler.client.jar}, ${scheduler.worker.jar}, ${scheduler.common.client.jar}"/>
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.jar}, ${rm.client.jar}, ${scheduler.client.jar}, ${scheduler.worker.jar}, ${srm.common.client.jar}"/>
 		</copy>
 	</target>
 

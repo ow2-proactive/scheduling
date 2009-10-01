@@ -105,9 +105,9 @@
 		<delete dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" />
 	</target>
 
-	<target name="rcp.libCopy.rm" depends="deploy.rm, deploy.scheduler.client" description="Copy all required libraries to RM plugins">
+	<target name="rcp.libCopy.rm" depends="deploy.rm" description="Copy all required libraries to RM plugins">
 		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${scheduler.rm.client.jar}, ${scheduler.core.jar}, ${scheduler.worker.jar}, ${scheduler.common.client.jar}"/>
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.client.jar}, ${srm.common.client.jar}"/>
 		</copy>
 	</target>
 
