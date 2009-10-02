@@ -38,16 +38,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
+import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -300,19 +303,63 @@ public class AdminRMModel extends ConsoleModel {
         }
     }
 
-    public static void createns(String nodeSourceName) {
+    public static boolean createns(String nodeSourceName) {
         getModel().checkIsReady();
-        getModel().createns_(nodeSourceName);
+        return getModel().createns_(nodeSourceName, null, null, null);
     }
 
-    private void createns_(String nodeSourceName) {
+    public static boolean createns(String nodeSourceName, String[] imParams, String[] policyParams,
+            RMAuthentication auth) {
+        getModel().checkIsReady();
+        return getModel().createns_(nodeSourceName, imParams, policyParams, auth);
+    }
+
+    private Object[] packPluginParameters(String[] params, RMAuthentication auth) throws RMException,
+            ClassNotFoundException {
+        // extracting plugin name from the first param
+        if (params != null && params.length > 0) {
+            String name = params[0];
+            // shifting array of input params (plugin does not imply having its name in the first parameter)
+            Object[] shiftedParams = new Object[params.length - 1];
+            System.arraycopy(params, 1, shiftedParams, 0, params.length - 1);
+            Class<?> cls = Class.forName(name);
+            PluginDescriptor pd = new PluginDescriptor(cls);
+            // packing parameters (reading files on client side, processing login information, etc)
+            try {
+                return pd.packParameters(shiftedParams, auth);
+            } catch (RMException ex) {
+                getModel().print(pd.toString());
+                throw ex;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean createns_(String nodeSourceName, String[] imInputParams, String[] policyInputParams,
+            RMAuthentication auth) {
+
         try {
-            rm.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(), null, StaticPolicy.class
-                    .getName(), null);
+            String imName = GCMInfrastructure.class.getName();
+            if (imInputParams != null && imInputParams.length > 1) {
+                imName = imInputParams[0];
+            }
+
+            String policyName = StaticPolicy.class.getName();
+            if (policyInputParams != null && policyInputParams.length > 1) {
+                policyName = policyInputParams[0];
+            }
+
+            Object[] imPackedParams = packPluginParameters(imInputParams, auth);
+            Object[] policyPackedParams = packPluginParameters(policyInputParams, auth);
+
+            rm.createNodesource(nodeSourceName, imName, imPackedParams, policyName, policyPackedParams);
             print("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
         } catch (Exception e) {
             handleExceptionDisplay("Error while creating node source '" + nodeSourceName, e);
+            return false;
         }
+        return true;
     }
 
     public static void removenode(String nodeURL, boolean preempt) {
@@ -514,15 +561,6 @@ public class AdminRMModel extends ConsoleModel {
     //**************** GETTER / SETTER ******************
 
     /**
-     * Get the Resource manager
-     *
-     * @return the Resource manager
-     */
-    public RMAdmin getScheduler() {
-        return rm;
-    }
-
-    /**
      * Connect the Resource manager value to the given rm value
      *
      * @param rm the Resource manager to connect
@@ -543,4 +581,19 @@ public class AdminRMModel extends ConsoleModel {
         jmxInfoViewer = info;
     }
 
+    public static void listInfrastructures() {
+        getModel().checkIsReady();
+        getModel().print("Available node source infrastructures:");
+        for (PluginDescriptor plugin : getModel().rm.getSupportedNodeSourceInfrastructures()) {
+            getModel().print(plugin.toString());
+        }
+    }
+
+    public static void listPolicies() {
+        getModel().checkIsReady();
+        getModel().print("Available node source policies:");
+        for (PluginDescriptor plugin : getModel().rm.getSupportedNodeSourcePolicies()) {
+            getModel().print(plugin.toString());
+        }
+    }
 }

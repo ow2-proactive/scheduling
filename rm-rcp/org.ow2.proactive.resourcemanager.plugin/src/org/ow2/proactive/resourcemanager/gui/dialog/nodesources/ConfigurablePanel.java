@@ -31,8 +31,6 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog.nodesources;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -55,12 +53,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.ow2.proactive.authentication.crypto.Credentials.CredData;
-import org.ow2.proactive.resourcemanager.gui.dialog.CreateSourceDialog;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
-import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 public class ConfigurablePanel extends Group {
@@ -70,23 +67,20 @@ public class ConfigurablePanel extends Group {
         private Label nameLabel;
         private Text text;
         private Label descriptionLabel;
-        boolean isFile = false, isLogin = false, isPassword = false;
 
         public Property(Composite parent, ConfigurableField configurableField) {
             super(parent, SWT.LEFT);
+
             String name = configurableField.getName();
             Configurable configurable = configurableField.getMeta();
             String description = configurable.description();
-            isPassword = configurable.password();
-            isLogin = configurable.login();
-            isFile = configurable.fileBrowser();
 
             setLayout(new FormLayout());
 
             nameLabel = new Label(this, SWT.LEFT);
-            nameLabel.setText(beautifyName(name));
+            nameLabel.setText(PluginDescriptor.beautifyName(name));
 
-            int passwdMask = isPassword ? SWT.PASSWORD : 0;
+            int passwdMask = configurableField.getMeta().password() ? SWT.PASSWORD : 0;
             text = new Text(this, SWT.LEFT | SWT.BORDER | passwdMask);
             text.setText(configurableField.getValue());
 
@@ -101,7 +95,7 @@ public class ConfigurablePanel extends Group {
             fd.width = 200;
             text.setLayoutData(fd);
 
-            if (isFile) {
+            if (configurableField.getMeta().fileBrowser()) {
                 Button chooseButton = new Button(this, SWT.NONE);
                 chooseButton.setText("Choose file");
                 chooseButton.addListener(SWT.Selection, new Listener() {
@@ -191,7 +185,7 @@ public class ConfigurablePanel extends Group {
     }
 
     public void addComboValue(PluginDescriptor descriptor) {
-        String pluginName = beautifyName(descriptor.getPluginName());
+        String pluginName = PluginDescriptor.beautifyName(descriptor.getPluginName());
         combo.add(pluginName);
         comboStates.put(pluginName, descriptor);
     }
@@ -223,66 +217,20 @@ public class ConfigurablePanel extends Group {
     protected void checkSubclass() {
     }
 
-    public Object[] getParameters() throws IOException {
-        List<Object> params = new ArrayList<Object>();
-        String previous = null;
+    public Object[] getParameters(RMAuthentication auth) throws RMException {
+        List<String> params = new ArrayList<String>();
 
         for (Property p : properties) {
-            if (p.isFile) {
-                params.add(FileToBytesConverter.convertFileToByteArray(new File(p.getValue())));
-            } else if (p.isLogin) {
-                previous = p.getValue();
-            } else if (p.isPassword) {
-                if (previous != null) {
-                    CredData cdata = new CredData();
-                    cdata.login = previous;
-                    cdata.pass = p.getValue();
-                    params.add(cdata);
-                    previous = null;
-                } else {
-                    // no login field before password field
-                    params.add(p.getValue());
-                }
-            } else if (previous != null) {
-                // login field was not followed by password field
-                params.add(previous);
-                params.add(p.getValue());
-                previous = null;
-            } else {
-                params.add(p.getValue());
-            }
+            params.add(p.getValue());
         }
-        return params.toArray();
+
+        if (selectedDescriptor == null) {
+            throw new RMException("Incorrect plugin selection");
+        }
+        return selectedDescriptor.packParameters(params.toArray(), auth);
     }
 
     public PluginDescriptor getSelectedPlugin() {
         return selectedDescriptor;
-    }
-
-    public static String beautifyName(String name) {
-        StringBuffer buffer = new StringBuffer();
-
-        if (name.contains(".")) {
-            name = name.substring(name.lastIndexOf(".") + 1);
-        }
-
-        for (int i = 0; i < name.length(); i++) {
-            char ch = name.charAt(i);
-            if (i == 0) {
-                buffer.append(Character.toUpperCase(ch));
-            } else if (i > 0 && (Character.isUpperCase(ch) || Character.isDigit(ch))) {
-                boolean nextCharInAupperCase = (i < name.length() - 1) &&
-                    (Character.isUpperCase(name.charAt(i + 1)) || Character.isDigit(name.charAt(i + 1)));
-                if (!nextCharInAupperCase) {
-                    buffer.append(" " + ch);
-                } else {
-                    buffer.append(ch);
-                }
-            } else {
-                buffer.append(ch);
-            }
-        }
-
-        return buffer.toString();
     }
 }

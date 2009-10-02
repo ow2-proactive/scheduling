@@ -98,18 +98,10 @@ public class CreateSourceDialog extends Dialog {
                         RMAdmin admin = RMStore.getInstance().getRMAdmin();
                         RMAuthentication auth = RMConnection.join(RMStore.getInstance().getURL() +
                             RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
-                        Object[] policyParams = policy.getParameters();
-                        for (int i = 0; i < policyParams.length; i++) {
-                            if (policyParams[i] instanceof Credentials.CredData) {
-                                Credentials.CredData cd = (Credentials.CredData) policyParams[i];
-                                Credentials creds = Credentials.createCredentials(cd.login, cd.pass, auth
-                                        .getPublicKey());
-                                policyParams[i] = creds;
-                            }
-                        }
+                        Object[] policyParams = policy.getParameters(auth);
                         admin.createNodesource(name.getNodeSourceName(), infrastructure.getSelectedPlugin()
-                                .getPluginName(), infrastructure.getParameters(), policy.getSelectedPlugin()
-                                .getPluginName(), policyParams);
+                                .getPluginName(), infrastructure.getParameters(auth), policy
+                                .getSelectedPlugin().getPluginName(), policyParams);
 
                         shell.close();
                     } catch (Exception e) {

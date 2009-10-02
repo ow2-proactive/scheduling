@@ -340,11 +340,26 @@ public class AdminController {
         removeNodesOpt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(removeNodesOpt);
 
-        Option createNSOpt = new Option("c", "createns", true, control + "Create new node sources");
+        Option createNSOpt = new Option("cn", "createns", true, control + "Create new node sources");
         createNSOpt.setArgName("names");
         createNSOpt.setRequired(false);
         createNSOpt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(createNSOpt);
+
+        Option infrastuctureOpt = new Option("infrastructure", true,
+            "Specify an infrastructure when node source is created");
+        infrastuctureOpt.setArgName("params");
+        infrastuctureOpt.setRequired(false);
+        infrastuctureOpt.setOptionalArg(true);
+        infrastuctureOpt.setArgs(Option.UNLIMITED_VALUES);
+        options.addOption(infrastuctureOpt);
+
+        Option policyOpt = new Option("policy", true, "Specify a policy when node source is created");
+        policyOpt.setArgName("params");
+        policyOpt.setOptionalArg(true);
+        policyOpt.setRequired(false);
+        policyOpt.setArgs(Option.UNLIMITED_VALUES);
+        options.addOption(policyOpt);
 
         Option listNodesOpt = new Option("ln", "listnodes", false, control +
             "List nodes handled by Resource Manager. Display is : NODESOURCE HOSTNAME STATE NODE_URL");
@@ -460,9 +475,35 @@ public class AdminController {
                 AdminRMModel.removenode(nUrl, preempt);
             }
         } else if (cmd.hasOption("createns")) {
+
             String[] nsNames = cmd.getOptionValues("createns");
+
+            boolean hasInfrastructure = cmd.hasOption("infrastructure");
+            String[] imParams = null;
+            if (hasInfrastructure) {
+                imParams = cmd.getOptionValues("infrastructure");
+                if (imParams == null) {
+                    // list available infrastructures
+                    AdminRMModel.listInfrastructures();
+                    return false;
+                }
+            }
+            boolean hasPolicy = cmd.hasOption("policy");
+            String[] policyParams = null;
+            if (hasPolicy) {
+                policyParams = cmd.getOptionValues("policy");
+                if (policyParams == null) {
+                    // list available policies
+                    AdminRMModel.listPolicies();
+                    return false;
+                }
+            }
+
             for (String nsName : nsNames) {
-                AdminRMModel.createns(nsName);
+                // if imParams is null or policyParams is null use default
+                if (!AdminRMModel.createns(nsName, imParams, policyParams, auth)) {
+                    break;
+                }
             }
         } else if (cmd.hasOption("listnodes")) {
             AdminRMModel.listnodes();
