@@ -33,8 +33,6 @@ package org.ow2.proactive.resourcemanager.gui.dialog.nodesources;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -59,7 +57,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.ow2.proactive.authentication.crypto.Credentials.CredData;
 import org.ow2.proactive.resourcemanager.gui.dialog.CreateSourceDialog;
-import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
+import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -72,14 +72,10 @@ public class ConfigurablePanel extends Group {
         private Label descriptionLabel;
         boolean isFile = false, isLogin = false, isPassword = false;
 
-        public Property(Composite parent, Field f, Object instance) throws Exception {
+        public Property(Composite parent, ConfigurableField configurableField) {
             super(parent, SWT.LEFT);
-            String name = f.getName();
-            f.setAccessible(true);
-            Object valueObj = f.get(instance);
-            String value = valueObj == null ? "" : valueObj.toString();
-
-            Configurable configurable = f.getAnnotation(Configurable.class);
+            String name = configurableField.getName();
+            Configurable configurable = configurableField.getMeta();
             String description = configurable.description();
             isPassword = configurable.password();
             isLogin = configurable.login();
@@ -88,11 +84,11 @@ public class ConfigurablePanel extends Group {
             setLayout(new FormLayout());
 
             nameLabel = new Label(this, SWT.LEFT);
-            nameLabel.setText(CreateSourceDialog.beautifyName(name));
+            nameLabel.setText(beautifyName(name));
 
             int passwdMask = isPassword ? SWT.PASSWORD : 0;
             text = new Text(this, SWT.LEFT | SWT.BORDER | passwdMask);
-            text.setText(value);
+            text.setText(configurableField.getValue());
 
             FormData fd = new FormData();
             fd.top = new FormAttachment(1, 5);
@@ -141,8 +137,8 @@ public class ConfigurablePanel extends Group {
     private Combo combo;
     private List<Property> properties = new LinkedList<Property>();
     private Label description;
-    private Class<?> selectedClass = null;
-    private HashMap<String, Class<?>> comboStates = new HashMap<String, Class<?>>();
+    private PluginDescriptor selectedDescriptor = null;
+    private HashMap<String, PluginDescriptor> comboStates = new HashMap<String, PluginDescriptor>();
     private Shell parent;
 
     public ConfigurablePanel(final Shell parent, String labelText) {
@@ -174,6 +170,9 @@ public class ConfigurablePanel extends Group {
         fd.top = new FormAttachment(typeLabel, 10);
         description.setLayoutData(fd);
 
+        combo.add("");
+        comboStates.put("", null);
+
         combo.addSelectionListener(new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
@@ -185,62 +184,40 @@ public class ConfigurablePanel extends Group {
                 properties.clear();
                 parent.pack();
 
-                Class<?> cls = comboStates.get(combo.getText());
-                setClass(cls);
+                designGui(comboStates.get(combo.getText()));
                 parent.pack();
             }
         });
     }
 
-    public void addComboValue(String name, Class<?> value) {
-        combo.add(name);
-        comboStates.put(name, value);
+    public void addComboValue(PluginDescriptor descriptor) {
+        String pluginName = beautifyName(descriptor.getPluginName());
+        combo.add(pluginName);
+        comboStates.put(pluginName, descriptor);
     }
 
-    private void setClass(Class<?> cls) {
-        selectedClass = cls;
-        if (cls == null) {
+    private void designGui(PluginDescriptor descriptor) {
+        selectedDescriptor = descriptor;
+        if (descriptor == null) {
             description.setText("");
             return;
         }
 
-        try {
-            Object instance = cls.newInstance();
+        for (ConfigurableField configurableField : descriptor.getConfigurableFields()) {
+            Property property = new Property(this, configurableField);
+            Control lowest = properties.size() > 0 ? properties.get(properties.size() - 1) : this.description;
+            FormData fd = new FormData();
+            fd.top = new FormAttachment(lowest, 10);
+            property.setLayoutData(fd);
 
-            List<Field> fields = new LinkedList<Field>();
-            findFileds(cls, fields);
-            for (Field f : fields) {
-                Property property = new Property(this, f, instance);
-                Control lowest = properties.size() > 0 ? properties.get(properties.size() - 1)
-                        : this.description;
-                FormData fd = new FormData();
-                fd.top = new FormAttachment(lowest, 10);
-                property.setLayoutData(fd);
-
-                properties.add(property);
-            }
-
-            Method getDescription = cls.getMethod("getDescription");
-            if (getDescription != null) {
-                description.setText((String) getDescription.invoke(instance));
-                description.pack();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void findFileds(Class<?> cls, List<Field> fields) {
-        if (cls.getSuperclass() != null && cls.getSuperclass() != Object.class) {
-            findFileds(cls.getSuperclass(), fields);
+            properties.add(property);
         }
 
-        for (Field f : cls.getDeclaredFields()) {
-            if (f.getAnnotation(Configurable.class) != null) {
-                fields.add(f);
-            }
+        if (descriptor.getPluginDescription() != null) {
+            description.setText(descriptor.getPluginDescription());
+            description.pack();
         }
+
     }
 
     protected void checkSubclass() {
@@ -278,7 +255,34 @@ public class ConfigurablePanel extends Group {
         return params.toArray();
     }
 
-    public Class<?> getSelectedClass() {
-        return selectedClass;
+    public PluginDescriptor getSelectedPlugin() {
+        return selectedDescriptor;
+    }
+
+    public static String beautifyName(String name) {
+        StringBuffer buffer = new StringBuffer();
+
+        if (name.contains(".")) {
+            name = name.substring(name.lastIndexOf(".") + 1);
+        }
+
+        for (int i = 0; i < name.length(); i++) {
+            char ch = name.charAt(i);
+            if (i == 0) {
+                buffer.append(Character.toUpperCase(ch));
+            } else if (i > 0 && (Character.isUpperCase(ch) || Character.isDigit(ch))) {
+                boolean nextCharInAupperCase = (i < name.length() - 1) &&
+                    (Character.isUpperCase(name.charAt(i + 1)) || Character.isDigit(name.charAt(i + 1)));
+                if (!nextCharInAupperCase) {
+                    buffer.append(" " + ch);
+                } else {
+                    buffer.append(ch);
+                }
+            } else {
+                buffer.append(ch);
+            }
+        }
+
+        return buffer.toString();
     }
 }

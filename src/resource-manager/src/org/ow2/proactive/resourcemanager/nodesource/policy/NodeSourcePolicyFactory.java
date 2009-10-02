@@ -34,6 +34,7 @@ package org.ow2.proactive.resourcemanager.nodesource.policy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Properties;
 
 import org.objectweb.proactive.api.PAActiveObject;
@@ -52,7 +53,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 public class NodeSourcePolicyFactory {
 
     /** list of supported policies */
-    private static ArrayList<String> supportedPolicies;
+    private static Collection<Class<?>> supportedPolicies;
 
     /**
      * Creates a new node source policy using reflection mechanism.
@@ -68,7 +69,14 @@ public class NodeSourcePolicyFactory {
 
         NodeSourcePolicy policy;
         try {
-            if (!getSupportedPolicies().contains(policyClassName)) {
+            boolean supported = false;
+            for (Class<?> cls : getSupportedPolicies()) {
+                if (cls.getName().equals(policyClassName)) {
+                    supported = true;
+                    break;
+                }
+            }
+            if (!supported) {
                 throw new RMException(policyClassName + " is not supported");
             }
 
@@ -76,14 +84,14 @@ public class NodeSourcePolicyFactory {
             PolicyRestriction policyAnnotation = policyClass.getAnnotation(PolicyRestriction.class);
             if (policyAnnotation != null) {
                 // checking policy restrictions
-                boolean supported = false;
+                boolean compatible = false;
                 for (String supportedInfrastructure : policyAnnotation.supportedInfrastructures()) {
                     if (supportedInfrastructure.equals(infrastructureType)) {
-                        supported = true;
+                        compatible = true;
                         break;
                     }
                 }
-                if (!supported) {
+                if (!compatible) {
                     throw new RMException(policyClass.getSimpleName() + " cannot be used with " +
                         infrastructureType);
                 }
@@ -112,9 +120,9 @@ public class NodeSourcePolicyFactory {
      * Loads a list of supported policies from a configuration file
      * @return list of supported infrastructures
      */
-    public static ArrayList<String> getSupportedPolicies() {
+    public static Collection<Class<?>> getSupportedPolicies() {
         if (supportedPolicies == null) {
-            supportedPolicies = new ArrayList<String>();
+            supportedPolicies = new ArrayList<Class<?>>();
             Properties properties = new Properties();
             try {
                 String propFileName = PAResourceManagerProperties.RM_NODESOURCE_POLICY_FILE
@@ -133,7 +141,7 @@ public class NodeSourcePolicyFactory {
             for (Object className : properties.keySet()) {
                 try {
                     Class<?> cls = Class.forName(className.toString());
-                    supportedPolicies.add(cls.getName());
+                    supportedPolicies.add(cls);
                 } catch (ClassNotFoundException e) {
                 }
             }

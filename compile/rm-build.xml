@@ -68,6 +68,7 @@
 				<include name="org/ow2/proactive/resourcemanager/authentication/RMAuthentication.class" />
 				<include name="org/ow2/proactive/resourcemanager/common/**" />
 				<include name="org/ow2/proactive/resourcemanager/exception/**" />
+				<include name="org/ow2/proactive/resourcemanager/nodesource/common/**" />
 				<include name="org/ow2/proactive/resourcemanager/nodesource/NodeSource.class" />
 				<include name="org/ow2/proactive/resourcemanager/utils/adminconsole/**" />
 				<include name="org/ow2/proactive/resourcemanager/frontend/RMAdmin.class" />
@@ -77,7 +78,6 @@
 				<include name="org/ow2/proactive/resourcemanager/frontend/RMEventListener.class" />
 				<!-- RMNode is needed because it is used in RMNodeEvent-->
 				<include name="org/ow2/proactive/resourcemanager/rmnode/RMNode.class" />
-				<include name="org/ow2/proactive/resourcemanager/nodesource/policy/Configurable.class" />
 			</fileset>
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
@@ -105,9 +105,9 @@
 		<delete dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" />
 	</target>
 
-	<target name="rcp.libCopy.rm" depends="deploy.rm" description="Copy all required libraries to RM plugins">
+	<target name="rcp.libCopy.rm" depends="deploy.rm.client" description="Copy all required libraries to RM plugins">
 		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.client.jar}, ${srm.common.client.jar}"/>
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.jar}, ${srm.common.jar}"/>
 		</copy>
 	</target>
 

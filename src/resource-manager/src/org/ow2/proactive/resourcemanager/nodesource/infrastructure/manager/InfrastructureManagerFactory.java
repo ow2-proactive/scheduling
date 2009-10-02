@@ -34,6 +34,7 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Properties;
 
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -50,7 +51,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 public class InfrastructureManagerFactory {
 
     /** list of supported infrastructures */
-    private static ArrayList<String> supportedInfrastructures;
+    private static Collection<Class<?>> supportedInfrastructures;
 
     /**
      * Creates new infrastructure manager using reflection mechanism.
@@ -65,7 +66,15 @@ public class InfrastructureManagerFactory {
 
         InfrastructureManager im = null;
         try {
-            if (!getSupportedInfrastructures().contains(infrastructureType)) {
+
+            boolean supported = false;
+            for (Class<?> cls : getSupportedInfrastructures()) {
+                if (cls.getName().equals(infrastructureType)) {
+                    supported = true;
+                    break;
+                }
+            }
+            if (!supported) {
                 throw new RMException(infrastructureType + " is not supported");
             }
 
@@ -86,9 +95,9 @@ public class InfrastructureManagerFactory {
      * Loads a list of supported infrastructures from a configuration file
      * @return list of supported infrastructures
      */
-    public static ArrayList<String> getSupportedInfrastructures() {
+    public static Collection<Class<?>> getSupportedInfrastructures() {
         if (supportedInfrastructures == null) {
-            supportedInfrastructures = new ArrayList<String>();
+            supportedInfrastructures = new ArrayList<Class<?>>();
             Properties properties = new Properties();
             try {
                 String propFileName = PAResourceManagerProperties.RM_NODESOURCE_INFRASTRUCTURE_FILE
@@ -107,7 +116,7 @@ public class InfrastructureManagerFactory {
             for (Object className : properties.keySet()) {
                 try {
                     Class<?> cls = Class.forName(className.toString());
-                    supportedInfrastructures.add(cls.getName());
+                    supportedInfrastructures.add(cls);
                 } catch (ClassNotFoundException e) {
                 }
             }

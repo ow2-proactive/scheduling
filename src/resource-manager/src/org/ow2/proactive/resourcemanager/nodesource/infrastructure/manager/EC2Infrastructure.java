@@ -49,8 +49,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.ec2.EC2Deployer;
-import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 

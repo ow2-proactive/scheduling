@@ -32,7 +32,7 @@
 package org.ow2.proactive.resourcemanager.frontend;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
@@ -187,25 +188,15 @@ public interface RMAdmin extends RMUser, Serializable {
     public void disconnect();
 
     /**
-     * Gets a list of supported node source infrastructures
-     * @return a list of supported node source infrastructures
+     * Gets a list of supported node source infrastructures descriptors
+     * @return a list of supported node source infrastructures descriptors
      */
-    public ArrayList<String> getSupportedNodeSourceInfrastructures();
+    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures();
 
     /**
-     * Gets a list of supported node source policies
-     * @return a list of supported node source policies
+     * Gets a list of supported node source policies descriptors
+     * @return a list of supported node source policies descriptors
      */
-    public ArrayList<String> getSupportedNodeSourcePolicies();
+    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies();
 
-    /**
-     * Lookups class on the rm core side.
-     * This method is used for pluggable policies and infrastructure managers classes.
-     * The client instead of having this classes obtain them from the resource manager.
-     *
-     * @param name of the class
-     * @return loaded class if exist
-     * @throws ClassNotFoundException if non-existing class requested
-     */
-    public Class<?> lookupClass(String name) throws ClassNotFoundException;
 }

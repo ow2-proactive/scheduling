@@ -27,7 +27,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -52,6 +52,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.ConfigurablePanel;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.NodeSourceName;
+import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 
 
 /**
@@ -106,9 +107,9 @@ public class CreateSourceDialog extends Dialog {
                                 policyParams[i] = creds;
                             }
                         }
-                        admin.createNodesource(name.getNodeSourceName(), infrastructure.getSelectedClass()
-                                .getName(), infrastructure.getParameters(), policy.getSelectedClass()
-                                .getName(), policyParams);
+                        admin.createNodesource(name.getNodeSourceName(), infrastructure.getSelectedPlugin()
+                                .getPluginName(), infrastructure.getParameters(), policy.getSelectedPlugin()
+                                .getPluginName(), policyParams);
 
                         shell.close();
                     } catch (Exception e) {
@@ -163,32 +164,23 @@ public class CreateSourceDialog extends Dialog {
         // creation
         name = new NodeSourceName(shell, SWT.NONE);
         infrastructure = new ConfigurablePanel(shell, "Node source infrastructure");
-        infrastructure.addComboValue("", null);
-
         policy = new ConfigurablePanel(shell, "Node source policy");
-        policy.addComboValue("", null);
 
         RMAdmin admin = RMStore.getInstance().getRMAdmin();
-        ArrayList<String> supportedInfrastructures = admin.getSupportedNodeSourceInfrastructures();
+        Collection<PluginDescriptor> infrastructures = admin.getSupportedNodeSourceInfrastructures();
 
-        for (String className : supportedInfrastructures) {
+        for (PluginDescriptor descriptor : infrastructures) {
             try {
-                Class<?> cls = admin.lookupClass(className);
-                infrastructure.addComboValue(beautifyName(cls.getSimpleName()), cls);
+                infrastructure.addComboValue(descriptor);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
 
-        ArrayList<String> supportedPolicies = admin.getSupportedNodeSourcePolicies();
+        Collection<PluginDescriptor> policies = admin.getSupportedNodeSourcePolicies();
 
-        for (String className : supportedPolicies) {
-            try {
-                Class<?> cls = admin.lookupClass(className);
-                policy.addComboValue(beautifyName(cls.getSimpleName()), cls);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+        for (PluginDescriptor descriptor : policies) {
+            policy.addComboValue(descriptor);
         }
 
         new NodeSourceButtons(shell, SWT.NONE);
@@ -227,35 +219,12 @@ public class CreateSourceDialog extends Dialog {
             throw new RuntimeException("Node source name cannot be empty");
         }
 
-        if (infrastructure.getSelectedClass() == null) {
+        if (infrastructure.getSelectedPlugin() == null) {
             throw new RuntimeException("Select node source infrastructure type");
         }
 
-        if (policy.getSelectedClass() == null) {
+        if (policy.getSelectedPlugin() == null) {
             throw new RuntimeException("Select node source policy type");
         }
-    }
-
-    public static String beautifyName(String name) {
-        StringBuffer buffer = new StringBuffer();
-
-        for (int i = 0; i < name.length(); i++) {
-            char ch = name.charAt(i);
-            if (i == 0) {
-                buffer.append(Character.toUpperCase(ch));
-            } else if (i > 0 && (Character.isUpperCase(ch) || Character.isDigit(ch))) {
-                boolean nextCharInAupperCase = (i < name.length() - 1) &&
-                    (Character.isUpperCase(name.charAt(i + 1)) || Character.isDigit(name.charAt(i + 1)));
-                if (!nextCharInAupperCase) {
-                    buffer.append(" " + ch);
-                } else {
-                    buffer.append(ch);
-                }
-            } else {
-                buffer.append(ch);
-            }
-        }
-
-        return buffer.toString();
     }
 }

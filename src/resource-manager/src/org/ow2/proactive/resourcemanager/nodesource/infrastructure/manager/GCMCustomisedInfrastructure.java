@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 
 
 /**

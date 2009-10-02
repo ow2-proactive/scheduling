@@ -54,7 +54,7 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.policy.Configurable;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;

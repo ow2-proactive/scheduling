@@ -33,6 +33,7 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -55,6 +56,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManagerFactory;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
@@ -257,26 +259,28 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
         return registerTrustedService(id);
     }
 
-    /**
-     * Gets a list of supported node source infrastructures
-     * @return a list of supported node source infrastructures
-     */
-    public ArrayList<String> getSupportedNodeSourceInfrastructures() {
-        return InfrastructureManagerFactory.getSupportedInfrastructures();
-    }
+    private Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
 
-    /**
-     * Gets a list of supported node source policies
-     * @return a list of supported node source policies
-     */
-    public ArrayList<String> getSupportedNodeSourcePolicies() {
-        return NodeSourcePolicyFactory.getSupportedPolicies();
+        Collection<PluginDescriptor> descriptors = new ArrayList<PluginDescriptor>();
+
+        for (Class<?> cls : plugins) {
+            descriptors.add(new PluginDescriptor(cls));
+        }
+        return descriptors;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Class<?> lookupClass(String name) throws ClassNotFoundException {
-        return Class.forName(name);
+    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
+        return getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
+        return getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
+    }
+
 }

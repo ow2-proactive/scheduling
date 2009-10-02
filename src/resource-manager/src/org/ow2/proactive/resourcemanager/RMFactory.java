@@ -33,7 +33,6 @@ package org.ow2.proactive.resourcemanager;
 
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -47,6 +46,8 @@ import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
