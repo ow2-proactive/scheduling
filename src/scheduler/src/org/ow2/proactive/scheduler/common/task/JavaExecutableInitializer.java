@@ -87,7 +87,6 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
         for (Entry<String, byte[]> e : this.serializedArguments.entrySet()) {
             deserialized.put(e.getKey(), (Serializable) ByteToObjectConverter.ObjectStream.convert(e
                     .getValue(), cl));
-            File.createTempFile("MKJE_" + e.getKey(), "" + deserialized.get(e.getKey()));
         }
         return deserialized;
     }
