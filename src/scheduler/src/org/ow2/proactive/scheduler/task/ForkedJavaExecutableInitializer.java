@@ -47,7 +47,7 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
     /** Environment of a new dedicated JVM */
     private ForkEnvironment forkEnvironment = null;
 
-    /** Launcher initializer containint scripts */
+    /** Launcher initializer containing scripts */
     private TaskLauncherInitializer taskLauncherInitializer;
 
     /** Java executable container for the forked java task */
@@ -59,7 +59,7 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializer {
      * @param execInitializer the parent initializer in order to decorate this one
      */
     public ForkedJavaExecutableInitializer(JavaExecutableInitializer execInitializer) {
-        this.arguments = execInitializer.getArguments();
+        this.serializedArguments = execInitializer.getSerializedArguments();
         this.nodes = execInitializer.getNodes();
     }
 

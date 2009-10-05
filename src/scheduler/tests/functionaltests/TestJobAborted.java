@@ -32,6 +32,7 @@
 package functionaltests;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -106,6 +107,7 @@ public class TestJobAborted extends FunctionalTest {
         JobResult res = SchedulerTHelper.getJobResult(id);
 
         Map<String, TaskResult> results = res.getAllResults();
+
         //check that number of results correspond to 1
         Assert.assertEquals(1, results.size());
         Assert.assertNotNull(results.get("task2").getException());

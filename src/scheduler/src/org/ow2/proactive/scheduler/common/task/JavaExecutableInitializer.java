@@ -31,8 +31,14 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -48,7 +54,7 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
     protected NodeSet nodes;
 
     /** Arguments of the java task */
-    protected Map<String, String> arguments;
+    protected Map<String, byte[]> serializedArguments;
 
     /**
      * Get the nodes list
@@ -69,21 +75,39 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
     }
 
     /**
-     * Get the arguments of the executable
+     * Get the arguments of the executable. Instances are created from the serialized version.
      *
      * @return the arguments of the executable
+     * @throws IOException if the deserialization of the value cannot be performed.
+     * @throws ClassNotFoundException if the value's class cannot be loaded.
      */
-    public Map<String, String> getArguments() {
-        return arguments;
+    public Map<String, Serializable> getArguments(ClassLoader cl) throws IOException, ClassNotFoundException {
+        final Map<String, Serializable> deserialized = new HashMap<String, Serializable>(
+            this.serializedArguments.size());
+        for (Entry<String, byte[]> e : this.serializedArguments.entrySet()) {
+            deserialized.put(e.getKey(), (Serializable) ByteToObjectConverter.ObjectStream.convert(e
+                    .getValue(), cl));
+            File.createTempFile("MKJE_" + e.getKey(), "" + deserialized.get(e.getKey()));
+        }
+        return deserialized;
+    }
+
+    /**
+     * Return a map containing all the task arguments serialized as byte[].
+     *
+     * @return the serialized arguments map.
+     */
+    public Map<String, byte[]> getSerializedArguments() {
+        return serializedArguments;
     }
 
     /**
      * Set the arguments value to the given arguments value
      *
-     * @param arguments the arguments to set
+     * @param serializedArguments the arguments to set
      */
-    public void setArguments(Map<String, String> arguments) {
-        this.arguments = arguments;
+    public void setSerializedArguments(Map<String, byte[]> serializedArguments) {
+        this.serializedArguments = serializedArguments;
     }
 
 }

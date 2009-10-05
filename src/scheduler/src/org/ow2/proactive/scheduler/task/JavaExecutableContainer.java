@@ -60,7 +60,8 @@ import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.common.task.util.BigString;
+import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
+import org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 
@@ -93,7 +94,7 @@ public class JavaExecutableContainer extends ExecutableContainer {
     @Cascade(CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @JoinTable(name = "JAVA_EXECCONTAINER_ARGUMENTS", joinColumns = @JoinColumn(name = "J_EXEC_CONTAINER_ID"))
-    protected Map<String, BigString> args = new HashMap<String, BigString>();
+    protected final Map<String, ByteArrayWrapper> serializedArguments = new HashMap<String, ByteArrayWrapper>();
 
     // instanciated on demand : not DB managed
     @Transient
@@ -110,11 +111,13 @@ public class JavaExecutableContainer extends ExecutableContainer {
     /**
      * Create a new container for JavaExecutable
      * @param userExecutableClassName the classname of the user defined executable
-     * @param args the arguments for Executable.init() method.
+     * @param args the serialized arguments for Executable.init() method.
      */
-    public JavaExecutableContainer(String userExecutableClassName, Map<String, BigString> args) {
+    public JavaExecutableContainer(String userExecutableClassName, Map<String, byte[]> args) {
         this.userExecutableClassName = userExecutableClassName;
-        this.args = args;
+        for (Entry<String, byte[]> e : args.entrySet()) {
+            this.serializedArguments.put(e.getKey(), new ByteArrayWrapper(e.getValue()));
+        }
     }
 
     /**
@@ -149,11 +152,11 @@ public class JavaExecutableContainer extends ExecutableContainer {
      */
     public JavaExecutableInitializer createExecutableInitializer() {
         JavaExecutableInitializer jei = new JavaExecutableInitializer();
-        Map<String, String> tmp = new HashMap<String, String>();
-        for (Entry<String, BigString> e : this.args.entrySet()) {
-            tmp.put(e.getKey(), e.getValue().getValue());
+        Map<String, byte[]> tmp = new HashMap<String, byte[]>();
+        for (Entry<String, ByteArrayWrapper> e : this.serializedArguments.entrySet()) {
+            tmp.put(e.getKey(), e.getValue().byteArrayValue());
         }
-        jei.setArguments(tmp);
+        jei.setSerializedArguments(tmp);
         jei.setNodes(nodes);
         return jei;
     }

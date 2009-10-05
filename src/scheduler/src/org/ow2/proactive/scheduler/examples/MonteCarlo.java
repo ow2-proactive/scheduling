@@ -62,7 +62,7 @@ public class MonteCarlo extends JavaExecutable {
      * @see org.ow2.proactive.scheduler.common.task.executable.JavaExecutable#init(java.util.Map)
      */
     @Override
-    public void init(Map<String, String> args) {
+    public void init(Map<String, Serializable> args) {
         if (args.containsKey("steps")) {
             try {
                 steps = Long.parseLong(args.get("steps").toString());

@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.scheduler.common.task.executable;
 
+import java.io.File;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,6 +54,8 @@ import org.ow2.proactive.utils.NodeSet;
 @PublicAPI
 public abstract class JavaExecutable extends Executable {
 
+    // this value is set only on worker node side !!
+    // see JavaTaskLauncher
     private JavaExecutableInitializer execInitializer;
 
     /**
@@ -64,7 +68,9 @@ public abstract class JavaExecutable extends Executable {
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
     private void internalInit(JavaExecutableInitializer execInitializer) throws Exception {
         this.execInitializer = execInitializer;
-        init(execInitializer.getArguments());
+        // at this point, the context class loader is the TaskClassLoader
+        // see JavaExecutableContainer.getExecutable()
+        init(execInitializer.getArguments(Thread.currentThread().getContextClassLoader()));
     }
 
     /**
@@ -81,30 +87,38 @@ public abstract class JavaExecutable extends Executable {
      *
      * @param args a map containing the different parameter names and values given by the user task.
      */
-    public void init(Map<String, String> args) throws Exception {
+    public void init(Map<String, Serializable> args) throws Exception {
         if (args == null) {
             return;
         }
-        for (Entry<String, String> e : args.entrySet()) {
+        for (Entry<String, Serializable> e : args.entrySet()) {
             try {
                 Field f = this.getClass().getDeclaredField(e.getKey());
+                // if f does not exist -> catch block
                 f.setAccessible(true);
-                Class<?> klass = f.getType();
-                if (klass.equals(String.class)) {
+                Class<?> valueClass = e.getValue().getClass();
+                Class<?> fieldClass = f.getType();
+                if (String.class.equals(valueClass) && !String.class.equals(fieldClass)) {
+                    String valueAsString = (String) e.getValue();
+                    // parameter has been defined as string in XML
+                    // try to convert it automatically
+                    if (fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
+                        f.set(this, Integer.parseInt(valueAsString));
+                    } else if (fieldClass.equals(Short.class) || fieldClass.equals(short.class)) {
+                        f.set(this, Short.parseShort(valueAsString));
+                    } else if (fieldClass.equals(Long.class) || fieldClass.equals(long.class)) {
+                        f.set(this, Long.parseLong(valueAsString));
+                    } else if (fieldClass.equals(Byte.class) || fieldClass.equals(byte.class)) {
+                        f.set(this, Byte.parseByte(valueAsString));
+                    } else if (fieldClass.equals(Boolean.class) || fieldClass.equals(boolean.class)) {
+                        f.set(this, Boolean.parseBoolean(valueAsString));
+                    }
+                } else if (fieldClass.isAssignableFrom(valueClass)) {
+                    // no conversion for other type than String
                     f.set(this, e.getValue());
-                } else if (klass.equals(Integer.class) || klass.equals(int.class)) {
-                    f.set(this, Integer.parseInt(e.getValue()));
-                } else if (klass.equals(Short.class) || klass.equals(short.class)) {
-                    f.set(this, Short.parseShort(e.getValue()));
-                } else if (klass.equals(Long.class) || klass.equals(long.class)) {
-                    f.set(this, Long.parseLong(e.getValue()));
-                } else if (klass.equals(Byte.class) || klass.equals(byte.class)) {
-                    f.set(this, Byte.parseByte(e.getValue()));
-                } else if (klass.equals(Boolean.class) || klass.equals(boolean.class)) {
-                    f.set(this, Boolean.parseBoolean(e.getValue()));
                 }
             } catch (Exception ex) {
-                //field not set
+                // nothing to do, no automatic assignment can be done
             }
         }
     }
@@ -118,7 +132,7 @@ public abstract class JavaExecutable extends Executable {
      *
      * @return the list of nodes demanded by the user.
      */
-    public NodeSet getNodes() {
+    public final NodeSet getNodes() {
         return execInitializer.getNodes();
     }
 

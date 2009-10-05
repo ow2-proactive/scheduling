@@ -70,6 +70,7 @@
         <mapping class="org.ow2.proactive.scheduler.common.task.util.BooleanWrapper"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.util.IntegerWrapper"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.util.BigString"/>
+        <mapping class="org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper"/>
         <!-- SCRIPTING -->
         <mapping class="org.ow2.proactive.scripting.Script"/>
         <mapping class="org.ow2.proactive.scripting.GenerationScript"/>

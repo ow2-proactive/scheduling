@@ -36,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -746,12 +747,12 @@ public class JobFactory_xpath extends JobFactory {
                         XPathConstants.STRING);
 
                 if ((name != null) && (value != null)) {
-                    desc.getArguments().put(name, value);
+                    desc.addArgument(name, value);
                 }
             }
         }
 
-        for (Entry<String, String> entry : desc.getArguments().entrySet())
+        for (Entry<String, Serializable> entry : desc.getArguments().entrySet())
             logger.debug("arg: " + entry.getKey() + " = " + entry.getValue());
 
         return desc;

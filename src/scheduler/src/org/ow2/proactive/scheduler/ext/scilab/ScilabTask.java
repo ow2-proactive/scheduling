@@ -222,7 +222,7 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
      * @see org.ow2.proactive.scheduler.common.task.JavaExecutable#init(java.util.Map)
      */
     @Override
-    public void init(Map<String, String> args) throws Exception {
+    public void init(Map<String, Serializable> args) throws Exception {
         Object s = args.get("script");
 
         if (s != null) {
@@ -253,18 +253,18 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
                 "Either one of \"script\" \"scripturl\" \"scriptfile\" must be given");
         }
 
-        String d = args.get("debug");
+        String d = (String) args.get("debug");
         if (d != null) {
             debug = Boolean.parseBoolean(d);
         }
 
-        String input = args.get("input");
+        String input = (String) args.get("input");
 
         if (input != null) {
             inputScript = input;
         }
 
-        String functionsDef = args.get("functionsDefinition");
+        String functionsDef = (String) args.get("functionsDefinition");
         if (functionsDef != null) {
             functionsDefinition = functionsDef;
         }

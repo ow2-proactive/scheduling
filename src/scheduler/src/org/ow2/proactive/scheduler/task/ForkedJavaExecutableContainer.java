@@ -31,14 +31,14 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.common.task.util.BigString;
+import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
@@ -88,7 +88,7 @@ public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
      * @param userExecutableClassName the classname of the user defined executable
      * @param args the arguments for Executable.init() method.
      */
-    public ForkedJavaExecutableContainer(String userExecutableClassName, Map<String, BigString> args) {
+    public ForkedJavaExecutableContainer(String userExecutableClassName, Map<String, byte[]> args) {
         super(userExecutableClassName, args);
     }
 
@@ -106,7 +106,11 @@ public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
         JavaExecutableInitializer jei = super.createExecutableInitializer();
         ForkedJavaExecutableInitializer fjei = new ForkedJavaExecutableInitializer(jei);
         fjei.setForkEnvironment(forkEnvironment);
-        fjei.setJavaExecutableContainer(new JavaExecutableContainer(this.userExecutableClassName, this.args));
+        Map<String, byte[]> tmp = new HashMap<String, byte[]>();
+        for (Entry<String, ByteArrayWrapper> e : this.serializedArguments.entrySet()) {
+            tmp.put(e.getKey(), e.getValue().byteArrayValue());
+        }
+        fjei.setJavaExecutableContainer(new JavaExecutableContainer(this.userExecutableClassName, tmp));
         return fjei;
     }
 

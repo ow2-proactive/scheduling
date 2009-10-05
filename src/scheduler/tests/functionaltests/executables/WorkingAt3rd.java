@@ -82,9 +82,9 @@ public class WorkingAt3rd extends JavaExecutable {
     }
 
     @Override
-    public void init(Map<String, String> args) throws Exception {
-        prefix = args.get("prefix");
-        suffix = args.get("suffix");
+    public void init(Map<String, Serializable> args) throws Exception {
+        prefix = (String) args.get("prefix");
+        suffix = (String) args.get("suffix");
     }
 
 }

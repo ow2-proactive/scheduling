@@ -116,8 +116,8 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task1").getWallTime(), 12 * 1000);
         Assert.assertEquals(tfJob.getTask("task1").isWallTime(), true);
         Assert.assertEquals(tfJob.getTask("task1").getGenericInformations().size(), 0);
-        Assert.assertEquals(((JavaTask) tfJob.getTask("task1")).getArguments().get("sleepTime"), "1");
-        Assert.assertEquals(((JavaTask) tfJob.getTask("task1")).getArguments().get("number"), "1");
+        Assert.assertEquals(((JavaTask) tfJob.getTask("task1")).getArgument("sleepTime"), "1");
+        Assert.assertEquals(((JavaTask) tfJob.getTask("task1")).getArgument("number"), "1");
         Assert.assertEquals(((JavaTask) tfJob.getTask("task1")).getExecutableClassName(),
                 "org.ow2.proactive.scheduler.examples.WaitAndPrint");
         Assert.assertEquals(((JavaTask) tfJob.getTask("task1")).isFork(), true);
@@ -143,10 +143,9 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task2").getWallTime(), 0);
         Assert.assertEquals(tfJob.getTask("task2").isWallTime(), false);
         Assert.assertEquals(tfJob.getTask("task2").getGenericInformations().size(), 0);
-        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getArguments().get("sleepTime"), "12");
-        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getArguments().get("number"), "21");
-        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getArguments().get("test"),
-                "/bin/java/jdk1.5");
+        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getArgument("sleepTime"), "12");
+        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getArgument("number"), "21");
+        Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getArgument("test"), "/bin/java/jdk1.5");
         Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getExecutableClassName(),
                 "org.ow2.proactive.scheduler.examples.WaitAndPrint");
         Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).isFork(), true);
@@ -238,7 +237,7 @@ public class TestJobFactory {
         Assert.assertEquals(mnJob.getGenericInformations().get("n2"), "v2");
         //Check task properties
         JavaTask jt = (JavaTask) mnJob.getTask("Controller");
-        Assert.assertEquals(jt.getArguments().get("numberToFind"), "100");
+        Assert.assertEquals(jt.getArgument("numberToFind"), "100");
         Assert.assertEquals(jt.isCancelJobOnError(), false);
         Assert.assertEquals(jt.getCleaningScript(), null);
         Assert.assertEquals(jt.getDependencesList(), null);

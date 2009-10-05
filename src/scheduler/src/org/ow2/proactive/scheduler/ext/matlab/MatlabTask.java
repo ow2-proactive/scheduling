@@ -265,7 +265,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
     }
 
     @Override
-    public void init(Map<String, String> args) throws Exception {
+    public void init(Map<String, Serializable> args) throws Exception {
         // Retrieving task parameters
 
         // main script to execute (embedded, url or file)
@@ -313,7 +313,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
             index = Integer.parseInt((String) ind);
         }
 
-        String d = args.get("debug");
+        String d = (String) args.get("debug");
         if (d != null) {
             debug = Boolean.parseBoolean(d);
         }

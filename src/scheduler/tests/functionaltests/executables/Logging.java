@@ -68,10 +68,10 @@ public class Logging extends JavaExecutable {
         return RESULT;
     }
 
-    public void init(Map<String, String> args) throws Exception {
-        this.numberOfLines = Integer.parseInt(args.get("lines"));
-        this.sleepTime = Long.parseLong(args.get("sleep"));
-        this.stream = args.get("stream");
+    public void init(Map<String, Serializable> args) throws Exception {
+        this.numberOfLines = Integer.parseInt((String) args.get("lines"));
+        this.sleepTime = Long.parseLong((String) args.get("sleep"));
+        this.stream = (String) args.get("stream");
     }
 
 }

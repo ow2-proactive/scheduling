@@ -31,10 +31,30 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.future.Future;
+import org.objectweb.proactive.core.body.future.FutureID;
+import org.objectweb.proactive.core.body.future.FuturePool;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
+import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
@@ -54,7 +74,7 @@ public class JavaTask extends Task {
     protected String executableClassName = null;
 
     /** Arguments of the task as a map */
-    protected Map<String, String> arguments = new HashMap<String, String>();
+    private final Map<String, byte[]> serializedArguments = new HashMap<String, byte[]>();
 
     /** if the task will be executed in a separate JVM */
     private boolean fork;
@@ -96,25 +116,74 @@ public class JavaTask extends Task {
     }
 
     /**
-     * Return the task arguments list as an hash map.
+     * Return a copy of all the task arguments as a hash map.
      *
-     * @return the arguments list.
+     * @return a copy of the arguments list.
+     * @throws IOException if the copy of the value cannot be performed.
+     * @throws ClassNotFoundException if the value's class cannot be loaded.
      */
-    public Map<String, String> getArguments() {
-        return this.arguments;
+    public Map<String, Serializable> getArguments() throws IOException, ClassNotFoundException {
+        final Set<String> allNames = this.getArgumentsNames();
+        final Map<String, Serializable> deserialized = new HashMap<String, Serializable>(allNames.size());
+        for (String name : allNames) {
+            deserialized.put(name, this.getArgument(name));
+        }
+        return deserialized;
     }
 
     /**
-     * Add an argument to the list of arguments.
+     * Return a map containing all the task arguments serialized as byte[].
+     *
+     * @return the serialized arguments map.
+     */
+    public Map<String, byte[]> getSerializedArguments() {
+        return new HashMap<String, byte[]>(this.serializedArguments);
+    }
+
+    /**
+     * Add an argument to the list of arguments. Note that the value is serialized and stored
+     * in the JavaTask.
      *
      * @param name the name of the argument to add.
      * @param value the associated value to add.
+     * @throws IllegalArgumentException if the value cannot be serialized and stored in the task.
      */
-    public void addArgument(String name, String value) {
+    public void addArgument(String name, Serializable value) {
         if (name != null && name.length() > 255) {
             throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + name);
+        } else {
+            byte[] serialized = null;
+            try {
+                serialized = ObjectToByteConverter.ObjectStream.convert(value);
+                this.serializedArguments.put(name, serialized);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Cannot add argument " + name + " in task " + this.name, e);
+            }
         }
-        this.arguments.put(name, value);
+    }
+
+    /**
+     * Return a copy of the value of the specified argument.
+     * @param name the name of the specified argument.
+     * @return a copy of the value of the specified argument.
+     * @throws IOException if the copy of the value cannot be performed.
+     * @throws ClassNotFoundException if the value's class cannot be loaded.
+     */
+    public Serializable getArgument(String name) throws IOException, ClassNotFoundException {
+        byte[] serializedValue = this.serializedArguments.get(name);
+        if (serializedValue != null) {
+            return (Serializable) ByteToObjectConverter.ObjectStream.convert(serializedValue);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Return the set of all the argument names for this task.
+     * @return Return the set of all the argument names for this task.
+     */
+    public Set<String> getArgumentsNames() {
+        return this.serializedArguments.keySet();
     }
 
     /**
@@ -148,5 +217,4 @@ public class JavaTask extends Task {
     public void setForkEnvironment(ForkEnvironment forkEnvironment) {
         this.forkEnvironment = forkEnvironment;
     }
-
 }
