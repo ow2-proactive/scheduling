@@ -1165,7 +1165,11 @@ public class JobFactory_stax extends JobFactory {
                 logger.debug("infos : " + t.getGenericInformations());
                 if (t instanceof JavaTask) {
                     logger.debug("class : " + ((JavaTask) t).getExecutableClassName());
-                    logger.debug("args  : " + ((JavaTask) t).getArgumentsNames());
+                    try {
+                        logger.debug("args  : " + ((JavaTask) t).getArguments());
+                    } catch (Exception e) {
+                        logger.debug("Cannot get args  : " + e.getMessage(), e);
+                    }
                     logger.debug("fork  : " + ((JavaTask) t).isFork());
                     if (((JavaTask) t).getForkEnvironment() != null) {
                         logger.debug("forkJ  : " + ((JavaTask) t).getForkEnvironment().getJavaHome());

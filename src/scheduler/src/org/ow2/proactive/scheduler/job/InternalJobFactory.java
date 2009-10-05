@@ -31,9 +31,8 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,7 +40,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -211,14 +209,26 @@ public class InternalJobFactory implements Serializable {
         InternalJavaTask javaTask;
 
         if (task.getExecutableClassName() != null) {
+            // HACK HACK HACK : Get arguments for the task
+            Map<String, byte[]> args = null;
+            try {
+                Field f = JavaTask.class.getDeclaredField(JavaTask.ARGS_FIELD_NAME);
+                f.setAccessible(true);
+                args = (Map<String, byte[]>) f.get(task);
+            } catch (Exception e) {
+                // should not happen...
+                logger_dev.fatal("Internal error : cannot retreive arguments for task " + task.getName(), e);
+                throw new Error("Internal error : implementation must be revised.", e);
+            }
+
             if (task.isWallTime() || task.isFork()) {
                 ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
-                        .getExecutableClassName(), task.getSerializedArguments());
+                        .getExecutableClassName(), args);
                 fjec.setForkEnvironment(task.getForkEnvironment());
                 javaTask = new InternalForkedJavaTask(fjec);
             } else {
                 javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
-                    task.getSerializedArguments()));
+                    args));
             }
         } else {
             String msg = "You must specify your own executable task class to be launched (in every task) !";

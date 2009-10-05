@@ -31,28 +31,15 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.Future;
-import org.objectweb.proactive.core.body.future.FutureID;
-import org.objectweb.proactive.core.body.future.FuturePool;
-import org.objectweb.proactive.core.body.future.MethodCallResult;
-import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -74,7 +61,11 @@ public class JavaTask extends Task {
     protected String executableClassName = null;
 
     /** Arguments of the task as a map */
+    // WARNING : this field is accessed by reflection from InternalJobFactory
     private final Map<String, byte[]> serializedArguments = new HashMap<String, byte[]>();
+
+    /** For internal use : name of the field that stores task arguments */
+    public static final String ARGS_FIELD_NAME = "serializedArguments";
 
     /** if the task will be executed in a separate JVM */
     private boolean fork;
@@ -116,28 +107,19 @@ public class JavaTask extends Task {
     }
 
     /**
-     * Return a copy of all the task arguments as a hash map.
+     * Return an unmodifiable copy of all the task arguments as a hash map.
      *
-     * @return a copy of the arguments list.
+     * @return an unmodifiable copy of the arguments list.
      * @throws IOException if the copy of the value cannot be performed.
      * @throws ClassNotFoundException if the value's class cannot be loaded.
      */
     public Map<String, Serializable> getArguments() throws IOException, ClassNotFoundException {
-        final Set<String> allNames = this.getArgumentsNames();
+        final Set<String> allNames = this.serializedArguments.keySet();
         final Map<String, Serializable> deserialized = new HashMap<String, Serializable>(allNames.size());
         for (String name : allNames) {
             deserialized.put(name, this.getArgument(name));
         }
-        return deserialized;
-    }
-
-    /**
-     * Return a map containing all the task arguments serialized as byte[].
-     *
-     * @return the serialized arguments map.
-     */
-    public Map<String, byte[]> getSerializedArguments() {
-        return new HashMap<String, byte[]>(this.serializedArguments);
+        return Collections.unmodifiableMap(deserialized);
     }
 
     /**
@@ -179,11 +161,19 @@ public class JavaTask extends Task {
     }
 
     /**
-     * Return the set of all the argument names for this task.
-     * @return Return the set of all the argument names for this task.
+     * Remove the specified argument from the argument map.
+     * @param name the name of the specified argument.
+     * @return a copy of the value of the specified argument.
+     * @throws IOException if the copy of the value cannot be performed.
+     * @throws ClassNotFoundException if the value's class cannot be loaded.
      */
-    public Set<String> getArgumentsNames() {
-        return this.serializedArguments.keySet();
+    public Serializable removeArgument(String name) throws IOException, ClassNotFoundException {
+        byte[] serializedValue = this.serializedArguments.remove(name);
+        if (serializedValue != null) {
+            return (Serializable) ByteToObjectConverter.ObjectStream.convert(serializedValue);
+        } else {
+            return null;
+        }
     }
 
     /**

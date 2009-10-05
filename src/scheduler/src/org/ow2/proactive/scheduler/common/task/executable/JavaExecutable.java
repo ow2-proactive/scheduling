@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.scheduler.common.task.executable;
 
-import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -76,10 +75,12 @@ public abstract class JavaExecutable extends Executable {
     /**
      * Initialization default method for a java task.<br>
      * <p>
-     * By default, this method try so do some kind of automatic assignment between the value given
-     * in the args map and the field contains in your executable.<br>
-     * Manage types are String, byte, short, int, long, boolean and the corresponding classes.<br><br>
-     * For example, (when making your task) if you set as arguments the key="var", value="12"<br>
+     * By default, this method does automatic assignment between the value given in the arguments map
+     * and the fields contained in your executable.<br>
+     * If the field type and the argument type are different and if the argument type is String
+     * (i.e. for all jobs defined with XML descriptors), then a automatic mapping is tried.
+     * Managed types are byte, short, int, long, boolean and the corresponding classes.<br><br>
+     * For example, if you set as argument the key="var", value="12" in the XML descriptor<br>
      * just add an int (or Integer, long, Long) field named "var" in your executable.
      * The default {@link #init(Map)} method will store your arguments into the integer class field.
      * </p>
