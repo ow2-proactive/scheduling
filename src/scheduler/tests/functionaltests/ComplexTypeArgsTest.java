@@ -19,8 +19,6 @@ public class ComplexTypeArgsTest extends FunctionalTest {
 
         SchedulerTHelper.startScheduler();
 
-        System.out.println("======================> L1");
-
         //creating job
         TaskFlowJob submittedJob = new TaskFlowJob();
         JavaTask task = new JavaTask();
@@ -34,18 +32,11 @@ public class ComplexTypeArgsTest extends FunctionalTest {
             "/classes/schedulerTests/" });
         submittedJob.setEnvironment(env);
 
-        System.out.println("======================> L2");
-
         //test submission and event reception
         JobId id = SchedulerTHelper.testJobSubmission(submittedJob);
 
-        System.out.println("======================> L3");
-
         //check job results
         JobResult res = SchedulerTHelper.getJobResult(id);
-
-        System.out.println("======================> L4 : res = " +
-            res.getResult("t1").getOutput().getAllLogs(false));
 
         Thread.sleep(5000);
 

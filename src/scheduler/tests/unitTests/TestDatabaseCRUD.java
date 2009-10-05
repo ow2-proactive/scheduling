@@ -40,6 +40,8 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -54,6 +56,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
+import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
 import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 import org.ow2.proactive.scheduler.core.db.Condition;
 import org.ow2.proactive.scheduler.core.db.ConditionComparator;
@@ -166,12 +169,14 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getGenericInformations().size(), 0);
                 Assert.assertNull(it.getExecutableContainer());
                 DatabaseManager.getInstance().load(it);
-                Field f = JavaExecutableContainer.class.getDeclaredField("args");
+                Field f = JavaExecutableContainer.class.getDeclaredField("serializedArguments");
                 f.setAccessible(true);
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
-                        "sleepTime").getValue(), "1");
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
-                        "number").getValue(), "1");
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "sleepTime").byteArrayValue()), "1");
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "number").byteArrayValue()), "1");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
@@ -199,14 +204,17 @@ public class TestDatabaseCRUD {
                 Assert.assertEquals(it.getGenericInformations().size(), 0);
                 Assert.assertNull(it.getExecutableContainer());
                 DatabaseManager.getInstance().load(it);
-                Field f = JavaExecutableContainer.class.getDeclaredField("args");
+                Field f = JavaExecutableContainer.class.getDeclaredField("serializedArguments");
                 f.setAccessible(true);
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
-                        "sleepTime").getValue(), "12");
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
-                        "number").getValue(), "21");
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get("test")
-                        .getValue(), "/bin/java/jdk1.5");
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "sleepTime").byteArrayValue()), "12");
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "number").byteArrayValue()), "21");
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "test").byteArrayValue()), "/bin/java/jdk1.5");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
@@ -303,27 +311,34 @@ public class TestDatabaseCRUD {
         }
         //load
         for (InternalTask it : itfJob.getITasks()) {
+
             DatabaseManager.getInstance().load(it);
             if (it.getName().equals("task1")) {
-                Field f = JavaExecutableContainer.class.getDeclaredField("args");
+                Field f = JavaExecutableContainer.class.getDeclaredField("serializedArguments");
                 f.setAccessible(true);
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
-                        "sleepTime").getValue(), "1");
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
-                        "number").getValue(), "1");
+
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "sleepTime").byteArrayValue()), "1");
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "number").byteArrayValue()), "1");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
                         "org.ow2.proactive.scheduler.examples.WaitAndPrint");
             } else if (it.getName().equals("task2")) {
-                Field f = JavaExecutableContainer.class.getDeclaredField("args");
+                Field f = JavaExecutableContainer.class.getDeclaredField("serializedArguments");
                 f.setAccessible(true);
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
-                        "sleepTime").getValue(), "12");
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get(
-                        "number").getValue(), "21");
-                Assert.assertEquals(((Map<String, BigString>) f.get(it.getExecutableContainer())).get("test")
-                        .getValue(), "/bin/java/jdk1.5");
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "sleepTime").byteArrayValue()), "12");
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "number").byteArrayValue()), "21");
+                Assert.assertEquals(ByteToObjectConverter.ObjectStream
+                        .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
+                                "test").byteArrayValue()), "/bin/java/jdk1.5");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
