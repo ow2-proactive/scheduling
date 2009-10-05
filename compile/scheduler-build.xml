@@ -202,6 +202,7 @@
 				<include name="org/ow2/proactive/scheduler/common/task/util/IntegerWrapper.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/util/ResultPreviewTool.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/util/BigString.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/util/ByteArrayWrapper.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/UpdatableProperties.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/ResultPreview.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskInfo.java" />
