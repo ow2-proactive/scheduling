@@ -67,14 +67,14 @@ public enum NodeState {
      * 
      */
     TO_BE_RELEASED("To be Released");
-    
+
     private String desc;
 
     /**
      * Constructor
      * @param nb state to specify.
      */
-    NodeState(String desc) {        
+    NodeState(String desc) {
         this.desc = desc;
     }
 

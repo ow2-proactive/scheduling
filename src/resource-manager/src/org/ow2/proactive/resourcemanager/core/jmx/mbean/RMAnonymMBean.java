@@ -56,26 +56,26 @@ public interface RMAnonymMBean {
      * Returns the current status of the resource manager.
      * @return the current status of the resource manager
      */
-    public String getRMStatus();   
-	
+    public String getRMStatus();
+
     /** 
      * Returns the current number of available nodes.
      * @return the current number of available nodes
      */
     public int getAvailableNodesCount();
-    
+
     /** 
      * Returns the current number of nodes in {@link NodeState#FREE} state.
      * @return the current number of free nodes
      */
     public int getFreeNodesCount();
-    
+
     /**
      * Returns the current number of nodes in {@link NodeState#BUSY} state.
      * @return the current number of busy nodes
      */
     public int getBusyNodesCount();
-    
+
     /**
      * Returns the current number of nodes in {@link NodeState#TO_BE_RELEASED} state.
      * @return the current number of busy nodes
@@ -86,7 +86,6 @@ public interface RMAnonymMBean {
      * Returns the current number of nodes in {@link NodeState#DOWN} state.
      * @return the current number of down nodes
      */
-    public int getDownNodesCount();    
+    public int getDownNodesCount();
 
- 
 }

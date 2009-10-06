@@ -172,7 +172,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeEvent(RMNodeEvent event) {
         event.setRMUrl(this.MonitoringUrl);
-        RMMonitoringImpl.rmStatistics.nodeEvent(event);        
+        RMMonitoringImpl.rmStatistics.nodeEvent(event);
         //dispatch event
         if (logger.isDebugEnabled()) {
             logger.debug("Dispatch event '" + event.toString() + "'");

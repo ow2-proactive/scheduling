@@ -31,8 +31,11 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
+import javax.management.NotCompliantMBeanException;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
+
 
 /**
  * This class implements {@link RMAdminMBean} to allow the management of the Resource
@@ -44,58 +47,60 @@ import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
  * @since ProActive Scheduling 1.1
  */
 @PublicAPI
-public final class RMAdminMBeanImpl extends RMAnonymMBeanImpl implements
-		RMAdminMBean {	
+public final class RMAdminMBeanImpl extends RMAnonymMBeanImpl implements RMAdminMBean {
 
-	/**
-	 * Creates a new instance of this class.
-	 * 
-	 * @param rmStatisticsHolder The statistics holder
-	 */
-	public RMAdminMBeanImpl(final AtomicRMStatisticsHolder rmStatisticsHolder) {
-		super(RMAdminMBean.class, rmStatisticsHolder);
-	}
+    /**
+     * Creates a new instance of this class.
+     * 
+     * @param rmStatisticsHolder The statistics holder
+     * @throws NotCompliantMBeanException if the {@link RMAdminMBean} interface does not follow
+     * JMX design patterns for Management Interfaces, or if <var>this</var> does not 
+     * implement the specified interface.
+     */
+    public RMAdminMBeanImpl(final AtomicRMStatisticsHolder rmStatisticsHolder)
+            throws NotCompliantMBeanException {
+        super(RMAdminMBean.class, rmStatisticsHolder);
+    }
 
-	/**
-	 * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxFreeNodes()
-	 */
-	public int getMaxFreeNodes() {
-		return super.rmStatisticsHolder.getStatistics().getMaxFreeNodes();
-	}
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxFreeNodes()
+     */
+    public int getMaxFreeNodes() {
+        return super.rmStatisticsHolder.getStatistics().getMaxFreeNodes();
+    }
 
-	/**
-	 * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxBusyNodes()
-	 */
-	public int getMaxBusyNodes() {
-		return super.rmStatisticsHolder.getStatistics().getMaxBusyNodes();
-	}
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxBusyNodes()
+     */
+    public int getMaxBusyNodes() {
+        return super.rmStatisticsHolder.getStatistics().getMaxBusyNodes();
+    }
 
-	/**
-	 * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxToBeReleasedNodes()
-	 */
-	public int getMaxToBeReleasedNodes() {
-		return super.rmStatisticsHolder.getStatistics().getMaxBusyNodes();
-	}
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxToBeReleasedNodes()
+     */
+    public int getMaxToBeReleasedNodes() {
+        return super.rmStatisticsHolder.getStatistics().getMaxBusyNodes();
+    }
 
-	/**
-	 * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxDownNodes()
-	 */
-	public int getMaxDownNodes() {
-		return super.rmStatisticsHolder.getStatistics().getMaxDownNodes();
-	}
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxDownNodes()
+     */
+    public int getMaxDownNodes() {
+        return super.rmStatisticsHolder.getStatistics().getMaxDownNodes();
+    }
 
-	/**
-	 * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getActivityTimePercentage()
-	 */
-	public double getActivityTimePercentage() {
-		return super.rmStatisticsHolder.getStatistics().getActivityTimePercentage();
-	}
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getActivityTimePercentage()
+     */
+    public double getActivityTimePercentage() {
+        return super.rmStatisticsHolder.getStatistics().getActivityTimePercentage();
+    }
 
-	/**
-	 * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getInactivityTimePercentage()
-	 */
-	public double getInactivityTimePercentage() {
-		return super.rmStatisticsHolder.getStatistics()
-				.getInactivityTimePercentage();
-	}
+    /**
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getInactivityTimePercentage()
+     */
+    public double getInactivityTimePercentage() {
+        return super.rmStatisticsHolder.getStatistics().getInactivityTimePercentage();
+    }
 }

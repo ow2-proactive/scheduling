@@ -356,18 +356,19 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * @param rmNode
      *            node to set free.
      */
-    private void internalSetFree(final RMNode rmNode) {    	
+    private void internalSetFree(final RMNode rmNode) {
         // If the node is already free no need to go further
-    	if (rmNode.isFree()) {
-    		return;
-    	}
+        if (rmNode.isFree()) {
+            return;
+        }
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
         try {
             rmNode.setFree();
             this.freeNodes.add(rmNode);
             // create the event
-            this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState));
+            this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
+                previousNodeState));
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
             internalSetDown(rmNode);
@@ -385,9 +386,9 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      */
     private void internalSetToRelease(final RMNode rmNode) {
         // If the node is already set to release no need to go further
-    	if (rmNode.isToRelease()) {
-    		return;
-    	}
+        if (rmNode.isToRelease()) {
+            return;
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Prepare to release node " + rmNode.getNodeURL());
         }
@@ -410,9 +411,9 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      */
     private void internalSetDown(final RMNode rmNode) {
         // If the node is already down no need to go further
-    	if (rmNode.isDown()) {
-    		return;
-    	}
+        if (rmNode.isDown()) {
+            return;
+        }
         logger.info("Down node : " + rmNode.getNodeURL() + ", from Source : " + rmNode.getNodeSourceId());
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
@@ -923,7 +924,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         }
         // If the node is already busy no need to go further
         if (rmNode.isBusy()) {
-        	return;
+            return;
         }
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();

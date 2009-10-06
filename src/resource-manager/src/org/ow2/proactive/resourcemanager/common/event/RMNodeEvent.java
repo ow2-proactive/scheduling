@@ -85,8 +85,8 @@ public final class RMNodeEvent extends RMEvent {
 
     /** The state of the associated node */
     private final NodeState nodeState;
-    
-    /** The previous state of the associated node */ 
+
+    /** The previous state of the associated node */
     private final NodeState previousNodeState;
 
     /** Time of the last status update */
@@ -96,24 +96,24 @@ public final class RMNodeEvent extends RMEvent {
      * ProActive empty constructor
      */
     public RMNodeEvent() {
-    	this.nodeUrl = null;
-    	this.nodeSource = null;
-    	this.PADName = null;
-    	this.VnName = null;
-    	this.hostName = null;
-    	this.VMName = null;
-    	this.nodeState = null;
-    	this.previousNodeState = null;
-    	this.stateChangeTime = null;
+        this.nodeUrl = null;
+        this.nodeSource = null;
+        this.PADName = null;
+        this.VnName = null;
+        this.hostName = null;
+        this.VMName = null;
+        this.nodeState = null;
+        this.previousNodeState = null;
+        this.stateChangeTime = null;
     }
-    
+
     /**
      * Creates a node event object without previous node state.
      * @param rmNode the node concerned by this event
      * @param eventType the resource manager event type 
      */
     public RMNodeEvent(final RMNode rmNode, final RMEventType eventType) {
-    	this(rmNode, eventType, null);
+        this(rmNode, eventType, null);
     }
 
     /**
@@ -123,7 +123,7 @@ public final class RMNodeEvent extends RMEvent {
      * @param previousNodeState the previous state of the node concerned by this event
      */
     public RMNodeEvent(final RMNode rmNode, final RMEventType eventType, final NodeState previousNodeState) {
-    	super(eventType);
+        super(eventType);
         this.nodeUrl = rmNode.getNodeURL();
         this.nodeSource = rmNode.getNodeSourceId();
         this.PADName = "";
@@ -131,7 +131,7 @@ public final class RMNodeEvent extends RMEvent {
         this.hostName = rmNode.getHostName();
         this.VMName = rmNode.getDescriptorVMName();
         this.nodeState = rmNode.getState();
-        this.previousNodeState = previousNodeState;        
+        this.previousNodeState = previousNodeState;
         this.stateChangeTime = rmNode.getStateChangeTime();
     }
 
@@ -211,7 +211,7 @@ public final class RMNodeEvent extends RMEvent {
     public NodeState getNodeState() {
         return this.nodeState;
     }
-    
+
     /**
      * Returns the previous state of the node related to this event.
      *

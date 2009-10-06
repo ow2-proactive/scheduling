@@ -58,35 +58,35 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public interface RMAdminMBean extends RMAnonymMBean {
-	
-	/**
-	 * Returns the maximum number of nodes in {@link NodeState#FREE} state.
-	 * 
-	 * @return the maximum number of free nodes
-	 */
-	public int getMaxFreeNodes();
-	
-	/**
-	 * Returns the maximum number of nodes in {@link NodeState#BUSY} state.
-	 * 
-	 * @return the maximum number of busy nodes
-	 */
-	public int getMaxBusyNodes();
-	
-	/**
-	 * Returns the maximum number of nodes in {@link NodeState#TO_BE_RELEASED} state.
-	 * 
-	 * @return the maximum number of busy nodes
-	 */
-	public int getMaxToBeReleasedNodes();
-	
-	/**
-	 * Returns the maximum number of nodes in {@link NodeState#FREE} state.
-	 * 
-	 * @return the maximum number of down nodes
-	 */
-	public int getMaxDownNodes();
-	
+
+    /**
+     * Returns the maximum number of nodes in {@link NodeState#FREE} state.
+     * 
+     * @return the maximum number of free nodes
+     */
+    public int getMaxFreeNodes();
+
+    /**
+     * Returns the maximum number of nodes in {@link NodeState#BUSY} state.
+     * 
+     * @return the maximum number of busy nodes
+     */
+    public int getMaxBusyNodes();
+
+    /**
+     * Returns the maximum number of nodes in {@link NodeState#TO_BE_RELEASED} state.
+     * 
+     * @return the maximum number of busy nodes
+     */
+    public int getMaxToBeReleasedNodes();
+
+    /**
+     * Returns the maximum number of nodes in {@link NodeState#FREE} state.
+     * 
+     * @return the maximum number of down nodes
+     */
+    public int getMaxDownNodes();
+
     /**
      * Returns the nodes activity time percentage.
      * 

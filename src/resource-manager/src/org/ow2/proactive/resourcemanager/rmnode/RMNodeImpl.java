@@ -69,7 +69,7 @@ import org.ow2.proactive.scripting.SelectionScript;
  * @since ProActive Scheduling 0.9
  *
  */
-public class RMNodeImpl implements RMNode, Serializable { 
+public class RMNodeImpl implements RMNode, Serializable {
 
     /** HashMap associates a selection Script to its result on the node */
     private HashMap<SelectionScript, Integer> scriptStatus;
@@ -138,10 +138,10 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getNode()
      */
     public Node getNode() throws NodeException {
-    	if (this.isDown()) {
-    		throw new NodeException("The node is down");
-    	}
-        return this.node;        
+        if (this.isDown()) {
+            throw new NodeException("The node is down");
+        }
+        return this.node;
     }
 
     /**
@@ -197,11 +197,11 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @throws NodeException if the node is down.
      */
     public void setBusy() throws NodeException {
-    	if (this.isDown()) {
-    		throw new NodeException("The node is down");
-    	}
+        if (this.isDown()) {
+            throw new NodeException("The node is down");
+        }
         this.state = NodeState.BUSY;
-        this.stateChangeTime = Calendar.getInstance();        
+        this.stateChangeTime = Calendar.getInstance();
     }
 
     /**
@@ -209,11 +209,11 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @throws NodeException if the node is down.
      */
     public void setFree() throws NodeException {
-    	if (this.isDown()) {
-    		throw new NodeException("The node is down");
-    	}        
+        if (this.isDown()) {
+            throw new NodeException("The node is down");
+        }
         this.state = NodeState.FREE;
-        this.stateChangeTime = Calendar.getInstance();        
+        this.stateChangeTime = Calendar.getInstance();
     }
 
     /**
@@ -229,39 +229,39 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @throws NodeException if the node is down.
      */
     public void setToRelease() throws NodeException {
-    	if(this.isDown()) {
-    		throw new NodeException("The node is down");
-    	}        
+        if (this.isDown()) {
+            throw new NodeException("The node is down");
+        }
         this.state = NodeState.TO_BE_RELEASED;
-        this.stateChangeTime = Calendar.getInstance();        
+        this.stateChangeTime = Calendar.getInstance();
     }
 
     /**
      * @return true if the node is free, false otherwise.
      */
     public boolean isFree() {
-    	return this.state == NodeState.FREE;
+        return this.state == NodeState.FREE;
     }
 
     /**
      * @return true if the node is busy, false otherwise.
      */
     public boolean isBusy() {
-    	return this.state == NodeState.BUSY;
+        return this.state == NodeState.BUSY;
     }
 
     /**
      * @return true if the node is down, false otherwise.
      */
     public boolean isDown() {
-    	return this.state == NodeState.DOWN;
+        return this.state == NodeState.DOWN;
     }
 
     /**
      * @return true if the node is 'to be released', false otherwise.
      */
     public boolean isToRelease() {
-    	return this.state == NodeState.TO_BE_RELEASED;
+        return this.state == NodeState.TO_BE_RELEASED;
     }
 
     /**
