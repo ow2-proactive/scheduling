@@ -32,42 +32,61 @@
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 
 
 /**
- * MBean interface representing the attributes and the statistic values to monitor the Resource Manager
- *
+ * This MBean interface exposes a limited set of Resource Manager statistics:
+ * <p>
+ * <ul>
+ * <li>The Resource Manager status
+ * <li>Available nodes count
+ * <li>Free nodes count
+ * <li>Busy nodes count 
+ * </ul>
+ * <p> 
+ * 
  * @author The ProActive Team
- * @since ProActive Scheduling 1.0
+ * @since ProActive Scheduling 1.1
  */
 @PublicAPI
-public interface RMWrapperAdminMBean extends RMWrapperAnonymMBean {
+public interface RMAnonymMBean {
 
     /**
-     * It`s the percentage time of inactivity of all the available nodes
-     * 
-     * @return the current percentage time of nodes inactivity
+     * Returns the current status of the resource manager.
+     * @return the current status of the resource manager
      */
-    public int getTimePercentageOfNodesInactivity();
+    public String getRMStatus();   
+	
+    /** 
+     * Returns the current number of available nodes.
+     * @return the current number of available nodes
+     */
+    public int getAvailableNodesCount();
+    
+    /** 
+     * Returns the current number of nodes in {@link NodeState#FREE} state.
+     * @return the current number of free nodes
+     */
+    public int getFreeNodesCount();
+    
+    /**
+     * Returns the current number of nodes in {@link NodeState#BUSY} state.
+     * @return the current number of busy nodes
+     */
+    public int getBusyNodesCount();
+    
+    /**
+     * Returns the current number of nodes in {@link NodeState#TO_BE_RELEASED} state.
+     * @return the current number of busy nodes
+     */
+    public int getToBeReleasedNodesCount();
 
     /**
-     * It`s the percentage time of usage of all the available nodes
-     * 
-     * @return the current percentage time of nodes usage
+     * Returns the current number of nodes in {@link NodeState#DOWN} state.
+     * @return the current number of down nodes
      */
-    public int getTimePercentageOfNodesUsage();
+    public int getDownNodesCount();    
 
-    /**
-     * It`s the percentage time of inactivity of all the available nodes as double
-     * 
-     * @return the current percentage time of nodes inactivity as double
-     */
-    public double getTimePercentageOfNodesInactivityAsDouble();
-
-    /**
-     * It`s the percentage time of usage of all the available nodes as double
-     * 
-     * @return the current percentage time of nodes usage as double
-     */
-    public double getTimePercentageOfNodesUsageAsDouble();
+ 
 }

@@ -45,7 +45,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 /**
  * This class implements Event object related to an {@link RMNode}
- * This event object is thrown to all Resource Manager Monitors to inform them
+ * This immutable event object is thrown to all Resource Manager Monitors to inform them
  * about a Node's state modification.<BR>
  * This event can be :<BR>
  * -a new Node acquisition.<BR>
@@ -56,61 +56,83 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
  * -a node removed from the Resource Manager.<BR><BR>
  *
  * An RMNodesourceEvent contains all information about its related {@link RMNode}.
- *
+ * 
  * @see RMMonitoring
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public class RMNodeEvent extends RMEvent {
+public final class RMNodeEvent extends RMEvent {
 
     /** URL of the related node */
-    private String nodeUrl = null;
+    private final String nodeUrl;
 
     /** {@link NodeSource} name of the node */
-    private String nodeSource = null;
+    private final String nodeSource;
 
     /** {@link ProActiveDescriptor} name of the node */
-    private String PADName = null;
+    private final String PADName;
 
     /** {@link VirtualNode} name of the node */
-    private String VnName = null;
+    private final String VnName;
 
     /** Host name of the node */
-    private String hostName = null;
+    private final String hostName;
 
     /** Java virtual machine name of the node */
-    private String VMName = null;
+    private final String VMName;
 
-    /** State of the associated node */
-    private NodeState nodeState;
+    /** The state of the associated node */
+    private final NodeState nodeState;
+    
+    /** The previous state of the associated node */ 
+    private final NodeState previousNodeState;
 
     /** Time of the last status update */
-    private Calendar stateChangeTime;
-
-    /** date formatter */
-    private SimpleDateFormat dateFormatter = new SimpleDateFormat();
+    private final Calendar stateChangeTime;
 
     /**
      * ProActive empty constructor
      */
     public RMNodeEvent() {
+    	this.nodeUrl = null;
+    	this.nodeSource = null;
+    	this.PADName = null;
+    	this.VnName = null;
+    	this.hostName = null;
+    	this.VMName = null;
+    	this.nodeState = null;
+    	this.previousNodeState = null;
+    	this.stateChangeTime = null;
+    }
+    
+    /**
+     * Creates a node event object without previous node state.
+     * @param rmNode the node concerned by this event
+     * @param eventType the resource manager event type 
+     */
+    public RMNodeEvent(final RMNode rmNode, final RMEventType eventType) {
+    	this(rmNode, eventType, null);
     }
 
     /**
-     * Creates the node event object.
+     * Creates a node event object with a previous node state. 
+     * @param rmNode the node concerned by this event
+     * @param eventType the resource manager event type
+     * @param previousNodeState the previous state of the node concerned by this event
      */
-    public RMNodeEvent(RMNode rmnode, RMEventType type) {
-        this.nodeUrl = rmnode.getNodeURL();
-        this.nodeSource = rmnode.getNodeSourceId();
+    public RMNodeEvent(final RMNode rmNode, final RMEventType eventType, final NodeState previousNodeState) {
+    	super(eventType);
+        this.nodeUrl = rmNode.getNodeURL();
+        this.nodeSource = rmNode.getNodeSourceId();
         this.PADName = "";
-        this.VnName = rmnode.getVNodeName();
-        this.hostName = rmnode.getHostName();
-        this.VMName = rmnode.getDescriptorVMName();
-        this.nodeState = rmnode.getState();
-        this.type = type;
-        this.stateChangeTime = rmnode.getStateChangeTime();
+        this.VnName = rmNode.getVNodeName();
+        this.hostName = rmNode.getHostName();
+        this.VMName = rmNode.getDescriptorVMName();
+        this.nodeState = rmNode.getState();
+        this.previousNodeState = previousNodeState;        
+        this.stateChangeTime = rmNode.getStateChangeTime();
     }
 
     /**
@@ -184,10 +206,19 @@ public class RMNodeEvent extends RMEvent {
     /**
      * Returns the state of the node related to this event.
      *
-     * @return state of the node.
+     * @return the state of the node.
      */
     public NodeState getNodeState() {
-        return nodeState;
+        return this.nodeState;
+    }
+    
+    /**
+     * Returns the previous state of the node related to this event.
+     *
+     * @return the previous state of the node.
+     */
+    public NodeState getPreviousNodeState() {
+        return this.previousNodeState;
     }
 
     /**
@@ -195,7 +226,7 @@ public class RMNodeEvent extends RMEvent {
      * @return the time when state changed the last time
      */
     public String getStateChangeTime() {
-        return dateFormatter.format(stateChangeTime.getTime());
+        return new SimpleDateFormat().format(this.stateChangeTime.getTime());
     }
 
     /**

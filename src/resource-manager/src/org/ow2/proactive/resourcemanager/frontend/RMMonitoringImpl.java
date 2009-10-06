@@ -51,9 +51,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
-import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMWrapperAdmin;
-import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMWrapperAnonym;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -80,9 +79,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     private Set<UniqueID> dirtyList = new HashSet<UniqueID>();
     private String MonitoringUrl = null;
 
-    /** Resource Manager's MBean */
-    public static RMWrapperAnonym rMBeanAnonym = new RMWrapperAnonym();
-    public static RMWrapperAdmin rMBeanAdmin = new RMWrapperAdmin();
+    /** Resource Manager's statistics */
+    public static final AtomicRMStatisticsHolder rmStatistics = new AtomicRMStatisticsHolder();
 
     // ----------------------------------------------------------------------//
     // CONSTRUTORS
@@ -174,8 +172,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeEvent(RMNodeEvent event) {
         event.setRMUrl(this.MonitoringUrl);
-        rMBeanAnonym.nodeEvent(event);
-        rMBeanAdmin.nodeEvent(event);
+        RMMonitoringImpl.rmStatistics.nodeEvent(event);        
         //dispatch event
         if (logger.isDebugEnabled()) {
             logger.debug("Dispatch event '" + event.toString() + "'");
@@ -214,8 +211,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void rmEvent(RMEvent event) {
         event.setRMUrl(this.MonitoringUrl);
-        rMBeanAnonym.rmEvent(event);
-        rMBeanAdmin.rmEvent(event);
+        RMMonitoringImpl.rmStatistics.rmEvent(event);
         //dispatch event
         if (logger.isDebugEnabled()) {
             logger.debug("Dispatch event '" + event.toString() + "'");

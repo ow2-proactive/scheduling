@@ -52,31 +52,29 @@ public enum NodeState {
     /**
      * a node that can be provided to a RM user, and able to perform a task
      */
-    FREE(0, "Free"),
+    FREE("Free"),
     /**
      * a node provided to a RM user.
      */
-    BUSY(1, "Busy"),
+    BUSY("Busy"),
     /**
      * a node that has been detected down.
      */
-    DOWN(2, "Down"),
+    DOWN("Down"),
     /**
      * a node busy which must be removed from Resource manager, when the RM user
      * will give back the node.
      * 
      */
-    TO_BE_RELEASED(3, "To be Released");
-
-    private int state;
+    TO_BE_RELEASED("To be Released");
+    
     private String desc;
 
     /**
      * Constructor
      * @param nb state to specify.
      */
-    NodeState(int nb, String desc) {
-        state = nb;
+    NodeState(String desc) {        
         this.desc = desc;
     }
 

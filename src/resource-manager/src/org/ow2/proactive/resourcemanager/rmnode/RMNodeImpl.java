@@ -36,15 +36,12 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -72,10 +69,7 @@ import org.ow2.proactive.scripting.SelectionScript;
  * @since ProActive Scheduling 0.9
  *
  */
-public class RMNodeImpl implements RMNode, Serializable {
-
-    /** associated logger */
-    private static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMNODE);
+public class RMNodeImpl implements RMNode, Serializable { 
 
     /** HashMap associates a selection Script to its result on the node */
     private HashMap<SelectionScript, Integer> scriptStatus;
@@ -108,7 +102,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     private String nodeSourceID;
 
     /** State of the node */
-    private NodeState status;
+    private NodeState state;
 
     /** Time of the last status update */
     private Calendar stateChangeTime = Calendar.getInstance();
@@ -129,7 +123,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         this.hostName = node.getNodeInformation().getVMInformation().getHostName();
         this.vmName = node.getNodeInformation().getVMInformation().getName();
         this.scriptStatus = new HashMap<SelectionScript, Integer>();
-        this.status = NodeState.FREE;
+        this.state = NodeState.FREE;
     }
 
     /**
@@ -144,11 +138,10 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getNode()
      */
     public Node getNode() throws NodeException {
-        if (this.status != NodeState.DOWN) {
-            return this.node;
-        } else {
-            throw new NodeException("The node is down");
-        }
+    	if (this.isDown()) {
+    		throw new NodeException("The node is down");
+    	}
+        return this.node;        
     }
 
     /**
@@ -200,94 +193,75 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * change the node's status to busy.
+     * Changes the state of this node to {@link NodeState#BUSY}.
      * @throws NodeException if the node is down.
      */
     public void setBusy() throws NodeException {
-        if (this.status != NodeState.DOWN) {
-            this.status = NodeState.BUSY;
-            stateChangeTime = Calendar.getInstance();
-        } else {
-            throw new NodeException("The node is down");
-        }
+    	if (this.isDown()) {
+    		throw new NodeException("The node is down");
+    	}
+        this.state = NodeState.BUSY;
+        this.stateChangeTime = Calendar.getInstance();        
     }
 
     /**
-     * change the node's status to free.
+     * Changes the state of this node to {@link NodeState#FREE}.
      * @throws NodeException if the node is down.
      */
     public void setFree() throws NodeException {
-        if (this.status != NodeState.DOWN) {
-            this.status = NodeState.FREE;
-            stateChangeTime = Calendar.getInstance();
-        } else {
-            throw new NodeException("The node is down");
-        }
+    	if (this.isDown()) {
+    		throw new NodeException("The node is down");
+    	}        
+        this.state = NodeState.FREE;
+        this.stateChangeTime = Calendar.getInstance();        
     }
 
     /**
-     * change the node's status to down.
+     * Changes the state of this node to {@link NodeState#DOWN}.
      */
     public void setDown() {
-        this.status = NodeState.DOWN;
-        stateChangeTime = Calendar.getInstance();
+        this.state = NodeState.DOWN;
+        this.stateChangeTime = Calendar.getInstance();
     }
 
     /**
-     * change the node's status to 'to be released'.
+     * Changes the state of this node to {@link NodeState#TO_BE_RELEASED}.
      * @throws NodeException if the node is down.
      */
     public void setToRelease() throws NodeException {
-        if (this.status != NodeState.DOWN) {
-            this.status = NodeState.TO_BE_RELEASED;
-            stateChangeTime = Calendar.getInstance();
-        } else {
-            throw new NodeException("The node is down");
-        }
+    	if(this.isDown()) {
+    		throw new NodeException("The node is down");
+    	}        
+        this.state = NodeState.TO_BE_RELEASED;
+        this.stateChangeTime = Calendar.getInstance();        
     }
 
     /**
      * @return true if the node is free, false otherwise.
      */
     public boolean isFree() {
-        if (this.status == NodeState.FREE) {
-            return true;
-        } else {
-            return false;
-        }
+    	return this.state == NodeState.FREE;
     }
 
     /**
      * @return true if the node is busy, false otherwise.
      */
     public boolean isBusy() {
-        if (this.status == NodeState.BUSY) {
-            return true;
-        } else {
-            return false;
-        }
+    	return this.state == NodeState.BUSY;
     }
 
     /**
      * @return true if the node is down, false otherwise.
      */
     public boolean isDown() {
-        if (this.status == NodeState.DOWN) {
-            return true;
-        } else {
-            return false;
-        }
+    	return this.state == NodeState.DOWN;
     }
 
     /**
      * @return true if the node is 'to be released', false otherwise.
      */
     public boolean isToRelease() {
-        if (this.status == NodeState.TO_BE_RELEASED) {
-            return true;
-        } else {
-            return false;
-        }
+    	return this.state == NodeState.TO_BE_RELEASED;
     }
 
     /**
@@ -362,7 +336,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     @Override
     public int hashCode() {
-        return nodeURL.hashCode();
+        return this.nodeURL.hashCode();
     }
 
     /**
@@ -370,7 +344,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return the HashMap of all scripts tested with corresponding results.
      */
     public HashMap<SelectionScript, Integer> getScriptStatus() {
-        return scriptStatus;
+        return this.scriptStatus;
     }
 
     /**
@@ -413,13 +387,13 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getState()
      */
     public NodeState getState() {
-        return status;
+        return this.state;
     }
 
     /**
      * {@inheritDoc}
      */
     public Calendar getStateChangeTime() {
-        return stateChangeTime;
+        return this.stateChangeTime;
     }
 }

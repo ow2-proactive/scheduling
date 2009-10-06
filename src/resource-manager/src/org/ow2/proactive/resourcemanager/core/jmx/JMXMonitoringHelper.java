@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorServer;
 import org.ow2.proactive.jmx.naming.JMXProperties;
+import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBeanImpl;
+import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAnonymMBeanImpl;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -61,7 +63,7 @@ public class JMXMonitoringHelper implements Serializable {
 
     /** logger device */
     public static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);
-    private static final String RM_BEAN_NAME = "RMFrontend:name=RMBean";
+    public static final String RM_BEAN_NAME = "RMFrontend:name=RMBean";
 
     private static final String JMX_CONNECTOR_NAME = PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME
             .getValueAsString();
@@ -107,8 +109,8 @@ public class JMXMonitoringHelper implements Serializable {
             rMNameAdmin = new ObjectName(RM_BEAN_NAME + "_" + JMXProperties.JMX_ADMIN);
             // Get the MBean Objects for the Resource Manager from the ResourceManager Frontend
             // Register the MBean Views for the Resource Manager
-            mbsAnonym.registerMBean(RMMonitoringImpl.rMBeanAnonym, rMNameAnonym);
-            mbsAdmin.registerMBean(RMMonitoringImpl.rMBeanAdmin, rMNameAdmin);
+            mbsAnonym.registerMBean(new RMAnonymMBeanImpl(RMMonitoringImpl.rmStatistics), rMNameAnonym);
+            mbsAdmin.registerMBean(new RMAdminMBeanImpl(RMMonitoringImpl.rmStatistics), rMNameAdmin);
         } catch (Exception e) {
             logger.error("", e);
         }

@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.ow2.proactive.authentication.RestrictedService;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -352,21 +353,24 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * and move the node to the internal free nodes list. An event informing the
      * node state's change is thrown to RMMonitoring.
      * 
-     * @param rmnode
+     * @param rmNode
      *            node to set free.
      */
-    private void internalSetFree(RMNode rmnode) {
-        // the node can only come from a busy state or down state
-        assert rmnode.isBusy();
+    private void internalSetFree(final RMNode rmNode) {    	
+        // If the node is already free no need to go further
+    	if (rmNode.isFree()) {
+    		return;
+    	}
+        // Get the previous state of the node needed for the event
+        final NodeState previousNodeState = rmNode.getState();
         try {
-            rmnode.setFree();
-            this.freeNodes.add(rmnode);
-
+            rmNode.setFree();
+            this.freeNodes.add(rmNode);
             // create the event
-            this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
+            this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState));
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
-            internalSetDown(rmnode);
+            internalSetDown(rmNode);
             logger.debug("", e);
         }
     }
@@ -376,23 +380,27 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * the node to the internal 'to be released' nodes list. An event informing
      * the node state's change is thrown to RMMonitoring.
      * 
-     * @param rmnode
-     *            node to set.
+     * @param rmNode
+     *            node to set to release.
      */
-    private void internalSetToRelease(RMNode rmnode) {
+    private void internalSetToRelease(final RMNode rmNode) {
+        // If the node is already set to release no need to go further
+    	if (rmNode.isToRelease()) {
+    		return;
+    	}
         if (logger.isDebugEnabled()) {
-            logger.debug("Prepare to release node " + rmnode.getNodeURL());
+            logger.debug("Prepare to release node " + rmNode.getNodeURL());
         }
-        // the node can only come from a busy state
-        assert rmnode.isBusy();
+        // Get the previous state of the node needed for the event
+        final NodeState previousNodeState = rmNode.getState();
         try {
-            rmnode.setToRelease();
+            rmNode.setToRelease();
         } catch (NodeException e1) {
             // A down node shouldn't be busied...
             logger.debug("", e1);
         }
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
+        this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState));
     }
 
     /**
@@ -400,16 +408,20 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * list. An event informing the node state's change is thrown to
      * RMMonitoring
      */
-    private void internalSetDown(RMNode rmnode) {
-        logger.info("Down node : " + rmnode.getNodeURL() + ", from Source : " + rmnode.getNodeSourceId());
-        assert (!rmnode.isDown());
-
-        if (rmnode.isFree()) {
-            freeNodes.remove(rmnode);
+    private void internalSetDown(final RMNode rmNode) {
+        // If the node is already down no need to go further
+    	if (rmNode.isDown()) {
+    		return;
+    	}
+        logger.info("Down node : " + rmNode.getNodeURL() + ", from Source : " + rmNode.getNodeSourceId());
+        // Get the previous state of the node needed for the event
+        final NodeState previousNodeState = rmNode.getState();
+        if (rmNode.isFree()) {
+            freeNodes.remove(rmNode);
         }
-        rmnode.setDown();
+        rmNode.setDown();
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
+        this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState));
     }
 
     /**
@@ -901,28 +913,31 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      *
      * @param rmnode
      *            node to set
-     * @throws NodeException
+     * @throws NodeException if the node can't be set busy
      */
-    public void setBusyNode(String nodeUrl) throws NodeException {
-
-        RMNode rmnode = allNodes.get(nodeUrl);
-        if (rmnode == null) {
+    public void setBusyNode(final String nodeUrl) throws NodeException {
+        final RMNode rmNode = this.allNodes.get(nodeUrl);
+        if (rmNode == null) {
             logger.error("Unknown node " + nodeUrl);
             return;
         }
-
-        assert rmnode.isFree();
-        assert this.freeNodes.contains(rmnode);
-
-        try {
-            rmnode.setBusy();
-        } catch (NodeException e1) {
-            // A down node shouldn't be busied...
-            logger.debug("", e1);
+        // If the node is already busy no need to go further
+        if (rmNode.isBusy()) {
+        	return;
         }
-        this.freeNodes.remove(rmnode);
+        // Get the previous state of the node needed for the event
+        final NodeState previousNodeState = rmNode.getState();
+        try {
+            rmNode.setBusy();
+        } catch (NodeException e) {
+            // A down node shouldn't be busied...
+            logger.error("Unable to set the node " + rmNode.getNodeURL() + " busy", e);
+            // Since this method throws a NodeException re-throw e to inform the caller 
+            throw e;
+        }
+        this.freeNodes.remove(rmNode);
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED));
+        this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState));
     }
 
     /**
