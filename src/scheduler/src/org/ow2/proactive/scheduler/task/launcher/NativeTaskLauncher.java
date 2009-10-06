@@ -100,8 +100,9 @@ public class NativeTaskLauncher extends TaskLauncher {
             logger_dev.debug("Starting execution of task '" + taskId + "'");
             Serializable userResult = currentExecutable.execute(results);
 
-            //execute post-script
-            if (post != null) {
+            //execute post-script only if user task return code is 0
+            int retCode = Integer.parseInt(userResult.toString());
+            if (post != null && retCode == 0) {
                 this.executePostScript(PAActiveObject.getNode());
             }
 
