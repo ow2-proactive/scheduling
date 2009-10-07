@@ -44,6 +44,7 @@ import java.util.List;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -124,14 +125,11 @@ public class PluginDescriptor implements Serializable {
      * Performs some operations such as file loading on user side.
      *
      * @param parameters input parameters
-     * @param auth authentication for the resource manager, used to create credentials
-     * if there are login/password information in the plugin
      * @return output parameters
      * @throws RMException when error occurs
      */
-    public Object[] packParameters(Object[] parameters, RMAuthentication auth) throws RMException {
+    public Object[] packParameters(Object[] parameters) throws RMException {
         List<Object> resultParams = new ArrayList<Object>();
-        String previous = null;
 
         if (parameters.length != configurableFields.size()) {
             throw new RMException("Incorrect number of parameters: expected " + configurableFields.size() +
@@ -139,43 +137,41 @@ public class PluginDescriptor implements Serializable {
         }
 
         int counter = 0;
+        boolean loginData = false;
+
         for (ConfigurableField field : configurableFields) {
-            String value = parameters[counter++].toString();
+            Object value = parameters[counter++];
 
             Configurable configurable = field.getMeta();
             if (configurable.fileBrowser()) {
                 try {
-                    resultParams.add(FileToBytesConverter.convertFileToByteArray(new File(value)));
+                    resultParams.add(FileToBytesConverter.convertFileToByteArray(new File(value.toString())));
                 } catch (IOException e) {
                     throw new RMException("Cannot load file", e);
                 }
             } else if (configurable.login()) {
-                previous = value;
-            } else if (configurable.password()) {
-                if (previous != null) {
-                    String login = previous;
-                    String pass = value;
+                loginData = true;
+            } else if (configurable.password() && loginData) {
+                Credentials creds;
+                try {
+                    // TODO we need to connect to scheduler!
+                    // not to RM. HOw to do that without introducing scheduler dependency
+                    String login = resultParams.remove(resultParams.size() - 1).toString();
+                    String url = resultParams.get(resultParams.size() - 1).toString();
+                    String pass = value.toString();
 
-                    Credentials creds;
-                    try {
-                        creds = Credentials.createCredentials(login, pass, auth.getPublicKey());
-                        resultParams.add(creds);
-                    } catch (Exception e) {
-                        throw new RMException(e);
-                    }
-                    previous = null;
-                } else {
-                    // no login field before password field
-                    resultParams.add(value);
+                    RMAuthentication auth = RMConnection.join(url);
+                    value = Credentials.createCredentials(login, pass, auth.getPublicKey());
+                } catch (Exception e) {
+                    throw new RMException(e);
                 }
-            } else if (previous != null) {
-                // login field was not followed by password field
-                resultParams.add(previous);
-                resultParams.add(value);
-                previous = null;
-            } else {
-                resultParams.add(value);
             }
+
+            if (loginData && !configurable.login()) {
+                loginData = false;
+            }
+
+            resultParams.add(value);
         }
         return resultParams.toArray();
     }

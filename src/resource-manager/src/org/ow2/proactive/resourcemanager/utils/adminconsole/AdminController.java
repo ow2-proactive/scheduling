@@ -501,7 +501,7 @@ public class AdminController {
 
             for (String nsName : nsNames) {
                 // if imParams is null or policyParams is null use default
-                if (!AdminRMModel.createns(nsName, imParams, policyParams, auth)) {
+                if (!AdminRMModel.createns(nsName, imParams, policyParams)) {
                     break;
                 }
             }

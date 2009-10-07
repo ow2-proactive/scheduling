@@ -34,8 +34,8 @@ function gcmdeploy(gcmdFile, nodeSourceName){
     return AdminRMModel.gcmdeploy(gcmdFile, nodeSourceName);
 }
 
-function createns(nodeSourceName){
-    return AdminRMModel.createns(nodeSourceName);
+function createns(nsName,infrastructure,policy){
+	return AdminRMModel.createns(nsName,infrastructure,policy);
 }
 
 function removens(nodeSourceName,preemptively){
@@ -52,6 +52,14 @@ function listnodes(){
 
 function listns(){
     return AdminRMModel.listns();
+}
+
+function listInfrastructures(){
+	return AdminRMModel.listInfrastructures();
+}
+
+function listPolicies(){
+	return AdminRMModel.listPolicies();
 }
 
 function shutdown(preemptively){

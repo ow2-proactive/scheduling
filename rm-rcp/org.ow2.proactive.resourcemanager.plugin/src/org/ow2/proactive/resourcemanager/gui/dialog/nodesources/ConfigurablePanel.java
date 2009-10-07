@@ -217,7 +217,7 @@ public class ConfigurablePanel extends Group {
     protected void checkSubclass() {
     }
 
-    public Object[] getParameters(RMAuthentication auth) throws RMException {
+    public Object[] getParameters() throws RMException {
         List<String> params = new ArrayList<String>();
 
         for (Property p : properties) {
@@ -227,7 +227,7 @@ public class ConfigurablePanel extends Group {
         if (selectedDescriptor == null) {
             throw new RMException("Incorrect plugin selection");
         }
-        return selectedDescriptor.packParameters(params.toArray(), auth);
+        return selectedDescriptor.packParameters(params.toArray());
     }
 
     public PluginDescriptor getSelectedPlugin() {

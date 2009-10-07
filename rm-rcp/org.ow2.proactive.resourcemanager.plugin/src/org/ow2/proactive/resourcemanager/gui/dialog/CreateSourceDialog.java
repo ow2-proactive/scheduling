@@ -43,12 +43,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.ConfigurablePanel;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.NodeSourceName;
@@ -96,12 +92,10 @@ public class CreateSourceDialog extends Dialog {
                         validateForm();
 
                         RMAdmin admin = RMStore.getInstance().getRMAdmin();
-                        RMAuthentication auth = RMConnection.join(RMStore.getInstance().getURL() +
-                            RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
-                        Object[] policyParams = policy.getParameters(auth);
+                        Object[] policyParams = policy.getParameters();
                         admin.createNodesource(name.getNodeSourceName(), infrastructure.getSelectedPlugin()
-                                .getPluginName(), infrastructure.getParameters(auth), policy
-                                .getSelectedPlugin().getPluginName(), policyParams);
+                                .getPluginName(), infrastructure.getParameters(), policy.getSelectedPlugin()
+                                .getPluginName(), policyParams);
 
                         shell.close();
                     } catch (Exception e) {

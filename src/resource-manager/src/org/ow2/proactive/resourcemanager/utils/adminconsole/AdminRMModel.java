@@ -38,9 +38,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
+import org.globus.replica.catalog.GRCContext.Authentication;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -49,7 +49,6 @@ import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -113,13 +112,15 @@ public class AdminRMModel extends ConsoleModel {
         commands.add(new Command("gcmdeploy(gcmdFile,nsName)",
             "Add node(s) to the given node source (parameter is a string representing the a GCMD file AND"
                 + " a string representing the node source in which to add the node(s) )"));
-        commands.add(new Command("createns(nsName)",
-            "Create a new node source (parameter is a string representing the node source name to create)"));
+        commands.add(new Command("createns(nsName,infr,pol)",
+            "Create a new node source with specified name, infrastructure and policy"));
         commands.add(new Command("removens(nsName,preempt)",
             "Remove the given node source (parameter is a string representing the node source name to remove,"
                 + " nodeSource is removed immediately if second parameter is true)"));
         commands.add(new Command("listnodes()", "List every handled nodes"));
         commands.add(new Command("listns()", "List every handled node sources"));
+        commands.add(new Command("listInfrastructures()", "List supported infrastructures"));
+        commands.add(new Command("listPolicies()", "List available node sources policies"));
         commands.add(new Command("shutdown(preempt)",
             "Shutdown the Resource Manager (RM shutdown immediately if parameter is true)"));
         commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
@@ -303,30 +304,25 @@ public class AdminRMModel extends ConsoleModel {
         }
     }
 
-    public static boolean createns(String nodeSourceName) {
+    public static boolean createns(String nodeSourceName, String[] imParams, String[] policyParams) {
         getModel().checkIsReady();
-        return getModel().createns_(nodeSourceName, null, null, null);
+        return getModel().createns_(nodeSourceName, imParams, policyParams);
     }
 
-    public static boolean createns(String nodeSourceName, String[] imParams, String[] policyParams,
-            RMAuthentication auth) {
-        getModel().checkIsReady();
-        return getModel().createns_(nodeSourceName, imParams, policyParams, auth);
-    }
-
-    private Object[] packPluginParameters(String[] params, RMAuthentication auth) throws RMException,
-            ClassNotFoundException {
+    private Object[] packPluginParameters(String[] params) throws RMException, ClassNotFoundException {
         // extracting plugin name from the first param
         if (params != null && params.length > 0) {
             String name = params[0];
             // shifting array of input params (plugin does not imply having its name in the first parameter)
             Object[] shiftedParams = new Object[params.length - 1];
             System.arraycopy(params, 1, shiftedParams, 0, params.length - 1);
+
+            //TODO if we want to run rm-admin remotely this part has to be rewritten
             Class<?> cls = Class.forName(name);
             PluginDescriptor pd = new PluginDescriptor(cls);
             // packing parameters (reading files on client side, processing login information, etc)
             try {
-                return pd.packParameters(shiftedParams, auth);
+                return pd.packParameters(shiftedParams);
             } catch (RMException ex) {
                 getModel().print(pd.toString());
                 throw ex;
@@ -336,8 +332,7 @@ public class AdminRMModel extends ConsoleModel {
         return null;
     }
 
-    private boolean createns_(String nodeSourceName, String[] imInputParams, String[] policyInputParams,
-            RMAuthentication auth) {
+    private boolean createns_(String nodeSourceName, String[] imInputParams, String[] policyInputParams) {
 
         try {
             String imName = GCMInfrastructure.class.getName();
@@ -350,8 +345,8 @@ public class AdminRMModel extends ConsoleModel {
                 policyName = policyInputParams[0];
             }
 
-            Object[] imPackedParams = packPluginParameters(imInputParams, auth);
-            Object[] policyPackedParams = packPluginParameters(policyInputParams, auth);
+            Object[] imPackedParams = packPluginParameters(imInputParams);
+            Object[] policyPackedParams = packPluginParameters(policyInputParams);
 
             rm.createNodesource(nodeSourceName, imName, imPackedParams, policyName, policyPackedParams);
             print("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
