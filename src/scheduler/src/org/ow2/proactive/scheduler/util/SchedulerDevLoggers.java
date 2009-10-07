@@ -48,6 +48,8 @@ public interface SchedulerDevLoggers {
 
     static final public String DATABASE = SCHEDULER + ".database";
 
+    static final public String DATASPACE = SCHEDULER + ".dataspace";
+
     static final public String FRONTEND = SCHEDULER + ".frontend";
 
     static final public String CONNECTION = SCHEDULER + ".connection";

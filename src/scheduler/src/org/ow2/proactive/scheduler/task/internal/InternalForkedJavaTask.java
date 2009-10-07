@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.launcher.ForkedJavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
@@ -90,12 +91,13 @@ public class InternalForkedJavaTask extends InternalJavaTask {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.task.internal.InternalTask#createLauncher(org.objectweb.proactive.core.node.Node)
+     * {@inheritDoc}
      */
     @Override
-    public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
+    public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
+            NodeException {
 
-        TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer();
+        TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer(job);
         tli.setPolicyContent(getJavaPolicy());
         logger_dev.info("Create forked java task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class

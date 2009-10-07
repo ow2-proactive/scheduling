@@ -14,6 +14,8 @@
 	<description>
 			No ${EXCLUSION_STRING} in its HostName.
 	</description>
+	<inputSpace url="input/space"/>
+	<outputSpace url="output/space"/>
 	<taskFlow>
 		<task name="task1" cancelJobOnError="false" preciousResult="false" maxNumberOfExecution="1" restartTaskOnError="anywhere" walltime="12">
 			<description>Parallel Tasks - Task 1</description>
@@ -64,6 +66,16 @@
 		</task>
 		<task name="task2" maxNumberOfExecution="2" restartTaskOnError="elsewhere">
 			<description>Parallel Tasks - Task 2</description>
+			<inputFiles includes="tata*" excludes="tata*1">
+				<include name="toto*.txt"/>
+				<exclude name="toto*2.txt"/>
+				<exclude name="toto*3.txt"/>
+			</inputFiles>
+			<outputFiles includes="titi*" excludes="titi*1">
+				<include name="titi*.txt"/>
+				<include name="tutu*.txt"/>
+				<exclude name="titi*3.txt"/>
+			</outputFiles>
 			<pre>
 				<script>
 					<file path="${WORK_DIR}/set.js"/>
@@ -80,6 +92,7 @@
 		</task>
 		<task name="task3" walltime="10:53" numberOfNodes="3">
 			<description>Dependent Tasks - Task 3</description>
+			<outputFiles includes="tutu*" excludes="tutu*1" />
 			<depends>
 				<task ref="task1"/>
 				<task ref="task2"/>
@@ -103,6 +116,10 @@
 				<info name="n11" value="v11"/>
 				<info name="n22" value="v22"/>
 			</genericInformation>
+			<inputFiles>
+				<include name="tutu*"/>
+				<exclude name="tutu*1"/>
+			</inputFiles>
 			<depends>
 				<task ref="task3"/>
 			</depends>

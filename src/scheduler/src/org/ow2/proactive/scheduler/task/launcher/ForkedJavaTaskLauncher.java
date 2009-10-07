@@ -87,7 +87,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
         try {
-
             // create the executable (will set the context class loader to the taskclassserver)
             currentExecutable = executableContainer.getExecutable();
 

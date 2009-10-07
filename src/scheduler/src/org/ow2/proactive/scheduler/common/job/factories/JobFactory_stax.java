@@ -59,6 +59,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.FileSelector;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
@@ -154,6 +155,16 @@ public class JobFactory_stax extends JobFactory {
     private static final String ELEMENT_FORK_ENVIRONMENT = "forkEnvironment";
     private static final String ATTRIBUTE_FORK_JAVAHOME = "javaHome";
     private static final String ATTRIBUTE_FORK_JVMPARAMETERS = "jvmParameters";
+
+    //DATASPACES
+    private static final String ELEMENT_DS_INPUTSPACE = "inputSpace";
+    private static final String ELEMENT_DS_OUTPUTSPACE = "outputSpace";
+    private static final String ELEMENT_DS_INPUTFILES = "inputFiles";
+    private static final String ELEMENT_DS_OUTPUTFILES = "outputFiles";
+    private static final String ATTRIBUTE_DS_EXCLUDES = "excludes";
+    private static final String ATTRIBUTE_DS_INCLUDES = "includes";
+    private static final String ELEMENT_DS_INCLUDE = "include";
+    private static final String ELEMENT_DS_EXCLUDE = "exclude";
 
     /** XML input factory */
     private XMLInputFactory xmlif = null;
@@ -350,6 +361,10 @@ public class JobFactory_stax extends JobFactory {
                             jtmp.getEnvironment().setJobClasspath(getClasspath(cursorJob));
                         } else if (current.equals(JobFactory_stax.ELEMENT_COMMON_DESCRIPTION)) {
                             jtmp.setDescription(getDescription(cursorJob));
+                        } else if (current.equals(JobFactory_stax.ELEMENT_DS_INPUTSPACE)) {
+                            jtmp.setInputSpace(getIOSpace(cursorJob));
+                        } else if (current.equals(JobFactory_stax.ELEMENT_DS_OUTPUTSPACE)) {
+                            jtmp.setOutputSpace(getIOSpace(cursorJob));
                         } else if (current.equals(JobFactory_stax.ELEMENT_TASKFLOW)) {
                             job = new TaskFlowJob();
                             continu = false;
@@ -368,6 +383,8 @@ public class JobFactory_stax extends JobFactory {
             job.setRestartTaskOnError(jtmp.getRestartTaskOnError());
             job.setMaxNumberOfExecution(jtmp.getMaxNumberOfExecution());
             job.setGenericInformations(jtmp.getGenericInformations());
+            job.setInputSpace(jtmp.getInputSpace());
+            job.setOutputSpace(jtmp.getOutputSpace());
         } catch (Exception e) {
             throw new JobCreationException(e.getMessage(), e);
         }
@@ -495,6 +512,25 @@ public class JobFactory_stax extends JobFactory {
     }
 
     /**
+     * Get the INPUT/OUTPUT space URL of the job.
+     * Leave the method with the cursor at the end of 'ELEMENT_DS_INPUT/OUTPUTSPACE' tag.
+     *
+     * @param cursorVariables the streamReader with the cursor on the 'ELEMENT_DS_INPUT/OUTPUTSPACE' tag.
+     * @return the INPUT/OUTPUT space URL of this tag.
+     */
+    private String getIOSpace(XMLStreamReader cursorVariables) throws JobCreationException {
+        try {
+            String url = replace(cursorVariables.getAttributeValue(0));
+            //go to the END_ELEMENT
+            while (cursorVariables.next() != XMLEvent.END_ELEMENT)
+                ;
+            return url;
+        } catch (Exception e) {
+            throw new JobCreationException(e.getMessage(), e);
+        }
+    }
+
+    /**
      * Fill the created Job with coming tasks..
      * Leave the method with the cursor at the end of the file (nothing more has to be parsed).
      *
@@ -593,6 +629,10 @@ public class JobFactory_stax extends JobFactory {
                             tmpTask.setGenericInformations(getGenericInformations(cursorTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_COMMON_DESCRIPTION)) {
                             tmpTask.setDescription(getDescription(cursorTask));
+                        } else if (current.equals(JobFactory_stax.ELEMENT_DS_INPUTFILES)) {
+                            tmpTask.setInputFiles(getIOFIles(cursorTask, ELEMENT_DS_INPUTFILES));
+                        } else if (current.equals(JobFactory_stax.ELEMENT_DS_OUTPUTFILES)) {
+                            tmpTask.setOutputFiles(getIOFIles(cursorTask, ELEMENT_DS_OUTPUTFILES));
                         } else if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_SELECTION)) {
                             tmpTask.setSelectionScripts(createSelectionScript(cursorTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_PRE)) {
@@ -622,6 +662,8 @@ public class JobFactory_stax extends JobFactory {
             if (taskToFill == null) {
                 toReturn.setCleaningScript(tmpTask.getCleaningScript());
                 toReturn.setDescription(tmpTask.getDescription());
+                toReturn.setInputFiles(tmpTask.getInputFiles());
+                toReturn.setOutputFiles(tmpTask.getOutputFiles());
                 toReturn.setGenericInformations(tmpTask.getGenericInformations());
                 toReturn.setName(tmpTask.getName());
                 toReturn.setPostScript(tmpTask.getPostScript());
@@ -648,6 +690,64 @@ public class JobFactory_stax extends JobFactory {
                 ((JavaTask) toReturn).setFork(true);
             }
             return toReturn;
+        } catch (Exception e) {
+            throw new JobCreationException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create the list of includes/excludes pattern for the given INPUT/OUTPUT files
+     * Leave the method with the cursor at the end of 'ELEMENT_DS_INPUT/OUTPUTFILES' tag.
+     *
+     * @param cursorTask the streamReader with the cursor on the 'ELEMENT_DS_INPUT/OUTPUTFILES' tag.
+     * @param endTag the final tag for this tag : ELEMENT_DS_INPUTFILES or ELEMENT_DS_INPUTFILES
+     * @return A filled fileSelector if some patterns are found, null if nothing has been found
+     * @throws JobCreationException
+     */
+    private FileSelector getIOFIles(XMLStreamReader cursorTask, String endTag) throws JobCreationException {
+        try {
+            ArrayList<String> includes = new ArrayList<String>();
+            ArrayList<String> excludes = new ArrayList<String>();
+            int attrLen = cursorTask.getAttributeCount();
+            for (int i = 0; i < attrLen; i++) {
+                String attrName = cursorTask.getAttributeLocalName(i);
+                if (attrName.equals(JobFactory_stax.ATTRIBUTE_DS_INCLUDES)) {
+                    includes.add(cursorTask.getAttributeValue(i));
+                } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_DS_EXCLUDES)) {
+                    excludes.add(cursorTask.getAttributeValue(i));
+                }
+            }
+            int eventType;
+            boolean continu = true;
+            while (continu && cursorTask.hasNext()) {
+                eventType = cursorTask.next();
+                switch (eventType) {
+                    case XMLEvent.START_ELEMENT:
+                        String current = cursorTask.getLocalName();
+                        if (current.equals(JobFactory_stax.ELEMENT_DS_INCLUDE)) {
+                            includes.add(cursorTask.getAttributeValue(0));
+                        } else if (current.equals(JobFactory_stax.ELEMENT_DS_EXCLUDE)) {
+                            excludes.add(cursorTask.getAttributeValue(0));
+                        }
+                        break;
+                    case XMLEvent.END_ELEMENT:
+                        if (cursorTask.getLocalName().equals(endTag)) {
+                            continu = false;
+                        }
+                        break;
+                }
+            }
+            //fill selector
+            if (includes.size() > 0 || excludes.size() > 0) {
+                FileSelector selector = new FileSelector();
+                selector.setIncludes((includes.size() > 0) ? includes.toArray(new String[includes.size()])
+                        : null);
+                selector.setExcludes((excludes.size() > 0) ? excludes.toArray(new String[excludes.size()])
+                        : null);
+                return selector;
+            } else {
+                return null;
+            }
         } catch (Exception e) {
             throw new JobCreationException(e.getMessage(), e);
         }
@@ -1123,6 +1223,8 @@ public class JobFactory_stax extends JobFactory {
             logger.debug("cjoe : " + job.isCancelJobOnError());
             logger.debug("rtoe : " + job.getRestartTaskOnError());
             logger.debug("mnoe : " + job.getMaxNumberOfExecution());
+            logger.debug("insp : " + job.getInputSpace());
+            logger.debug("ousp : " + job.getOutputSpace());
             logger.debug("cp   : ");
             if (job.getEnvironment().getJobClasspath() != null) {
                 String cp = "cp   : ";
@@ -1153,6 +1255,13 @@ public class JobFactory_stax extends JobFactory {
                 logger.debug("pre   : " + t.getPreScript());
                 logger.debug("post  : " + t.getPostScript());
                 logger.debug("clean : " + t.getCleaningScript());
+                try {
+                    logger.debug("ifsel : inc=" + t.getInputFiles().getIncludes().length + " exc=" +
+                        t.getInputFiles().getExcludes().length);
+                    logger.debug("ofsel : inc=" + t.getOutputFiles().getIncludes().length + " exc=" +
+                        t.getOutputFiles().getExcludes().length);
+                } catch (NullPointerException npe) {
+                }
                 if (t.getDependencesList() != null) {
                     String dep = "dep   : ";
                     for (Task tdep : t.getDependencesList()) {

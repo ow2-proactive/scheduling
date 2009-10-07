@@ -6,7 +6,7 @@ start = job
 
 
 job = ## Definition of a job for the scheduler 
-    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow ) }
+    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, inputSpace? ,outputSpace? ,projectName?, logFile?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow ) }
 
 jobName = ## Identification of this job
     attribute name { xsd:string }
@@ -16,7 +16,7 @@ variable = ## Definition of one variable, the variable can be reused (even in an
     element variable { variableName, variableValue}
 variableName = ## Name of a variable
     attribute name  { xsd:string }
-variableValue = ## The patterns ${name_of_variable} will be replaced by this value
+variableValue = ## The patterns ${variable_name} will be replaced by this value
     attribute value { xsd:string }
 priority = ## Priority of the job
     attribute priority { jobPriority | variableRefType}
@@ -52,7 +52,7 @@ taskFlow = ## A job composed of a flow of tasks with or without dependencies
 
 # +++++++++++++ task
 task = ## A task is the smallest computation unit for the scheduler 
-    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, selection?, pre?, executable , post?, cleaning?}
+    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, inputFiles?, outputFiles?, depends?, selection?, pre?, executable , post?, cleaning?}
 taskName = ## Identification of this task (identifier) 
     attribute name { xsd:ID }
 nodesNumber_t = ## number of cores needed for the task (identifier)
@@ -141,9 +141,32 @@ javaParameters = ## A list of parameters that will be given to the Java task thr
 javaParameter = ## A parameter in the form of key/value pair 
     element parameter { attribute name { xsd:string }, attribute value { xsd:string } }
 
+
+# +++++++++++++ DataSpaces
+inputSpace = ## Input space for the job, URL that define root directory containing job needed files
+    element inputSpace { url }
+outputSpace = ## Output space for the job, URL that define root directory that will contain job generated output files
+    element outputSpace { url }
+inputFiles = ## selection of input files that will be accessible for the application and copied from INPUT to local system
+    element inputFiles { includes_?, excludes_?, ( include_ | exclude_ )* }
+outputFiles = ## selection of output files that will be copied from local system to OUTPUT
+    element outputFiles { includes_?, excludes_?, ( include_ | exclude_ )* }
+includes_ = ## Pattern of the files to include, relative to INPUT or OUTPUT spaces
+	attribute includes { inexcludePattern }
+excludes_ = ## Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces
+	attribute excludes { inexcludePattern }
+include_ = ## Target for include pattern
+	element include { name }
+exclude_ = ## Target for exclude pattern
+	element exclude { name }
+name = ## Pattern that represents file to exclude or include
+	attribute name { inexcludePattern }
+
+
 # +++++++++++++ User define types
 jobPriority = 'highest' | 'high' | 'normal' | 'low' | 'lowest' | variableRefType
 restartTaskType = 'anywhere' | 'elsewhere' | variableRefType
 classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*" }
 walltimePattern = xsd:string { pattern="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}" }
 variableRefType = xsd:string { pattern="$\{[A-Za-z0-9._]+\}" }
+inexcludePattern = xsd:string { pattern=".+(,.+)*" }

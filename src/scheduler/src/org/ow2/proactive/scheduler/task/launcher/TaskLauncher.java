@@ -33,6 +33,9 @@ package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Appender;
@@ -49,9 +52,15 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.Selector;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
+import org.ow2.proactive.scheduler.common.task.FileSelector;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -63,6 +72,8 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppen
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
+import org.ow2.proactive.scheduler.task.NativeExecutable;
+import org.ow2.proactive.scheduler.task.launcher.dataspace.AntFileSelector;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -84,8 +95,17 @@ public abstract class TaskLauncher implements InitActive {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
+    protected static final String DATASPACE_TAG = "\\$DATASPACE";
+
+    protected DataSpacesFileObject SCRATCH = null;
+    protected DataSpacesFileObject INPUT = null;
+    protected DataSpacesFileObject OUTPUT = null;
+    protected String namingServiceUrl = null;
+    protected FileSelector inputFiles;
+    protected FileSelector outputFiles;
+
     /**
-     * Scheduler related java properties. Thoses properties are automatically 
+     * Scheduler related java properties. Thoses properties are automatically
      * translated into system property when the task is native (see NativeTaskLauncher) :
      * SYSENV_NAME = upcase(JAVAENV_NAME).replace('.','_')
      */
@@ -159,6 +179,10 @@ public abstract class TaskLauncher implements InitActive {
         if (initializer.getWalltime() > 0) {
             this.wallTime = initializer.getWalltime();
         }
+        //keep input/output files descriptor in memory for further copy
+        this.inputFiles = initializer.getTaskInputFiles();
+        this.outputFiles = initializer.getTaskOutputFiles();
+        this.namingServiceUrl = initializer.getNamingServiceUrl();
     }
 
     /**
@@ -180,6 +204,8 @@ public abstract class TaskLauncher implements InitActive {
         // set the launcher as initialized
         this.launcherInitialized.countDown();
         logger_dev.debug("TaskLauncher initialized");
+        //init dataspace
+        initDataSpaces();
     }
 
     /**
@@ -478,6 +504,173 @@ public abstract class TaskLauncher implements InitActive {
      */
     public boolean isWallTime() {
         return wallTime > 0;
+    }
+
+    protected void replaceDSTags() throws Exception {
+        String[] args = ((NativeExecutable) currentExecutable).getCommand();
+        //I cannot use DataSpace to get the local scratch path
+        String fullScratchPath = SCRATCH.getURL().replace("file://", "");
+        for (int i = 0; i < args.length; i++) {
+            args[i] = args[i].replaceAll(DATASPACE_TAG, fullScratchPath);
+        }
+    }
+
+    protected void initDataSpaces() {
+        if (isDataspaceAware()) {
+            try {
+                // configure node for application
+                long id = taskId.getJobId().hashCode();
+                DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
+                        .getStubOnThis()), id, namingServiceUrl);
+                //prepare scratch, input, output
+                SCRATCH = PADataSpaces.resolveScratchForAO();
+                INPUT = PADataSpaces.resolveDefaultInput();
+                OUTPUT = PADataSpaces.resolveDefaultOutput();
+            } catch (Throwable t) {
+                logger_dev.warn("Their was a problem while initializing dataSpaces, they won't be activated",
+                        t);
+            }
+        }
+    }
+
+    protected void terminateDataSpace() {
+        if (isDataspaceAware()) {
+            try {
+                DataSpacesNodes.tryCloseNodeApplicationConfig(PAActiveObject
+                        .getActiveObjectNode(PAActiveObject.getStubOnThis()));
+            } catch (Exception e) {
+                //dwooooo !
+            }
+        }
+    }
+
+    protected void copyInputDataToScratch() throws FileSystemException {
+        if (isDataspaceAware()) {
+            if (inputFiles == null) {
+                logger_dev.debug("Input selector is empty, no file to copy");
+                return;
+            }
+            //check first the OUTPUT and then the INPUT, take care if not set
+            if (INPUT == null && OUTPUT == null) {
+                logger_dev.debug("Job INPUT/OUTPUT spaces are not defined, cannot copy file.");
+                return;
+            }
+            //fill ant file selector
+            AntFileSelector ant = new AntFileSelector();
+            ant.setIncludes(inputFiles.getIncludes());
+            ant.setExcludes(inputFiles.getExcludes());
+            ant.setCaseSensitive(inputFiles.isCaseSensitive());
+
+            FileSystemException toBeThrown = null;
+
+            //search in OUTPUT
+            ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
+            try {
+                Selector.findFiles(OUTPUT, ant, true, results);
+            } catch (FileSystemException fse) {
+                logger_dev.warn("", fse);
+                toBeThrown = fse;
+            } catch (NullPointerException npe) {
+                //do nothing
+            }
+            try {
+                if (INPUT.getType().hasChildren()) {
+                    Selector.findFiles(INPUT, ant, true, results);
+                } else {
+                    logger_dev
+                            .debug("Cannot list files for this INPUT, switch to non-pattern mode and try again");
+                    for (String incl : inputFiles.getIncludes()) {
+                        try {
+                            DataSpacesFileObject dsfo = INPUT.resolveFile(incl);
+                            if (dsfo.exists()) {
+                                results.add(dsfo);
+                            }
+                        } catch (FileSystemException fse2) {
+                            logger_dev.debug("Cannot read file " + incl, fse2);
+                            toBeThrown = fse2;
+                        }
+                    }
+                }
+            } catch (FileSystemException fse) {
+                logger_dev.warn("", fse);
+                toBeThrown = fse;
+            } catch (NullPointerException npe) {
+                //logger_dev.warn("",npe);
+            }
+
+            String outuri = (OUTPUT == null) ? "" : OUTPUT.getURI();
+            String inuri = (INPUT == null) ? "" : INPUT.getURI();
+
+            Set<String> relPathes = new HashSet<String>();
+            for (DataSpacesFileObject dsfo : results) {
+                try {
+                    String relativePath;
+                    if (dsfo.isWritable()) {
+                        relativePath = dsfo.getURI().replaceFirst(outuri + "/?", "");
+                    } else {
+                        relativePath = dsfo.getURI().replaceFirst(inuri + "/?", "");
+                    }
+                    if (!relPathes.contains(relativePath)) {
+                        SCRATCH.resolveFile(relativePath).copyFrom(dsfo,
+                                org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+                    }
+                    relPathes.add(relativePath);
+                } catch (FileSystemException fse) {
+                    logger_dev.warn("", fse);
+                    toBeThrown = fse;
+                }
+            }
+            if (toBeThrown != null) {
+                throw toBeThrown;
+            }
+        }
+    }
+
+    protected void copyScratchDataToOutput() throws FileSystemException {
+        if (isDataspaceAware()) {
+            if (outputFiles == null) {
+                logger_dev.debug("Output selector is empty, no file to copy");
+                return;
+            }
+            //check first the OUTPUT and then the INPUT, take care if not set
+            if (OUTPUT == null) {
+                logger_dev.debug("Job OUTPUT space is not defined, cannot copy file.");
+                return;
+            }
+            AntFileSelector ant = new AntFileSelector();
+            ant.setIncludes(outputFiles.getIncludes());
+            ant.setExcludes(outputFiles.getExcludes());
+            ant.setCaseSensitive(outputFiles.isCaseSensitive());
+
+            FileSystemException toBeThrown = null;
+
+            try {
+                ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
+                Selector.findFiles(SCRATCH, ant, true, results);
+                String buri = SCRATCH.getURI();
+                for (DataSpacesFileObject dsfo : results) {
+                    try {
+                        String relativePath = dsfo.getURI().replaceFirst(buri + "/?", "");
+                        OUTPUT.resolveFile(relativePath).copyFrom(dsfo,
+                                org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+                    } catch (FileSystemException fse) {
+                        logger_dev.warn("", fse);
+                        toBeThrown = fse;
+                    }
+                }
+            } catch (FileSystemException fse) {
+                logger_dev.warn("", fse);
+                toBeThrown = fse;
+            }
+
+            if (toBeThrown != null) {
+                throw toBeThrown;
+            }
+        }
+    }
+
+    private boolean isDataspaceAware() {
+        return true;
     }
 
 }

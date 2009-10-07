@@ -32,6 +32,12 @@
         <ref name="genericInformation"/>
       </optional>
       <optional>
+        <ref name="inputSpace"/>
+      </optional>
+      <optional>
+        <ref name="outputSpace"/>
+      </optional>
+      <optional>
         <ref name="projectName"/>
       </optional>
       <optional>
@@ -74,7 +80,7 @@
   </define>
   <define name="variableValue">
     <attribute name="value">
-      <doc:documentation>The patterns ${name_of_variable} will be replaced by this value</doc:documentation>
+      <doc:documentation>The patterns ${variable_name} will be replaced by this value</doc:documentation>
       <data type="string"/>
     </attribute>
   </define>
@@ -221,6 +227,12 @@
       </optional>
       <optional>
         <ref name="genericInformation"/>
+      </optional>
+      <optional>
+        <ref name="inputFiles"/>
+      </optional>
+      <optional>
+        <ref name="outputFiles"/>
       </optional>
       <optional>
         <ref name="depends"/>
@@ -583,6 +595,83 @@
       </attribute>
     </element>
   </define>
+  <!-- +++++++++++++ DataSpaces -->
+  <define name="inputSpace">
+    <element name="inputSpace">
+      <doc:documentation>Input space for the job, URL that define root directory containing job needed files </doc:documentation>
+      <ref name="url"/>
+    </element>
+  </define>
+  <define name="outputSpace">
+    <element name="outputSpace">
+      <doc:documentation>Output space for the job, URL that define root directory that will contain job generated output files  </doc:documentation>
+      <ref name="url"/>
+    </element>
+  </define>
+  <define name="inputFiles">
+    <element name="inputFiles">
+      <doc:documentation>selection of input files that will be accessible for the application and copied from INPUT to local system</doc:documentation>
+      <optional>
+        <ref name="includes_"/>
+      </optional>
+      <optional>
+        <ref name="excludes_"/>
+      </optional>
+      <zeroOrMore>
+        <choice>
+          <ref name="include_"/>
+          <ref name="exclude_"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="outputFiles">
+    <element name="outputFiles">
+      <doc:documentation>selection of output files that will be copied from local system to OUTPUT</doc:documentation>
+      <optional>
+        <ref name="includes_"/>
+      </optional>
+      <optional>
+        <ref name="excludes_"/>
+      </optional>
+      <zeroOrMore>
+        <choice>
+          <ref name="include_"/>
+          <ref name="exclude_"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="includes_">
+    <attribute name="includes">
+      <doc:documentation>Pattern of the files to include, relative to INPUT or OUTPUT spaces</doc:documentation>
+      <ref name="inexcludePattern"/>
+    </attribute>
+  </define>
+  <define name="excludes_">
+    <attribute name="excludes">
+      <doc:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</doc:documentation>
+      <ref name="inexcludePattern"/>
+    </attribute>
+  </define>
+  <define name="include_">
+    <element name="include">
+      <doc:documentation>Target for include pattern</doc:documentation>
+      <ref name="name"/>
+    </element>
+  </define>
+  <define name="exclude_">
+    <element name="exclude">
+      <doc:documentation>Target for exclude pattern</doc:documentation>
+      <ref name="name"/>
+    </element>
+  </define>
+  <define name="name">
+    <attribute name="name">
+      <doc:documentation>Pattern that represents file to exclude or include</doc:documentation>
+      <ref name="inexcludePattern"/>
+    </attribute>
+  </define>
   <!-- +++++++++++++ User define types -->
   <define name="jobPriority">
     <choice>
@@ -614,6 +703,11 @@
   <define name="variableRefType">
     <data type="string">
       <param name="pattern">$\{[A-Za-z0-9._]+\}</param>
+    </data>
+  </define>
+  <define name="inexcludePattern">
+    <data type="string">
+      <param name="pattern">.+(,.+)*</param>
     </data>
   </define>
 </grammar>

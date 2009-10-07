@@ -64,6 +64,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
@@ -138,10 +139,11 @@ public abstract class InternalTask extends TaskState {
      * Create the launcher for this taskDescriptor.
      *
      * @param node the node on which to create the launcher.
+     * @param job the job on which to create the launcher.
      * @return the created launcher as an activeObject.
      */
-    public abstract TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException,
-            NodeException;
+    public abstract TaskLauncher createLauncher(InternalJob job, Node node)
+            throws ActiveObjectCreationException, NodeException;
 
     /**
      * Return a container for the user executable represented by this task descriptor.
@@ -365,11 +367,14 @@ public abstract class InternalTask extends TaskState {
      * 
      * @return the default created task launcher initializer
      */
-    protected TaskLauncherInitializer getDefaultTaskLauncherInitializer() {
+    protected TaskLauncherInitializer getDefaultTaskLauncherInitializer(InternalJob job) {
         TaskLauncherInitializer tli = new TaskLauncherInitializer();
         tli.setTaskId(getId());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
+        tli.setTaskInputFiles(getInputFiles());
+        tli.setTaskOutputFiles(getOutputFiles());
+        tli.setNamingServiceUrl(job.getJobDataSpaceApplication().getNamingServiceURL());
         if (isWallTime()) {
             tli.setWalltime(wallTime);
         }

@@ -58,6 +58,7 @@ import org.hibernate.annotations.MapKeyManyToMany;
 import org.hibernate.annotations.MetaValue;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -122,6 +123,11 @@ public abstract class InternalJob extends JobState {
     //Not DB managed, created once needed.
     @Transient
     private JobDescriptor jobDescriptor;
+
+    /** DataSpace application manager for this job */
+    //Not DB managed, created once needed.
+    @Transient
+    private JobDataSpaceApplication jobDataSpaceApplication;
 
     /** Job result */
     @Cascade(CascadeType.ALL)
@@ -258,6 +264,17 @@ public abstract class InternalJob extends JobState {
     }
 
     /**
+     * Start dataspace configuration and application
+     */
+    public void startDataSpaceApplication(NamingService namingService, String namingServiceURL) {
+        if (jobDataSpaceApplication == null) {
+            long appId = getJobInfo().getJobId().hashCode();
+            jobDataSpaceApplication = new JobDataSpaceApplication(appId, namingService, namingServiceURL);
+        }
+        jobDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(), getOwner());
+    }
+
+    /**
      * Updates count for running to pending event.
      */
     public void newWaitingTask() {
@@ -383,6 +400,10 @@ public abstract class InternalJob extends JobState {
 
         setTaskStatusModify(hts);
         setTaskFinishedTimeModify(htl);
+
+        if (jobDataSpaceApplication != null) {
+            jobDataSpaceApplication.terminateDataSpaceApplication();
+        }
     }
 
     /**
@@ -454,6 +475,9 @@ public abstract class InternalJob extends JobState {
         logger_dev.debug(" ");
         setStatus(JobStatus.FINISHED);
         setFinishedTime(System.currentTimeMillis());
+        if (jobDataSpaceApplication != null) {
+            jobDataSpaceApplication.terminateDataSpaceApplication();
+        }
     }
 
     /**
@@ -765,5 +789,14 @@ public abstract class InternalJob extends JobState {
         }
 
         return false;
+    }
+
+    /**
+     * Get the jobDataSpaceApplication
+     *
+     * @return the jobDataSpaceApplication
+     */
+    public JobDataSpaceApplication getJobDataSpaceApplication() {
+        return jobDataSpaceApplication;
     }
 }

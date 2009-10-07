@@ -144,6 +144,26 @@ public enum PASchedulerProperties {
     NUMBER_OF_EXECUTION_ON_FAILURE("pa.scheduler.task.numberofexecutiononfailure", PAPropertiesType.INTEGER),
 
     /* ***************************************************************** */
+    /* ********************** DATASPACES PROPERTIES ******************** */
+    /* ***************************************************************** */
+
+    /** Default INPUT space URL. Used to define INPUT space of each job that does not define an INPUT space. */
+    DATASPACE_DEFAULTINPUTURL("pa.scheduler.dataspace.defaultinputurl", PAPropertiesType.STRING),
+
+    /** Default INPUT space path. Used to define the same INPUT space but with a local (faster) access (if possible). */
+    DATASPACE_DEFAULTINPUTURL_LOCALPATH("pa.scheduler.dataspace.defaultinputurl.localpath",
+            PAPropertiesType.STRING),
+
+    /** Host name from which the localpath is accessible */
+    DATASPACE_DEFAULTINPUTURL_HOSTNAME("pa.scheduler.dataspace.defaultinputurl.hostname",
+            PAPropertiesType.STRING),
+
+    /** The same for the OUPUT */
+    DATASPACE_DEFAULTOUTPUTURL("pa.scheduler.dataspace.defaultoutputurl", PAPropertiesType.STRING), DATASPACE_DEFAULTOUTPUTURL_LOCALPATH(
+            "pa.scheduler.dataspace.defaultoutputurl.localpath", PAPropertiesType.STRING), DATASPACE_DEFAULTOUTPUTURL_HOSTNAME(
+            "pa.scheduler.dataspace.defaultoutputurl.hostname", PAPropertiesType.STRING),
+
+    /* ***************************************************************** */
     /* ************************* LOGS PROPERTIES *********************** */
     /* ***************************************************************** */
 

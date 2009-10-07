@@ -64,9 +64,14 @@ public interface RMLoggers {
     static final public String MONITORING = RESOURCEMANAGER + ".monitoring";
 
     /**
-     * Node sources logger's name. 
+     * Node sources logger's name.
      */
     static final public String NODESOURCE = RESOURCEMANAGER + ".nodeSource";
+
+    /**
+     * Node sources Dataspace logger's name.
+     */
+    static final public String DATASPACE = NODESOURCE + ".dataspace";
 
     /**
      * RMNode logger's name. 

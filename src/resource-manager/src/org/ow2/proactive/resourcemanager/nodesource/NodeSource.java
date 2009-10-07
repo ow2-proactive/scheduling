@@ -54,6 +54,7 @@ import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.utils.Pinger;
@@ -261,10 +262,41 @@ public class NodeSource implements InitActive {
             throw new AddingNodesException(e);
         }
 
+        configureForDataSpace(nodeToAdd);
         RMNode rmnode = new RMNodeImpl(nodeToAdd, "noVn", (NodeSource) PAActiveObject.getStubOnThis());
         rmcore.internalAddNodeToCore(rmnode);
 
         return new BooleanWrapper(true);
+    }
+
+    /**
+     * Configure node for dataSpaces
+     *
+     * @param node the node to be configured
+     */
+    private void configureForDataSpace(Node node) {
+        try {
+            DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
+                    .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
+            conf.configureNode();
+        } catch (Throwable t) {
+            logger.warn("Cannot configure dataSpaces", t);
+        }
+    }
+
+    /**
+     * Close dataSpaces node configuration
+     *
+     * @param node the node to be unconfigured
+     */
+    private void closeDataSpaceConfiguration(Node node) {
+        try {
+            DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
+                    .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
+            conf.closeNodeConfiguration();
+        } catch (Throwable t) {
+            logger.warn("Cannot close dataSpaces configuration", t);
+        }
     }
 
     /**
@@ -418,6 +450,7 @@ public class NodeSource implements InitActive {
             logger.info("[" + name + "] removing node : " + nodeUrl);
             Node node = nodes.remove(nodeUrl);
             try {
+                closeDataSpaceConfiguration(node);
                 infrastructureManager.removeNode(node, forever);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage());

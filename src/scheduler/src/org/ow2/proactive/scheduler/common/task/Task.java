@@ -101,6 +101,13 @@ public abstract class Task extends CommonAttribute {
     @Lob
     protected String resultPreview;
 
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = FileSelector.class)
+    protected FileSelector inputFiles = null;
+    @Cascade(CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = FileSelector.class)
+    protected FileSelector outputFiles = null;
+
     /**
      * selection script : can be launched before getting a node in order to
      * verify some computer specificity.
@@ -428,6 +435,42 @@ public abstract class Task extends CommonAttribute {
         }
 
         this.numberOfNodesNeeded = numberOfNodesNeeded;
+    }
+
+    /**
+     * Get the inputFiles
+     *
+     * @return the inputFiles
+     */
+    public FileSelector getInputFiles() {
+        return inputFiles;
+    }
+
+    /**
+     * Set the inputFiles value to the given inputFiles value
+     *
+     * @param inputFiles the inputFiles to set
+     */
+    public void setInputFiles(FileSelector inputFiles) {
+        this.inputFiles = inputFiles;
+    }
+
+    /**
+     * Get the outputFiles
+     *
+     * @return the outputFiles
+     */
+    public FileSelector getOutputFiles() {
+        return outputFiles;
+    }
+
+    /**
+     * Set the outputFiles value to the given outputFiles value
+     *
+     * @param outputFiles the outputFiles to set
+     */
+    public void setOutputFiles(FileSelector outputFiles) {
+        this.outputFiles = outputFiles;
     }
 
 }

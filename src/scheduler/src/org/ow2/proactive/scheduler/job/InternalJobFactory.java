@@ -280,6 +280,8 @@ public class InternalJobFactory implements Serializable {
         jobToSet.setProjectName(job.getProjectName());
         jobToSet.setEnvironment(job.getEnvironment());
         jobToSet.setGenericInformations(job.getGenericInformations());
+        jobToSet.setInputSpace(job.getInputSpace());
+        jobToSet.setOutputSpace(job.getOutputSpace());
     }
 
     /**
@@ -300,6 +302,8 @@ public class InternalJobFactory implements Serializable {
         taskToSet.setResultPreview(task.getResultPreview());
         taskToSet.setWallTime(task.getWallTime());
         taskToSet.setNumberOfNeededNodes(task.getNumberOfNodesNeeded());
+        taskToSet.setInputFiles(task.getInputFiles());
+        taskToSet.setOutputFiles(task.getOutputFiles());
         //Properties with priority between job and tasks
         if (task.getCancelJobOnErrorProperty().isSet()) {
             taskToSet.setCancelJobOnError(task.isCancelJobOnError());

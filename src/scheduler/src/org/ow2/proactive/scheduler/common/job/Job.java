@@ -31,6 +31,9 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
@@ -96,6 +99,11 @@ public abstract class Job extends CommonAttribute {
     /** Job priority */
     @Column(name = "PRIORITY", columnDefinition = "integer")
     protected JobPriority priority = JobPriority.NORMAL;
+
+    @Column(name = "INPUT_SPACE")
+    protected String inputSpace = null;
+    @Column(name = "OUTPUT_SPACE")
+    protected String outputSpace = null;
 
     /** ProActive Empty Constructor */
     public Job() {
@@ -225,5 +233,42 @@ public abstract class Job extends CommonAttribute {
      */
     public void setEnvironment(JobEnvironment environment) {
         this.environment = environment;
+    }
+
+    /**
+     * Get the input Space
+     *
+     * @return the input Space
+     */
+    public String getInputSpace() {
+        return inputSpace;
+    }
+
+    /**
+     * Set the input Space value to the given inputSpace value
+     *
+     * @param inputSpace the input Space to set
+     * @throws MalformedURLException
+     */
+    public void setInputSpace(String inputSpace) {
+        this.inputSpace = inputSpace;
+    }
+
+    /**
+     * Get the output Space
+     *
+     * @return the output Space
+     */
+    public String getOutputSpace() {
+        return outputSpace;
+    }
+
+    /**
+     * Set the output Space value to the given outputSpace value
+     *
+     * @param outputDataSpaceURL the outputDataSpaceURL to set
+     */
+    public void setOutputSpace(String outputSpace) {
+        this.outputSpace = outputSpace;
     }
 }

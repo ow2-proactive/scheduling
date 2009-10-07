@@ -34,6 +34,7 @@ package org.ow2.proactive.scheduler.task.launcher;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -72,6 +73,14 @@ public class NativeTaskLauncher extends TaskLauncher {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initActivity(Body body) {
+        super.initActivity(body);
+    }
+
+    /**
      * Execute the user task as an active object.
      *
      * @param core The scheduler core to be notify
@@ -82,6 +91,9 @@ public class NativeTaskLauncher extends TaskLauncher {
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
         try {
+            //copy datas from OUTPUT or INPUT to local scratch
+            copyInputDataToScratch();
+
             //execute pre-script
             if (pre != null) {
                 this.executePreScript(PAActiveObject.getNode());
@@ -96,6 +108,9 @@ public class NativeTaskLauncher extends TaskLauncher {
                 scheduleTimer();
             }
 
+            //replace dataspace tags in command (if needed) by local scratch directory
+            replaceDSTags();
+
             //launch task
             logger_dev.debug("Starting execution of task '" + taskId + "'");
             Serializable userResult = currentExecutable.execute(results);
@@ -109,6 +124,9 @@ public class NativeTaskLauncher extends TaskLauncher {
             //logBuffer is filled up
             TaskResult result = new TaskResultImpl(taskId, userResult, this.getLogs());
 
+            //copy output file
+            copyScratchDataToOutput();
+
             //return result
             return result;
         } catch (Throwable ex) {
@@ -116,6 +134,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
+            terminateDataSpace();
             if (isWallTime()) {
                 cancelTimer();
             }

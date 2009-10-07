@@ -79,6 +79,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.FileSelector;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
@@ -180,6 +181,17 @@ public class JobFactory_xpath extends JobFactory {
     private static final String FORK_TAG_ENVIRONMENT = "forkEnvironment";
     private static final String FORK_ATTRIBUTE_JAVAHOME = "@javaHome";
     private static final String FORK_ATTRIBUTE_JVMPARAMETERS = "@jvmParameters";
+    //DATASPACES
+    private static final String DS_TAG_INPUTSPACE = "inputSpace";
+    private static final String DS_TAG_OUTPUTSPACE = "outputSpace";
+    private static final String DS_ATTRIBUTE_URL = "@url";
+    private static final String DS_TAG_INPUTFILES = "inputFiles";
+    private static final String DS_TAG_OUTPUTFILES = "outputFiles";
+    private static final String DS_ATTRIBUTE_EXCLUDES = "@excludes";
+    private static final String DS_ATTRIBUTE_INCLUDES = "@includes";
+    private static final String DS_TAG_INCLUDE = "include";
+    private static final String DS_TAG_EXCLUDE = "exclude";
+    private static final String DS_ATTRIBUTE_NAME = "@name";
 
     /** Xpath factory instance */
     private XPath xpath;
@@ -436,6 +448,22 @@ public class JobFactory_xpath extends JobFactory {
             }
         }
 
+        //DATASPACES input space
+        String is = (String) xpath.evaluate(addPrefixes(DS_TAG_INPUTSPACE + "/" + DS_ATTRIBUTE_URL), jobNode,
+                XPathConstants.STRING);
+        if (is != null && is.length() > 0) {
+            job.setInputSpace(is);
+            logger.debug(DS_TAG_INPUTSPACE + "/" + DS_ATTRIBUTE_URL + " = " + job.getInputSpace());
+        }
+
+        //DATASPACES output space
+        String os = (String) xpath.evaluate(addPrefixes(DS_TAG_OUTPUTSPACE + "/" + DS_ATTRIBUTE_URL),
+                jobNode, XPathConstants.STRING);
+        if (os != null && os.length() > 0) {
+            job.setOutputSpace(os);
+            logger.debug(DS_TAG_OUTPUTSPACE + "/" + DS_ATTRIBUTE_URL + " = " + job.getOutputSpace());
+        }
+
         //JOB CLASSPATH
         String[] classpathEntries = null;
         NodeList classPathNodes = (NodeList) xpath.evaluate(addPrefixes(CP_TAG_CLASSPATHES), jobNode,
@@ -566,6 +594,24 @@ public class JobFactory_xpath extends JobFactory {
                     task.addGenericInformation(name, value);
                 }
             }
+        }
+
+        // DATASPACE inputFiles
+        ArrayList<String> includes = new ArrayList<String>();
+        ArrayList<String> excludes = new ArrayList<String>();
+        FileSelector selector = parseIOFiles(taskNode, DS_TAG_INPUTFILES, includes, excludes);
+        //insert in task
+        if (selector != null) {
+            task.setInputFiles(selector);
+        }
+
+        // DATASPACE outputFiles
+        includes = new ArrayList<String>();
+        excludes = new ArrayList<String>();
+        selector = parseIOFiles(taskNode, DS_TAG_OUTPUTFILES, includes, excludes);
+        //insert in task
+        if (selector != null) {
+            task.setOutputFiles(selector);
         }
 
         // TASK RESULT DESCRIPTION
@@ -942,6 +988,59 @@ public class JobFactory_xpath extends JobFactory {
          */
         public Iterator<?> getPrefixes(String uri) {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    private FileSelector parseIOFiles(Node taskNode, String tag, ArrayList<String> includes,
+            ArrayList<String> excludes) throws XPathExpressionException {
+        //attributes includes, excludes
+        String ief = (String) xpath.evaluate(addPrefixes(tag + "/" + DS_ATTRIBUTE_INCLUDES), taskNode,
+                XPathConstants.STRING);
+        if (ief != null && ief.length() > 0) {
+            includes.add(ief);
+            logger.debug(tag + "/" + DS_ATTRIBUTE_INCLUDES + " = " + ief);
+        }
+        ief = (String) xpath.evaluate(addPrefixes(tag + "/" + DS_ATTRIBUTE_EXCLUDES), taskNode,
+                XPathConstants.STRING);
+        if (ief != null && ief.length() > 0) {
+            excludes.add(ief);
+            logger.debug(tag + "/" + DS_ATTRIBUTE_EXCLUDES + " = " + ief);
+        }
+        //tag include,exclude
+        NodeList listIE = (NodeList) xpath.evaluate(addPrefixes(tag + "/" + DS_TAG_INCLUDE), taskNode,
+                XPathConstants.NODESET);
+        if (listIE != null) {
+            for (int i = 0; i < listIE.getLength(); i++) {
+                Node n = listIE.item(i);
+                String name = (String) xpath.evaluate(DS_ATTRIBUTE_NAME, n, XPathConstants.STRING);
+                if (name != null) {
+                    includes.add(name);
+                    logger.debug(tag + "/" + DS_TAG_INCLUDE + "/" + DS_ATTRIBUTE_NAME + " = " + name);
+                }
+            }
+        }
+        listIE = (NodeList) xpath.evaluate(addPrefixes(tag + "/" + DS_TAG_EXCLUDE), taskNode,
+                XPathConstants.NODESET);
+        if (listIE != null) {
+            for (int i = 0; i < listIE.getLength(); i++) {
+                Node n = listIE.item(i);
+                String name = (String) xpath.evaluate(DS_ATTRIBUTE_NAME, n, XPathConstants.STRING);
+                if (name != null) {
+                    excludes.add(name);
+                    logger.debug(tag + "/" + DS_TAG_EXCLUDE + "/" + DS_ATTRIBUTE_NAME + " = " + name);
+                }
+            }
+        }
+        //fill selector
+        if (includes.size() > 0 || excludes.size() > 0) {
+            FileSelector selector = new FileSelector();
+            selector
+                    .setIncludes((includes.size() > 0) ? includes.toArray(new String[includes.size()]) : null);
+            selector
+                    .setExcludes((excludes.size() > 0) ? excludes.toArray(new String[excludes.size()]) : null);
+            return selector;
+        } else {
+            return null;
         }
     }
 

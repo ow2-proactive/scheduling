@@ -75,7 +75,7 @@ public class NativeExecutableContainer extends ExecutableContainer {
     protected long hId;
 
     // actual executable data
-    @Column(name = "CLASSPATH", columnDefinition = "BLOB")
+    @Column(name = "NATIVE_COMMAND", columnDefinition = "BLOB")
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
     private String[] command;
 

@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
 
+import org.ow2.proactive.scheduler.common.task.FileSelector;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scripting.Script;
 
@@ -57,6 +58,11 @@ public class TaskLauncherInitializer implements Serializable {
     private long walltime;
     /** policy content to be prepared before being sent to node */
     private String policyContent;
+
+    /** DataSpaces needed parameter */
+    private FileSelector taskInputFiles = null;
+    private FileSelector taskOutputFiles = null;
+    private String namingServiceUrl;
 
     /**
      * Get the taskId
@@ -147,4 +153,59 @@ public class TaskLauncherInitializer implements Serializable {
     public String getPolicyContent() {
         return policyContent;
     }
+
+    /**
+     * Get the namingServiceUrl
+     *
+     * @return the namingServiceUrl
+     */
+    public String getNamingServiceUrl() {
+        return namingServiceUrl;
+    }
+
+    /**
+     * Set the namingServiceUrl value to the given namingServiceUrl value
+     *
+     * @param namingServiceUrl the namingServiceUrl to set
+     */
+    public void setNamingServiceUrl(String namingServiceUrl) {
+        this.namingServiceUrl = namingServiceUrl;
+    }
+
+    /**
+     * Get the taskInputFiles
+     *
+     * @return the taskInputFiles
+     */
+    public FileSelector getTaskInputFiles() {
+        return taskInputFiles;
+    }
+
+    /**
+     * Set the taskInputFiles value to the given taskInputFiles value
+     *
+     * @param taskInputFiles the taskInputFiles to set
+     */
+    public void setTaskInputFiles(FileSelector taskInputFiles) {
+        this.taskInputFiles = taskInputFiles;
+    }
+
+    /**
+     * Get the taskOutputFiles
+     *
+     * @return the taskOutputFiles
+     */
+    public FileSelector getTaskOutputFiles() {
+        return taskOutputFiles;
+    }
+
+    /**
+     * Set the taskOutputFiles value to the given taskOutputFiles value
+     *
+     * @param taskOutputFiles the taskOutputFiles to set
+     */
+    public void setTaskOutputFiles(FileSelector taskOutputFiles) {
+        this.taskOutputFiles = taskOutputFiles;
+    }
+
 }

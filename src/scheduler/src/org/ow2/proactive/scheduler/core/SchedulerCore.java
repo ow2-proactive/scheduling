@@ -212,6 +212,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private static Hashtable<JobId, TaskClassServer> classServers = new Hashtable<JobId, TaskClassServer>();
     private static Hashtable<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers = new Hashtable<JobId, RemoteObjectExposer<TaskClassServer>>();
 
+    /** Dataspaces Naming service */
+    private DataSpaceServiceStarter dataSpaceNSStarter;
+
     /**
      * Return the task classserver for the job jid.<br>
      * return null if the classServer is undefine for the given jobId.
@@ -441,6 +444,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     public void runActivity(Body body) {
 
         try {
+            //start Dataspace naming service
+            dataSpaceNSStarter = new DataSpaceServiceStarter();
+            dataSpaceNSStarter.startNamingService();
             //Start DB and rebuild the scheduler if needed.
             recover();
         } catch (Throwable e) {
@@ -569,6 +575,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //closing data base
         logger.debug("Closing Scheduler data base !");
         DatabaseManager.getInstance().close();
+        //stop dataspace
+        dataSpaceNSStarter.terminateNamingService();
         //terminate this active object
         PAActiveObject.terminateActiveObject(false);
         logger.info("Scheduler is now shutdown !");
@@ -737,7 +745,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     if (nodeSet.size() >= internalTask.getNumberOfNodesNeeded()) {
 
                         nodeSet.remove(0);
-                        launcher = internalTask.createLauncher(node);
+                        //start dataspace app for this job
+                        currentJob.startDataSpaceApplication(dataSpaceNSStarter.getNamingService(),
+                                dataSpaceNSStarter.getNamingServiceURL());
+                        //create launcher
+                        launcher = internalTask.createLauncher(currentJob, node);
                         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
                         this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
                                 launcher);
@@ -753,9 +765,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             this.jobsToBeLoggedinAFile.containsKey(currentJob.getId())) {
                             launcher.activateLogs(this.lfs.getAppenderProvider());
                         }
-
-                        logger_dev.info("Starting deployment of task '" + internalTask.getName() +
-                            "' for job '" + currentJob.getId() + "'");
 
                         TaskResult[] params = null;
                         //if job is TASKSFLOW, preparing the list of parameters for this task.
@@ -779,10 +788,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         //set nodes in the executable container
                         internalTask.getExecutableContainer().setNodes(nodes);
 
+                        logger_dev.info("Starting deployment of task '" + internalTask.getName() +
+                            "' for job '" + currentJob.getId() + "'");
+
                         //TODO if the next task is a native task, it's no need to pass params
                         ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask.getName(),
                                 launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(), internalTask
                                         .getExecutableContainer(), params));
+
                     }
 
                     //if a task has been launched
@@ -2035,6 +2048,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     break;
                 case STALLED:
                 case RUNNING:
+                    //start dataspace app for this job
+                    job.startDataSpaceApplication(dataSpaceNSStarter.getNamingService(), dataSpaceNSStarter
+                            .getNamingServiceURL());
+
                     runningJobs.add(job);
                     currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
 

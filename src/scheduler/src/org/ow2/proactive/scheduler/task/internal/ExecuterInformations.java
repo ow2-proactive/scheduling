@@ -71,7 +71,7 @@ public class ExecuterInformations implements Serializable {
         this.nodes = new NodeSet();
         this.nodes.add(node);
         this.nodeName = node.getNodeInformation().getName();
-        this.hostName = node.getNodeInformation().getVMInformation().getHostName();
+        this.hostName = node.getVMInformation().getHostName();
     }
 
     /**

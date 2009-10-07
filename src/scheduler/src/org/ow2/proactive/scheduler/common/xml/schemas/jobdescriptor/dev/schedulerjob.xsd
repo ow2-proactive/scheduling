@@ -10,6 +10,8 @@
         <xs:group minOccurs="0" ref="jd:jobDescription"/>
         <xs:element minOccurs="0" ref="jd:jobClasspath"/>
         <xs:element minOccurs="0" ref="jd:genericInformation"/>
+        <xs:element minOccurs="0" ref="jd:inputSpace"/>
+        <xs:element minOccurs="0" ref="jd:outputSpace"/>
         <xs:element ref="jd:taskFlow"/>
       </xs:sequence>
       <xs:attributeGroup ref="jd:jobName"/>
@@ -97,7 +99,7 @@
   <xs:attributeGroup name="variableValue">
     <xs:attribute name="value" use="required" type="xs:string">
       <xs:annotation>
-        <xs:documentation>The patterns ${name_of_variable} will be replaced by this value</xs:documentation>
+        <xs:documentation>The patterns ${variable_name} will be replaced by this value</xs:documentation>
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
@@ -244,6 +246,8 @@
           <xs:sequence>
             <xs:group minOccurs="0" ref="jd:taskDescription"/>
             <xs:element minOccurs="0" ref="jd:genericInformation"/>
+            <xs:element minOccurs="0" ref="jd:inputFiles"/>
+            <xs:element minOccurs="0" ref="jd:outputFiles"/>
             <xs:element minOccurs="0" ref="jd:depends"/>
             <xs:element minOccurs="0" ref="jd:selection"/>
             <xs:element minOccurs="0" ref="jd:pre"/>
@@ -739,6 +743,102 @@
       <xs:attribute name="value" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
+  <!-- +++++++++++++ DataSpaces -->
+  <xs:element name="inputSpace">
+    <xs:annotation>
+      <xs:documentation>Input space for the job, URL that define root directory containing job needed files </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:url"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="outputSpace">
+    <xs:annotation>
+      <xs:documentation>Output space for the job, URL that define root directory that will contain job generated output files  </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:url"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="inputFiles">
+    <xs:annotation>
+      <xs:documentation>selection of input files that will be accessible for the application and copied from INPUT to local system</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="jd:include"/>
+        <xs:element ref="jd:exclude"/>
+      </xs:choice>
+      <xs:attribute name="includes" type="jd:inexcludePattern">
+        <xs:annotation>
+          <xs:documentation>Pattern of the files to include, relative to INPUT or OUTPUT spaces</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="excludes" type="jd:inexcludePattern">
+        <xs:annotation>
+          <xs:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="outputFiles">
+    <xs:annotation>
+      <xs:documentation>selection of output files that will be copied from local system to OUTPUT</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="jd:include"/>
+        <xs:element ref="jd:exclude"/>
+      </xs:choice>
+      <xs:attribute name="includes" type="jd:inexcludePattern">
+        <xs:annotation>
+          <xs:documentation>Pattern of the files to include, relative to INPUT or OUTPUT spaces</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="excludes" type="jd:inexcludePattern">
+        <xs:annotation>
+          <xs:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="includes_">
+    <xs:attribute name="includes" use="required" type="jd:inexcludePattern">
+      <xs:annotation>
+        <xs:documentation>Pattern of the files to include, relative to INPUT or OUTPUT spaces</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="excludes_">
+    <xs:attribute name="excludes" use="required" type="jd:inexcludePattern">
+      <xs:annotation>
+        <xs:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="include">
+    <xs:annotation>
+      <xs:documentation>Target for include pattern</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:name"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="exclude">
+    <xs:annotation>
+      <xs:documentation>Target for exclude pattern</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:name"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="name">
+    <xs:attribute name="name" use="required" type="jd:inexcludePattern">
+      <xs:annotation>
+        <xs:documentation>Pattern that represents file to exclude or include</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
   <!-- +++++++++++++ User define types -->
   <xs:simpleType name="jobPriority">
     <xs:union memberTypes="jd:variableRefType">
@@ -796,6 +896,11 @@
   <xs:simpleType name="variableRefType">
     <xs:restriction base="xs:string">
       <xs:pattern value="$\{[A-Za-z0-9._]+\}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="inexcludePattern">
+    <xs:restriction base="xs:string">
+      <xs:pattern value=".+(,.+)*"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

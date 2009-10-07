@@ -307,4 +307,13 @@ public class NativeExecutable extends Executable {
         }
     }
 
+    /**
+     * Get the command
+     *
+     * @return the command
+     */
+    public String[] getCommand() {
+        return command;
+    }
+
 }

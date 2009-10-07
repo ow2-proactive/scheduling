@@ -82,6 +82,9 @@ public class JavaTaskLauncher extends TaskLauncher {
             TaskResult... results) {
         try {
 
+            //copy datas from OUTPUT or INPUT to local scratch
+            copyInputDataToScratch();
+
             //launch pre script
             if (pre != null) {
                 this.executePreScript(PAActiveObject.getNode());
@@ -105,6 +108,9 @@ public class JavaTaskLauncher extends TaskLauncher {
             if (post != null) {
                 this.executePostScript(PAActiveObject.getNode());
             }
+
+            //copy output file
+            copyScratchDataToOutput();
 
             //return result
             return new TaskResultImpl(taskId, userResult, this.getLogs());
