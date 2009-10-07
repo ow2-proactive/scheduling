@@ -725,7 +725,7 @@ public class HelloTask extends JavaExecutable{
 		<code>rm-admin -ln</code>
 	</para>
 	<para>
-	Finally, it just remains to launch the Scheduler as it was done in <xref linkend="launch_sched"/>. The Scheduler will automatically look for an existing Resource Manager first. It will therefore find the one you have launched and use it. If you have launched the Resource Manager on a host different from those on which you want to start the Scheduler, you have to precise its URL to the startScheduler.sh script.
+	Finally, it just remains to launch the Scheduler as it was done in <xref linkend="launch_sched"/>. The Scheduler will automatically look for an existing Resource Manager first. It will therefore find the one you have launched and use it. If you have launched the Resource Manager on a host different from those on which you want to start the Scheduler, you have to precise its URL to the 'scheduler-start' script.
 	</para>
 	<para>
 	There is also another way to start the Resource Manager directly with nodes using a deployment descriptor file.

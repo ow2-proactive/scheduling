@@ -1302,7 +1302,7 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 		</section>
 		<section xml:id="scheduler_controller"><info><title>Using the Scheduler controller</title></info>
 			<para>
-				The Scheduler controller provides a way to interact with the Scheduler. Start it with the <emphasis>bin/[os]/userScheduler.[sh|bat]</emphasis>
+				The Scheduler controller provides a way to interact with the Scheduler. Start it with the <emphasis>bin/[os]/scheduler-user[.bat]</emphasis>
 				script. You can use it as a command line (as shown
 				in some examples above, go to <xref linkend="scheduler_controller_non_interactive"/>) or in interactive mode (go to
 				<xref linkend="scheduler_controller_interactive"/>).
@@ -1376,7 +1376,7 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 					<emphasis>java -Dpa.common.auth.pubkey=$HOME/.proactive/my_encrypted_credentials</emphasis>.
 				    </para></listitem>
 				    <listitem><para>
-					In batch mode, this public key will be used when encrypting the credentials with the createCred.[sh|bat] script: 
+					In batch mode, this public key will be used when encrypting the credentials with the bin/[os]/createCred[.bat] script:
 					<screen><![CDATA[
 # use local public key to generate credentials for user 'demo'
 /bin/unix $ ./create-cred -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo

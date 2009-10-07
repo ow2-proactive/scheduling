@@ -40,6 +40,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -54,6 +55,11 @@ import org.hibernate.annotations.MetaValue;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -101,12 +107,17 @@ public abstract class Task extends CommonAttribute {
     @Lob
     protected String resultPreview;
 
+    /** DataSpace inputFiles */
+    @OneToMany
+    @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = FileSelector.class)
-    protected FileSelector inputFiles = null;
+    protected List<InputSelector> inputFiles = null;
+
+    /** DataSpace outputFiles */
+    @OneToMany
+    @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = FileSelector.class)
-    protected FileSelector outputFiles = null;
+    protected List<OutputSelector> outputFiles = null;
 
     /**
      * selection script : can be launched before getting a node in order to
@@ -154,7 +165,7 @@ public abstract class Task extends CommonAttribute {
     @JoinTable(joinColumns = @JoinColumn(name = "TASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
-    protected List<Task> dependences = null;
+    private List<Task> dependences = null;
 
     /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     @Column(name = "WALLTIME")
@@ -433,44 +444,107 @@ public abstract class Task extends CommonAttribute {
         if (this.numberOfNodesNeeded < 1) {
             this.numberOfNodesNeeded = 1;
         }
-
         this.numberOfNodesNeeded = numberOfNodesNeeded;
     }
 
     /**
-     * Get the inputFiles
+     * Add the files value to the given files value
+     * according to the provided access mode.<br />
+     * mode define the way the files will be bring to LOCAL space.
      *
-     * @return the inputFiles
+     * @param files the input Files to add
+     * @param mode the way to provide files to LOCAL space
      */
-    public FileSelector getInputFiles() {
+    public void addInputFiles(FileSelector files, InputAccessMode mode) {
+        if (files == null) {
+            throw new IllegalArgumentException("Argument files is null");
+        }
+        if (inputFiles == null) {
+            inputFiles = new ArrayList<InputSelector>();
+        }
+        inputFiles.add(new InputSelector(files, mode));
+    }
+
+    /**
+     * Add the files value to the given files value
+     * according to the provided access mode.<br />
+     * mode define the way the files will be send to OUTPUT space.
+     *
+     * @param files the output Files to add
+     * @param mode the way to send files to OUTPUT space
+     */
+    public void addOutputFiles(FileSelector files, OutputAccessMode mode) {
+        if (files == null) {
+            throw new IllegalArgumentException("Argument files is null");
+        }
+        if (outputFiles == null) {
+            outputFiles = new ArrayList<OutputSelector>();
+        }
+        outputFiles.add(new OutputSelector(files, mode));
+    }
+
+    /**
+     * Add the files to the given filesToInclude value
+     * according to the provided access mode.<br />
+     * mode define the way the files will be bring to LOCAL space.
+     * filesToInclude can represent one file or many files defined by a regular expression.
+     * @see FileSelector for details
+     *
+     * @param filesToInclude the input files to add
+     * @param mode the way to provide files to LOCAL space
+     */
+    public void addInputFiles(String filesToInclude, InputAccessMode mode) {
+        if (filesToInclude == null) {
+            throw new IllegalArgumentException("Argument filesToInclude is null");
+        }
+        if (inputFiles == null) {
+            inputFiles = new ArrayList<InputSelector>();
+        }
+        inputFiles.add(new InputSelector(new FileSelector(new String[] { filesToInclude }), mode));
+    }
+
+    /**
+     * Add the files to the given filesToInclude value
+     * according to the provided access mode.<br />
+     * mode define the way the files will be send to OUTPUT space.
+     * filesToInclude can represent one file or many files defined by a regular expression.
+     * @see FileSelector for details
+     *
+     * @param filesToInclude the output files to add
+     * @param mode the way to send files to OUTPUT space
+     */
+    public void addOutputFiles(String filesToInclude, OutputAccessMode mode) {
+        if (filesToInclude == null) {
+            throw new IllegalArgumentException("Argument filesToInclude is null");
+        }
+        if (outputFiles == null) {
+            outputFiles = new ArrayList<OutputSelector>();
+        }
+        outputFiles.add(new OutputSelector(new FileSelector(new String[] { filesToInclude }), mode));
+    }
+
+    /**
+     * Get the input file selectors list.
+     * This list represents every couple of input FileSelector and its associated access mode
+     * The first element is the first added couple.<br>
+     * This method returns null if nothing was added to the inputFiles.
+     *
+     * @return the input file selectors list
+     */
+    public List<InputSelector> getInputFilesList() {
         return inputFiles;
     }
 
     /**
-     * Set the inputFiles value to the given inputFiles value
+     * Get the output file selectors list.
+     * This list represents every couple of output FileSelector and its associated access mode
+     * The first element is the first added couple.<br>
+     * This method returns null if nothing was added to the outputFiles.
      *
-     * @param inputFiles the inputFiles to set
+     * @return the output file selectors list
      */
-    public void setInputFiles(FileSelector inputFiles) {
-        this.inputFiles = inputFiles;
-    }
-
-    /**
-     * Get the outputFiles
-     *
-     * @return the outputFiles
-     */
-    public FileSelector getOutputFiles() {
+    public List<OutputSelector> getOutputFilesList() {
         return outputFiles;
-    }
-
-    /**
-     * Set the outputFiles value to the given outputFiles value
-     *
-     * @param outputFiles the outputFiles to set
-     */
-    public void setOutputFiles(FileSelector outputFiles) {
-        this.outputFiles = outputFiles;
     }
 
 }

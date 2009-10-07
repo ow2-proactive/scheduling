@@ -52,7 +52,7 @@ taskFlow = ## A job composed of a flow of tasks with or without dependencies
 
 # +++++++++++++ task
 task = ## A task is the smallest computation unit for the scheduler 
-    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, inputFiles?, outputFiles?, depends?, selection?, pre?, executable , post?, cleaning?}
+    element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, walltime?, preciousResult?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, selection?, pre?, executable, post?, cleaning?, outputFiles?}
 taskName = ## Identification of this task (identifier) 
     attribute name { xsd:ID }
 nodesNumber_t = ## number of cores needed for the task (identifier)
@@ -147,25 +147,29 @@ inputSpace = ## Input space for the job, URL that define root directory containi
     element inputSpace { url }
 outputSpace = ## Output space for the job, URL that define root directory that will contain job generated output files
     element outputSpace { url }
-inputFiles = ## selection of input files that will be accessible for the application and copied from INPUT to local system
-    element inputFiles { includes_?, excludes_?, ( include_ | exclude_ )* }
-outputFiles = ## selection of output files that will be copied from local system to OUTPUT
-    element outputFiles { includes_?, excludes_?, ( include_ | exclude_ )* }
+inputFiles = ## selection of input files that will be accessible for the application and copied from INPUT/OUTPUT to local system
+    element inputFiles { infiles_+ }
+infiles_ = ## description of input files with include, exclude and an access mode
+	element files { includes_, excludes_?, inaccessMode_ }
+inaccessMode_ = ## type of access on the selected files
+	attribute accessMode { inaccessModeType }
+outputFiles = ## selection of output files that will be copied from LOCALSPACE to OUTPUT
+    element outputFiles { outfiles_+ }
+outfiles_ = ## description of output files with include, exclude and an access mode
+	element files { includes_, excludes_?, outaccessMode_ }
+outaccessMode_ = ## type of access on the selected files
+	attribute accessMode { outaccessModeType }
 includes_ = ## Pattern of the files to include, relative to INPUT or OUTPUT spaces
 	attribute includes { inexcludePattern }
 excludes_ = ## Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces
 	attribute excludes { inexcludePattern }
-include_ = ## Target for include pattern
-	element include { name }
-exclude_ = ## Target for exclude pattern
-	element exclude { name }
-name = ## Pattern that represents file to exclude or include
-	attribute name { inexcludePattern }
 
 
 # +++++++++++++ User define types
 jobPriority = 'highest' | 'high' | 'normal' | 'low' | 'lowest' | variableRefType
 restartTaskType = 'anywhere' | 'elsewhere' | variableRefType
+inaccessModeType = 'transferFromInputSpace' | 'transferFromOutputSpace' | 'none' | variableRefType
+outaccessModeType = 'transferToOutputSpace' | 'none' | variableRefType
 classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*" }
 walltimePattern = xsd:string { pattern="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}" }
 variableRefType = xsd:string { pattern="$\{[A-Za-z0-9._]+\}" }

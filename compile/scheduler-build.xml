@@ -223,7 +223,11 @@
 				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/Os.java" />
 				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/PathTokenizer.java" />
 				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/SelectorUtils.java" />
-				<include name="org/ow2/proactive/scheduler/common/task/FileSelector.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/dataspaces/FileSelector.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/dataspaces/InputAccessMode.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/dataspaces/OutputAccessMode.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/dataspaces/InputSelector.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/dataspaces/OutputSelector.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/Tools.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/SchedulerLoggers.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/JarUtils.java" />

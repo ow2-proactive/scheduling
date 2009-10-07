@@ -54,7 +54,7 @@
 			<para>
 				<emphasis role="italics">pa.rm.home</emphasis>: 
 				Resource Manager home directory.
-				Default is <emphasis>.</emphasis>, but this property is overridden in Resource Manager launching scripts, startRM.[sh|bat], 
+				Default is <emphasis>.</emphasis>, but this property is overridden in Resource Manager launching scripts, rm-start[.bat],
 				in order to build an absolute path of Resource manager installation directory.
 			</para>
 		</listitem>
@@ -421,7 +421,7 @@ user2:user
 	<section xml:id="rm_admin_js_console"><info><title>Interactive mode</title></info>
 	<para> Another way to interact with the resource manager is using the interactive mode of the controller. Interactive mode correspond to a JavaSscript console, able
 	manage Resouce Manager.
-	To start it in this mode, just execute the bin/[os]/adminRM.[sh|bat] command without specifying one of -a, -c, -d, -gcmd, -ln, -r or -s options:
+	To start it in this mode, just execute the bin/[os]/rm-admin[.bat] command without specifying one of -a, -c, -d, -gcmd, -ln, -r or -s options:
 	Once connected, type ? or help() to get the list of provided functions:
 	</para>
 	<itemizedlist>

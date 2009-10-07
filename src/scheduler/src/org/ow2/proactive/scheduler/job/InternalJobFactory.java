@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.job;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,6 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
@@ -237,7 +239,11 @@ public class InternalJobFactory implements Serializable {
         }
 
         //set task common properties
-        setTaskCommonProperties(userJob, task, javaTask);
+        try {
+            setTaskCommonProperties(userJob, task, javaTask);
+        } catch (Exception e) {
+            throw new SchedulerException(e);
+        }
         return javaTask;
     }
 
@@ -258,7 +264,11 @@ public class InternalJobFactory implements Serializable {
         InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
                 .getCommandLine(), task.getGenerationScript(), task.getWorkingDir()));
         //set task common properties
-        setTaskCommonProperties(userJob, task, nativeTask);
+        try {
+            setTaskCommonProperties(userJob, task, nativeTask);
+        } catch (Exception e) {
+            throw new SchedulerException(e);
+        }
         return nativeTask;
     }
 
@@ -267,10 +277,13 @@ public class InternalJobFactory implements Serializable {
      *
      * @param job the user job.
      * @param jobToSet the internal job to set.
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
      */
-    private static void setJobCommonProperties(Job job, InternalJob jobToSet) {
+    private static void setJobCommonProperties(Job job, InternalJob jobToSet)
+            throws IllegalArgumentException, IllegalAccessException {
         logger_dev.info("Setting job common properties");
-        jobToSet.setName(job.getName());
+        /*jobToSet.setName(job.getName());
         jobToSet.setPriority(job.getPriority());
         jobToSet.setCancelJobOnError(job.isCancelJobOnError());
         jobToSet.setRestartTaskOnError(job.getRestartTaskOnError());
@@ -281,7 +294,12 @@ public class InternalJobFactory implements Serializable {
         jobToSet.setEnvironment(job.getEnvironment());
         jobToSet.setGenericInformations(job.getGenericInformations());
         jobToSet.setInputSpace(job.getInputSpace());
-        jobToSet.setOutputSpace(job.getOutputSpace());
+        jobToSet.setOutputSpace(job.getOutputSpace());*/
+
+        autoCopyfields(CommonAttribute.class, job, jobToSet);
+        autoCopyfields(Job.class, job, jobToSet);
+        //special behavior
+        jobToSet.setPriority(job.getPriority());
     }
 
     /**
@@ -289,10 +307,13 @@ public class InternalJobFactory implements Serializable {
      *
      * @param task the user task.
      * @param taskToSet the internal task to set.
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
      */
-    private static void setTaskCommonProperties(Job userJob, Task task, InternalTask taskToSet) {
+    private static void setTaskCommonProperties(Job userJob, Task task, InternalTask taskToSet)
+            throws IllegalArgumentException, IllegalAccessException {
         logger_dev.info("Setting task common properties");
-        taskToSet.setDescription(task.getDescription());
+        /*taskToSet.setDescription(task.getDescription());
         taskToSet.setPreciousResult(task.isPreciousResult());
         taskToSet.setName(task.getName());
         taskToSet.setPreScript(task.getPreScript());
@@ -303,8 +324,12 @@ public class InternalJobFactory implements Serializable {
         taskToSet.setWallTime(task.getWallTime());
         taskToSet.setNumberOfNeededNodes(task.getNumberOfNodesNeeded());
         taskToSet.setInputFiles(task.getInputFiles());
-        taskToSet.setOutputFiles(task.getOutputFiles());
-        //Properties with priority between job and tasks
+        taskToSet.setOutputFiles(task.getOutputFiles());*/
+
+        autoCopyfields(CommonAttribute.class, task, taskToSet);
+        autoCopyfields(Task.class, task, taskToSet);
+
+        //special behavior
         if (task.getCancelJobOnErrorProperty().isSet()) {
             taskToSet.setCancelJobOnError(task.isCancelJobOnError());
         } else {
@@ -320,8 +345,26 @@ public class InternalJobFactory implements Serializable {
         } else {
             taskToSet.setMaxNumberOfExecution(userJob.getMaxNumberOfExecution());
         }
-        //Generic informations
-        taskToSet.setGenericInformations(task.getGenericInformations());
+    }
+
+    /**
+     * Copy fields belonging to 'cFrom' from 'from' to 'to'.
+     * Will only iterate on non-private field.
+     * Private fields in 'cFrom' won't be set in 'to'.
+     *
+     * @param <T> check type given as argument is equals or under this type.
+     * @param klass the klass in which to find the fields
+     * @param from the T object in which to get the value
+     * @param to the T object in which to set the value
+     */
+    private static <T> void autoCopyfields(Class<T> klass, T from, T to) throws IllegalArgumentException,
+            IllegalAccessException {
+        for (Field f : klass.getDeclaredFields()) {
+            if (!Modifier.isPrivate(f.getModifiers())) {
+                f.setAccessible(true);
+                f.set(to, f.get(from));
+            }
+        }
     }
 
     /**

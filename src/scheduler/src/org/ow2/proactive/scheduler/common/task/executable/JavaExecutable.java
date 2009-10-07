@@ -32,11 +32,18 @@
 package org.ow2.proactive.scheduler.common.task.executable;
 
 import java.io.Serializable;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -135,6 +142,129 @@ public abstract class JavaExecutable extends Executable {
      */
     public final NodeSet getNodes() {
         return execInitializer.getNodes();
+    }
+
+    /**
+     * Retrieve the root of the INPUT space. This allow you to resolve files, copy, move, delete, etc...
+     * from and to other defined spaces.<br />
+     * The INPUT space is Read-Only, so you can get files but not put files inside.</br>
+     * It's real path is defined by the INPUT space specified in your Job or the Scheduler default one
+     * specified by the administrator.<br />
+     * INPUT space can be a local or a distant space.
+     *
+     * @return the root of the INPUT space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     * 							   if the node is not properly configured,
+     * 							   or if the INPUT space cannot be reached or has not be found.
+     */
+    public final DataSpacesFileObject getInputSpace() throws FileSystemException {
+        try {
+            return PADataSpaces.resolveDefaultInput();
+        } catch (NotConfiguredException e) {
+            throw new FileSystemException("Node is not configured for INPUT space");
+        } catch (ConfigurationException e) {
+            throw new FileSystemException("Configuration problems for INPUT space");
+        } catch (SpaceNotFoundException e) {
+            throw new FileSystemException("INPUT space not found");
+        }
+    }
+
+    /**
+     * Retrieve the root of the OUTPUT space. This allow you to resolve files, copy, move, delete, etc...
+     * from and to other defined spaces.<br />
+     * The OUTPUT space is a full access space, so you can get files, create, move, copy, etc...</br>
+     * It's real path is defined by the OUTPUT space specified in your Job or the Scheduler default one
+     * specified by the administrator.<br />
+     * OUTPUT space can be a local or a distant space.
+     *
+     * @return the root of the OUTPUT space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     * 							   if the node is not properly configured,
+     * 							   or if the OUTPUT space cannot be reached or has not be found.
+     */
+    public final DataSpacesFileObject getOutputSpace() throws FileSystemException {
+        try {
+            return PADataSpaces.resolveDefaultOutput();
+        } catch (NotConfiguredException e) {
+            throw new FileSystemException("Node is not configured for OUTPUT space");
+        } catch (ConfigurationException e) {
+            throw new FileSystemException("Configuration problems for OUTPUT space");
+        } catch (SpaceNotFoundException e) {
+            throw new FileSystemException("OUTPUT space not found");
+        }
+    }
+
+    /**
+     * Retrieve the root of the LOCAL space. This allow you to resolve files, copy, move, delete, etc...
+     * from and to other defined spaces.<br />
+     * The LOCAL space is a full local access space, so you can get files, create, move, copy, etc...</br>
+     * It's real path is located in the temporary directory of the host on which the task is executed.<br />
+     * As it is a local path, accessing data for computing remains faster.
+     *
+     * @return the root of the LOCAL space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     * 							   or if the node is not properly configured.
+     */
+    public final DataSpacesFileObject getLocalSpace() throws FileSystemException {
+        try {
+            return PADataSpaces.resolveScratchForAO();
+        } catch (NotConfiguredException e) {
+            throw new FileSystemException("Node is not configured for LOCAL space");
+        } catch (ConfigurationException e) {
+            throw new FileSystemException("Configuration problems for LOCAL space");
+        }
+    }
+
+    /**
+     * Retrieve the given file resolved relative to the INPUT space.<br />
+     * The file path denoted by the given path argument must exist in the INPUT space.
+     *
+     * @param path the file path to be resolve relative to the INPUT space.
+     * @return the given file resolved in the INPUT space
+     * @throws FileNotFoundException if the file cannot be found in the INPUT space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     * 							   if the node is not properly configured,
+     * 							   or if the OUTPUT space cannot be reached or has not be found.
+     * @see #getInputSpace() for details
+     */
+    public final DataSpacesFileObject getInputFile(String path) throws FileNotFoundException,
+            FileSystemException {
+        try {
+            DataSpacesFileObject dsfo = getInputSpace().resolveFile(path);
+            if (!dsfo.exists()) {
+                throw new FileNotFoundException("File '" + path + "' has not be found in the INPUT space.");
+            }
+            return dsfo;
+        } catch (FileSystemException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Retrieve the given file resolved relative to the OUTPUT space.<br />
+     *
+     * @param path the file path to be resolve relative to the OUTPUT space.
+     * @return the given file resolved in the OUTPUT space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     * 							   if the node is not properly configured,
+     * 							   or if the OUTPUT space cannot be reached or has not be found.
+     * @see #getOutputSpace() for details
+     */
+    public final DataSpacesFileObject getOutputFile(String path) throws FileSystemException {
+        return getOutputSpace().resolveFile(path);
+    }
+
+    /**
+     * Retrieve the given file resolved relative to the LOCAL space.<br />
+     *
+     * @param path the file path to be resolve relative to the LOCAL space.
+     * @return the given file resolved in the LOCAL space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     * 							   or if the node is not properly configured.
+     * @see #getLocalSpace() for details
+     */
+    public final DataSpacesFileObject getLocalFile(String path) throws FileSystemException {
+        return getLocalSpace().resolveFile(path);
     }
 
 }

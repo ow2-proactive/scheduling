@@ -276,12 +276,12 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      */
     public abstract String getOwner();
 
-    /**
-     * Returns the job result.
-     *
-     * @return the job result.
-     */
-    public abstract JobResult getJobResult();
+    //    /**
+    //     * Returns the job result.
+    //     *
+    //     * @return the job result.
+    //     */
+    //    public abstract JobResult getJobResult();
 
     /**
      * Get the toBeRemoved property.

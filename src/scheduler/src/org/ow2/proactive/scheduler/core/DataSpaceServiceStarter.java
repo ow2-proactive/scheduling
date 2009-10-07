@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
-public class DataSpaceServiceStarter implements Serializable {
+public final class DataSpaceServiceStarter implements Serializable {
 
     private static final String DEFAULT_LOCAL_INPUT = System.getProperty("java.io.tmpdir") + File.separator +
         "scheduling" + File.separator + "defaultinput";
@@ -66,7 +66,7 @@ public class DataSpaceServiceStarter implements Serializable {
      * @throws Exception
      */
     public void startNamingService() throws Exception {
-        namingServiceDeployer = new NamingServiceDeployer();
+        namingServiceDeployer = new NamingServiceDeployer(true);
         namingServiceURL = namingServiceDeployer.getNamingServiceURL();
         namingService = NamingService.createNamingServiceStub(namingServiceURL);
         //set default INPUT/OUTPUT spaces if needed
@@ -79,7 +79,7 @@ public class DataSpaceServiceStarter implements Serializable {
                 dir.mkdirs();
             }
             inputFilesServer = new FileSystemServerDeployer("defaultSchedulingInput", DEFAULT_LOCAL_INPUT,
-                true);
+                true, true);
             String url = inputFilesServer.getVFSRootURL();
             PASchedulerProperties.DATASPACE_DEFAULTINPUTURL.updateProperty(url);
             PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_LOCALPATH.updateProperty(DEFAULT_LOCAL_INPUT);
@@ -92,7 +92,7 @@ public class DataSpaceServiceStarter implements Serializable {
                 dir.mkdirs();
             }
             outputFilesServer = new FileSystemServerDeployer("defaultSchedulingOutput", DEFAULT_LOCAL_OUTPUT,
-                true);
+                true, true);
             String url = outputFilesServer.getVFSRootURL();
             PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL.updateProperty(url);
             PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_LOCALPATH.updateProperty(DEFAULT_LOCAL_OUTPUT);

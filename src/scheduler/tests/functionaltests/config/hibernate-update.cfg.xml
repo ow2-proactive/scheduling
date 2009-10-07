@@ -53,7 +53,9 @@
         <mapping class="org.ow2.proactive.scheduler.common.task.ForkEnvironment"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.Log4JTaskLogs"/>
         <mapping class="org.ow2.proactive.scheduler.common.task.SimpleTaskLogs"/>
-        <mapping class="org.ow2.proactive.scheduler.common.task.FileSelector"/>
+        <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector"/>
+        <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector"/>
+        <mapping class="org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector"/>
         <mapping class="org.ow2.proactive.scheduler.task.TaskInfoImpl"/>
         <mapping class="org.ow2.proactive.scheduler.task.TaskIdImpl"/>
         <!-- UTIL -->

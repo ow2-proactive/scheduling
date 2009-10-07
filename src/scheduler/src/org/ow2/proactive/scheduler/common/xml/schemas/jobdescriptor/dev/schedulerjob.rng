@@ -229,13 +229,10 @@
         <ref name="genericInformation"/>
       </optional>
       <optional>
-        <ref name="inputFiles"/>
-      </optional>
-      <optional>
-        <ref name="outputFiles"/>
-      </optional>
-      <optional>
         <ref name="depends"/>
+      </optional>
+      <optional>
+        <ref name="inputFiles"/>
       </optional>
       <optional>
         <ref name="selection"/>
@@ -249,6 +246,9 @@
       </optional>
       <optional>
         <ref name="cleaning"/>
+      </optional>
+      <optional>
+        <ref name="outputFiles"/>
       </optional>
     </element>
   </define>
@@ -598,49 +598,63 @@
   <!-- +++++++++++++ DataSpaces -->
   <define name="inputSpace">
     <element name="inputSpace">
-      <doc:documentation>Input space for the job, URL that define root directory containing job needed files </doc:documentation>
+      <doc:documentation>Input space for the job, URL that define root directory containing job needed files</doc:documentation>
       <ref name="url"/>
     </element>
   </define>
   <define name="outputSpace">
     <element name="outputSpace">
-      <doc:documentation>Output space for the job, URL that define root directory that will contain job generated output files  </doc:documentation>
+      <doc:documentation>Output space for the job, URL that define root directory that will contain job generated output files</doc:documentation>
       <ref name="url"/>
     </element>
   </define>
   <define name="inputFiles">
     <element name="inputFiles">
-      <doc:documentation>selection of input files that will be accessible for the application and copied from INPUT to local system</doc:documentation>
-      <optional>
-        <ref name="includes_"/>
-      </optional>
+      <doc:documentation>selection of input files that will be accessible for the application and copied from INPUT/OUTPUT to local system</doc:documentation>
+      <oneOrMore>
+        <ref name="infiles_"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="infiles_">
+    <element name="files">
+      <doc:documentation>description of input files with include, exclude and an access mode</doc:documentation>
+      <ref name="includes_"/>
       <optional>
         <ref name="excludes_"/>
       </optional>
-      <zeroOrMore>
-        <choice>
-          <ref name="include_"/>
-          <ref name="exclude_"/>
-        </choice>
-      </zeroOrMore>
+      <ref name="inaccessMode_"/>
     </element>
+  </define>
+  <define name="inaccessMode_">
+    <attribute name="accessMode">
+      <doc:documentation>type of access on the selected files</doc:documentation>
+      <ref name="inaccessModeType"/>
+    </attribute>
   </define>
   <define name="outputFiles">
     <element name="outputFiles">
-      <doc:documentation>selection of output files that will be copied from local system to OUTPUT</doc:documentation>
-      <optional>
-        <ref name="includes_"/>
-      </optional>
+      <doc:documentation>selection of output files that will be copied from LOCALSPACE to OUTPUT</doc:documentation>
+      <oneOrMore>
+        <ref name="outfiles_"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="outfiles_">
+    <element name="files">
+      <doc:documentation>description of output files with include, exclude and an access mode</doc:documentation>
+      <ref name="includes_"/>
       <optional>
         <ref name="excludes_"/>
       </optional>
-      <zeroOrMore>
-        <choice>
-          <ref name="include_"/>
-          <ref name="exclude_"/>
-        </choice>
-      </zeroOrMore>
+      <ref name="outaccessMode_"/>
     </element>
+  </define>
+  <define name="outaccessMode_">
+    <attribute name="accessMode">
+      <doc:documentation>type of access on the selected files</doc:documentation>
+      <ref name="outaccessModeType"/>
+    </attribute>
   </define>
   <define name="includes_">
     <attribute name="includes">
@@ -651,24 +665,6 @@
   <define name="excludes_">
     <attribute name="excludes">
       <doc:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</doc:documentation>
-      <ref name="inexcludePattern"/>
-    </attribute>
-  </define>
-  <define name="include_">
-    <element name="include">
-      <doc:documentation>Target for include pattern</doc:documentation>
-      <ref name="name"/>
-    </element>
-  </define>
-  <define name="exclude_">
-    <element name="exclude">
-      <doc:documentation>Target for exclude pattern</doc:documentation>
-      <ref name="name"/>
-    </element>
-  </define>
-  <define name="name">
-    <attribute name="name">
-      <doc:documentation>Pattern that represents file to exclude or include</doc:documentation>
       <ref name="inexcludePattern"/>
     </attribute>
   </define>
@@ -687,6 +683,21 @@
     <choice>
       <value>anywhere</value>
       <value>elsewhere</value>
+      <ref name="variableRefType"/>
+    </choice>
+  </define>
+  <define name="inaccessModeType">
+    <choice>
+      <value>transferFromInputSpace</value>
+      <value>transferFromOutputSpace</value>
+      <value>none</value>
+      <ref name="variableRefType"/>
+    </choice>
+  </define>
+  <define name="outaccessModeType">
+    <choice>
+      <value>transferToOutputSpace</value>
+      <value>none</value>
       <ref name="variableRefType"/>
     </choice>
   </define>

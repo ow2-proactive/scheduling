@@ -259,13 +259,6 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * @param numberOfNodesNeeded the numberOfNodesNeeded to set
-     */
-    public void setNumberOfNeededNodes(int numberOfNodesNeeded) {
-        this.numberOfNodesNeeded = numberOfNodesNeeded;
-    }
-
-    /**
      * To get the dependences of this task as internal tasks.
      * Return null if this task has no dependence.
      *
@@ -372,8 +365,8 @@ public abstract class InternalTask extends TaskState {
         tli.setTaskId(getId());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
-        tli.setTaskInputFiles(getInputFiles());
-        tli.setTaskOutputFiles(getOutputFiles());
+        tli.setTaskInputFiles(getInputFilesList());
+        tli.setTaskOutputFiles(getOutputFilesList());
         tli.setNamingServiceUrl(job.getJobDataSpaceApplication().getNamingServiceURL());
         if (isWallTime()) {
             tli.setWalltime(wallTime);

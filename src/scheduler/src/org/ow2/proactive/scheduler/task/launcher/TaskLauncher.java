@@ -35,6 +35,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -60,11 +61,12 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.selector.Selector;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
-import org.ow2.proactive.scheduler.common.task.FileSelector;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -95,14 +97,14 @@ public abstract class TaskLauncher implements InitActive {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
 
-    protected static final String DATASPACE_TAG = "\\$DATASPACE";
+    protected static final String DATASPACE_TAG = "\\$LOCALSPACE";
 
     protected DataSpacesFileObject SCRATCH = null;
     protected DataSpacesFileObject INPUT = null;
     protected DataSpacesFileObject OUTPUT = null;
     protected String namingServiceUrl = null;
-    protected FileSelector inputFiles;
-    protected FileSelector outputFiles;
+    protected List<InputSelector> inputFiles;
+    protected List<OutputSelector> outputFiles;
 
     /**
      * Scheduler related java properties. Thoses properties are automatically
@@ -509,7 +511,7 @@ public abstract class TaskLauncher implements InitActive {
     protected void replaceDSTags() throws Exception {
         String[] args = ((NativeExecutable) currentExecutable).getCommand();
         //I cannot use DataSpace to get the local scratch path
-        String fullScratchPath = SCRATCH.getURL().replace("file://", "");
+        String fullScratchPath = SCRATCH.getRealURI().replace("file://", "");
         for (int i = 0; i < args.length; i++) {
             args[i] = args[i].replaceAll(DATASPACE_TAG, fullScratchPath);
         }
@@ -555,60 +557,78 @@ public abstract class TaskLauncher implements InitActive {
                 logger_dev.debug("Job INPUT/OUTPUT spaces are not defined, cannot copy file.");
                 return;
             }
-            //fill ant file selector
-            AntFileSelector ant = new AntFileSelector();
-            ant.setIncludes(inputFiles.getIncludes());
-            ant.setExcludes(inputFiles.getExcludes());
-            ant.setCaseSensitive(inputFiles.isCaseSensitive());
 
-            FileSystemException toBeThrown = null;
-
-            //search in OUTPUT
             ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
-            try {
-                Selector.findFiles(OUTPUT, ant, true, results);
-            } catch (FileSystemException fse) {
-                logger_dev.warn("", fse);
-                toBeThrown = fse;
-            } catch (NullPointerException npe) {
-                //do nothing
-            }
-            try {
-                if (INPUT.getType().hasChildren()) {
-                    Selector.findFiles(INPUT, ant, true, results);
-                } else {
-                    logger_dev
-                            .debug("Cannot list files for this INPUT, switch to non-pattern mode and try again");
-                    for (String incl : inputFiles.getIncludes()) {
+            FileSystemException toBeThrown = null;
+            for (InputSelector is : inputFiles) {
+                //fill ant file selector
+                AntFileSelector ant = new AntFileSelector();
+                ant.setIncludes(is.getInputFiles().getIncludes());
+                ant.setExcludes(is.getInputFiles().getExcludes());
+                ant.setCaseSensitive(is.getInputFiles().isCaseSensitive());
+                switch (is.getMode()) {
+                    case TransferFromInputSpace:
+                        //search in INPUT
                         try {
-                            DataSpacesFileObject dsfo = INPUT.resolveFile(incl);
-                            if (dsfo.exists()) {
-                                results.add(dsfo);
+                            if (INPUT.getType().hasChildren()) {
+                                Selector.findFiles(INPUT, ant, true, results);
+                            } else {
+                                logger_dev
+                                        .debug("Cannot list files for this INPUT, switch to non-pattern mode and try again");
+                                for (String incl : is.getInputFiles().getIncludes()) {
+                                    try {
+                                        DataSpacesFileObject dsfo = INPUT.resolveFile(incl);
+                                        if (dsfo.exists()) {
+                                            results.add(dsfo);
+                                        }
+                                    } catch (FileSystemException fse2) {
+                                        logger_dev.debug("Cannot read file " + incl, fse2);
+                                        toBeThrown = new FileSystemException("Cannot read file " + incl);
+                                    }
+                                }
                             }
-                        } catch (FileSystemException fse2) {
-                            logger_dev.debug("Cannot read file " + incl, fse2);
-                            toBeThrown = fse2;
+                        } catch (FileSystemException fse) {
+                            logger_dev.info("", fse);
+                            toBeThrown = new FileSystemException(
+                                "Could not contact INPUT space. Check that INPUT space is still reachable !");
+                        } catch (NullPointerException npe) {
+                            //logger_dev.warn("",npe);
                         }
-                    }
+                        break;
+                    case TransferFromOutputSpace:
+                        //search in OUTPUT
+                        try {
+                            Selector.findFiles(OUTPUT, ant, true, results);
+                        } catch (FileSystemException fse) {
+                            logger_dev.info("", fse);
+                            toBeThrown = new FileSystemException(
+                                "Could not contact OUTPUT space. Check that OUTPUT space is still reachable !");
+                            ;
+                        } catch (NullPointerException npe) {
+                            //do nothing
+                        }
+                        break;
+                    case none:
+                        //do nothing
+                        break;
                 }
-            } catch (FileSystemException fse) {
-                logger_dev.warn("", fse);
-                toBeThrown = fse;
-            } catch (NullPointerException npe) {
-                //logger_dev.warn("",npe);
             }
 
-            String outuri = (OUTPUT == null) ? "" : OUTPUT.getURI();
-            String inuri = (INPUT == null) ? "" : INPUT.getURI();
+            if (toBeThrown != null) {
+                throw toBeThrown;
+            }
+
+            String outuri = (OUTPUT == null) ? "" : OUTPUT.getVirtualURI();
+            String inuri = (INPUT == null) ? "" : INPUT.getVirtualURI();
 
             Set<String> relPathes = new HashSet<String>();
             for (DataSpacesFileObject dsfo : results) {
                 try {
                     String relativePath;
                     if (dsfo.isWritable()) {
-                        relativePath = dsfo.getURI().replaceFirst(outuri + "/?", "");
+                        relativePath = dsfo.getVirtualURI().replaceFirst(outuri + "/?", "");
                     } else {
-                        relativePath = dsfo.getURI().replaceFirst(inuri + "/?", "");
+                        relativePath = dsfo.getVirtualURI().replaceFirst(inuri + "/?", "");
                     }
                     if (!relPathes.contains(relativePath)) {
                         SCRATCH.resolveFile(relativePath).copyFrom(dsfo,
@@ -616,7 +636,7 @@ public abstract class TaskLauncher implements InitActive {
                     }
                     relPathes.add(relativePath);
                 } catch (FileSystemException fse) {
-                    logger_dev.warn("", fse);
+                    logger_dev.info("", fse);
                     toBeThrown = fse;
                 }
             }
@@ -637,30 +657,41 @@ public abstract class TaskLauncher implements InitActive {
                 logger_dev.debug("Job OUTPUT space is not defined, cannot copy file.");
                 return;
             }
-            AntFileSelector ant = new AntFileSelector();
-            ant.setIncludes(outputFiles.getIncludes());
-            ant.setExcludes(outputFiles.getExcludes());
-            ant.setCaseSensitive(outputFiles.isCaseSensitive());
 
+            ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
             FileSystemException toBeThrown = null;
-
-            try {
-                ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
-                Selector.findFiles(SCRATCH, ant, true, results);
-                String buri = SCRATCH.getURI();
-                for (DataSpacesFileObject dsfo : results) {
-                    try {
-                        String relativePath = dsfo.getURI().replaceFirst(buri + "/?", "");
-                        OUTPUT.resolveFile(relativePath).copyFrom(dsfo,
-                                org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
-                    } catch (FileSystemException fse) {
-                        logger_dev.warn("", fse);
-                        toBeThrown = fse;
-                    }
+            for (OutputSelector os : outputFiles) {
+                //fill ant file selector
+                AntFileSelector ant = new AntFileSelector();
+                ant.setIncludes(os.getOutputFiles().getIncludes());
+                ant.setExcludes(os.getOutputFiles().getExcludes());
+                ant.setCaseSensitive(os.getOutputFiles().isCaseSensitive());
+                switch (os.getMode()) {
+                    case TransferToOutputSpace:
+                        try {
+                            Selector.findFiles(SCRATCH, ant, true, results);
+                            String buri = SCRATCH.getVirtualURI();
+                            for (DataSpacesFileObject dsfo : results) {
+                                try {
+                                    String relativePath = dsfo.getVirtualURI().replaceFirst(buri + "/?", "");
+                                    OUTPUT
+                                            .resolveFile(relativePath)
+                                            .copyFrom(
+                                                    dsfo,
+                                                    org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+                                } catch (FileSystemException fse) {
+                                    logger_dev.warn("", fse);
+                                    toBeThrown = fse;
+                                }
+                            }
+                        } catch (FileSystemException fse) {
+                            logger_dev.warn("", fse);
+                            toBeThrown = fse;
+                        }
+                        break;
+                    case none:
+                        break;
                 }
-            } catch (FileSystemException fse) {
-                logger_dev.warn("", fse);
-                toBeThrown = fse;
             }
 
             if (toBeThrown != null) {

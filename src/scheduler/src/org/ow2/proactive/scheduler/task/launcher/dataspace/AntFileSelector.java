@@ -114,8 +114,8 @@ public class AntFileSelector implements FileSelector {
 
     public boolean includeFile(FileSelectInfo fileInfo) {
         boolean included = false;
-        String buri = fileInfo.getBaseFolder().getURI();
-        String furi = fileInfo.getFile().getURI();
+        String buri = fileInfo.getBaseFolder().getVirtualURI();
+        String furi = fileInfo.getFile().getVirtualURI();
         String name = furi.replaceFirst(buri + "/?", "");
 
         if (isIncluded(name)) {

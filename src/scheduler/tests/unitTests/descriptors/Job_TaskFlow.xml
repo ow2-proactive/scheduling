@@ -66,16 +66,10 @@
 		</task>
 		<task name="task2" maxNumberOfExecution="2" restartTaskOnError="elsewhere">
 			<description>Parallel Tasks - Task 2</description>
-			<inputFiles includes="tata*" excludes="tata*1">
-				<include name="toto*.txt"/>
-				<exclude name="toto*2.txt"/>
-				<exclude name="toto*3.txt"/>
+			<inputFiles>
+				<files includes="tata*" excludes="tata*1" accessMode="transferFromInputSpace"/>
+				<files includes="toto*.txt" excludes="toto*2.txt,toto*3.txt" accessMode="transferFromOutputSpace"/>
 			</inputFiles>
-			<outputFiles includes="titi*" excludes="titi*1">
-				<include name="titi*.txt"/>
-				<include name="tutu*.txt"/>
-				<exclude name="titi*3.txt"/>
-			</outputFiles>
 			<pre>
 				<script>
 					<file path="${WORK_DIR}/set.js"/>
@@ -89,14 +83,20 @@
 					<parameter name="test" value="${JAVA_HOME}"/>
 				</parameters>
 			</javaExecutable>
+			<outputFiles>
+				<files includes="titi*" excludes="titi*1" accessMode="transferToOutputSpace"/>
+				<files includes="titi*.txt,tutu*.txt" excludes="titi*3.txt" accessMode="transferToOutputSpace"/>
+			</outputFiles>
 		</task>
 		<task name="task3" walltime="10:53" numberOfNodes="3">
 			<description>Dependent Tasks - Task 3</description>
-			<outputFiles includes="tutu*" excludes="tutu*1" />
 			<depends>
 				<task ref="task1"/>
 				<task ref="task2"/>
 			</depends>
+			<inputFiles>
+				<files includes="tata*" accessMode="none"/>
+			</inputFiles>
 			<nativeExecutable>
 				<staticCommand value="${WORK_DIR2}/nativTask 1 2% 2" workingDir="task3workingDir">
 					<arguments>
@@ -116,10 +116,6 @@
 				<info name="n11" value="v11"/>
 				<info name="n22" value="v22"/>
 			</genericInformation>
-			<inputFiles>
-				<include name="tutu*"/>
-				<exclude name="tutu*1"/>
-			</inputFiles>
 			<depends>
 				<task ref="task3"/>
 			</depends>
@@ -136,6 +132,13 @@
 					</generation>
 				</dynamicCommand>
 			</nativeExecutable>
+			<outputFiles>
+				<files includes="a" excludes="f" accessMode="transferToOutputSpace"/>
+				<files includes="b" excludes="g" accessMode="none"/>
+				<files includes="c" accessMode="none"/>
+				<files includes="d" excludes="h" accessMode="transferToOutputSpace"/>
+				<files includes="e" excludes="i" accessMode="none"/>
+			</outputFiles>
 		</task>
 	</taskFlow>
 </job>

@@ -18,11 +18,13 @@
 					<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
-					<!-- Needed explicitly by VFS (file transfer in pre/post script -->
+					<!-- Needed explicitly by VFS (file transfer in pre/post script and dataspace -->
 					<pathElement base="proactive" relpath="/dist/lib/commons-logging-1.0.4.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/commons-httpclient-3.0.1.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/commons-codec-1.3.jar"/>
 					<!-- <pathElement base="proactive" relpath="/dist/lib/script-api.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/js.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>

@@ -72,7 +72,7 @@ public abstract class CommonAttribute implements Serializable {
      */
     @OneToOne(fetch = FetchType.EAGER)
     @Cascade(CascadeType.ALL)
-    private UpdatableProperties<BooleanWrapper> cancelJobOnError = new UpdatableProperties<BooleanWrapper>(
+    protected UpdatableProperties<BooleanWrapper> cancelJobOnError = new UpdatableProperties<BooleanWrapper>(
         new BooleanWrapper(false));
 
     /** 
@@ -82,7 +82,7 @@ public abstract class CommonAttribute implements Serializable {
      */
     @OneToOne(fetch = FetchType.EAGER)
     @Cascade(CascadeType.ALL)
-    private UpdatableProperties<RestartMode> restartTaskOnError = new UpdatableProperties<RestartMode>(
+    protected UpdatableProperties<RestartMode> restartTaskOnError = new UpdatableProperties<RestartMode>(
         RestartMode.ANYWHERE);
 
     /**
@@ -91,14 +91,14 @@ public abstract class CommonAttribute implements Serializable {
      */
     @OneToOne(fetch = FetchType.EAGER)
     @Cascade(CascadeType.ALL)
-    private UpdatableProperties<IntegerWrapper> maxNumberOfExecution = new UpdatableProperties<IntegerWrapper>(
+    protected UpdatableProperties<IntegerWrapper> maxNumberOfExecution = new UpdatableProperties<IntegerWrapper>(
         new IntegerWrapper(1));
 
     /** Common user informations */
     @OneToMany(cascade = javax.persistence.CascadeType.ALL)
     @Cascade(CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
-    private Map<String, BigString> genericInformations = new HashMap<String, BigString>();
+    protected Map<String, BigString> genericInformations = new HashMap<String, BigString>();
 
     /**
      * To get the cancelOnError property

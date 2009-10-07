@@ -215,7 +215,7 @@
 					</section>
 					<section xml:id="RM_launch_with_gcmd"><info><title>Launch Resource Manager with your specific deployment descriptor</title></info>
 						<para>  
-						To start the Resource Manager with your own GCM deployment descriptor, run the <emphasis>startRM.[sh|bat]</emphasis>
+						To start the Resource Manager with your own GCM deployment descriptor, run the <emphasis>rm-start[.bat]</emphasis>
 						script in 'bin/[os]/' directory and put in paramter the path of your GCM Deployment file. If you want to deploy Resource Manager
 						with the deployment_ssh_host_list.xml file defined above, type in the 'bin/[os]/' directory:
 						<literal>rm-start -d ../../config/rm/deployment/deployment_ssh_host_list.xml</literal>

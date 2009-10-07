@@ -32,9 +32,11 @@
 package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
+import java.util.List;
 
-import org.ow2.proactive.scheduler.common.task.FileSelector;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scripting.Script;
 
 
@@ -60,8 +62,8 @@ public class TaskLauncherInitializer implements Serializable {
     private String policyContent;
 
     /** DataSpaces needed parameter */
-    private FileSelector taskInputFiles = null;
-    private FileSelector taskOutputFiles = null;
+    private List<InputSelector> taskInputFiles = null;
+    private List<OutputSelector> taskOutputFiles = null;
     private String namingServiceUrl;
 
     /**
@@ -177,7 +179,7 @@ public class TaskLauncherInitializer implements Serializable {
      *
      * @return the taskInputFiles
      */
-    public FileSelector getTaskInputFiles() {
+    public List<InputSelector> getTaskInputFiles() {
         return taskInputFiles;
     }
 
@@ -186,7 +188,7 @@ public class TaskLauncherInitializer implements Serializable {
      *
      * @param taskInputFiles the taskInputFiles to set
      */
-    public void setTaskInputFiles(FileSelector taskInputFiles) {
+    public void setTaskInputFiles(List<InputSelector> taskInputFiles) {
         this.taskInputFiles = taskInputFiles;
     }
 
@@ -195,7 +197,7 @@ public class TaskLauncherInitializer implements Serializable {
      *
      * @return the taskOutputFiles
      */
-    public FileSelector getTaskOutputFiles() {
+    public List<OutputSelector> getTaskOutputFiles() {
         return taskOutputFiles;
     }
 
@@ -204,7 +206,7 @@ public class TaskLauncherInitializer implements Serializable {
      *
      * @param taskOutputFiles the taskOutputFiles to set
      */
-    public void setTaskOutputFiles(FileSelector taskOutputFiles) {
+    public void setTaskOutputFiles(List<OutputSelector> taskOutputFiles) {
         this.taskOutputFiles = taskOutputFiles;
     }
 

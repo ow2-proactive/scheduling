@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.task;
+package org.ow2.proactive.scheduler.common.task.dataspaces;
 
 import java.io.Serializable;
 
@@ -46,6 +46,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
+ * Specify a set of files to include and a set of files to exclude among the include set.
+ * This allows accurate files targeting.
+ *
  * The idea is simple. A given directory is recursively scanned for all files
  * and directories. Each file/directory is matched against a set of selectors,
  * including special support for matching against filenames with include and

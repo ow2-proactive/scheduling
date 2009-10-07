@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -59,12 +60,15 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.FileSelector;
+import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.RegexpMatcher;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
@@ -161,10 +165,10 @@ public class JobFactory_stax extends JobFactory {
     private static final String ELEMENT_DS_OUTPUTSPACE = "outputSpace";
     private static final String ELEMENT_DS_INPUTFILES = "inputFiles";
     private static final String ELEMENT_DS_OUTPUTFILES = "outputFiles";
-    private static final String ATTRIBUTE_DS_EXCLUDES = "excludes";
+    private static final String ELEMENT_DS_FILES = "files";
     private static final String ATTRIBUTE_DS_INCLUDES = "includes";
-    private static final String ELEMENT_DS_INCLUDE = "include";
-    private static final String ELEMENT_DS_EXCLUDE = "exclude";
+    private static final String ATTRIBUTE_DS_EXCLUDES = "excludes";
+    private static final String ATTRIBUTE_DS_ACCESSMODE = "accessMode";
 
     /** XML input factory */
     private XMLInputFactory xmlif = null;
@@ -630,9 +634,9 @@ public class JobFactory_stax extends JobFactory {
                         } else if (current.equals(JobFactory_stax.ELEMENT_COMMON_DESCRIPTION)) {
                             tmpTask.setDescription(getDescription(cursorTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_DS_INPUTFILES)) {
-                            tmpTask.setInputFiles(getIOFIles(cursorTask, ELEMENT_DS_INPUTFILES));
+                            setIOFIles(cursorTask, ELEMENT_DS_INPUTFILES, tmpTask);
                         } else if (current.equals(JobFactory_stax.ELEMENT_DS_OUTPUTFILES)) {
-                            tmpTask.setOutputFiles(getIOFIles(cursorTask, ELEMENT_DS_OUTPUTFILES));
+                            setIOFIles(cursorTask, ELEMENT_DS_OUTPUTFILES, tmpTask);
                         } else if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_SELECTION)) {
                             tmpTask.setSelectionScripts(createSelectionScript(cursorTask));
                         } else if (current.equals(JobFactory_stax.ELEMENT_SCRIPT_PRE)) {
@@ -660,28 +664,17 @@ public class JobFactory_stax extends JobFactory {
             }
             //fill the real task with common attribute if it is a new one
             if (taskToFill == null) {
-                toReturn.setCleaningScript(tmpTask.getCleaningScript());
-                toReturn.setDescription(tmpTask.getDescription());
-                toReturn.setInputFiles(tmpTask.getInputFiles());
-                toReturn.setOutputFiles(tmpTask.getOutputFiles());
-                toReturn.setGenericInformations(tmpTask.getGenericInformations());
-                toReturn.setName(tmpTask.getName());
-                toReturn.setPostScript(tmpTask.getPostScript());
-                toReturn.setPreciousResult(tmpTask.isPreciousResult());
-                toReturn.setPreScript(tmpTask.getPreScript());
-                toReturn.setResultPreview(tmpTask.getResultPreview());
-                toReturn.setSelectionScripts(tmpTask.getSelectionScripts());
-                toReturn.setWallTime(tmpTask.getWallTime());
-                toReturn.setNumberOfNeededNodes(tmpTask.getNumberOfNodesNeeded());
+                autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
+                autoCopyfields(Task.class, tmpTask, toReturn);
                 //set the following properties only if it is needed.
-                if (tmpTask.getCancelJobOnErrorProperty().isSet()) {
-                    toReturn.setCancelJobOnError(tmpTask.isCancelJobOnError());
+                if (toReturn.getCancelJobOnErrorProperty().isSet()) {
+                    toReturn.setCancelJobOnError(toReturn.isCancelJobOnError());
                 }
-                if (tmpTask.getRestartTaskOnErrorProperty().isSet()) {
-                    toReturn.setRestartTaskOnError(tmpTask.getRestartTaskOnError());
+                if (toReturn.getRestartTaskOnErrorProperty().isSet()) {
+                    toReturn.setRestartTaskOnError(toReturn.getRestartTaskOnError());
                 }
-                if (tmpTask.getMaxNumberOfExecutionProperty().isSet()) {
-                    toReturn.setMaxNumberOfExecution(tmpTask.getMaxNumberOfExecution());
+                if (toReturn.getMaxNumberOfExecutionProperty().isSet()) {
+                    toReturn.setMaxNumberOfExecution(toReturn.getMaxNumberOfExecution());
                 }
             }
             //check if walltime and fork are consistency
@@ -701,22 +694,11 @@ public class JobFactory_stax extends JobFactory {
      *
      * @param cursorTask the streamReader with the cursor on the 'ELEMENT_DS_INPUT/OUTPUTFILES' tag.
      * @param endTag the final tag for this tag : ELEMENT_DS_INPUTFILES or ELEMENT_DS_INPUTFILES
-     * @return A filled fileSelector if some patterns are found, null if nothing has been found
+     * @param task the task in which to add the input/output files selector
      * @throws JobCreationException
      */
-    private FileSelector getIOFIles(XMLStreamReader cursorTask, String endTag) throws JobCreationException {
+    private void setIOFIles(XMLStreamReader cursorTask, String endTag, Task task) throws JobCreationException {
         try {
-            ArrayList<String> includes = new ArrayList<String>();
-            ArrayList<String> excludes = new ArrayList<String>();
-            int attrLen = cursorTask.getAttributeCount();
-            for (int i = 0; i < attrLen; i++) {
-                String attrName = cursorTask.getAttributeLocalName(i);
-                if (attrName.equals(JobFactory_stax.ATTRIBUTE_DS_INCLUDES)) {
-                    includes.add(cursorTask.getAttributeValue(i));
-                } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_DS_EXCLUDES)) {
-                    excludes.add(cursorTask.getAttributeValue(i));
-                }
-            }
             int eventType;
             boolean continu = true;
             while (continu && cursorTask.hasNext()) {
@@ -724,10 +706,35 @@ public class JobFactory_stax extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         String current = cursorTask.getLocalName();
-                        if (current.equals(JobFactory_stax.ELEMENT_DS_INCLUDE)) {
-                            includes.add(cursorTask.getAttributeValue(0));
-                        } else if (current.equals(JobFactory_stax.ELEMENT_DS_EXCLUDE)) {
-                            excludes.add(cursorTask.getAttributeValue(0));
+                        if (current.equals(JobFactory_stax.ELEMENT_DS_FILES)) {
+                            int attrLen = cursorTask.getAttributeCount();
+                            FileSelector selector = null;
+                            for (int i = 0; i < attrLen; i++) {
+                                String attrName = cursorTask.getAttributeLocalName(i);
+                                if (attrName.equals(JobFactory_stax.ATTRIBUTE_DS_INCLUDES)) {
+                                    if (selector == null) {
+                                        selector = new FileSelector();
+                                    }
+                                    selector.setIncludes(new String[] { replace(cursorTask
+                                            .getAttributeValue(i)) });
+                                } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_DS_EXCLUDES)) {
+                                    if (selector == null) {
+                                        selector = new FileSelector();
+                                    }
+                                    selector.setExcludes(new String[] { replace(cursorTask
+                                            .getAttributeValue(i)) });
+                                } else if (attrName.equals(JobFactory_stax.ATTRIBUTE_DS_ACCESSMODE) &&
+                                    selector != null) {
+                                    String accessMode = replace(cursorTask.getAttributeValue(i));
+                                    if (endTag.equals(ELEMENT_DS_INPUTFILES)) {
+                                        task.addInputFiles(selector, InputAccessMode
+                                                .getAccessMode(accessMode));
+                                    } else {
+                                        task.addOutputFiles(selector, OutputAccessMode
+                                                .getAccessMode(accessMode));
+                                    }
+                                }
+                            }
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -736,17 +743,6 @@ public class JobFactory_stax extends JobFactory {
                         }
                         break;
                 }
-            }
-            //fill selector
-            if (includes.size() > 0 || excludes.size() > 0) {
-                FileSelector selector = new FileSelector();
-                selector.setIncludes((includes.size() > 0) ? includes.toArray(new String[includes.size()])
-                        : null);
-                selector.setExcludes((excludes.size() > 0) ? excludes.toArray(new String[excludes.size()])
-                        : null);
-                return selector;
-            } else {
-                return null;
             }
         } catch (Exception e) {
             throw new JobCreationException(e.getMessage(), e);
@@ -1256,10 +1252,11 @@ public class JobFactory_stax extends JobFactory {
                 logger.debug("post  : " + t.getPostScript());
                 logger.debug("clean : " + t.getCleaningScript());
                 try {
-                    logger.debug("ifsel : inc=" + t.getInputFiles().getIncludes().length + " exc=" +
-                        t.getInputFiles().getExcludes().length);
-                    logger.debug("ofsel : inc=" + t.getOutputFiles().getIncludes().length + " exc=" +
-                        t.getOutputFiles().getExcludes().length);
+                    logger.debug("ifsel : length=" + t.getInputFilesList().size());
+                } catch (NullPointerException npe) {
+                }
+                try {
+                    logger.debug("ofsel : inc=" + t.getOutputFilesList().size());
                 } catch (NullPointerException npe) {
                 }
                 if (t.getDependencesList() != null) {
@@ -1290,6 +1287,24 @@ public class JobFactory_stax extends JobFactory {
                 }
                 logger.debug("--------------------------------------------------");
             }
+        }
+    }
+
+    /**
+     * Copy fields belonging to 'cFrom' from 'from' to 'to'.
+     * Will only iterate on non-private field.
+     * Private fields in 'cFrom' won't be set in 'to'.
+     *
+     * @param <T> check type given as argument is equals or under this type.
+     * @param klass the klass in which to find the fields
+     * @param from the T object in which to get the value
+     * @param to the T object in which to set the value
+     */
+    private static <T> void autoCopyfields(Class<T> klass, T from, T to) throws IllegalArgumentException,
+            IllegalAccessException {
+        for (Field f : klass.getDeclaredFields()) {
+            f.setAccessible(true);
+            f.set(to, f.get(from));
         }
     }
 

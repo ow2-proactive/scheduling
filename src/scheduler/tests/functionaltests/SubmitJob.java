@@ -1,6 +1,7 @@
 package functionaltests;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -28,7 +29,8 @@ public class SubmitJob implements SchedulerEventListener {
         try {
             //connect the Scheduler
             //get the authentication interface using the SchedulerConnection
-            SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("rmi://localhost/");
+            SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("rmi://localhost:" +
+                PAProperties.PA_RMI_PORT.getValue() + "/");
             //get the user interface using the retrieved SchedulerAuthenticationInterface
             user = auth.logAsUser(Credentials.createCredentials(SchedulerTHelper.username,
                     SchedulerTHelper.password, auth.getPublicKey()));

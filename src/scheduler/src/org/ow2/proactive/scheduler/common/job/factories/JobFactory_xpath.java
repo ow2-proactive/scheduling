@@ -79,12 +79,14 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.FileSelector;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.RegexpMatcher;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
@@ -187,11 +189,10 @@ public class JobFactory_xpath extends JobFactory {
     private static final String DS_ATTRIBUTE_URL = "@url";
     private static final String DS_TAG_INPUTFILES = "inputFiles";
     private static final String DS_TAG_OUTPUTFILES = "outputFiles";
-    private static final String DS_ATTRIBUTE_EXCLUDES = "@excludes";
+    private static final String DS_TAG_FILES = "files";
     private static final String DS_ATTRIBUTE_INCLUDES = "@includes";
-    private static final String DS_TAG_INCLUDE = "include";
-    private static final String DS_TAG_EXCLUDE = "exclude";
-    private static final String DS_ATTRIBUTE_NAME = "@name";
+    private static final String DS_ATTRIBUTE_EXCLUDES = "@excludes";
+    private static final String DS_ATTRIBUTE_ACCESSMODE = "@accessMode";
 
     /** Xpath factory instance */
     private XPath xpath;
@@ -597,22 +598,10 @@ public class JobFactory_xpath extends JobFactory {
         }
 
         // DATASPACE inputFiles
-        ArrayList<String> includes = new ArrayList<String>();
-        ArrayList<String> excludes = new ArrayList<String>();
-        FileSelector selector = parseIOFiles(taskNode, DS_TAG_INPUTFILES, includes, excludes);
-        //insert in task
-        if (selector != null) {
-            task.setInputFiles(selector);
-        }
+        parseIOFiles(taskNode, DS_TAG_INPUTFILES, task);
 
         // DATASPACE outputFiles
-        includes = new ArrayList<String>();
-        excludes = new ArrayList<String>();
-        selector = parseIOFiles(taskNode, DS_TAG_OUTPUTFILES, includes, excludes);
-        //insert in task
-        if (selector != null) {
-            task.setOutputFiles(selector);
-        }
+        parseIOFiles(taskNode, DS_TAG_OUTPUTFILES, task);
 
         // TASK RESULT DESCRIPTION
         String previewClassName = (String) xpath.evaluate(TASK_ATTRIBUTE_RESULTPREVIEW, taskNode,
@@ -766,14 +755,14 @@ public class JobFactory_xpath extends JobFactory {
         ForkEnvironment forkEnv = new ForkEnvironment();
         String javaHome = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
             FORK_ATTRIBUTE_JAVAHOME), process, XPathConstants.STRING);
-        if (javaHome != null) {
+        if (javaHome != null && javaHome.length() > 0) {
             forkEnv.setJavaHome(javaHome);
             logger.debug(FORK_TAG_ENVIRONMENT + "/" + FORK_ATTRIBUTE_JAVAHOME + " = " + javaHome);
         }
 
         String jvmParameters = (String) xpath.evaluate(addPrefixes(FORK_TAG_ENVIRONMENT + "/" +
             FORK_ATTRIBUTE_JVMPARAMETERS), process, XPathConstants.STRING);
-        if (jvmParameters != null) {
+        if (jvmParameters != null && jvmParameters.length() > 0) {
             forkEnv.setJVMParameters(jvmParameters);
             logger.debug(FORK_TAG_ENVIRONMENT + "/" + FORK_ATTRIBUTE_JVMPARAMETERS + " = " + jvmParameters);
         }
@@ -991,56 +980,42 @@ public class JobFactory_xpath extends JobFactory {
         }
     }
 
-    private FileSelector parseIOFiles(Node taskNode, String tag, ArrayList<String> includes,
-            ArrayList<String> excludes) throws XPathExpressionException {
-        //attributes includes, excludes
-        String ief = (String) xpath.evaluate(addPrefixes(tag + "/" + DS_ATTRIBUTE_INCLUDES), taskNode,
-                XPathConstants.STRING);
-        if (ief != null && ief.length() > 0) {
-            includes.add(ief);
-            logger.debug(tag + "/" + DS_ATTRIBUTE_INCLUDES + " = " + ief);
-        }
-        ief = (String) xpath.evaluate(addPrefixes(tag + "/" + DS_ATTRIBUTE_EXCLUDES), taskNode,
-                XPathConstants.STRING);
-        if (ief != null && ief.length() > 0) {
-            excludes.add(ief);
-            logger.debug(tag + "/" + DS_ATTRIBUTE_EXCLUDES + " = " + ief);
-        }
-        //tag include,exclude
-        NodeList listIE = (NodeList) xpath.evaluate(addPrefixes(tag + "/" + DS_TAG_INCLUDE), taskNode,
+    private void parseIOFiles(Node taskNode, String tag, Task task) throws XPathExpressionException {
+        //tag files
+        NodeList listIE = (NodeList) xpath.evaluate(addPrefixes(tag + "/" + DS_TAG_FILES), taskNode,
                 XPathConstants.NODESET);
         if (listIE != null) {
             for (int i = 0; i < listIE.getLength(); i++) {
                 Node n = listIE.item(i);
-                String name = (String) xpath.evaluate(DS_ATTRIBUTE_NAME, n, XPathConstants.STRING);
-                if (name != null) {
-                    includes.add(name);
-                    logger.debug(tag + "/" + DS_TAG_INCLUDE + "/" + DS_ATTRIBUTE_NAME + " = " + name);
+                FileSelector selector = null;
+                String includes = (String) xpath.evaluate(DS_ATTRIBUTE_INCLUDES, n, XPathConstants.STRING);
+                if (!"".equals(includes)) {
+                    if (selector == null) {
+                        selector = new FileSelector();
+                    }
+                    selector.setIncludes(new String[] { includes });
+                    logger.debug(tag + "/" + DS_TAG_FILES + "/" + DS_ATTRIBUTE_INCLUDES + " = " + includes);
+                }
+                String excludes = (String) xpath.evaluate(DS_ATTRIBUTE_EXCLUDES, n, XPathConstants.STRING);
+                if (!"".equals(excludes)) {
+                    if (selector == null) {
+                        selector = new FileSelector();
+                    }
+                    selector.setExcludes(new String[] { excludes });
+                    logger.debug(tag + "/" + DS_TAG_FILES + "/" + DS_ATTRIBUTE_EXCLUDES + " = " + excludes);
+                }
+                String mode = (String) xpath.evaluate(DS_ATTRIBUTE_ACCESSMODE, n, XPathConstants.STRING);
+                if (mode != null && selector != null) {
+                    if (DS_TAG_INPUTFILES.equals(tag)) {
+                        task.addInputFiles(selector, InputAccessMode.getAccessMode(mode));
+                    } else if (DS_TAG_OUTPUTFILES.equals(tag)) {
+                        task.addOutputFiles(selector, OutputAccessMode.getAccessMode(mode));
+                    } else {
+                        throw new RuntimeException("Should never be here !!");
+                    }
+                    logger.debug(tag + "/" + DS_TAG_FILES + "/" + DS_ATTRIBUTE_INCLUDES + " = " + includes);
                 }
             }
-        }
-        listIE = (NodeList) xpath.evaluate(addPrefixes(tag + "/" + DS_TAG_EXCLUDE), taskNode,
-                XPathConstants.NODESET);
-        if (listIE != null) {
-            for (int i = 0; i < listIE.getLength(); i++) {
-                Node n = listIE.item(i);
-                String name = (String) xpath.evaluate(DS_ATTRIBUTE_NAME, n, XPathConstants.STRING);
-                if (name != null) {
-                    excludes.add(name);
-                    logger.debug(tag + "/" + DS_TAG_EXCLUDE + "/" + DS_ATTRIBUTE_NAME + " = " + name);
-                }
-            }
-        }
-        //fill selector
-        if (includes.size() > 0 || excludes.size() > 0) {
-            FileSelector selector = new FileSelector();
-            selector
-                    .setIncludes((includes.size() > 0) ? includes.toArray(new String[includes.size()]) : null);
-            selector
-                    .setExcludes((excludes.size() > 0) ? excludes.toArray(new String[excludes.size()]) : null);
-            return selector;
-        } else {
-            return null;
         }
     }
 
