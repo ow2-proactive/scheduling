@@ -217,6 +217,13 @@
 				<include name="org/ow2/proactive/scheduler/common/task/executable/JavaExecutable.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/CommonAttribute.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskStatus.java" />
+				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/AntFileSelector.java" />
+				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/BuildException.java" />
+				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/FileUtils.java" />
+				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/Os.java" />
+				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/PathTokenizer.java" />
+				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/SelectorUtils.java" />
+				<include name="org/ow2/proactive/scheduler/common/task/FileSelector.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/Tools.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/SchedulerLoggers.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/JarUtils.java" />
