@@ -163,8 +163,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
 
     private boolean shutedDown = false;
 
-    JMXMonitoringHelper jmxHelper = new JMXMonitoringHelper();
-
     /**
      * Normalize the given URL into an URL that only contains protocol://host:port/
      *
@@ -256,9 +254,9 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             if (logger.isDebugEnabled()) {
                 logger.debug("active object RMMonitoring");
             }
-            // Create the MBeanServers and the Connectors before creating the monitoring Object
-            jmxHelper.createMBeanServers();
-            jmxHelper.createConnectors(authentication);
+            // Boot the JMX monitoring infrastructure            
+            JMXMonitoringHelper.getInstance().boot(authentication);
+
             monitoring = (RMMonitoringImpl) PAActiveObject.newActive(RMMonitoringImpl.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 

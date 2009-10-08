@@ -88,13 +88,37 @@ public class PAAuthenticationConnectorServer {
     }
 
     /**
-     * Starts the JMX Connector
+     * Starts the JMX connector server.
      */
     public void start() {
         try {
-            cs.start();
+            this.cs.start();
         } catch (IOException e) {
             logger.error("", e);
         }
+    }
+
+    /**
+     * Stops the JMX connector server.
+     */
+    public void stop() {
+        try {
+            this.cs.stop();
+        } catch (IOException e) {
+            logger.error("", e);
+        }
+    }
+
+    /**
+     * Returns the address of the connector server.
+     * 
+     * @return the address of this connector server, or null if it
+     * does not have one or the connector server could not been started.
+     */
+    public JMXServiceURL getAddress() {
+        if (this.cs == null) {
+            return null;
+        }
+        return this.cs.getAddress();
     }
 }

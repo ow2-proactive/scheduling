@@ -33,6 +33,7 @@ package org.ow2.proactive.resourcemanager.authentication;
 
 import java.security.KeyException;
 
+import javax.management.JMException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -171,8 +172,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     /**
      * {@inheritDoc}
      */
-    public String getJMXConnectorURL() {
-        return JMXMonitoringHelper.getDefaultJmxConnectorUrl() +
-            PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME.getValueAsString();
+    public String getJMXConnectorURL() throws JMException {
+        return JMXMonitoringHelper.getInstance().getAddress().toString();
     }
 }

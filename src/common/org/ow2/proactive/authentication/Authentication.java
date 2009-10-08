@@ -34,6 +34,7 @@ package org.ow2.proactive.authentication;
 import java.io.Serializable;
 import java.security.PublicKey;
 
+import javax.management.JMException;
 import javax.security.auth.login.LoginException;
 
 
@@ -62,10 +63,11 @@ public interface Authentication extends Loggable, Serializable {
     public PublicKey getPublicKey() throws LoginException;
 
     /**
-     * Return the JMX connector server URL used to contact this instance
+     * Return the JMX connector server URL used to contact this instance.
      *
-     * @return the JMX conector server URL for this instance
+     * @return the string representation of the JMX connector server URL
+     * @throws JMException if the JMX connector server could not be started
      */
-    public String getJMXConnectorURL();
+    public String getJMXConnectorURL() throws JMException;
 
 }
