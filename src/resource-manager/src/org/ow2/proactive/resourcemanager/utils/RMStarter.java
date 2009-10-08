@@ -51,6 +51,8 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -150,10 +152,18 @@ public class RMStarter {
             RMAuthentication auth = RMConnection.waitAndJoin(null);
             RMAdmin admin = auth.logAsAdmin(Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+            String nodeSourceName = NodeSource.DEFAULT_NAME;
+            int counter = 2;
+
             for (String deploymentDescriptor : deploymentDescriptors) {
                 byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
                     deploymentDescriptor));
-                admin.addNodes(NodeSource.DEFAULT_NAME, new Object[] { GCMDeploymentData });
+
+                admin.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(),
+                        new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
+
+                nodeSourceName = NodeSource.DEFAULT_NAME + counter;
+                counter++;
             }
 
             /*logger.info("(Once started, press 'e' to shutdown)");

@@ -46,7 +46,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
  * should register itself into the resource manager by calling {@link InfrastructureManager#registerAcquiredNode(Node)}<br>
  *
  * To define a new infrastructure manager
- * - define a way to add information about further node acquisition implementing {@link InfrastructureManager#addNodesAcquisitionInfo(Object...)}
+ * - define a way to add information about further node acquisition implementing {@link InfrastructureManager#configure(Object...)}
  * - define a way to acquire a single node from underlying infrastructure in {@link InfrastructureManager#acquireNode()}
  * - define a way to acquire all available nodes from the infrastructure in the method {@link InfrastructureManager#acquireAllNodes()}
  * - register available nodes in the resource manager using {@link InfrastructureManager#registerAcquiredNode(Node)}, so they till be taken into account.
@@ -63,7 +63,7 @@ public abstract class InfrastructureManager implements Serializable {
      * Do not initiate a real nodes deployment/acquisition as it's up to the
      * policy.
      */
-    public abstract void addNodesAcquisitionInfo(Object... parameters) throws RMException;
+    public abstract void configure(Object... parameters) throws RMException;
 
     /**
      * Asynchronous node acquisition request.
@@ -82,8 +82,7 @@ public abstract class InfrastructureManager implements Serializable {
      * @param node node to release
      * @throws RMException if any problems occurred
      */
-    // TODO forever should be set true by default
-    public abstract void removeNode(Node node, boolean forever) throws RMException;
+    public abstract void removeNode(Node node) throws RMException;
 
     /**
      * Sets an infrastructure node source

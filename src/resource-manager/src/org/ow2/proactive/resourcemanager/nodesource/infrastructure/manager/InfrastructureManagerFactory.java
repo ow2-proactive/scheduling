@@ -80,7 +80,7 @@ public class InfrastructureManagerFactory {
 
             Class<?> imClass = Class.forName(infrastructureType);
             im = (InfrastructureManager) imClass.newInstance();
-            im.addNodesAcquisitionInfo(infrastructureParameters);
+            im.configure(infrastructureParameters);
         } catch (ClassNotFoundException e) {
             throw new RMException(e);
         } catch (InstantiationException e) {

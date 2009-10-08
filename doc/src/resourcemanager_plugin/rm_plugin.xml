@@ -171,8 +171,7 @@
 					Resource Manager daemon.</para>  
 				</listitem>
 				<listitem><para>
-					<emphasis role="bold">[5] Add nodes</emphasis> - Add nodes to Resource Manager. Nodes can be deployed and added with a GCM deployment 
-					descriptor, or already deployed (running) nodes can be added using their URLs.</para>
+					<emphasis role="bold">[5] Add node</emphasis> - Add existing node to Resource Manager providing its URL.</para>
 				</listitem>
 				<listitem><para>
 					<emphasis role="bold">[6] Remove nodes</emphasis> - Remove nodes that are handled by Resource Manager</para>
@@ -335,49 +334,21 @@
 			and finally, remove the Node Source.</para></warning>
 			</para>
 		</section>
-		<section xml:id="rm_add_node"><info><title>Add nodes to a Node Source</title></info>
+		<section xml:id="rm_add_node"><info><title>Add node by URL</title></info>
 			<para>
-			You can add nodes to an existing Node Source:
+			You can add existing node to any Node Source by providing its URL:
 			</para>
-			<figure xml:id="rm_add_nodes_dialog"><info><title>RM add nodes dialog box</title></info>
+			<figure xml:id="rm_add_node_url_dialog"><info><title>Add Node by URL</title></info>
 				<mediaobject>
 				<imageobject>
-					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_add_node_dialog.png" format="PNG"/>
+					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_add_node_url.png" format="PNG"/>
 				</imageobject>
 				</mediaobject>
 			</figure>
-			<section xml:id="rm_add_node_url"><info><title>Add node by URL</title></info>
-				<figure xml:id="rm_add_node_url_dialog"><info><title>Add Node by URL</title></info>
-					<mediaobject>
-					<imageobject>
-						<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_add_node_url.png" format="PNG"/>
-					</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-				Choose a Node Source's name from your nodes sources list, and fill the node's URL to add. 
-				Node will be added and managed by the node source that you have chosen.
-				</para>
-			</section>
-			<section xml:id="rm_add_node_deployment_descriptor"><info><title>Add node by a deployment descriptor</title></info>
-				<figure xml:id="rm_add_node_GCM_dialog"><info><title>Add Node by GCM deployment descriptor</title></info>
-					<mediaobject>
-					<imageobject>
-						<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="resourcemanager_plugin/pics/rm_add_nodes_GCM_dialog.png" format="PNG"/>
-					</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-				Choose a Node Source's name from your node sources list, and choose a GCM deployment file to deploy. 
-				Resource Manager will perform deployment of your GCMD, and new nodes deployed are added to the selected Node Source.
-				For more information about GCM deployment, please refer to <xref linkend="RM_GCM"/>
-				</para>
-				<para>
-				<warning><para>When nodes are added by GCM deployment descriptor, it does not mean that they will be
-				acquired right away. It is true only if this node source uses static acquisition policy. Otherwise, nodes will be acquired
-				at the moment they are needed according to the node source policy.</para></warning>
-				</para>
-			</section>
+			<para>
+			Choose a Node Source's name from your nodes sources list, and fill the node's URL to add.
+			Node will be added and managed by the node source that you have chosen.
+			</para>
 		</section>
 		<section xml:id="rm_gui_remove_node"><info><title>Remove a node</title></info>
 			<figure xml:id="rm_del_node_dialog"><info><title>Node removal dialog</title></info>

@@ -113,9 +113,9 @@
       <command
             categoryId="org.ow2.proactive.resourcemanager.plugin.gui.connectionCategory"
             defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.AddNodesHandler"
-            description="Add nodes command"
+            description="Add node command"
             id="org.ow2.proactive.resourcemanager.plugin.addNodes"
-            name="Add nodes">
+            name="Add node">
       </command>
       <command
             categoryId="org.ow2.proactive.resourcemanager.plugin.gui.connectionCategory"
@@ -148,8 +148,8 @@
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
                icon="classes/org/ow2/proactive/resourcemanager/gui/icons/add_node.gif"
-               label="Add nodes"
-               tooltip="Add node by URL or several nodes by GCM deployment descriptor">
+               label="Add node"
+               tooltip="Add node by URL">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
@@ -200,8 +200,8 @@
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
                   icon="classes/org/ow2/proactive/resourcemanager/gui/icons/add_node.gif"
-                  label="Add nodes"
-                  tooltip="Add node by URL or several nodes by GCM deployment descriptor">
+                  label="Add node"
+                  tooltip="Add node by URL">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
@@ -266,8 +266,8 @@
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
                   icon="classes/org/ow2/proactive/resourcemanager/gui/icons/add_node.gif"
-                  label="Add nodes"
-                  tooltip="Add node by URL or several nodes by GCM deployment descriptor">
+                  label="Add node"
+                  tooltip="Add node by URL">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"

@@ -38,7 +38,7 @@ import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.dialog.AddNodeDialog;
+import org.ow2.proactive.resourcemanager.gui.dialog.AddNodeByURLDialog;
 
 
 public class AddNodesHandler extends AbstractHandler implements IHandler {
@@ -60,7 +60,7 @@ public class AddNodesHandler extends AbstractHandler implements IHandler {
     }
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        AddNodeDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell(), null);
+        AddNodeByURLDialog.showDialog(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell(), null);
         return null;
     }
 }

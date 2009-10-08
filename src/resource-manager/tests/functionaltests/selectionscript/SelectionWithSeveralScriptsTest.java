@@ -44,6 +44,7 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -93,8 +94,8 @@ public class SelectionWithSeveralScriptsTest extends FunctionalTest {
     public void action() throws Exception {
 
         RMTHelper.log("Deployment");
-
-        RMTHelper.deployDefault();
+        RMTHelper.createDefaultNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT_NAME);
 
         RMAdmin admin = RMTHelper.getAdminInterface();
 

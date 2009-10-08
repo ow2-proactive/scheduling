@@ -117,7 +117,7 @@ public class RemoveNodeDialog extends Dialog {
                         if (removeDownNodes && node.getState() != NodeState.DOWN) {
                             continue;
                         }
-                        RMStore.getInstance().getRMAdmin().removeNode(node.getName(), preemptive, true);
+                        RMStore.getInstance().getRMAdmin().removeNode(node.getName(), preemptive);
                     }
                 } catch (RMException e) {
                     MessageDialog.openError(parent, "Access denied", e.getMessage());

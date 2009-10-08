@@ -37,8 +37,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.rmi.dgc.VMID;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -52,7 +50,6 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
@@ -87,7 +84,7 @@ public class GCMInfrastructure extends InfrastructureManager {
     /** registered nodes number */
     protected int nodesCount = 0;
     /** deployment data list */
-    protected List<DeploymentData> deploymentData = new LinkedList<DeploymentData>();
+    protected DeploymentData deploymentData = new DeploymentData();
     /** configurable path to a deployment descriptor */
     @Configurable(fileBrowser = true)
     protected File descriptor;
@@ -134,7 +131,7 @@ public class GCMInfrastructure extends InfrastructureManager {
      * Do not initiate a real nodes deployment/acquisition as it's up to the
      * policy.
      */
-    public void addNodesAcquisitionInfo(Object... parameters) throws RMException {
+    public void configure(Object... parameters) throws RMException {
         if (parameters == null) {
             // nothing to add
             return;
@@ -144,9 +141,7 @@ public class GCMInfrastructure extends InfrastructureManager {
             throw new RMException("Incorrect parameters for nodes acqusition");
         }
 
-        DeploymentData dd = new DeploymentData();
-        dd.data = (byte[]) parameters[0];
-        deploymentData.add(dd);
+        deploymentData.data = (byte[]) parameters[0];
     }
 
     /**
@@ -163,34 +158,26 @@ public class GCMInfrastructure extends InfrastructureManager {
      */
     public void acquireAllNodes() {
         logger.debug("Acquire all nodes request");
-        for (DeploymentData dd : deploymentData) {
-            if (!dd.deployed) {
-                try {
-                    logger.debug("Deploying nodes");
-                    deployGCMD(convertGCMdeploymentDataToGCMappl(dd.data, null));
-                    dd.deployed = true;
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                }
-            } else {
-                logger.debug("Nodes have already been deployed");
+        if (!deploymentData.deployed) {
+            try {
+                logger.debug("Deploying nodes");
+                deployGCMD(convertGCMdeploymentDataToGCMappl(deploymentData.data, null));
+                deploymentData.deployed = true;
+            } catch (Exception e) {
+                logger.error(e.getMessage());
             }
+        } else {
+            logger.warn("Nodes have already been deployed");
         }
     }
 
     /**
      * Remove the node from underlying infrastructure. Terminates proactive runtime if there is no more nodes.
      * @param node node to release
-     * @param forever if true removes the node and associated information so that it will be no possible to
-     * deploy node again. It is not supported by this infrastructure manager.
      * @throws RMException if any problems occurred
      */
-    public void removeNode(Node node, boolean forever) throws RMException {
+    public void removeNode(Node node) throws RMException {
         try {
-
-            if (forever) {
-                logger.warn("Cannot remove node forever in GCM infrastructure");
-            }
 
             logger.info("Terminating the node " + node.getNodeInformation().getName());
             if (!isThereNodesInSameJVM(node)) {
@@ -209,19 +196,10 @@ public class GCMInfrastructure extends InfrastructureManager {
             nodesCount--;
 
             if (nodesCount == 0) {
-                if (forever) {
-                    // last node released
-                    // forever is set to true, so remove all deployment
-                    // data in order not to redeploy nodes in the future
-                    deploymentData.clear();
-                } else {
-                    // last node release - clear deployment status
-                    // for standard GCM it's the only one possible granularity
-                    for (DeploymentData dd : deploymentData) {
-                        logger.debug("Last node was removed");
-                        dd.deployed = false;
-                    }
-                }
+                // last node release - clear deployment status
+                // for standard GCM it's the only one possible granularity
+                logger.debug("Last node was removed");
+                deploymentData.deployed = false;
             }
         } catch (Exception e) {
             throw new RMException(e);

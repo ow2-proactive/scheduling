@@ -36,7 +36,6 @@ import junit.framework.Assert;
 
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -45,6 +44,9 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
 import functionalTests.FunctionalTest;
@@ -83,6 +85,10 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         int pingFrequency = 5000;
         RMAdmin admin = RMTHelper.getAdminInterface();
+
+        admin.createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class.getName(), null,
+                StaticPolicy.class.getName(), null);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT_NAME);
 
         admin.setDefaultNodeSourcePingFrequency(pingFrequency);
 

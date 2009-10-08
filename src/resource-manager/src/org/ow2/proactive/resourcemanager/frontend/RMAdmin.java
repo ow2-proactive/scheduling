@@ -68,8 +68,9 @@ public interface RMAdmin extends RMUser, Serializable {
     /**
      * Set the ping frequency to the default node source
      * @param frequency the frequency to set to the node source in ms.
+     * @throws RMException if the default node source doesn't exist
      */
-    public void setDefaultNodeSourcePingFrequency(int frequency);
+    public void setDefaultNodeSourcePingFrequency(int frequency) throws RMException;
 
     /**
      * Set the ping frequency to a node source
@@ -110,15 +111,6 @@ public interface RMAdmin extends RMUser, Serializable {
             throws RMException;
 
     /**
-     * Adds nodes to the specified node source.
-     *
-     * @param sourceName a name of the node source
-     * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
-     * @return true if new nodes is added successfully, false otherwise
-     */
-    public BooleanWrapper addNodes(String sourceName, Object... parameters);
-
-    /**
      * Add an already deployed node to the default static nodes source of the RM
      * @param nodeUrl URL of the node to add.
      * @return true if new node is added successfully, false otherwise
@@ -141,16 +133,6 @@ public interface RMAdmin extends RMUser, Serializable {
      * @param preempt if true remove the node immediately without waiting while it will be freed.
      */
     public void removeNode(String nodeUrl, boolean preempt);
-
-    /**
-     * Removes a node from the RM.
-     *
-     * @param nodeUrl URL of the node to remove.
-     * @param preempt if true remove the node immediately without waiting while it will be freed.
-     * @param forever if true remove the from a dynamic node source forever. Otherwise node source
-     * is able to add this node to the RM again once it is needed. See {@link NodeSourcePolicy}.
-     */
-    public void removeNode(String nodeUrl, boolean preempt, boolean forever);
 
     /**
      * Remove a node source from the RM.

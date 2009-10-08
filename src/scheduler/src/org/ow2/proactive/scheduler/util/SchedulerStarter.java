@@ -58,6 +58,9 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
@@ -176,14 +179,16 @@ public class SchedulerStarter {
                             //get the proxy on the Resource Manager
                             imp = ResourceManagerProxy.getProxy(uri);
 
-                            //add the local nodes
+                            //creating default node source
                             RMAdmin rmAdmin = rmAuth.logAsAdmin(Credentials
                                     .getCredentials(PAResourceManagerProperties
                                             .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
                                                     .getValueAsString())));
                             byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
                                 deploymentFile));
-                            rmAdmin.addNodes("Default", new Object[] { GCMDeploymentData });
+                            rmAdmin.createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class
+                                    .getName(), new Object[] { GCMDeploymentData }, StaticPolicy.class
+                                    .getName(), null);
 
                             logger.info("Resource Manager created on " +
                                 Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(imp)));

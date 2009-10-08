@@ -136,7 +136,7 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMAdmin#setDefaultNodeSourcePingFrequency(int)
      */
-    public void setDefaultNodeSourcePingFrequency(int frequency) {
+    public void setDefaultNodeSourcePingFrequency(int frequency) throws RMException {
         this.rmcore.setPingFrequency(frequency);
     }
 
@@ -176,13 +176,6 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
     /**
      * {@inheritDoc}
      */
-    public BooleanWrapper addNodes(String sourceName, Object... parameters) {
-        return rmcore.addNodes(sourceName, parameters);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public BooleanWrapper addNode(String nodeUrl) {
         return rmcore.addNode(nodeUrl);
     }
@@ -201,19 +194,7 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
      * @param preempt if true remove the node immediately without waiting while it will be freed.
      */
     public void removeNode(String nodeUrl, boolean preempt) {
-        removeNode(nodeUrl, preempt, false);
-    }
-
-    /**
-     * Removes a node from the RM.
-     *
-     * @param nodeUrl URL of the node to remove.
-     * @param preempt if true remove the node immediately without waiting while it will be freed.
-     * @param forever if true remove the from a dynamic node source forever. Otherwise node source
-     * is able to add this node to the RM again once it is needed. See {@link NodeSourcePolicy}.
-     */
-    public void removeNode(String nodeUrl, boolean preempt, boolean forever) {
-        this.rmcore.removeNode(nodeUrl, preempt, forever);
+        this.rmcore.removeNode(nodeUrl, preempt);
     }
 
     /**

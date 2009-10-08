@@ -258,7 +258,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
                 // 10secs delay at worse should be enough for the terminate request to be sent in time
                 int delay = Math.max(refreshTime, 10);
                 if ((dt + delay) % releaseCycle <= delay) {
-                    nodeSource.getRMCore().removeNode(nodeUrl, super.preemptive, true);
+                    nodeSource.getRMCore().removeNode(nodeUrl, super.preemptive);
                     diff--;
                     if (diff == 0) {
                         break;

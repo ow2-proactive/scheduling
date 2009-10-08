@@ -33,7 +33,6 @@
 package org.ow2.proactive.resourcemanager.utils.adminconsole;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -327,13 +326,6 @@ public class AdminController {
         addNodesOpt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(addNodesOpt);
 
-        Option gcmdOpt = new Option("gcmd", "gcmdeploy", true, control +
-            "Add nodes by GCM deployment descriptor files");
-        gcmdOpt.setArgName("GCMD files");
-        gcmdOpt.setRequired(false);
-        gcmdOpt.setArgs(Option.UNLIMITED_VALUES);
-        actionGroup.addOption(gcmdOpt);
-
         Option removeNodesOpt = new Option("d", "removenodes", true, control + "Remove nodes by their URLs");
         removeNodesOpt.setArgName("node URLs");
         removeNodesOpt.setRequired(false);
@@ -447,25 +439,6 @@ public class AdminController {
             } else {
                 for (String nUrl : nodesURls) {
                     AdminRMModel.addnode(nUrl, null);
-                }
-            }
-        } else if (cmd.hasOption("gcmdeploy")) {
-            String[] gcmdTab = cmd.getOptionValues("gcmdeploy");
-
-            for (String gcmdf : gcmdTab) {
-                File gcmdFile = new File(gcmdf);
-                if (!(gcmdFile.exists() && gcmdFile.isFile() && gcmdFile.canRead())) {
-                    model.error("Cannot read GCMDeployment descriptor : " + gcmdf);
-                }
-            }
-            if (cmd.hasOption("ns")) {
-                String nsName = cmd.getOptionValue("ns");
-                for (String desc : gcmdTab) {
-                    AdminRMModel.gcmdeploy(desc, nsName);
-                }
-            } else {
-                for (String desc : gcmdTab) {
-                    AdminRMModel.gcmdeploy(desc, null);
                 }
             }
         } else if (cmd.hasOption("removenodes")) {

@@ -12,6 +12,9 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
 import functionalTests.FunctionalTest;
@@ -38,6 +41,9 @@ public class TestConcurrentUsers extends FunctionalTest {
         String node1Name = "node1";
         String node1URL = "//" + hostName + "/" + node1Name;
         RMTHelper.createNode(node1Name);
+        admin.createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class.getName(), null,
+                StaticPolicy.class.getName(), null);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT_NAME);
         admin.addNode(node1URL);
 
         // waiting for node adding event

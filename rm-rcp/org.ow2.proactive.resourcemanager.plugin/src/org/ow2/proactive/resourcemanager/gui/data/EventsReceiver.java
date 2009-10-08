@@ -165,8 +165,6 @@ public class EventsReceiver implements InitActive, RMEventListener {
             case NODESOURCE_REMOVED:
                 model.removeNodeSource(event);
                 break;
-            case NODESOURCE_NODES_ACQUISTION_INFO_ADDED:
-                break;
         }
     }
 

@@ -178,7 +178,7 @@ public class EC2Infrastructure extends InfrastructureManager {
      * @throws RMException
      *             when the configuration could not be set
      */
-    public void addNodesAcquisitionInfo(Object... parameters) throws RMException {
+    public void configure(Object... parameters) throws RMException {
 
         /** parameters look fine */
         if (parameters != null && parameters.length == 5) {
@@ -221,7 +221,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     /**
      * {@inheritDoc}
      */
-    public void removeNode(Node node, boolean forever) throws RMException {
+    public void removeNode(Node node) throws RMException {
 
         synchronized (this.ec2d) {
 

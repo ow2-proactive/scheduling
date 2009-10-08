@@ -32,17 +32,15 @@
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 
 
 /**
  *
- * A policy defined static nodes acquisition. Once nodes were added to a node source
- * it initiates nodes acquisition. Releases nodes at node source shutdown or by user request.
+ * A policy defined static nodes acquisition.
  *
  */
-public class StaticPolicy extends RMAwareNodeSourcePolicy {
+public class StaticPolicy extends NodeSourcePolicy {
 
     /**
      * Configure a policy with given parameters.
@@ -55,12 +53,6 @@ public class StaticPolicy extends RMAwareNodeSourcePolicy {
      * Activates static policy. Register a listener in RMMonitoring
      */
     public BooleanWrapper activate() {
-        BooleanWrapper activationStatus = super.activate();
-
-        if (!activationStatus.booleanValue()) {
-            return activationStatus;
-        }
-
         acquireAllNodes();
         return new BooleanWrapper(true);
     }
@@ -70,17 +62,6 @@ public class StaticPolicy extends RMAwareNodeSourcePolicy {
      */
     public String getDescription() {
         return "Static nodes acquisition.";
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
-     */
-    public void nodeSourceEvent(RMNodeSourceEvent event) {
-        switch (event.getEventType()) {
-            case NODESOURCE_NODES_ACQUISTION_INFO_ADDED:
-                acquireAllNodes();
-                break;
-        }
     }
 
     /**

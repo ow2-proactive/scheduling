@@ -145,7 +145,7 @@ public class PluginDescriptor implements Serializable {
             Configurable configurable = field.getMeta();
             if (configurable.fileBrowser()) {
                 try {
-                    resultParams.add(FileToBytesConverter.convertFileToByteArray(new File(value.toString())));
+                    value = FileToBytesConverter.convertFileToByteArray(new File(value.toString()));
                 } catch (IOException e) {
                     throw new RMException("Cannot load file", e);
                 }
@@ -154,8 +154,7 @@ public class PluginDescriptor implements Serializable {
             } else if (configurable.password() && loginData) {
                 Credentials creds;
                 try {
-                    // TODO we need to connect to scheduler!
-                    // not to RM. HOw to do that without introducing scheduler dependency
+                    // TODO we need to connect to scheduler! not to RM.
                     String login = resultParams.remove(resultParams.size() - 1).toString();
                     String url = resultParams.get(resultParams.size() - 1).toString();
                     String pass = value.toString();

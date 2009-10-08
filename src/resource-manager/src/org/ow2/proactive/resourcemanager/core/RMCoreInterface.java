@@ -100,15 +100,6 @@ public interface RMCoreInterface {
     public BooleanWrapper addNode(String nodeUrl, String sourceName);
 
     /**
-     * Adds nodes to the specified node source.
-     *
-     * @param sourceName a name of the node source
-     * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
-     * @return true if new nodes is added successfully, false otherwise
-     */
-    public BooleanWrapper addNodes(String sourceName, Object[] parameters);
-
-    /**
      * Remove a node from the Core and from its node source.
      *
      * If the node is down, node is just removed from the Core, and nothing is asked to its related NodeSource,
@@ -119,11 +110,9 @@ public interface RMCoreInterface {
      * <BR><BR>
      * @param nodeUrl URL of the node to remove.
      * @param preempt if true remove the node immediately without waiting while it will be freed.
-     * @param forever forever if true remove the from a dynamic node source forever. Otherwise node source
-     * is able to add this node to the RM again once it is needed. See {@link NodeSourcePolicy}
      *
      */
-    public void removeNode(String nodeUrl, boolean preempt, boolean forever);
+    public void removeNode(String nodeUrl, boolean preempt);
 
     /**
      * Removes "number" of nodes from specified node source
@@ -234,8 +223,9 @@ public interface RMCoreInterface {
     /**
      * Set the ping frequency to the default node source
      * @param frequency the frequency to set to the node source in ms.
+     * @throws RMException if there is no default node source.
      */
-    public void setPingFrequency(int frequency);
+    public void setPingFrequency(int frequency) throws RMException;
 
     /**
      * Set the ping frequency to a node source

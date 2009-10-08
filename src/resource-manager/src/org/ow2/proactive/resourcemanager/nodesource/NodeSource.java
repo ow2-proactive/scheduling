@@ -156,29 +156,6 @@ public class NodeSource implements InitActive {
     }
 
     /**
-     * Adds nodes to the node source using infrastructure manager. Notifies node source policy
-     * to handle changes.
-     *
-     * @param parameters information necessary to deploy nodes. Specific to each infrastructure.
-     */
-    public BooleanWrapper addNodes(Object... parameters) {
-        if (toShutdown) {
-            throw new AddingNodesException("[" + name +
-                "] addNodes request discarded because node source is shutting down");
-        }
-
-        try {
-            infrastructureManager.addNodesAcquisitionInfo(parameters);
-            rmcore.getMonitoring().nodeSourceEvent(
-                    new RMNodeSourceEvent(this, RMEventType.NODESOURCE_NODES_ACQUISTION_INFO_ADDED));
-
-            return new BooleanWrapper(true);
-        } catch (RMException e) {
-            throw new AddingNodesException(e.getMessage());
-        }
-    }
-
-    /**
      * Updates internal node source structures.
      */
     private void internalAddNode(Node node) throws RMException {
@@ -228,7 +205,7 @@ public class NodeSource implements InitActive {
             if (result.booleanValue()) {
                 logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
                 // just removing it from down nodes list
-                removeNode(nodeUrl, false);
+                removeNode(nodeUrl);
             }
         } else if (nodes.containsKey(nodeUrl)) {
             // adding a node which exists in node source
@@ -439,10 +416,8 @@ public class NodeSource implements InitActive {
      * Removes the node from the node source.
      *
      * @param nodeUrl the url of the node to be released
-     * @param forever if true removes the node from underlying infrastructure forever without
-     * an ability to re-acquire node in the future
      */
-    public BooleanWrapper removeNode(String nodeUrl, boolean forever) {
+    public BooleanWrapper removeNode(String nodeUrl) {
 
         //verifying if node is already in the list,
         //node could have fallen between remove request and the confirm
@@ -451,7 +426,7 @@ public class NodeSource implements InitActive {
             Node node = nodes.remove(nodeUrl);
             try {
                 closeDataSpaceConfiguration(node);
-                infrastructureManager.removeNode(node, forever);
+                infrastructureManager.removeNode(node);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage());
             }

@@ -40,19 +40,15 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.globus.replica.catalog.GRCContext.Authentication;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.console.Command;
 import org.ow2.proactive.utils.console.ConsoleModel;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
@@ -365,33 +361,6 @@ public class AdminRMModel extends ConsoleModel {
     private void removenode_(String nodeURL, boolean preempt) {
         rm.removeNode(nodeURL, preempt);
         print("Nodes '" + nodeURL + "' removal request sent to Resource Manager");
-    }
-
-    public static void gcmdeploy(String fileName, String nodeSourceName) {
-        getModel().checkIsReady();
-        getModel().gcmdeploy_(fileName, nodeSourceName);
-    }
-
-    private void gcmdeploy_(String fileName, String nodeSourceName) {
-        try {
-            File gcmDeployFile = new File(fileName);
-            BooleanWrapper result;
-            if (nodeSourceName != null) {
-                result = rm.addNodes(nodeSourceName, new Object[] { FileToBytesConverter
-                        .convertFileToByteArray(gcmDeployFile) });
-            } else {
-                result = rm.addNodes(NodeSource.DEFAULT_NAME, new Object[] { FileToBytesConverter
-                        .convertFileToByteArray(gcmDeployFile) });
-            }
-
-            if (result.booleanValue()) {
-                print("GCM deployment '" + fileName + "' request sent to Resource Manager");
-            }
-        } catch (IOException e) {
-            handleExceptionDisplay("Error while load GCMD file '" + fileName, e);
-        } catch (AddingNodesException e) {
-            handleExceptionDisplay(e.getMessage(), e);
-        }
     }
 
     public static void addnode(String nodeName, String nodeSourceName) {

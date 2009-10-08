@@ -70,7 +70,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * Do not initiate a real nodes deployment/acquisition as it's up to the
      * policy.
      */
-    public void addNodesAcquisitionInfo(Object... parameters) throws RMException {
+    public void configure(Object... parameters) throws RMException {
         if (parameters == null) {
             // nothing to do
             return;
@@ -138,23 +138,16 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * Marks corresponding deployment data as undeployed.
      *
      * @param node node to release
-     * @param forever if true removes the node and associated information so that it will be no possible to
-     * deploy node again.
      * @throws RMException if any problems occurred
      */
-    public void removeNode(Node node, boolean forever) throws RMException {
-        super.removeNode(node, false);
+    public void removeNode(Node node) throws RMException {
+        super.removeNode(node);
 
         String hostName = URIBuilder.getHostNameFromUrl(node.getNodeInformation().getURL());
         DeploymentData dd = hosts.get(hostName);
         if (dd != null) {
-            if (forever) {
-                logger.info("Host " + hostName + " removed");
-                hosts.remove(hostName);
-            } else {
-                logger.info("Host " + hostName + " released");
-                dd.deployed = false;
-            }
+            logger.info("Host " + hostName + " released");
+            dd.deployed = false;
         } else {
             logger.error("Cannot find deploymeny data for host " + hostName);
         }

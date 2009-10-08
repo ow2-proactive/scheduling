@@ -33,7 +33,6 @@ package functionaltests.nodesource;
 
 import java.io.File;
 
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -71,7 +70,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
-    protected void createDefaultNodeSource(String sourceName) throws Exception {
+    protected void createNodeSourceWithNodes(String sourceName) throws Exception {
 
         // creating node source
         RMTHelper.getAdminInterface().createNodesource(sourceName,
@@ -82,15 +81,5 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         }
-    }
-
-    protected BooleanWrapper addNodes(String sourceName) throws Exception {
-        BooleanWrapper result = RMTHelper.getAdminInterface().addNodes(sourceName,
-                new Object[] { GCMDeploymentData, hostsListData });
-        if (result.booleanValue()) {
-            // waiting for adding nodes acquisition info event
-            RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_NODES_ACQUISTION_INFO_ADDED, sourceName);
-        }
-        return result;
     }
 }

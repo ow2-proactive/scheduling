@@ -98,24 +98,6 @@ admin.shutdown(true); //performs preemptive shutdown	</programlisting>
 String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config/rm/deployment/Local4JVMDeployment.xml";
 RMFactory.startLocal(Collections.singleton(gcmDeployFile));
 		</programlisting>
-		<para>
-		In order to deploy nodes to existing Resource Manager, RMAdmin interface should be acquired
-		as in example above and then deployment can be performed:
-		</para>
-		<programlisting language="java">
-//create File object
-File GCMDFile = new File("GCMDeployment.xml");
-       
-//put content of GCMD file in a byte array
-byte[] GCMDContent = FileToBytesConverter.convertFileToByteArray(GCMDFile);
-       
-//launch deployment defined in GCMD
-admin.addNodes(sourceName, new Object[] { GCMDContent });</programlisting>
-		<para>
-		This example asks RMAdmin to perform deployment by passing to it a byte array containing a GCMD. It is not possible to
-		directly pass the File object to RMAdmin, since RMAdmin active object can run on another JVM, a JVM different
-		from the JVM that executes the code above. So, File is read by the JVM that asks the deployment and its content is transfered to the RM's active object.
-		</para>
 	</section>
 	<section xml:id="RM_API_add_node"><info><title>Add an already deployed node</title></info>
 	<para>

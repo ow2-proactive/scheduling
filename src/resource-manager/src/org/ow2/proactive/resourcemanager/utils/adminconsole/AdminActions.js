@@ -26,14 +26,6 @@ function removenode(nodeURL,preemptively){
     return AdminRMModel.removenode(nodeURL,preemptively);
 }
 
-function gcmdeploy(gcmdFile, nodeSourceName){
-	if (nodeSourceName==undefined){
-		nodeSourceName = null;
-		println("Node Source will be the default one as it is not set");
-	}
-    return AdminRMModel.gcmdeploy(gcmdFile, nodeSourceName);
-}
-
 function createns(nsName,infrastructure,policy){
 	return AdminRMModel.createns(nsName,infrastructure,policy);
 }

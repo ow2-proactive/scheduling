@@ -29,11 +29,14 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 import functionalTests.FunctionalTest;
@@ -113,6 +116,14 @@ public class RMTHelper {
      */
     public static Node createNode(String nodeName) throws IOException, NodeException {
         return createNode(nodeName, null);
+    }
+
+    public static void createDefaultNodeSource() throws Exception {
+        RMFactory.setOsJavaProperty();
+        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
+        RMAdmin admin = getAdminInterface();
+        admin.createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class.getName(),
+                new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
     }
 
     /**
@@ -267,18 +278,6 @@ public class RMTHelper {
             connectAsAdmin();
         }
         return admin;
-    }
-
-    /**
-     * Deploy the default GCMD to RM's default node source, and add nodes to the RM.
-     * @throws Exception if the deployment fails.
-     */
-    public static void deployDefault() throws Exception {
-        RMFactory.setOsJavaProperty();
-        byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
-        RMAdmin admin = getAdminInterface();
-        admin.addNodes(NodeSource.DEFAULT_NAME, GCMDeploymentData);
-
     }
 
     /**

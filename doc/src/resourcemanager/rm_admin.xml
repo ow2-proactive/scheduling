@@ -386,13 +386,6 @@ user2:user
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">-gcmd or--gcmdeploy</emphasis>, followed a by a list of GCM deployment files, in order to deploy GCM Deployment descriptors.
-				This argument can be used with <emphasis role="italics">-ns or --nodesource</emphasis> argument, followed by a name of an existing node source,
-				to add nodes on a specific node source.
-			</para>			
-		</listitem>
-		<listitem>
-			<para>
 				<emphasis role="italics">-ln or--listnodes</emphasis>; list nodes handled by Resource Manager. Display is: NODESOURCE HOSTNAME STATE NODE_URL.
 			</para>			
 		</listitem>
@@ -434,12 +427,6 @@ user2:user
 		<listitem>
 			<para>
 				<emphasis role="italics">removenode(nodeURL,preempt)</emphasis>; removes the given node (parameter is a string representing the node URL, node is removed immediately if second parameter is true.
-			</para>
-		</listitem>
-		<listitem>
-			<para>
-				<emphasis role="italics">gcmdeploy(gcmdFile,nsName)</emphasis>; deploys a GCM deployment descriptor to the given node source
-				(parameter is a string representing the a GCMD file, and a string representing the node source in which nodes will be added).
 			</para>
 		</listitem>
 		<listitem>
@@ -499,10 +486,6 @@ removens("my_node_source",true);
 
 /* create a new node source */
 createns("my_node_source");
-
-/*deploy computing nodes with a GCM deployment descriptor,
-and add nodes to the created node source */
-gcmdeploy("myGCMD.xml","my_node_source");
 
 /* wait for a while */
 java.lang.Thread.sleep(10000);
