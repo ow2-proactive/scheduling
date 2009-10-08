@@ -126,7 +126,7 @@ public abstract class JavaExecutable extends Executable {
                     f.set(this, e.getValue());
                 }
             } catch (Exception ex) {
-                // nothing to do, no automatic assignment can be done
+                // nothing to do, no automatic assignment can be done for this field
             }
         }
     }

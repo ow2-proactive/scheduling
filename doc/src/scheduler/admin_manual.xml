@@ -146,9 +146,13 @@ PASchedulerProperties.updateProperties("your_property_file");
 			</para>
 			<section xml:id="PASchedulerProperties"><info><title>ProActive Scheduler properties</title></info>
 				<para>
-					<emphasis>Note: </emphasis> some properties require a file path. File path can be given relative to the Scheduler home directory
+					<emphasis>Note1: </emphasis> some properties require a file path. File path can be given relative to the Scheduler home directory
 					(i.e. to the application root directory) OR with an absolute path. Also note that each property can be overridden by
 					using the JVM properties when starting the Scheduler. (i.e. scheduler-start[.bat] -Dpa.scheduler.core.timeout=1000)
+				</para>
+				<para>
+					<emphasis>Note2: </emphasis> the main properties file could be found at
+					'config/scheduler/settings.ini'
 				</para>
 				<para>
 					<emphasis>Scheduler properties</emphasis>
@@ -264,6 +268,54 @@ PASchedulerProperties.updateProperties("your_property_file");
 							(default is 2, so one retry)
 						</para>
 					</listitem>
+				</itemizedlist>
+				<para>
+					<emphasis>DataSpaces properties</emphasis>
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.dataspace.defaultinputurl</emphasis>:
+							Default INPUT space URL. Used to define INPUT space of each job that does
+							not define an INPUT space.
+							This URL can be HTTP, FTP, file system provided by ProActive : PAPRMI, ...
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.dataspace.defaultinputurl.localpath</emphasis>:
+							Default INPUT space path. Used to define the same INPUT space but with
+							a local (faster) access (if possible).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.dataspace.defaultinputurl.hostname</emphasis>:
+							Host name from which the input localpath is accessible
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.dataspace.defaultoutputurl</emphasis>:
+							Default OUTPUT space URL. Used to define OUTPUT space of each job that does
+							not define an OUTPUT space.
+							This URL can be, FTP, file system provided by ProActive : PAPRMI, ... and cannot be HTTP
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.dataspace.defaultoutputurl.localpath</emphasis>:
+							Default OUTPUT space path. Used to define the same OUTPUT space but with
+							a local (faster) access (if possible).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.dataspace.defaultoutputurl.hostname</emphasis>:
+							Host name from which the output localpath is accessible
+						</para>
+					</listitem>
+
 				</itemizedlist>
 				<para>
 					<emphasis>Logs properties</emphasis>
@@ -561,7 +613,7 @@ JobId myJobId = scheduler.submit(job);
 					The admin Scheduler controller is an interface which allows to administer the ProActive Scheduler without the
 					java API. It is also possible to see exceptions coming from the scheduler to know what happened.
 					To start a admin controller, run the <emphasis>scheduler-admin[.bat]</emphasis>
-					script in 'unix/[os]/' directory. It works in the same manner as the user controller (<xref linkend="scheduler_controller"/>)
+					script in 'bin/[os]/' directory. It works in the same manner as the user controller (<xref linkend="scheduler_controller"/>)
 					but some administration functions have been added. Note that the admin controller uses administrator rights to allow
 					the connection to the scheduler.
 				</para>
@@ -666,6 +718,68 @@ AdminSchedulerInterface scheduler = auth.logAsAdmin(Credentials.getCredentials()
 scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 				</programlisting>
 			</section>
+		</section>
+		<section xml:id="scheduler_dataspaces_admin"><info><title>Configuring DataSpaces</title></info>
+			<para>
+				The only thing to configure in the DataSpace are the default INPUT and OUTPUT spaces.
+				If not configured, it will use the default temporary directory of the system.
+				To the default tmp dir is appended the 'defaultinput' and 'defaultoutput' directories.
+				In each of those last directories will be append the username of the job owner that will
+				be the default dataSpace for a particular user job.
+			</para>
+			<para>
+				For example, to set the default INPUT space of the scehduler, just set the 3 following properties:
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis>pa.scheduler.dataspace.defaultinputurl=http://myFileServer.myCompagny.com/files</emphasis>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>#pa.scheduler.dataspace.defaultinputurl.localpath</emphasis>
+							leave it commented for this example.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>#pa.scheduler.dataspace.defaultinputurl.hostname</emphasis>
+							leave it commented for this example.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				It is also possible to set a remote files system as a server of files thanks to the ProActive
+				provider server. In this new example, just locate the path to be served and start the ProActive
+				provider server : <emphasis>PAProviderServer.bat D:\scheduling\outputSpace myOutput</emphasis>.
+				The first argument is the absolute path via the root space directory, the second one is
+				the name of the server (could be usefull to start more than one server on the same host).
+			</para>
+			<para>
+				Once launched, the server will retrieve an URL of the form :
+				<emphasis>paprmi://toto.company.com:1099/myOutput?proactive_vfs_provider_path=/</emphasis>. Just put this
+				URL in the scheduler settings :
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis>pa.scheduler.dataspace.defaultoutputurl=paprmi://toto.company.com:1099/myOutput?proactive_vfs_provider_path=/</emphasis>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>pa.scheduler.dataspace.defaultoutputurl.localpath=D:\scheduling\outputSpace</emphasis>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>pa.scheduler.dataspace.defaultoutputurl.hostname=toto</emphasis>
+							this value allow a task executed on 'toto' to handle files using the direct access (localpath above).
+							This could be great for performance issues.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
 		</section>
 		<section xml:id="scheduler_JMX_admin"><info><title>Connecting to JMX as administrator</title></info>
 			
@@ -794,7 +908,7 @@ public class PriorityPolicy implements PolicyInterface {
 		    <figure xml:id="scheduler_crypto_pic"><info><title>Credentials encryption</title></info>
 		      <mediaobject>
 			<imageobject>
-			  <imagedata width="100%" align="center" fileref="scheduler/pics/schedulerCrypto.png" format="PNG"/>
+			  <imagedata width="60%" align="center" fileref="scheduler/pics/schedulerCrypto.png" format="PNG"/>
 			</imageobject>
 		      </mediaobject>
 		    </figure>		  

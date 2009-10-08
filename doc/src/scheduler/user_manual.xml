@@ -74,11 +74,6 @@
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>description</emphasis> (optional) - human readable description of the job.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
 							<emphasis>variables</emphasis> (optional) - variables which can be reused throughout the descriptor file.
 							Inside this tag, each variable can be reused (even in another following variable definition)
 							by using the syntax ${name_of_variable}.
@@ -86,6 +81,11 @@
 							For instance, if the JVM that starts the Job parser (JobFactory)
 							has been started with the option -Dtoto=helloWorld, the variable ${toto} in the XML descriptor file would have 'helloWorld' as value.
 							This way is not commonly used but can be very useful to manage your relative path.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>description</emphasis> (optional) - human readable description of the job.
 						</para>
 					</listitem>
 					<listitem>
@@ -101,6 +101,22 @@
 							<emphasis>JobClasspath</emphasis> (optional) - equivalent to the Java classpath.
 							All classes in this path can be loaded by
 							Java tasks contained in this job. The jobClasspath can either contain class directories or jar files.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>inputSpace</emphasis> (optional) - URL that define the INPUT space of the job.
+							The INPUT space URL represents an abstract (or real) link to a real dataSpace.
+							It is used for data transfer and offers a way to get files to be computed
+							on the task execution side. (see <xref linkend="Dataspace" /> for details)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>outputSpace</emphasis> (optional) - URL that define the OUTPUT space of the job.
+							The OUTPUT space URL represents an abstract (or real) link to a real dataSpace.
+							It is used for data transfer and offers a way to put produced files from the task
+							execution side to this OUTPUT space. (see <xref linkend="Dataspace" /> for details)
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -143,7 +159,7 @@
 			<para>
 				Job parameters created through the Java API are identical to those created through
 				XML files (see <xref linkend="Create_job_xml"/>).
-				The example below creates a TaskFlow job (works also with ProActive jobs) using the Java Scheduler API and sets some parameters for the job:
+				The example below creates a TaskFlow job using the Java Scheduler API and sets some parameters for the job:
 			</para>
 <!--			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/taskflow_params.snip"/></textobject></programlisting>-->
 			<programlisting language="java">
@@ -262,7 +278,7 @@ private int bar;
 private String test;
 
 @Override
-public void init(Map&lt;String, Object&gt; args) {
+public void init(Map&lt;String, Serializable&gt; args) {
 	foo = (Boolean)args.get("foo");
 	bar = (Integer)args.get("bar");
 	test = args.get("test");
@@ -278,10 +294,13 @@ private boolean foo;
 private int bar;
 private String test;
 
+//1
 @Override
-public void init(Map&lt;String, Object&gt; args) {
+public void init(Map&lt;String, Serializable&gt; args) {
 	super.init(args);
 }
+//2
+//commenting from 1 to 2 is also the same of course
 					</programlisting>
 				</para>
 				<para>
@@ -301,6 +320,7 @@ public Serializable execute(TaskResult... results) throws Throwable {
 	tResult2 = results[0];
 	//TaskResult
 	tResult3 = results[1];
+	//...
 }
 					</programlisting>
 				</para>
@@ -705,6 +725,28 @@ task2.setGenerationScript(gscript);
 					</listitem>
 					<listitem>
 						<para>
+							<emphasis>inputFiles</emphasis> (optional) -
+							select files to be transfered to the task execution side.
+							It is possible to add a selection of files to be copied from the
+							INPUT or OUPUT space to the worker side. Files can be select one by one or
+							through regular expression. For each selected files, an access mode specify
+							if the files must be transfered from INPUT, OUTPUT space or if transfer is
+							not needed. (see <xref linkend="Dataspace"/> for more details).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>outputFiles</emphasis> (optional) -
+							select files to be transfered to the OUTPUT space.
+							It is possible to add a selection of files to be copied from the
+							the worker side to the OUTPUT space of the job. Files can be select one by one or
+							through regular expression. For each selected files, an access mode specify
+							if the files must be transfered to OUTPUT space or if no transfer is
+							needed. (see <xref linkend="Dataspace"/> for more details).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
 							<emphasis>preciousResult</emphasis> (optional - false by default) - 
 							defines whether a result of a task is important. 
 							For example, in a job result, you could have to retrieve only some task results that are
@@ -911,7 +953,6 @@ task2.setGenerationScript(gscript);
 					</listitem>
 					<listitem>
 						<para>
-							<!-- TODO gsigety : Add more scripts examples -->
 							<emphasis>scripts</emphasis> (optional) -
 							The ProActive scheduler supports portable script execution through the
 							JSR 223 Java Scripting capabilities. Scripts can be written in any language
@@ -1010,6 +1051,282 @@ task2.setGenerationScript(gscript);
 				<para>
 					Once your job created, next step is to submit it to the ProActive Scheduler.
 				</para>
+			</section>
+		</section>
+		<section xml:id="Dataspace"><info><title>Handling data and files using Data Spaces</title></info>
+			<para>
+				The Scheduler infrastructure allows user to handle files during the scheduling process.
+				Based on the ProActive DataSpace, It is now possible to describe from where to pick files,
+				and where to put eventual produced files. This ability supports protocol such as FTP, HTTP, File system,
+				and also distributed file System using the ProActive Provider Server. Here's a brief explanation
+				around the file handling mechanism :
+			</para>
+			<figure xml:id="dataspaces"><info><title>Handling data during scheduling</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="70%" align="center" fileref="scheduler/pics/dataspace.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				The Scheduler (0) is always connected to default INPUT(1) and OUTPUT(6) spaces, defined by the administrator.
+				INPUT space (read-only) is used to store every files and data needed by a job. Each task should be able to
+				read and/or write data in the OUTPUT space (read-write).
+				As there are default INPUT/OUTPUT spaces, user can also define its own data spaces by specifying them
+				in the job descriptor. User can define INPUT and/or OUTPUT spaces. If a space is not defined,
+				the default one is used.
+			</para>
+			<para>
+				As an example and as shown in the image above, an Executable (5) can get files (2) from the INPUT
+				space (1). Once files are located in the LOCAL space, Executable can read and write from/to
+				the LOCAL space. At the end of the task, files will be sent (9) to the OUTPUT (8) FTP space.
+				An other task, could read (3) the default OUTPUT space (6), while another could write (4) to
+				the same space (6). User must take care about concurrent access in the OUTPUT space.
+			</para>
+			<para>
+				If using the default spaces, user data must be stored into a directory named as his login. This directory will
+				be the root of the space. Ask your administrator if you could not locate the default targeted spaces.
+			</para>
+			<para>
+				Let's continue with an example of uses through a job containing a native task and a java task.
+			</para>
+			<section xml:id="Dataspace_job"><info><title>Using data spaces in a job</title></info>
+				<para>
+					A job can define INPUT and/or OUTPUT spaces. To set up a space in the XML descriptor,
+					just proceed as follow :
+				</para>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/job_dataspace.xml"/></textobject></programlisting>
+				<para>
+					The example shows how to define both INPUT and OUTPUT spaces. The INPUT space is defined on a HTTP server since
+					the OUTPUT is defined on a remote file system provided by the ProActive provider server.
+					The only constraint to take care about is to be sure that the OUTPUT space is a writable space.
+					(for example, it cannot be HTTP protocol).
+				</para>
+				<para>
+					In this example, a ProActive provider server is started, to do so, just go into the bin directory
+					and launch the <emphasis>PAProviderServer[.bat]</emphasis> script that take one mandatory argument and one optional :
+					<itemizedlist>
+						<listitem>
+							<para>
+								<emphasis>path</emphasis> : an absolute path pointing on the local file system directory
+								that will be the root of the started space. (mandatory)
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>name</emphasis> : the name of the server to be started. Can be usefull
+								if more than one server is started on the same host. ('myOutputSpace' in the example).
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
+					The same description is of course possible in job java API :
+				</para>
+				<programlisting language="java">
+//...
+//job is create above ...
+job.setInputSpace("http://myserver/directory");
+job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path=/");
+//...
+				</programlisting>
+				<para>
+					Until now, every files that will be picked or put in those spaces must be represented
+					by a "virtual" path whose root is "http://myserver/directory" for the INPUT space,
+					and the path passed (to the PAProviderServer) as first argument for the OUTPUT space.
+				</para>
+				<para>
+					Let's continue with the description of the tasks.
+				</para>
+			</section>
+			<section xml:id="Dataspace_tasks"><info><title>Specifying data spaces in the tasks</title></info>
+				<para>
+					The task can define a set of input files and a set of output files. The input files can be picked from
+					the job INPUT or OUTPUT space. To specify a file to be transfered it is necessary to set
+					two fields, a third one can be useful but is not mandatory :
+					<itemizedlist>
+						<listitem>
+							<para>
+								<emphasis>includes</emphasis> : is a file or a regular expression targeting the abstract relative
+								path to the file you want to be selected in the job space. For example, "bin/toto*.xml" will target
+								every files starting with 'toto' and ending with '.xml' in the 'bin' directory relative to the chosen space.
+								(mandatory).
+								Note : for read-only (as HTTP) INPUT space, includes files must not be regular expression.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>excludes</emphasis> : describe a file or every files that must not be targeted among
+								the selected includes files. In our example, if excludes is "bin/toto123.xml", the file
+								'toto123.xml' in the 'bin' directory will finally not be selected.
+								Note : for read-only (as HTTP) INPUT space, includes files must not be regular expression.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>accessMode</emphasis> : specify if the selected files must be transfered from
+								INPUT or OUTPUT, to OUTPUT, or not transfered.
+								Possible values for the input files are : 'transferFromInputSpace', 'transferFromOutputSpace', 'none'.
+								Possible values for the output files are : 'transferToOutputSpace', 'none'.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
+					To set up input and/or output files in the XML descriptor, just proceed as follow :
+				</para>
+				<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/task_dataspace.xml"/></textobject></programlisting>
+				<para>
+					Until now, LOCALSPACE will be used as the root of the space local to the task execution (green data space on the picture above).
+					In this example, the file 'tata' at the root of the INPUT space will be transfered from INPUT
+					space to LOCALSPACE and every 'toto*.txt' in the 'txt' directory but the 'toto*2.txt' will be transfered from OUTPUT space
+					to LOCALSPACE.
+				</para>
+				<para>
+					At the end of the execution, every produced files 'titi*.dat' but the 'titi*1.dat' files will be transfered
+					from LOCALSPACE to OUTPUT space. The 'titi*.txt' files won't be transfered, it is just identified as an output file
+					by the Scheduler.
+				</para>
+				<para>
+					Here's the same description using the java API :
+				</para>
+				<programlisting language="java">
+//...
+//job is create above ...
+job.setInputSpace("http://myserver/directory");
+job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path=/");
+//...
+				</programlisting>
+				<para>
+					Now, let's go on the explanation of how to get files in the executable.
+				</para>
+				<section xml:id="Dataspace_native"><info><title>Retrieving files in a native task</title></info>
+					<para>
+						To retrieve files as argument in a native task, you must use the special variable $LOCALSPACE.
+						$LOCALSPACE will be replaced by the real path to the LOCAL space ensuring that your selected
+						input files will be there. To produced files and copy them to the OUTPUT space,
+						just put them at a relative to LOCALSPACE path and select them in the output files list.
+					</para>
+					<para>
+						The example below shows how to make such a behavior.
+					</para>
+					<programlisting language="xml"><textobject><textdata fileref="scheduler/xml/task_dataspace_with_native.xml"/></textobject></programlisting>
+					<para>
+						In this example, the 'myExec' native executable takes one file and one directory as arguments.
+						Every selected input files will be copied into the LOCALSPACE.
+						Once the execution terminated, every produced file in the third argument (LOCALSPACE root)
+						will be copied to the OUTPUT space except the 'titi*.txt' files.
+					</para>
+					<para>
+						To do the same in java, just proceed as follow :
+					</para>
+					<programlisting language="java">
+NativeTask t = new NativeTask();
+//add input files
+t.addInputFiles("tata",InputAccessMode.TransferFromInputSpace);
+FileSelector fs = new FileSelector(new String[]{"txt/toto*.txt"}, new String[]{"txt/toto*2.txt"});
+t.addInputFiles(fs,InputAccessMode.transferFromOutputSpace);
+//add output files
+fs = new FileSelector(new String[]{"titi*.dat"}, new String[]{"titi*1.dat"});
+t.addOutputFiles(fs,OutputAccessMode.TransferToOutputSpace);
+t.addOutputFiles("titi*.txt",OutputAccessMode.none);
+t.setName("native_java");
+t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "$LOCALSPACE"});
+//...
+//job.addTask(t);
+					</programlisting>
+					<para>
+						At the end of the task, LOCALSPACE is cleared, every files deleted.
+					</para>
+				</section>
+				<section xml:id="Dataspace_java"><info><title>Retrieving spaces and files in a java task</title></info>
+					<para>
+						For java task, everything can be done using the dataspace API inside the javaExecutable.
+						Transferring files works as well, but it is also possible to handle non-transfered files.
+						6 methods are available in the JavaExecutable to retrieve Spaces or files :
+						<itemizedlist>
+							<listitem>
+								<para>
+									<emphasis>getInputSpace()</emphasis> : retrieve the root of INPUT space.
+									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>getOutputSpace()</emphasis> : retrieve the root of OUTPUT space.
+									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>getLocalSpace()</emphasis> : retrieve the root of the LOCAL space.
+									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>getInputFile(pathName)</emphasis> : select the file located at pathName in the INPUT space.
+									pathName must be relative to the root of the INPUT.
+									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+									File can be moved, copied or read.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>getOutputFile(pathName)</emphasis> : select the file located at pathName in the OUTPUT space.
+									pathName must be relative to the root of the OUTPUT.
+									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+									File can be moved, copied or read.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>getLocalFile(pathName)</emphasis> : select the file located at pathName in the LOCAL space.
+									pathName must be relative to the root of the LOCALSPACE.
+									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+									File can be moved, copied or read.
+								</para>
+							</listitem>
+						</itemizedlist>
+					</para>
+					<para>
+						Here's a complete JavaExecutable example using the data spaces:
+					</para>
+					<programlisting language="java">
+public class DSTest extends JavaExecutable {
+
+	@Override
+	public Serializable execute(TaskResult... args) throws Throwable {
+		//create titi1.dat from tata in the LOCALSPACE as it is copied
+		getLocalFile("titi1.dat").copyFrom(getLocalFile("tata"),FileSelector.SELECT_SELF);
+		//create titi2.dat -> will be transfered to OUTPUT space at the end
+		getLocalFile("titi2.dat").createFile();
+		//list toto*.txt in txt dir from LOCALSPACE as they are copied
+		//toto*2.txt is not printed as it is exclude
+		for (DataSpacesFileObject dsfo : getLocalFile("txt").getChildren()){
+			System.out.println(dsfo.getRealURI());
+			System.out.println(dsfo.getVirtualURI());
+		}
+		//create titi3.dat -> will be transfered to OUTPUT space at the end
+		getLocalFile("titi3.dat").createFile();
+		//create titi12.txt -> won't be transfered to OUTPUT space
+		getLocalFile("titi12.txt").createFile();
+		//create titi123.txt directly in the OUTPUT space as it won't be transfered
+		getOutputFile("titi123.txt").copyFrom(getInputFile("txt/toto12.txt"), FileSelector.SELECT_SELF);
+		//as expected, OUTPUT space will contain :
+		//titi2.dat : copied automatically
+		//titi3.dat : copied automatically
+		//titi123.txt : copied manually by the code above
+		return "helloWorld";
+	}
+
+}
+					</programlisting>
+					<para>
+						As we can see, java executable can read, copy, move files from/to every spaces.
+						At the end of the task, LOCALSPACE is cleared, every files deleted.
+					</para>
+				</section>
 			</section>
 		</section>
 		<section xml:id="Submit_a_job"><info><title>Submit a job to the Scheduler</title></info>

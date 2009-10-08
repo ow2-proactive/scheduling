@@ -68,7 +68,7 @@
 			<description>Parallel Tasks - Task 2</description>
 			<inputFiles>
 				<files includes="tata*" excludes="tata*1" accessMode="transferFromInputSpace"/>
-				<files includes="toto*.txt" excludes="toto*2.txt,toto*3.txt" accessMode="transferFromOutputSpace"/>
+				<files includes="toto*.txt" excludes="toto*2.txt" accessMode="transferFromOutputSpace"/>
 			</inputFiles>
 			<pre>
 				<script>
@@ -85,7 +85,7 @@
 			</javaExecutable>
 			<outputFiles>
 				<files includes="titi*" excludes="titi*1" accessMode="transferToOutputSpace"/>
-				<files includes="titi*.txt,tutu*.txt" excludes="titi*3.txt" accessMode="transferToOutputSpace"/>
+				<files includes="titi*.txt" excludes="titi*3.txt" accessMode="transferToOutputSpace"/>
 			</outputFiles>
 		</task>
 		<task name="task3" walltime="10:53" numberOfNodes="3">

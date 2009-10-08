@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="job_name" priority="normal" projectName="project_name" cancelJobOnError="true" logFile="path/to/a/log/file.log">
+
+	...
+	<inputSpace url="http://myserver/directory" />
+	<outputSpace url="paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path=/" />
+	...
+
+	<taskFlow>
+		<task name="task1" retries="2">
+			...
+			<inputFiles>
+				<files includes="tata" accessMode="transferFromInputSpace"/>
+				<files includes="txt/toto*.txt" excludes="txt/toto*2.txt" accessMode="transferFromOutputSpace"/>
+			</inputFiles>
+			<!-- Java or native Executable -->
+			<outputFiles>
+				<files includes="titi*.dat" excludes="titi*1.dat" accessMode="transferToOutputSpace"/>
+				<files includes="titi*.txt" accessMode="none"/>
+			</outputFiles>
+			...
+		</task>
+		...
+	</taskFlow>
+</job>

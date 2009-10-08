@@ -85,7 +85,7 @@ public class NativeTask extends Task {
      * 
      * @param commandLine the commandLine to set
      */
-    public void setCommandLine(String[] commandLine) {
+    public void setCommandLine(String... commandLine) {
         this.commandLine = commandLine;
     }
 

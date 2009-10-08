@@ -152,7 +152,7 @@ public class FileSelector implements Serializable {
      *
      * @param includes
      */
-    public FileSelector(String[] includes) {
+    public FileSelector(String... includes) {
         this.includes = includes;
     }
 
@@ -181,7 +181,7 @@ public class FileSelector implements Serializable {
      *
      * @param includes the includes to set
      */
-    public void setIncludes(String[] includes) {
+    public void setIncludes(String... includes) {
         this.includes = includes;
     }
 
@@ -199,7 +199,7 @@ public class FileSelector implements Serializable {
      *
      * @param excludes the excludes to set
      */
-    public void setExcludes(String[] excludes) {
+    public void setExcludes(String... excludes) {
         this.excludes = excludes;
     }
 
