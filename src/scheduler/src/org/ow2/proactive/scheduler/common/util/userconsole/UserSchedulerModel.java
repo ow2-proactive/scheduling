@@ -37,8 +37,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map.Entry;
 
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -143,6 +145,7 @@ public class UserSchedulerModel extends ConsoleModel {
         commands
                 .add(new Command("jobstate(id)",
                     "Get the current state of the given job (parameter is an int or a string representing the jobId)"));
+        commands.add(new Command("joblist", "Display the list of jobs managed by the scheduler"));
         commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
         commands
                 .add(new Command("exec(scriptFilePath)",
@@ -446,7 +449,7 @@ public class UserSchedulerModel extends ConsoleModel {
 
     private void jobState_(String jobId) {
         try {
-            JobState js = scheduler.getState(jobId);
+            JobState js = scheduler.getJobState(jobId);
             JobInfo ji = js.getJobInfo();
             String state = "Job '" + ji.getJobId() + "'    name:" + ji.getJobId().getReadableName() +
                 "    owner:" + js.getOwner() + "    status:" + ji.getStatus() + "    #tasks:" +
@@ -505,6 +508,98 @@ public class UserSchedulerModel extends ConsoleModel {
         }
     }
 
+    public static void schedulerState() {
+        getModel().checkIsReady();
+        getModel().schedulerState_();
+    }
+
+    private void schedulerState_() {
+        try {
+            SchedulerState state = scheduler.getSchedulerState();
+            int[] namesSize = new int[] { 2, 4, 5, 8, 7, 6, 8, 8 };
+            for (JobState js : state.getPendingJobs()) {
+                computeSpaces(namesSize, js);
+            }
+            for (JobState js : state.getRunningJobs()) {
+                computeSpaces(namesSize, js);
+            }
+            for (JobState js : state.getFinishedJobs()) {
+                computeSpaces(namesSize, js);
+            }
+            namesSize[0] += 4;
+            namesSize[1] += 4;
+            namesSize[2] += 4;
+            namesSize[3] += 4;
+            namesSize[4] += 4;
+            namesSize[5] += 4;
+            namesSize[6] += 4;
+            namesSize[7] += 4;
+            StringBuilder stateSB = new StringBuilder();
+            stateSB.append(String.format("\t%1$-" + namesSize[0] + "s", "ID"));
+            stateSB.append(String.format(" %1$-" + namesSize[1] + "s", "NAME"));
+            stateSB.append(String.format(" %1$-" + namesSize[2] + "s", "OWNER"));
+            stateSB.append(String.format(" %1$-" + namesSize[3] + "s", "PRIORITY"));
+            stateSB.append(String.format(" %1$-" + namesSize[4] + "s", "PROJECT"));
+            stateSB.append(String.format(" %1$-" + namesSize[5] + "s", "STATUS"));
+            stateSB.append(String.format(" %1$-" + namesSize[6] + "s", "START AT"));
+            stateSB.append(String.format(" %1$-" + namesSize[7] + "s", "DURATION"));
+            print(stateSB.toString() + "\n");
+            JobState.setSortingBy(JobState.SORT_BY_ID);
+            JobState.setSortingOrder(JobState.ASC_ORDER);
+            Collections.sort(state.getPendingJobs());
+            Collections.sort(state.getRunningJobs());
+            Collections.sort(state.getFinishedJobs());
+            for (JobState js : state.getFinishedJobs()) {
+                print(printFormatted(namesSize, js).toString());
+            }
+            print("");
+            for (JobState js : state.getRunningJobs()) {
+                print(printFormatted(namesSize, js).toString());
+            }
+            print("");
+            for (JobState js : state.getPendingJobs()) {
+                print(printFormatted(namesSize, js).toString());
+            }
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while getting list of jobs", e);
+        }
+
+    }
+
+    private void computeSpaces(int[] namesSize, JobState js) {
+        String formattedDuration = Tools.getFormattedDuration(js.getFinishedTime(), js.getStartTime());
+        String time = Tools.getFormattedDate(js.getStartTime());
+        namesSize[0] = (js.getId().toString().length() > namesSize[0]) ? js.getId().toString().length()
+                : namesSize[0];
+        namesSize[1] = (cutNchar(js.getName(), 20).length() > namesSize[1]) ? cutNchar(js.getName(), 20)
+                .length() : namesSize[1];
+        namesSize[2] = (js.getOwner().length() > namesSize[2]) ? js.getOwner().length() : namesSize[2];
+        namesSize[3] = (js.getPriority().toString().length() > namesSize[3]) ? js.getPriority().toString()
+                .length() : namesSize[3];
+        namesSize[4] = (cutNchar(js.getProjectName(), 20).length() > namesSize[4]) ? cutNchar(
+                js.getProjectName(), 20).length() : namesSize[4];
+        namesSize[5] = (js.getStatus().toString().length() > namesSize[5]) ? js.getStatus().toString()
+                .length() : namesSize[5];
+        namesSize[6] = (time.length() > namesSize[6]) ? time.length() : namesSize[6];
+        namesSize[7] = (formattedDuration.length() > namesSize[7]) ? formattedDuration.length()
+                : namesSize[7];
+    }
+
+    private StringBuilder printFormatted(int[] namesSize, JobState js) {
+        StringBuilder stateSB = new StringBuilder();
+        String formattedDuration = Tools.getFormattedDuration(js.getFinishedTime(), js.getStartTime());
+        String time = Tools.getFormattedDate(js.getStartTime());
+        stateSB.append(String.format("\t%1$-" + namesSize[0] + "s", js.getId()));
+        stateSB.append(String.format(" %1$-" + namesSize[1] + "s", cutNchar(js.getName(), 20)));
+        stateSB.append(String.format(" %1$-" + namesSize[2] + "s", js.getOwner()));
+        stateSB.append(String.format(" %1$-" + namesSize[3] + "s", js.getPriority()));
+        stateSB.append(String.format(" %1$-" + namesSize[4] + "s", js.getProjectName()));
+        stateSB.append(String.format(" %1$-" + namesSize[5] + "s", js.getStatus()));
+        stateSB.append(String.format(" %1$-" + namesSize[6] + "s", time));
+        stateSB.append(String.format(" %1$-" + namesSize[7] + "s", formattedDuration));
+        return stateSB;
+    }
+
     /**
      * Cut the given string to the specified number of character
      *
@@ -514,6 +609,9 @@ public class UserSchedulerModel extends ConsoleModel {
      * 			otherwise a shortcut string endind with '...'
      */
     private String cutNchar(String str, int nbChar) {
+        if (str == null) {
+            return "";
+        }
         nbChar--;//use to have a space after the returned string
         if (str == null || str.length() <= nbChar) {
             return str;

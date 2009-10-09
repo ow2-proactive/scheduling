@@ -118,6 +118,13 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerState()
+     */
+    public SchedulerState getSchedulerState() throws SchedulerException {
+        return schedulerFrontend.getSchedulerState();
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getStatus()
      *
      * @deprecated {@link UserScheduler#getSchedulerStatus()}
@@ -211,10 +218,10 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getState(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobState(org.ow2.proactive.scheduler.common.job.JobId)
      */
-    public JobState getState(JobId jobId) throws SchedulerException {
-        return schedulerFrontend.getState(jobId);
+    public JobState getJobState(JobId jobId) throws SchedulerException {
+        return schedulerFrontend.getJobState(jobId);
     }
 
     /**
@@ -253,10 +260,10 @@ public class UserScheduler implements UserSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getState(java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobState(java.lang.String)
      */
-    public JobState getState(String jobId) throws SchedulerException {
-        return schedulerFrontend.getState(jobId);
+    public JobState getJobState(String jobId) throws SchedulerException {
+        return schedulerFrontend.getJobState(jobId);
     }
 
     /**

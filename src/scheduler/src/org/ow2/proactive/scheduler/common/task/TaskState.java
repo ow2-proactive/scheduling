@@ -31,8 +31,6 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.util.List;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -136,14 +134,6 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     }
 
     /**
-     * Return true if this task has dependencies.
-     * It means the first eligible tasks in case of TASK_FLOW job type.
-     *
-     * @return true if this task has dependencies, false otherwise.
-     */
-    public abstract boolean hasDependences();
-
-    /**
      * To get the taskInfo
      *
      * @return the taskInfo
@@ -194,14 +184,6 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     public TaskStatus getStatus() {
         return getTaskInfo().getStatus();
     }
-
-    /**
-     * To get the dependences of this task.
-     * Return null if this task has no dependence.
-     *
-     * @return the dependences of this task
-     */
-    public abstract List<TaskState> getDependences();
 
     /**
      * To get the executionHostName

@@ -639,17 +639,24 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getState(java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobState(java.lang.String)
      */
-    public JobState getState(String id) throws SchedulerException {
-        return scheduler.getState(id);
+    public JobState getJobState(String id) throws SchedulerException {
+        return scheduler.getJobState(id);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getState(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobState(org.ow2.proactive.scheduler.common.job.JobId)
      */
-    public JobState getState(JobId id) throws SchedulerException {
-        return scheduler.getState(id);
+    public JobState getJobState(JobId id) throws SchedulerException {
+        return scheduler.getJobState(id);
     }
+
+	/**
+	 * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerState()
+	 */
+	public SchedulerState getSchedulerState() throws SchedulerException {
+		return scheduler.getSchedulerState();
+	}
 
 }

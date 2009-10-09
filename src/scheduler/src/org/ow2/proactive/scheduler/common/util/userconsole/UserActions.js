@@ -62,6 +62,10 @@ function exec(commandFilePath){
 	UserSchedulerModel.exec(""+commandFilePath);
 }
 
+function joblist(){
+	UserSchedulerModel.schedulerState();
+}
+
 function jmxinfo(){
 	UserSchedulerModel.JMXinfo();
 }

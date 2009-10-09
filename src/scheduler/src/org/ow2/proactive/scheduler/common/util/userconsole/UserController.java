@@ -410,6 +410,11 @@ public class UserController {
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
+        opt = new Option("joblist", false, control + "Display the list of jobs managed by the scheduler");
+        opt.setRequired(false);
+        opt.setArgs(0);
+        actionGroup.addOption(opt);
+
         opt = new Option("jmxinfo", false, control +
             "Display some statistics provided by the Scheduler MBean");
         opt.setRequired(false);
@@ -497,6 +502,8 @@ public class UserController {
             }
         } else if (cmd.hasOption("jobstate")) {
             UserSchedulerModel.jobState(cmd.getOptionValue("jobstate"));
+        } else if (cmd.hasOption("joblist")) {
+            UserSchedulerModel.schedulerState();
         } else if (cmd.hasOption("jmxinfo")) {
             UserSchedulerModel.JMXinfo();
         } else if (cmd.hasOption("script")) {

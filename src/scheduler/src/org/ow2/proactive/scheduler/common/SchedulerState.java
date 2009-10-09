@@ -40,7 +40,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 
 /**
  * This interface is a representation of the whole scheduler jobs list state.<br>
- * It is basically represented by 3 lists of jobs, and its scheduling status.
+ * It is basically represented by 3 lists of jobs, and their scheduling status.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9

@@ -472,8 +472,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //Fix SCHEDULING-337, it could remains a better solution to avoid race condition in DB
             //body.setImmediateService("getTaskResult");
             body.setImmediateService("getJobResult");
-            body.setImmediateService("getState");
-            logger_dev.debug("Core immediate services : isSubmitPossible, getJobResult, getState");
+            body.setImmediateService("getJobState");
+            logger_dev.debug("Core immediate services : isSubmitPossible, getJobResult, getJobState");
 
             //set the filter for serveAll method (user action are privileged)
             RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenLog",
@@ -1370,9 +1370,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * Return the scheduler current state with the pending, running, finished jobs list.
-     *
-     * @return the scheduler current state with the pending, running, finished jobs list.
+     * {@inheritDoc}
      */
     public SchedulerState getSchedulerState() {
         SchedulerStateImpl sState = new SchedulerStateImpl();
@@ -1911,9 +1909,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getState(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobState(org.ow2.proactive.scheduler.common.job.JobId)
      */
-    public JobState getState(JobId jobId) throws SchedulerException {
+    public JobState getJobState(JobId jobId) throws SchedulerException {
         logger_dev.info("Request sent to get the State of job '" + jobId + "'");
         return jobs.get(jobId);
     }

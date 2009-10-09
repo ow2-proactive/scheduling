@@ -31,7 +31,13 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -63,6 +69,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
@@ -99,11 +106,13 @@ public abstract class InternalTask extends TaskState {
     @JoinTable(joinColumns = @JoinColumn(name = "ITASK_ID"), inverseJoinColumns = @JoinColumn(name = "DEPEND_ID"))
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @Cascade(CascadeType.ALL)
+    @TransientInSerialization
     private List<InternalTask> ideps = null;
 
     /** Informations about the launcher and node */
     //These informations are not required during task process
     @Transient
+    @TransientInSerialization
     private ExecuterInformations executerInformations;
 
     /** Task information : this is the informations that can change during process. */
@@ -113,7 +122,8 @@ public abstract class InternalTask extends TaskState {
 
     /** Node exclusion for this task if desired */
     @Transient
-    private transient NodeSet nodeExclusion = null;
+    @TransientInSerialization
+    private NodeSet nodeExclusion = null;
 
     /** Contains the user executable */
     @Unloadable
@@ -124,6 +134,7 @@ public abstract class InternalTask extends TaskState {
             @MetaValue(targetEntity = ForkedJavaExecutableContainer.class, value = "FJEC") })
     @JoinColumn(name = "EXEC_CONTAINER_ID", updatable = false)
     @Cascade(CascadeType.ALL)
+    @TransientInSerialization
     protected ExecutableContainer executableContainer = null;
 
     /** Maximum number of execution for this task in case of failure (node down) */
@@ -169,7 +180,10 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskState#hasDependences()
+     * Return true if this task has dependencies.
+     * It means the first eligible tasks in case of TASK_FLOW job type.
+     *
+     * @return true if this task has dependencies, false otherwise.
      */
     public boolean hasDependences() {
         return (ideps != null && ideps.size() > 0);
@@ -273,7 +287,10 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskState#getDependences()
+     * To get the dependences of this task.
+     * Return null if this task has no dependence.
+     *
+     * @return the dependences of this task
      */
     public List<TaskState> getDependences() {
         //set to null if needed
@@ -387,6 +404,57 @@ public abstract class InternalTask extends TaskState {
         }
 
         return false;
+    }
+
+    //********************************************************************
+    //************************* SERIALIZATION ****************************
+    //********************************************************************
+
+    /**
+     * <b>IMPORTANT : </b><br />
+     * Using hibernate does not allow to have java transient fields that is inserted in database anyway.<br />
+     * Hibernate defined @Transient annotation meaning the field won't be inserted in database.
+     * If the java transient modifier is set for a field, so the hibernate @Transient annotation becomes
+     * useless and the field won't be inserted in DB anyway.<br />
+     * For performance reason, some field must be java transient but not hibernate transient.
+     * These fields are annotated with @TransientInSerialization.
+     * The @TransientInSerialization describe the fields that won't be serialized by java since the two following
+     * methods describe the serialization process.
+     */
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        Field[] fields = InternalTask.class.getDeclaredFields();
+        LinkedList<String> fieldsName = new LinkedList<String>();
+        LinkedList<Field> fieldsObject = new LinkedList<Field>();
+        for (Field f : fields) {
+            if (!f.isAnnotationPresent(TransientInSerialization.class) &&
+                !Modifier.isStatic(f.getModifiers())) {
+                fieldsObject.addFirst(f);
+                fieldsName.addFirst(f.getName());
+            }
+        }
+        out.writeObject(fieldsName);
+        while (!fieldsObject.isEmpty()) {
+            try {
+                out.writeObject(fieldsObject.poll().get(this));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        LinkedList<String> fieldsName = (LinkedList<String>) in.readObject();
+        while (!fieldsName.isEmpty()) {
+            try {
+                String fieldName = fieldsName.poll();
+                Object o = in.readObject();
+                InternalTask.class.getDeclaredField(fieldName).set(this, o);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

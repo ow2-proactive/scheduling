@@ -572,6 +572,20 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerState()
+     */
+    public SchedulerState getSchedulerState() throws SchedulerException {
+        checkAccess();
+        //get the scheduler State
+        SchedulerStateImpl initState = null;
+        initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler.getSchedulerState()));
+        //and update the connected users list.
+        initState.setUsers(connectedUsers);
+        //return to the user
+        return initState;
+    }
+
+    /**
      * @deprecated {@link SchedulerFrontend#addEventListener(SchedulerEventListener, boolean, SchedulerEvent...)}
      */
     @Deprecated
@@ -662,11 +676,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         //cancel timer for this user : session is now managed by events
         uIdent.getSession().cancel();
         //get the scheduler State
-        SchedulerStateImpl initState = null;
+        SchedulerState initState = null;
         if (getInitialState) {
-            initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler.getSchedulerState()));
-            //and update the connected users list.
-            initState.setUsers(connectedUsers);
+            initState = getSchedulerState();
         }
         //return to the user
         return initState;
@@ -909,11 +921,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getState(org.ow2.proactive.scheduler.common.job.JobId)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobState(org.ow2.proactive.scheduler.common.job.JobId)
      */
-    public JobState getState(JobId jobId) throws SchedulerException {
+    public JobState getJobState(JobId jobId) throws SchedulerException {
         prkcp(jobId, "You do not have permission to get the state of this job !");
-        return scheduler.getState(jobId);
+        return scheduler.getJobState(jobId);
     }
 
     /**
@@ -952,10 +964,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getState(java.lang.String)
+     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobState(java.lang.String)
      */
-    public JobState getState(String jobId) throws SchedulerException {
-        return this.getState(JobIdImpl.makeJobId(jobId));
+    public JobState getJobState(String jobId) throws SchedulerException {
+        return this.getJobState(JobIdImpl.makeJobId(jobId));
     }
 
     /**

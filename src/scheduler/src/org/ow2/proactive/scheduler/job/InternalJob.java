@@ -31,9 +31,15 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -72,6 +78,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
@@ -122,20 +129,24 @@ public abstract class InternalJob extends JobState {
     /** Job descriptor for dependences management */
     //Not DB managed, created once needed.
     @Transient
+    @TransientInSerialization
     private JobDescriptor jobDescriptor;
 
     /** DataSpace application manager for this job */
     //Not DB managed, created once needed.
     @Transient
+    @TransientInSerialization
     private JobDataSpaceApplication jobDataSpaceApplication;
 
     /** Job result */
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.EAGER, targetEntity = JobResultImpl.class)
+    @TransientInSerialization
     private JobResult jobResult;
 
     /** Initial waiting time for a task before restarting in millisecond */
     @Column(name = "RESTART_TIMER")
+    @TransientInSerialization
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
 
     /** Hibernate default constructor */
@@ -799,4 +810,56 @@ public abstract class InternalJob extends JobState {
     public JobDataSpaceApplication getJobDataSpaceApplication() {
         return jobDataSpaceApplication;
     }
+
+    //********************************************************************
+    //************************* SERIALIZATION ****************************
+    //********************************************************************
+
+    /**
+     * <b>IMPORTANT : </b><br />
+     * Using hibernate does not allow to have java transient fields that is inserted in database anyway.<br />
+     * Hibernate defined @Transient annotation meaning the field won't be inserted in database.
+     * If the java transient modifier is set for a field, so the hibernate @Transient annotation becomes
+     * useless and the field won't be inserted in DB anyway.<br />
+     * For performance reason, some field must be java transient but not hibernate transient.
+     * These fields are annotated with @TransientInSerialization.
+     * The @TransientInSerialization describe the fields that won't be serialized by java since the two following
+     * methods describe the serialization process.
+     */
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        Field[] fields = InternalJob.class.getDeclaredFields();
+        LinkedList<String> fieldsName = new LinkedList<String>();
+        LinkedList<Field> fieldsObject = new LinkedList<Field>();
+        for (Field f : fields) {
+            if (!f.isAnnotationPresent(TransientInSerialization.class) &&
+                !Modifier.isStatic(f.getModifiers())) {
+                fieldsObject.addFirst(f);
+                fieldsName.addFirst(f.getName());
+            }
+        }
+        out.writeObject(fieldsName);
+        while (!fieldsObject.isEmpty()) {
+            try {
+                out.writeObject(fieldsObject.poll().get(this));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        LinkedList<String> fieldsName = (LinkedList<String>) in.readObject();
+        while (!fieldsName.isEmpty()) {
+            try {
+                String fieldName = fieldsName.poll();
+                Object o = in.readObject();
+                InternalJob.class.getDeclaredField(fieldName).set(this, o);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
 }

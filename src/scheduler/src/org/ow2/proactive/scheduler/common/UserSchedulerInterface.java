@@ -218,7 +218,7 @@ public interface UserSchedulerInterface extends UserSchedulerInterface_ {
      * @throws UnknowJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
-    public JobState getState(String jobId) throws SchedulerException;
+    public JobState getJobState(String jobId) throws SchedulerException;
 
     /**
      * @deprecated {@link UserSchedulerInterface#getSchedulerStatus()}

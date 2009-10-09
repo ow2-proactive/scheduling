@@ -187,6 +187,15 @@ public interface UserSchedulerInterface_ extends Serializable {
      * @throws UnknowJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
-    public JobState getState(JobId jobId) throws SchedulerException;
+    public JobState getJobState(JobId jobId) throws SchedulerException;
+
+    /**
+     * Get the list of job states that describe every jobs in the Scheduler.
+     * The SchedulerState contains 3 list of jobs, pending, running, and finished
+     *
+     * @return the list of every jobs in the Scheduler
+     * @throws SchedulerException if you are not authenticated.
+     */
+    public SchedulerState getSchedulerState() throws SchedulerException;
 
 }
