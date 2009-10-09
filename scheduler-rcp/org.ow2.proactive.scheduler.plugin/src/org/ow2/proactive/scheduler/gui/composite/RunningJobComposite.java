@@ -506,12 +506,18 @@ class DotTask extends TimerTask {
                                 ")");
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        //miam miam miam
+                        //concurrent access may occur, this catch handle the task termination.
+                        //If progress bar is disposed (by the graphical thread) just before this code
+                        //this code will throw an exception.
                     }
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            //miam miam miam
+            //same reason, there are 2 threads with a potential concurrent access.
+            //If the first terminate the progress bar and the second is accessing the PB at the same time,
+            //exception may be thrown.
         }
     }
 
