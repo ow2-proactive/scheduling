@@ -31,6 +31,8 @@
  */
 package org.ow2.proactive.authentication.crypto;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,6 +54,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.codec.binary.Base64;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 
@@ -77,6 +81,7 @@ import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
  * @since ProActive Scheduling 1.1
  * 
  */
+@PublicAPI
 public class Credentials implements Serializable {
 
     /** symmetric encryption parameters */
@@ -167,15 +172,8 @@ public class Credentials implements Serializable {
      * Use the current value of the {@link org.ow2.proactive.authentication.crypto.Credentials#credentialsPathProperty}
      * property to determine the file to which the data will be written
      * <p>
-     * The credentials file consists in 5 information:
-     * <ul>
-     * <li>The key generation algorithm, in human readable format, on a single
-     * line
-     * <li>The key size, in human readable format, on a single line
-     * <li>The cipher parameters, in human readable format, on a single line
-     * <li>The encrypted AES key, which should be exactly <code>size / 8</code> bytes
-     * <li>The encrypted data, which can be of arbitrary length, should occupy the rest of the file
-     * </ul>
+     * Credentials are written to disk in base64 encoded form.
+     * <p>
      * See {@link org.ow2.proactive.authentication.crypto.Credentials#getCredentials()} for the inverse operation
      * 
      * @param path file path where the credentials will be written on the disk
@@ -186,11 +184,7 @@ public class Credentials implements Serializable {
         FileOutputStream fs = null;
         try {
             fs = new FileOutputStream(f);
-            fs.write((algorithm + '\n').getBytes());
-            fs.write(("" + size + '\n').getBytes());
-            fs.write((cipher + '\n').getBytes());
-            fs.write(this.aes);
-            fs.write(this.data);
+            fs.write(getBase64());
             fs.close();
         } catch (Exception e) {
             throw new KeyException("Could not write credentials to " + path, e);
@@ -328,7 +322,7 @@ public class Credentials implements Serializable {
     }
 
     /**
-     * Retreives a credentials from disk
+     * Retrieves a credentials from disk
      * <p>
      * See {@link org.ow2.proactive.authentication.crypto.Credentials#writeToDisk()} for details on how information is
      * stored on disk.
@@ -342,28 +336,52 @@ public class Credentials implements Serializable {
     }
 
     /**
-     * Retreives a credentials from disk
+     * Retrieves a credentials from disk
      * <p>
      * See {@link org.ow2.proactive.authentication.crypto.Credentials#writeToDisk()} for details on how information is
      * stored on disk.
      * 
-     * @param path path to the credentials file on the local filesystem
-     * @return the Credentials object represented by the file saved at the file
-     *         described by the property {@link org.ow2.proactive.authentication.crypto.Credentials#credentialsPathProperty}
+     * @param path to the file in which credentials are stored
+     * @return the Credentials object represented by the file located at <code>path</code>
      * @throws KeyException Credentials could not be recovered
      */
     public static Credentials getCredentials(String path) throws KeyException {
         File f = new File(path);
+        byte[] bytes = new byte[(int) f.length()];
         FileInputStream fin = null;
+        try {
+            fin = new FileInputStream(f);
+            fin.read(bytes);
+        } catch (Exception e) {
+            throw new KeyException("Could not read credentials from " + path, e);
+        }
+        return getCredentialsBase64(bytes);
+    }
 
+    /**
+     * Creates a Credentials given its base64 encoded representation
+     * 
+     * @param base64enc the Credentials representation as a base64 encoded byte array,
+     *  as returned by {@link Credentials#getBase64()}
+     * @return the Credentials object corresponding the <code>base64en</code> representation
+     * @throws KeyException
+     */
+    public static Credentials getCredentialsBase64(byte[] base64enc) throws KeyException {
         String algo = "", cipher = "", tmp = "";
         byte[] data = null;
         byte[] aes = null;
         int size = 0;
 
+        byte[] asciiEnc = null;
+
         try {
-            fin = new FileInputStream(f);
-            DataInputStream in = new DataInputStream(fin);
+            asciiEnc = Base64.decodeBase64(base64enc);
+        } catch (Exception e) {
+            throw new KeyException("Unable to decode base64 credentials", e);
+        }
+
+        try {
+            DataInputStream in = new DataInputStream(new ByteArrayInputStream(asciiEnc));
             int read, tot = 0;
             while ((read = in.read()) != '\n') {
                 algo += (char) read;
@@ -387,14 +405,49 @@ public class Credentials implements Serializable {
                 tot++;
             }
 
-            data = new byte[(int) f.length() - tot];
+            data = new byte[(int) asciiEnc.length - tot];
             in.readFully(data);
         } catch (Exception e) {
-            throw new KeyException("Could not retreive credentials from " + path, e);
+            throw new KeyException("Could not decode credentials", e);
         }
 
         Credentials cred = new Credentials(algo, size, cipher, aes, data);
         return cred;
+    }
+
+    /**
+     * Returns a representation of this credentials as a base64 encoded byte array
+     * <p>
+     * Prior to base64 encoding, format is the following:
+     * <ul>
+     * <li>The key generation algorithm, in human readable format, on a single
+     * line
+     * <li>The key size, in human readable format, on a single line
+     * <li>The cipher parameters, in human readable format, on a single line
+     * <li>The encrypted AES key, which should be exactly <code>size / 8</code> bytes
+     * <li>The encrypted data, which can be of arbitrary length, should occupy the rest of the file
+     * </ul>
+     * @return
+     * @throws KeyException
+     */
+    public byte[] getBase64() throws KeyException {
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        try {
+            b.write((algorithm + '\n').getBytes());
+            b.write(("" + size + '\n').getBytes());
+            b.write((cipher + '\n').getBytes());
+            b.write(this.aes);
+            b.write(this.data);
+        } catch (IOException e) {
+
+        }
+        byte[] ret = null;
+        try {
+            ret = Base64.encodeBase64(b.toByteArray());
+        } catch (Exception e) {
+            throw new KeyException("Unable to encode credentials to base64", e);
+        }
+        return ret;
     }
 
     /**
