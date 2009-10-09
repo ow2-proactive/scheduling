@@ -105,11 +105,8 @@ public class AdminRMModel extends ConsoleModel {
         commands.add(new Command("removenode(nodeURL,preempt)",
             "Remove the given node (parameter is a string representing the node URL,"
                 + " node is removed immediately if second parameter is true)"));
-        commands.add(new Command("gcmdeploy(gcmdFile,nsName)",
-            "Add node(s) to the given node source (parameter is a string representing the a GCMD file AND"
-                + " a string representing the node source in which to add the node(s) )"));
         commands.add(new Command("createns(nsName,infr,pol)",
-            "Create a new node source with specified name, infrastructure and policy"));
+            "Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastrucure', 'param1', ...], ['policy', 'param1', ...]))"));
         commands.add(new Command("removens(nsName,preempt)",
             "Remove the given node source (parameter is a string representing the node source name to remove,"
                 + " nodeSource is removed immediately if second parameter is true)"));
