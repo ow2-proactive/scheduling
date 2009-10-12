@@ -16,8 +16,8 @@ log4j.logger.proactive.resourceManager=INFO,RMDevFileAppender
 #log4j.logger.proactive.resourceManager.nodeSource=INFO
 #log4j.logger.proactive.resourceManager.rmnode=INFO
 #log4j.logger.proactive.resourceManager.rmfactory=INFO
-#log4j.logger.proactive.resourceManager.rmlauncher=INFO,CONSOLE
-#log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
+log4j.logger.proactive.resourceManager.rmlauncher=INFO,CONSOLE
+log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
 #log4j.logger.proactive.resourceManager.policy=INFO
 
 # Hibernate logger
