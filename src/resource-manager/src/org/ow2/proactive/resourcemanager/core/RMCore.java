@@ -289,7 +289,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
                         if (!shutedDown) {
                             try {
                                 // wait for rmcore shutdown (5 min at most)
-                                nodeRM.wait(5 * 60 * 60);
+                                nodeRM.wait(5 * 60 * 60 * 1000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -675,9 +675,13 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
 
-        for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
-            removeAllNodes(entry.getKey(), preempt);
-            entry.getValue().shutdown();
+        if (nodeSources.size() == 0) {
+            finalizeShutdown();
+        } else {
+            for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
+                removeAllNodes(entry.getKey(), preempt);
+                entry.getValue().shutdown();
+            }
         }
     }
 
@@ -866,25 +870,30 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         unregisterTrustedService(nodeSource);
 
         if ((this.nodeSources.size() == 0) && this.toShutDown) {
-            // all nodes sources has been removed and RMCore in shutdown state,
-            // finish the shutdown
-            this.user.shutdown();
-            this.monitoring.shutdown();
-            PAActiveObject.terminateActiveObject(admin, false);
-            PAActiveObject.terminateActiveObject(true);
-            try {
-                Thread.sleep(2000);
-                synchronized (nodeRM) {
-                    nodeRM.notifyAll();
-                    shutedDown = true;
-                }
-                this.nodeRM.getProActiveRuntime().killRT(true);
-            } catch (Exception e) {
-                logger.debug("", e);
-            }
+            finalizeShutdown();
         }
 
         return new BooleanWrapper(true);
+    }
+
+    private void finalizeShutdown() {
+        // all nodes sources has been removed and RMCore in shutdown state,
+        // finish the shutdown
+        this.user.shutdown();
+        this.monitoring.shutdown();
+        PAActiveObject.terminateActiveObject(admin, false);
+        PAActiveObject.terminateActiveObject(true);
+        try {
+            Thread.sleep(2000);
+            synchronized (nodeRM) {
+                nodeRM.notifyAll();
+                shutedDown = true;
+            }
+
+            this.nodeRM.getProActiveRuntime().killRT(true);
+        } catch (Exception e) {
+            logger.debug("", e);
+        }
     }
 
     /**
