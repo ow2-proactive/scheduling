@@ -1191,10 +1191,16 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 					Here's the same description using the java API:
 				</para>
 				<programlisting language="java">
+//task is created above...
+//add input files
+task.addInputFiles("tata",InputAccessMode.TransferFromInputSpace);
+FileSelector fs = new FileSelector(new String[]{"txt/toto*.txt"}, new String[]{"txt/toto*2.txt"});
+task.addInputFiles(fs,InputAccessMode.transferFromOutputSpace);
 //...
-//job is create above ...
-job.setInputSpace("http://myserver/directory");
-job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path=/");
+//add output files
+fs = new FileSelector(new String[]{"titi*.dat"}, new String[]{"titi*1.dat"});
+task.addOutputFiles(fs,OutputAccessMode.TransferToOutputSpace);
+task.addOutputFiles("titi*.txt",OutputAccessMode.none);
 //...
 				</programlisting>
 				<para>
