@@ -99,11 +99,19 @@ public interface TaskInfo extends Serializable {
     public TaskStatus getStatus();
 
     /**
-     * To get the executionHostName
+     * Get the last execution HostName of the task.
      *
-     * @return the executionHostName
+     * @return the last execution HostName.
      */
     public String getExecutionHostName();
+
+    /**
+     * To get the list of execution hosts name.
+     * The first element of the returned array is the most recent used host.
+     *
+     * @return the execution Host Name list.
+     */
+    public String[] getExecutionHostNameList();
 
     /**
      * Get the number of execution left.

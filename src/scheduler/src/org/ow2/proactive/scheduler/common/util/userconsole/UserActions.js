@@ -55,14 +55,14 @@ function priority(jobId, priority){
 }
 
 function jobstate(jobId){
-	UserSchedulerModel.jobState(""+jobId);
+	return UserSchedulerModel.jobState(""+jobId);
 }
 
 function exec(commandFilePath){
 	UserSchedulerModel.exec(""+commandFilePath);
 }
 
-function joblist(){
+function listjobs(){
 	UserSchedulerModel.schedulerState();
 }
 

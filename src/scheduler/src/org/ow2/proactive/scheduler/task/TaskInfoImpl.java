@@ -36,6 +36,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -44,11 +45,11 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
 import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 
@@ -67,6 +68,9 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 @AccessType("field")
 @Proxy(lazy = false)
 public class TaskInfoImpl implements TaskInfo {
+
+    private static final String HOSTNAME_SEPARATOR = ",";
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
@@ -99,7 +103,8 @@ public class TaskInfoImpl implements TaskInfo {
 
     /** name of the host where the task is executed */
     @Alterable
-    @Column(name = "EXEC_HOSTNAME")
+    @Column(name = "EXEC_HOSTNAME", length = Integer.MAX_VALUE)
+    @Lob
     private String executionHostName;
 
     /** Number of executions left */
@@ -230,16 +235,36 @@ public class TaskInfoImpl implements TaskInfo {
      * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getExecutionHostName()
      */
     public String getExecutionHostName() {
-        return executionHostName;
+        if (this.executionHostName == null || "".equals(this.executionHostName)) {
+            return null;
+        } else {
+            return getExecutionHostNameList()[0];
+        }
     }
 
     /**
-     * To set the executionHostName
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getExecutionHostNameList()
+     */
+    public String[] getExecutionHostNameList() {
+        if (this.executionHostName == null || "".equals(this.executionHostName)) {
+            return null;
+        } else {
+            return this.executionHostName.split(HOSTNAME_SEPARATOR);
+        }
+    }
+
+    /**
+     * Set a new execution HostName.
+     * If there was already a hostname, the new one is prepended to the old one.
      *
-     * @param executionHostName the executionHostName to set
+     * @param executionHostName the execution HostName to set
      */
     public void setExecutionHostName(String executionHostName) {
-        this.executionHostName = executionHostName;
+        if (this.executionHostName == null || "".equals(this.executionHostName)) {
+            this.executionHostName = executionHostName;
+        } else {
+            this.executionHostName = executionHostName + HOSTNAME_SEPARATOR + this.executionHostName;
+        }
     }
 
     /**

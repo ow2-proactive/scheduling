@@ -145,7 +145,7 @@ public class UserSchedulerModel extends ConsoleModel {
         commands
                 .add(new Command("jobstate(id)",
                     "Get the current state of the given job (parameter is an int or a string representing the jobId)"));
-        commands.add(new Command("joblist", "Display the list of jobs managed by the scheduler"));
+        commands.add(new Command("listjobs()", "Display the list of jobs managed by the scheduler"));
         commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
         commands
                 .add(new Command("exec(scriptFilePath)",
@@ -442,12 +442,12 @@ public class UserSchedulerModel extends ConsoleModel {
         }
     }
 
-    public static void jobState(String jobId) {
+    public static JobState jobState(String jobId) {
         getModel().checkIsReady();
-        getModel().jobState_(jobId);
+        return getModel().jobState_(jobId);
     }
 
-    private void jobState_(String jobId) {
+    private JobState jobState_(String jobId) {
         try {
             JobState js = scheduler.getJobState(jobId);
             JobInfo ji = js.getJobInfo();
@@ -503,8 +503,10 @@ public class UserSchedulerModel extends ConsoleModel {
                 stateSB.append(String.format(" %1$-" + namesSize[5] + "s", nodesKilled));
                 print(stateSB.toString());
             }
+            return js;
         } catch (Exception e) {
             handleExceptionDisplay("Error on job " + jobId, e);
+            return null;
         }
     }
 
