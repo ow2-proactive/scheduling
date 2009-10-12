@@ -151,17 +151,24 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getFreeNodesNumber()
+     * {@inheritDoc}
      */
     public IntWrapper getFreeNodesNumber() {
-        return rmcore.getSizeListFreeRMNodes();
+        return rmcore.getFreeNodesNumber();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#getTotalNodesNumber()
+     * {@inheritDoc}
      */
     public IntWrapper getTotalNodesNumber() {
-        return rmcore.getNbAllRMNodes();
+        return rmcore.getTotalNodesNumber();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public IntWrapper getTotalAliveNodesNumber() {
+        return rmcore.getTotalAliveNodesNumber();
     }
 
     /**

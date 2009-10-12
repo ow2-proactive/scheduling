@@ -81,7 +81,13 @@ public interface RMUser {
     public IntWrapper getFreeNodesNumber();
 
     /**
-     * Gives total number of nodes handled by RM
+     * Gives total number of alive nodes handled by RM
+     * @return total number of alive nodes
+     */
+    public IntWrapper getTotalAliveNodesNumber();
+
+    /**
+     * Gives total number of nodes handled by RM (including dead nodes)
      * @return total number of nodes
      */
     public IntWrapper getTotalNodesNumber();

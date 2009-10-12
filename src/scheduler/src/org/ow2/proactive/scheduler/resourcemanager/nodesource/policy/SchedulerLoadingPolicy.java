@@ -173,7 +173,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     }
 
     protected IntWrapper getTotalNodeNumber() {
-        return nodeSource.getRMCore().getNbAllRMNodes();
+        return nodeSource.getRMCore().getTotalAliveNodesNumber();
     }
 
     private void refreshPolicyState() {

@@ -103,7 +103,7 @@ public class AddNodeByURLDialog extends Dialog {
         if ((source != null) && (!source.equals("")))
             sourceNameCombo.setText(source);
         else
-            sourceNameCombo.setText(NodeSource.DEFAULT_NAME);
+            sourceNameCombo.setText(NodeSource.DEFAULT);
 
         // label sourceName
         urlLabel.setText("Node url :");

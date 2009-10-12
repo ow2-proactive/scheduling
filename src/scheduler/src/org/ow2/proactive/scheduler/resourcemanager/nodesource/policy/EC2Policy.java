@@ -149,7 +149,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
      * @return the current number of nodes available in the ResourceManager
      */
     protected IntWrapper getTotalNodeNumber() {
-        return nodeSource.getRMCore().getNbAllRMNodes();
+        return nodeSource.getRMCore().getTotalAliveNodesNumber();
     }
 
     /**

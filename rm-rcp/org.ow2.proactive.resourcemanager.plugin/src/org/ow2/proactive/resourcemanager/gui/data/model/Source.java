@@ -47,7 +47,7 @@ public class Source extends TreeParentElement {
     }
 
     public boolean isTheDefault() {
-        return getName().equals(NodeSource.DEFAULT_NAME);
+        return getName().equals(NodeSource.DEFAULT);
     }
 
     public String getDescription() {

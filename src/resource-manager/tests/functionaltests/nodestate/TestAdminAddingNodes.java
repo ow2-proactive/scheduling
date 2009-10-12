@@ -101,6 +101,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         assertTrue(admin.getTotalNodesNumber().intValue() == 1);
+        assertTrue(admin.getTotalAliveNodesNumber().intValue() == 1);
         assertTrue(admin.getFreeNodesNumber().intValue() == 1);
 
         RMTHelper.log("Test 2");
@@ -111,6 +112,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
 
         assertTrue(admin.getTotalNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalAliveNodesNumber().intValue() == 0);
         assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         RMTHelper.log("Test 3");
@@ -124,6 +126,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
         //wait the node added event
         assertTrue(admin.getTotalNodesNumber().intValue() == 1);
         assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(admin.getTotalAliveNodesNumber().intValue() == 1);
 
         //kill the node
         RMTHelper.killNode(node2URL);
@@ -134,6 +137,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
         //wait the node down event
         Assert.assertEquals(admin.getTotalNodesNumber().intValue(), 1);
         assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(admin.getTotalAliveNodesNumber().intValue() == 0);
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
@@ -147,6 +151,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         Assert.assertEquals(admin.getTotalNodesNumber().intValue(), 1);
         Assert.assertEquals(admin.getFreeNodesNumber().intValue(), 1);
+        Assert.assertEquals(admin.getTotalAliveNodesNumber().intValue(), 1);
 
         RMTHelper.log("Test 4");
 

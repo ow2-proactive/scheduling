@@ -209,16 +209,22 @@ public interface RMCoreInterface {
     public void freeNodes(NodeSet nodes);
 
     /**
-     * Gives number of free nodes handled by the Core.
-     * @return IntWrapper number of free nodes in the RMCore.
+     * Return number of free nodes available for scheduling
+     * @return number of free nodes
      */
-    public IntWrapper getSizeListFreeRMNodes();
+    public IntWrapper getFreeNodesNumber();
 
     /**
-     * Gives number of all nodes handled by the Core.
-     * @return IntWrapper number of nodes in the RMCore.
+     * Gives total number of alive nodes handled by RM
+     * @return total number of alive nodes
      */
-    public IntWrapper getNbAllRMNodes();
+    public IntWrapper getTotalAliveNodesNumber();
+
+    /**
+     * Gives total number of nodes handled by RM (including dead nodes)
+     * @return total number of nodes
+     */
+    public IntWrapper getTotalNodesNumber();
 
     /**
      * Set the ping frequency to the default node source

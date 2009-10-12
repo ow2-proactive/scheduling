@@ -690,17 +690,33 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     // ----------------------------------------------------------------------
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getNbAllRMNodes()
+     * Return number of free nodes available for scheduling
+     * @return number of free nodes
      */
-    public IntWrapper getNbAllRMNodes() {
-        return new IntWrapper(this.allNodes.size());
+    public IntWrapper getFreeNodesNumber() {
+        return new IntWrapper(this.freeNodes.size());
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#getSizeListFreeRMNodes()
+     * Gives total number of alive nodes handled by RM
+     * @return total number of alive nodes
      */
-    public IntWrapper getSizeListFreeRMNodes() {
-        return new IntWrapper(this.freeNodes.size());
+    public IntWrapper getTotalAliveNodesNumber() {
+        // TODO get the number of alive nodes in a more effective way
+        int count = 0;
+        for (RMNode node : allNodes.values()) {
+            if (!node.isDown())
+                count++;
+        }
+        return new IntWrapper(count);
+    }
+
+    /**
+     * Gives total number of nodes handled by RM (including dead nodes)
+     * @return total number of nodes
+     */
+    public IntWrapper getTotalNodesNumber() {
+        return new IntWrapper(this.allNodes.size());
     }
 
     /**
