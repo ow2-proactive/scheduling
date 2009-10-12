@@ -278,7 +278,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 							<emphasis role="italics">pa.scheduler.dataspace.defaultinputurl</emphasis>:
 							Default INPUT space URL. Used to define INPUT space of each job that does
 							not define an INPUT space.
-							This URL can be HTTP, FTP, file system provided by ProActive : PAPRMI, ...
+							This URL can be HTTP, FTP, file system provided by ProActive: PAPRMI...
 						</para>
 					</listitem>
 					<listitem>
@@ -291,7 +291,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 					<listitem>
 						<para>
 							<emphasis role="italics">pa.scheduler.dataspace.defaultinputurl.hostname</emphasis>:
-							Host name from which the input localpath is accessible
+							Host name from which the input localpath is accessible.
 						</para>
 					</listitem>
 					<listitem>
@@ -299,7 +299,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 							<emphasis role="italics">pa.scheduler.dataspace.defaultoutputurl</emphasis>:
 							Default OUTPUT space URL. Used to define OUTPUT space of each job that does
 							not define an OUTPUT space.
-							This URL can be, FTP, file system provided by ProActive : PAPRMI, ... and cannot be HTTP
+							This URL can be, FTP, file system provided by ProActive: PAPRMI... and cannot be HTTP
 						</para>
 					</listitem>
 					<listitem>
@@ -312,7 +312,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 					<listitem>
 						<para>
 							<emphasis role="italics">pa.scheduler.dataspace.defaultoutputurl.hostname</emphasis>:
-							Host name from which the output localpath is accessible
+							Host name from which the output localpath is accessible.
 						</para>
 					</listitem>
 
@@ -721,14 +721,15 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 		</section>
 		<section xml:id="scheduler_dataspaces_admin"><info><title>Configuring DataSpaces</title></info>
 			<para>
-				The only thing to configure in the DataSpace are the default INPUT and OUTPUT spaces.
+				The only things to configure in the DataSpace are the default INPUT and OUTPUT spaces.
 				If not configured, it will use the default temporary directory of the system.
-				To the default tmp dir is appended the 'defaultinput' and 'defaultoutput' directories.
-				In each of those last directories will be append the username of the job owner that will
-				be the default dataSpace for a particular user job.
+				To the default tmp dir, "scheduling/" will first be appended and then the 'defaultinput' and 'defaultoutput' directories.
+				Finally, the username of the job owner will be also added to the previous path.
+				For instance, if "defaultinput" is set to "myInput" and my username is "myUserName", then my INPUT data space will be
+				/tmp/scheduling/myInput/myUserName (if the temporary directory is /tmp).
 			</para>
 			<para>
-				For example, to set the default INPUT space of the scehduler, just set the 3 following properties:
+				For example, to set the default INPUT space of the scheduler, just set the 3 following properties:
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -752,14 +753,14 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 			<para>
 				It is also possible to set a remote files system as a server of files thanks to the ProActive
 				provider server. In this new example, just locate the path to be served and start the ProActive
-				provider server : <emphasis>PAProviderServer.bat D:\scheduling\outputSpace myOutput</emphasis>.
-				The first argument is the absolute path via the root space directory, the second one is
-				the name of the server (could be usefull to start more than one server on the same host).
+				provider server: <emphasis>PAProviderServer.bat D:\scheduling\outputSpace myOutput</emphasis>.
+				The first argument is the absolute path to the root space directory, the second one is
+				the name of the server (could be useful to start more than one server on the same host).
 			</para>
 			<para>
-				Once launched, the server will retrieve an URL of the form :
+				Once launched, the server will retrieve an URL of the form:
 				<emphasis>paprmi://toto.company.com:1099/myOutput?proactive_vfs_provider_path=/</emphasis>. Just put this
-				URL in the scheduler settings :
+				URL in the scheduler settings:
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -774,7 +775,7 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 					<listitem>
 						<para>
 							<emphasis>pa.scheduler.dataspace.defaultoutputurl.hostname=toto</emphasis>
-							this value allow a task executed on 'toto' to handle files using the direct access (localpath above).
+							this value allows a task executed on 'toto' to handle files using the direct access (localpath above).
 							This could be great for performance issues.
 						</para>
 					</listitem>
