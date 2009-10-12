@@ -69,7 +69,7 @@ import org.ow2.proactive.utils.SchedulerLoggers;
  *  A static script is executed once on a node and result of script's execution is memorized
  *  for a next script execution request, so that we avoid a second execution of a static script.
  *  A dynamic script is always executed, because we suppose that script tests dynamic properties
- *  able to change. by default a script is dynamic
+ *  able to change. By default a script is dynamic.
  *
  *
  * @author The ProActive Team
@@ -97,7 +97,7 @@ public class SelectionScript extends Script<Boolean> {
 
     /** If true, script result is not cached */
     @Column(name = "DYNAMIC")
-    private boolean dynamic = false;
+    private boolean dynamic = true;
 
     /**
      * Hash digest of the script
