@@ -94,8 +94,8 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
     public void action() throws Exception {
 
         RMTHelper.log("Deployment");
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT_NAME);
+        RMTHelper.createGCMLocalNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -111,7 +111,7 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         vmProperties.put(this.vmPropKey, this.vmPropValue);
 
         String node1URL = RMTHelper.createNode(node1Name, vmProperties).getNodeInformation().getURL();
-        admin.addNode(node1URL);
+        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
@@ -166,7 +166,7 @@ public class dynamicSelectionScriptTest extends FunctionalTest {
         //add a second with JVM env var
 
         String node2URL = RMTHelper.createNode(node2Name, vmProperties).getNodeInformation().getURL();
-        admin.addNode(node2URL);
+        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);

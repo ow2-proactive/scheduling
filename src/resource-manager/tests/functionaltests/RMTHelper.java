@@ -118,11 +118,11 @@ public class RMTHelper {
         return createNode(nodeName, null);
     }
 
-    public static void createDefaultNodeSource() throws Exception {
+    public static void createGCMLocalNodeSource() throws Exception {
         RMFactory.setOsJavaProperty();
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
         RMAdmin admin = getAdminInterface();
-        admin.createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class.getName(),
+        admin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
                 new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
     }
 

@@ -86,18 +86,18 @@ public class TestAdminAddingNodes extends FunctionalTest {
         int pingFrequency = 5000;
         RMAdmin admin = RMTHelper.getAdminInterface();
 
-        admin.createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class.getName(), null,
+        admin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(), null,
                 StaticPolicy.class.getName(), null);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT_NAME);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
 
-        admin.setDefaultNodeSourcePingFrequency(pingFrequency);
+        admin.setNodeSourcePingFrequency(pingFrequency, NodeSource.GCM_LOCAL);
 
         RMTHelper.log("Test 1");
         String node1Name = "node1";
         String node1URL = "//" + hostName + "/" + node1Name;
         RMTHelper.createNode(node1Name);
 
-        admin.addNode(node1URL);
+        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         assertTrue(admin.getTotalNodesNumber().intValue() == 1);
@@ -118,7 +118,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
         String node2URL = "//" + hostName + "/" + node2Name;
         RMTHelper.createNode(node2Name);
 
-        admin.addNode(node2URL);
+        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait the node added event
@@ -137,7 +137,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
-        admin.addNode(node2URL);
+        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
 
         //wait for removal of the previous down node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
@@ -151,7 +151,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
         RMTHelper.log("Test 4");
 
         //put a large ping frequency in order to avoid down nodes detection
-        admin.setDefaultNodeSourcePingFrequency(Integer.MAX_VALUE);
+        admin.setNodeSourcePingFrequency(Integer.MAX_VALUE, NodeSource.GCM_LOCAL);
 
         //wait the end of last ping sequence
         Thread.sleep(PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt() + 500);
@@ -161,7 +161,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
-        admin.addNode(node2URL);
+        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
 
         //wait for removal of the previous free node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
@@ -194,7 +194,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
-        admin.addNode(node2URL);
+        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
 
         //wait for removal of the previous free node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
@@ -237,7 +237,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
-        admin.addNode(node2URL);
+        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
 
         //wait for removal of the previous down node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
@@ -256,7 +256,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //add the same node twice and check that RM will not kill the node. If it does
         //second attempt will fail
-        BooleanWrapper result = admin.addNode(node2URL);
+        BooleanWrapper result = admin.addNode(node2URL, NodeSource.GCM_LOCAL);
         if (result.booleanValue()) {
             assertTrue("Successfully added the same node twice - incorrect", false);
         }

@@ -186,9 +186,8 @@ public class SchedulerStarter {
                                                     .getValueAsString())));
                             byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
                                 deploymentFile));
-                            rmAdmin.createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class
-                                    .getName(), new Object[] { GCMDeploymentData }, StaticPolicy.class
-                                    .getName(), null);
+                            rmAdmin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
+                                    new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
                             logger.info("Resource Manager created on " +
                                 Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(imp)));

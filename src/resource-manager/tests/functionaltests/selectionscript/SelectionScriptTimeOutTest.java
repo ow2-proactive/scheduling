@@ -71,8 +71,8 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         RMTHelper.log("Deployment");
 
         RMAdmin admin = RMTHelper.getAdminInterface();
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT_NAME);
+        RMTHelper.createGCMLocalNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);

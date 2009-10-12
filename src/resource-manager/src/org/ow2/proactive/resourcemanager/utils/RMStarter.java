@@ -152,7 +152,7 @@ public class RMStarter {
             RMAuthentication auth = RMConnection.waitAndJoin(null);
             RMAdmin admin = auth.logAsAdmin(Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-            String nodeSourceName = NodeSource.DEFAULT_NAME;
+            String nodeSourceName = NodeSource.GCM_LOCAL;
             int counter = 2;
 
             for (String deploymentDescriptor : deploymentDescriptors) {
@@ -162,7 +162,7 @@ public class RMStarter {
                 admin.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(),
                         new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
-                nodeSourceName = NodeSource.DEFAULT_NAME + counter;
+                nodeSourceName = NodeSource.GCM_LOCAL + counter;
                 counter++;
             }
 

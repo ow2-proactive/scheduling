@@ -41,10 +41,10 @@ public class TestConcurrentUsers extends FunctionalTest {
         String node1Name = "node1";
         String node1URL = "//" + hostName + "/" + node1Name;
         RMTHelper.createNode(node1Name);
-        admin.createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class.getName(), null,
+        admin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(), null,
                 StaticPolicy.class.getName(), null);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT_NAME);
-        admin.addNode(node1URL);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
 
         // waiting for node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);

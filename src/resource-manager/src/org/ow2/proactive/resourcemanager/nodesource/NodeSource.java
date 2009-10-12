@@ -84,7 +84,8 @@ public class NodeSource implements InitActive {
             .getValueAsInt();
 
     /** Default name */
-    public static final String DEFAULT_NAME = "Default";
+    public static final String GCM_LOCAL = "GCMLocalNodes";
+    public static final String DEFAULT = "Default";
 
     /** unique name of the source */
     private String name;

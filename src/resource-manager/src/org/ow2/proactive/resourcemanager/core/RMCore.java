@@ -69,10 +69,12 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.RMUserImpl;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManagerFactory;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
@@ -474,13 +476,25 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * {@inheritDoc}
      */
     public BooleanWrapper addNode(String nodeUrl) {
-        return addNode(nodeUrl, NodeSource.DEFAULT_NAME);
+        return addNode(nodeUrl, NodeSource.DEFAULT);
     }
 
     /**
      * {@inheritDoc}
      */
     public BooleanWrapper addNode(String nodeUrl, String sourceName) {
+        boolean existingNodeSource = nodeSources.containsKey(sourceName);
+
+        if (!existingNodeSource && sourceName.equals(NodeSource.DEFAULT)) {
+            // creating the default node source
+            try {
+                createNodesource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(), null,
+                        StaticPolicy.class.getName(), null);
+            } catch (RMException e) {
+                logger.error("Cannot create the default node source", e);
+            }
+        }
+
         if (nodeSources.containsKey(sourceName)) {
             NodeSource nodeSource = this.nodeSources.get(sourceName);
 
@@ -962,7 +976,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#setPingFrequency(int)
      */
     public void setPingFrequency(int frequency) throws RMException {
-        setPingFrequency(frequency, NodeSource.DEFAULT_NAME);
+        setPingFrequency(frequency, NodeSource.DEFAULT);
     }
 
     /**

@@ -99,8 +99,8 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         RMTHelper.log("Deployment");
 
         RMAdmin admin = RMTHelper.getAdminInterface();
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT_NAME);
+        RMTHelper.createGCMLocalNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -232,10 +232,10 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         vmProperties.put(this.vmPropKey, this.vmPropValue);
 
         String node1URL = RMTHelper.createNode(node1Name, vmProperties).getNodeInformation().getURL();
-        admin.addNode(node1URL);
+        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
 
         String node2URL = RMTHelper.createNode(node2Name, vmProperties).getNodeInformation().getURL();
-        admin.addNode(node2URL);
+        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
 
         Thread.sleep(5000);
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);

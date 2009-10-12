@@ -1,3 +1,6 @@
+# A default infrastructure (can register existing nodes and remove them)
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.DefaultInfrastructureManager
+
 # Basic GCM infrastructure
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure
 

@@ -92,7 +92,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
     /**
      * Asynchronous request of all nodes acquisition.
-     * Nodes should register themselves by calling {@link RMCore#addNode(String)}
+     * Nodes should register themselves by calling {@link RMCore#addNode(String, String)}
      */
     public void acquireAllNodes() {
         logger.debug("Acquire all nodes request");
@@ -114,7 +114,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
     /**
      * Asynchronous node acquisition request.
-     * Proactive node should register itself by calling {@link RMCore#addNode(String)}
+     * Proactive node should register itself by calling {@link RMCore#addNode(String, String)}
      */
     public void acquireNode() {
         logger.debug("Acquire node request");

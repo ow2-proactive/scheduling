@@ -78,8 +78,8 @@ public class NonBlockingCoreTest extends FunctionalTest {
 
         RMTHelper.log("Deployment");
 
-        RMTHelper.createDefaultNodeSource();
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT_NAME);
+        RMTHelper.createGCMLocalNodeSource();
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -110,7 +110,7 @@ public class NonBlockingCoreTest extends FunctionalTest {
         RMTHelper.createNode(node1Name);
 
         RMTHelper.log("Adding node " + node1URL);
-        admin.addNode(node1URL);
+        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
 

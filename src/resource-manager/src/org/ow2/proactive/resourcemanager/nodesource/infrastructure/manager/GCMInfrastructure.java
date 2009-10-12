@@ -35,15 +35,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.rmi.dgc.VMID;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -53,7 +49,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -64,7 +59,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * nodes from the infrastructure.
  *
  */
-public class GCMInfrastructure extends InfrastructureManager {
+public class GCMInfrastructure extends DefaultInfrastructureManager {
 
     /**
      * Deployment data container
@@ -74,15 +69,11 @@ public class GCMInfrastructure extends InfrastructureManager {
         boolean deployed = false;
     }
 
-    /** logger*/
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
     /** path to GCM deployment descriptor */
     protected static String GCMD_PROPERTY_NAME;
     /** path to GCM application descriptor */
     protected static String gcmApplicationFile;
 
-    /** registered nodes number */
-    protected int nodesCount = 0;
     /** deployment data list */
     protected DeploymentData deploymentData = new DeploymentData();
     /** configurable path to a deployment descriptor */
@@ -154,7 +145,7 @@ public class GCMInfrastructure extends InfrastructureManager {
 
     /**
      * Asynchronous request of all nodes acquisition.
-     * Nodes should register themselves by calling {@link RMCore#addNode(String)}
+     * Nodes should register themselves by calling {@link RMCore#addNode(String, String)}
      */
     public void acquireAllNodes() {
         logger.debug("Acquire all nodes request");
@@ -178,23 +169,7 @@ public class GCMInfrastructure extends InfrastructureManager {
      */
     public void removeNode(Node node) throws RMException {
         try {
-
-            logger.info("Terminating the node " + node.getNodeInformation().getName());
-            if (!isThereNodesInSameJVM(node)) {
-                final Node n = node;
-                nodeSource.executeInParallel(new Runnable() {
-                    public void run() {
-                        try {
-                            logger.info("Terminating the runtime " + n.getProActiveRuntime().getURL());
-                            n.getProActiveRuntime().killRT(false);
-                        } catch (Exception e) {
-                            //do nothing, no exception treatment for node just killed before
-                        }
-                    }
-                });
-            }
-            nodesCount--;
-
+            super.removeNode(node);
             if (nodesCount == 0) {
                 // last node release - clear deployment status
                 // for standard GCM it's the only one possible granularity
@@ -289,25 +264,6 @@ public class GCMInfrastructure extends InfrastructureManager {
      */
     public String getDescription() {
         return "Infrastructure described in GCM deployment descriptor";
-    }
-
-    /**
-     * Check if there are any other nodes handled by the NodeSource in the same JVM of the node
-     * passed in parameter.
-     * @param node Node to check if there any other node of the NodeSource in the same JVM
-     * @return true there is another node in the node's JVM handled by the nodeSource, false otherwise.
-     */
-    public boolean isThereNodesInSameJVM(Node node) {
-        VMID nodeID = node.getVMInformation().getVMID();
-        String nodeToTestUrl = node.getNodeInformation().getURL();
-        Collection<Node> nodesList = nodeSource.getAliveNodes();
-        for (Node n : nodesList) {
-            if (!n.getNodeInformation().getURL().equals(nodeToTestUrl) &&
-                n.getVMInformation().getVMID().equals(nodeID)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

@@ -47,6 +47,7 @@ import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.console.Command;
@@ -105,8 +106,10 @@ public class AdminRMModel extends ConsoleModel {
         commands.add(new Command("removenode(nodeURL,preempt)",
             "Remove the given node (parameter is a string representing the node URL,"
                 + " node is removed immediately if second parameter is true)"));
-        commands.add(new Command("createns(nsName,infr,pol)",
-            "Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastrucure', 'param1', ...], ['policy', 'param1', ...]))"));
+        commands
+                .add(new Command(
+                    "createns(nsName,infr,pol)",
+                    "Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastrucure', 'param1', ...], ['policy', 'param1', ...]))"));
         commands.add(new Command("removens(nsName,preempt)",
             "Remove the given node source (parameter is a string representing the node source name to remove,"
                 + " nodeSource is removed immediately if second parameter is true)"));
@@ -328,7 +331,7 @@ public class AdminRMModel extends ConsoleModel {
     private boolean createns_(String nodeSourceName, String[] imInputParams, String[] policyInputParams) {
 
         try {
-            String imName = GCMInfrastructure.class.getName();
+            String imName = DefaultInfrastructureManager.class.getName();
             if (imInputParams != null && imInputParams.length > 1) {
                 imName = imInputParams[0];
             }

@@ -113,7 +113,7 @@ public class MyAO implements Serializable {
             RMAdmin rmAdmin = rmAuth.logAsAdmin(Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
             byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(GCMDPath));
-            rmAdmin.createNodesource(NodeSource.DEFAULT_NAME, GCMInfrastructure.class.getName(),
+            rmAdmin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
                     new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
         }
         System.out.println("Scheduler successfully created !");
