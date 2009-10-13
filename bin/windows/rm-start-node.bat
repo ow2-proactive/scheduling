@@ -11,7 +11,7 @@ echo.
 echo Start a new Node
 echo    - 1 : the url of the node to create
 echo.
-echo ex : startNode  rmi://localhost/node1
+echo ex : rm-start-node.bat  rmi://localhost/node1
 echo.
 echo Node started with a random name
 echo.
