@@ -2,7 +2,7 @@
 
 CLASSPATH=.
 workingDir=`dirname $0`
-. $workingDir/env.sh
+. $workingDir/env log4j-client
 
 eval $JAVACMD org.objectweb.proactive.extensions.vfsprovider.console.PAProviderServerStarter $@
 
