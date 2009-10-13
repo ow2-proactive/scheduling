@@ -199,7 +199,7 @@ public final class PAAgentServiceRMStarter {
             }
             // Optional node name
             if (cl.hasOption('n')) {
-                nodeName = cl.getOptionValue('r');
+                nodeName = cl.getOptionValue('n');
             }
             // Optional node source name
             if (cl.hasOption('s')) {
