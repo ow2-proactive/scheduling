@@ -119,8 +119,10 @@ public class JavaTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
-            if (isWallTime())
+            if (isWallTime()) {
                 cancelTimer();
+            }
+            terminateDataSpace();
             if (core != null) {
                 // This call should be conditioned by the isKilled ... ?
                 this.finalizeTask(core);
