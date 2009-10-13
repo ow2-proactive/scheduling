@@ -125,7 +125,6 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scripting.ScriptException;
-import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -640,14 +639,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             InternalJob currentJob = jobs.get(taskDescriptor.getJobId());
             InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
             InternalTask sentinel = internalTask;
-            int ssHashCode = SelectionScript.hashCodeFromList(internalTask.getSelectionScripts());
-            NodeSet ns = internalTask.getNodeExclusion();
+            SchedulingTaskComparator referentComp = new SchedulingTaskComparator(internalTask);
+            SchedulingTaskComparator currentComp = referentComp;
             logger_dev.debug("Get the most nodes matching the current selection");
             //if free resources are available and (selection script ID and Node Exclusion) are the same as the first
-            while (freeResourcesNb > 0 &&
-                (ssHashCode == SelectionScript.hashCodeFromList(internalTask.getSelectionScripts())) &&
-                (ns == internalTask.getNodeExclusion() || (ns != null && ns.equals(internalTask
-                        .getNodeExclusion())))) {
+            while (freeResourcesNb > 0 && referentComp.equals(currentComp)) {
+                taskDescriptor = taskRetrivedFromPolicy.get(taskToCheck);
+                currentJob = jobs.get(taskDescriptor.getJobId());
+                internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
                 //last task to be launched
                 sentinel = internalTask;
                 if (internalTask.getNumberOfNodesNeeded() > freeResourcesNb) {
@@ -665,9 +664,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 if (taskToCheck >= taskRetrivedFromPolicy.size()) {
                     break;
                 }
-                taskDescriptor = taskRetrivedFromPolicy.get(taskToCheck);
-                currentJob = jobs.get(taskDescriptor.getJobId());
-                internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
+                {
+                    //create next comparator
+                    TaskDescriptor td = taskRetrivedFromPolicy.get(taskToCheck);
+                    InternalTask it = jobs.get(td.getJobId()).getIHMTasks().get(td.getId());
+                    currentComp = new SchedulingTaskComparator(it);
+                }
             }
 
             logger_dev.debug("Number of nodes to ask for : " + nbNodesToAskFor);
@@ -675,11 +677,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             if (nbNodesToAskFor > 0) {
                 logger.debug("Asking for " + nbNodesToAskFor + " node(s) with" +
-                    ((ssHashCode == 0) ? "out " : " ") + "selection script");
+                    ((referentComp.getSsHashCode() == 0) ? "out " : " ") + "selection script");
 
                 try {
                     nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, internalTask
-                            .getSelectionScripts(), ns);
+                            .getSelectionScripts(), internalTask.getNodeExclusion());
                     //the following line is used to unwrap the future, warning when moving or removing
                     //it may also throw a ScriptException which is a RuntimeException
                     logger.debug("Got " + nodeSet.size() + " node(s)");
@@ -707,6 +709,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
 
             }
+
+            //remove unschedulable task
             if (nbNodesToAskFor <= 0 || nodeSet.size() == 0) {
                 //if RM returns 0 nodes, i.e. no nodes satisfy selection script (or no nodes at all)
                 //remove these tasks from the tasks list to Schedule, and then prevent infinite loop :
@@ -721,6 +725,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             Node node = null;
 
+            //start selected tasks
             try {
                 while (nodeSet != null && !nodeSet.isEmpty()) {
                     taskDescriptor = taskRetrivedFromPolicy.get(0);

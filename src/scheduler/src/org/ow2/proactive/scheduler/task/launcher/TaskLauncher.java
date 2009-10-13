@@ -298,11 +298,11 @@ public abstract class TaskLauncher implements InitActive {
      * Set scheduler related variables for the current task. 
      */
     protected void initEnv() {
-        System.setProperty("" + SchedulerVars.JAVAENV_JOB_ID_VARNAME, "" + this.taskId.getJobId());
-        System.setProperty("" + SchedulerVars.JAVAENV_JOB_NAME_VARNAME, "" +
-            this.taskId.getJobId().getReadableName());
-        System.setProperty("" + SchedulerVars.JAVAENV_TASK_ID_VARNAME, "" + this.taskId);
-        System.setProperty("" + SchedulerVars.JAVAENV_TASK_NAME_VARNAME, "" + this.taskId.getReadableName());
+        System.setProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), this.taskId.getJobId().value());
+        System.setProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), this.taskId.getJobId()
+                .getReadableName());
+        System.setProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
+        System.setProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId.getReadableName());
     }
 
     /**

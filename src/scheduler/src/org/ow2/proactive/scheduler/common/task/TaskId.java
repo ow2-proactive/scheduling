@@ -60,4 +60,14 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
      */
     public String getReadableName();
 
+    /**
+     * Get the value of the TaskId.<br />
+     * As the internal implementation of this class can change, It is strongly recommended to use this method
+     * to get a literal value of the ID.<br />
+     * Use this value if you lost the TaskId Object returned by the scheduler.
+     *
+     * @return the textual representation of this TaskId
+     */
+    public String value();
+
 }

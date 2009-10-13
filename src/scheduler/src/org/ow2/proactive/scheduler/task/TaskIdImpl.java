@@ -194,6 +194,13 @@ public final class TaskIdImpl implements TaskId {
      */
     @Override
     public String toString() {
+        return value();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String value() {
         return "" + this.id;
     }
 }
