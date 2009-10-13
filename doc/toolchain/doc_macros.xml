@@ -1,5 +1,6 @@
 <project>
 	<import file="doc_paths.xml" />
+
 	<!-- ==================================================================== -->
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
@@ -44,7 +45,12 @@
 				<fileset dir="${snippets.location}"/>
 			</delete>
 			<mkdir dir="${snippets.location}"/>
-			<java classname="doc.snippets.Snippetizer" fork="true">
+			<if name="snippets.start">
+				<else>
+					<property name="snippets.start" value="${snippets.start.default}" />
+				</else>
+			</if>
+			<java classname="doc.snippets.Snippetizer" fork="true" >
 				<classpath refid="docs.utils.classpath"/>
 				<!-- The root for parser start, it will check all the files in the dir and subdirs-->
 				<arg value="${snippets.start}" />
@@ -76,12 +82,13 @@
 			<xslt basedir="${docs.src.dir}"  in="${docs.tmp.dir}/@{docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${docs.xsl.profiling}" force="yes">
 				<param name="profile.os" expression="@{docbook.profile}" />
 				<param name="tmp.dir" expression="${docs.tmp.dir}/" />
+				<param name="url.file.prefix" expression="${url.file.prefix}" />
 				<classpath refid="docs.utils.classpath" />
 			</xslt>
 
 			<java classname="com.icl.saxon.StyleSheet" fork="true" dir="@{docbookOutputDir}">
 				<classpath refid="docs.utils.classpath" />
-				<jvmarg value="-Dxslthl.config=file://${docs.highlighting.dir}/xml/xslthl-config.xml"/>
+				<jvmarg value="-Dxslthl.config=${xslthl.path}"/>
 				<arg line="-o @{docbookOutputFile} ${docs.tmp.dir}/profiled.xml @{docbookStyle}"/>
 				<arg value="TODAY=${TODAY}" />
 				<arg value="VERSION=${version}" />
@@ -126,8 +133,6 @@
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<macrodef name="manualSingleHtml" description="Make only the big html file in the manual">
-		<!--<attribute name="mainFile" value="${docs.mainFile}" />-->
-
 		<sequential>
 		  <docbookPreProcess output.docs.dir="${docs.html.single.dir}" />
 		  <docbookTransform docbookInputFile="${docs.mainFile}" 
@@ -198,4 +203,69 @@
 	</macrodef>
 	
 	
+	<!-- ==================================================================== -->
+	<!--                            Javadoc checkstyle                        -->
+	<!-- ==================================================================== -->
+	<taskdef resource="checkstyletask.properties" classpath="${compile.dir}/lib/checkstyle-all-5.0-beta01.jar"/>
+
+	<macrodef name="javadoc.checkstyle" description="Generate javadoc violation reports">
+	  <sequential>
+	    <property name="checkstyle.plain.file" value="${docs.built.dir}/${doc.name}_javadoc.txt"/>
+	    <property name="checkstyle.xml.file" value="${docs.built.dir}/${doc.name}_javadoc.xml"/>
+	    <property name="translation.severity" value="ignore"/>
+	    <mkdir dir="${docs.built.dir}"/>
+	    <checkstyle config="${checkstyle.config}"
+		  failOnViolation="false">
+		<formatter type="plain"  tofile="${checkstyle.plain.file}"/>
+		<formatter type="xml" tofile="${checkstyle.xml.file}"/>
+		<fileset dir="${checkstyle.src.set}" includes="**/*.java"/>
+	    </checkstyle>
+	  </sequential>
+	</macrodef>
+
+
+   <taskdef name="xsddoc" classname="net.sf.xframe.xsddoc.Task">
+        <classpath>
+            <fileset dir="${docs.lib.dir}">
+                   <include name="xalan-2.7.0.jar" />
+                   <include name="xercesImpl-2.7.1.jar" />
+                   <include name="xerces.jar" />
+                   <include name="xml-apis.jar"/>
+                   <include name="xsddoc.jar"/>
+            </fileset>
+        </classpath>
+    </taskdef>
+
+    <macrodef name="xsddoc.gcmd" description="build documentation for GCM Deployment schema using xsddoc">
+        <sequential>
+            <property name="gcmd.dir" value="${docs.schemas.dir}/gcmd" />
+            <mkdir dir="${gcmd.dir}"/>
+            <xsddoc out="${gcmd.dir}"
+                    title="GCM Deployment Schema"
+                    verbose="true"
+                    header="&lt;img width='70%' src='${base.dir}/doc/pa/images/Logo-ProActive.png' /&gt;"
+                    bottom=" "
+                    file="${src.extensions.dir}/${extensions.path}/gcmdeployment/schema/ExtensionSchemas.xsd" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="xsddoc.gcma" description="build documentation for GCM Application schema using xsddoc">
+        <sequential>
+            <property name="gcma.dir" value="${docs.schemas.dir}/gcma" />
+            <mkdir dir="${gcma.dir}"/>
+            <xsddoc out="${gcma.dir}"
+                    title="GCM Application Schema"
+                    verbose="true"
+                    header="&lt;img width='70%' src='${base.dir}/doc/pa/images/Logo-ProActive.png' /&gt;"
+                    bottom=" "
+                    file="${src.extensions.dir}/${extensions.path}/gcmdeployment/schema/ApplicationDescriptorSchema.xsd" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="schemas" description="build documentation for GCM schemas">
+        <sequential>
+            <xsddoc.gcmd/>
+            <xsddoc.gcma/>
+        </sequential>
+    </macrodef>
 </project>

@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir=".">
 
+    <!-- ************
+        Taskdefs
+    -->
+
+    <taskdef name="if" classname="ise.antelope.tasks.IfTask" />
+
+    <condition property="isWindows">
+           <os family="Windows"/>
+    </condition>
+
 	<!--  =============================================================== -->
 	<!--                   Doc directories paths                          -->
 	<!--  =============================================================== -->
 	<property name="base.dir"      			value="${basedir}" /> <!-- doc/toolchain folder -->		
-	<property name="docs.dir"      			value="${base.dir}/doc/" /> <!-- doc folder -->	
+	<property name="docs.dir"      			value="${base.dir}/doc" /> <!-- doc folder -->
 	<property name="docs.src.dir"       		value="${docs.dir}/src" /> <!-- doc/src folder -->	
 	<property name="docs.tmp.dir"  			value="${docs.dir}/tmp" /> <!-- doc/tmp folder -->
 	<property name="docs.toolchain.dir"		value="${docs.dir}/toolchain" /> <!-- doc/toolchain folder -->
@@ -19,10 +29,10 @@
 	<property name="docs.html.multiple.dir"		value="${docs.built.dir}/multiple_html/" />
 	<property name="docs.html.single.dir"		value="${docs.built.dir}/single_html/" />
 	<property name="docs.pdf.dir"			value="${docs.built.dir}/pdf/" />
-	
+	<property name="docs.schemas.dir"          value="${docs.built.dir}/schemas/" />
 	
 	<property name="docs.mainFile" 			value="main.xml" />
-	<property name="snippets.start"			value="${docs.dir}/../src" />
+	<property name="snippets.start.default"	value="${docs.dir}/../src" />
 	<property name="snippets.location"		value="${docs.tmp.dir}/automatic_snippets" />
 	
 	
@@ -90,7 +100,24 @@
 	<property name="docs.javadoc.window.title" 	value="${doc.name}"/>
 	<property name="javadoc.tmp.dir"  		value="../doc/tmp" />
 
-   <!-- Directory of xml configuration files for highlighting -->
+	<!-- ================================================================ -->
+	<!--                   checkstyle properties                          -->
+	<!--  =============================================================== -->
+
+	<property name="checkstyle.path"		value="${docs.toolchain.dir}/checkstyle/" />
+	<property name="checkstyle.suppressions.file"	value="${checkstyle.path}/suppressions.xml"/>
+	<property name="checkstyle.header.file" 	value="${checkstyle.path}/proactive.header"/>
+	<property name="checkstyle.importcontrol.file" 	value="${checkstyle.path}/import-control.xml"/>
+	<property name="checkstyle.config" 		value="${checkstyle.path}/proactive_checks.xml"/>
+
+  <!-- Directory of xml configuration files for highlighting -->
    <property name="docs.highlighting.dir" value="${docs.toolchain.dir}/highlighting"/>
 
+    <if name="isWindows">
+        <property name="url.file.prefix" value="file:///" />
+        <else>
+            <property name="url.file.prefix" value="file://" />
+        </else>
+    </if>
+    <property name="xslthl.path" value="${url.file.prefix}${docs.highlighting.dir}/xml/xslthl-config.xml" />
 </project>

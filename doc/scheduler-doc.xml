@@ -3,6 +3,8 @@
 	<property name="scheduler.file.set" value="../doc/toolchain" />
 	<property name="scheduler.src.dir" value="../doc/src" />
 	<import file="toolchain/doc_paths.xml" />
+	<property name="snippets.start" value="${snippets.start.default}:${docs.dir}/../samples" />
+
 
 	<!-- ================================================================ -->
 	<!--            Create docs, which is the javadoc + manual            -->

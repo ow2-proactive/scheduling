@@ -65,7 +65,7 @@
 				will assume that you are familiar with the example in
 				<xref linkend="Scheduler_Matlab_More_Complex"/>
 				. This example will solve numerically the Bouncing Ball problem.
-                 <programlisting><textobject><textdata fileref="../../src/scheduler/src/org/ow2/proactive/scheduler/examples/documentation/modelica/BouncingBall.mo"/></textobject></programlisting>
+                 <programlisting><textobject><textdata fileref="../../samples/jobs_descriptors/job_modelica/BouncingBall.mo"/></textobject></programlisting>
 			</para>
             <section xml:id="Scheduler_Modelica_Jobs_Split"><info><title>Tasks split </title></info>
                 <para>The omc compiler is used in several steps, to make the source code, build and run the executable.</para>

@@ -10,6 +10,7 @@
 	<!-- These templates change fileref attributes of textdata tags from relative paths to absolute paths-->
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 	<xsl:param name="tmp.dir"/>
+    <xsl:param name="url.file.prefix" />
 
 	<xsl:template match="/">
 			 <xsl:apply-templates/>
@@ -27,9 +28,9 @@
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="name()='fileref' and name(..)='textdata'">
-						<xsl:attribute name="fileref">
-							<xsl:value-of select="concat('file://',$tmp.dir,$filename)"/>
-						</xsl:attribute>
+				<xsl:attribute name="fileref">
+                    <xsl:value-of select="concat($url.file.prefix,$tmp.dir,$filename)"/>
+				</xsl:attribute>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:copy/>

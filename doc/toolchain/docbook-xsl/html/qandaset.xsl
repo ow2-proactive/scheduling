@@ -176,10 +176,10 @@
     <td align="{$direction.align.start}" valign="top">
       <xsl:choose>
         <xsl:when test="$deflabel = 'none' and not(label)">
-          <b><xsl:apply-templates select="*[local-name(.) != 'label']"/></b>
+          <p><b><xsl:apply-templates select="*[local-name(.) != 'label']"/></b></p>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:apply-templates select="*[local-name(.) != 'label']"/>
+          <p><b><xsl:apply-templates select="*[local-name(.) != 'label']"/></b></p>
         </xsl:otherwise>
       </xsl:choose>
     </td>
