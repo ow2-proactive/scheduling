@@ -72,7 +72,15 @@ import java.util.*;
  */
 public class MatlabTask extends JavaExecutable implements NotificationListener {
 
+    /**
+     * Is this task run in debug mode ?
+     */
     protected boolean debug;
+
+    /**
+     * Do we keep the Matlab engine between tasks ?
+     */
+    protected boolean keepEngine = false;
 
     /**
      * This hostname, for debugging purpose
@@ -197,10 +205,6 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
                 System.out.println(matlabConfig);
             }
 
-            // We create a custom URI as the node name
-            //            uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
-            //                    Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
-            //                    .toString();
             if (debug) {
                 System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
             }
@@ -320,6 +324,11 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
             debug = Boolean.parseBoolean(d);
         }
 
+        String ke = (String) args.get("keepEngine");
+        if (ke != null) {
+            keepEngine = Boolean.parseBoolean(ke);
+        }
+
         host = java.net.InetAddress.getLocalHost().getHostName();
     }
 
@@ -359,7 +368,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
      */
     protected Serializable executeInternal(TaskResult... results) throws Throwable {
 
-        boolean releaseEngine = inputScript.indexOf("PROACTIVE_INITIALIZATION_CODE") == -1;
+        boolean notInitializationTask = inputScript.indexOf("PROACTIVE_INITIALIZATION_CODE") == -1;
         MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
         AOMatlabWorker sw = jvminfo.getWorker();
         if (sw == null) {
@@ -396,7 +405,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
             if (debug) {
                 System.out.println("[" + host + " MatlabTask] Received result");
             }
-            if (releaseEngine) {
+            if (notInitializationTask && !keepEngine) {
                 if (debug) {
                     System.out.println("[" + host + " MatlabTask] Terminating Matlab engine");
                 }

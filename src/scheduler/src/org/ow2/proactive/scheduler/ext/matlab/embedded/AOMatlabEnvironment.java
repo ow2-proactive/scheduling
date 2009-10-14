@@ -366,7 +366,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      * @param priority     priority of the job
      */
     public ArrayList<Token> solve(String[] inputScripts, String[] mainScripts, URL scriptURL,
-            String[] scriptParams, JobPriority priority, boolean debugJob) {
+            String[] scriptParams, JobPriority priority, boolean debugJob, boolean keepEngine) {
 
         if (schedulerStopped) {
             System.err.println("[AOMatlabEnvironment] the Scheduler is stopped");
@@ -406,6 +406,9 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             schedulerTask.setDescription(mainScripts[i]);
             if (debugJob) {
                 schedulerTask.addArgument("debug", "true");
+            }
+            if (keepEngine) {
+                schedulerTask.addArgument("keepEngine", "true");
             }
             schedulerTask.setExecutableClassName("org.ow2.proactive.scheduler.ext.matlab.MatlabTask");
             if (availableScript != null) {

@@ -7,14 +7,16 @@
 %       func - a handle to a Matlab or user-defined function
 %       args - a one-dimensional cell array of objects holding the parameters. If the cell
 %              contains X elements, then X tasks will be deployed.
-%              Nested cells and structures can be used inside the cell array.
-%              Functions, or other Matlab user-defined classes are not supported.
+               Each cell must contain another cell array corresponding to the function multiple parameters.
+               If the function takes a single parameter, then the nested cell arrays must be of size one each
+%
 %       debug - '-debug' if the computation needs to be run in debug mode
 %
 %   Ouputs:
 %       results - a cell array containing the results. The cell array will be of the same size as the input cell array.
 %
-%   Example: results = PAsolve(@factorial,{1, 2, 3, 4, 5})
+%   Example: results = PAsolve(@factorial,{{1}, {2}, {3}, {4}, {5})
+%           Calls on remote machines factorial(1), factorial(2), etc...
 %
 %/*
 % * ################################################################
@@ -148,7 +150,7 @@ for i=1:length(tblist)
 end
 
 % send the task list to the scheduler
-resfuture = solver.solve(inputScripts,mainScripts,scriptUrl,scriptParams,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug);
+resfuture = solver.solve(inputScripts,mainScripts,scriptUrl,scriptParams,org.ow2.proactive.scheduler.common.job.JobPriority.NORMAL, debug, false);
 if length(args) == 1
   results = PAResult(resfuture);
 else
