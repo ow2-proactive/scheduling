@@ -64,6 +64,20 @@ public @interface Configurable {
     boolean password() default false;
 
     /**
+     * Data contained in the field should not be editable by the user
+     */
+    boolean editable() default true;
+
+    /**
+     * Field describes a method to connect to a RM, or a Scheduler
+     */
+    Auth auth() default Auth.RM;
+
+    public static enum Auth {
+        SCHEDULER, RM
+    };
+
+    /**
      * Field represents a file. File browser will be added to the GUI.
      * A file will be loaded and converted to a byte array.
      */
