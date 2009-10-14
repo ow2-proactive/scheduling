@@ -28,57 +28,41 @@
  *
  * ################################################################
  */
-package org.ow2.proactive.resourcemanager.gui.tree.actions;
+package org.ow2.proactive.resourcemanager.gui.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 
 
 /**
  * @author The ProActive Team
  *
  */
-public class CollapseAllAction extends Action {
-
-    /**
-     * determine the enabled/disabled action state at its instantiation
-     */
+public class ExpandAllAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;
-    private static CollapseAllAction instance = null;
+    private static ExpandAllAction instance = null;
     private TreeViewer viewer = null;
 
-    private CollapseAllAction(TreeViewer viewer) {
+    private ExpandAllAction(TreeViewer viewer) {
         this.viewer = viewer;
-        this.setText("Collapse All");
-        this.setToolTipText("To collapse all items");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/collapseall.gif"));
+        this.setText("Expand All");
+        this.setToolTipText("To expand all items");
+        this.setImageDescriptor(Activator.getImageDescriptor("icons/collapseall.gif"));        
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
-    /**
-     * @see org.eclipse.jface.action.Action#run()
-     */
     @Override
     public void run() {
-        viewer.collapseAll();
+        viewer.expandAll();
     }
 
-    /**
-     * return a new instance of CollapseAction class
-     * @param viewer TreeViewer originating the action
-     * @return an instance of CollapseAction
-     */
-    public static CollapseAllAction newInstance(TreeViewer viewer) {
-        instance = new CollapseAllAction(viewer);
+    public static ExpandAllAction newInstance(TreeViewer viewer) {
+        instance = new ExpandAllAction(viewer);
         return instance;
     }
 
-    /**
-     * Return an instance of this class
-     * @return an instance of this class
-     */
-    public static CollapseAllAction getInstance() {
+    public static ExpandAllAction getInstance() {
         return instance;
     }
 }

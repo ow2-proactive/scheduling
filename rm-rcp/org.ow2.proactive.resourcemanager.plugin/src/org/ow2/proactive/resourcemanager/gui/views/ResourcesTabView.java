@@ -67,25 +67,37 @@ public class ResourcesTabView extends ViewPart {
         tabViewer = new RMTableViewer(parent);
         Table table = tabViewer.getTable();
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
-        new TableViewerColumn(tabViewer, SWT.LEFT).setLabelProvider(new TableLabelProvider(0));
-        new TableViewerColumn(tabViewer, SWT.LEFT).setLabelProvider(new TableLabelProvider(1));
-        new TableViewerColumn(tabViewer, SWT.CENTER).setLabelProvider(new TableLabelProvider(2));
-        new TableViewerColumn(tabViewer, SWT.LEFT).setLabelProvider(new TableLabelProvider(3));
-        new TableViewerColumn(tabViewer, SWT.LEFT).setLabelProvider(new TableLabelProvider(4));
+        
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
-        table.getColumn(0).setWidth(100);
-        table.getColumn(0).setText("Node Source");
-        table.getColumn(1).setWidth(150);
-        table.getColumn(1).setText("Host");
-        table.getColumn(2).setWidth(60);
-        table.getColumn(2).setResizable(false);
-        table.getColumn(2).setText("State");
-        table.getColumn(2).setAlignment(SWT.CENTER);
-        table.getColumn(3).setText("Since");
-        table.getColumn(3).setWidth(120);
-        table.getColumn(4).setText("URL");
-        table.getColumn(4).setWidth(10);
+        
+        final TableViewerColumn nodeSourceTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
+        nodeSourceTableViewerColumn.setLabelProvider(new TableLabelProvider(0));
+        nodeSourceTableViewerColumn.getColumn().setText("Node Source");
+        nodeSourceTableViewerColumn.getColumn().setWidth(100);
+        
+        final TableViewerColumn hostTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
+        hostTableViewerColumn.setLabelProvider(new TableLabelProvider(1));
+        hostTableViewerColumn.getColumn().setText("Host");
+        hostTableViewerColumn.getColumn().setWidth(150);
+        
+        final TableViewerColumn stateTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
+        stateTableViewerColumn.setLabelProvider(new TableLabelProvider(2));
+        stateTableViewerColumn.getColumn().setText("State");
+        stateTableViewerColumn.getColumn().setWidth(60);
+        stateTableViewerColumn.getColumn().setResizable(false);
+        stateTableViewerColumn.getColumn().setAlignment(SWT.CENTER);
+        
+        final TableViewerColumn sinceTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
+        sinceTableViewerColumn.setLabelProvider(new TableLabelProvider(3));
+        sinceTableViewerColumn.getColumn().setText("Since");
+        sinceTableViewerColumn.getColumn().setWidth(120);
+        
+        final TableViewerColumn urlTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
+        urlTableViewerColumn.setLabelProvider(new TableLabelProvider(4));
+        urlTableViewerColumn.getColumn().setText("URL");
+        urlTableViewerColumn.getColumn().setWidth(10);                
+
         table.setSortColumn(table.getColumn(1));
         hookContextMenu();
         tabViewer.addSelectionChangedListener(new TableSelectionListener());

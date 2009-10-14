@@ -27,7 +27,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -57,7 +57,7 @@ public class RemoveNodeDialog extends Dialog {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
-    private RemoveNodeDialog(final Shell parent, final ArrayList<Node> nodes) {
+    private RemoveNodeDialog(final Shell parent, final List<Node> nodes) {
 
         // Pass the default styles here
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -167,7 +167,7 @@ public class RemoveNodeDialog extends Dialog {
      * @param parent
      *            the parent
      */
-    public static void showDialog(Shell parent, ArrayList<Node> nodes) {
+    public static void showDialog(Shell parent, List<Node> nodes) {
         new RemoveNodeDialog(parent, nodes);
     }
 }

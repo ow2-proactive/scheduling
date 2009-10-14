@@ -20,7 +20,7 @@
             allowMultiple="false"
             category="org.ow2.proactive.resourcemanager.gui.views.category"
             class="org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView"
-            icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
+            icon="icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView"
             name="Tree Explorer">
       </view>
@@ -28,7 +28,7 @@
             allowMultiple="false"
             category="org.ow2.proactive.resourcemanager.gui.views.category"
             class="org.ow2.proactive.resourcemanager.gui.views.StatisticsView"
-            icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
+            icon="icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.StatisticsView"
             name="Statistics">
       </view>
@@ -36,7 +36,7 @@
             allowMultiple="false"
             category="org.ow2.proactive.resourcemanager.gui.views.category"
             class="org.ow2.proactive.resourcemanager.gui.views.NodeInfoView"
-            icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
+            icon="icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.NodeInfoView"
             name="Info">
       </view>
@@ -44,7 +44,7 @@
             allowMultiple="false"
             category="org.ow2.proactive.resourcemanager.gui.views.category"
             class="org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView"
-            icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
+            icon="icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView"
             name="Tab Explorer">
       </view>
@@ -52,7 +52,7 @@
             allowMultiple="false"
             category="org.ow2.proactive.resourcemanager.gui.views.category"
             class="org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView"
-            icon="classes/org/ow2/proactive/resourcemanager/gui/icons/pa_icon_16.gif"
+            icon="icons/pa_icon_16.gif"
             id="org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView"
             name="Compact View">
       </view>
@@ -126,18 +126,36 @@
       </command>
    </extension>
    <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="popup:org.eclipse.ui.popup.configureview"
+            targetID="org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView">
+         <action
+               class="org.ow2.proactive.resourcemanager.gui.actions.ConfigureViewAction"
+               id="org.ow2.proactive.resourcemanager.plugin.configureviewaction"
+               label="Configure view"
+               menubarPath="org.ow2.proactive.resourcemanager.plugin.configureviewmenu"
+               style="push">
+         </action>
+         <menu
+               id="org.ow2.proactive.resourcemanager.plugin.configureviewmenu"
+               label="Configure view">
+         </menu>
+      </viewerContribution>
+   </extension>
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any">
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
-               icon="classes/org/ow2/proactive/resourcemanager/gui/icons/connect.gif"
+               icon="icons/connect.gif"
                label="Connect"
                tooltip="connect to a Resource Manager">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
-               icon="classes/org/ow2/proactive/resourcemanager/gui/icons/disconnect.gif"
+               icon="icons/disconnect.gif"
                label="Disconnect"
                tooltip="disconnect from a Resource Manager">
          </command>
@@ -147,31 +165,31 @@
          </separator>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
-               icon="classes/org/ow2/proactive/resourcemanager/gui/icons/add_node.gif"
+               icon="icons/add_node.gif"
                label="Add node"
                tooltip="Add node by URL">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
-               icon="classes/org/ow2/proactive/resourcemanager/gui/icons/remove_node.gif"
+               icon="icons/remove_node.gif"
                label="Remove nodes"
                tooltip="remove nodes">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
-               icon="classes/org/ow2/proactive/resourcemanager/gui/icons/create_source.gif"
+               icon="icons/create_source.gif"
                label="Create node source"
                tooltip="Create a new node source on Resource Manager">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
-               icon="classes/org/ow2/proactive/resourcemanager/gui/icons/remove_source.gif"
+               icon="icons/remove_source.gif"
                label="Remove node source"
                tooltip="Remove an existing node source with all its nodes">
          </command>
          <command
                commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
-               icon="classes/org/ow2/proactive/resourcemanager/gui/icons/rm_shutdown.png"
+               icon="icons/rm_shutdown.gif"
                label="Shutdown"
                tooltip="Shutdown connected Resource Manager">
          </command>
@@ -183,13 +201,13 @@
                label="Connection">
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/connect.gif"
+                  icon="icons/connect.gif"
                   label="Connect"
                   tooltip="connect to a Resource Manager">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/disconnect.gif"
+                  icon="icons/disconnect.gif"
                   label="Disconnect"
                   tooltip="disconnect from a Resource Manager">
             </command>
@@ -199,31 +217,31 @@
                label="Actions">
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/add_node.gif"
+                  icon="icons/add_node.gif"
                   label="Add node"
                   tooltip="Add node by URL">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/remove_node.gif"
+                  icon="icons/remove_node.gif"
                   label="Remove nodes"
                   tooltip="remove nodes">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/create_source.gif"
+                  icon="icons/create_source.gif"
                   label="Create node source"
                   tooltip="Create a new node source on Resource Manager">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/remove_source.gif"
+                  icon="icons/remove_source.gif"
                   label="Remove node source"
                   tooltip="Remove an existing node source with all its nodes">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/rm_shutdown.png"
+                  icon="icons/rm_shutdown.png"
                   label="Shutdown"
                   tooltip="Shutdown connected Resource Manager">
             </command>
@@ -246,7 +264,7 @@
                sibling_order="&lt;command&#x0A;                  commandId=&quot;org.ow2.proactive.resourcemanager.plugin.removeNodes&quot;&#x0A;                  icon=&quot;classes/org/ow2/proactive/resourcemanager/gui/icons/remove_node.gif&quot;&#x0A;                  label=&quot;Remove nodes&quot;&#x0A;                  tooltip=&quot;remove nodes&quot;&gt;&#x0A;            &lt;/command&gt;">
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/connect.gif"
+                  icon="icons/connect.gif"
                   id="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
                   label="Connect"
                   style="push"
@@ -254,7 +272,7 @@
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/disconnect.gif"
+                  icon="icons/disconnect.gif"
                   id="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
                   label="Disconnect"
                   tooltip="disconnect from a Resource Manager">
@@ -265,31 +283,31 @@
             </separator>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/add_node.gif"
+                  icon="icons/add_node.gif"
                   label="Add node"
                   tooltip="Add node by URL">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/remove_node.gif"
+                  icon="icons/remove_node.gif"
                   label="Remove nodes"
                   tooltip="remove nodes">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/create_source.gif"
+                  icon="icons/create_source.gif"
                   label="Create node source"
                   tooltip="Create a new node source on Resource Manager">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/remove_source.gif"
+                  icon="icons/remove_source.gif"
                   label="Remove node source"
                   tooltip="Remove an existing node source with all its nodes">
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
-                  icon="classes/org/ow2/proactive/resourcemanager/gui/icons/rm_shutdown.png"
+                  icon="icons/rm_shutdown.png"
                   label="Shutdown"
                   tooltip="Shutdown connected Resource Manager">
             </command>
@@ -338,24 +356,6 @@
             schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
             sequence="R">
       </key>
-   </extension>
-   <extension
-         point="org.eclipse.ui.popupMenus">
-      <viewerContribution
-            id="popup:org.eclipse.ui.popup.configureview"
-            targetID="org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView">
-         <action
-               class="org.ow2.proactive.resourcemanager.gui.compact.actions.ConfigureViewAction"
-               id="org.ow2.proactive.resourcemanager.plugin.configureviewaction"
-               label="Configure view"
-               menubarPath="org.ow2.proactive.resourcemanager.plugin.configureviewmenu"
-               style="push">
-         </action>
-         <menu
-               id="org.ow2.proactive.resourcemanager.plugin.configureviewmenu"
-               label="Configure view">
-         </menu>
-      </viewerContribution>
    </extension>
 
 </plugin>

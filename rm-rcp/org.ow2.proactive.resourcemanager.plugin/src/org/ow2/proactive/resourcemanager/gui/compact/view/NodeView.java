@@ -27,11 +27,10 @@
  */
 package org.ow2.proactive.resourcemanager.gui.compact.view;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Label;
-import org.ow2.proactive.resourcemanager.gui.compact.CompactViewer;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 import org.ow2.proactive.resourcemanager.gui.compact.LabelMouseListener;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
@@ -47,10 +46,11 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 public class NodeView extends View {
 
     public static Image[] images = new Image[] {
-            ImageDescriptor.createFromFile(CompactViewer.class, "icons/free.gif").createImage(),
-            ImageDescriptor.createFromFile(CompactViewer.class, "icons/busy.gif").createImage(),
-            ImageDescriptor.createFromFile(CompactViewer.class, "icons/down.gif").createImage(),
-            ImageDescriptor.createFromFile(CompactViewer.class, "icons/to_release.gif").createImage(), };
+    	Activator.getImageDescriptor("icons/free.gif").createImage(),
+    	Activator.getImageDescriptor("icons/busy.gif").createImage(),
+    	Activator.getImageDescriptor("icons/down.gif").createImage(),
+    	Activator.getImageDescriptor("icons/to_release.gif").createImage(),
+    };    
 
     public NodeView(TreeLeafElement element, Filter filter) {
         super(element);

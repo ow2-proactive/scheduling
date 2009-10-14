@@ -31,10 +31,10 @@
  */
 package org.ow2.proactive.resourcemanager.gui.table;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 
 
@@ -57,17 +57,13 @@ public class TableLabelProvider extends ColumnLabelProvider {
         if (element instanceof Node && columnIndex == STATE_COLUMN_NUMBER) {
             switch (((Node) element).getState()) {
                 case DOWN:
-                    return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/down.gif")
-                            .createImage();
+                    return Activator.getImageDescriptor("icons/down.gif").createImage();
                 case FREE:
-                    return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/free.gif")
-                            .createImage();
+                    return Activator.getImageDescriptor("icons/free.gif").createImage();
                 case BUSY:
-                    return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/busy.gif")
-                            .createImage();
+                    return Activator.getImageDescriptor("icons/busy.gif").createImage();
                 case TO_BE_RELEASED:
-                    return ImageDescriptor.createFromFile(RMTableViewer.class, "icons/to_release.gif")
-                            .createImage();
+                    return Activator.getImageDescriptor("icons/to_release.gif").createImage();
             }
         }
         return null;

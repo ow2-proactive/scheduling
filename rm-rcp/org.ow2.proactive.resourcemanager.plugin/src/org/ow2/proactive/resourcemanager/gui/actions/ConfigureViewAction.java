@@ -25,7 +25,7 @@
  *
  * ################################################################
  */
-package org.ow2.proactive.resourcemanager.gui.compact.actions;
+package org.ow2.proactive.resourcemanager.gui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;

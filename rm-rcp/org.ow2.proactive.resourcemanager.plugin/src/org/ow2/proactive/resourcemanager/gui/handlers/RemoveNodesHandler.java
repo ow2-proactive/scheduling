@@ -31,7 +31,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.handlers;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -49,7 +49,7 @@ public class RemoveNodesHandler extends AbstractHandler implements IHandler {
     private static RemoveNodesHandler instance;
 
     private boolean previousState = true;
-    private ArrayList<Node> selectedNodes = null;
+    private List<Node> selectedNodes = null;
 
     public RemoveNodesHandler() {
         super();
@@ -86,7 +86,7 @@ public class RemoveNodesHandler extends AbstractHandler implements IHandler {
         return null;
     }
 
-    public void setSelectedNodes(ArrayList<Node> selectedNodes) {
+    public void setSelectedNodes(List<Node> selectedNodes) {
         this.selectedNodes = selectedNodes;
         if (!previousState && selectedNodes.size() > 0) {
             fireHandlerChanged(new HandlerEvent(this, true, false));

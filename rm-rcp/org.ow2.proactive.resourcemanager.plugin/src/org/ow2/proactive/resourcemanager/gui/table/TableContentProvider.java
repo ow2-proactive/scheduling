@@ -60,11 +60,11 @@ public class TableContentProvider implements IStructuredContentProvider {
         synchronized (root) {
             //nodes sources
             for (TreeLeafElement src : root.getChildren()) {
-                String nodeSourceName = src.getName();
+                // String nodeSourceName = src.getName();
                 TreeParentElement source = (TreeParentElement) src;
                 //hosts
                 for (TreeLeafElement hst : source.getChildren()) {
-                    String hostName = hst.getName();
+                    // String hostName = hst.getName();
                     TreeParentElement host = (TreeParentElement) hst;
                     //Vms
                     for (TreeLeafElement jvms : host.getChildren()) {

@@ -13,8 +13,8 @@ Eclipse-LazyStart: true
 Eclipse-RegisterBuddy: org.ow2.proactive.resourcemanager.lib
 Bundle-ClassPath: classes/
 Export-Package: org.ow2.proactive.resourcemanager.gui,
+ org.ow2.proactive.resourcemanager.gui.actions,
  org.ow2.proactive.resourcemanager.gui.compact,
- org.ow2.proactive.resourcemanager.gui.compact.actions,
  org.ow2.proactive.resourcemanager.gui.compact.view,
  org.ow2.proactive.resourcemanager.gui.data,
  org.ow2.proactive.resourcemanager.gui.data.model,
@@ -24,5 +24,4 @@ Export-Package: org.ow2.proactive.resourcemanager.gui,
  org.ow2.proactive.resourcemanager.gui.stats,
  org.ow2.proactive.resourcemanager.gui.table,
  org.ow2.proactive.resourcemanager.gui.tree,
- org.ow2.proactive.resourcemanager.gui.tree.actions,
  org.ow2.proactive.resourcemanager.gui.views

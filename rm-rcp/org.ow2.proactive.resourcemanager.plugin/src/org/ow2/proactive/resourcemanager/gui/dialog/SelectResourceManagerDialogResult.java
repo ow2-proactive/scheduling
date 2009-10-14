@@ -30,14 +30,13 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
-import java.io.Serializable;
 
 
 /**
  * @author The ProActive Team
  *
  */
-public class SelectResourceManagerDialogResult implements Serializable {
+public class SelectResourceManagerDialogResult {
     private String url = null;
     private String login = null;
     private String password = null;

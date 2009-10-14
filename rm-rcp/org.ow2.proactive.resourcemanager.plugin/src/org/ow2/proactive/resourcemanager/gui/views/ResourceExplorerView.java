@@ -46,12 +46,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
+import org.ow2.proactive.resourcemanager.gui.actions.CollapseAllAction;
+import org.ow2.proactive.resourcemanager.gui.actions.ExpandAllAction;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.tree.RMTreeViewer;
 import org.ow2.proactive.resourcemanager.gui.tree.TreeLabelProvider;
 import org.ow2.proactive.resourcemanager.gui.tree.TreeSelectionListener;
-import org.ow2.proactive.resourcemanager.gui.tree.actions.CollapseAllAction;
-import org.ow2.proactive.resourcemanager.gui.tree.actions.ExpandAllAction;
 
 
 /**

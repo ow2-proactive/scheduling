@@ -31,7 +31,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.table;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -45,17 +45,15 @@ import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 public class TableSelectionListener implements ISelectionChangedListener {
 
     public void selectionChanged(SelectionChangedEvent event) {
-        Object selection = event.getSelectionProvider().getSelection();
-        List<Node> list = (List<Node>) ((IStructuredSelection) selection).toList();
-
-        ArrayList<Node> selectionList = new ArrayList<Node>();
-        for (Node node : list) {
-            selectionList.add(node);
-        }
-        //normally RM is connected if I can select something...
-        if (RMStore.isConnected()) {
-            RemoveNodesHandler.getInstance().setSelectedNodes(selectionList);
-        }
-    }
+		final IStructuredSelection selection = (IStructuredSelection) event
+				.getSelectionProvider().getSelection();
+		// Converting an array to a generic list using Array.asList
+		final Node[] arr = (Node[]) selection.toArray();
+		final List<Node> list = Arrays.asList(arr);
+		// normally RM is connected if I can select something...
+		if (RMStore.isConnected()) {
+			RemoveNodesHandler.getInstance().setSelectedNodes(list);
+		}
+	}
 
 }
