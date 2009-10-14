@@ -48,8 +48,6 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_SRM-common.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_ResourceManager.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-core.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-client.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-worker.jar
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%

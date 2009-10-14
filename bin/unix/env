@@ -54,8 +54,6 @@ else
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_SRM-common.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_ResourceManager.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-client.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-worker.jar"
 fi
 
 export CLASSPATH
