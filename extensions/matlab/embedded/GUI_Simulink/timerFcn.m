@@ -22,7 +22,7 @@ for i=1:length(files)
         if length(files_in_dir.mat) > 0
             fid = fopen([dir filesep files_in_dir.mat{1}]);
             if (fid ~= -1)
-                try 
+                try                     
                     %position the file to the number of rows
                     fseek(fid,4,-1);
                     num_rows = fread(fid,1,'int32');
@@ -50,6 +50,8 @@ if (finalmin +tolerance < end_time) && (finalmin >= 0)
 elseif finalmin > end_time - tolerance
     updateBar(han, hanTXTPerc, finalmin, end_time, LEDhandles);    
     cd(curr_dir);
+    dur=toc;
+    set(hanTXTPerc,'String',['Finished ' num2str(dur) ' sec'],'Visible','on');
     stopTimer_Callback(obj, curr_dir, Go_plot_button,pushbutton_start, Sim_Matlab_button,simulation_status);
     %disp('the timer is being stopped ');
 %     finalmin = finalmin

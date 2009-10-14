@@ -22,6 +22,10 @@ Windows 32bits : Matlab 7.1,7.2,7.3,7.4,7.5
 If your architecture is different, you need to run scripts bundled in SCHEDULER/extensions/matlab.
 The scripts in this directory can be run either Linux or Cygwin(under Windows)
 On Windows environment, it is mandatory to have both Cygwin (www.cygwin.com) and Mingw (www.mingw.org) installed in order to build the library.
+On Windows 64 bits, unfortunately, MinGW does not work as it is a 32bit only gcc.
+A 64bits version of MinGW exists and is available at http://sourceforge.net/projects/mingw-w64/.
+You will need to download the package called "mingw-w64_x86-64_mingw32_4.4.0-1.zip" , in "Toolchains targetting Win64" >> "Release for GCC 4.4.0"
+You can either extract it to c:\MinGW or if you want to install it to another location, you'll need to define an environment variable MINGW containing that location.
 
 In order to build the libraries :
 1a) set the MATLAB environment variable to the full path of your Matlab command.

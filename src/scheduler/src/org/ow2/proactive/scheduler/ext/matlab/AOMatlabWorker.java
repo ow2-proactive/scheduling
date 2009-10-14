@@ -80,28 +80,30 @@ public class AOMatlabWorker implements Serializable {
         MatlabEngine.Connection conn = MatlabEngine.acquire();
         try {
             conn.clear();
-            if (results.length > 1) {
-                throw new InvalidNumberOfParametersException(results.length);
-            }
+            if (results != null) {
+                if (results.length > 1) {
+                    throw new InvalidNumberOfParametersException(results.length);
+                }
 
-            if (results.length == 1) {
-                TaskResult res = results[0];
+                if (results.length == 1) {
+                    TaskResult res = results[0];
 
-                if (index != -1) {
-                    if (!(res.value() instanceof SplittedResult)) {
-                        throw new InvalidParameterException(res.value().getClass());
+                    if (index != -1) {
+                        if (!(res.value() instanceof SplittedResult)) {
+                            throw new InvalidParameterException(res.value().getClass());
+                        }
+
+                        SplittedResult sr = (SplittedResult) res.value();
+                        Token tok = sr.getResult(index);
+                        conn.put("in", tok);
+                    } else {
+                        if (!(res.value() instanceof Token)) {
+                            throw new InvalidParameterException(res.value().getClass());
+                        }
+
+                        Token in = (Token) res.value();
+                        conn.put("in", in);
                     }
-
-                    SplittedResult sr = (SplittedResult) res.value();
-                    Token tok = sr.getResult(index);
-                    conn.put("in", tok);
-                } else {
-                    if (!(res.value() instanceof Token)) {
-                        throw new InvalidParameterException(res.value().getClass());
-                    }
-
-                    Token in = (Token) res.value();
-                    conn.put("in", in);
                 }
             }
 

@@ -173,9 +173,11 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        for (TaskResult res : results) {
-            if (res.hadException()) {
-                throw res.getException();
+        if (results != null) {
+            for (TaskResult res : results) {
+                if (res.hadException()) {
+                    throw res.getException();
+                }
             }
         }
         Serializable res = null;

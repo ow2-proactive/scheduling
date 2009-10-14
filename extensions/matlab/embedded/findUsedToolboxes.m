@@ -9,7 +9,7 @@ depmodules = {};
 toolboxroot = [ matlabroot filesep 'toolbox' filesep ];
 for i=1:length(list)
     [pathstr, name, ext, versn] = fileparts(list{i});
-    if ~strcmp(name,functionName)
+    if ~strcmp(name,functionName) && length(name) > 0
         if strfind(list{i},matlabroot)
             pathwithouttoolboxroot = list{i}(length(toolboxroot)+1:length(list{i}));
             pos = strfind(pathwithouttoolboxroot,filesep);

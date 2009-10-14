@@ -66,7 +66,7 @@ end
 %     error('solver parameter should be a connection to the proactive scheduler obtained from the PAconnect function');
 % end
 if ~isa(args, 'cell')
-    error('args parameter should be of class "cell" (a cell array of values passed to each parallel task instance)');
+    error('args parameter should be of class "cell of cells" (a cell array of cell array of values passed to each parallel task instance)');
 end
 if length(args) == 0
     error('argument list of size > 0 expected');
@@ -74,31 +74,23 @@ end
 if ~isa(func, 'function_handle')
     error('func parameter should be of class "function_handle" (the function handle of the task needed to be executed in parallel)');
 end
-failure = '';
+
 v=version;
 if str2num(v(1:3)) > 7.2
-    try
-    if nargin(func)~=1
-        failure = 'func parameter should be a function with one and only one input parameter';
-    end
-    catch err
-        if strcmp(err.identifier,'MATLAB:nargin:isScript') == 1
-            error('func parameter is a script, expected a function with one input and one output');
-        else
-            throw(err);
-        end
-    end
-else
-    if nargin(func)~=1
-        failure = 'func parameter should be a function with one and only one input parameter';
-    end
-end
-if length(failure) > 0
-    error(failure);
-end
-if nargout(func)~=1
-    error('func parameter should be a function with one and only one output parameter');
-end
+     try
+        nargin(func);
+     catch err
+         if strcmp(err.identifier,'MATLAB:nargin:isScript') == 1
+             error('func parameter is a script, expected a function');
+         else
+             throw(err);
+         end
+     end
+ end
+
+ if nargout(func)~=1
+     error('func parameter should be a function with one and only one output parameter');
+ end
 
 % Get the solver from memory
 solver = PAgetsolver();
@@ -112,6 +104,9 @@ if strfunc(1) ~= '@'
     strfunc = strcat ('@', strfunc);
 end
 
+% scattering the parameter matrix
+
+
 % Creating the tasks
 inputScripts = javaArray('java.lang.String',length(args));
 mainScripts = javaArray('java.lang.String',length(args));
@@ -121,10 +116,23 @@ for i=1:length(args)
     % Creating the input command
     % (We use this amazing contribution which converts (nearly) any variable
     % to an evaluatable string)
-    main = strcat('in = ',vararg2str(args(i)),';');
+    argi = args{i};
+    if ~isa(argi,'cell')
+        error('args parameter should be of class "cell of cells" (a cell array of cell array of values passed to each parallel task instance)');
+    end
+    main ='';
+    for j=1:length(argi)
+        
+        main = [main 'in' num2str(j) ' = ' vararg2str(argi{j}) ';'];
+    end
 
     % Creating the rest of the command (evaluation of the user function)
-    main = strcat(main ,'; func = ', strfunc,'; out = func(in);');
+    main = [main '; func = ' strfunc '; out = func('];
+    for j=1:length(argi)-1
+        main = [main 'in' num2str(j) ','];
+    end
+    main = [main 'in' num2str(length(argi))];
+    main = [main ');'];
     inputScripts(i) = java.lang.String(input);
     mainScripts(i) = java.lang.String(main);
 end

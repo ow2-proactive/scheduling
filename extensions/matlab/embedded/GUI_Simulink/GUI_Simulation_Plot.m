@@ -299,7 +299,7 @@ function pushbutton_add_Callback(hObject, eventdata, handles)
 
 %specify the directory to add from
 
-str_File = uigetfile('*.m','Select Parameter File');
+str_Files = uigetfile('*.m','Select Parameter File','MultiSelect','on');
 
 %delete the file if the directory already exists
 %%if (exist(str_File(1:end-2)) == 7)
@@ -308,12 +308,18 @@ str_File = uigetfile('*.m','Select Parameter File');
 %    cd ..
 %end
 
-if ~isnumeric(str_File)
-    str_File = strtrim(str_File);
-    ht = get(handles.tree,'UserData');
+
+if ~isnumeric(str_Files)
+    if ~iscell(str_Files)
+        str_Files = { str_Files };
+    end
+    for i = 1:length(str_Files)
+        str_File = str_Files{i};
+        str_File = strtrim(str_File);
+        ht = get(handles.tree,'UserData');
 
 
-    str_List_old = get(handles.listbox_param_files,'String');
+        str_List_old = get(handles.listbox_param_files,'String');
     %    str_List_cell = get(handles.listbox_param_files,'UserData');
     %    if ~iscell(str_List_cell)
     %        str_List_cell = {str_File};
@@ -321,22 +327,23 @@ if ~isnumeric(str_File)
     %        str_List_cell = [ str_List_cell {str_File} ];
     %    end
 
-    if ~ismember(str_File,str_List_old)
-        str_List_new = [ str_List_old; {str_File} ];
+        if ~ismember(str_File,str_List_old)
+            str_List_new = [ str_List_old; {str_File} ];
 
-        if isempty(str_List_old)
-            %        str_List_new = {str_File};
-            set(handles.listbox_param_files,'Value',1);
-            %   else
-            %       str_List_new = [ str_List_old {str_File} ];
-        end
+            if isempty(str_List_old)
+                %        str_List_new = {str_File};
+                set(handles.listbox_param_files,'Value',1);
+                %   else
+                %       str_List_new = [ str_List_old {str_File} ];
+            end
 
-        set(handles.listbox_param_files,'String',str_List_new);
+            set(handles.listbox_param_files,'String',str_List_new);
         %   set(handles.listbox_param_files,'UserData',str_List_cell);
-        set(handles.pushbutton_remove,'Enable','on');
-        listbox_param_files_Callback(hObject, eventdata, handles);
-        set(handles.listbox_mat_files,'Enable','on');
-        set(handles.add_mat_button,'Enable','on');
+            set(handles.pushbutton_remove,'Enable','on');
+            listbox_param_files_Callback(hObject, eventdata, handles);
+            set(handles.listbox_mat_files,'Enable','on');
+            set(handles.add_mat_button,'Enable','on');
+        end
     end
 end
 
@@ -405,7 +412,6 @@ set(handles.textLEDpercentDone,'Visible','off');
 period = 1;
 end_time = str2num(get(handles.Simulation_end_time,'String'));
 curr_dir = get(handles.curr_dir,'UserData');
-
 Save_Mat_File_Info(hObject, eventdata, handles);
 %create a timer object here
 
@@ -413,10 +419,10 @@ T = timer('TimerFcn', {'timerFcn',end_time, param_files, handles.editLEDbkground
 %starting the timer before executing
 
 %saving the mat-file
-
+tic;
 start(T);
 
-resl = {};
+paramList = cell(1,length(param_files));
 for i = 1:length(param_files)
 
     str_cur_param = strtrim(param_files{i});
@@ -435,17 +441,15 @@ for i = 1:length(param_files)
     %% the current directory is not meant to be pwd, bu the one in which
     %% the value of the path to the selected modelname is stored
     %curr_dir = pwd ;
-    curr_dir = get(handles.edit_model,'UserData');
-    PAeval_param{i}.modelName =  model_Name;
-    PAeval_param{i}.paramFile = param_files{i};
-    PAeval_param{i}.pwd_dir = [curr_dir filesep str_cur_param];
-    PAeval_param{i}.end_time = str2num(get(handles.Simulation_end_time,'String'));
-    PAeval_param{i}.current_dir = curr_dir;
-
-    res = PAeval(@PAsolve_modelname,PAeval_param{i});
-    resl = [resl {res}];
+    PAeval_param.modelName =  model_Name;
+    PAeval_param.paramFile = param_files{i};
+    PAeval_param.pwd_dir = [curr_dir filesep str_cur_param];
+    PAeval_param.end_time = str2num(get(handles.Simulation_end_time,'String'));
+    PAeval_param.current_dir = curr_dir;
+    paramList{i} = {PAeval_param};
 end
 
+resl = PAsolve(@PAsolve_modelname, paramList); 
 
 % for i = 1:length(param_files)
 %     res = resl{i};
@@ -739,6 +743,7 @@ for i = 1:LED
     set(LEDhandles(i),'Visible','off');
 end
 set(handles.textLEDpercentDone,'Visible','off');
+set(handles.textLEDpercentDone,'String','0% Done','Visible','off');
 
 set(handles.simulation_status,'Visible','on');
 set(handles.pushbutton_start,'Enable','off');
@@ -769,10 +774,11 @@ params.current_dir = curr_dir;
 period = 1;
 end_time = params.end_time;
 %create a timer object here
+tcount = cputime;
 T = timer('TimerFcn', {'timerFcn',end_time, {param_file}, handles.editLEDbkground, handles.textLEDpercentDone, curr_dir, handles.Go_plot_button, handles.pushbutton_start, handles.Sim_Matlab_button, handles.simulation_status, {handles.textLED1, handles.textLED2, handles.textLED3, handles.textLED4, handles.textLED5, handles.textLED6, handles.textLED7, handles.textLED8, handles.textLED9, handles.textLED10}, @stopTimer_Callback} ,'ExecutionMode','FixedRate','Period',period);
 %starting the timer before executing 
+tic;
 start(T);
-
 PAsolve_modelname(params);
     
 
@@ -856,7 +862,7 @@ set(handles.remove_mat_button,'Enable','off');
 
 set(handles.pushbutton_start,'Visible','on','Enable','on');
 clear_plots_button_Callback(hObject, eventdata, handles);
-curr_dir = pwd;
+curr_dir = get(handles.curr_dir,'UserData');
 set(handles.current_directory,'String',curr_dir);
 %need to delete the file with the fullpath, as exists acts on all the files on the current path 
 if exist('M_data.mat') == 2
@@ -937,7 +943,7 @@ if ~isnumeric(curr)
     set(handles.current_directory,'String',curr);
 
     cd (curr);
-    set(handles.curr_dir,'UserData',pwd);
+    set(handles.curr_dir,'UserData',curr);    
 end
 
 
