@@ -149,21 +149,23 @@ public class RMStarter {
             // starting clean resource manager
             RMFactory.startLocal();
 
-            RMAuthentication auth = RMConnection.waitAndJoin(null);
-            RMAdmin admin = auth.logAsAdmin(Credentials.getCredentials(PAResourceManagerProperties
-                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-            String nodeSourceName = NodeSource.GCM_LOCAL;
-            int counter = 2;
+            if (deploymentDescriptors.size() > 0) {
+                RMAuthentication auth = RMConnection.waitAndJoin(null);
+                RMAdmin admin = auth.logAsAdmin(Credentials.getCredentials(PAResourceManagerProperties
+                        .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+                String nodeSourceName = NodeSource.GCM_LOCAL;
+                int counter = 2;
 
-            for (String deploymentDescriptor : deploymentDescriptors) {
-                byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
-                    deploymentDescriptor));
+                for (String deploymentDescriptor : deploymentDescriptors) {
+                    byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
+                        deploymentDescriptor));
 
-                admin.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(),
-                        new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
+                    admin.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(),
+                            new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
-                nodeSourceName = NodeSource.GCM_LOCAL + counter;
-                counter++;
+                    nodeSourceName = NodeSource.GCM_LOCAL + counter;
+                    counter++;
+                }
             }
 
             /*logger.info("(Once started, press 'e' to shutdown)");
