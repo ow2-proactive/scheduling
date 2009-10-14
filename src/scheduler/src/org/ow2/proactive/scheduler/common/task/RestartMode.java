@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTORS$$
  */
 package org.ow2.proactive.scheduler.common.task;
 
@@ -89,6 +89,7 @@ public class RestartMode implements java.io.Serializable {
      * @param description the name of the restart mode.
      */
     private RestartMode(int index, String description) {
+        this.index = index;
         this.description = description;
     }
 
@@ -99,7 +100,7 @@ public class RestartMode implements java.io.Serializable {
      * @return the RestartMode.
      */
     public static RestartMode getMode(String description) {
-        if ("elsewhere".equalsIgnoreCase(description)) {
+        if (ELSEWHERE.description.equalsIgnoreCase(description)) {
             return ELSEWHERE;
         } else {
             return ANYWHERE;

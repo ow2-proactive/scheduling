@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTORS$$
  */
 package org.ow2.proactive.scheduler.core;
 
@@ -672,12 +672,17 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             }
 
-            logger_dev.debug("Number of nodes to ask for : " + nbNodesToAskFor);
+            logger.debug("Number of nodes to ask for : " + nbNodesToAskFor);
             NodeSet nodeSet = null;
 
             if (nbNodesToAskFor > 0) {
-                logger.debug("Asking for " + nbNodesToAskFor + " node(s) with" +
-                    ((referentComp.getSsHashCode() == 0) ? "out " : " ") + "selection script");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Referent task              : " + internalTask.getId());
+                    logger.debug("Selection script(s)        : " +
+                        ((referentComp.getSsHashCode() == 0) ? "no" : "yes (" + referentComp.getSsHashCode() +
+                            ")"));
+                    logger.debug("Node(s) exclusion          : " + internalTask.getNodeExclusion());
+                }
 
                 try {
                     nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, internalTask
@@ -1233,6 +1238,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     return;
                 }
                 if (descriptor.getNumberOfExecutionLeft() > 0) {
+                    logger_dev.debug("Node Exclusion : restart mode is '" +
+                        descriptor.getRestartTaskOnError() + "'");
                     if (descriptor.getRestartTaskOnError().equals(RestartMode.ELSEWHERE)) {
                         //if the task restart ELSEWHERE
                         descriptor.setNodeExclusion(descriptor.getExecuterInformations().getNodes());
