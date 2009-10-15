@@ -48,8 +48,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * <li>Maximum busy nodes
  * <li>Maximum to be released nodes
  * <li>Maximum down nodes
- * <li>Activity time percentage
- * <li>Inactivity time percentage
+ * <li>Average activity percentage
+ * <li>Average inactivity percentage
  * </ul>
  * <p> 
  *
@@ -88,16 +88,16 @@ public interface RMAdminMBean extends RMAnonymMBean {
     public int getMaxDownNodes();
 
     /**
-     * Returns the nodes activity time percentage.
+     * Returns the average activity percentage.
      * 
-     * @return the nodes activity time percentage
+     * @return the average activity percentage
      */
-    public double getActivityTimePercentage();
+    public double getAverageActivity();
 
     /**
-     * Returns the nodes inactivity time percentage.
+     * Returns the average inactivity percentage.
      * 
-     * @return the nodes inactivity time percentage
+     * @return the average inactivity percentage
      */
-    public double getInactivityTimePercentage();
+    public double getAverageInactivity();
 }

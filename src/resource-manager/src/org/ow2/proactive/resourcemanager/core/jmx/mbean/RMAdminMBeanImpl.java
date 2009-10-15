@@ -91,16 +91,16 @@ public final class RMAdminMBeanImpl extends RMAnonymMBeanImpl implements RMAdmin
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getActivityTimePercentage()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getAverageActivity()
      */
-    public double getActivityTimePercentage() {
+    public double getAverageActivity() {
         return super.rmStatisticsHolder.getStatistics().getActivityTimePercentage();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getInactivityTimePercentage()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getAverageInactivity()
      */
-    public double getInactivityTimePercentage() {
+    public double getAverageInactivity() {
         return super.rmStatisticsHolder.getStatistics().getInactivityTimePercentage();
     }
 }
