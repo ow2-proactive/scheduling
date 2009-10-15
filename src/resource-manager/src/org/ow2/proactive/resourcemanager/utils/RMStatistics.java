@@ -140,6 +140,7 @@ public final class RMStatistics {
                         // Unknown NodeState
                 }
                 this.decrementAvailableNodesCount();
+                break;
             case NODE_STATE_CHANGED:
                 // Depending on the previous state decrement counters
                 final NodeState previousNodeState = event.getPreviousNodeState();

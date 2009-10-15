@@ -80,7 +80,7 @@ public final class RMAdminMBeanImpl extends RMAnonymMBeanImpl implements RMAdmin
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxToBeReleasedNodes()
      */
     public int getMaxToBeReleasedNodes() {
-        return super.rmStatisticsHolder.getStatistics().getMaxBusyNodes();
+        return super.rmStatisticsHolder.getStatistics().getToBeReleasedNodesCount();
     }
 
     /**
