@@ -168,14 +168,6 @@ public class RMStarter {
                 }
             }
 
-            /*logger.info("(Once started, press 'e' to shutdown)");
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            while (!br.readLine().equals("e"))
-                ;
-
-            logger.info("Shutting down the resource manager");
-            System.exit(0);*/
-
         } catch (ParseException e1) {
             displayHelp();
         } catch (Exception e) {

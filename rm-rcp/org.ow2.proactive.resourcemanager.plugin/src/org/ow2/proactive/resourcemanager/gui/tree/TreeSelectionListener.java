@@ -46,13 +46,13 @@ import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 
 public class TreeSelectionListener implements ISelectionChangedListener {
 
-    public void selectionChanged(SelectionChangedEvent event) {        
+    public void selectionChanged(SelectionChangedEvent event) {
         ArrayList<Node> selectionList = new ArrayList<Node>();
         if (event != null && event.getSelectionProvider() != null) {
             Object selection = event.getSelectionProvider().getSelection();
-            if (selection != null) {                
-                for (Object leaf : ((IStructuredSelection) selection).toList()) {                
-                    getSubTreeNodesList((TreeLeafElement)leaf, selectionList);
+            if (selection != null) {
+                for (Object leaf : ((IStructuredSelection) selection).toList()) {
+                    getSubTreeNodesList((TreeLeafElement) leaf, selectionList);
                 }
             }
         }

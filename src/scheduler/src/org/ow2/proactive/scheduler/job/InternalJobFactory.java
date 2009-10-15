@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -49,7 +48,6 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
@@ -69,7 +67,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class InternalJobFactory implements Serializable {
+public class InternalJobFactory {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FACTORY);
 
@@ -207,6 +205,7 @@ public class InternalJobFactory implements Serializable {
      * @return the created internal task.
      * @throws SchedulerException an exception if the factory cannot create the given task.
      */
+    @SuppressWarnings("unchecked")
     private static InternalTask createTask(Job userJob, JavaTask task) throws SchedulerException {
         InternalJavaTask javaTask;
 
@@ -283,18 +282,6 @@ public class InternalJobFactory implements Serializable {
     private static void setJobCommonProperties(Job job, InternalJob jobToSet)
             throws IllegalArgumentException, IllegalAccessException {
         logger_dev.info("Setting job common properties");
-        /*jobToSet.setName(job.getName());
-        jobToSet.setPriority(job.getPriority());
-        jobToSet.setCancelJobOnError(job.isCancelJobOnError());
-        jobToSet.setRestartTaskOnError(job.getRestartTaskOnError());
-        jobToSet.setMaxNumberOfExecution(job.getMaxNumberOfExecution());
-        jobToSet.setDescription(job.getDescription());
-        jobToSet.setLogFile(job.getLogFile());
-        jobToSet.setProjectName(job.getProjectName());
-        jobToSet.setEnvironment(job.getEnvironment());
-        jobToSet.setGenericInformations(job.getGenericInformations());
-        jobToSet.setInputSpace(job.getInputSpace());
-        jobToSet.setOutputSpace(job.getOutputSpace());*/
 
         autoCopyfields(CommonAttribute.class, job, jobToSet);
         autoCopyfields(Job.class, job, jobToSet);
@@ -312,19 +299,7 @@ public class InternalJobFactory implements Serializable {
      */
     private static void setTaskCommonProperties(Job userJob, Task task, InternalTask taskToSet)
             throws IllegalArgumentException, IllegalAccessException {
-        logger_dev.info("Setting task common properties");
-        /*taskToSet.setDescription(task.getDescription());
-        taskToSet.setPreciousResult(task.isPreciousResult());
-        taskToSet.setName(task.getName());
-        taskToSet.setPreScript(task.getPreScript());
-        taskToSet.setPostScript(task.getPostScript());
-        taskToSet.setCleaningScript(task.getCleaningScript());
-        taskToSet.setSelectionScripts(task.getSelectionScripts());
-        taskToSet.setResultPreview(task.getResultPreview());
-        taskToSet.setWallTime(task.getWallTime());
-        taskToSet.setNumberOfNeededNodes(task.getNumberOfNodesNeeded());
-        taskToSet.setInputFiles(task.getInputFiles());
-        taskToSet.setOutputFiles(task.getOutputFiles());*/
+        logger_dev.debug("Setting task common properties");
 
         autoCopyfields(CommonAttribute.class, task, taskToSet);
         autoCopyfields(Task.class, task, taskToSet);
@@ -367,20 +342,4 @@ public class InternalJobFactory implements Serializable {
         }
     }
 
-    /**
-     * Transform a String map into a BigString map to prepare Hibernate storage.
-     *
-     * @param arguments the String map to transform.
-     * @return The same map but with big string type
-     */
-    private static Map<String, BigString> toBigStringMap(Map<String, String> arguments) {
-        if (arguments == null) {
-            return null;
-        }
-        Map<String, BigString> tmp = new HashMap<String, BigString>();
-        for (Entry<String, String> e : arguments.entrySet()) {
-            tmp.put(e.getKey(), new BigString(e.getValue()));
-        }
-        return tmp;
-    }
 }

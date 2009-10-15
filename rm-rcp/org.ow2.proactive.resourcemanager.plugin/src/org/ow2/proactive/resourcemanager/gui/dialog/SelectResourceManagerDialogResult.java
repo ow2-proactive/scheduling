@@ -30,8 +30,6 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog;
 
-
-
 /**
  * @author The ProActive Team
  *

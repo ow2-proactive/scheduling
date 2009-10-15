@@ -45,15 +45,15 @@ import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodesHandler;
 public class TableSelectionListener implements ISelectionChangedListener {
 
     public void selectionChanged(SelectionChangedEvent event) {
-		final IStructuredSelection selection = (IStructuredSelection) event
-				.getSelectionProvider().getSelection();
-		// Converting an array to a generic list using Array.asList
-		final Node[] arr = (Node[]) selection.toArray();
-		final List<Node> list = Arrays.asList(arr);
-		// normally RM is connected if I can select something...
-		if (RMStore.isConnected()) {
-			RemoveNodesHandler.getInstance().setSelectedNodes(list);
-		}
-	}
+        final IStructuredSelection selection = (IStructuredSelection) event.getSelectionProvider()
+                .getSelection();
+        // Converting an array to a generic list using Array.asList
+        final Node[] arr = (Node[]) selection.toArray();
+        final List<Node> list = Arrays.asList(arr);
+        // normally RM is connected if I can select something...
+        if (RMStore.isConnected()) {
+            RemoveNodesHandler.getInstance().setSelectedNodes(list);
+        }
+    }
 
 }

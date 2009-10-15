@@ -46,11 +46,10 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 public class NodeView extends View {
 
     public static Image[] images = new Image[] {
-    	Activator.getImageDescriptor("icons/free.gif").createImage(),
-    	Activator.getImageDescriptor("icons/busy.gif").createImage(),
-    	Activator.getImageDescriptor("icons/down.gif").createImage(),
-    	Activator.getImageDescriptor("icons/to_release.gif").createImage(),
-    };    
+            Activator.getImageDescriptor("icons/free.gif").createImage(),
+            Activator.getImageDescriptor("icons/busy.gif").createImage(),
+            Activator.getImageDescriptor("icons/down.gif").createImage(),
+            Activator.getImageDescriptor("icons/to_release.gif").createImage(), };
 
     public NodeView(TreeLeafElement element, Filter filter) {
         super(element);

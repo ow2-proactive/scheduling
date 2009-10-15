@@ -339,7 +339,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
         checkIsEntity(o);
         Session session = beginTransaction();
         try {
-            logger_dev.info("Updating Object : " + o.getClass().getName());
+            logger_dev.debug("Updating Object : " + o.getClass().getName());
             session.update(o);
             commitTransaction(session);
         } catch (Exception e) {
@@ -518,7 +518,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
         String hql;
         Field[] fields = getDeclaredFields(clazz, true);
         boolean hasAlterable = false;
-        logger_dev.info("Synchronizing " + o.getClass().getName());
+        logger_dev.debug("Synchronizing " + o.getClass().getName());
         //start transaction
         Session session = beginTransaction();
         try {
@@ -661,7 +661,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
     public void unload(Object o) {
         Class<?> clazz = o.getClass();
         Field[] fields = getDeclaredFields(clazz, true);
-        logger_dev.info("Unloading object : " + o.getClass().getName());
+        logger_dev.debug("Unloading object : " + o.getClass().getName());
         try {
             //for each @unloadable field and non-primitive type
             for (Field f : fields) {

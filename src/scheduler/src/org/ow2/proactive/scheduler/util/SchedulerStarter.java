@@ -207,13 +207,6 @@ public class SchedulerStarter {
                 } catch (AdminSchedulerException e) {
                     logger.warn(e);
                 }
-
-                /*logger.info("(Once started, press 'e' to shutdown)");
-                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                while (!br.readLine().equals("e"))
-                    ;
-                //and terminate scheduler JVM
-                System.exit(0);*/
             }
         } catch (MissingArgumentException e) {
             logger_dev.error(e.getLocalizedMessage());
