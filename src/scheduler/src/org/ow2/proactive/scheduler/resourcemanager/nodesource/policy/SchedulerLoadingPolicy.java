@@ -61,8 +61,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
 @PolicyRestriction(supportedInfrastructures = {
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.EC2Infrastructure" })
+        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure",
+        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure" })
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive {
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
