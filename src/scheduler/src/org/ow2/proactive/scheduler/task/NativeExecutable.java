@@ -49,7 +49,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
@@ -60,6 +59,7 @@ import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.Tools;
 
 
 /**

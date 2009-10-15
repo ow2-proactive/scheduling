@@ -29,7 +29,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTORS$$
  */
-package org.ow2.proactive.scheduler.common.util;
+package org.ow2.proactive.utils;
 
 import java.net.URI;
 import java.util.ArrayList;

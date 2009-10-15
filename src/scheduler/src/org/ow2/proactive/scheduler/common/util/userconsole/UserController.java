@@ -67,7 +67,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.common.util.Tools;
+import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive.utils.console.SimpleConsole;

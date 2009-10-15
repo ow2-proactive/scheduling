@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.util.Tools;
+import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
 

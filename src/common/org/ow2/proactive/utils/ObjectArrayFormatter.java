@@ -29,7 +29,7 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.scheduler.common.util;
+package org.ow2.proactive.utils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -62,12 +62,12 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.Tools;
 
 
 /**

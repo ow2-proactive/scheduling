@@ -66,7 +66,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
-import org.ow2.proactive.scheduler.common.util.Tools;
+import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.Colors;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
