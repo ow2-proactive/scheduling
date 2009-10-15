@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $PROACTIVE_INITIAL_DEV$
+ * $ACTIVEEON_INITIAL_DEV$
  */
 package org.ow2.proactive.resourcemanager.utils.adminconsole;
 
@@ -48,8 +48,9 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.DefaultInfrastructureManager;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.scheduler.common.util.ObjectArrayFormatter;
+import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.utils.console.Command;
 import org.ow2.proactive.utils.console.ConsoleModel;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
@@ -224,28 +225,26 @@ public class AdminRMModel extends ConsoleModel {
     }
 
     private void listns_() {
-        List<RMNodeSourceEvent> list = rm.getNodeSourcesList();
-        int[] nameSize = new int[] { 11, 9 };
-        for (RMNodeSourceEvent evt : list) {
-            if (evt.getSourceName().length() > nameSize[0]) {
-                nameSize[0] = evt.getSourceName().length();
-            }
-            if (evt.getSourceDescription().length() > nameSize[1]) {
-                nameSize[1] = evt.getSourceDescription().length();
-            }
+        List<String> list;
+        List<RMNodeSourceEvent> listns = rm.getNodeSourcesList();
+        ObjectArrayFormatter oaf = new ObjectArrayFormatter();
+        oaf.setMaxColumnLength(70);
+        //space between column
+        oaf.setSpace(3);
+        //title line
+        list = new ArrayList<String>();
+        list.add("SOURCE NAME");
+        list.add("DESCRIPTION");
+        oaf.setTitle(list);
+        //separator
+        oaf.addEmptyLine();
+        for (RMNodeSourceEvent evt : listns) {
+            list = new ArrayList<String>();
+            list.add(evt.getSourceName());
+            list.add(evt.getSourceDescription());
+            oaf.addLine(list);
         }
-        nameSize[0] += 2;
-        nameSize[1] += 2;
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format(" %1$-" + nameSize[0] + "s", "SOURCE NAME"));
-        sb.append(String.format(" %1$-" + nameSize[1] + "s", "DESCRIPTION"));
-        print(sb.toString());
-        for (RMNodeSourceEvent evt : list) {
-            sb = new StringBuilder();
-            sb.append(String.format(" %1$-" + nameSize[0] + "s", evt.getSourceName()));
-            sb.append(String.format(" %1$-" + nameSize[1] + "s", evt.getSourceDescription()));
-            print(sb.toString());
-        }
+        print(Tools.getStringAsArray(oaf));
     }
 
     public static void listnodes() {
@@ -254,49 +253,35 @@ public class AdminRMModel extends ConsoleModel {
     }
 
     private void listnodes_() {
-        List<RMNodeEvent> list = rm.getNodesList();
-        if (list.size() == 0) {
+        List<RMNodeEvent> listne = rm.getNodesList();
+        if (listne.size() == 0) {
             print("No nodes handled by Resource Manager");
         } else {
-            int[] nameSize = new int[] { 11, 8, 5, 8, 3 };
-            for (RMNodeEvent evt : list) {
-                if (evt.getNodeSource().length() > nameSize[0]) {
-                    nameSize[0] = evt.getNodeSource().length();
-                }
-                if (evt.getHostName().length() > nameSize[1]) {
-                    nameSize[1] = evt.getHostName().length();
-                }
-                if (evt.getNodeState().toString().length() > nameSize[2]) {
-                    nameSize[2] = evt.getNodeState().toString().length();
-                }
-                if (evt.getStateChangeTime().toString().length() > nameSize[3]) {
-                    nameSize[3] = evt.getStateChangeTime().toString().length();
-                }
-                if (evt.getNodeUrl().length() > nameSize[4]) {
-                    nameSize[4] = evt.getNodeUrl().length();
-                }
+            List<String> list;
+            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
+            oaf.setMaxColumnLength(50);
+            //space between column
+            oaf.setSpace(2);
+            //title line
+            list = new ArrayList<String>();
+            list.add("SOURCE NAME");
+            list.add("HOSTNAME");
+            list.add("STATE");
+            list.add("SINCE");
+            list.add("URL");
+            oaf.setTitle(list);
+            //separator
+            oaf.addEmptyLine();
+            for (RMNodeEvent evt : listne) {
+                list = new ArrayList<String>();
+                list.add(evt.getNodeSource());
+                list.add(evt.getHostName());
+                list.add(evt.getNodeState().toString());
+                list.add(evt.getStateChangeTime().toString());
+                list.add(evt.getNodeUrl());
+                oaf.addLine(list);
             }
-            nameSize[0] += 2;
-            nameSize[1] += 2;
-            nameSize[2] += 2;
-            nameSize[3] += 2;
-            nameSize[4] += 2;
-            StringBuilder sb = new StringBuilder();
-            sb.append(String.format(" %1$-" + nameSize[0] + "s", "SOURCE NAME"));
-            sb.append(String.format(" %1$-" + nameSize[1] + "s", "HOSTNAME"));
-            sb.append(String.format(" %1$-" + nameSize[2] + "s", "STATE"));
-            sb.append(String.format(" %1$-" + nameSize[3] + "s", "SINCE"));
-            sb.append(String.format(" %1$-" + nameSize[4] + "s", "URL"));
-            print(sb.toString());
-            for (RMNodeEvent evt : list) {
-                sb = new StringBuilder();
-                sb.append(String.format(" %1$-" + nameSize[0] + "s", evt.getNodeSource()));
-                sb.append(String.format(" %1$-" + nameSize[1] + "s", evt.getHostName()));
-                sb.append(String.format(" %1$-" + nameSize[2] + "s", evt.getNodeState()));
-                sb.append(String.format(" %1$-" + nameSize[3] + "s", evt.getStateChangeTime()));
-                sb.append(String.format(" %1$-" + nameSize[4] + "s", evt.getNodeUrl()));
-                print(sb.toString());
-            }
+            print(Tools.getStringAsArray(oaf));
         }
     }
 

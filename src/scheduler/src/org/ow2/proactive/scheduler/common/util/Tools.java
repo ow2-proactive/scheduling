@@ -27,11 +27,10 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTORS$$
  */
 package org.ow2.proactive.scheduler.common.util;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,7 +46,7 @@ import org.objectweb.proactive.core.config.PAProperties;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public class Tools implements Serializable {
+public class Tools {
 
     /**
      * Format the given integer 'toFormat' to a String containing 'nbChar'
@@ -59,11 +58,11 @@ public class Tools implements Serializable {
      *            the number of characters of the formatted result string
      * @return the given integer formatted as a 'nbChar' length String.
      */
-    public static String formatNChar(int toFormat, int nbChar) {
+    public static String formatNChar(int toFormat, int nbChar, char replacement) {
         String formatted = toFormat + "";
 
         while (formatted.length() < nbChar) {
-            formatted = "0" + formatted;
+            formatted = replacement + formatted;
         }
 
         return formatted;
@@ -90,13 +89,13 @@ public class Tools implements Serializable {
         // Millisecondes
         tmp = (int) duration % 1000;
         duration = duration / 1000;
-        formatted = tmp + "ms" + formatted;
+        formatted = formatNChar(tmp, 3, ' ') + "ms" + formatted;
         // Secondes
         tmp = (int) duration % 60;
         duration = duration / 60;
 
         if (tmp > 0) {
-            formatted = tmp + "s " + formatted;
+            formatted = formatNChar(tmp, 2, ' ') + "s " + formatted;
         }
 
         // Minutes
@@ -104,7 +103,7 @@ public class Tools implements Serializable {
         duration = duration / 60;
 
         if (tmp > 0) {
-            formatted = tmp + "m " + formatted;
+            formatted = formatNChar(tmp, 2, ' ') + "m " + formatted;
         }
 
         // Hours
@@ -112,7 +111,7 @@ public class Tools implements Serializable {
         duration = duration / 24;
 
         if (tmp > 0) {
-            formatted = tmp + "h " + formatted;
+            formatted = formatNChar(tmp, 2, ' ') + "h " + formatted;
         }
 
         // Days
@@ -235,5 +234,15 @@ public class Tools implements Serializable {
         } else {
             return "";
         }
+    }
+
+    /**
+     * Get the columned string according to the given ObjectArrayFormatter descriptor.
+     *
+     * @param oaf the ObjectArrayFormatter describing how to print the array.
+     * @return the columned string according the given descriptor
+     */
+    public static String getStringAsArray(ObjectArrayFormatter oaf) {
+        return oaf.getAsString();
     }
 }

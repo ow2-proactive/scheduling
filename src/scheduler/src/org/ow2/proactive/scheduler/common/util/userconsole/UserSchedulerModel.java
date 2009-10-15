@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $PROACTIVE_INITIAL_DEV$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.util.userconsole;
 
@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -52,6 +53,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.util.ObjectArrayFormatter;
 import org.ow2.proactive.scheduler.common.util.Tools;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.console.Command;
@@ -74,6 +76,13 @@ public class UserSchedulerModel extends ConsoleModel {
     private ArrayList<Command> commands;
 
     protected MBeanInfoViewer jmxInfoViewer = null;
+
+    static {
+        TaskState.setSortingBy(TaskState.SORT_BY_ID);
+        TaskState.setSortingOrder(TaskState.ASC_ORDER);
+        JobState.setSortingBy(JobState.SORT_BY_ID);
+        JobState.setSortingOrder(JobState.ASC_ORDER);
+    }
 
     /**
      * Get this model. Also specify if the exit command should do something or not
@@ -448,61 +457,56 @@ public class UserSchedulerModel extends ConsoleModel {
     }
 
     private JobState jobState_(String jobId) {
+        List<String> list;
         try {
             JobState js = scheduler.getJobState(jobId);
             JobInfo ji = js.getJobInfo();
-            String state = "Job '" + ji.getJobId() + "'    name:" + ji.getJobId().getReadableName() +
+            String state = "\n   Job '" + ji.getJobId() + "'    name:" + ji.getJobId().getReadableName() +
                 "    owner:" + js.getOwner() + "    status:" + ji.getStatus() + "    #tasks:" +
                 ji.getTotalNumberOfTasks() + newline;
             print(state);
-            int[] namesSize = new int[] { 2, 4, 6, 8, 8, 13 };
-            String formattedDuration;
-            String nodesKilled;
-            for (TaskState ts : js.getTasks()) {
-                formattedDuration = Tools.getFormattedDuration(ts.getFinishedTime(), ts.getStartTime());
-                nodesKilled = (ts.getMaxNumberOfExecutionOnFailure() - ts.getNumberOfExecutionOnFailureLeft()) +
-                    "/" + ts.getMaxNumberOfExecutionOnFailure();
-                namesSize[0] = (ts.getId().toString().length() > namesSize[0]) ? ts.getId().toString()
-                        .length() : namesSize[0];
-                namesSize[1] = (cutNchar(ts.getName(), 20).length() > namesSize[1]) ? cutNchar(ts.getName(),
-                        20).length() : namesSize[1];
-                namesSize[2] = (ts.getStatus().toString().length() > namesSize[2]) ? ts.getStatus()
-                        .toString().length() : namesSize[2];
-                namesSize[3] = (cutNchar(ts.getExecutionHostName(), 24).length() > namesSize[3]) ? cutNchar(
-                        ts.getExecutionHostName(), 24).length() : namesSize[3];
-                namesSize[4] = (formattedDuration.length() > namesSize[4]) ? formattedDuration.length()
-                        : namesSize[4];
-                namesSize[5] = (nodesKilled.length() > namesSize[5]) ? nodesKilled.length() : namesSize[5];
+            //create formatter
+            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
+            oaf.setMaxColumnLength(30);
+            //space between column
+            oaf.setSpace(2);
+            //title line
+            list = new ArrayList<String>();
+            list.add("ID");
+            list.add("NAME");
+            list.add("STATUS");
+            list.add("HOSTNAME");
+            list.add("DURATION");
+            list.add("#EXECUTIONS");
+            list.add("#NODES KILLED");
+            oaf.setTitle(list);
+            //separator
+            oaf.addEmptyLine();
+            //add each lines
+            List<TaskState> tasks = js.getTasks();
+            Collections.sort(tasks);
+            for (TaskState ts : tasks) {
+                list = new ArrayList<String>();
+                list.add(ts.getId().toString());
+                list.add(ts.getName());
+                list.add(ts.getStatus().toString());
+                list.add(ts.getExecutionHostName());
+                list.add(Tools.getFormattedDuration(ts.getFinishedTime(), ts.getStartTime()));
+                if (ts.getMaxNumberOfExecution() - ts.getNumberOfExecutionLeft() < ts
+                        .getMaxNumberOfExecution()) {
+                    list.add((ts.getMaxNumberOfExecution() - ts.getNumberOfExecutionLeft() + 1) + "/" +
+                        ts.getMaxNumberOfExecution());
+                } else {
+                    list.add((ts.getMaxNumberOfExecution() - ts.getNumberOfExecutionLeft()) + "/" +
+                        ts.getMaxNumberOfExecution());
+                }
+                list.add((ts.getMaxNumberOfExecutionOnFailure() - ts.getNumberOfExecutionOnFailureLeft()) +
+                    "/" + ts.getMaxNumberOfExecutionOnFailure());
+                oaf.addLine(list);
             }
-            namesSize[0] += 2;
-            namesSize[1] += 2;
-            namesSize[2] += 2;
-            namesSize[3] += 2;
-            namesSize[4] += 2;
-            namesSize[5] += 2;
+            //print formatter
+            print(Tools.getStringAsArray(oaf));
 
-            StringBuilder stateSB = new StringBuilder();
-            stateSB.append(String.format("\t%1$-" + namesSize[0] + "s", "ID"));
-            stateSB.append(String.format(" %1$-" + namesSize[1] + "s", "NAME"));
-            stateSB.append(String.format(" %1$-" + namesSize[2] + "s", "STATUS"));
-            stateSB.append(String.format(" %1$-" + namesSize[3] + "s", "HOSTNAME"));
-            stateSB.append(String.format(" %1$-" + namesSize[4] + "s", "DURATION"));
-            stateSB.append(String.format(" %1$-" + namesSize[5] + "s", "#NODES KILLED"));
-            print(stateSB.toString());
-            for (TaskState ts : js.getTasks()) {
-                stateSB = new StringBuilder();
-                formattedDuration = Tools.getFormattedDuration(ts.getFinishedTime(), ts.getStartTime());
-                nodesKilled = (ts.getMaxNumberOfExecutionOnFailure() - ts.getNumberOfExecutionOnFailureLeft()) +
-                    "/" + ts.getMaxNumberOfExecutionOnFailure();
-                stateSB.append(String.format("\t%1$-" + namesSize[0] + "s", ts.getId()));
-                stateSB.append(String.format(" %1$-" + namesSize[1] + "s", cutNchar(ts.getName(), 20)));
-                stateSB.append(String.format(" %1$-" + namesSize[2] + "s", ts.getStatus()));
-                stateSB.append(String.format(" %1$-" + namesSize[3] + "s", cutNchar(
-                        ts.getExecutionHostName(), 24)));
-                stateSB.append(String.format(" %1$-" + namesSize[4] + "s", formattedDuration));
-                stateSB.append(String.format(" %1$-" + namesSize[5] + "s", nodesKilled));
-                print(stateSB.toString());
-            }
             return js;
         } catch (Exception e) {
             handleExceptionDisplay("Error on job " + jobId, e);
@@ -516,109 +520,71 @@ public class UserSchedulerModel extends ConsoleModel {
     }
 
     private void schedulerState_() {
+        List<String> list;
         try {
             SchedulerState state = scheduler.getSchedulerState();
-            int[] namesSize = new int[] { 2, 4, 5, 8, 7, 6, 8, 8 };
-            for (JobState js : state.getPendingJobs()) {
-                computeSpaces(namesSize, js);
+            if (state.getPendingJobs().size() + state.getRunningJobs().size() +
+                state.getFinishedJobs().size() == 0) {
+                print("\n\tThere is no jobs handled by the Scheduler");
+                return;
             }
-            for (JobState js : state.getRunningJobs()) {
-                computeSpaces(namesSize, js);
-            }
-            for (JobState js : state.getFinishedJobs()) {
-                computeSpaces(namesSize, js);
-            }
-            namesSize[0] += 4;
-            namesSize[1] += 4;
-            namesSize[2] += 4;
-            namesSize[3] += 4;
-            namesSize[4] += 4;
-            namesSize[5] += 4;
-            namesSize[6] += 4;
-            namesSize[7] += 4;
-            StringBuilder stateSB = new StringBuilder();
-            stateSB.append(String.format("\t%1$-" + namesSize[0] + "s", "ID"));
-            stateSB.append(String.format(" %1$-" + namesSize[1] + "s", "NAME"));
-            stateSB.append(String.format(" %1$-" + namesSize[2] + "s", "OWNER"));
-            stateSB.append(String.format(" %1$-" + namesSize[3] + "s", "PRIORITY"));
-            stateSB.append(String.format(" %1$-" + namesSize[4] + "s", "PROJECT"));
-            stateSB.append(String.format(" %1$-" + namesSize[5] + "s", "STATUS"));
-            stateSB.append(String.format(" %1$-" + namesSize[6] + "s", "START AT"));
-            stateSB.append(String.format(" %1$-" + namesSize[7] + "s", "DURATION"));
-            print(stateSB.toString() + "\n");
-            JobState.setSortingBy(JobState.SORT_BY_ID);
-            JobState.setSortingOrder(JobState.ASC_ORDER);
+            //create formatter
+            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
+            oaf.setMaxColumnLength(30);
+            //space between column
+            oaf.setSpace(4);
+            //title line
+            list = new ArrayList<String>();
+            list.add("ID");
+            list.add("NAME");
+            list.add("OWNER");
+            list.add("PRIORITY");
+            list.add("PROJECT");
+            list.add("STATUS");
+            list.add("START AT");
+            list.add("DURATION");
+            oaf.setTitle(list);
+            //separator
+            oaf.addEmptyLine();
+            //sort lists
             Collections.sort(state.getPendingJobs());
             Collections.sort(state.getRunningJobs());
             Collections.sort(state.getFinishedJobs());
+            //add lines to formatter
             for (JobState js : state.getFinishedJobs()) {
-                print(printFormatted(namesSize, js).toString());
+                oaf.addLine(makeList(js));
             }
-            print("");
+            if (state.getRunningJobs().size() > 0) {
+                oaf.addEmptyLine();
+            }
             for (JobState js : state.getRunningJobs()) {
-                print(printFormatted(namesSize, js).toString());
+                oaf.addLine(makeList(js));
             }
-            print("");
+            if (state.getPendingJobs().size() > 0) {
+                oaf.addEmptyLine();
+            }
             for (JobState js : state.getPendingJobs()) {
-                print(printFormatted(namesSize, js).toString());
+                oaf.addLine(makeList(js));
             }
+            //print formatter
+            print(Tools.getStringAsArray(oaf));
         } catch (Exception e) {
             handleExceptionDisplay("Error while getting list of jobs", e);
         }
 
     }
 
-    private void computeSpaces(int[] namesSize, JobState js) {
-        String formattedDuration = Tools.getFormattedDuration(js.getFinishedTime(), js.getStartTime());
-        String time = Tools.getFormattedDate(js.getStartTime());
-        namesSize[0] = (js.getId().toString().length() > namesSize[0]) ? js.getId().toString().length()
-                : namesSize[0];
-        namesSize[1] = (cutNchar(js.getName(), 20).length() > namesSize[1]) ? cutNchar(js.getName(), 20)
-                .length() : namesSize[1];
-        namesSize[2] = (js.getOwner().length() > namesSize[2]) ? js.getOwner().length() : namesSize[2];
-        namesSize[3] = (js.getPriority().toString().length() > namesSize[3]) ? js.getPriority().toString()
-                .length() : namesSize[3];
-        namesSize[4] = (cutNchar(js.getProjectName(), 20).length() > namesSize[4]) ? cutNchar(
-                js.getProjectName(), 20).length() : namesSize[4];
-        namesSize[5] = (js.getStatus().toString().length() > namesSize[5]) ? js.getStatus().toString()
-                .length() : namesSize[5];
-        namesSize[6] = (time.length() > namesSize[6]) ? time.length() : namesSize[6];
-        namesSize[7] = (formattedDuration.length() > namesSize[7]) ? formattedDuration.length()
-                : namesSize[7];
-    }
-
-    private StringBuilder printFormatted(int[] namesSize, JobState js) {
-        StringBuilder stateSB = new StringBuilder();
-        String formattedDuration = Tools.getFormattedDuration(js.getFinishedTime(), js.getStartTime());
-        String time = Tools.getFormattedDate(js.getStartTime());
-        stateSB.append(String.format("\t%1$-" + namesSize[0] + "s", js.getId()));
-        stateSB.append(String.format(" %1$-" + namesSize[1] + "s", cutNchar(js.getName(), 20)));
-        stateSB.append(String.format(" %1$-" + namesSize[2] + "s", js.getOwner()));
-        stateSB.append(String.format(" %1$-" + namesSize[3] + "s", js.getPriority()));
-        stateSB.append(String.format(" %1$-" + namesSize[4] + "s", js.getProjectName()));
-        stateSB.append(String.format(" %1$-" + namesSize[5] + "s", js.getStatus()));
-        stateSB.append(String.format(" %1$-" + namesSize[6] + "s", time));
-        stateSB.append(String.format(" %1$-" + namesSize[7] + "s", formattedDuration));
-        return stateSB;
-    }
-
-    /**
-     * Cut the given string to the specified number of character
-     *
-     * @param str the string to cut.
-     * @param nbChar the maximum length of the string to be returned
-     * @return a string that is the same as the given one if str.length() is lesser or equals to nbChar,
-     * 			otherwise a shortcut string endind with '...'
-     */
-    private String cutNchar(String str, int nbChar) {
-        if (str == null) {
-            return "";
-        }
-        nbChar--;//use to have a space after the returned string
-        if (str == null || str.length() <= nbChar) {
-            return str;
-        }
-        return str.substring(0, nbChar - 3) + "...";
+    private List<String> makeList(JobState js) {
+        List<String> list = new ArrayList<String>();
+        list.add(js.getId().toString());
+        list.add(js.getName());
+        list.add(js.getOwner());
+        list.add(js.getPriority().toString());
+        list.add(js.getProjectName());
+        list.add(js.getStatus().toString());
+        list.add(Tools.getFormattedDate(js.getStartTime()));
+        list.add(Tools.getFormattedDuration(js.getStartTime(), js.getFinishedTime()));
+        return list;
     }
 
     public static void JMXinfo() {

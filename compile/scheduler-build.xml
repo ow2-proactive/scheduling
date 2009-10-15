@@ -233,6 +233,7 @@
 				<include name="org/ow2/proactive/scheduler/common/util/JarUtils.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/SimpleLoggerServer.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/RegexpMatcher.java" />
+				<include name="org/ow2/proactive/scheduler/common/util/ObjectArrayFormatter.java" />
 				<include name="org/ow2/proactive/scheduler/common/TaskTerminateNotification.java" />
 				<include name="org/ow2/proactive/scheduler/examples/PropertyTask.java" />
 				<include name="org/ow2/proactive/scheduler/examples/NativeTestWithRandomDefault.java" />

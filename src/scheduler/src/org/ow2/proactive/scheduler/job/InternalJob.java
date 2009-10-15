@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTORS$$
  */
 package org.ow2.proactive.scheduler.job;
 
