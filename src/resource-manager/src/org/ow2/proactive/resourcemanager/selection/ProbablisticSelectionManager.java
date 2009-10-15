@@ -111,7 +111,13 @@ public class ProbablisticSelectionManager extends SelectionManager {
             return filteredList;
         }
 
-        logger.debug("Selection scripts count is " + selectionScriptList.size());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Selection scripts count is " + selectionScriptList.size() + ": ");
+            for (SelectionScript script : selectionScriptList) {
+                logger.debug("Content of the script with id " + script.hashCode() + ":\n" +
+                    script.getScript());
+            }
+        }
 
         // finding intersection
         HashMap<RMNode, Probability> intersectionMap = new HashMap<RMNode, Probability>();
@@ -142,15 +148,17 @@ public class ProbablisticSelectionManager extends SelectionManager {
         res.addAll(intersectionMap.keySet());
         Collections.sort(res, new NodeProbabilityComparator(intersectionMap));
 
-        logger.debug("The following nodes are selected for scripts execution (time is " +
-            (System.currentTimeMillis() - startTime) + " ms) :");
-        if (res.size() > 0) {
-            for (RMNode rmnode : res) {
-                logger.debug("Node url: " + rmnode.getNodeURL() + ", probability: " +
-                    intersectionMap.get(rmnode));
+        if (logger.isDebugEnabled()) {
+            logger.debug("The following nodes are selected for scripts execution (time is " +
+                (System.currentTimeMillis() - startTime) + " ms) :");
+            if (res.size() > 0) {
+                for (RMNode rmnode : res) {
+                    logger.debug("Node url: " + rmnode.getNodeURL() + ", probability: " +
+                        intersectionMap.get(rmnode));
+                }
+            } else {
+                logger.debug("None");
             }
-        } else {
-            logger.debug("None");
         }
 
         return res;

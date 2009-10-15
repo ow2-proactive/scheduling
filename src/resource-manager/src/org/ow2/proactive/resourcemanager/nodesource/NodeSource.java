@@ -602,4 +602,11 @@ public class NodeSource implements InitActive {
         threadPool.execute(command);
     }
 
+    /**
+     * Gets the pinger of the node source
+     * @return pinger object
+     */
+    public Pinger getPinger() {
+        return pinger;
+    }
 }

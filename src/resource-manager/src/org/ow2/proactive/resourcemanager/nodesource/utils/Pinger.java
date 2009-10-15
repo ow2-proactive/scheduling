@@ -37,6 +37,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.authentication.RestrictedService;
@@ -83,6 +84,7 @@ public class Pinger extends RestrictedService implements InitActive {
 
     public void initActivity(Body body) {
         PAActiveObject.setImmediateService("setPingFrequency");
+        PAActiveObject.setImmediateService("pingNode");
         PAActiveObject.setImmediateService("shutdown");
         pingerThread = Thread.currentThread();
     }
@@ -130,12 +132,7 @@ public class Pinger extends RestrictedService implements InitActive {
                     if (!this.isActive()) {
                         break;
                     }
-                    String nodeURL = node.getNodeInformation().getURL();
-                    try {
-                        node.getNumberOfActiveObjects();
-                    } catch (Exception e) {
-                        this.nodeSource.detectedPingedDownNode(nodeURL);
-                    }
+                    pingNode(node.getNodeInformation().getURL());
                 }
             } catch (BodyTerminatedException e) {
                 // node source is terminated
@@ -170,4 +167,18 @@ public class Pinger extends RestrictedService implements InitActive {
     public synchronized void setPingFrequency(int frequency) {
         pingFrequency = frequency;
     }
+
+    /**
+     * Pings the node with specified url.
+     * If the node is dead sends the request to the node source.
+     */
+    public void pingNode(String url) {
+        try {
+            Node node = NodeFactory.getNode(url);
+            node.getNumberOfActiveObjects();
+        } catch (Throwable t) {
+            nodeSource.detectedPingedDownNode(url);
+        }
+    }
+
 }
