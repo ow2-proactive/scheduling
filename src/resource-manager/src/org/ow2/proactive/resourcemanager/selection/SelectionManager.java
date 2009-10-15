@@ -176,7 +176,9 @@ public abstract class SelectionManager extends RestrictedService implements Init
             for (ScriptWithResult swr : scriptsExecutionResults.get(rmnode)) {
                 ScriptResult<Boolean> scriptResult = swr.getScriptResult();
 
-                if (!MOP.isReifiedObject(scriptResult)) {
+                // if script result is not reified it means either an exception occurred in
+                // handler creation or it's known static script and fake script result has been put
+                if (!MOP.isReifiedObject(scriptResult) && scriptResult.getException() != null) {
                     // could not create script execution handler
                     // probably the node id down
                     logger.warn("Cannot execute script " + swr.getScript().hashCode() + " on the node " +
@@ -184,21 +186,21 @@ public abstract class SelectionManager extends RestrictedService implements Init
                     logger.warn("Checking if the node " + rmnode.getNodeURL() + " is still alive");
                     rmnode.getNodeSource().getPinger().pingNode(rmnode.getNodeURL());
                     continue;
-                }
-
-                try {
-                    // calculating time to wait script result
-                    long timeToWait = deadline - System.currentTimeMillis();
-                    if (timeToWait <= 0)
-                        timeToWait = 1; //ms
-                    PAFuture.waitFor(scriptResult, timeToWait);
-                } catch (ProActiveTimeoutException e) {
-                    // no script result was obtained
-                    scriptResult = null;
-                    String message = "Time out while waiting the end of " + swr.getScript().hashCode() +
-                        " script execution on the node " + rmnode.getNodeURL();
-                    logger.warn(message);
-                    throw new ScriptException(message, e);
+                } else {
+                    try {
+                        // calculating time to wait script result
+                        long timeToWait = deadline - System.currentTimeMillis();
+                        if (timeToWait <= 0)
+                            timeToWait = 1; //ms
+                        PAFuture.waitFor(scriptResult, timeToWait);
+                    } catch (ProActiveTimeoutException e) {
+                        // no script result was obtained
+                        scriptResult = null;
+                        String message = "Time out while waiting the end of " + swr.getScript().hashCode() +
+                            " script execution on the node " + rmnode.getNodeURL();
+                        logger.warn(message);
+                        throw new ScriptException(message, e);
+                    }
                 }
 
                 if (scriptResult != null && scriptResult.errorOccured()) {
