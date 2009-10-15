@@ -14,6 +14,7 @@
 	  <!ENTITY RM_API SYSTEM "resourcemanager/rm_api.xml">
 	  <!ENTITY RM_EC2 SYSTEM "resourcemanager/rm_ec2.xml">
 	  <!ENTITY RM_plugin SYSTEM "resourcemanager_plugin/rm_plugin.xml">
+	  <!ENTITY RM_WindowsAgent SYSTEM "resourcemanager/ProActiveWindowsAgent.xml">
 
 ]>
 
@@ -31,6 +32,7 @@
 		&RM_plugin;
 		&RM_EC2;
 		&RM_API;
+		&RM_WindowsAgent;
 	</part>
 
 </book>

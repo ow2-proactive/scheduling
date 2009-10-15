@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive Scheduling <systemitem role="VERSION"/> Documentation</title>
+<?xml version="1.0" encoding="utf-8"?><info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive Resource Manager<systemitem role="VERSION"/> Documentation</title>
 <subtitle role="motto">An Open Source Middleware For
 Parallel, Distributed, Multicore Computing</subtitle>
 <subtitle role="main">ProActive Resource Manager</subtitle> <!-- to change the version and date look in the html.xsl

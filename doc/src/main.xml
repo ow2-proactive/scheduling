@@ -26,6 +26,7 @@
 	  
 	  <!ENTITY SchedulerTutorial SYSTEM "scheduler_tuto/scheduler_tutorial.xml">
 	  
+	  <!ENTITY RM_WindowsAgent SYSTEM "resourcemanager/ProActiveWindowsAgent.xml">
 ]>
 
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
@@ -53,6 +54,7 @@
 		&RM_plugin;
 		&RM_EC2;
 		&RM_API;
+		&RM_WindowsAgent;
 	</part>
 
 	<part xml:id="SchedulingWithMatlab">
