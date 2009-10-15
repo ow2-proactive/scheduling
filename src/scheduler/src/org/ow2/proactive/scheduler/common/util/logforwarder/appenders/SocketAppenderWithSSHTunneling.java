@@ -36,51 +36,16 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import org.apache.log4j.net.SocketAppender;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.ssh.SSHConnection;
-import org.ow2.proactive.scripting.helper.filetransfer.ScriptLoggerHelper;
+import org.objectweb.proactive.core.ssh.SshConfig;
+import org.objectweb.proactive.core.ssh.SshConnection;
+import org.objectweb.proactive.core.ssh.SshTunnel;
 
 
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               Activeeon Team
- *                        http://www.activeeon.com
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
- */
 public class SocketAppenderWithSSHTunneling extends SocketAppender {
 
-    // look for an open port from ...
-    private static final int BASE_PORT_SEARCH = 1025;
-    // stop looking for an open port after ...
-    private static final int MAX_PORT_SEARCH_TRIES = 65535 - BASE_PORT_SEARCH;
-
     // connection to the log server
-    SSHConnection sshConnection;
+    SshConnection sshConnection;
+    SshTunnel tunnel;
 
     /**
      * Create a new SocketAppenderWithSSHTunneling with the current username on remote ssh port 22.
@@ -116,29 +81,19 @@ public class SocketAppenderWithSSHTunneling extends SocketAppender {
         super(remoteHost, port);
 
         InetAddress localhost = InetAddress.getLocalHost();
-        sshConnection = new SSHConnection(username, remoteHost, remoteSSHPort);
-
-        int localPort = BASE_PORT_SEARCH;
-        int nbTries = 0;
-        boolean stop = false;
-
-        while (!stop && nbTries < MAX_PORT_SEARCH_TRIES) {
-            try {
-                sshConnection.createTunnel(localPort, remoteHost, port);
-                stop = true;
-            } catch (java.net.BindException e) {
-                nbTries++;
-                localPort++;
-            }
-        }
+        SshConfig config = new SshConfig();
+        sshConnection = new SshConnection(username, remoteHost, remoteSSHPort, config
+                .getPrivateKeys(remoteHost));
+        tunnel = sshConnection.getSSHTunnel(remoteHost, remoteSSHPort);
         this.setRemoteHost(localhost.getHostAddress());
-        this.setPort(localPort);
+        this.setPort(tunnel.getPort());
     }
 
     public void close() {
         super.close();
         try {
-            this.sshConnection.close(false);
+            this.tunnel.close();
+            this.sshConnection.close();
         } catch (Exception e) {
             //well, if we are here it's difficult to log the error somewhere ...
             e.printStackTrace();

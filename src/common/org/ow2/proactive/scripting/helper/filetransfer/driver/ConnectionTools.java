@@ -36,8 +36,7 @@ import static org.objectweb.proactive.core.ssh.SSH.logger;
 import java.io.File;
 import java.io.IOException;
 
-import org.objectweb.proactive.core.ssh.SSHKeys;
-import org.objectweb.proactive.core.ssh.SshParameters;
+import org.objectweb.proactive.core.ssh.SshConfig;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
 import com.trilead.ssh2.Connection;
@@ -52,10 +51,10 @@ public class ConnectionTools {
                 " to " + hostname + ":" + port);
         }
         Connection connection = null;
-        SshParameters.getSshKeyDirectory();
-        String[] keys = SSHKeys.getKeys();
+        // get keys through ProActive's ssh config
+        SshConfig config = new SshConfig();
 
-        for (String key : keys) {
+        for (String key : config.getPrivateKeys(hostname)) {
             connection = new Connection(hostname, port);
             connection.connect();
 
@@ -94,7 +93,7 @@ public class ConnectionTools {
             if (logger.isInfoEnabled()) {
                 logger.info("Authentication failed for " + username + "@" + hostname + ":" + port);
                 logger.info("Keys were:");
-                for (String key : keys) {
+                for (String key : config.getPrivateKeys(hostname)) {
                     logger.info("\t" + key);
                 }
             }

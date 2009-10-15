@@ -54,9 +54,9 @@ public class SocketWithSSHTunnelBasedForwardingProvider extends SocketBasedForwa
      */
     public AppenderProvider createAppenderProvider(URI serverURI) {
         // use ProActive defined ssh port if any
-        if (PAProperties.PA_SSH_PORT.isSet()) {
+        if (PAProperties.PA_RMISSH_REMOTE_PORT.isSet()) {
             return new SocketSSHAppenderProvider(serverURI.getHost(), serverURI.getPort(),
-                PAProperties.PA_SSH_PORT.getValueAsInt());
+                PAProperties.PA_RMISSH_REMOTE_PORT.getValueAsInt());
         } else {
             return new SocketSSHAppenderProvider(serverURI.getHost(), serverURI.getPort(), 22);
         }
@@ -85,7 +85,7 @@ public class SocketWithSSHTunnelBasedForwardingProvider extends SocketBasedForwa
          */
         public Appender getAppender() throws LogForwardingException {
             // resolve username locally: use ProActive defined username, or current username if any
-            String sshUserName = PAProperties.PA_SSH_USERNAME.getValue();
+            String sshUserName = PAProperties.PA_RMISSH_REMOTE_USERNAME.getValue();
             if ((sshUserName == null) || sshUserName.equals("")) {
                 sshUserName = System.getProperty("user.name");
             }
