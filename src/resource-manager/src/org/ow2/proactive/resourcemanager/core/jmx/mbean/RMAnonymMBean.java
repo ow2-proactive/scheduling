@@ -42,7 +42,9 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
  * <li>The Resource Manager status
  * <li>Available nodes count
  * <li>Free nodes count
- * <li>Busy nodes count 
+ * <li>Busy nodes count
+ * <li>To be released nodes count
+ * <li>Down nodes count
  * </ul>
  * <p> 
  * 

@@ -349,11 +349,14 @@ public final class RMStatistics {
      * @return the nodes activity time percentage
      */
     public double getActivityTimePercentage() {
-        final double total = this.cumulativeActivityTime + this.cumulativeInactivityTime;
+        final long lastInterval = System.nanoTime() - this.previousTimeStamp;
+        final long v1 = this.cumulativeActivityTime + (lastInterval * this.busyNodesCount);
+        final long v2 = this.cumulativeInactivityTime + (lastInterval * this.freeNodesCount);
+        final long total = v1 + v2;
         if (total == 0) {
             return 0;
         }
-        return (((double) this.cumulativeActivityTime / total) * 100);
+        return (((double) v1 / total) * 100);
     }
 
     /**
@@ -361,10 +364,13 @@ public final class RMStatistics {
      * @return the nodes inactivity time percentage
      */
     public double getInactivityTimePercentage() {
-        final double total = this.cumulativeActivityTime + this.cumulativeInactivityTime;
+        final long lastInterval = System.nanoTime() - this.previousTimeStamp;
+        final long v1 = this.cumulativeActivityTime + (lastInterval * this.busyNodesCount);
+        final long v2 = this.cumulativeInactivityTime + (lastInterval * this.freeNodesCount);
+        final long total = v1 + v2;
         if (total == 0) {
             return 0;
         }
-        return (((double) this.cumulativeInactivityTime / total) * 100);
+        return (((double) v2 / total) * 100);
     }
 }
