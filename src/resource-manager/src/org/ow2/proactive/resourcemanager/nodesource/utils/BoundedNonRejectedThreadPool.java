@@ -1,4 +1,4 @@
-package org.ow2.proactive.resourcemanager.nodesource;
+package org.ow2.proactive.resourcemanager.nodesource.utils;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;

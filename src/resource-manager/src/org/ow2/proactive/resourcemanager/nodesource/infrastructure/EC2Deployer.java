@@ -30,7 +30,7 @@
  * $$PROACTIVE_INITIAL_DEV$$
  */
 
-package org.ow2.proactive.resourcemanager.nodesource.ec2;
+package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

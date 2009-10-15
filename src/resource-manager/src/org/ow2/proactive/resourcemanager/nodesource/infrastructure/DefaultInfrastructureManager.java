@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager;
+package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.rmi.dgc.VMID;
 import java.util.Collection;

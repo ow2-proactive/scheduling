@@ -1,13 +1,13 @@
 # A default infrastructure (can register existing nodes and remove them)
-org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.DefaultInfrastructureManager
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager
 
 # Basic GCM infrastructure
-org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMInfrastructure
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure
 
 # Customized GCM infrastructure
 # - requires one node per host
 # - is able to deploy/undeploy a single node
 # - uses GCM descriptor with "HOST" java variable contract
-org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.GCMCustomisedInfrastructure
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure
 
-org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.EC2Infrastructure
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure

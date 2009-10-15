@@ -30,7 +30,7 @@
  * $$PROACTIVE_INITIAL_DEV$$
  */
 
-package org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager;
+package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.ec2.EC2Deployer;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -378,7 +377,7 @@ public class EC2Infrastructure extends InfrastructureManager {
      * Cleanup deployed instances,
      * so that instances that did not register to the nodesource be removed as well
      * 
-     * @see org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager#shutDown()
+     * @see org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager#shutDown()
      */
     @Override
     public void shutDown() {
