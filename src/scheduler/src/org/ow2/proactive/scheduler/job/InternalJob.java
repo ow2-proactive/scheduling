@@ -39,7 +39,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -828,37 +827,30 @@ public abstract class InternalJob extends JobState {
      */
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        Field[] fields = InternalJob.class.getDeclaredFields();
-        LinkedList<String> fieldsName = new LinkedList<String>();
-        LinkedList<Field> fieldsObject = new LinkedList<Field>();
-        for (Field f : fields) {
-            if (!f.isAnnotationPresent(TransientInSerialization.class) &&
-                !Modifier.isStatic(f.getModifiers())) {
-                fieldsObject.addFirst(f);
-                fieldsName.addFirst(f.getName());
+        try {
+            Map<String, Object> toSerialize = new HashMap<String, Object>();
+            Field[] fields = InternalJob.class.getDeclaredFields();
+            for (Field f : fields) {
+                if (!f.isAnnotationPresent(TransientInSerialization.class) &&
+                    !Modifier.isStatic(f.getModifiers())) {
+                    toSerialize.put(f.getName(), f.get(this));
+                }
             }
-        }
-        out.writeObject(fieldsName);
-        while (!fieldsObject.isEmpty()) {
-            try {
-                out.writeObject(fieldsObject.poll().get(this));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            out.writeObject(toSerialize);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        LinkedList<String> fieldsName = (LinkedList<String>) in.readObject();
-        while (!fieldsName.isEmpty()) {
-            try {
-                String fieldName = fieldsName.poll();
-                Object o = in.readObject();
-                InternalJob.class.getDeclaredField(fieldName).set(this, o);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        try {
+            Map<String, Object> map = (Map<String, Object>) in.readObject();
+            for (Entry<String, Object> e : map.entrySet()) {
+                InternalJob.class.getDeclaredField(e.getKey()).set(this, e.getValue());
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
