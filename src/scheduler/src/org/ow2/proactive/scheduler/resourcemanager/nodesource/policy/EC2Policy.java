@@ -34,6 +34,8 @@ package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -87,10 +89,19 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
+    /**
+     * Delay in seconds between each time the policy refreshes its internal state
+     */
     @Configurable(description = "Refresh frequency (s)")
     private int refreshTime = 5;
+    /**
+     * The policy will try to maintain a number <code>schedulerTasks/loadFactor</code> nodes in the whole RM
+     */
     @Configurable(description = "Tasks per node")
     private int loadFactor = 10;
+    /**
+     * Time after which a node is considered 'releasable', since the time of its acquisition
+     */
     @Configurable(description = "Release cycle (s)")
     private int releaseCycle = 3600;
 
@@ -99,12 +110,23 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     private Map<JobId, Integer> activeTasks = new HashMap<JobId, Integer>();
     private int activeTask = 0;
 
+    /**
+     * current number of operational nodes in the NS
+     */
     private int nodeNumber = 0;
-    private int pendingNodes = 0;
+    /**
+     * Each time a node is requested to the NS, the result of 
+     * <code>System.currentTimeMillis()</code> is added to the head of this structure;
+     * each time a node registers in the NS, an element is removed from the tail. 
+     */
+    private LinkedList<Long> pendingNodes = new LinkedList<Long>();
 
     private boolean rmShuttingDown = false;
     private RMMonitoring rmMonitoring;
 
+    /**
+     * Maps a Node Name to Date for all NS nodes
+     */
     private HashMap<String, Calendar> nodes = new HashMap<String, Calendar>();
 
     /**
@@ -246,8 +268,8 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
 
         int requiredNodes = activeTask / loadFactor + (activeTask % loadFactor == 0 ? 0 : 1);
 
-        logger.info("Policy state: RM=" + rmNodeNumber + " NS=" + nsNodeNumber + " pending=" + pendingNodes +
-            " required=" + requiredNodes + " tasks=" + activeTask);
+        logger.info("Policy state: RM=" + rmNodeNumber + " NS=" + nsNodeNumber + " pending=" +
+            pendingNodes.size() + " required=" + requiredNodes + " tasks=" + activeTask);
 
         if (requiredNodes < rmNodeNumber && nodeNumber > 0) {
             int diff = Math.min(nodeNumber, rmNodeNumber - requiredNodes);
@@ -266,11 +288,24 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
                 }
             }
         } else if (requiredNodes > rmNodeNumber) {
-            if (pendingNodes + rmNodeNumber < requiredNodes) {
-                for (int i = 0; i < requiredNodes - (pendingNodes + rmNodeNumber); i++) {
+            if (pendingNodes.size() + rmNodeNumber < requiredNodes) {
+                for (int i = 0; i < requiredNodes - (pendingNodes.size() + rmNodeNumber); i++) {
                     nodeSource.acquireNode();
-                    pendingNodes++;
+                    pendingNodes.addLast(System.currentTimeMillis());
                 }
+            }
+        }
+
+        for (Iterator<Long> it = pendingNodes.iterator(); it.hasNext();) {
+            Long l = it.next();
+            // waiting more than half the release cycle is considered timeout.
+            // this is *wildly* inaccurate, but as the useful info is kept on IM side,
+            // this provides at least the guarantee that nodes won't stay pending forever,
+            // which is far worse than unexpected nodes poping in the NS without being expected
+            if (System.currentTimeMillis() - l > (this.releaseCycle / 2) * 1000) {
+                it.remove();
+            } else {
+                break;
             }
         }
     }
@@ -357,11 +392,10 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
         }
 
         if (event.getEventType().equals(RMEventType.NODE_ADDED)) {
-            if (pendingNodes <= 0) {
+            if (pendingNodes.size() == 0) {
                 logger.warn("Added new node while not awaiting one...");
-                pendingNodes = 0;
             } else {
-                pendingNodes--;
+                pendingNodes.removeLast();
             }
             if (nodes.put(event.getNodeUrl(), Calendar.getInstance()) != null) {
                 logger.warn("New node " + event.getNodeUrl() + " was already in nodeSource " +
