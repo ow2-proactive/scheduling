@@ -81,14 +81,13 @@ public class WindowsEC2RMStarter {
             System.setProperty("pa.scheduler.home", args[0]);
             System.setProperty("pa.rm.home", args[0]);
 
-            String rmUser = "", rmPass = "", rmUrl = "", rmNodeName = "", rmNsName = "", nodePort = "";
+            String rmCred = "", rmUrl = "", rmNodeName = "", rmNsName = "", nodePort = "";
 
             Properties props = new Properties();
             ByteArrayInputStream in = new ByteArrayInputStream(getUrl(userData).getBytes());
             props.load(in);
 
-            rmUser = props.getProperty("rmLogin");
-            rmPass = props.getProperty("rmPass");
+            rmCred = props.getProperty("creds");
             rmUrl = props.getProperty("rmUrl");
             rmNodeName = getNodeName();
             rmNsName = props.getProperty("nodeSource");
@@ -98,7 +97,8 @@ public class WindowsEC2RMStarter {
             System.setProperty("proactive.http.port", "" + nodePort);
             System.setProperty("proactive.hostname", getUrl(publicIp));
 
-            PAAgentServiceRMStarter.main(new String[] { rmUser, rmPass, rmUrl, rmNodeName, rmNsName });
+            PAAgentServiceRMStarter.main(new String[] { "-v", rmCred, "-r", rmUrl, "-n", rmNodeName, "-s",
+                    rmNsName });
 
         } catch (Exception e) {
             System.out.println("Exception caught: " + e);

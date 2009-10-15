@@ -30,13 +30,14 @@
  * $$PROACTIVE_INITIAL_DEV$$
  */
 
-package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
+package org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -47,9 +48,13 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable.Auth;
+import org.ow2.proactive.resourcemanager.nodesource.ec2.EC2Deployer;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -78,7 +83,9 @@ public class EC2Infrastructure extends InfrastructureManager {
     protected File configurationFile;
     @Configurable
     protected String rmUrl;
-    @Configurable
+    @Configurable(auth = Auth.RM, editable = false)
+    protected String authName = new String(RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
+    @Configurable(login = true)
     protected String rmLogin;
     @Configurable(password = true)
     protected String rmPass;
@@ -171,16 +178,15 @@ public class EC2Infrastructure extends InfrastructureManager {
      * @param parameters
      *            parameters[0]: Configuration file as byte array
      *            parameters[1]: Fully qualified URL of the Resource Manager (proto://IP:port)
-     *            parameters[2]: RM login
-     *            parameters[3]: RM passw
-     *            parameters[4]: HTTP node port
+     *            parameters[2]: RM credentials
+     *            parameters[3]: HTTP node port
      * @throws RMException
      *             when the configuration could not be set
      */
     public void configure(Object... parameters) throws RMException {
 
         /** parameters look fine */
-        if (parameters != null && parameters.length == 5) {
+        if (parameters != null && parameters.length == 4) {
             try {
                 //                File ff = new File(parameters[0].toString());
                 byte[] configFile = (byte[]) parameters[0];
@@ -193,9 +199,14 @@ public class EC2Infrastructure extends InfrastructureManager {
                 logger.debug("Expected File as 1st parameter for EC2Infrastructure: " + e.getMessage());
             }
             String rmu = parameters[1].toString();
-            String rml = parameters[2].toString();
-            String rmp = parameters[3].toString();
-            String nodep = parameters[4].toString();
+            String creds64 = "";
+            try {
+                Credentials creds = (Credentials) parameters[2];
+                creds64 = new String(creds.getBase64());
+            } catch (KeyException e) {
+                throw new RMException("Could not retrieve base64 credentials", e);
+            }
+            String nodep = parameters[3].toString();
 
             try {
                 int pp = Integer.parseInt(nodep);
@@ -206,7 +217,7 @@ public class EC2Infrastructure extends InfrastructureManager {
                 throw new RMException("Invalid value for parameter Node Port", e);
             }
 
-            this.ec2d.setUserData(rmu, rml, rmp, nodep);
+            this.ec2d.setUserData(rmu, creds64, nodep);
 
         }
         /**
@@ -377,7 +388,7 @@ public class EC2Infrastructure extends InfrastructureManager {
      * Cleanup deployed instances,
      * so that instances that did not register to the nodesource be removed as well
      * 
-     * @see org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager#shutDown()
+     * @see org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager#shutDown()
      */
     @Override
     public void shutDown() {

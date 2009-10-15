@@ -385,6 +385,7 @@ fi
 
 
 cat <<EOF > /tmp/Excludes
+.svn
 ./bin
 ./classes
 ./.classpath
@@ -396,7 +397,14 @@ cat <<EOF > /tmp/Excludes
 ./lib
 ./.logs
 ./samples
-./scheduler_plugins
+./scheduler-rcp
+./rm-rcp
+./SCHEDULER-DB
+./LICENCE.txt
+./.logs
+./.project
+./README.txt
+./RM-README.txt
 ./scripts
 ./.settings
 ./src

@@ -40,19 +40,12 @@ if len(res) != 1:
     port = 80
 port = res[0]
 
-# RM login
-pat = re.compile(r'[\s]*rmLogin[\s]*=[\s]*(.+)[\s]*')
+# RM credentials
+pat = re.compile(r'[\s]*creds[\s]*=[\s]*(.+)[\s]*')
 res =  pat.findall(data)
 if len(res) != 1:
-    raise NameError("Could not extract RM Login from user-data.")
-rmLogin = res[0]
-
-# RM pass
-pat = re.compile(r'[\s]*rmPass[\s]*=[\s]*(.+)[\s]*')
-res =  pat.findall(data)
-if len(res) != 1:
-    raise NameError("Could not extract RM Pass from user-data.")
-rmPass = res[0]
+    raise NameError("Could not extract RM credentials from user-data.")
+rmCreds = res[0]
 
 # remote NS name
 pat = re.compile(r'[\s]*nodeSource[\s]*=[\s]*(.+)[\s]*')
@@ -77,5 +70,6 @@ print "-Dproactive.communication.protocol=" + proto +" "+\
     "-D" + port_prop + "=" + port +" "+\
     "-Dproactive.hostname=" + ip +" "+\
     "org.ow2.proactive.resourcemanager.utils.PAAgentServiceRMStarter" +\
-    " "+rmLogin+" "+rmPass+" "+rmUrl+" "+nodeName+" "+nodeSource
+    " -v "+rmCreds+" -r "+rmUrl+" -n "+nodeName+" -s "+nodeSource
+
 

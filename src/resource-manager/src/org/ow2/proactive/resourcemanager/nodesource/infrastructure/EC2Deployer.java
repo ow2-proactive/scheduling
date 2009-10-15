@@ -30,7 +30,7 @@
  * $$PROACTIVE_INITIAL_DEV$$
  */
 
-package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
+package org.ow2.proactive.resourcemanager.nodesource.ec2;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -100,18 +100,14 @@ public class EC2Deployer implements java.io.Serializable {
     /** Url of the RM, from the instance's viewpoint */
     private String rmUrl;
 
-    /** login to use for RM auth, from the instance's viewpoint */
-    private String rmLogin;
-
     /** instance type: smaller is cheaper; bigger is faster;
      * x86_64 AMIs requires extra large, or will fail to deploy */
     private InstanceType instanceType;
 
     /**
-     * passw to use for RM auth, from the instance's viewpoint must be fully qualified:
-     * protocol://IP:port/
+     * base64-encoded RM credentials
      */
-    private String rmPass;
+    private String cred64;
 
     /** Name of the NodeSource bound to the EC2Infrastructure this Deployer bound to */
     private String nsName;
@@ -389,8 +385,7 @@ public class EC2Deployer implements java.io.Serializable {
         String userData = "";
         try {
             userData += "rmUrl=" + rmUrl + "\n";
-            userData += "rmLogin=" + rmLogin + "\n";
-            userData += "rmPass=" + rmPass + "\n";
+            userData += "creds=" + cred64 + "\n";
             userData += "nodeSource=" + nsName + "\n";
             userData += "nodePort=" + nodePort + "\n";
         } catch (Exception exc) {
@@ -523,15 +518,14 @@ public class EC2Deployer implements java.io.Serializable {
      *
      * @param rmUrl
      *            URL of the resource manager
-     * @param rmLogin
-     *            login of the RM for authentication
-     * @param rmPass
-     *            pw of the RM for authentication
+     * @param creds64
+     *            base64-encoded credentials for RM authentication
+     * @param nodePort
+     *            ec2 node port
      */
-    public void setUserData(String rmUrl, String rmLogin, String rmPass, String nodePort) {
+    public void setUserData(String rmUrl, String creds64, String nodePort) {
         this.rmUrl = rmUrl;
-        this.rmLogin = rmLogin;
-        this.rmPass = rmPass;
+        this.cred64 = creds64;
         this.nodePort = nodePort;
     }
 
