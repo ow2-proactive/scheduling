@@ -1,9 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <java version="1.5.0_21" class="java.beans.XMLDecoder"> 
- <int>6</int> 
+ <int>9</int> 
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
+  <void property="labels"> 
+   <array class="java.lang.String" length="2"> 
+    <void index="0"> 
+     <string>Activity</string> 
+    </void> 
+    <void index="1"> 
+     <string>Inactivity</string> 
+    </void> 
+   </array> 
+  </void> 
+  <void property="name"> 
+   <string>Activity/Inactivity</string> 
+  </void> 
+  <void property="runtimeNames"> 
+   <array class="java.lang.String" length="2"> 
+    <void index="0"> 
+     <string>AverageActivity</string> 
+    </void> 
+    <void index="1"> 
+     <string>AverageInactivity</string> 
+    </void> 
+   </array> 
+  </void> 
+ </object> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
-   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
+   <object id="ChartType0" class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
+    <class>org.objectweb.proactive.ic2d.chartit.data.ChartType</class> 
+    <string>TIME_SERIES</string> 
+   </object> 
+  </void> 
+  <void property="labels"> 
+   <array class="java.lang.String" length="2"> 
+    <void index="0"> 
+     <string>Activity %</string> 
+    </void> 
+    <void index="1"> 
+     <string>Inactivity</string> 
+    </void> 
+   </array> 
+  </void> 
+  <void property="name"> 
+   <string>Activity History</string> 
+  </void> 
+  <void property="runtimeNames"> 
+   <array class="java.lang.String" length="1"> 
+    <void index="0"> 
+     <string>AverageActivity</string> 
+    </void> 
+   </array> 
+  </void> 
+ </object> 
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
+  <void property="chartType"> 
+   <object id="ChartType1" class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
     <class>org.objectweb.proactive.ic2d.chartit.data.ChartType</class> 
     <string>BAR</string> 
    </object> 
@@ -52,10 +105,47 @@
  </object> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
-   <object id="ChartType0" class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
-    <class>org.objectweb.proactive.ic2d.chartit.data.ChartType</class> 
-    <string>TIME_SERIES</string> 
-   </object> 
+   <object idref="ChartType1"/> 
+  </void> 
+  <void property="labels"> 
+   <array class="java.lang.String" length="4"> 
+    <void index="0"> 
+     <string>Max Free</string> 
+    </void> 
+    <void index="1"> 
+     <string>Max Busy</string> 
+    </void> 
+    <void index="2"> 
+     <string>Max ToBeReleased</string> 
+    </void> 
+    <void index="3"> 
+     <string>Max Down</string> 
+    </void> 
+   </array> 
+  </void> 
+  <void property="name"> 
+   <string>Node States Peaks</string> 
+  </void> 
+  <void property="runtimeNames"> 
+   <array class="java.lang.String" length="4"> 
+    <void index="0"> 
+     <string>MaxFreeNodes</string> 
+    </void> 
+    <void index="1"> 
+     <string>MaxBusyNodes</string> 
+    </void> 
+    <void index="2"> 
+     <string>MaxToBeReleasedNodes</string> 
+    </void> 
+    <void index="3"> 
+     <string>MaxDownNodes</string> 
+    </void> 
+   </array> 
+  </void> 
+ </object> 
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
+  <void property="chartType"> 
+   <object idref="ChartType0"/> 
   </void> 
   <void property="labels"> 
    <array class="java.lang.String" length="1"> 

@@ -50,6 +50,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.gui.Activator;
+import org.ow2.proactive.resourcemanager.gui.actions.JMXChartItAction;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
@@ -99,21 +100,15 @@ public class RMStore {
             }
 
             try {
+                Credentials creds = null;
+                try {
+                    creds = Credentials.createCredentials(login, password, auth.getPublicKey());
+                } catch (KeyException e) {
+                    throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
+                }
                 if (isAdmin) {
-                    Credentials creds = null;
-                    try {
-                        creds = Credentials.createCredentials(login, password, auth.getPublicKey());
-                    } catch (KeyException e) {
-                        throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
-                    }
                     loggerUser = auth.logAsAdmin(creds);
                 } else {
-                    Credentials creds = null;
-                    try {
-                        creds = Credentials.createCredentials(login, password, auth.getPublicKey());
-                    } catch (KeyException e) {
-                        throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
-                    }
                     loggerUser = auth.logAsUser(creds);
                 }
             } catch (LoginException e) {
@@ -130,6 +125,10 @@ public class RMStore {
             isConnected = true;
             //ControllerView.getInstance().connectedEvent(isAdmin);
             RMStatusBarItem.getInstance().setText("connected");
+
+            // Initialize the JMX chartit action
+            JMXChartItAction.getInstance().initJMXClient(auth, login, password, isAdmin);
+
         } catch (ActiveObjectCreationException e) {
             RMStatusBarItem.getInstance().setText("disconnected");
             Activator.log(IStatus.ERROR, "Exception when creating active object", e);

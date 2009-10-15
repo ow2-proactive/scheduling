@@ -31,12 +31,14 @@
  */
 package org.ow2.proactive.resourcemanager.gui.views;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
+import org.ow2.proactive.resourcemanager.gui.actions.JMXChartItAction;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.stats.RMStatsViewer;
 
@@ -74,6 +76,11 @@ public class StatisticsView extends ViewPart {
         tc2.setWidth(150);
         tc1.setMoveable(true);
         tc2.setMoveable(true);
+
+        // Add JMX chartit action to the toolbar manager 
+        final IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+        toolBarManager.add(JMXChartItAction.getInstance());
+
         if (RMStore.isConnected()) {
             statsViewer.init();
         }

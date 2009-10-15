@@ -8,7 +8,8 @@ Bundle-Vendor: ProActive
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.editors,
- org.ow2.proactive.resourcemanager.lib;bundle-version="11.22.33"
+ org.ow2.proactive.resourcemanager.lib;bundle-version="11.22.33",
+ org.objectweb.proactive.ic2d.chartit;bundle-version="1.0.0"
 Eclipse-LazyStart: true
 Eclipse-RegisterBuddy: org.ow2.proactive.resourcemanager.lib
 Bundle-ClassPath: classes/
