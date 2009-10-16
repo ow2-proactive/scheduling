@@ -39,7 +39,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -64,7 +63,7 @@ public class SubmitJobAction extends SchedulerGUIAction {
         this.parent = parent;
         this.setText("Submit an XML job file");
         this.setToolTipText("Submit job from an XML file containing a job description");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_submit.gif"));
+        this.setImageDescriptor(Activator.getImageDescriptor("icons/job_submit.gif"));
         this.setEnabled(false);
     }
 

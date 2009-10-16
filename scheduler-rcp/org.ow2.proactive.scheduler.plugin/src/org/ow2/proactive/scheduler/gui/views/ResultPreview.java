@@ -110,7 +110,7 @@ public class ResultPreview extends ViewPart {
      */
     public void putOnTop() {
         try {
-            this.getViewSite().getWorkbenchWindow().getActivePage().showView(this.ID);
+            this.getViewSite().getWorkbenchWindow().getActivePage().showView(ResultPreview.ID);
             //create view if not created
         } catch (PartInitException e) {
             Activator.log(IStatus.ERROR, "", e);

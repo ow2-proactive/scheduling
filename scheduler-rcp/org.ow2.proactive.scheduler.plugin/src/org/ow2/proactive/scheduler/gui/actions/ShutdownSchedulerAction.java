@@ -31,9 +31,9 @@
 package org.ow2.proactive.scheduler.gui.actions;
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -48,8 +48,7 @@ public class ShutdownSchedulerAction extends SchedulerGUIAction {
         this.setText("Shutdown scheduler");
         this
                 .setToolTipText("Shutdown the scheduler (This will finish all running and pending jobs before shutdown)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                "icons/scheduler_shutdown.png"));
+        this.setImageDescriptor(Activator.getImageDescriptor("icons/scheduler_shutdown.png"));
         this.setEnabled(false);
     }
 

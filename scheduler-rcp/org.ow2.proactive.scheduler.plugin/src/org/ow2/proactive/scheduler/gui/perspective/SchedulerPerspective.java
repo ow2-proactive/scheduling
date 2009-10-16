@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.ow2.proactive.scheduler.gui;
+package org.ow2.proactive.scheduler.gui.perspective;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.gui.views.Users;
 public class SchedulerPerspective implements IPerspectiveFactory {
 
     /** the id */
-    public static final String ID = "org.ow2.proactive.scheduler.gui.SchedulerPerspective";
+    public static final String ID = "org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective";
 
     /** Top folder's id. */
     public static final String ID_TOP_FOLDER = ID + ".topFolder";

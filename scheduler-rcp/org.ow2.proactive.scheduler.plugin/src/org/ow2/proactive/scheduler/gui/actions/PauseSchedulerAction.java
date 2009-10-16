@@ -30,8 +30,8 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -43,7 +43,7 @@ public class PauseSchedulerAction extends SchedulerGUIAction {
     public PauseSchedulerAction() {
         this.setText("Pause scheduler");
         this.setToolTipText("Pause the scheduler (All running Jobs will be terminated)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_pause.png"));
+        this.setImageDescriptor(Activator.getImageDescriptor("icons/scheduler_pause.png"));
         this.setEnabled(false);
     }
 

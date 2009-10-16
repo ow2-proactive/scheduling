@@ -32,6 +32,7 @@ package org.ow2.proactive.scheduler.gui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -46,7 +47,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService
 public class Activator extends AbstractUIPlugin {
 
     /*  The plug-in ID */
-    public static final String PLUGIN_ID = "Scheduler_Plugin";
+    public static final String PLUGIN_ID = "org.ow2.proactive.scheduler.plugin";
 
     /* The name of the property that sets the log service provider */
     public static final String LOGSERVICE_CLASS_PROPERTY = "pa.scheduler.logs.provider";
@@ -106,7 +107,7 @@ public class Activator extends AbstractUIPlugin {
         lfs = null;
     }
 
-    /*
+    /**
      * Returns the shared instance
      *
      * @return the shared instance
@@ -115,6 +116,22 @@ public class Activator extends AbstractUIPlugin {
         return plugin;
     }
 
+    /**
+     * Returns an image descriptor for the image file at the given
+     * plug-in relative path
+     *
+     * @param path the path
+     * @return the image descriptor
+     */
+    public static ImageDescriptor getImageDescriptor(String path) {
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    /**
+     * Returns the id of this plug-in.
+     * 
+     * @return the id of this plug-in
+     */
     public static String getPluginId() {
         return PLUGIN_ID;
     }

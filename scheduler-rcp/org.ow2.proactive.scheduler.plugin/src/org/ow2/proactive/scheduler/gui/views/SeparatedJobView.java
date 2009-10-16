@@ -371,6 +371,9 @@ public class SeparatedJobView extends ViewPart {
             jobsOutputController.removeAllJobOutput();
         }
 
+        // Disconnect the JMX client of ChartIt
+        JMXChartItAction.getInstance().disconnectJMXClient();
+
         if (sendDisconnectMessage) {
             SchedulerProxy.getInstance().disconnect();
         }

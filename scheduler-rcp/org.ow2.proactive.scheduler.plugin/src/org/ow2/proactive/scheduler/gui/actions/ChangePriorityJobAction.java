@@ -33,10 +33,10 @@ package org.ow2.proactive.scheduler.gui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -49,7 +49,7 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
     public ChangePriorityJobAction() {
         setText("Change job priority");
         setToolTipText("Change job priority");
-        setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_priority.png"));
+        setImageDescriptor(Activator.getImageDescriptor("icons/job_priority.png"));
         setMenuCreator(this);
     }
 

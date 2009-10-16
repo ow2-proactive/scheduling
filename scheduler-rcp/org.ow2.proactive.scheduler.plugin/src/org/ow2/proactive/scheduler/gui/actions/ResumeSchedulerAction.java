@@ -30,8 +30,8 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -43,9 +43,7 @@ public class ResumeSchedulerAction extends SchedulerGUIAction {
     public ResumeSchedulerAction() {
         this.setText("Resume scheduler");
         this.setToolTipText("Resume the scheduler");
-        this
-                .setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                        "icons/scheduler_resume.png"));
+        this.setImageDescriptor(Activator.getImageDescriptor("icons/scheduler_resume.png"));
         this.setEnabled(false);
     }
 

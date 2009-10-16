@@ -30,10 +30,10 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.wizards.flatJobWizard.FlatFileJobWizard;
 
 
@@ -47,7 +47,7 @@ public class SubmitFlatFileJobAction extends SchedulerGUIAction {
         this.parent = parent;
         this.setText("Submit a file containing commands");
         this.setToolTipText("Submit a file containing commands");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/file_obj.gif"));
+        this.setImageDescriptor(Activator.getImageDescriptor("icons/file_obj.gif"));
         this.setEnabled(false);
     }
 

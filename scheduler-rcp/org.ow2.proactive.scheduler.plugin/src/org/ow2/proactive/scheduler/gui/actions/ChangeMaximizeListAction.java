@@ -33,9 +33,9 @@ package org.ow2.proactive.scheduler.gui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.ow2.proactive.scheduler.gui.Activator;
 
 
 /**
@@ -47,7 +47,7 @@ public class ChangeMaximizeListAction extends Action implements IMenuCreator {
     public ChangeMaximizeListAction() {
         setText("Maximize list");
         setToolTipText("Maximize a job list");
-        setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/maximize.gif"));
+        setImageDescriptor(Activator.getImageDescriptor("icons/maximize.gif"));
         setMenuCreator(this);
     }
 

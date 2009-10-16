@@ -32,7 +32,6 @@ package org.ow2.proactive.scheduler.gui.actions;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormLayout;
@@ -88,8 +87,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                     SelectSchedulerDialog.saveInformations();
                     this.setText("Disconnect");
                     this.setToolTipText("Disconnect from the ProActive Scheduler");
-                    this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                            "icons/disconnect.gif"));
+                    this.setImageDescriptor(Activator.getImageDescriptor("icons/disconnect.gif"));
                     waitShell = new Shell(parent.getShell(), SWT.PRIMARY_MODAL);
                     FormLayout layout = new FormLayout();
                     layout.marginHeight = 20;
@@ -151,7 +149,6 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                 e.printStackTrace();
             }
             SeparatedJobView.clearOnDisconnection(true);
-            JMXChartItAction.getInstance().disconnectJMXClient();
         }
     }
 
@@ -159,7 +156,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
         isConnected = false;
         this.setText("Connect the ProActive Scheduler");
         this.setToolTipText("Connect the started ProActive Scheduler by its url");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/connect.gif"));
+        this.setImageDescriptor(Activator.getImageDescriptor("icons/connect.gif"));
     }
 
     @Override

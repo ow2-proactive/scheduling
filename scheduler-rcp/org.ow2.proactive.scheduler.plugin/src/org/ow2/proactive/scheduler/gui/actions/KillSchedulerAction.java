@@ -31,9 +31,9 @@
 package org.ow2.proactive.scheduler.gui.actions;
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -47,7 +47,7 @@ public class KillSchedulerAction extends SchedulerGUIAction {
         this.shell = shell;
         this.setText("Kill scheduler");
         this.setToolTipText("Kill the scheduler (this kill immediately the scheduler)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_kill.png"));
+        this.setImageDescriptor(Activator.getImageDescriptor("icons/scheduler_kill.png"));
         this.setEnabled(false);
     }
 

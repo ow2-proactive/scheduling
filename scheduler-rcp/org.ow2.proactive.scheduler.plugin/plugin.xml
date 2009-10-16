@@ -4,8 +4,8 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.ow2.proactive.scheduler.gui.SchedulerPerspective"
-            id="org.ow2.proactive.scheduler.gui.SchedulerPerspective"
+            class="org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective"
+            id="org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective"
             name="Scheduler">
       </perspective>
    </extension>

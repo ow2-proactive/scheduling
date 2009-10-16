@@ -33,6 +33,7 @@ package org.ow2.proactive.scheduler.gui.actions;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 
@@ -47,7 +48,7 @@ public class ChangeViewModeAction extends SchedulerGUIAction {
     public ChangeViewModeAction() {
         this.setText("Switch view mode");
         this.setToolTipText("Switch view to horizontal mode");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), HORIZONTAL_ICON_URL));
+        this.setImageDescriptor(Activator.getImageDescriptor(HORIZONTAL_ICON_URL));
         this.setEnabled(false);
     }
 

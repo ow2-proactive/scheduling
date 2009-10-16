@@ -11,12 +11,11 @@ Require-Bundle: org.eclipse.ui,
  org.ow2.proactive.scheduler.lib;bundle-version="11.22.33",
  org.objectweb.proactive.ic2d.chartit;bundle-version="1.0.0"
 Eclipse-RegisterBuddy: org.ow2.proactive.scheduler.lib
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Eclipse-BuddyPolicy: dependent
 Export-Package: .,
  org.ow2.proactive.scheduler.gui;uses:="org.eclipse.ui",
  org.ow2.proactive.scheduler.gui.actions;uses:="org.objectweb.proactive.extra.scheduler.gui.views,org.eclipse.jface.action,org.eclipse.swt.widgets",
- org.ow2.proactive.scheduler.gui.actions.icons,
  org.ow2.proactive.scheduler.gui.composite;
   uses:="org.objectweb.proactive.extra.scheduler.gui.data,
    org.objectweb.proactive.extra.scheduler.job,
@@ -43,4 +42,5 @@ Export-Package: .,
    org.objectweb.proactive.extra.scheduler.task,
    org.eclipse.swt.widgets",
  org.ow2.proactive.scheduler.gui.wizards.flatJobWizard
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 
