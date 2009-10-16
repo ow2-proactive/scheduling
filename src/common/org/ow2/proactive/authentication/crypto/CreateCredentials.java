@@ -72,6 +72,8 @@ public class CreateCredentials {
         String pass = null;
         String cipher = "RSA/ECB/PKCS1Padding";
         String path = Credentials.getCredentialsPath();
+        String rm = null;
+        String scheduler = null;
         String url = null;
 
         /**
@@ -86,12 +88,19 @@ public class CreateCredentials {
                 }
                 pubKeyPath = args[index];
             }
-            if (args[index].equals("--url") || args[index].equals("-U")) {
+            if (args[index].equals("--rm") || args[index].equals("-R")) {
                 if (++index == args.length) {
-                    System.out.println("No value provided for argument --url");
+                    System.out.println("No value provided for argument --rm");
                     return;
                 }
-                url = args[index];
+                rm = args[index];
+            }
+            if (args[index].equals("--scheduler") || args[index].equals("-S")) {
+                if (++index == args.length) {
+                    System.out.println("No value provided for argument --scheduler");
+                    return;
+                }
+                scheduler = args[index];
             }
             if (args[index].equals("--login") || args[index].equals("-l")) {
                 if (++index == args.length) {
@@ -135,9 +144,10 @@ public class CreateCredentials {
                 System.out.println("\t-F, --file PATH [=" + Credentials.getPubKeyPath() + "]");
                 System.out.println("\t\tPath to the public key on the local filesystem.");
                 System.out.println("\t\tIf no pubkey argument is specified, default location will be used.");
-                System.out.println("\t-U, --url URL");
-                System.out.println("\t\tRequest the public key to the Scheduler or Resource Manager at URL.");
-                System.out.println("\t\tEx: rmi://localhost/SCHEDULER, rmi://localhost/RMAUTHENTICATION.");
+                System.out.println("\t-R, --rm URL");
+                System.out.println("\t\tRequest the public key to the Resource Manager at URL.");
+                System.out.println("\t-S, --scheduler URL");
+                System.out.println("\t\tRequest the public key to the Scheduler at URL.");
                 System.out.println("");
                 System.out.println("Options:");
                 System.out.println("\t-l, --login LOGIN");
@@ -157,12 +167,20 @@ public class CreateCredentials {
         }
 
         int acc = 0;
-        if (url != null)
+        if (scheduler != null) {
+            url = normalize(scheduler, "SCHEDULER");
             acc++;
-        if (pubKeyPath != null)
+
+        }
+        if (rm != null) {
+            url = normalize(rm, "RMAUTHENTICATION");
             acc++;
+        }
+        if (pubKeyPath != null) {
+            acc++;
+        }
         if (acc > 1) {
-            System.out.println("--url and --file arguments cannot be combined.");
+            System.out.println("--rm, --scheduler and --file arguments cannot be combined.");
             System.out.println("try -h for help.");
             return;
         }
@@ -248,5 +266,13 @@ public class CreateCredentials {
         System.out.println("\t" + path);
 
         System.exit(0);
+    }
+
+    private static String normalize(String url, String name) {
+        if (url.endsWith("/")) {
+            return url + name;
+        } else {
+            return url + "/" + name;
+        }
     }
 }
