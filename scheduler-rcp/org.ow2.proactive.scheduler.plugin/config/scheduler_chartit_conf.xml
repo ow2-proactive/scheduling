@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.5.0_21" class="java.beans.XMLDecoder"> 
+ <int>3</int> 
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
+  <void property="labels"> 
+   <array class="java.lang.String" length="2"> 
+    <void index="0"> 
+     <string>Pending</string> 
+    </void> 
+    <void index="1"> 
+     <string>Running</string> 
+    </void> 
+   </array> 
+  </void> 
+  <void property="name"> 
+   <string>Pending and Running Jobs</string> 
+  </void> 
+  <void property="runtimeNames"> 
+   <array class="java.lang.String" length="2"> 
+    <void index="0"> 
+     <string>NumberOfPendingJobs</string> 
+    </void> 
+    <void index="1"> 
+     <string>NumberOfRunningJobs</string> 
+    </void> 
+   </array> 
+  </void> 
+ </object> 
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
+  <void property="labels"> 
+   <array class="java.lang.String" length="2"> 
+    <void index="0"> 
+     <string>Pending</string> 
+    </void> 
+    <void index="1"> 
+     <string>Running</string> 
+    </void> 
+   </array> 
+  </void> 
+  <void property="name"> 
+   <string>Pending and Running Tasks</string> 
+  </void> 
+  <void property="runtimeNames"> 
+   <array class="java.lang.String" length="2"> 
+    <void index="0"> 
+     <string>NumberOfPendingTasks</string> 
+    </void> 
+    <void index="1"> 
+     <string>NumberOfRunningTasks</string> 
+    </void> 
+   </array> 
+  </void> 
+ </object> 
+ <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
+  <void property="chartType"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
+    <class>org.objectweb.proactive.ic2d.chartit.data.ChartType</class> 
+    <string>TIME_SERIES</string> 
+   </object> 
+  </void> 
+  <void property="labels"> 
+   <array class="java.lang.String" length="1"> 
+    <void index="0"> 
+     <string>Connected Users</string> 
+    </void> 
+   </array> 
+  </void> 
+  <void property="name"> 
+   <string>Connected Users History</string> 
+  </void> 
+  <void property="runtimeNames"> 
+   <array class="java.lang.String" length="1"> 
+    <void index="0"> 
+     <string>NumberOfConnectedUsers</string> 
+    </void> 
+   </array> 
+  </void> 
+ </object> 
+</java> 

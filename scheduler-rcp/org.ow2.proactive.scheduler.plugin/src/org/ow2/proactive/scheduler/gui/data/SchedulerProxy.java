@@ -62,6 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.actions.JMXChartItAction;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
@@ -433,19 +434,19 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             logAsAdmin = dialogResult.isLogAsAdmin();
             schedulerURL = dialogResult.getUrl();
             sai = SchedulerConnection.join(schedulerURL);
+            final Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
+                    .getPublicKey());
             if (logAsAdmin) {
-                Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
-                        .getPublicKey());
                 scheduler = sai.logAsAdmin(creds);
             } else {
-                Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
-                        .getPublicKey());
                 scheduler = sai.logAsUser(creds);
             }
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
             startPinger();
             connected = true;
             ControllerView.getInstance().connectedEvent(logAsAdmin);
+            JMXChartItAction.getInstance().initJMXClient(sai, dialogResult.getLogin(),
+                    dialogResult.getPassword(), logAsAdmin);
             return CONNECTED;
         } catch (LoginException e) {
             e.printStackTrace();

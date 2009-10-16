@@ -8,7 +8,8 @@ Bundle-Vendor: ProActive
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.console,
- org.ow2.proactive.scheduler.lib;bundle-version="11.22.33"
+ org.ow2.proactive.scheduler.lib;bundle-version="11.22.33",
+ org.objectweb.proactive.ic2d.chartit;bundle-version="1.0.0"
 Eclipse-RegisterBuddy: org.ow2.proactive.scheduler.lib
 Eclipse-LazyStart: true
 Eclipse-BuddyPolicy: dependent

@@ -151,6 +151,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                 e.printStackTrace();
             }
             SeparatedJobView.clearOnDisconnection(true);
+            JMXChartItAction.getInstance().disconnectJMXClient();
         }
     }
 
