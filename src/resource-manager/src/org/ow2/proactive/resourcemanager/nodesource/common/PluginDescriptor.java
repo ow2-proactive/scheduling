@@ -36,21 +36,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.security.KeyException;
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.authentication.Authentication;
-import org.ow2.proactive.authentication.AuthenticationImpl;
-import org.ow2.proactive.authentication.Connection;
-import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -143,7 +134,6 @@ public class PluginDescriptor implements Serializable {
         }
 
         int counter = 0;
-        boolean loginData = false;
 
         for (ConfigurableField field : configurableFields) {
 
@@ -156,44 +146,6 @@ public class PluginDescriptor implements Serializable {
                 } catch (IOException e) {
                     throw new RMException("Cannot load file", e);
                 }
-            } else if (configurable.login()) {
-                loginData = true;
-            } else if (configurable.password() && loginData) {
-                Credentials creds;
-                try {
-                    String login = resultParams.remove(resultParams.size() - 1).toString();
-                    String authName = resultParams.remove(resultParams.size() - 1).toString();
-                    String url = resultParams.get(resultParams.size() - 1).toString();
-                    String pass = value.toString();
-                    Authentication auth = null;
-                    PublicKey pk = null;
-
-                    Connection<AuthenticationImpl> conn = new Connection<AuthenticationImpl>(
-                            AuthenticationImpl.class) {
-                        public Logger getLogger() {
-                            return ProActiveLogger.getLogger(RMLoggers.RESOURCEMANAGER + ".credentials");
-                        }
-                    };
-
-                    String authUrl = "";
-                    if (url.endsWith("/")) {
-                        authUrl = url + authName;
-                    } else {
-                        authUrl = url + "/" + authName;
-                    }
-
-                    auth = conn.connect(authUrl);
-
-                    pk = auth.getPublicKey();
-
-                    value = Credentials.createCredentials(login, pass, pk);
-                } catch (Exception e) {
-                    throw new RMException("Could not retrieve public key", e);
-                }
-            }
-
-            if (loginData && !configurable.login()) {
-                loginData = false;
             }
 
             resultParams.add(value);

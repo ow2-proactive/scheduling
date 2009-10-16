@@ -31,19 +31,19 @@
  */
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable.Auth;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -60,12 +60,8 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
 
     @Configurable
     protected String url = "";
-    @Configurable(auth = Auth.SCHEDULER, editable = false)
-    protected String authName = new String(SchedulerConstants.SCHEDULER_DEFAULT_NAME);
-    @Configurable(login = true)
-    protected String userName = "";
-    @Configurable(password = true)
-    protected String password = "";
+    @Configurable(fileBrowser = true)
+    protected File schedulerCredentialsPath;
     @Configurable
     protected boolean preemptive = false;
 
@@ -76,7 +72,8 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         SchedulerAuthenticationInterface authentication;
         try {
             authentication = SchedulerConnection.join(params[0].toString());
-            userInterface = authentication.logAsUser((Credentials) params[1]);
+            Credentials creds = Credentials.getCredentialsBase64((byte[]) params[1]);
+            userInterface = authentication.logAsUser(creds);
             preemptive = Boolean.parseBoolean(params[2].toString());
         } catch (Throwable t) {
             throw new RMException(t);

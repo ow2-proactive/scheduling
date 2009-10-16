@@ -39,6 +39,8 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastruc
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
+import com.lowagie.text.t;
+
 import functionalTests.FunctionalTest;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
@@ -160,13 +162,14 @@ public class RMTHelper {
         nodeProcess.startProcess();
         try {
             Node newNode = null;
-            Thread.sleep(1000);
-
-            for (int i = 0; i < 5; i++) {
+            Thread.sleep(5000);
+            NodeException toThrow = null;
+            for (int i = 0; i < 12; i++) {
                 try {
                     newNode = NodeFactory.getNode("//" + ProActiveInet.getInstance().getHostname() + "/" +
                         nodeName);
                 } catch (NodeException e) {
+                    toThrow = e;
                     //nothing, wait another loop
                 }
                 if (newNode != null)
@@ -174,7 +177,7 @@ public class RMTHelper {
                 else
                     Thread.sleep(1000);
             }
-            throw new NodeException("unable to create the node " + nodeName);
+            throw toThrow == null ? new NodeException("unable to create the node " + nodeName) : toThrow;
         } catch (InterruptedException e) {
             e.printStackTrace();
             return null;

@@ -37,7 +37,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -48,12 +47,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable.Auth;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -82,12 +78,8 @@ public class EC2Infrastructure extends InfrastructureManager {
     protected File configurationFile;
     @Configurable
     protected String rmUrl;
-    @Configurable(auth = Auth.RM, editable = false)
-    protected String authName = new String(RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
-    @Configurable(login = true)
-    protected String rmLogin;
-    @Configurable(password = true)
-    protected String rmPass;
+    @Configurable(fileBrowser = true)
+    protected File RMCredentialsPath;
     @Configurable
     protected String nodeHttpPort = "80";
 
@@ -198,13 +190,7 @@ public class EC2Infrastructure extends InfrastructureManager {
                 logger.debug("Expected File as 1st parameter for EC2Infrastructure: " + e.getMessage());
             }
             String rmu = parameters[1].toString();
-            String creds64 = "";
-            try {
-                Credentials creds = (Credentials) parameters[2];
-                creds64 = new String(creds.getBase64());
-            } catch (KeyException e) {
-                throw new RMException("Could not retrieve base64 credentials", e);
-            }
+            String creds64 = new String((byte[]) parameters[2]);
             String nodep = parameters[3].toString();
 
             try {
