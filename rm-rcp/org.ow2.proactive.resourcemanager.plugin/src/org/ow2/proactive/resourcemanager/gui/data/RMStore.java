@@ -231,6 +231,8 @@ public class RMStore {
         if (StatisticsView.getStatsViewer() != null) {
             StatisticsView.getStatsViewer().setInput(null);
         }
+        // Disconnect JMX ChartIt action
+        JMXChartItAction.getInstance().disconnectJMXClient();
         try {
             //disconnect user if user has not failed
             //protect it by a try catch
