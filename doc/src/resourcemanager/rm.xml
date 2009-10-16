@@ -3,28 +3,24 @@
 		<section xml:id="Role"><info><title>Role</title></info>
 			
 			<para>
-				As Scheduler manages pool of jobs to execute, Resource
-				Manager is in charge of supplying Scheduler with resources (ProActive nodes).
-				Resource Manager (RM) takes benefits
-				from the ProActive library, so it can handle resources
-				from LAN, on cluster, on P2P desktop Grids, or on
-				Internet Grids. Resource Manager selects nodes from the pool
-				of resources according to tasks criteria (operating system,
-				dynamic libraries, memory...). Its main functions are:
+				The ProActive Resource Manager is a software for resource aggregation across the
+				network. It delivers compute units represented by ProActive nodes to the scheduler
+				which is in charge of handling a task flow and distribute tasks on accessible
+				resources. Thanks to the deployment framework, it can retrieves computing nodes
+				using different standards such as SSH, LSF, OAR, gLite, EC2, etc. Its main functions
+				are:
 			</para>
 			<itemizedlist>
 				<listitem>
 					<para>
-						Deployment, acquisition and release of ProActive
-						nodes to/from an underlying infrastructure.
+						Deployment, acquisition and release of ProActive nodes to/from an underlying
+						infrastructure.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						Supplying Scheduler with nodes for tasks
-						executions. Scheduler can ask nodes that meet
-						some criteria. These criteria are defined in a
-						selection script.
+						Supplying ProActive Scheduler with nodes for tasks executions, based on required
+						properties.
 					</para>
 				</listitem>
 				<listitem>
@@ -37,7 +33,12 @@
 		</section>
 		<section xml:id="architecture"><info><title>Resource Manager architecture</title></info>
 			
-			<para>Resource Manager is made of several components:</para>
+			<para>
+				Resource Manager is aimed to hide the nature of a dynamic infrastructure and
+				simplify effective utilization of multiple computing resources, enabling the exploitation
+				of resources from different providers on a single application. In order to achieve
+				this goal the Resource Manager is split into several components:
+			</para>
 			<itemizedlist>
 				<listitem>
 					<para>
@@ -116,7 +117,14 @@
 			<itemizedlist>
 				<listitem>
 					<para>
-						<emphasis>GCM infrastructure manager</emphasis> - this manager is able to acquire/release nodes described in
+						<emphasis>Default infrastructure manager</emphasis> is designed to be used with ProActive agent.
+						I cannot perform the deployment and knows nothing about underlying infrastructure but can register
+						already existing nodes and release them.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>GCM infrastructure manager</emphasis> is able to acquire/release nodes described in
 						GCM deployment descriptor. Nodes are deployed to the infrastructure at the moment of acquisition and
 						will be removed from it at the release time. It supports only "acquire all" / "release all" operations
 						and cannot acquire a single node.
@@ -124,8 +132,8 @@
 				</listitem>
 				<listitem>
 					<para>
-						<emphasis>GCM customized infrastructure</emphasis> - this manager is able to deploy / release
-						a single node from infrastructure. It can be used by advanced node source policies which
+						<emphasis>GCM customized infrastructure</emphasis> can deploy / release
+						a single node to / from the infrastructure. It can be used by advanced node source policies which
 						allow to have as many nodes in the resource pool as needed. It holds the
 						list of nodes and the GCM deployment descriptor template described how to deploy one node to the host.
 					</para>

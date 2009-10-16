@@ -362,6 +362,11 @@ user2:user
 				<emphasis role="italics">--l or --login</emphasis>, followed by a login name. If you don't specify this option, login name is asked in a prompt.
 			</para>
 		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="italics">-uc,--use-creds</emphasis> to use credentials retreived from disk.
+			</para>
+		</listitem>
 	</itemizedlist>
 	<para>Then you can ask for one of these actions:</para>
 	<itemizedlist>
@@ -375,9 +380,98 @@ user2:user
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">-c or --createns</emphasis>, followed a name of node source, in order to create a new node source.
+				<emphasis role="italics">-cn or --createns</emphasis>, followed a name of node source, in order to create a new node source.
 			</para>
 		</listitem>
+	</itemizedlist>
+	<para>
+			When new node source is created custom infrastructure or policy can be specified
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+					<emphasis role="italics">-infrastructure</emphasis> parameter allows to list or specify an infrastructure.
+					In order to see the list of supported infrastructures run
+			</para>
+		</listitem>
+	</itemizedlist>
+		
+		<programlisting>
+>rm-admin -cn myns -infrastructure
+Available node source infrastructures:
+Name: GCM Infrastructure
+Description: Infrastructure described in GCM deployment descriptor
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure
+Parameters: &lt;class name&gt; descriptor
+
+Name: EC2 Infrastructure
+Description: Handles nodes from the Amazon Elastic Compute Cloud Service.
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure
+Parameters: &lt;class name&gt; configurationFile rmUrl authName rmLogin rmPass nodeHttpPort
+
+Name: GCM Customised Infrastructure
+Description: Handles hosts from the list using specified gcm deployment descriptor
+template with HOST java variable contract (see proactive documentation)
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure
+Parameters: &lt;class name&gt; descriptor hostsList
+
+Name: Default Infrastructure Manager
+Description: Default infrastructure
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager
+		</programlisting>
+		<para>
+			Choose the one you need and add corresponding parameters to the command line
+		</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+					<emphasis role="italics">-policy</emphasis> parameter allows to list or specify a policy. First see the list
+					of available policies
+			</para>
+		</listitem>
+	</itemizedlist>
+		
+		<programlisting>
+>rm-admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy
+Available node source policies:
+Name: Release Resources When Scheduler Idle
+Description: Releases all resources when scheduler is idle for specified
+time. Acquires them back on job submission.
+Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle
+Parameters: &lt;class name&gt; url authName userName password preemptive idleTime
+
+Name: EC2 Policy
+Description: Allocates resources according to the Scheduler loading factor,
+releases resources considering EC2 instances are paid by the hour
+Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.EC2Policy
+Parameters: &lt;class name&gt; url authName userName password preemptive refreshTime loadFactor releaseCycle
+
+Name: Time Slot Policy
+Description: Acquires and releases nodes at specified time.
+Class name: org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
+Parameters: &lt;class name&gt; acquireTime releaseTime period preemptive
+
+Name: Scheduler Loading Policy
+Description: Allocates as many resources as scheduler required according
+to loading factor. Releases resources smoothly.
+Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy
+Parameters: &lt;class name&gt; url authName userName password preemptive policyPeriod minNodes maxNodes loadingFactor releasePeriod
+
+Name: Static Policy
+Description: Static nodes acquisition.
+Class name: org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
+		</programlisting>
+		<para>
+			Then select the appropriate one and specify it in the command line. Example
+		</para>
+		<programlisting>
+>rm-admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
+		</programlisting>
+		
+		<para>
+			Other actions
+		</para>
+		<itemizedlist>
 		<listitem>
 			<para>
 				<emphasis role="italics">-d or --removenodes</emphasis>, followed a by a list of nodes URLs handled by Resource Manager, in order to remove them.
@@ -409,12 +503,12 @@ user2:user
 		</listitem>
 	</itemizedlist>
 	<para>
-	if no -a, -c, -d, -gcmd, -ln, -r or -s, this program starts in interactive mode. See below.  
+	if no -a, -c, -d, -ln, -r or -s, this program starts in interactive mode. See below.  
 	</para>
 	<section xml:id="rm_admin_js_console"><info><title>Interactive mode</title></info>
 	<para> Another way to interact with the resource manager is using the interactive mode of the controller. Interactive mode correspond to a JavaSscript console, able
 	manage Resouce Manager.
-	To start it in this mode, just execute the bin/[os]/rm-admin[.bat] command without specifying one of -a, -c, -d, -gcmd, -ln, -r or -s options:
+	To start it in this mode, just execute the bin/[os]/rm-admin[.bat] command without specifying one of -a, -c, -d, -ln, -r or -s options:
 	Once connected, type ? or help() to get the list of provided functions:
 	</para>
 	<itemizedlist>
@@ -431,7 +525,7 @@ user2:user
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis role="italics">createns(nsName)</emphasis>; creates a new node source (parameter is a string representing the node source name to create).
+				<emphasis role="italics">createns(nsName,infr,pol)</emphasis>; Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastrucure', 'param1', ...], ['policy', 'param1', ...]))
 			</para>
 		</listitem>
 		<listitem>
@@ -449,6 +543,16 @@ user2:user
 		<listitem>
 			<para>
 				<emphasis role="italics">listns()</emphasis>; lists all node sources.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="italics">listInfrastructures()</emphasis>; lists supported infrastructures.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="italics">listPolicies()</emphasis>; lists availible node souce policies.
 			</para>
 		</listitem>
 		<listitem>
@@ -484,8 +588,8 @@ exMode(false,false);
 /* remove a node source, preemptively */
 removens("my_node_source",true);
 
-/* create a new node source */
-createns("my_node_source");
+/* create a new node source with GCMD and static nodes acquisition*/
+createns("my_node_source", ['org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure', 'path_to_descriptor'], ['org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy']);
 
 /* wait for a while */
 java.lang.Thread.sleep(10000);

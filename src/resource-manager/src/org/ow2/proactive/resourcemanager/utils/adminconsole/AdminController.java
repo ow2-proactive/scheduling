@@ -382,8 +382,7 @@ public class AdminController {
         options.addOptionGroup(actionGroup);
 
         Option nodeSourceNameOpt = new Option("ns", "nodesource", true, control +
-            "Specify an existing node source name for " +
-            "adding nodes on and deploying GCMD actions (-a and -gcmd)");
+            "Specify an existing node source name for adding nodes");
         nodeSourceNameOpt.setArgName("nodes URLs");
         nodeSourceNameOpt.setRequired(false);
         nodeSourceNameOpt.setArgs(1);
