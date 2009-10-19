@@ -1,0 +1,24 @@
+# The default logging level is INFO
+# The root logger logs in the test.log file
+
+log4j.rootLogger=INFO, rootLoggerAppenderINFO
+avoid displaying additivity of the inherit loggers
+
+
+
+#Embarrassingly parallel framework logger
+log4j.logger.proactive.epf=INFO, epfAppender
+log4j.additivity.proactive.epf=false
+
+#epfAppender Appender
+log4j.appender.epfAppender=org.apache.log4j.FileAppender
+log4j.appender.epfAppender.File=logs/epf.log
+log4j.appender.epfAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.epfAppender.layout.ConversionPattern=%d{dd MMM yyyy HH:mm:ss} %m %n
+
+
+#Root Appender
+log4j.appender.rootLoggerAppenderINFO=org.apache.log4j.FileAppender
+log4j.appender.rootLoggerAppenderINFO.File=logs/proactive.log
+log4j.appender.rootLoggerAppenderINFO.layout=org.apache.log4j.PatternLayout
+log4j.appender.rootLoggerAppenderINFO.layout.ConversionPattern=%d{dd MMM yyyy HH:mm:ss} %m %n
