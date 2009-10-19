@@ -46,12 +46,13 @@ public class FileTransfertInitializerSCP implements FileTransfertInitializer {
     private String _host = "";
     private String _user = "";
     private String _pass = "";
+    int compression_level = 0;
 
     //default scp port is 22
     private int _port = 22;
 
     //--FileTransfertDriverVFSSCP is the default driver
-    private Class<? extends FileTransfertDriver> _driverClass = SCP_Trilead_Driver.class;
+    protected Class<? extends FileTransfertDriver> _driverClass = SCP_Trilead_Driver.class;
 
     public FileTransfertInitializerSCP(String host, String user, String pass) {
         _host = host;
@@ -100,6 +101,14 @@ public class FileTransfertInitializerSCP implements FileTransfertInitializer {
 
     public String getPassword() {
         return _pass;
+    }
+
+    public int getCompression_level() {
+        return compression_level;
+    }
+
+    public void setCompression_level(int compression_level) {
+        this.compression_level = compression_level;
     }
 
 }

@@ -159,7 +159,7 @@ public class SCP_Trilead_Driver implements FileTransfertDriver {
         throw new Exception("This method is not implemented by the " + this.getClass() + " driver.");
     }
 
-    private void debug(String msg) {
+    public void debug(String msg) {
         System.out.println(this.getClass().getSimpleName() + ": " + msg);
     }
 

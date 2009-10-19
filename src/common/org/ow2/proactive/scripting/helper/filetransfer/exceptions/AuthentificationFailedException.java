@@ -41,7 +41,10 @@ public class AuthentificationFailedException extends Exception {
 
     public AuthentificationFailedException(String msg) {
         super(msg);
+    }
 
+    public AuthentificationFailedException(Exception e) {
+        super(e);
     }
 
 }
