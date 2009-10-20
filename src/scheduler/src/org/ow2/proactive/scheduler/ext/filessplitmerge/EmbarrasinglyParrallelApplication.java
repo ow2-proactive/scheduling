@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : ProActive Embarrassingly Parallel Framework 
+// Name        : ProActive Files Split-Merge Framework 
 // Author      : Emil Salageanu, ActiveEon team
 // Version     : 0.1
 // Copyright   : Copyright ActiveEon 2008-2009, Tous Droits Réservés (All Rights Reserved)
