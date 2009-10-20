@@ -85,7 +85,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
             DataSpacesNodes.closeNodeConfig(PAActiveObject
                     .getActiveObjectNode(PAActiveObject.getStubOnThis()));
         } catch (Throwable t) {
-            logger.error("Cannot close dataSpace configuration", t);
+            logger.error("Cannot close dataSpace configuration : " + t.getMessage());
         }
         PAActiveObject.terminateActiveObject(false);
     }
