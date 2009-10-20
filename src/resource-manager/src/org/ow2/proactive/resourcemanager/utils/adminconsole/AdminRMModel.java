@@ -102,8 +102,8 @@ public class AdminRMModel extends ConsoleModel {
                     "exMode(display,onDemand)",
                     "Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)"));
         commands.add(new Command("addnode(nodeURL, nsName)",
-            "Add node to the given node source (parameters is a string representing the node URL to add AND"
-                + " a string representing the node source in which to add the node)"));
+            "Add node to the given node source (parameters is a string representing the node URL to add &"
+                + " an optional string representing the node source in which to add the node)"));
         commands.add(new Command("removenode(nodeURL,preempt)",
             "Remove the given node (parameter is a string representing the node URL,"
                 + " node is removed immediately if second parameter is true)"));

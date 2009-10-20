@@ -31,6 +31,7 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
+import java.net.URI;
 import java.security.KeyException;
 
 import javax.management.JMException;
@@ -174,5 +175,28 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      */
     public String getJMXConnectorURL() throws JMException {
         return JMXMonitoringHelper.getInstance().getAddress().toString();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getHostURL() {
+		return getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));
+	}
+
+	/**
+     * Normalize the given URL into an URL that only contains protocol://host:port/
+     *
+     * @param url the url to transform
+     * @return an URL that only contains protocol://host:port/
+     */
+    private static String getHostURL(String url) {
+        URI uri = URI.create(url);
+        int port = uri.getPort();
+        if (port == -1) {
+            return uri.getScheme() + "://" + uri.getHost() + "/";
+        } else {
+            return uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + "/";
+        }
     }
 }

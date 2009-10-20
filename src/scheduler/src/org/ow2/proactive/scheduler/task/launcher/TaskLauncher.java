@@ -511,9 +511,11 @@ public abstract class TaskLauncher implements InitActive {
     protected void replaceDSTags() throws Exception {
         String[] args = ((NativeExecutable) currentExecutable).getCommand();
         //I cannot use DataSpace to get the local scratch path
-        String fullScratchPath = SCRATCH.getRealURI().replace("file://", "");
-        for (int i = 0; i < args.length; i++) {
-            args[i] = args[i].replaceAll(DATASPACE_TAG, fullScratchPath);
+        if (SCRATCH != null){
+	        String fullScratchPath = SCRATCH.getRealURI().replace("file://", "");
+	        for (int i = 0; i < args.length; i++) {
+	            args[i] = args[i].replaceAll(DATASPACE_TAG, fullScratchPath);
+	        }
         }
     }
 
@@ -531,6 +533,8 @@ public abstract class TaskLauncher implements InitActive {
             } catch (Throwable t) {
                 logger_dev.warn("Their was a problem while initializing dataSpaces, they won't be activated",
                         t);
+                //print for user task
+                System.err.println("Their was a problem while initializing dataSpaces, they won't be activated : "+t.getMessage());
             }
         }
     }
@@ -654,6 +658,7 @@ public abstract class TaskLauncher implements InitActive {
             }
             //check first the OUTPUT and then the INPUT, take care if not set
             if (OUTPUT == null) {
+
                 logger_dev.debug("Job OUTPUT space is not defined, cannot copy file.");
                 return;
             }

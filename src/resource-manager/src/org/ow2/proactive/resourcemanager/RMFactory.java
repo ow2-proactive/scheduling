@@ -38,15 +38,19 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
@@ -71,51 +75,79 @@ public class RMFactory {
     /** RMCore interface of the created Resource manager */
     private static RMCoreInterface rmcore = null;
 
-    /** ProActive node that will contains Resource manager active objects */
-    private static String RM_NODE_NAME = PAResourceManagerProperties.RM_NODE_NAME.getValueAsString();
-
     /**
-     * Creates Resource manager on local host.
+     * Creates and starts a Resource manager on the local host using the given initializer to configure it.
+     * Only one RM can be started by JVM.
+     *
+     * @param initializer Use to configure the Resource Manager before starting it.
+     * 		This parameter can be null, if so the Resource Manager will try to start on the JVM properties and
+     * 		the "pa.rm.home" property MUST be set to the root of the RM directory.
+     * @return a RM authentication that allow you to administer the RM or get its connection URL.
+     *
      * @throws NodeException If the RM's node can't be created
      * @throws ActiveObjectCreationException If RMCore cannot be created
      * @throws AlreadyBoundException if a node with the same RMNode's name is already exist. 
      * @throws IOException If node and RMCore fails.
+     * @throws RMException if the connection to the authentication interface fails.
      */
-    public static void startLocal() throws NodeException, ActiveObjectCreationException,
-            AlreadyBoundException, IOException {
-
-        String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
+    public static RMAuthentication startLocal(RMInitializer initializer) throws Exception {
         if (rmcore == null) {
-            Node nodeRM = NodeFactory.createLocalNode(RM_NODE_NAME, false, null, null, null);
+		if (initializer != null){
+			//configure application
+			configure(initializer);
+		}
+            Node nodeRM = NodeFactory.createLocalNode(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), false, null, null, null);
+            String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
             rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                     new Object[] { RMCoreName, nodeRM }, nodeRM);
-
-            if (logger.isInfoEnabled()) {
-                logger.info("New RM core localy started");
-            }
+            logger.info("New RM core localy started");
+            return RMConnection.waitAndJoin(null);
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("RM Core already localy running");
-            }
+            throw new RMException("RM Core already localy running");
         }
     }
 
     /**
-     * Main function, create the resource Manager.
-     * @param args command line arguments
+     * Configure the VM to be ready to start the new RM.
+     *
+     * @param initializer the initializer used to configured the VM
      */
-    public static void main(String[] args) {
-        try {
-            startLocal();
-        } catch (NodeException e) {
-            logger.debug("", e);
-        } catch (ActiveObjectCreationException e) {
-            logger.debug("", e);
-        } catch (AlreadyBoundException e) {
-            logger.debug("", e);
-        } catch (IOException e) {
-            logger.debug("", e);
-        }
+    private static void configure(RMInitializer initializer) {
+	//security manager
+	if (System.getProperty("java.security.manager") == null){
+		System.setProperty("java.security.manager","");
+	}
+	//rm properties
+		String s = initializer.getResourceManagerPropertiesConfiguration();
+		if (s == null) {
+			throw new IllegalArgumentException("RM properties file is not set, cannot start RM !");
+		}
+		System.setProperty(PAResourceManagerProperties.PA_RM_PROPERTIES_FILEPATH, s);
+		//pa conf
+		s = initializer.getProActiveConfiguration();
+		if (s != null){
+			System.setProperty(PAProperties.PA_CONFIGURATION_FILE.getKey(), s);
+		}
+		//RM home
+		s = initializer.getRMHomePath();
+		if (s != null){
+			System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), s);
+		}
+    }
+
+	/**
+     * Creates and starts a Resource manager on the local host.
+     * This call considered that the JVM is correctly configured for starting RM.
+     * The "pa.rm.home" and required JVM properties MUST be set.
+     *
+     * @return a RM authentication that allow you to administer the RM or get its connection URL.
+     * @throws NodeException If the RM's node can't be created
+     * @throws ActiveObjectCreationException If RMCore cannot be created
+     * @throws AlreadyBoundException if a node with the same RMNode's name is already exist.
+     * @throws IOException If node and RMCore fails.
+     */
+    public static RMAuthentication startLocal() throws Exception {
+	return startLocal(null);
     }
 
     /**

@@ -57,12 +57,12 @@ import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.scheduler.SchedulerFactory;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
@@ -121,6 +121,7 @@ public class SchedulerStarter {
         boolean displayHelp = false;
 
         try {
+		RMAuthentication rmAuth = null;
             //get the path of the file
             ResourceManagerProxy imp = null;
 
@@ -168,11 +169,7 @@ public class SchedulerStarter {
                             //Starting a local RM using default deployment descriptor
                             RMFactory.setOsJavaProperty();
                             logger.info("Trying to start a local Resource Manager");
-                            RMFactory.startLocal();
-
-                            logger_dev.info("Trying to join the local Resource Manager");
-                            //wait for the RM to be created
-                            RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
+                            rmAuth = RMFactory.startLocal();
 
                             logger_dev
                                     .info("Trying to connect the local Resource Manager using Scheduler identity");
@@ -202,10 +199,11 @@ public class SchedulerStarter {
                 }
 
                 try {
-                    logger_dev.info("Creating scheduler...");
-                    AdminScheduler.createScheduler(imp, policyFullName);
+                    logger.info("Starting scheduler...");
+                    SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(rmAuth.getHostURL(), policyFullName);
+                    logger.info("Scheduler successfully created on " + sai.getHostURL());
                 } catch (AdminSchedulerException e) {
-                    logger.warn(e);
+                    logger.warn("",e);
                 }
             }
         } catch (MissingArgumentException e) {

@@ -69,7 +69,7 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
-	        </jar>
+	    </jar>
 	</target>
 
 	<!-- ************

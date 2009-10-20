@@ -159,9 +159,11 @@ public enum PASchedulerProperties {
             PAPropertiesType.STRING),
 
     /** The same for the OUPUT */
-    DATASPACE_DEFAULTOUTPUTURL("pa.scheduler.dataspace.defaultoutputurl", PAPropertiesType.STRING), DATASPACE_DEFAULTOUTPUTURL_LOCALPATH(
-            "pa.scheduler.dataspace.defaultoutputurl.localpath", PAPropertiesType.STRING), DATASPACE_DEFAULTOUTPUTURL_HOSTNAME(
-            "pa.scheduler.dataspace.defaultoutputurl.hostname", PAPropertiesType.STRING),
+    DATASPACE_DEFAULTOUTPUTURL("pa.scheduler.dataspace.defaultoutputurl", PAPropertiesType.STRING),
+    /** */
+    DATASPACE_DEFAULTOUTPUTURL_LOCALPATH("pa.scheduler.dataspace.defaultoutputurl.localpath", PAPropertiesType.STRING),
+    /** */
+    DATASPACE_DEFAULTOUTPUTURL_HOSTNAME("pa.scheduler.dataspace.defaultoutputurl.hostname", PAPropertiesType.STRING),
 
     /* ***************************************************************** */
     /* ************************* LOGS PROPERTIES *********************** */
@@ -202,24 +204,14 @@ public enum PASchedulerProperties {
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
+    public static final String PA_SCHEDULER_PROPERTIES_FILEPATH = "pa.scheduler.properties.filepath";
     /** Default properties file for the scheduler configuration */
-    private static final String DEFAULT_PROPERTIES_FILE;
-
-    private static final boolean fileLoaded;
-
-    static {
-        String propertiesPath = "config/scheduler/settings.ini";
-        if (System.getProperty("pa.scheduler.properties.filepath") != null) {
-            propertiesPath = System.getProperty("pa.scheduler.properties.filepath");
-        }
-        if (!new File(propertiesPath).isAbsolute()) {
-            propertiesPath = System.getProperty(SCHEDULER_HOME.key) + File.separator + propertiesPath;
-        }
-        DEFAULT_PROPERTIES_FILE = propertiesPath;
-        fileLoaded = new File(propertiesPath).exists();
-    }
+    private static String DEFAULT_PROPERTIES_FILE = null;
+    /** to know if the file has been loaded or not */
+    private static boolean fileLoaded;
     /** memory entity of the properties file. */
     private static Properties prop = null;
+
     /** Key of the specific instance. */
     private String key;
     /** value of the specific instance. */
@@ -246,12 +238,12 @@ public enum PASchedulerProperties {
     }
 
     /**
-     * Set a the value of this property to the given one.
+     * Set the value of this property to the given one.
      *
      * @param value the new value to set.
      */
     public void updateProperty(String value) {
-        getProperties(DEFAULT_PROPERTIES_FILE);
+        getProperties(null);
         prop.setProperty(key, value);
     }
 
@@ -260,12 +252,42 @@ public enum PASchedulerProperties {
      * User properties are defined using the -Dname=value in the java command.
      */
     private static void setUserJavaProperties() {
-        for (Object o : prop.keySet()) {
-            String s = System.getProperty((String) o);
-            if (s != null) {
-                prop.setProperty((String) o, s);
-            }
-        }
+	if (prop != null){
+	        for (Object o : prop.keySet()) {
+	            String s = System.getProperty((String) o);
+	            if (s != null) {
+	                prop.setProperty((String) o, s);
+	            }
+	        }
+	}
+    }
+
+    /**
+     * Initialize the file to be loaded by this properties.
+     * It first check the filename argument :<br>
+     * - if null  : default config file is used (first check if java property file exist)<br>
+     * - if exist : use the filename argument to read configuration.<br>
+     *
+     * Finally, if the selected file is a relative path, the file will be relative to the SCHEDULER_HOME property.
+     *
+     * @param filename the file to load or null to use the default one or the one set in java property.
+     */
+    private static void init(String filename) {
+	String propertiesPath;
+	if (filename == null){
+		if (System.getProperty(PA_SCHEDULER_PROPERTIES_FILEPATH) != null) {
+			propertiesPath = System.getProperty(PA_SCHEDULER_PROPERTIES_FILEPATH);
+		} else {
+			propertiesPath = "config/scheduler/settings.ini";
+		}
+	} else {
+		propertiesPath = filename;
+	}
+	if (!new File(propertiesPath).isAbsolute()) {
+		propertiesPath = System.getProperty(SCHEDULER_HOME.key) + File.separator + propertiesPath;
+	}
+        DEFAULT_PROPERTIES_FILE = propertiesPath;
+        fileLoaded = new File(propertiesPath).exists();
     }
 
     /**
@@ -276,10 +298,18 @@ public enum PASchedulerProperties {
      */
     private static Properties getProperties(String filename) {
         if (prop == null) {
-            prop = new Properties();
+		prop = new Properties();
+		init(filename);
+		if (filename == null && fileLoaded == false){
+			return prop;
+		}
             try {
+		if (filename == null){
+			filename = DEFAULT_PROPERTIES_FILE;
+		}
                 prop.load(new FileInputStream(filename));
                 setUserJavaProperties();
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -288,26 +318,35 @@ public enum PASchedulerProperties {
     }
 
     /**
+     * Load the properties from the given file.
+     * This method will clean every loaded properties before.
+     *
+     * @param filename the file containing the properties to be loaded.
+     */
+    public static void loadProperties(String filename){
+	DEFAULT_PROPERTIES_FILE = null;
+        fileLoaded = false;
+        prop = null;
+        getProperties(filename);
+    }
+
+    /**
      * Override properties defined in the default configuration file,
      * by properties defined in another file.
+     * Call this method implies the default properties to be loaded
      * @param filename path of file containing some properties to override
      */
     public static void updateProperties(String filename) {
-        if (fileLoaded) {
-            //load properties file if needed
-            getProperties(DEFAULT_PROPERTIES_FILE);
-            Properties ptmp = new Properties();
-            try {
-                ptmp.load(new FileInputStream(filename));
-                for (Object o : ptmp.keySet()) {
-                    prop.setProperty((String) o, (String) ptmp.get(o));
-                }
-                setUserJavaProperties();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        getProperties(null);
+        Properties ptmp = new Properties();
+        try {
+            ptmp.load(new FileInputStream(filename));
+            for (Object o : ptmp.keySet()) {
+                prop.setProperty((String) o, (String) ptmp.get(o));
             }
-        } else {
-            getProperties(filename);
+            setUserJavaProperties();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -317,6 +356,7 @@ public enum PASchedulerProperties {
      * @return true if this property is set, false otherwise.
      */
     public boolean isSet() {
+	getProperties(null);
         if (fileLoaded) {
             return prop.containsKey(key);
         } else {
@@ -342,6 +382,7 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public int getValueAsInt() {
+	getProperties(null);
         if (fileLoaded) {
             String valueS = getValueAsString();
             try {
@@ -363,6 +404,7 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public String getValueAsString() {
+	getProperties(null);
         if (fileLoaded) {
             return getProperties(DEFAULT_PROPERTIES_FILE).getProperty(key);
         } else {
@@ -378,6 +420,7 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public boolean getValueAsBoolean() {
+	getProperties(null);
         if (fileLoaded) {
             return Boolean.parseBoolean(getValueAsString());
         } else {
@@ -407,7 +450,7 @@ public enum PASchedulerProperties {
      * It the path is absolute, then it is returned. If the path is relative, then the Scheduler_home directory is 
      * concatenated in front of the given string.
      *
-     * @param userPath  the path to check transform.
+     * @param userPath the path to check transform.
      * @return the absolute path of the given path.
      */
     public static String getAbsolutePath(String userPath) {

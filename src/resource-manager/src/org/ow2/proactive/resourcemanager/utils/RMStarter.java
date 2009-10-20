@@ -49,7 +49,6 @@ import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -147,10 +146,10 @@ public class RMStarter {
             }
 
             // starting clean resource manager
-            RMFactory.startLocal();
+            RMAuthentication auth = RMFactory.startLocal();
+            logger.info("Resource Manager successfully created on " + auth.getHostURL());
 
             if (deploymentDescriptors.size() > 0) {
-                RMAuthentication auth = RMConnection.waitAndJoin(null);
                 RMAdmin admin = auth.logAsAdmin(Credentials.getCredentials(PAResourceManagerProperties
                         .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
                 String nodeSourceName = NodeSource.GCM_LOCAL;

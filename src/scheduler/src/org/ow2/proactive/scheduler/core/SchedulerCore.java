@@ -454,11 +454,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             return;
         }
 
-        //Scheduler started
-        ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE).info(
-                "Scheduler successfully started on " +
-                    Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis())));
-
         if (status != SchedulerStatus.KILLED) {
 
             //listen log as immediate Service.

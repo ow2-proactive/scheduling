@@ -87,18 +87,6 @@ admin.shutdown(true); //performs preemptive shutdown	</programlisting>
 		</para>			
 	</section>
 
-
-	<section xml:id="RM_API_GCMD"><info><title>Deploy GCM deployment descriptors</title></info>
-		<para>
-		RMFactory provides a way to specify a list of deployment descriptors which will be deployed once Resource Manager is started.
-		Here is an example of starting the Resource Manager with 4 nodes. In this case, node sources with GCM infrastructure manager and
-		static node acquisition policy will be created.
-		</para>
-		<programlisting language="java">
-String gcmDeployFile = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "config/rm/deployment/Local4JVMDeployment.xml";
-RMFactory.startLocal(Collections.singleton(gcmDeployFile));
-		</programlisting>
-	</section>
 	<section xml:id="RM_API_add_node"><info><title>Add an already deployed node</title></info>
 	<para>
 	RMAdmin provides a way to add ProActive nodes that are already deployed. Nodes are added using

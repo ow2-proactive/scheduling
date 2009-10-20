@@ -75,8 +75,9 @@ public enum PAResourceManagerProperties {
     /** GCM application template file path, used to perform GCM deployments */
     RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PAPropertiesType.STRING),
 
-    /** name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
-     * as a place of a GCM deployment file. 
+    /**
+     * name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
+     * as a place of a GCM deployment file.
      */
     RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PAPropertiesType.STRING),
 
@@ -129,24 +130,14 @@ public enum PAResourceManagerProperties {
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
+    public static final String PA_RM_PROPERTIES_FILEPATH = "pa.rm.properties.filepath";
     /** Default properties file for the RM configuration */
-    private static final String DEFAULT_PROPERTIES_FILE;
-
-    private static final boolean fileLoaded;
-
-    static {
-        String propertiesPath = "config/rm/settings.ini";
-        if (System.getProperty("pa.rm.properties.filepath") != null) {
-            propertiesPath = System.getProperty("pa.rm.properties.filepath");
-        }
-        if (!new File(propertiesPath).isAbsolute()) {
-            propertiesPath = System.getProperty(RM_HOME.key) + File.separator + propertiesPath;
-        }
-        DEFAULT_PROPERTIES_FILE = propertiesPath;
-        fileLoaded = new File(propertiesPath).exists();
-    }
+    private static String DEFAULT_PROPERTIES_FILE = null;
+    /** to know if the file has been loaded or not */
+    private static boolean fileLoaded = false;
     /** memory entity of the properties file. */
     private static Properties prop = null;
+
     /** Key of the specific instance. */
     private String key;
     /** value of the specific instance. */
@@ -173,12 +164,12 @@ public enum PAResourceManagerProperties {
     }
 
     /**
-     * Set a the value of this property to the given one.
+     * Set the value of this property to the given one.
      *
      * @param value the new value to set.
      */
     public void updateProperty(String value) {
-        getProperties(DEFAULT_PROPERTIES_FILE);
+        getProperties(null);
         prop.setProperty(key, value);
     }
 
@@ -187,12 +178,42 @@ public enum PAResourceManagerProperties {
      * User properties are defined using the -Dname=value in the java command.
      */
     private static void setUserJavaProperties() {
-        for (Object o : prop.keySet()) {
-            String s = System.getProperty((String) o);
-            if (s != null) {
-                prop.setProperty((String) o, s);
-            }
-        }
+	if (prop != null){
+	        for (Object o : prop.keySet()) {
+	            String s = System.getProperty((String) o);
+	            if (s != null) {
+	                prop.setProperty((String) o, s);
+	            }
+	        }
+	}
+    }
+
+    /**
+     * Initialize the file to be loaded by this properties.
+     * It first check the filename argument :<br>
+     * - if null  : default config file is used (first check if java property file exist)<br>
+     * - if exist : use the filename argument to read configuration.<br>
+     *
+     * Finally, if the selected file is a relative path, the file will be relative to the RM_HOME property.
+     *
+     * @param filename the file to load or null to use the default one or the one set in java property.
+     */
+    private static void init(String filename) {
+	String propertiesPath;
+	if (filename == null){
+		if (System.getProperty(PA_RM_PROPERTIES_FILEPATH) != null) {
+			propertiesPath = System.getProperty(PA_RM_PROPERTIES_FILEPATH);
+		} else {
+			propertiesPath = "config/rm/settings.ini";
+		}
+	} else {
+		propertiesPath = filename;
+	}
+	if (!new File(propertiesPath).isAbsolute()) {
+		propertiesPath = System.getProperty(RM_HOME.key) + File.separator + propertiesPath;
+	}
+        DEFAULT_PROPERTIES_FILE = propertiesPath;
+        fileLoaded = new File(propertiesPath).exists();
     }
 
     /**
@@ -203,10 +224,18 @@ public enum PAResourceManagerProperties {
      */
     private static Properties getProperties(String filename) {
         if (prop == null) {
-            prop = new Properties();
+		prop = new Properties();
+		init(filename);
+		if (filename == null && fileLoaded == false){
+			return prop;
+		}
             try {
+		if (filename == null){
+			filename = DEFAULT_PROPERTIES_FILE;
+		}
                 prop.load(new FileInputStream(filename));
                 setUserJavaProperties();
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -215,25 +244,35 @@ public enum PAResourceManagerProperties {
     }
 
     /**
-     * override properties defined in the default configuration file,
+     * Load the properties from the given file.
+     * This method will clean every loaded properties before.
+     *
+     * @param filename the file containing the properties to be loaded.
+     */
+    public static void loadProperties(String filename){
+	DEFAULT_PROPERTIES_FILE = null;
+        fileLoaded = false;
+        prop = null;
+        getProperties(filename);
+    }
+
+    /**
+     * Override properties defined in the default configuration file,
      * by properties defined in another file.
+     * Call this method implies the default properties to be loaded
      * @param filename path of file containing some properties to override
      */
     public static void updateProperties(String filename) {
-        if (fileLoaded) {
-            getProperties(DEFAULT_PROPERTIES_FILE);
-            Properties ptmp = new Properties();
-            try {
-                ptmp.load(new FileInputStream(filename));
-                for (Object o : ptmp.keySet()) {
-                    prop.setProperty((String) o, (String) ptmp.get(o));
-                }
-                setUserJavaProperties();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+	getProperties(null);
+        Properties ptmp = new Properties();
+        try {
+            ptmp.load(new FileInputStream(filename));
+            for (Object o : ptmp.keySet()) {
+                prop.setProperty((String) o, (String) ptmp.get(o));
             }
-        } else {
-            getProperties(filename);
+            setUserJavaProperties();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -243,6 +282,7 @@ public enum PAResourceManagerProperties {
      * @return true if this property is set, false otherwise.
      */
     public boolean isSet() {
+	getProperties(null);
         if (fileLoaded) {
             return prop.containsKey(key);
         } else {
@@ -268,6 +308,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public int getValueAsInt() {
+	getProperties(null);
         if (fileLoaded) {
             String valueS = getValueAsString();
             try {
@@ -289,6 +330,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public String getValueAsString() {
+	getProperties(null);
         if (fileLoaded) {
             return getProperties(DEFAULT_PROPERTIES_FILE).getProperty(key);
         } else {
@@ -304,6 +346,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public boolean getValueAsBoolean() {
+	getProperties(null);
         if (fileLoaded) {
             return Boolean.parseBoolean(getValueAsString());
         } else {

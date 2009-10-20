@@ -70,4 +70,12 @@ public interface Authentication extends Loggable, Serializable {
      */
     public String getJMXConnectorURL() throws JMException;
 
+    /**
+     * Return the URL of this Resource Manager.
+     * This URL must be used to contact this Resource Manager.
+     *
+     * @return the URL of this Resource Manager.
+     */
+    public String getHostURL();
+
 }

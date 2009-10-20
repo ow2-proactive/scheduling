@@ -2,7 +2,7 @@
 # It is given as property in the env.sh or init.bat script
 
 # The default logging level is INFO
-# The root logger logs in the SchedulerLogs/SchedulerDev.log file
+# The root logger logs in the ${pa.rm.home}/.logs/RM.log file
 
 log4j.rootLogger=INFO,RMDevFileAppender
 
@@ -20,13 +20,9 @@ log4j.logger.proactive.resourceManager.rmlauncher=INFO,CONSOLE
 log4j.logger.proactive.resourceManager.consol=INFO,CONSOLE
 #log4j.logger.proactive.resourceManager.policy=INFO
 
-# Hibernate logger
-#log4j.additivity.org.hibernate=false
-#log4j.logger.org.hibernate=INFO,SchedulerDevHibFileAppender
-
 # File appender for verbose developer logging level (FILE3)
 log4j.appender.RMDevFileAppender=org.apache.log4j.RollingFileAppender
-log4j.appender.RMDevFileAppender.File=${pa.scheduler.home}/.logs/RM.log
+log4j.appender.RMDevFileAppender.File=${pa.rm.home}/.logs/RM.log
 log4j.appender.RMDevFileAppender.MaxFileSize=10MB
 log4j.appender.RMDevFileAppender.MaxBackupIndex=5
 log4j.appender.RMDevFileAppender.layout=org.apache.log4j.PatternLayout

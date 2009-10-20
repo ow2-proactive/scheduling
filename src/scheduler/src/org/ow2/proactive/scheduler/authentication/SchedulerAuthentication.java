@@ -54,6 +54,7 @@ import org.ow2.proactive.scheduler.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.utils.Tools;
 
 
 /**
@@ -225,4 +226,11 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         return JMXMonitoringHelper.getDefaultJmxConnectorUrl() +
             PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME.getValueAsString();
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getHostURL() {
+        return Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));
+	}
 }

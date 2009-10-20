@@ -32,7 +32,6 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import java.io.Serializable;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -166,22 +165,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     private boolean shutedDown = false;
 
     /**
-     * Normalize the given URL into an URL that only contains protocol://host:port/
-     *
-     * @param url the url to transform
-     * @return an URL that only contains protocol://host:port/
-     */
-    public static String getHostURL(String url) {
-        URI uri = URI.create(url);
-        int port = uri.getPort();
-        if (port == -1) {
-            return uri.getScheme() + "://" + uri.getHost() + "/";
-        } else {
-            return uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + "/";
-        }
-    }
-
-    /**
      * ProActive Empty constructor
      */
     public RMCore() {
@@ -300,10 +283,6 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
 
             // Creating RM started event
             this.monitoring.rmEvent(new RMEvent(RMEventType.STARTED));
-
-            ProActiveLogger.getLogger(RMLoggers.CONSOLE).info(
-                    "Resource Manager successfully created on " +
-                        getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis())));
 
             authentication.setActivated(true);
 
