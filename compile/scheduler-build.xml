@@ -290,11 +290,11 @@
 			RCP
 		-->
 
-	<target name="rcp.libClean.scheduler" description="Clean all required libraries for scheduler RCP">
+	<target name="rcp.libClean.scheduler" depends="clean" description="Clean all required libraries for scheduler RCP">
 		<delete dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" />
 	</target>
 
-	<target name="rcp.libCopy.scheduler" depends="deploy.all" description="Copy all required libraries to scheduler plugins">
+	<target name="rcp.libCopy.scheduler" depends="rcp.libClean.scheduler, deploy.all" description="Copy all required libraries to scheduler plugins">
 		<copy todir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" includeemptydirs="no">
 			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.jar}, ${rm.client.jar}, ${scheduler.client.jar}, ${scheduler.worker.jar}, ${srm.common.client.jar}"/>
 		</copy>
