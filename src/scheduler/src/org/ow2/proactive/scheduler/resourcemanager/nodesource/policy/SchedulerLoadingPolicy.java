@@ -167,7 +167,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     }
 
     protected SchedulerEvent[] getEventsList() {
-        return new SchedulerEvent[] { SchedulerEvent.JOB_SUBMITTED, SchedulerEvent.TASK_RUNNING_TO_FINISHED };
+        return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED,
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED };
     }
 
     protected SchedulerEventListener getSchedulerListener() {
