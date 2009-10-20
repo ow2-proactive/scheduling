@@ -507,30 +507,76 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<para>
 					You can start the ProActive Scheduler using the Java API. Supposing that a Resource Manager is already started on toto
 					(see Resource Manager documentation <xref linkend="Resource_Manager"/> to create a resource Manager),
-					this can be done as following:
+					here's a complete example showing how to start both Scheduler and Resource Manager (assuming the JVM is totally clean ):
 				</para>
 				<programlisting language="java">
-ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("//toto/"));
-AdminScheduler.createScheduler(
-	rmp,
-	"org.ow2.proactive.scheduler.policy.PriorityPolicy");
+
+RMInitializer init = new RMInitializer();
+init.setRMHomePath("/path/to/RM/home");
+init.setLog4jConfiguration("/path/to/log4j");
+init.setJavaSecurityPolicy("/path/to/securityPolicy");
+init.setProActiveConfiguration("/path/to/PAconfigurationFile");
+init.setResourceManagerPropertiesConfiguration("/path/to/RMPropertiesFile");
+System.out.println("Starting RM, please wait...");
+RMAuthentication rmAuth = RMFactory.startLocal(init);
+System.out.println("RM successfully started at : " + rmAuth.getHostURL());
+
+//starting scheduler...
+//initializer is optionnal if the JVM already specified the following variables
+SchedulerInitializer init = new SchedulerInitializer();
+init.setSchedulerHomePath("/path/to/Scheduler/home");
+init.setProActiveConfiguration("/path/to/PAconfigurationFile");
+init.setSchedulerPropertiesConfiguration("/path/to/SchedulerPropertiesFile");
+init.setPolicyFullClassName(PriorityPolicy.class.getName());
+
+System.out.println("Starting Scheduler, please wait...");
+SchedulerAuthenticationInterface sAuth = SchedulerFactory.startLocal(rmAuth.getHostURL(),init);
+System.out.println("Scheduler successfully started at : " + sAuth.getHostURL());
+
 				</programlisting>
-				<para>where arguments are respectively :</para>
-				<orderedlist>
-					<listitem>
-						<para>
-							<emphasis>The Resource Manager Proxy</emphasis>: A reference on an already started Resources Manager instance.
-							Refer to the Resource Manager documentation to know how to do that
-							(<xref linkend="Resource_Manager"/>).
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis>The Policy Full Class Name</emphasis>: The scheduling policy to use, as a string
-							representing the complete name of the class.
-						</para>
-					</listitem>
-				</orderedlist>
+				<para>
+					Every thing could be started in different JVM and also without using the initializer.
+					The example below shows how to start both RM and Scheduler assuming that the following variables
+					are defined at JVM start up :
+					<itemizedlist>
+						<listitem>
+							<emphasis>-Djava.security.manager :</emphasis> to activate the security manager
+						</listitem>
+						<listitem>
+							<emphasis>-Dproactive.configuration=/path/to/pa_conf.xml :</emphasis>
+							to set the location of the PA Configuration file
+						</listitem>
+						<listitem>
+							<emphasis>-Djava.security.policy=/path/to/security_file :</emphasis>
+							to set the path of the java security policy file
+						</listitem>
+						<listitem>
+							<emphasis>-Dlog4j.configuration=file:/path/to/log4j_file :</emphasis>
+							to set the file of the log4j configuration file (ex: scheduler-log4j-server).
+							The <emphasis>file:</emphasis> protocol is mandatory for this property.
+						</listitem>
+						<listitem>
+							<emphasis>-Dpa.rm.home=/path/to/rm_home :</emphasis>
+							the root path of the RM install.
+						</listitem>
+						<listitem>
+							<emphasis>-Dpa.scheduler.home=/path/to/scheduler_home :</emphasis>
+							the root path of the Scheduler install.
+						</listitem>
+					</itemizedlist>
+				</para>
+				<programlisting language="java">
+
+System.out.println("Starting RM, please wait...");
+RMAuthentication rmAuth = RMFactory.startLocal();
+System.out.println("RM successfully started at : " + rmAuth.getHostURL());
+
+//starting scheduler...
+System.out.println("Starting Scheduler, please wait...");
+SchedulerAuthenticationInterface sAuth = SchedulerFactory.startLocal(rmAuth.getHostURL(),PriorityPolicy.class.getName());
+System.out.println("Scheduler successfully started at : " + sAuth.getHostURL());
+
+				</programlisting>
 				<para>
 					<emphasis role="bold">NOTE: </emphasis>
 					By default, authentication are provided by the 2 files into the <emphasis>config/authentication</emphasis> directory.
