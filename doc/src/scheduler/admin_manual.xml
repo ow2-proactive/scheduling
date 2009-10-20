@@ -540,28 +540,40 @@ System.out.println("Scheduler successfully started at : " + sAuth.getHostURL());
 					are defined at JVM start up :
 					<itemizedlist>
 						<listitem>
-							<emphasis>-Djava.security.manager :</emphasis> to activate the security manager
+							<para>
+								<emphasis>-Djava.security.manager :</emphasis> to activate the security manager
+							</para>
 						</listitem>
 						<listitem>
-							<emphasis>-Dproactive.configuration=/path/to/pa_conf.xml :</emphasis>
-							to set the location of the PA Configuration file
+							<para>
+								<emphasis>-Dproactive.configuration=/path/to/pa_conf.xml :</emphasis>
+								to set the location of the PA Configuration file
+							</para>
 						</listitem>
 						<listitem>
-							<emphasis>-Djava.security.policy=/path/to/security_file :</emphasis>
-							to set the path of the java security policy file
+							<para>
+								<emphasis>-Djava.security.policy=/path/to/security_file :</emphasis>
+								to set the path of the java security policy file
+							</para>
 						</listitem>
 						<listitem>
-							<emphasis>-Dlog4j.configuration=file:/path/to/log4j_file :</emphasis>
-							to set the file of the log4j configuration file (ex: scheduler-log4j-server).
-							The <emphasis>file:</emphasis> protocol is mandatory for this property.
+							<para>
+								<emphasis>-Dlog4j.configuration=file:/path/to/log4j_file :</emphasis>
+								to set the file of the log4j configuration file (ex: scheduler-log4j-server).
+								The <emphasis>file:</emphasis> protocol is mandatory for this property.
+							</para>
 						</listitem>
 						<listitem>
-							<emphasis>-Dpa.rm.home=/path/to/rm_home :</emphasis>
-							the root path of the RM install.
+							<para>
+								<emphasis>-Dpa.rm.home=/path/to/rm_home :</emphasis>
+								the root path of the RM install.
+							</para>
 						</listitem>
 						<listitem>
-							<emphasis>-Dpa.scheduler.home=/path/to/scheduler_home :</emphasis>
-							the root path of the Scheduler install.
+							<para>
+								<emphasis>-Dpa.scheduler.home=/path/to/scheduler_home :</emphasis>
+								the root path of the Scheduler install.
+							</para>
 						</listitem>
 					</itemizedlist>
 				</para>
