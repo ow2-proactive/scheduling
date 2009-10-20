@@ -62,10 +62,10 @@
 
 	<target name="deploy.scheduler.client" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler client jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
-				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
-				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
-				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/util/adminconsole/*" />
-				<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/util/adminconsole/*" />
+			<fileset dir="${cl.rm.dir}" includes="org/ow2/proactive/resourcemanager/common/*" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
@@ -73,9 +73,22 @@
 	</target>
 
 	<target name="deploy.scheduler.matlab" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler matlab/scilab jar">
-		<jar destfile="${deploy.lib.dir}/${scheduler.matlab.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
+		<jar destfile="${deploy.lib.dir}/${scheduler.matlab.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/**" />
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
+	    </jar>
+	</target>
+
+	<target name="deploy.scheduler.splitmerge" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler file split/merge jar">
+		<jar destfile="${deploy.lib.dir}/${scheduler.fsm.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/filessplitmerge/**" />
+			<indexjars>
+				<fileset refid="jar.index.fileset" />
+			</indexjars>
 	    </jar>
 	</target>
 

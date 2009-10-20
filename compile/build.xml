@@ -12,7 +12,7 @@
 	<!-- ************
 		Deploy
 	-->
-	<target name="deploy.all" depends="deploy.common, deploy.common.client, deploy.scheduler, deploy.rm, deploy.scheduler.client, deploy.scheduler.worker, deploy.rm.client, deploy.scheduler.matlab" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
+	<target name="deploy.all" depends="deploy.common, deploy.common.client, deploy.scheduler, deploy.rm, deploy.scheduler.client, deploy.scheduler.worker, deploy.rm.client, deploy.scheduler.splitmerge, deploy.scheduler.matlab" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
 
 
 	<!-- ************

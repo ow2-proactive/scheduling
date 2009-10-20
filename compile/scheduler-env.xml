@@ -31,6 +31,7 @@
 	<property name="scheduler.client.jar"        value="ProActive_Scheduler-client.jar" />
 	<property name="scheduler.worker.jar"        value="ProActive_Scheduler-worker.jar" />
 	<property name="scheduler.matlab.jar"        value="ProActive_Scheduler-matlab.jar" />
+	<property name="scheduler.fsm.jar"    		 value="ProActive_Scheduler-fsm.jar" />
 
 
 	<!-- ================================================================ -->
