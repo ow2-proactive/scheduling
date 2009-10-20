@@ -192,8 +192,8 @@ public class FilesTools {
             dir.mkdir();
 
             // Cannot set read write attributes, need java5 compliance
-            dir.setWritable(true, false);
-            dir.setReadable(true, false);
+            //dir.setWritable(true, false);
+            //dir.setReadable(true, false);
             // System.out.println("Directory "+path+" hhave been created." );
             return dir;
         }
