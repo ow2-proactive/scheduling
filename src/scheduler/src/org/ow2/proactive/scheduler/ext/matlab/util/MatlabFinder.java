@@ -48,10 +48,10 @@ import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
+import org.ow2.proactive.scheduler.ext.common.util.LinuxShellExecuter;
 import org.ow2.proactive.scheduler.ext.common.util.ProcessResult;
+import org.ow2.proactive.scheduler.ext.common.util.Shell;
 import org.ow2.proactive.scheduler.ext.matlab.exception.MatlabInitException;
-import org.ow2.proactive.scheduler.util.LinuxShellExecuter;
-import org.ow2.proactive.scheduler.util.Shell;
 
 
 public class MatlabFinder {

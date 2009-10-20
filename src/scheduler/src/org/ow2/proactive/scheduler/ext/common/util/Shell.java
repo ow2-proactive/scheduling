@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util;
+package org.ow2.proactive.scheduler.ext.common.util;
 
 public enum Shell {
     Sh("/bin/sh"), Bash("/bin/bash"), Zsh("/bin/zsh"), Csh("/bin/csh");
