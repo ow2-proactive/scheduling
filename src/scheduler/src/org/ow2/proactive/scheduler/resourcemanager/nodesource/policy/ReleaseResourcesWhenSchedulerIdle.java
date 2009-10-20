@@ -91,8 +91,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
     }
 
     protected SchedulerEvent[] getEventsList() {
-        return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED,
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED };
+        return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED };
     }
 
     protected SchedulerEventListener getSchedulerListener() {
