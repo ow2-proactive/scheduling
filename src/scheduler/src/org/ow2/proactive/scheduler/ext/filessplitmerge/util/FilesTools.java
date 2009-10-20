@@ -26,18 +26,22 @@ import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
 public class FilesTools {
 
     /**
-     * We assume that, in a xxx.conf file, attributes are written on a single line:
-     * attrName = value 
-     * OR
-     * attrName value
+     * We assume that, in a xxx.conf file, attributes are written on a single
+     * line: attrName = value OR attrName value
      * 
-     * This method will read the xxx.conf file line by line and look for the attributeName at the beginning of a line in order to get the value.  
+     * This method will read the xxx.conf file line by line and look for the
+     * attributeName at the beginning of a line in order to get the value.
      * 
-     * @param configFile the gold configuration file
+     * @param configFile
+     *            the gold configuration file
      * @param attributeName
-     * @param stopToFirstBlank If true, the value of the attribute is between "=" and the first blank. Otherwise, the value is between "=" and the end of the line. 
-     * @return the value of attributeName, or null if the attribute is not defined in the configuration file
-     * @throws IOException 
+     * @param stopToFirstBlank
+     *            If true, the value of the attribute is between "=" and the
+     *            first blank. Otherwise, the value is between "=" and the end
+     *            of the line.
+     * @return the value of attributeName, or null if the attribute is not
+     *         defined in the configuration file
+     * @throws IOException
      */
     public synchronized String getValueForAttribute(File configFile, String attributeName,
             boolean stopToFirstBlank) throws IOException {
@@ -45,15 +49,15 @@ public class FilesTools {
         BufferedReader gcReader = new BufferedReader(fr);
         String line;
         while ((line = gcReader.readLine()) != null) {
-            //look for the attributeName at the begining at the line
+            // look for the attributeName at the begining at the line
             line = line.trim();
 
             if (line.startsWith(attributeName))
-            //we found the atttribute
+            // we found the atttribute
             {
                 line = line.substring(attributeName.length());
                 line = line.trim();
-                //the line contains now eather the value eather '= '+value
+                // the line contains now eather the value eather '= '+value
                 if (line.startsWith("="))
                     line = line.substring(1);
                 line = line.trim();
@@ -63,9 +67,9 @@ public class FilesTools {
                         line = line.substring(0, line.indexOf(" "));
                         line.trim();
                     }
-                }//stop to first blank
+                }// stop to first blank
 
-                //we have our value in the line variable. 
+                // we have our value in the line variable.
                 gcReader.close();
                 return line;
             }
@@ -85,11 +89,11 @@ public class FilesTools {
 
         String line;
         while ((line = gcReader.readLine()) != null) {
-            //look for the attributeName at the begining at the line
+            // look for the attributeName at the begining at the line
             line = line.trim();
 
             if (line.startsWith(attributeName))
-            //we found the atttribute
+            // we found the atttribute
             {
                 line = attributeLine;
                 attributeFound = true;
@@ -110,8 +114,9 @@ public class FilesTools {
     }
 
     /**
-     * remove the line with the assignment of the value of an attribute
-     * this removes 
+     * remove the line with the assignment of the value of an attribute this
+     * removes
+     * 
      * @param attributesFile
      * @param attributeName
      * @throws IOException
@@ -123,11 +128,11 @@ public class FilesTools {
 
         String line;
         while ((line = gcReader.readLine()) != null) {
-            //look for the attributeName at the begining at the line
+            // look for the attributeName at the begining at the line
             line = line.trim();
 
             if (!line.startsWith(attributeName))
-            //we write all the lines that do not start with the attr name
+            // we write all the lines that do not start with the attr name
             {
                 fileContentUpdated = fileContentUpdated + line + "\n";
             }
@@ -185,9 +190,11 @@ public class FilesTools {
         File dir = new File(path);
         if (!dir.exists()) {
             dir.mkdir();
-            dir.setWritable(true, false);
-            dir.setReadable(true, false);
-            //System.out.println("Directory "+path+" hhave been created." );
+
+            // Cannot set read write attributes, need java5 compliance
+            // dir.setWritable(true, false);
+            // dir.setReadable(true, false);
+            // System.out.println("Directory "+path+" hhave been created." );
             return dir;
         }
 
@@ -223,7 +230,9 @@ public class FilesTools {
     }
 
     /**
-     * Uses the system-dependent rename function in order to move the file to the destination folder
+     * Uses the system-dependent rename function in order to move the file to
+     * the destination folder
+     * 
      * @param f
      * @param destDirPath
      * @return true if the file has been moved, false otherwise
@@ -272,7 +281,7 @@ public class FilesTools {
             return;
         }
 
-        //move files from scrFolder To destFolder
+        // move files from scrFolder To destFolder
         for (int i = 0; i < files.length; i++) {
             File f = files[i];
             if (deleteSource)
