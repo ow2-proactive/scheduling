@@ -22,6 +22,8 @@
 	  
 	  <!ENTITY Matlab SYSTEM "matlab/matlab.xml">
 	  <!ENTITY Scilab SYSTEM "scilab/scilab.xml">
+	  <!ENTITY FilesSplitMerge SYSTEM "filessplitmerge/filessplitmerge.xml">
+	  
       <!ENTITY Modelica SYSTEM "modelica/modelica.xml">
 	  
 	  <!ENTITY SchedulerTutorial SYSTEM "scheduler_tuto/scheduler_tutorial.xml">
@@ -71,11 +73,24 @@
 		&Scilab;
 	</part>
 
-    <part xml:id="SchedulingWithModelica">
+	<part xml:id="SchedulingWithModelica">
 		<info>
 			<title>Scheduling examples of Modelica simulations</title>
 		</info>
 		&Modelica;
 	</part>
-	
+
+	<part xml:id="FilesSplitMerge">
+		<info>
+			<title>
+				ProActive Scheduler's Files Split-Merge extension
+			</title>
+		</info>
+		&FilesSplitMerge;
+	</part>
+
+
+
+
+
 </book>
