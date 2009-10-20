@@ -84,31 +84,32 @@
 		</copy>
     </target>
 
-	<target name="deploy.common.client" depends="-deployCopy, compile.common" description="Creates common client jar">
-		<jar destfile="${deploy.lib.dir}/${srm.common.client.jar}" index="true">
-			<fileset dir="${cl.common.dir}">
-				<include name="org/ow2/proactive/authentication/Loggable.class" />
-				<include name="org/ow2/proactive/authentication/Connection.class" />
-				<include name="org/ow2/proactive/authentication/Authentication.class" />
-				<include name="org/ow2/proactive/authentication/AuthenticationImpl.class" />
-				<include name="org/ow2/proactive/authentication/crypto/**" />
-				<include name="org/ow2/proactive/scripting/**" />
-				<include name="org/ow2/proactive/utils/**" />
-			</fileset>
-			<indexjars>
-				<fileset refid="jar.index.fileset" />
-			</indexjars>
-        </jar>
-	</target>
-
 	<target name="deploy.common" depends="-deployCopy, compile.common" description="Creates common core jar">
-		<jar destfile="${deploy.lib.dir}/${srm.common.jar}" index="true">
+		<jar destfile="${deploy.lib.dir}/${srm.common.jar}" manifest="${basedir}/common-Manifest-base.mf" index="true">
 			<fileset dir="${cl.common.dir}" includes="**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
         </jar>
 	</target>
+
+	<target name="deploy.common.client" depends="-deployCopy, compile.common" description="Creates common client jar">
+			<jar destfile="${deploy.lib.dir}/${srm.common.client.jar}" manifest="${basedir}/common-Manifest-base.mf" index="true">
+				<fileset dir="${cl.common.dir}">
+					<include name="org/ow2/proactive/Main.class" />
+					<include name="org/ow2/proactive/authentication/Loggable.class" />
+					<include name="org/ow2/proactive/authentication/Connection.class" />
+					<include name="org/ow2/proactive/authentication/Authentication.class" />
+					<include name="org/ow2/proactive/authentication/AuthenticationImpl.class" />
+					<include name="org/ow2/proactive/authentication/crypto/**" />
+					<include name="org/ow2/proactive/scripting/**" />
+					<include name="org/ow2/proactive/utils/**" />
+				</fileset>
+				<indexjars>
+					<fileset refid="jar.index.fileset" />
+				</indexjars>
+	        </jar>
+		</target>
 
 	<!-- ************
 		ing

@@ -30,6 +30,7 @@
 	<property name="scheduler.core.jar"          value="ProActive_Scheduler-core.jar" />
 	<property name="scheduler.client.jar"        value="ProActive_Scheduler-client.jar" />
 	<property name="scheduler.worker.jar"        value="ProActive_Scheduler-worker.jar" />
+	<property name="scheduler.matlab.jar"        value="ProActive_Scheduler-matlab.jar" />
 
 
 	<!-- ================================================================ -->

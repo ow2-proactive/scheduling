@@ -54,7 +54,7 @@
 	-->
 
 	<target name="deploy.rm" depends="-deployCopy, compile.rm, deploy.common" description="Creates resource manager core jar">
-		<jar destfile="${deploy.lib.dir}/${rm.jar}" index="true">
+		<jar destfile="${deploy.lib.dir}/${rm.jar}" manifest="${basedir}/rm-Manifest-base.mf" index="true">
 			<fileset dir="${cl.rm.dir}" includes="**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
@@ -63,7 +63,7 @@
 	</target>
 
 	<target name="deploy.rm.client" depends="-deployCopy, compile.rm, deploy.common.client" description="Creates resource manager client jar">
-		<jar destfile="${deploy.lib.dir}/${rm.client.jar}" index="true">
+		<jar destfile="${deploy.lib.dir}/${rm.client.jar}" manifest="${basedir}/rm-Manifest-base.mf" index="true">
 			<fileset dir="${cl.rm.dir}">
 				<include name="org/ow2/proactive/resourcemanager/authentication/RMAuthentication.class" />
 				<include name="org/ow2/proactive/resourcemanager/common/**" />

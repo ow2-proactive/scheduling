@@ -52,7 +52,7 @@
 	-->
 
 	<target name="deploy.scheduler" depends="-deployCopy, compile.scheduler, deploy.common, deploy.rm"  description="Creates scheduler core jar">
-		<jar destfile="${deploy.lib.dir}/${scheduler.core.jar}" manifest="${basedir}/Manifest-base.mf" index="true">
+		<jar destfile="${deploy.lib.dir}/${scheduler.core.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.dir}" includes="**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
@@ -61,7 +61,7 @@
 	</target>
 
 	<target name="deploy.scheduler.client" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler client jar">
-		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/Manifest-base.mf" index="true">
+		<jar destfile="${deploy.lib.dir}/${scheduler.client.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/**" />
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/resourcemanager/nodesource/policy/**" />
 				<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/util/adminconsole/*" />
@@ -69,6 +69,13 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+	    </jar>
+	</target>
+
+	<target name="deploy.scheduler.matlab" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler matlab/scilab jar">
+		<jar destfile="${deploy.lib.dir}/${scheduler.matlab.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/**" />
 	    </jar>
 	</target>
 
@@ -86,7 +93,7 @@
 	</target>
 
 	<!-- ================================================================ -->
-	<!--  Scheduler Specific - Convert Schemas from Relax NG to XMLSchema -->
+	<!--          Convert Schemas from Relax NG to XMLSchema              -->
 	<!-- ================================================================ -->
 	<target name="convertSchemas" description="convert Schemas from Relax NG Compact Syntax to Relax NG XML Syntax and to XMLSchema inside the scheduler.">
 		<taskdef name="trang" classname="net.amadan.trang.ant.TrangTask">
@@ -275,7 +282,7 @@
 			</fileset>
 		</copy>
 
-		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}"  manifest="${basedir}/Manifest-base.mf" index="true">
+		<jar destfile="${deploy.lib.dir}/${scheduler.worker.jar}"  manifest="${basedir}/scheduler-Manifest-base.mf" index="true">
 			<fileset dir="${cl.scheduler.worker.dir}" includes="**"/>
             <indexjars>
 				<fileset refid="jar.index.fileset" />

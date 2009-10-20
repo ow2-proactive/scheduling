@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $PROACTIVE_INITIAL_DEV$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.utils.console;
 

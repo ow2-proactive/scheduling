@@ -1,0 +1,5 @@
+Main-Class: org.ow2.proactive.Main
+Implementation-Title: Scheduling & Resource Manager
+Implementation-Version: $Id$
+Implementation-Vendor: OASIS - INRIA Sophia Antipolis
+Implementation-URL: http://proactive.inria.fr

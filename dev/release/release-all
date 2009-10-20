@@ -1,6 +1,10 @@
 . common
 
 function build() {
+	# Replace version tag in main java file
+	sed -i "s/{rm-version-main}/$VERSION/" src/scheduler/src/org/ow2/proactive/scheduler/common/Main.java
+	sed -i "s/{scheduler-version-main}/$VERSION/" src/resource-manager/src/org/ow2/proactive/resourcemanager/common/Main.java
+
 	echo "********************** Building the scheduler ************************"
 	cd compile || warn_and_exit "Cannot move in compile"
 	./build clean

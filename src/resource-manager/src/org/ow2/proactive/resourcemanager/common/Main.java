@@ -27,36 +27,36 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common;
+package org.ow2.proactive.resourcemanager.common;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
 /**
- * Main class displays the current version of Scheduling
+ * Main class displays the current version of Resource Manager
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 1.0
+ * @since ProActive Scheduling 2.0
  */
 public final class Main {
 
-    public static String version = "{scheduler-version-main}";
+    public static String version = "{rm-version-main}";
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-        if (version.equals("{scheduler-version-main}")) {
+        if (version.equals("{rm-version-main}")) {
             Date d = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             version = sdf.format(d) + " - (Unreleased Version)";
         } else {
             version = "v" + version;
         }
-        System.out.println("ProActive-Scheduling " + version);
+        System.out.println("ProActive-ResourceManager " + version);
     }
 
 }

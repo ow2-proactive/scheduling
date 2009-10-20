@@ -94,7 +94,7 @@ function build_and_clean() {
 	# Remove logs directory
 	rm -rf ${SCHEDULER_DIR}/.logs
 
-	# Building the product
+	# Building the product : call to the build of release-all/release-rm
 	build
 
 	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
