@@ -276,9 +276,11 @@ public enum PASchedulerProperties {
      */
     private static void init(String filename) {
         String propertiesPath;
+        boolean jPropSet = false;
         if (filename == null) {
             if (System.getProperty(PA_SCHEDULER_PROPERTIES_FILEPATH) != null) {
                 propertiesPath = System.getProperty(PA_SCHEDULER_PROPERTIES_FILEPATH);
+                jPropSet = true;
             } else {
                 propertiesPath = "config/scheduler/settings.ini";
             }
@@ -290,6 +292,9 @@ public enum PASchedulerProperties {
         }
         DEFAULT_PROPERTIES_FILE = propertiesPath;
         fileLoaded = new File(propertiesPath).exists();
+        if (jPropSet && !fileLoaded) {
+            throw new RuntimeException("Scheduler properties file not found : '" + propertiesPath + "'");
+        }
     }
 
     /**

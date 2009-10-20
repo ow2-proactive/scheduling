@@ -36,6 +36,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.swing.JPopupMenu;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
 
@@ -200,9 +202,11 @@ public enum PAResourceManagerProperties {
      */
     private static void init(String filename) {
         String propertiesPath;
+        boolean jPropSet = false;
         if (filename == null) {
             if (System.getProperty(PA_RM_PROPERTIES_FILEPATH) != null) {
                 propertiesPath = System.getProperty(PA_RM_PROPERTIES_FILEPATH);
+                jPropSet = true;
             } else {
                 propertiesPath = "config/rm/settings.ini";
             }
@@ -214,6 +218,9 @@ public enum PAResourceManagerProperties {
         }
         DEFAULT_PROPERTIES_FILE = propertiesPath;
         fileLoaded = new File(propertiesPath).exists();
+        if (jPropSet && !fileLoaded) {
+            throw new RuntimeException("RM properties file not found : '" + propertiesPath + "'");
+        }
     }
 
     /**
@@ -226,7 +233,7 @@ public enum PAResourceManagerProperties {
         if (prop == null) {
             prop = new Properties();
             init(filename);
-            if (filename == null && fileLoaded == false) {
+            if (filename == null && !fileLoaded) {
                 return prop;
             }
             try {
