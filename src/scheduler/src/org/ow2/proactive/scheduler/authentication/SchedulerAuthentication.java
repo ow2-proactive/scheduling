@@ -227,10 +227,10 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
             PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME.getValueAsString();
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getHostURL() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getHostURL() {
         return Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));
-	}
+    }
 }

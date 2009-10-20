@@ -178,14 +178,14 @@ public enum PAResourceManagerProperties {
      * User properties are defined using the -Dname=value in the java command.
      */
     private static void setUserJavaProperties() {
-	if (prop != null){
-	        for (Object o : prop.keySet()) {
-	            String s = System.getProperty((String) o);
-	            if (s != null) {
-	                prop.setProperty((String) o, s);
-	            }
-	        }
-	}
+        if (prop != null) {
+            for (Object o : prop.keySet()) {
+                String s = System.getProperty((String) o);
+                if (s != null) {
+                    prop.setProperty((String) o, s);
+                }
+            }
+        }
     }
 
     /**
@@ -199,19 +199,19 @@ public enum PAResourceManagerProperties {
      * @param filename the file to load or null to use the default one or the one set in java property.
      */
     private static void init(String filename) {
-	String propertiesPath;
-	if (filename == null){
-		if (System.getProperty(PA_RM_PROPERTIES_FILEPATH) != null) {
-			propertiesPath = System.getProperty(PA_RM_PROPERTIES_FILEPATH);
-		} else {
-			propertiesPath = "config/rm/settings.ini";
-		}
-	} else {
-		propertiesPath = filename;
-	}
-	if (!new File(propertiesPath).isAbsolute()) {
-		propertiesPath = System.getProperty(RM_HOME.key) + File.separator + propertiesPath;
-	}
+        String propertiesPath;
+        if (filename == null) {
+            if (System.getProperty(PA_RM_PROPERTIES_FILEPATH) != null) {
+                propertiesPath = System.getProperty(PA_RM_PROPERTIES_FILEPATH);
+            } else {
+                propertiesPath = "config/rm/settings.ini";
+            }
+        } else {
+            propertiesPath = filename;
+        }
+        if (!new File(propertiesPath).isAbsolute()) {
+            propertiesPath = System.getProperty(RM_HOME.key) + File.separator + propertiesPath;
+        }
         DEFAULT_PROPERTIES_FILE = propertiesPath;
         fileLoaded = new File(propertiesPath).exists();
     }
@@ -224,15 +224,15 @@ public enum PAResourceManagerProperties {
      */
     private static Properties getProperties(String filename) {
         if (prop == null) {
-		prop = new Properties();
-		init(filename);
-		if (filename == null && fileLoaded == false){
-			return prop;
-		}
+            prop = new Properties();
+            init(filename);
+            if (filename == null && fileLoaded == false) {
+                return prop;
+            }
             try {
-		if (filename == null){
-			filename = DEFAULT_PROPERTIES_FILE;
-		}
+                if (filename == null) {
+                    filename = DEFAULT_PROPERTIES_FILE;
+                }
                 prop.load(new FileInputStream(filename));
                 setUserJavaProperties();
 
@@ -249,8 +249,8 @@ public enum PAResourceManagerProperties {
      *
      * @param filename the file containing the properties to be loaded.
      */
-    public static void loadProperties(String filename){
-	DEFAULT_PROPERTIES_FILE = null;
+    public static void loadProperties(String filename) {
+        DEFAULT_PROPERTIES_FILE = null;
         fileLoaded = false;
         prop = null;
         getProperties(filename);
@@ -263,7 +263,7 @@ public enum PAResourceManagerProperties {
      * @param filename path of file containing some properties to override
      */
     public static void updateProperties(String filename) {
-	getProperties(null);
+        getProperties(null);
         Properties ptmp = new Properties();
         try {
             ptmp.load(new FileInputStream(filename));
@@ -282,7 +282,7 @@ public enum PAResourceManagerProperties {
      * @return true if this property is set, false otherwise.
      */
     public boolean isSet() {
-	getProperties(null);
+        getProperties(null);
         if (fileLoaded) {
             return prop.containsKey(key);
         } else {
@@ -308,7 +308,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public int getValueAsInt() {
-	getProperties(null);
+        getProperties(null);
         if (fileLoaded) {
             String valueS = getValueAsString();
             try {
@@ -330,7 +330,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public String getValueAsString() {
-	getProperties(null);
+        getProperties(null);
         if (fileLoaded) {
             return getProperties(DEFAULT_PROPERTIES_FILE).getProperty(key);
         } else {
@@ -346,7 +346,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public boolean getValueAsBoolean() {
-	getProperties(null);
+        getProperties(null);
         if (fileLoaded) {
             return Boolean.parseBoolean(getValueAsString());
         } else {

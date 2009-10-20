@@ -121,7 +121,7 @@ public class SchedulerStarter {
         boolean displayHelp = false;
 
         try {
-		RMAuthentication rmAuth = null;
+            RMAuthentication rmAuth = null;
             //get the path of the file
             ResourceManagerProxy imp = null;
 
@@ -200,10 +200,11 @@ public class SchedulerStarter {
 
                 try {
                     logger.info("Starting scheduler...");
-                    SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(rmAuth.getHostURL(), policyFullName);
+                    SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(rmAuth.getHostURL(),
+                            policyFullName);
                     logger.info("Scheduler successfully created on " + sai.getHostURL());
                 } catch (AdminSchedulerException e) {
-                    logger.warn("",e);
+                    logger.warn("", e);
                 }
             }
         } catch (MissingArgumentException e) {

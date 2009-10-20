@@ -155,7 +155,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
                 deployGCMD(convertGCMdeploymentDataToGCMappl(deploymentData.data, null));
                 deploymentData.deployed = true;
             } catch (Exception e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
             }
         } else {
             logger.warn("Nodes have already been deployed");

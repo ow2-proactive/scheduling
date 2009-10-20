@@ -44,132 +44,133 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
  */
 public class RMInitializer {
 
-	private String paConfiguration;
-	private String security;
-	private String log4j;
-	private String rmHome;
-	private String rmProperties;
+    private String paConfiguration;
+    private String security;
+    private String log4j;
+    private String rmHome;
+    private String rmProperties;
 
-	/**
-	 * Set the ProActive configuration file to be used.
-	 * This file is used to define the behavior of ProActive.
-	 *
-	 * @see org.objectweb.proactive.core.config.PAProperties for more details.
-	 *
-	 * @param filePath the absolute file path to the PA configuration file to use.
-	 */
-	public void setProActiveConfiguration(String filePath){
-		if (filePath == null || !new File(filePath).exists()){
-			throw new RuntimeException("File " + filePath + " does not exist !");
-		}
-		paConfiguration = filePath;
-	}
+    /**
+     * Set the ProActive configuration file to be used.
+     * This file is used to define the behavior of ProActive.
+     *
+     * @see org.objectweb.proactive.core.config.PAProperties for more details.
+     *
+     * @param filePath the absolute file path to the PA configuration file to use.
+     */
+    public void setProActiveConfiguration(String filePath) {
+        if (filePath == null || !new File(filePath).exists()) {
+            throw new RuntimeException("File " + filePath + " does not exist !");
+        }
+        paConfiguration = filePath;
+    }
 
-	/**
-	 * Set the java security policy file to be used.
-	 * This is exactly what you would put in the "java.security.policy" property.
-	 *
-	 * @param filePath the absolute file path to the java security policy file to use.
-	 */
-	public void setJavaSecurityPolicy(String filePath){
-		if (filePath == null || !new File(filePath).exists()){
-			throw new RuntimeException("File " + filePath + " does not exist !");
-		}
-		System.setProperty("java.security.policy", filePath);
-		security = filePath;
-	}
+    /**
+     * Set the java security policy file to be used.
+     * This is exactly what you would put in the "java.security.policy" property.
+     *
+     * @param filePath the absolute file path to the java security policy file to use.
+     */
+    public void setJavaSecurityPolicy(String filePath) {
+        if (filePath == null || !new File(filePath).exists()) {
+            throw new RuntimeException("File " + filePath + " does not exist !");
+        }
+        System.setProperty("java.security.policy", filePath);
+        security = filePath;
+    }
 
-	/**
-	 * Set the log4j configuration file to be used on this instance.
-	 *
-	 * @see org.objectweb.proactive.core.config.PAProperties for more details.
-	 *
-	 * @param filePath the absolute file path to the log4j configuration file to use.
-	 */
-	public void setLog4jConfiguration(String filePath){
-		if (filePath == null || !new File(filePath).exists()){
-			throw new RuntimeException("File " + filePath + " does not exist !");
-		}
-		System.setProperty("log4j.configuration", filePath.startsWith("file:")?filePath:"file:"+filePath);
-		log4j = filePath;
-	}
+    /**
+     * Set the log4j configuration file to be used on this instance.
+     *
+     * @see org.objectweb.proactive.core.config.PAProperties for more details.
+     *
+     * @param filePath the absolute file path to the log4j configuration file to use.
+     */
+    public void setLog4jConfiguration(String filePath) {
+        if (filePath == null || !new File(filePath).exists()) {
+            throw new RuntimeException("File " + filePath + " does not exist !");
+        }
+        System.setProperty("log4j.configuration", filePath.startsWith("file:") ? filePath : "file:" +
+            filePath);
+        log4j = filePath;
+    }
 
-	/**
-	 * Set the home directory for the Resource Manager.
-	 * This property is used to resolve every relative paths in the configuration file.<br />
-	 * You can leave this property without value if every specified paths are absolute in the configuration file.
-	 * The default value is the current directory.
-	 *
-	 * @param homeDir the home directory of Resource Manager. (used to resolve relative path)
-	 */
-	public void setRMHomePath(String homeDir){
-		if (homeDir == null || !new File(homeDir).exists()){
-			throw new RuntimeException("Directory " + homeDir + " does not exist !");
-		}
-		if (!new File(homeDir).isDirectory()){
-			throw new RuntimeException("RM Home path must be a directory !");
-		}
-		System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), homeDir);
-		rmHome = homeDir;
-	}
+    /**
+     * Set the home directory for the Resource Manager.
+     * This property is used to resolve every relative paths in the configuration file.<br />
+     * You can leave this property without value if every specified paths are absolute in the configuration file.
+     * The default value is the current directory.
+     *
+     * @param homeDir the home directory of Resource Manager. (used to resolve relative path)
+     */
+    public void setRMHomePath(String homeDir) {
+        if (homeDir == null || !new File(homeDir).exists()) {
+            throw new RuntimeException("Directory " + homeDir + " does not exist !");
+        }
+        if (!new File(homeDir).isDirectory()) {
+            throw new RuntimeException("RM Home path must be a directory !");
+        }
+        System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), homeDir);
+        rmHome = homeDir;
+    }
 
-	/**
-	 * Set the RM Property configuration file.
-	 * This is the main file that contains every RM properties.
-	 * THIS PROPERTY MUST BE SET.
-	 *
-	 * @param filePath the absolute file path to Resource Manager properties file.
-	 */
-	public void setResourceManagerPropertiesConfiguration(String filePath){
-		if (filePath == null || !new File(filePath).exists()){
-			throw new RuntimeException("File " + filePath + " does not exist !");
-		}
-		rmProperties = filePath;
-	}
+    /**
+     * Set the RM Property configuration file.
+     * This is the main file that contains every RM properties.
+     * THIS PROPERTY MUST BE SET.
+     *
+     * @param filePath the absolute file path to Resource Manager properties file.
+     */
+    public void setResourceManagerPropertiesConfiguration(String filePath) {
+        if (filePath == null || !new File(filePath).exists()) {
+            throw new RuntimeException("File " + filePath + " does not exist !");
+        }
+        rmProperties = filePath;
+    }
 
-	/**
-	 * Get the ProActive configuration file
-	 *
-	 * @return the ProActive configuration file
-	 */
-	public String getProActiveConfiguration() {
-		return paConfiguration;
-	}
+    /**
+     * Get the ProActive configuration file
+     *
+     * @return the ProActive configuration file
+     */
+    public String getProActiveConfiguration() {
+        return paConfiguration;
+    }
 
-	/**
-	 * Get the absolute file path to the java security policy file
-	 *
-	 * @return the absolute file path to the java security policy file
-	 */
-	public String getJavaSecurityPolicy() {
-		return security;
-	}
+    /**
+     * Get the absolute file path to the java security policy file
+     *
+     * @return the absolute file path to the java security policy file
+     */
+    public String getJavaSecurityPolicy() {
+        return security;
+    }
 
-	/**
-	 * Get the log4j configuration file
-	 *
-	 * @return the log4j configuration file
-	 */
-	public String getLog4jConfiguration() {
-		return log4j;
-	}
+    /**
+     * Get the log4j configuration file
+     *
+     * @return the log4j configuration file
+     */
+    public String getLog4jConfiguration() {
+        return log4j;
+    }
 
-	/**
-	 * Get the home directory of Resource Manager.
-	 *
-	 * @return the home directory of Resource Manager.
-	 */
-	public String getRMHomePath() {
-		return rmHome;
-	}
+    /**
+     * Get the home directory of Resource Manager.
+     *
+     * @return the home directory of Resource Manager.
+     */
+    public String getRMHomePath() {
+        return rmHome;
+    }
 
-	/**
-	 * Get the RM Property configuration file.
-	 *
-	 * @return the RM Property configuration file.
-	 */
-	public String getResourceManagerPropertiesConfiguration() {
-		return rmProperties;
-	}
+    /**
+     * Get the RM Property configuration file.
+     *
+     * @return the RM Property configuration file.
+     */
+    public String getResourceManagerPropertiesConfiguration() {
+        return rmProperties;
+    }
 
 }

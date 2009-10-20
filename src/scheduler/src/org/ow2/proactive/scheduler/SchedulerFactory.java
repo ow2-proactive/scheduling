@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.core.UserScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 
+
 /**
  * Object which performs the Scheduler (RM)creation,
  * and provides Scheduler's front-end active objects. :<BR>
@@ -58,8 +59,8 @@ import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 @PublicAPI
 public class SchedulerFactory {
 
-	private static ResourceManagerProxy imp = null;
-	private static boolean allowNullInit = false;
+    private static ResourceManagerProxy imp = null;
+    private static boolean allowNullInit = false;
 
     /**
      * Creates and starts a Scheduler on the local host using the given initializer to configure it.
@@ -74,24 +75,25 @@ public class SchedulerFactory {
      *
      * @throws ActiveObjectCreationException If Scheduler cannot be created
      */
-    public static SchedulerAuthenticationInterface startLocal(String rmURL, SchedulerInitializer initializer) throws Exception {
-	if (imp == null) {
-		if (!allowNullInit){
-			if (initializer != null){
-				//configure application
-				configure(initializer);
-			} else {
-				throw new IllegalArgumentException("Initializer cannot be null !");
-			}
-		}
-		if (rmURL == null || rmURL.length() == 0){
-			throw new IllegalArgumentException("RM url is null or empty !");
-		}
-		ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL));
-		String policy = initializer.getPolicyFullClassName();
-		//start scheduler
-		AdminScheduler.createScheduler(imp, policy);
-		return SchedulerConnection.waitAndJoin(null);
+    public static SchedulerAuthenticationInterface startLocal(String rmURL, SchedulerInitializer initializer)
+            throws Exception {
+        if (imp == null) {
+            if (!allowNullInit) {
+                if (initializer != null) {
+                    //configure application
+                    configure(initializer);
+                } else {
+                    throw new IllegalArgumentException("Initializer cannot be null !");
+                }
+            }
+            if (rmURL == null || rmURL.length() == 0) {
+                throw new IllegalArgumentException("RM url is null or empty !");
+            }
+            ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL));
+            String policy = initializer.getPolicyFullClassName();
+            //start scheduler
+            AdminScheduler.createScheduler(imp, policy);
+            return SchedulerConnection.waitAndJoin(null);
         } else {
             throw new SchedulerException("Scheduler already localy running");
         }
@@ -103,34 +105,35 @@ public class SchedulerFactory {
      * @param initializer the initializer used to configured the VM.
      */
     private static void configure(SchedulerInitializer initializer) {
-	//security manager
-	if (System.getProperty("java.security.manager") == null){
-		System.setProperty("java.security.manager","");
-	}
-	//check policy
-	String s = initializer.getPolicyFullClassName();
-		if (s == null) {
-			throw new IllegalArgumentException("Scheduler policy is not set, cannot start Scheduler !");
-		}
-	//scheduler properties
-		s = initializer.getSchedulerPropertiesConfiguration();
-		if (s == null) {
-			throw new IllegalArgumentException("Scheduler properties file is not set, cannot start Scheduler !");
-		}
-		System.setProperty(PASchedulerProperties.PA_SCHEDULER_PROPERTIES_FILEPATH, s);
-		//pa conf
-		s = initializer.getProActiveConfiguration();
-		if (s != null){
-			System.setProperty(PAProperties.PA_CONFIGURATION_FILE.getKey(), s);
-		}
-		//Scheduler home
-		s = initializer.getSchedulerHomePath();
-		if (s != null){
-			System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), s);
-		}
+        //security manager
+        if (System.getProperty("java.security.manager") == null) {
+            System.setProperty("java.security.manager", "");
+        }
+        //check policy
+        String s = initializer.getPolicyFullClassName();
+        if (s == null) {
+            throw new IllegalArgumentException("Scheduler policy is not set, cannot start Scheduler !");
+        }
+        //scheduler properties
+        s = initializer.getSchedulerPropertiesConfiguration();
+        if (s == null) {
+            throw new IllegalArgumentException(
+                "Scheduler properties file is not set, cannot start Scheduler !");
+        }
+        System.setProperty(PASchedulerProperties.PA_SCHEDULER_PROPERTIES_FILEPATH, s);
+        //pa conf
+        s = initializer.getProActiveConfiguration();
+        if (s != null) {
+            System.setProperty(PAProperties.PA_CONFIGURATION_FILE.getKey(), s);
+        }
+        //Scheduler home
+        s = initializer.getSchedulerHomePath();
+        if (s != null) {
+            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), s);
+        }
     }
 
-	/**
+    /**
      * Creates and starts a Scheduler on the local host.
      * This call considered that the JVM is correctly configured for starting Scheduler.
      * The "pa.scheduler.home" and required JVM properties MUST be set.
@@ -139,16 +142,16 @@ public class SchedulerFactory {
      * @param policy the full class name of the Scheduling policy to use.
      *
      * @return a Scheduler authentication that allow you to administer the Scheduler or get its connection URL.
-	 *
+     *
      * @throws ActiveObjectCreationException If Scheduler cannot be created
      */
     public static SchedulerAuthenticationInterface startLocal(String rmURL, String policy) throws Exception {
-	SchedulerInitializer init = new SchedulerInitializer();
-	init.setPolicyFullClassName(policy);
-	allowNullInit = true;
-	SchedulerAuthenticationInterface sai = startLocal(rmURL, init);
-	allowNullInit = false;
-	return sai;
+        SchedulerInitializer init = new SchedulerInitializer();
+        init.setPolicyFullClassName(policy);
+        allowNullInit = true;
+        SchedulerAuthenticationInterface sai = startLocal(rmURL, init);
+        allowNullInit = false;
+        return sai;
     }
 
 }

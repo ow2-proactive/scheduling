@@ -92,11 +92,12 @@ public class RMFactory {
      */
     public static RMAuthentication startLocal(RMInitializer initializer) throws Exception {
         if (rmcore == null) {
-		if (initializer != null){
-			//configure application
-			configure(initializer);
-		}
-            Node nodeRM = NodeFactory.createLocalNode(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), false, null, null, null);
+            if (initializer != null) {
+                //configure application
+                configure(initializer);
+            }
+            Node nodeRM = NodeFactory.createLocalNode(PAResourceManagerProperties.RM_NODE_NAME
+                    .getValueAsString(), false, null, null, null);
             String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
             rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                     new Object[] { RMCoreName, nodeRM }, nodeRM);
@@ -113,29 +114,29 @@ public class RMFactory {
      * @param initializer the initializer used to configured the VM
      */
     private static void configure(RMInitializer initializer) {
-	//security manager
-	if (System.getProperty("java.security.manager") == null){
-		System.setProperty("java.security.manager","");
-	}
-	//rm properties
-		String s = initializer.getResourceManagerPropertiesConfiguration();
-		if (s == null) {
-			throw new IllegalArgumentException("RM properties file is not set, cannot start RM !");
-		}
-		System.setProperty(PAResourceManagerProperties.PA_RM_PROPERTIES_FILEPATH, s);
-		//pa conf
-		s = initializer.getProActiveConfiguration();
-		if (s != null){
-			System.setProperty(PAProperties.PA_CONFIGURATION_FILE.getKey(), s);
-		}
-		//RM home
-		s = initializer.getRMHomePath();
-		if (s != null){
-			System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), s);
-		}
+        //security manager
+        if (System.getProperty("java.security.manager") == null) {
+            System.setProperty("java.security.manager", "");
+        }
+        //rm properties
+        String s = initializer.getResourceManagerPropertiesConfiguration();
+        if (s == null) {
+            throw new IllegalArgumentException("RM properties file is not set, cannot start RM !");
+        }
+        System.setProperty(PAResourceManagerProperties.PA_RM_PROPERTIES_FILEPATH, s);
+        //pa conf
+        s = initializer.getProActiveConfiguration();
+        if (s != null) {
+            System.setProperty(PAProperties.PA_CONFIGURATION_FILE.getKey(), s);
+        }
+        //RM home
+        s = initializer.getRMHomePath();
+        if (s != null) {
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), s);
+        }
     }
 
-	/**
+    /**
      * Creates and starts a Resource manager on the local host.
      * This call considered that the JVM is correctly configured for starting RM.
      * The "pa.rm.home" and required JVM properties MUST be set.
@@ -147,7 +148,7 @@ public class RMFactory {
      * @throws IOException If node and RMCore fails.
      */
     public static RMAuthentication startLocal() throws Exception {
-	return startLocal(null);
+        return startLocal(null);
     }
 
     /**

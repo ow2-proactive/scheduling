@@ -177,14 +177,14 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         return JMXMonitoringHelper.getInstance().getAddress().toString();
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getHostURL() {
-		return getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public String getHostURL() {
+        return getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));
+    }
 
-	/**
+    /**
      * Normalize the given URL into an URL that only contains protocol://host:port/
      *
      * @param url the url to transform
