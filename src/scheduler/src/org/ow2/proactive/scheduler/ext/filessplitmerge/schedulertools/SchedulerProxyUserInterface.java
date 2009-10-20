@@ -8,12 +8,16 @@
 
 package org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools;
 
+import java.security.KeyException;
+import java.security.PublicKey;
+
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -64,13 +68,22 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
         return activeInstance;
     }
 
-    public boolean init(String url, String userName, String passwd) throws SchedulerException, LoginException {
+    public boolean init(String url, String user, String pwd) throws SchedulerException, LoginException {
         this.schedulerUrl = url;
-        this.userName = userName;
-        this.password = passwd;
+        this.userName = user;
+        this.password = pwd;
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
-        this.uischeduler = auth.logAsUser(userName, passwd);
+        //this.uischeduler = auth.logAsUser(userName, passwd);
+        PublicKey pubKey = auth.getPublicKey();
+
+        try {
+            Credentials cred = Credentials.createCredentials(user, pwd, pubKey);
+            this.uischeduler = auth.logAsUser(cred);
+        } catch (KeyException e) {
+            throw new SchedulerException(e);
+        }
+
         //LoggerManager.getInstane().info("Connection to the scheduler successfully established. ");
         return true;
     }
@@ -79,13 +92,14 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     /**
      * Subscribes a listener to the Scheduler
      */
-    public SchedulerState addSchedulerEventListener(SchedulerEventListener arg0, boolean onlyMyEvents,
-            SchedulerEvent... arg1) throws SchedulerException {
+    public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, boolean myEventsOnly,
+            SchedulerEvent... events) throws SchedulerException {
 
         if (uischeduler == null)
             throw new SchedulerException("Not connected to the schecduler.");
 
-        return uischeduler.addSchedulerEventListener(arg0, onlyMyEvents, arg1);
+        //return uischeduler.addSchedulerEventListener(arg0, onlyMyEvents, arg1);
+        return uischeduler.addEventListener(sel, myEventsOnly, true, events);
     }
 
     //@Override
@@ -126,7 +140,8 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
         if (uischeduler == null)
             throw new SchedulerException("Not connected to the schecduler.");
 
-        uischeduler.removeSchedulerEventListener();
+        //uischeduler.removeSchedulerEventListener();
+        uischeduler.removeEventListener();
 
     }
 
@@ -242,7 +257,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
 
     //@Override
     public SchedulerStatus getStatus() throws SchedulerException {
-        return uischeduler.getStatus();
+        return uischeduler.getSchedulerStatus();
     }
 
     //@Override
