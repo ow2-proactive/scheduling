@@ -259,7 +259,7 @@ public class AdminRMModel extends ConsoleModel {
         } else {
             List<String> list;
             ObjectArrayFormatter oaf = new ObjectArrayFormatter();
-            oaf.setMaxColumnLength(50);
+            oaf.setMaxColumnLength(80);
             //space between column
             oaf.setSpace(2);
             //title line
