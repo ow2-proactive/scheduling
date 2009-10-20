@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.dataspace;
 
-import java.io.File;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
@@ -52,7 +51,6 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
 
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.DATASPACE);
     protected static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
-    private static final String DEFAULT_DATASPACE_TMPDIR = "ds_scratch";
 
     /**
      * Create a new instance of DataSpaceNodeConfigurationAgent
@@ -67,7 +65,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
             String scratchDir;
             if (System.getProperty(NODE_DATASPACE_SCRATCHDIR) == null) {
                 //if scratch dir java property is not set, set to default
-                scratchDir = System.getProperty("java.io.tmpdir") + File.separator + DEFAULT_DATASPACE_TMPDIR;
+                scratchDir = System.getProperty("java.io.tmpdir");
             } else {
                 //else use the property
                 scratchDir = System.getProperty(NODE_DATASPACE_SCRATCHDIR);
