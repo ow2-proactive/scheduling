@@ -257,6 +257,108 @@
 					</mediaobject>
 				</figure>
 			</section>
+			<section xml:id="rm_gui_ssh_infrastructure"><info><title>SSH infrastructure</title></info>
+			  <para>
+			    SSH Infrastructure provides a basic but functional way to acquire resources through an SSH connection.
+			    Although such acquisition can be achieved using a GCM descriptor, this Infrastructure can in some situations
+			    be easier to use for SSH-only use-cases.
+			  </para>
+			  <para>
+			    To acquire nodes, this infrastructure will need to start runtimes on remote hosts.
+			    To do so, it needs to know some information, assumed to be true for all hosts:
+			    <itemizedlist>
+			      <listitem><para>
+				  <emphasis role="bold">Java Path</emphasis>: path to the java executable on the remote hosts.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Scheduling Path</emphasis>: path to the Scheduling installation directory on the remote hosts.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Protocol</emphasis>: protocol (rmi, http...) used by the remote host to communicate with the RM.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Port</emphasis>: port used by the remote host to communicate with the RM.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Java Options</emphasis>: Java options appended to the command used to start the node
+				  on the remote host.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Hosts List</emphasis>: The path to a file containing the hosts on which resources should be acquired.
+				  This file should contain one host per line, described as a host name or a public IP address, optionally followed by a positive 
+				  integer describing the number of runtimes to start on the related host (default to 1 if not specified). Example:
+				  <screen><![CDATA[
+rm.example.com
+test.example.net 5
+192.168.9.10 2
+]]></screen>
+			      </para></listitem>
+			    </itemizedlist>
+			  </para>
+			  <figure xml:id="pic_ssh_infrastructure"><info><title>SSH infrastructure configuration panel</title></info>
+			    <mediaobject>
+			      <imageobject>
+				<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="resourcemanager_plugin/pics/ssh_infrastructure.png" format="PNG"/>
+			      </imageobject>
+			    </mediaobject>
+			  </figure>
+			</section>
+			<section xml:id="rm_gui_pbs_infrastructure"><info><title>PBS infrastructure</title></info>
+			  <para>
+			    PBS Infrastructure acquires resources on an existing PBS (ie Torque) installation. Useful to add a NodeSource to manage
+			    nodes from a cluster on which the configuration is not alterable.
+			    To acquire nodes, this Infrastructure will connect to the PBS server through SSH, and submit commands
+			    using the qsub client.
+			    To start nodes, some information needs to be filled in:
+			    <itemizedlist>
+			      <listitem><para>
+				  <emphasis role="bold">Java Path</emphasis>: path to the java executable on the remote hosts (ie the PBS slaves).
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Scheduling Path</emphasis>: path to the Scheduling installation directory on the remote hosts.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Protocol</emphasis>: protocol (rmi, http...) used by the remote host to communicate with the RM.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Port</emphasis>: port used by the remote host to communicate with the RM.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Java Options</emphasis>: Java options appended to the command used to start the node
+				  on the remote host.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Max Nodes</emphasis>: maximum number of nodes this Infrastructure can simultaneously hold from the PBS server.
+				  Useful considering PBS does not provide a mechanism to evaluate the number of currently available or idle cores on the cluster;
+				  this can result to asking more resources than physically available, and waiting for the resources to come up for a very long time
+				  as the request would be queued until satisfiable.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">PBS Server</emphasis>: URL of the PBS server, which is responsible for acquiring PBS nodes.
+				  this server will be contacted by the Resource Manager through an SSH connection.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">RM Url</emphasis>: URL of the Resource Manager from the PBS nodes point of view:
+				  this is the URL the nodes will try to lookup when attempting to register to the RM upon creation.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">RM Credentials</emphasis>: Encrypted credentials file, as created by the create-cred[.bat] utility.
+				  These credentials will be used by the nodes to authenticate on the Resource Manager.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Qsub Options</emphasis>: Options for the qsub command client when acquiring nodes on the PBS master.
+				  Default value should be enough in most cases, if not, refer to the documentation of the PBS cluster.
+			      </para></listitem>
+			    </itemizedlist>
+			  </para>
+			  <figure xml:id="pic_pbs_infrastructure"><info><title>PBS infrastructure configuration panel</title></info>
+			    <mediaobject>
+			      <imageobject>
+				<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="resourcemanager_plugin/pics/pbs_infrastructure.png" format="PNG"/>
+			      </imageobject>
+			    </mediaobject>
+			  </figure>
+			</section>
 			<section xml:id="rm_gui_static_policy"><info><title>Node source static policy</title></info>
 				<para>If static policy is selected, then node source will deploy all nodes once and never remove them.
 				</para>

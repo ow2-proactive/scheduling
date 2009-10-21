@@ -11,3 +11,7 @@ org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure
 
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure
+
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure
+
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
