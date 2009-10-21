@@ -94,6 +94,8 @@ public class NativeTaskLauncher extends TaskLauncher {
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
 
+            //get Executable before schedule timer
+            currentExecutable = executableContainer.getExecutable();
             //start walltime if needed
             if (isWallTime()) {
                 scheduleTimer();
@@ -104,7 +106,6 @@ public class NativeTaskLauncher extends TaskLauncher {
                 this.executePreScript(PAActiveObject.getNode());
             }
 
-            currentExecutable = executableContainer.getExecutable();
             //init task
             callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, executableContainer
                     .createExecutableInitializer());

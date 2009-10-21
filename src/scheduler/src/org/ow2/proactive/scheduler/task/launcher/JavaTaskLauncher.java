@@ -85,11 +85,6 @@ public class JavaTaskLauncher extends TaskLauncher {
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
 
-            //start walltime if needed
-            if (isWallTime()) {
-                scheduleTimer();
-            }
-
             //launch pre script
             if (pre != null) {
                 this.executePreScript(PAActiveObject.getNode());
@@ -120,9 +115,6 @@ public class JavaTaskLauncher extends TaskLauncher {
             // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex, this.getLogs());
         } finally {
-            if (isWallTime()) {
-                cancelTimer();
-            }
             terminateDataSpace();
             if (core != null) {
                 // This call should be conditioned by the isKilled ... ?
