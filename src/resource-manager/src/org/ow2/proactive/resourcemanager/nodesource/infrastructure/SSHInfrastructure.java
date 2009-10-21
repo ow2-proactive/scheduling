@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
@@ -64,7 +64,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * 
  * 
  * @author The ProActive Team
- * @since ProActive Scheduling 1.1
+ * @since ProActive Scheduling 2.0
  *
  */
 public class SSHInfrastructure extends AbstractSSHInfrastructure {

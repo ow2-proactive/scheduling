@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
@@ -70,7 +70,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  * 
  * 
  * @author The ProActive Team
- * @since ProActive Scheduling 1.1
+ * @since ProActive Scheduling 2.0
  * 
  */
 public class PBSInfrastructure extends AbstractSSHInfrastructure {
