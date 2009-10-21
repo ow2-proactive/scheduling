@@ -59,7 +59,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
     public DataSpaceNodeConfigurationAgent() {
     }
 
-    public void configureNode() {
+    public boolean configureNode() {
         try {
             // configure node for Data Spaces
             String scratchDir;
@@ -76,18 +76,22 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
                     scratchConf);
         } catch (Throwable t) {
             logger.error("Cannot configure dataSpace", t);
+            return false;
         }
         PAActiveObject.terminateActiveObject(false);
+        return true;
     }
 
-    public void closeNodeConfiguration() {
+    public boolean closeNodeConfiguration() {
         try {
             DataSpacesNodes.closeNodeConfig(PAActiveObject
                     .getActiveObjectNode(PAActiveObject.getStubOnThis()));
         } catch (Throwable t) {
-            logger.error("Cannot close dataSpace configuration : " + t.getMessage());
+            logger.error("Cannot close dataSpace configuration !", t);
+            return false;
         }
         PAActiveObject.terminateActiveObject(false);
+        return true;
     }
 
 }

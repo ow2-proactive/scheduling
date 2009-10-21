@@ -438,7 +438,7 @@ public class NodeSource implements InitActive {
                 logger.info("[" + name + "] removing down node : " + nodeUrl);
             } else {
                 logger.error("[" + name + "] removing node : " + nodeUrl +
-                    " which is not belong to this node source");
+                    " which not belongs to this node source");
                 return new BooleanWrapper(false);
             }
         }
