@@ -428,13 +428,6 @@ test.example.net 5
 				</imageobject>
 				</mediaobject>
 			</figure>
-			<para>
-			<warning><para>Default node source created at RM's startup cannot be removed. Yet, it is possible
-			to remove all nodes from it. You can tick the check-box  <emphasis role="bold">preemptively</emphasis>. If checked, all nodes handled by the Node source
-			will be immediately removed (including busy and to release nodes). If preemptively is not ticked, and node Source has busy nodes, Resource Manager will switch these 
-			nodes from the busy state to the "to release" one, wait tasks' ends on these nodes before removing these 'to release' nodes
-			and finally, remove the Node Source.</para></warning>
-			</para>
 		</section>
 		<section xml:id="rm_add_node"><info><title>Add node by URL</title></info>
 			<para>
