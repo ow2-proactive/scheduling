@@ -48,7 +48,6 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -123,7 +122,6 @@ public class SchedulerStarter {
         try {
             RMAuthentication rmAuth = null;
             //get the path of the file
-            ResourceManagerProxy imp = null;
 
             String rm = null;
             String policyFullName = defaultPolicy;
@@ -145,21 +143,24 @@ public class SchedulerStarter {
                 }
 
                 logger.info("Starting Scheduler, Please wait...");
+                boolean onlySched = false;
 
                 if (rm != null) {
                     try {
                         logger_dev.info("Trying to connect to Resource Manager on " + rm);
-                        imp = ResourceManagerProxy.getProxy(new URI(rm));
+                        ResourceManagerProxy.getProxy(new URI(rm));
+                        onlySched = true;
                     } catch (Exception e) {
-                        logger.error("Error while connecting the RM on " + rm, e);
+                        logger.error("ERROR while connecting the RM on " + rm + ", no RM found !");
                         System.exit(2);
                     }
                 } else {
-                    URI uri = new URI(getLocalAdress());
+                    rm = getLocalAdress();
+                    URI uri = new URI(rm);
                     //trying to connect to a started local RM
                     logger_dev.info("Trying to connect to a started Resource Manager on " + uri);
                     try {
-                        imp = ResourceManagerProxy.getProxy(uri);
+                        ResourceManagerProxy.getProxy(uri);
                         logger
                                 .info("Resource Manager URL was not specified, connection made to the local Resource Manager at " +
                                     uri);
@@ -173,8 +174,6 @@ public class SchedulerStarter {
 
                             logger_dev
                                     .info("Trying to connect the local Resource Manager using Scheduler identity");
-                            //get the proxy on the Resource Manager
-                            imp = ResourceManagerProxy.getProxy(uri);
 
                             //creating default node source
                             RMAdmin rmAdmin = rmAuth.logAsAdmin(Credentials
@@ -186,8 +185,7 @@ public class SchedulerStarter {
                             rmAdmin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
                                     new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
-                            logger.info("Resource Manager created on " +
-                                Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(imp)));
+                            logger.info("Resource Manager created on " + rmAuth.getHostURL());
                         } catch (AlreadyBoundException abe) {
                             logger.error("Resource Manager already exists on local host", abe);
                             System.exit(4);
@@ -199,9 +197,10 @@ public class SchedulerStarter {
                 }
 
                 try {
-                    logger.info("Starting scheduler...");
-                    SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(rmAuth.getHostURL(),
-                            policyFullName);
+                    if (!onlySched) {
+                        logger.info("Starting scheduler...");
+                    }
+                    SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(rm, policyFullName);
                     logger.info("Scheduler successfully created on " + sai.getHostURL());
                 } catch (AdminSchedulerException e) {
                     logger.warn("", e);
