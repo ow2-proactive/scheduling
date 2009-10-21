@@ -85,6 +85,11 @@ public class JavaTaskLauncher extends TaskLauncher {
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
 
+            //start walltime if needed
+            if (isWallTime()) {
+                scheduleTimer();
+            }
+
             //launch pre script
             if (pre != null) {
                 this.executePreScript(PAActiveObject.getNode());
@@ -96,10 +101,6 @@ public class JavaTaskLauncher extends TaskLauncher {
             //init task
             callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, executableContainer
                     .createExecutableInitializer());
-
-            if (isWallTime()) {
-                scheduleTimer();
-            }
 
             //launch task            
             Serializable userResult = currentExecutable.execute(results);

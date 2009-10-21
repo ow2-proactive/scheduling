@@ -125,7 +125,6 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.utils.NodeSet;
-import org.ow2.proactive.utils.Tools;
 
 
 /**

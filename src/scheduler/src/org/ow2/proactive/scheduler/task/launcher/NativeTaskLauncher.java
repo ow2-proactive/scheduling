@@ -94,6 +94,11 @@ public class NativeTaskLauncher extends TaskLauncher {
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
 
+            //start walltime if needed
+            if (isWallTime()) {
+                scheduleTimer();
+            }
+
             //execute pre-script
             if (pre != null) {
                 this.executePreScript(PAActiveObject.getNode());
@@ -103,10 +108,6 @@ public class NativeTaskLauncher extends TaskLauncher {
             //init task
             callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, executableContainer
                     .createExecutableInitializer());
-
-            if (isWallTime()) {
-                scheduleTimer();
-            }
 
             //replace dataspace tags in command (if needed) by local scratch directory
             replaceDSTags();
