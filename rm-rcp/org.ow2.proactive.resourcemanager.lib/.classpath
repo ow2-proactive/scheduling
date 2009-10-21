@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager-client.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common-client.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-net-1.4.1.jar"/>

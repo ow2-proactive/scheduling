@@ -78,7 +78,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     protected File configurationFile;
     @Configurable
     protected String rmUrl;
-    @Configurable(fileBrowser = true)
+    @Configurable(credential = true)
     protected File RMCredentialsPath;
     @Configurable
     protected String nodeHttpPort = "80";

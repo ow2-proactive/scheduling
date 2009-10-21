@@ -60,7 +60,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
 
     @Configurable
     protected String url = "";
-    @Configurable(fileBrowser = true)
+    @Configurable(credential = true)
     protected File schedulerCredentialsPath;
     @Configurable
     protected boolean preemptive = false;

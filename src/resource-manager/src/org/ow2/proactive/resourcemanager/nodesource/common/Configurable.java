@@ -59,6 +59,12 @@ public @interface Configurable {
     boolean password() default false;
 
     /**
+     * Credential field. Based on this parameter special gui is generated
+     * to simplify the credential creation.
+     */
+    boolean credential() default false;
+
+    /**
      * Field represents a file. File browser will be added to the GUI.
      * A file will be loaded and converted to a byte array.
      */

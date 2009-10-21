@@ -53,7 +53,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.gui.dialog.CreateCredentialDialog;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -66,6 +68,7 @@ public class ConfigurablePanel extends Group {
         private Label nameLabel;
         private Text text;
         private Label descriptionLabel;
+        private Object value;
 
         public Property(Composite parent, ConfigurableField configurableField) {
             super(parent, SWT.LEFT);
@@ -86,7 +89,7 @@ public class ConfigurablePanel extends Group {
             FormData fd = new FormData();
             fd.top = new FormAttachment(1, 5);
             fd.left = new FormAttachment(1, 5);
-            fd.width = 100;
+            fd.width = 140;
             nameLabel.setLayoutData(fd);
 
             fd = new FormData();
@@ -94,7 +97,7 @@ public class ConfigurablePanel extends Group {
             fd.width = 200;
             text.setLayoutData(fd);
 
-            if (configurableField.getMeta().fileBrowser()) {
+            if (configurableField.getMeta().fileBrowser() || configurableField.getMeta().credential()) {
                 Button chooseButton = new Button(this, SWT.NONE);
                 chooseButton.setText("Choose file");
                 chooseButton.addListener(SWT.Selection, new Listener() {
@@ -109,6 +112,24 @@ public class ConfigurablePanel extends Group {
                 FormData chooseFormData = new FormData();
                 chooseFormData.left = new FormAttachment(text, 5);
                 chooseButton.setLayoutData(chooseFormData);
+
+                if (configurableField.getMeta().credential()) {
+                    Button createCredentialButton = new Button(this, SWT.NONE);
+                    createCredentialButton.setText("Create");
+                    createCredentialButton.addListener(SWT.Selection, new Listener() {
+                        public void handleEvent(Event event) {
+                            CreateCredentialDialog dialog = new CreateCredentialDialog(
+                                ConfigurablePanel.this.parent, null);
+                            value = dialog.getCredentials();
+                            text.setText("<generated>");
+                        }
+                    });
+
+                    FormData createCredentialFormData = new FormData();
+                    createCredentialFormData.left = new FormAttachment(chooseButton, 5);
+                    createCredentialButton.setLayoutData(createCredentialFormData);
+                }
+
             } else if (description != null && description.length() > 0) {
                 descriptionLabel = new Label(this, SWT.LEFT);
                 descriptionLabel.setText(description);
@@ -122,8 +143,8 @@ public class ConfigurablePanel extends Group {
             pack();
         }
 
-        public String getValue() {
-            return text.getText();
+        public Object getValue() {
+            return value == null ? text.getText() : value;
         }
     }
 
@@ -217,7 +238,7 @@ public class ConfigurablePanel extends Group {
     }
 
     public Object[] getParameters() throws RMException {
-        List<String> params = new ArrayList<String>();
+        List<Object> params = new ArrayList<Object>();
 
         for (Property p : properties) {
             params.add(p.getValue());
