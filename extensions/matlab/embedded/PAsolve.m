@@ -7,8 +7,8 @@
 %       func - a handle to a Matlab or user-defined function
 %       args - a one-dimensional cell array of objects holding the parameters. If the cell
 %              contains X elements, then X tasks will be deployed.
-               Each cell must contain another cell array corresponding to the function multiple parameters.
-               If the function takes a single parameter, then the nested cell arrays must be of size one each
+%               Each cell must contain another cell array corresponding to the function multiple parameters.
+%               If the function takes a single parameter, then the nested cell arrays must be of size one each
 %
 %       debug - '-debug' if the computation needs to be run in debug mode
 %
@@ -125,7 +125,7 @@ for i=1:length(args)
     main ='';
     for j=1:length(argi)
         
-        main = [main 'in' num2str(j) ' = ' vararg2str(argi{j}) ';'];
+        main = [main 'in' num2str(j) ' = ' serialize(argi{j}) ';'];
     end
 
     % Creating the rest of the command (evaluation of the user function)

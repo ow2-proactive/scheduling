@@ -17,5 +17,5 @@ case '()'
    B = {RL.results{ind}};
 case '{}'
    ind = S.subs{:};
-   B = {RL.results{ind}};
+   B = RL.results{ind};
 end
