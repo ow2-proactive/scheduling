@@ -137,10 +137,13 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
 
         try {
             if (host.equals(InetAddress.getLocalHost()) || host.equals(InetAddress.getByName("127.0.0.1"))) {
+                logger.debug("The command will be executed locally");
                 sshCmd = cmd;
             }
         } catch (UnknownHostException e) {
         }
+
+        logger.debug("Executing SSH command: '" + sshCmd + "'");
 
         Process p = null;
         // start the SSH command in a new process and not a thread:

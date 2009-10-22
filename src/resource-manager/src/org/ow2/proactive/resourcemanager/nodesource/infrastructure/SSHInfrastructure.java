@@ -37,12 +37,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -135,14 +137,19 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
     private void startRemoteNode(InetAddress host) throws RMException {
 
         // build the command used to start the runtime on the remote host
-
-        // org.objectweb.proactive.core.node.StartNode
-
-        final String paJar = schedulingPath + "/dist/lib/ProActive.jar";
+        
+        String paJar = schedulingPath + "/dist/lib/ProActive.jar:";
+        paJar += schedulingPath + "/dist/lib/ProActive_ResourceManager-client.jar:";
+        paJar += schedulingPath + "/dist/lib/ProActive_Scheduler-worker.jar:";
+        paJar += schedulingPath + "/dist/lib/ProActive_SRM-common-client.jar:";
+        paJar += schedulingPath + "/dist/lib/script-js.jar:";
+        paJar += schedulingPath + "/dist/lib/jruby-engine.jar:";
+        paJar += schedulingPath + "/dist/lib/jython-engine.jar:";
+        paJar += schedulingPath + "/dist/lib/commons-logging-1.0.4.jar";
 
         String cmd = this.javaPath + " -cp " + paJar;
         cmd += " " + PAProperties.JAVA_SECURITY_POLICY.getCmdLine();
-        cmd += "\"" + PAProperties.JAVA_SECURITY_POLICY.getValue() + "\"";
+        cmd += schedulingPath + "/config/security.java.policy";
         cmd += " -Dproactive.communication.protocol=" + this.protocol;
         cmd += " -Dproactive.useIPaddress=true ";
         cmd += " " + this.javaOptions + " ";
@@ -178,7 +185,15 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
 
             try {
                 if (nodeSource.getRMCore().addNode(nodeUrl, nodeSource.getName()).booleanValue()) {
-                    p.destroy();
+                    try {
+                        // don't destroy the process if launched on localhost without SSH;
+                        // it would kill it
+                        if (!host.equals(InetAddress.getLocalHost()) &&
+                            !host.equals(InetAddress.getByName("127.0.0.1"))) {
+                            p.destroy();
+                        }
+                    } catch (UnknownHostException e) {
+                    }
                     break;
                 }
             } catch (Exception e) {

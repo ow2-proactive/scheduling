@@ -94,7 +94,7 @@ public class PBSInfrastructure extends AbstractSSHInfrastructure {
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(fileBrowser = true)
+    @Configurable(credential = true)
     protected File RMCredentialsPath;
     /**
      * options for the qsub command executed on {@link #PBSServer}
