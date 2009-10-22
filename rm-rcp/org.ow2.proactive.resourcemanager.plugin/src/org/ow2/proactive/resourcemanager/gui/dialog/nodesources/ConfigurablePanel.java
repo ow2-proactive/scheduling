@@ -31,11 +31,17 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog.nodesources;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -46,6 +52,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
@@ -53,8 +60,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.dialog.CreateCredentialDialog;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
@@ -68,12 +75,14 @@ public class ConfigurablePanel extends Group {
         private Label nameLabel;
         private Text text;
         private Label descriptionLabel;
+
+        private String name;
         private Object value;
 
         public Property(Composite parent, ConfigurableField configurableField) {
             super(parent, SWT.LEFT);
 
-            String name = configurableField.getName();
+            name = configurableField.getName();
             Configurable configurable = configurableField.getMeta();
             String description = configurable.description();
 
@@ -143,13 +152,23 @@ public class ConfigurablePanel extends Group {
             pack();
         }
 
+        public String getPropertyName() {
+            return name;
+        }
+
         public Object getValue() {
             return value == null ? text.getText() : value;
+        }
+
+        public void setValue(String value) {
+            this.value = null;
+            text.setText(value);
         }
     }
 
     private Combo combo;
     private List<Property> properties = new LinkedList<Property>();
+    private Button loadFromFile = null;
     private Label description;
     private PluginDescriptor selectedDescriptor = null;
     private HashMap<String, PluginDescriptor> comboStates = new HashMap<String, PluginDescriptor>();
@@ -195,10 +214,16 @@ public class ConfigurablePanel extends Group {
                 for (Property l : properties) {
                     l.dispose();
                 }
+
+                if (loadFromFile != null) {
+                    loadFromFile.dispose();
+                    loadFromFile = null;
+                }
+
                 properties.clear();
                 parent.pack();
 
-                designGui(comboStates.get(combo.getText()));
+                generateGui(comboStates.get(combo.getText()));
                 parent.pack();
             }
         });
@@ -210,7 +235,7 @@ public class ConfigurablePanel extends Group {
         comboStates.put(pluginName, descriptor);
     }
 
-    private void designGui(PluginDescriptor descriptor) {
+    private void generateGui(PluginDescriptor descriptor) {
         selectedDescriptor = descriptor;
         if (descriptor == null) {
             description.setText("");
@@ -225,6 +250,48 @@ public class ConfigurablePanel extends Group {
             property.setLayoutData(fd);
 
             properties.add(property);
+        }
+
+        if (properties.size() > 0) {
+            // adding 'load properties from file' button
+            loadFromFile = new Button(this, SWT.NONE);
+            loadFromFile.setText("Load from file");
+
+            loadFromFile.addListener(SWT.Selection, new Listener() {
+                public void handleEvent(Event event) {
+                    FileDialog fileDialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
+                    String fileName = fileDialog.open();
+                    if (fileName != null) {
+                        Properties loadedProperties = new Properties();
+                        try {
+                            loadedProperties.load(new FileInputStream(fileName));
+
+                            for (Property prop : properties) {
+                                String value = loadedProperties.getProperty(prop.getPropertyName());
+                                if (value == null) {
+                                    value = loadedProperties.getProperty(PluginDescriptor.beautifyName(prop
+                                            .getPropertyName()));
+                                }
+
+                                if (value != null) {
+                                    prop.setValue(value);
+                                }
+                            }
+
+                        } catch (Exception e) {
+                            Activator.log(IStatus.ERROR, "Cannot read file " + fileName, e);
+                            MessageDialog.openError(Display.getDefault().getActiveShell(),
+                                    "Cannot read file", "Cannot read file " + fileName + "\n\n" +
+                                        e.getMessage());
+                        }
+
+                    }
+                }
+            });
+
+            FormData fd = new FormData();
+            fd.top = new FormAttachment(properties.get(properties.size() - 1), 10);
+            loadFromFile.setLayoutData(fd);
         }
 
         if (descriptor.getPluginDescription() != null) {
