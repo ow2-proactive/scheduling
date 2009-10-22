@@ -32,6 +32,13 @@
     	<xsl:attribute name="wrap-option">wrap</xsl:attribute>
 	</xsl:attribute-set>
 
+	<!-- DOC-114 -->
+	<!-- Enables examples to be cut so that they can be displayed
+		 on several pages-->
+	<xsl:attribute-set name="example.properties">
+		<xsl:attribute name="keep-together.within-column">auto</xsl:attribute>
+	</xsl:attribute-set>
+
 	<!--  center all images in the tag figure horizontally  -->
 	<xsl:attribute-set name="figure.properties">
 		<xsl:attribute name="text-align">center</xsl:attribute>
