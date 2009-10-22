@@ -91,24 +91,38 @@ public class JobDataSpaceApplication implements Serializable {
                     isc = InputOutputSpaceConfiguration.createInputSpaceConfiguration(inputURL, null, null,
                             PADataSpaces.DEFAULT_IN_OUT_NAME);
                 } else {
+                    String localpath = null;
+                    String hostname = null;
+                    if (PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_LOCALPATH.isSet() &&
+                        PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_HOSTNAME.isSet()) {
+                        localpath = PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_LOCALPATH
+                                .getValueAsString() +
+                            File.separator + username;
+                        hostname = PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_HOSTNAME
+                                .getValueAsString();
+                    }
                     isc = InputOutputSpaceConfiguration.createInputSpaceConfiguration(
                             PASchedulerProperties.DATASPACE_DEFAULTINPUTURL.getValueAsString() + username,
-                            PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_LOCALPATH.getValueAsString() +
-                                File.separator + username,
-                            PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_HOSTNAME.getValueAsString(),
-                            PADataSpaces.DEFAULT_IN_OUT_NAME);
+                            localpath, hostname, PADataSpaces.DEFAULT_IN_OUT_NAME);
                 }
                 // create OUTPUT space
                 if (outputURL != null) {
                     osc = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(outputURL, null, null,
                             PADataSpaces.DEFAULT_IN_OUT_NAME);
                 } else {
+                    String localpath = null;
+                    String hostname = null;
+                    if (PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_LOCALPATH.isSet() &&
+                        PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_HOSTNAME.isSet()) {
+                        localpath = PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_LOCALPATH
+                                .getValueAsString() +
+                            File.separator + username;
+                        hostname = PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_HOSTNAME
+                                .getValueAsString();
+                    }
                     osc = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
                             PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL.getValueAsString() + username,
-                            PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_LOCALPATH.getValueAsString() +
-                                File.separator + username,
-                            PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_HOSTNAME.getValueAsString(),
-                            PADataSpaces.DEFAULT_IN_OUT_NAME);
+                            localpath, hostname, PADataSpaces.DEFAULT_IN_OUT_NAME);
                 }
                 predefinedSpaces.add(new SpaceInstanceInfo(applicationId, isc));
                 predefinedSpaces.add(new SpaceInstanceInfo(applicationId, osc));

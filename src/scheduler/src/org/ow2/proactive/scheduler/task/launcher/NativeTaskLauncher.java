@@ -38,6 +38,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutable;
@@ -55,6 +56,8 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 public class NativeTaskLauncher extends TaskLauncher {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+
+    private static final String DATASPACE_TAG = "\\$LOCALSPACE";
 
     /**
      * ProActive Empty Constructor
@@ -107,11 +110,12 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
 
             //init task
-            callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, executableContainer
-                    .createExecutableInitializer());
+            ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
+            replaceWorkingDirDSTags(execInit);
+            callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, execInit);
 
             //replace dataspace tags in command (if needed) by local scratch directory
-            replaceDSTags();
+            replaceCommandDSTags();
 
             //launch task
             logger_dev.debug("Starting execution of task '" + taskId + "'");
@@ -141,6 +145,25 @@ public class NativeTaskLauncher extends TaskLauncher {
                 cancelTimer();
             }
             this.finalizeTask(core);
+        }
+    }
+
+    private void replaceWorkingDirDSTags(ExecutableInitializer execInit) {
+        String wd = ((NativeExecutableInitializer) execInit).getWorkingDir();
+        if (wd != null) {
+            wd = wd.replaceAll(DATASPACE_TAG, SCRATCH.getRealURI().replace("file://", ""));
+        }
+        ((NativeExecutableInitializer) execInit).setWorkingDir(wd);
+    }
+
+    private void replaceCommandDSTags() throws Exception {
+        String[] args = ((NativeExecutable) currentExecutable).getCommand();
+        //I cannot use DataSpace to get the local scratch path
+        if (SCRATCH != null) {
+            String fullScratchPath = SCRATCH.getRealURI().replace("file://", "");
+            for (int i = 0; i < args.length; i++) {
+                args[i] = args[i].replaceAll(DATASPACE_TAG, fullScratchPath);
+            }
         }
     }
 

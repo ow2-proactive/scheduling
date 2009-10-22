@@ -36,8 +36,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.swing.JPopupMenu;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
 
@@ -337,9 +335,9 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public String getValueAsString() {
-        getProperties(null);
+        Properties prop = getProperties(null);
         if (fileLoaded) {
-            return getProperties(DEFAULT_PROPERTIES_FILE).getProperty(key);
+            return prop.getProperty(key);
         } else {
             return "";
         }

@@ -411,9 +411,9 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public String getValueAsString() {
-        getProperties(null);
+        Properties prop = getProperties(null);
         if (fileLoaded) {
-            return getProperties(DEFAULT_PROPERTIES_FILE).getProperty(key);
+            return prop.getProperty(key);
         } else {
             return "";
         }

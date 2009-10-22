@@ -74,7 +74,6 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppen
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
-import org.ow2.proactive.scheduler.task.NativeExecutable;
 import org.ow2.proactive.scheduler.task.launcher.dataspace.AntFileSelector;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.Script;
@@ -96,8 +95,6 @@ import org.ow2.proactive.scripting.ScriptResult;
 public abstract class TaskLauncher implements InitActive {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
-
-    protected static final String DATASPACE_TAG = "\\$LOCALSPACE";
 
     protected DataSpacesFileObject SCRATCH = null;
     protected DataSpacesFileObject INPUT = null;
@@ -506,17 +503,6 @@ public abstract class TaskLauncher implements InitActive {
      */
     public boolean isWallTime() {
         return wallTime > 0;
-    }
-
-    protected void replaceDSTags() throws Exception {
-        String[] args = ((NativeExecutable) currentExecutable).getCommand();
-        //I cannot use DataSpace to get the local scratch path
-        if (SCRATCH != null) {
-            String fullScratchPath = SCRATCH.getRealURI().replace("file://", "");
-            for (int i = 0; i < args.length; i++) {
-                args[i] = args[i].replaceAll(DATASPACE_TAG, fullScratchPath);
-            }
-        }
     }
 
     protected void initDataSpaces() {
