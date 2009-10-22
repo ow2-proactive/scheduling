@@ -15,3 +15,5 @@ org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure
 
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
+
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure
