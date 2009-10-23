@@ -5,7 +5,8 @@
 	xmlns:destination="http://xml.apache.org/fop/extensions"
 	exclude-result-prefixes="date" version="1.0">
 
- <xsl:import href="../docbook-xsl/fo/docbook.xsl" />
+	<xsl:import href="../docbook-xsl/fo/docbook.xsl" />
+	<xsl:import href="../docbook-xsl/common/personal-templates.xsl" />
 	<xsl:import href="common.xsl" />
 
    <!-- Import profiled highlighting color -->
@@ -1924,6 +1925,16 @@
 				</xsl:apply-templates>
 			</fo:block>
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="programlisting//text()">
+		<xsl:variable name="expandedText">
+			<xsl:call-template name="expandTabs">
+				<xsl:with-param name="text" select="." />
+			</xsl:call-template>
+		</xsl:variable>
+
+		<xsl:value-of select="$expandedText" />
 	</xsl:template>
 
 </xsl:stylesheet>
