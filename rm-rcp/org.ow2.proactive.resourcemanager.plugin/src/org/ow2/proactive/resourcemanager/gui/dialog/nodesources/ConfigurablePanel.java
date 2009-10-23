@@ -130,7 +130,8 @@ public class ConfigurablePanel extends Group {
                             CreateCredentialDialog dialog = new CreateCredentialDialog(
                                 ConfigurablePanel.this.parent, null);
                             value = dialog.getCredentials();
-                            text.setText("<generated>");
+                            if (value != null)
+                                text.setText("<generated>");
                         }
                     });
 
