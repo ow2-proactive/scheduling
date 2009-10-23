@@ -67,6 +67,7 @@ import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.Tools;
+import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 
 
 /**
@@ -95,6 +96,8 @@ public class SchedulerStarter {
      * @param args
      */
     public static void main(String[] args) {
+
+        args = JVMPropertiesPreloader.overrideJVMProperties(args);
 
         Options options = new Options();
 

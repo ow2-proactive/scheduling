@@ -69,6 +69,7 @@ import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Console;
+import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive.utils.console.SimpleConsole;
 import org.ow2.proactive.utils.console.VisualConsole;
@@ -104,6 +105,7 @@ public class UserController {
      * @param args the arguments to be passed
      */
     public static void main(String[] args) {
+        args = JVMPropertiesPreloader.overrideJVMProperties(args);
         shell = new UserController(null);
         shell.load(args);
     }

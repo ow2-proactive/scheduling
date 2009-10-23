@@ -43,6 +43,7 @@ import org.apache.commons.cli.Options;
 import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorClient;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
+import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
 
@@ -60,6 +61,7 @@ public class AdminController extends UserController {
      * @param args the arguments to be passed
      */
     public static void main(String[] args) {
+        args = JVMPropertiesPreloader.overrideJVMProperties(args);
         shell = new AdminController(null);
         shell.load(args);
     }

@@ -53,6 +53,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 
 
 /**
@@ -104,6 +105,8 @@ public class RMStarter {
      * @throws Exception
      */
     public static void main(String[] args) {
+
+        args = JVMPropertiesPreloader.overrideJVMProperties(args);
 
         initOptions();
 

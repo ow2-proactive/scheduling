@@ -68,6 +68,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.console.Console;
+import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive.utils.console.SimpleConsole;
 import org.ow2.proactive.utils.console.VisualConsole;
@@ -107,6 +108,7 @@ public class AdminController {
      * @param args the arguments to be passed
      */
     public static void main(String[] args) {
+        args = JVMPropertiesPreloader.overrideJVMProperties(args);
         shell = new AdminController(null);
         shell.load(args);
     }
