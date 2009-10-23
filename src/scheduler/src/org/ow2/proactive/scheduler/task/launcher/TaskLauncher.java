@@ -517,11 +517,11 @@ public abstract class TaskLauncher implements InitActive {
                 INPUT = PADataSpaces.resolveDefaultInput();
                 OUTPUT = PADataSpaces.resolveDefaultOutput();
             } catch (Throwable t) {
-                logger_dev.warn("Their was a problem while initializing dataSpaces, they won't be activated",
+                logger_dev.warn("There was a problem while initializing dataSpaces, they won't be activated",
                         t);
                 //print for user task
                 System.err
-                        .println("Their was a problem while initializing dataSpaces, they won't be activated : " +
+                        .println("There was a problem while initializing dataSpaces, they won't be activated : " +
                             t.getMessage());
             }
         }

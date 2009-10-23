@@ -137,7 +137,7 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
     private void startRemoteNode(InetAddress host) throws RMException {
 
         // build the command used to start the runtime on the remote host
-        
+
         String paJar = schedulingPath + "/dist/lib/ProActive.jar:";
         paJar += schedulingPath + "/dist/lib/ProActive_ResourceManager-client.jar:";
         paJar += schedulingPath + "/dist/lib/ProActive_Scheduler-worker.jar:";

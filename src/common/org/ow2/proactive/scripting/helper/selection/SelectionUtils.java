@@ -369,7 +369,7 @@ public class SelectionUtils {
     }
 
     /**
-     * Check if their is enough free memory.
+     * Check if there is enough free memory.
      *
      * @param requiredMemory the minimum amount of memory which is required (measured in byte)
      * @return true if the required memory is equal or lesser than the available memory, false otherwise.

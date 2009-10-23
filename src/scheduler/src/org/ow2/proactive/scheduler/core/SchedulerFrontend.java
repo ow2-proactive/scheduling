@@ -1063,7 +1063,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
-                    //if their is no specified event OR if the specified event is allowed
+                    //if there is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(eventType)) {
                         entry.getValue().schedulerStateUpdatedEvent(eventType);
                     }
@@ -1092,7 +1092,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
-                    //if their is no specified event OR if the specified event is allowed
+                    //if there is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(SchedulerEvent.JOB_SUBMITTED)) {
                         //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
@@ -1130,7 +1130,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
-                    //if their is no specified event OR if the specified event is allowed
+                    //if there is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
                         //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
@@ -1165,7 +1165,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
-                    //if their is no specified event OR if the specified event is allowed
+                    //if there is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
                         //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
@@ -1200,7 +1200,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 UserIdentificationImpl userId = null;
                 try {
                     userId = identifications.get(id);
-                    //if their is no specified event OR if the specified event is allowed
+                    //if there is no specified event OR if the specified event is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
                         //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)

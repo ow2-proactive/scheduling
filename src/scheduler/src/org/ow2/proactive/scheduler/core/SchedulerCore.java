@@ -1079,7 +1079,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             finishedJobs.add(job);
 
             if (!noResult) {
-                //send task event if their was a result
+                //send task event if there was a result
                 frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                     SchedulerEvent.TASK_RUNNING_TO_FINISHED, task.getTaskInfo()));
             }
