@@ -70,6 +70,11 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
 
     public void configure(Object... params) throws RMException {
         SchedulerAuthenticationInterface authentication;
+
+        if (params[1] == null) {
+            throw new RMException("Credentials must be specified");
+        }
+
         try {
             authentication = SchedulerConnection.join(params[0].toString());
             Credentials creds = Credentials.getCredentialsBase64((byte[]) params[1]);

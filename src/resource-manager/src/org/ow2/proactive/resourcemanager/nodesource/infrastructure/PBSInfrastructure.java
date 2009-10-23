@@ -279,6 +279,9 @@ public class PBSInfrastructure extends AbstractSSHInfrastructure {
             }
             this.PBSServer = parameters[6].toString();
             this.RMUrl = parameters[7].toString();
+            if (parameters[8] == null) {
+                throw new RMException("Credentials must be specified");
+            }
             try {
                 this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[8]);
             } catch (KeyException e) {

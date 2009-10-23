@@ -41,7 +41,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -145,7 +144,13 @@ public class PluginDescriptor implements Serializable {
 
             if (configurable.fileBrowser() || credentialsFilePath) {
                 try {
-                    value = FileToBytesConverter.convertFileToByteArray(new File(value.toString()));
+                    if (value.toString().length() > 0) {
+                        value = FileToBytesConverter.convertFileToByteArray(new File(value.toString()));
+                    } else {
+                        // in case if file path is not specified propagate null to plugin
+                        // it will decide then if it's acceptable or not
+                        value = null;
+                    }
                 } catch (IOException e) {
                     throw new RMException("Cannot load file", e);
                 }

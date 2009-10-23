@@ -76,12 +76,20 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
             return;
         }
         if (parameters.length == 2) {
+            if (parameters[1] == null) {
+                throw new RMException("Host list file must be specified");
+            }
+
             String hosts = new String((byte[]) parameters[1]);
 
             String[] hostsList = hosts.split("\\s");
             logger.debug("Number of hosts " + hostsList.length);
 
             for (String host : hostsList) {
+                if (parameters[0] == null) {
+                    throw new RMException("GCMD template file must be specified");
+                }
+
                 DeploymentData dd = new DeploymentData();
                 dd.data = (byte[]) parameters[0];
                 logger.debug("Registed deployment data for host " + host);

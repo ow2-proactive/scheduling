@@ -132,6 +132,10 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
             throw new RMException("Incorrect parameters for nodes acqusition");
         }
 
+        if (parameters[0] == null) {
+            // gcmd descriptor was not specified
+            throw new RMException("GCMD file must be specified");
+        }
         deploymentData.data = (byte[]) parameters[0];
     }
 

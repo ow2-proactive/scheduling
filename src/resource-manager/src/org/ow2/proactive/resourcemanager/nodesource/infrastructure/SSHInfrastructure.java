@@ -221,6 +221,9 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
         super.configure(parameters);
 
         if (parameters != null && parameters.length >= 6) {
+            if (parameters[5] == null) {
+                throw new RMException("Host file must be specified");
+            }
             try {
                 byte[] hosts = (byte[]) parameters[5];
                 File f = File.createTempFile("hosts", "list");

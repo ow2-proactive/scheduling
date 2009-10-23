@@ -178,9 +178,15 @@ public class EC2Infrastructure extends InfrastructureManager {
 
         /** parameters look fine */
         if (parameters != null && parameters.length == 4) {
+
+            if (parameters[0] == null) {
+                throw new RMException("EC2 config file must be specified");
+            }
+
             try {
                 //                File ff = new File(parameters[0].toString());
                 byte[] configFile = (byte[]) parameters[0];
+
                 File ff = File.createTempFile("configFile", "props");
                 FileToBytesConverter.convertByteArrayToFile(configFile, ff);
                 readConf(ff.getAbsolutePath());
@@ -190,6 +196,9 @@ public class EC2Infrastructure extends InfrastructureManager {
                 logger.debug("Expected File as 1st parameter for EC2Infrastructure: " + e.getMessage());
             }
             String rmu = parameters[1].toString();
+            if (parameters[2] == null) {
+                throw new RMException("Credentials must be specified");
+            }
             String creds64 = new String((byte[]) parameters[2]);
             String nodep = parameters[3].toString();
 
