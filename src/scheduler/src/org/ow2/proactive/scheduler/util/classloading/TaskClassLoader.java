@@ -31,6 +31,9 @@
  */
 package org.ow2.proactive.scheduler.util.classloading;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -52,6 +55,10 @@ public class TaskClassLoader extends ClassLoader {
     /** The associated classserver on the scheduler core side */
     // Can be null if no classpath has been set for the job
     private TaskClassServer remoteServer;
+    /** The directory containing extra classpath */
+    private File extClasspathDir;
+    /** Name of the property that set the extra classpath directory */
+    public final static String EXT_CLASSPATH_PROPERTY = "pa.scheduler.extraclasspath.dir";
 
     /**
      * Create a new classloader.
@@ -61,6 +68,21 @@ public class TaskClassLoader extends ClassLoader {
     public TaskClassLoader(ClassLoader parent, TaskClassServer remoteServer) {
         super(parent);
         this.remoteServer = remoteServer;
+        // look for the ext classpath dir if any
+        String ecd = System.getProperty(EXT_CLASSPATH_PROPERTY);
+        if (ecd != null && !"".equals(ecd)) {
+            logger_dev.debug("Extra classpath directory is set to " + ecd);
+            File extcp = new File(ecd);
+            if (extcp.exists() && extcp.isDirectory() && extcp.canRead()) {
+                this.extClasspathDir = extcp;
+            } else {
+                logger_dev.warn(extcp.getAbsolutePath() +
+                    " is not a readable directory : cannot use extra classpath directory.");
+            }
+        } else {
+            logger_dev.debug("Extra classpath directory is not set.");
+        }
+
     }
 
     /* (non-Javadoc)
@@ -79,14 +101,31 @@ public class TaskClassLoader extends ClassLoader {
         if (res != null) {
             // seeked class is already loaded. Return it.
             logger_dev.info("Class " + className + " was already loaded");
+            return res;
         } else {
             // try parent
             try {
                 res = this.getParent().loadClass(className);
                 logger_dev.debug("Found class " + className + " locally");
+                return res;
             } catch (ClassNotFoundException e) {
+                if (this.extClasspathDir != null) {
+                    try {
+                        // tries extra classpath dir
+                        logger_dev.debug("Look for class " + className + " to the extra classpath");
+                        byte[] classBytes = TaskClassUtils.lookIntoDirectory(className, this.extClasspathDir);
+                        if (classBytes != null && classBytes.length != 0) {
+                            logger_dev.debug("Found " + className + " in extra classpath");
+                            res = this.defineClass(className, classBytes, 0, classBytes.length);
+                            return res;
+                        }
+                    } catch (IOException e1) {
+                        logger_dev.warn("Cannot access to extra classpath directory.", e1);
+                        // try remote server anyway...
+                    }
+                }
+                // if class has not been found locally, tries remote TaskClassServer...
                 if (remoteServer != null) {
-                    // tries remote TaskClassServer...
                     logger_dev.debug("Ask for class " + className + " to the remote TaskClassServer");
                     byte[] classBytes = this.remoteServer.getClassBytes(className);
                     if (classBytes == null || classBytes.length == 0) {
@@ -95,15 +134,15 @@ public class TaskClassLoader extends ClassLoader {
                     } else {
                         logger_dev.debug("Found " + className);
                         res = this.defineClass(className, classBytes, 0, classBytes.length);
+                        return res;
                     }
                 } else {
                     // no remote classserver available...
                     logger_dev.debug("No TaskClassServer found when looking for " + className);
-                    throw e;
+                    throw new ClassNotFoundException(className);
                 }
             }
         }
-        return res;
     }
 
 }

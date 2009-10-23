@@ -32,17 +32,14 @@
 package org.ow2.proactive.scheduler.util.classloading;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.jar.JarFile;
 import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -50,7 +47,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
-import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -158,7 +154,7 @@ public class TaskClassServer {
             logger_dev.debug("Deleting classpath files for job " + servedJobId);
             // delete classpath files
             jarFile.delete();
-            deleteDirectory(dirClasspath);
+            TaskClassUtils.deleteDirectory(dirClasspath);
             crcFile.delete();
         }
 
@@ -204,7 +200,7 @@ public class TaskClassServer {
         File deflatedJarFile = new File(this.getPathToClassDir());
         File crcFile = new File(this.getPathToCrcFile());
         jarFile.delete();
-        deleteDirectory(deflatedJarFile);
+        TaskClassUtils.deleteDirectory(deflatedJarFile);
         crcFile.delete();
         // delete cache
         if (this.cachedClasses != null) {
@@ -224,8 +220,8 @@ public class TaskClassServer {
         if (cb == null) {
             logger_dev.debug("Class " + classname + " is not available in class cache");
             try {
-                cb = this.classpath.isFile() ? this.lookIntoJarFile(classname, new JarFile(classpath)) : this
-                        .lookIntoDirectory(classname, classpath);
+                cb = this.classpath.isFile() ? TaskClassUtils.lookIntoJarFile(classname, new JarFile(
+                    classpath)) : TaskClassUtils.lookIntoDirectory(classname, classpath);
                 if (useCache) {
                     logger_dev.debug("Class " + classname + " is added in class cache");
                     this.cachedClasses.put(classname, cb);
@@ -240,90 +236,6 @@ public class TaskClassServer {
         logger_dev.debug("Class " + classname + " has " + (cb == null ? "not" : "") + " been found in " +
             classpath.getAbsolutePath());
         return cb;
-    }
-
-    /**
-     * Look for a classfile into a directory.
-     * @param classname the looked up class.
-     * @param directory the directory to look into.
-     * @return the byte[] representation of the class if found, null otherwise.
-     * @throws IOException if the jar file cannot be read.
-     */
-    private byte[] lookIntoDirectory(String classname, File directory) throws IOException {
-        String pathToClass = convertNameToPath(classname, true);
-        if (directory.exists() && directory.isDirectory()) {
-            File[] files = directory.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    byte[] resInDir = lookIntoDirectory(classname, files[i]);
-                    if (resInDir != null) {
-                        return resInDir;
-                    }
-                } else if (isJarFile(files[i])) {
-                    byte[] resInJar = lookIntoJarFile(classname, new JarFile(files[i]));
-                    if (resInJar != null) {
-                        return resInJar;
-                    }
-                } else if (isClassFile(files[i]) && files[i].getAbsolutePath().endsWith(pathToClass)) {
-                    // TODO cdelbe : conlicts possible ? 
-                    return FileToBytesConverter.convertFileToByteArray(files[i]);
-                }
-            }
-            // not found
-            return null;
-        } else {
-            throw new IOException("Directory " + directory.getAbsolutePath() + " does not exist");
-        }
-    }
-
-    /**
-     * Look for a class definition into a jar file.
-     * @param classname the looked up class.
-     * @param file the jar file.
-     * @return the byte[] representation of the class if found, null otherwise.
-     * @throws IOException if the jar file cannot be read.
-     */
-    private byte[] lookIntoJarFile(String classname, JarFile file) throws IOException {
-        byte result[] = null;
-        String path = convertNameToPath(classname, false);
-        ZipEntry entry = file.getEntry(path);
-        if (entry != null) {
-            final InputStream inStream = file.getInputStream(entry);
-            final ByteArrayOutputStream bos = new ByteArrayOutputStream(); // ByteArrayOutputStream.close() is noop
-            final byte[] data = new byte[1024];
-            int count;
-            while ((count = inStream.read(data, 0, 1024)) > -1) {
-                bos.write(data, 0, count);
-            }
-            result = bos.toByteArray();
-            inStream.close();
-            return result;
-        } else {
-            logger_dev.debug("Entry " + path + " has not been found in jar " + file.getName());
-            return null;
-        }
-    }
-
-    /**
-     * Return true if f is a jar file.
-     */
-    private boolean isJarFile(File f) {
-        return f.isFile() && f.getName().endsWith(".jar");
-    }
-
-    /**
-     * Return true if f is a class file.
-     */
-    private boolean isClassFile(File f) {
-        return f.isFile() && f.getName().endsWith(".class");
-    }
-
-    /**
-     * Convert classname parameter (qualified) into path to the class file 
-     * (with the .class suffix)
-     */
-    private String convertNameToPath(String classname, boolean useSystemFileSeparator) {
-        return classname.replace('.', useSystemFileSeparator ? File.separatorChar : '/') + ".class";
     }
 
     /**
@@ -348,24 +260,6 @@ public class TaskClassServer {
      */
     private String getPathToClassDir() {
         return tmpJarFilesDir + servedJobId.toString();
-    }
-
-    /**
-     * Recursive delete for directories
-     * @param path
-     */
-    private static void deleteDirectory(File path) {
-        if (path.exists()) {
-            File[] files = path.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    deleteDirectory(files[i]);
-                } else {
-                    files[i].delete();
-                }
-            }
-            path.delete();
-        }
     }
 
 }
