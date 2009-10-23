@@ -94,7 +94,7 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      */
     public static SchedulerAuthenticationInterface join(String url) throws SchedulerException {
         try {
-            return getInstance().connect(normalize(url));
+            return getInstance().connect(normalizeScheduler(url));
         } catch (Exception e) {
             throw new SchedulerException(e.getMessage());
         }
@@ -124,7 +124,7 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
     public static SchedulerAuthenticationInterface waitAndJoin(String url, long timeout)
             throws SchedulerException {
         try {
-            return getInstance().waitAndConnect(normalize(url), timeout);
+            return getInstance().waitAndConnect(normalizeScheduler(url), timeout);
         } catch (Exception e) {
             throw new SchedulerException(e);
         }
@@ -134,20 +134,16 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      * Normalize the URL of the SCHEDULER.<br>
      *
      * @param url, the URL to normalize.
-     * @return 	//localhost/SCHEDULER_NAME if the given url is null.<br>
-     * 			the given URL if it terminates by the SCHEDULER_NAME<br>
-     * 			the given URL with /SCHEDULER_NAME appended if URL does not end with /<br>
-     * 			the given URL with SCHEDULER_NAME appended if URL does end with /<br>
-     * 			the given URL with SCHEDULER_NAME appended if URL does not end with SCHEDULER_NAME
+     * @return  //localhost/SCHEDULER_NAME if the given url is null.<br>
+     *          the given URL if it terminates by the SCHEDULER_NAME<br>
+     *          the given URL with /SCHEDULER_NAME appended if URL does not end with /<br>
+     *          the given URL with SCHEDULER_NAME appended if URL does end with /<br>
+     *          the given URL with SCHEDULER_NAME appended if URL does not end with SCHEDULER_NAME
      */
-    private static String normalize(String url) {
+    private static String normalizeScheduler(String url) {
+        url = Connection.normalize(url);
         String SCHEDULER_DEFAULT_NAME = SchedulerConstants.SCHEDULER_DEFAULT_NAME;
-        if (url == null) {
-            url = "//localhost/";
-        }
         if (!url.endsWith(SCHEDULER_DEFAULT_NAME)) {
-            if (!url.endsWith("/"))
-                url += "/";
             url += SCHEDULER_DEFAULT_NAME;
         }
         return url;

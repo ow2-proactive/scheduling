@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.authentication.Authentication;
+import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.gui.Activator;
 
@@ -200,9 +201,9 @@ public class CreateCredentialDialog extends Dialog {
             public void handleEvent(Event event) {
 
                 String entity = authEntityCombo.getSelectionIndex() == 0 ? "RMAUTHENTICATION" : "SCHEDULER";
-                String url = urlText.getText().equals("") ? "//localhost" : urlText.getText();
+                String url = urlText.getText();
+                String authAOUrl = Connection.normalize(url) + entity;
 
-                String authAOUrl = url + "/" + entity;
                 try {
                     Authentication auth = (Authentication) PAActiveObject.lookupActive(Authentication.class
                             .getName(), authAOUrl);

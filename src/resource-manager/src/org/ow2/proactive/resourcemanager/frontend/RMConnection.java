@@ -81,7 +81,7 @@ public class RMConnection extends Connection<RMAuthentication> {
      */
     public static RMAuthentication join(String url) throws RMException {
         try {
-            return getInstance().connect(normalize(url));
+            return getInstance().connect(normalizeRM(url));
         } catch (Exception e) {
             throw new RMException(e.getMessage());
         }
@@ -102,7 +102,7 @@ public class RMConnection extends Connection<RMAuthentication> {
      */
     public static RMAuthentication waitAndJoin(String url, long timeout) throws RMException {
         try {
-            return getInstance().waitAndConnect(normalize(url), timeout);
+            return getInstance().waitAndConnect(normalizeRM(url), timeout);
         } catch (Exception e) {
             throw new RMException(e.getMessage());
         }
@@ -118,17 +118,12 @@ public class RMConnection extends Connection<RMAuthentication> {
      * 			the given URL with RM_NAME appended if URL does end with /<br>
      * 			the given URL with RM_NAME appended if URL does not end with RM_NAME
      */
-    private static String normalize(String url) {
+    private static String normalizeRM(String url) {
+        url = Connection.normalize(url);
         String NAME_ACTIVE_OBJECT_RMAUTHENTICATION = RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
-        if (url == null) {
-            url = "//localhost/";
-        }
         if (!url.endsWith(NAME_ACTIVE_OBJECT_RMAUTHENTICATION)) {
-            if (!url.endsWith("/"))
-                url += "/";
             url += NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
         }
         return url;
     }
-
 }

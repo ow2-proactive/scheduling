@@ -173,4 +173,31 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
         // TODO two cycles has the same pattern => the code can be unified
         return authentication;
     }
+
+    /**
+     * Normalize the URL <code>url</code>.<br>
+     *
+     * @param url, the URL to normalize.
+     * @return  //localhost/ if the given url is null.<br>
+     *          the given URL with // prepended if it does not contain any scheme identifier
+     *          the given URL with / appended if URL does not end with / and does not
+     *          contain any path element,<br>
+     *          or the given URL, unchanged.
+     */
+    public static String normalize(String url) {
+        if (url == null || url.trim().equals("")) {
+            url = "//localhost/";
+        } else {
+            url = url.trim();
+        }
+        if (!url.contains("//")) {
+            url = "//" + url;
+        }
+
+        String[] elements = url.split("/", -2);
+        if (elements.length == 3 && !url.endsWith("/")) {
+            url += "/";
+        }
+        return url;
+    }
 }
