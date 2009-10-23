@@ -69,18 +69,22 @@ public class TaskClassLoader extends ClassLoader {
         super(parent);
         this.remoteServer = remoteServer;
         // look for the ext classpath dir if any
-        String ecd = System.getProperty(EXT_CLASSPATH_PROPERTY);
-        if (ecd != null && !"".equals(ecd)) {
-            logger_dev.debug("Extra classpath directory is set to " + ecd);
-            File extcp = new File(ecd);
-            if (extcp.exists() && extcp.isDirectory() && extcp.canRead()) {
-                this.extClasspathDir = extcp;
+        try {
+            String ecd = System.getProperty(EXT_CLASSPATH_PROPERTY);
+            if (ecd != null && !"".equals(ecd)) {
+                logger_dev.debug("Extra classpath directory is set to " + ecd);
+                File extcp = new File(ecd);
+                if (extcp.exists() && extcp.isDirectory() && extcp.canRead()) {
+                    this.extClasspathDir = extcp;
+                } else {
+                    logger_dev.warn(extcp.getAbsolutePath() +
+                        " is not a readable directory : cannot use extra classpath directory.");
+                }
             } else {
-                logger_dev.warn(extcp.getAbsolutePath() +
-                    " is not a readable directory : cannot use extra classpath directory.");
+                logger_dev.debug("Extra classpath directory is not set.");
             }
-        } else {
-            logger_dev.debug("Extra classpath directory is not set.");
+        } catch (SecurityException e) {
+            logger_dev.warn("Extra classpath cannot be accessed.", e);
         }
 
     }
