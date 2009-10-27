@@ -47,6 +47,7 @@ public class CharacterLargeOBject extends BinaryLargeOBject {
     /**
      * @see org.hibernate.usertype.UserType#sqlTypes()
      */
+    @Override
     public int[] sqlTypes() {
         return new int[] { Types.BLOB };
     }
@@ -54,6 +55,7 @@ public class CharacterLargeOBject extends BinaryLargeOBject {
     /**
      * @see org.hibernate.usertype.UserType#returnedClass()
      */
+    @Override
     public Class<?> returnedClass() {
         return String[].class;
     }
@@ -61,6 +63,7 @@ public class CharacterLargeOBject extends BinaryLargeOBject {
     /**
      * @see org.hibernate.usertype.UserType#equals(java.lang.Object, java.lang.Object)
      */
+    @Override
     public boolean equals(Object x, Object y) {
         return (x == y) || (x != null && y != null && java.util.Arrays.equals((String[]) x, (String[]) y));
     }
@@ -68,6 +71,7 @@ public class CharacterLargeOBject extends BinaryLargeOBject {
     /**
      * @see org.hibernate.usertype.UserType#deepCopy(java.lang.Object)
      */
+    @Override
     public Object deepCopy(Object value) {
         if (value == null)
             return null;

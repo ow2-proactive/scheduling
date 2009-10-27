@@ -51,11 +51,13 @@ import functionaltests.RMTHelper;
 public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         TestGCMInfrastructureReleaseWhenIdlePolicy {
 
+    @Override
     protected String getDescriptor() {
         return TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
                 "/functionaltests/nodesource/1node.xml").getPath();
     }
 
+    @Override
     protected void createDefaultNodeSource(String sourceName) throws Exception {
 
         byte[] hosts = "localhost1 localhost2 localhost3 localhost4 localhost5".getBytes();

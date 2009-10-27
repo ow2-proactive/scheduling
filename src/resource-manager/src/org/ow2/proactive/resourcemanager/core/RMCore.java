@@ -264,6 +264,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             // adding shutdown hook
             final RMCore rmcoreStub = (RMCore) PAActiveObject.getStubOnThis();
             Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
                 public void run() {
                     RMCore.this.registerTrustedService(PAActiveObject.getBodyOnThis().getID());
                     rmcoreStub.shutdown(true);

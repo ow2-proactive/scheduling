@@ -122,6 +122,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
      * @param eventType the type of the received event 
      */
+    @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
         switch (eventType) {
             case STARTED:
@@ -164,6 +165,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param job info
      */
+    @Override
     protected void jobPendingToRunningEvent(JobInfo info) {
         super.jobPendingToRunningEvent(info);
         // Call the private method to calculate the mean pending time
@@ -175,6 +177,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param info the job's information
      */
+    @Override
     protected void jobRunningToFinishedEvent(JobInfo info) {
         super.jobRunningToFinishedEvent(info);
         // Call the private method to compute the mean execution time
@@ -199,6 +202,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param job the state of the job
      */
+    @Override
     public void jobSubmittedEvent(JobState job) {
         super.jobSubmittedEvent(job);
         // Call the private method to calculate the mean arrival time
@@ -210,6 +214,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param info task's information
      */
+    @Override
     protected void taskPendingToRunningEvent(TaskInfo info) {
         super.taskPendingToRunningEvent(info);
         // Calculate the Pending time for this Task (taskStartTime - jobSubmittedTime)
@@ -227,6 +232,7 @@ public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements Sch
      * 
      * @param info task's information
      */
+    @Override
     protected void taskRunningToFinishedEvent(TaskInfo info) {
         super.taskRunningToFinishedEvent(info);
         // Calculate the Pending time for this Task (taskFinishedTime - taskStartTime)

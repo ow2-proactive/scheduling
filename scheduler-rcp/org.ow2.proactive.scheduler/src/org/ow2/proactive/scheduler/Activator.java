@@ -121,26 +121,32 @@ public class Activator extends AbstractUIPlugin {
     public class IC2DHandler extends Handler implements URLStreamHandlerService {
         protected URLStreamHandlerSetter realHandler;
 
+        @Override
         public boolean equals(URL u1, URL u2) {
             return super.equals(u1, u2);
         }
 
+        @Override
         public int getDefaultPort() {
             return super.getDefaultPort();
         }
 
+        @Override
         public InetAddress getHostAddress(URL u) {
             return super.getHostAddress(u);
         }
 
+        @Override
         public int hashCode(URL u) {
             return super.hashCode(u);
         }
 
+        @Override
         public boolean hostsEqual(URL u1, URL u2) {
             return super.hostsEqual(u1, u2);
         }
 
+        @Override
         public URLConnection openConnection(URL u) throws IOException {
             return super.openConnection(u);
         }
@@ -150,10 +156,12 @@ public class Activator extends AbstractUIPlugin {
             super.parseURL(u, spec, start, limit);
         }
 
+        @Override
         public boolean sameFile(URL u1, URL u2) {
             return super.sameFile(u1, u2);
         }
 
+        @Override
         public String toExternalForm(URL u) {
             return super.toExternalForm(u);
         }
@@ -166,6 +174,7 @@ public class Activator extends AbstractUIPlugin {
          * @deprecated This method is only for compatibility with handlers written
          *             for JDK 1.1.
          */
+        @Override
         protected void setURL(URL u, String proto, String host, int port, String file, String ref) {
             realHandler.setURL(u, proto, host, port, file, ref);
         }
@@ -176,6 +185,7 @@ public class Activator extends AbstractUIPlugin {
          *
          * @see "java.net.URLStreamHandler.setURL(URL,String,String,int,String,String,String,String)"
          */
+        @Override
         protected void setURL(URL u, String proto, String host, int port, String auth, String user,
                 String path, String query, String ref) {
             realHandler.setURL(u, proto, host, port, auth, user, path, query, ref);

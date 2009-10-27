@@ -8,11 +8,9 @@
 
 package org.ow2.proactive.scheduler.ext.filessplitmerge.textualui.genericcommands;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.JobPostTreatmentManagerHolder;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions.NotInitializedException;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;

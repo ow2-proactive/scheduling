@@ -107,6 +107,7 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
     /**
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
+    @Override
     public void initActivity(Body body) {
         try {
             thisStub = (RMUserImpl) PAActiveObject.getStubOnThis();
@@ -232,10 +233,12 @@ public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, In
         return rmcore.getRMInitialState().getNodeSource();
     }
 
+    @Override
     public Logger getLogger() {
         return logger;
     }
 
+    @Override
     public boolean connect(UniqueID id) {
         return registerTrustedService(id);
     }

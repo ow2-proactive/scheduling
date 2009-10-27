@@ -924,6 +924,7 @@ class FileUtils {
      */
     public String getDefaultEncoding() {
         InputStreamReader is = new InputStreamReader(new InputStream() {
+            @Override
             public int read() {
                 return -1;
             }

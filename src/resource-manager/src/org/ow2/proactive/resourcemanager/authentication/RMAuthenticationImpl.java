@@ -166,6 +166,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         return ProActiveLogger.getLogger(RMLoggers.CONNECTION);
     }
 
+    @Override
     protected String getLoginMethod() {
         return PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString();
     }

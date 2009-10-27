@@ -53,6 +53,7 @@ public class TableLabelProvider extends ColumnLabelProvider {
         this.columnIndex = columnNumber;
     }
 
+    @Override
     public Image getImage(Object element) {
         if (element instanceof Node && columnIndex == STATE_COLUMN_NUMBER) {
             switch (((Node) element).getState()) {
@@ -69,6 +70,7 @@ public class TableLabelProvider extends ColumnLabelProvider {
         return null;
     }
 
+    @Override
     public String getText(Object element) {
         if (element instanceof Node) {
             Node node = (Node) element;
@@ -92,22 +94,27 @@ public class TableLabelProvider extends ColumnLabelProvider {
         return null;
     }
 
+    @Override
     public int getToolTipDisplayDelayTime(Object object) {
         return 800;
     }
 
+    @Override
     public int getToolTipTimeDisplayed(Object object) {
         return 3000;
     }
 
+    @Override
     public Point getToolTipShift(Object object) {
         return new Point(5, 5);
     }
 
+    @Override
     public boolean useNativeToolTip(Object object) {
         return false;
     }
 
+    @Override
     public String getToolTipText(Object element) {
         if (element instanceof Node && columnIndex == STATE_COLUMN_NUMBER) {
             switch (((Node) element).getState()) {

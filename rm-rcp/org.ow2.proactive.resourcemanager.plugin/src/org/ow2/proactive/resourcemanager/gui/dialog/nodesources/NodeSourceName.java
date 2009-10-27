@@ -65,6 +65,7 @@ public class NodeSourceName extends Composite {
         nameText.setLayoutData(fd);
     }
 
+    @Override
     protected void checkSubclass() {
     }
 

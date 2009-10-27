@@ -595,6 +595,7 @@ public class Credentials implements Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return "[" + algorithm + " " + size + "b " + cipher + "]";
     }

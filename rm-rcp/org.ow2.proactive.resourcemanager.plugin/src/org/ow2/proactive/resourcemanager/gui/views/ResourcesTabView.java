@@ -127,6 +127,7 @@ public class ResourcesTabView extends ViewPart {
      * sacrifices tabViewer to garbage collector
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
      */
+    @Override
     public void dispose() {
         super.dispose();
         tabViewer = null;

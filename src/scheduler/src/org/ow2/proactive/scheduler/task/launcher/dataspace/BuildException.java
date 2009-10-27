@@ -87,6 +87,7 @@ class BuildException extends RuntimeException {
      * @return the nested exception, or <code>null</code> if no
      *         exception is associated with this one
      */
+    @Override
     public Throwable getCause() {
         return getException();
     }
@@ -96,6 +97,7 @@ class BuildException extends RuntimeException {
      *
      * @return the location of the error and the error message
      */
+    @Override
     public String toString() {
         return getMessage();
     }
@@ -104,6 +106,7 @@ class BuildException extends RuntimeException {
      * Prints the stack trace for this exception and any
      * nested exception to <code>System.err</code>.
      */
+    @Override
     public void printStackTrace() {
         printStackTrace(System.err);
     }
@@ -115,6 +118,7 @@ class BuildException extends RuntimeException {
      * @param ps The PrintStream to print the stack trace to.
      *           Must not be <code>null</code>.
      */
+    @Override
     public void printStackTrace(PrintStream ps) {
         synchronized (ps) {
             super.printStackTrace(ps);
@@ -132,6 +136,7 @@ class BuildException extends RuntimeException {
      * @param pw The PrintWriter to print the stack trace to.
      *           Must not be <code>null</code>.
      */
+    @Override
     public void printStackTrace(PrintWriter pw) {
         synchronized (pw) {
             super.printStackTrace(pw);

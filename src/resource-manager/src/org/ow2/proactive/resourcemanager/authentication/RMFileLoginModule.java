@@ -51,6 +51,7 @@ public class RMFileLoginModule extends FileLoginModule {
     /**
      * Returns login file name from resource manager configuration file
      */
+    @Override
     protected String getLoginFileName() {
 
         String loginFile = PAResourceManagerProperties.RM_LOGIN_FILE.getValueAsString();
@@ -66,6 +67,7 @@ public class RMFileLoginModule extends FileLoginModule {
     /**
      * Returns group file name from resource manager configuration file
      */
+    @Override
     protected String getGroupFileName() {
         String groupFile = PAResourceManagerProperties.RM_GROUP_FILE.getValueAsString();
         //test that group file path is an absolute path or not

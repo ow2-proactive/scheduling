@@ -85,6 +85,7 @@ public class TestMultipleUsersMakingMassivGetResultRequest extends FunctionalTes
         //start threads
         for (int i = 0; i < ThreadNumber; i++) {
             new Thread() {
+                @Override
                 public void run() {
                     try {
                         //connect the scheduler

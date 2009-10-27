@@ -31,10 +31,6 @@
  */
 package org.ow2.proactive.jmx;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Collections;
 
 import javax.management.remote.JMXAuthenticator;

@@ -133,6 +133,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
      * 
      * @see org.objectweb.proactive.extensions.masterworker.core.AOWorker#initActivity(org.objectweb.proactive.Body)
      */
+    @Override
     public void initActivity(Body body) {
         stubOnThis = (AOSchedulerWorker) PAActiveObject.getStubOnThis();
         SchedulerAuthenticationInterface auth;
@@ -172,6 +173,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         stubOnThis.getTaskAndSchedule();
     }
 
+    @Override
     public void clear() {
         for (JobId id : processing.keySet()) {
             try {
@@ -187,6 +189,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     /**
      * ScheduleTask : find a new task to run (actually here a task is a scheduler job)
      */
+    @Override
     public void scheduleTask() {
         if (debug) {
             logger.debug(name + " schedules tasks...");
@@ -238,6 +241,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     /**
      * Terminate this worker
      */
+    @Override
     public BooleanWrapper terminate() {
         try {
             scheduler.disconnect();

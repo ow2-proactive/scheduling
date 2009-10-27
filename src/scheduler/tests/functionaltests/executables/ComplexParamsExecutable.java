@@ -19,6 +19,7 @@ public class ComplexParamsExecutable extends JavaExecutable {
         return null;
     }
 
+    @Override
     public void init(Map<String, Serializable> args) throws Exception {
         this.param1 = (UserTypeA) args.get("param1");
     }

@@ -104,6 +104,7 @@ public class EventsReceiver implements InitActive, RMEventListener {
 
     private void startPinger() {
         pinger = new Thread() {
+            @Override
             public void run() {
                 while (!pinger.isInterrupted()) {
                     try {

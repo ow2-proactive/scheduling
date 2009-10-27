@@ -32,8 +32,6 @@
 package org.ow2.proactive.resourcemanager.gui.dialog.nodesources;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -302,6 +300,7 @@ public class ConfigurablePanel extends Group {
 
     }
 
+    @Override
     protected void checkSubclass() {
     }
 

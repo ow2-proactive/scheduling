@@ -68,6 +68,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     protected SchedulerState state;
     protected UserSchedulerInterface userInterface;
 
+    @Override
     public void configure(Object... params) throws RMException {
         SchedulerAuthenticationInterface authentication;
 
@@ -85,6 +86,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         }
     }
 
+    @Override
     public BooleanWrapper activate() {
         SchedulerAuthenticationInterface authentication;
         try {
@@ -96,6 +98,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         return new BooleanWrapper(true);
     }
 
+    @Override
     public void shutdown() {
         try {
             userInterface.removeEventListener();

@@ -227,36 +227,42 @@ class EmptyDatabaseManager extends DatabaseManager {
     /**
      * Do nothing
      */
+    @Override
     public void setProperty(String propertyName, String value) {
     }
 
     /**
      * Do nothing
      */
+    @Override
     public void build() {
     }
 
     /**
      * Do nothing
      */
+    @Override
     public void close() {
     }
 
     /**
      * Do nothing
      */
+    @Override
     public void startTransaction() {
     }
 
     /**
      * Do nothing
      */
+    @Override
     public void commitTransaction() {
     }
 
     /**
      * Do nothing
      */
+    @Override
     public void rollbackTransaction() {
     }
 
@@ -265,6 +271,7 @@ class EmptyDatabaseManager extends DatabaseManager {
      *
      * @param o the new object to store.
      */
+    @Override
     public void register(Object o) {
         InternalJob job = (InternalJob) o;
         jobs.put(job.getId(), job);
@@ -273,18 +280,21 @@ class EmptyDatabaseManager extends DatabaseManager {
     /**
      * Do nothing
      */
+    @Override
     public void delete(Object o) {
     }
 
     /**
      * Do nothing
      */
+    @Override
     public void update(Object o) {
     }
 
     /**
      * Return an empty list
      */
+    @Override
     public <T> List<T> recover(Class<T> egClass) {
         return recover(egClass, new Condition[] {});
     }
@@ -294,6 +304,7 @@ class EmptyDatabaseManager extends DatabaseManager {
      * If egClass is TaskresultImpl, return the taskResult corresponding to the given TaskId in the given condition,
      * Otherwise, return an empty list
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> recover(Class<T> egClass, Condition... conditions) {
         if (conditions == null || conditions.length == 0) {
@@ -316,6 +327,7 @@ class EmptyDatabaseManager extends DatabaseManager {
     /**
      * Return an empty list of InternalJob
      */
+    @Override
     public List<InternalJob> recoverAllJobs() {
         return recoverAllJobs(null);
     }
@@ -323,6 +335,7 @@ class EmptyDatabaseManager extends DatabaseManager {
     /**
      * Return an empty list of InternalJob
      */
+    @Override
     public List<InternalJob> recoverAllJobs(RecoverCallback callback) {
         return new ArrayList<InternalJob>();
     }
@@ -330,18 +343,21 @@ class EmptyDatabaseManager extends DatabaseManager {
     /**
      * Do nothing
      */
+    @Override
     public void synchronize(Object o) {
     }
 
     /**
      * Do nothing
      */
+    @Override
     public void load(Object o) {
     }
 
     /**
      * Do nothing
      */
+    @Override
     public void unload(Object o) {
     }
 

@@ -146,10 +146,12 @@ public abstract class ProcessTreeKiller {
      * Fallback implementation that doesn't do anything clever.
      */
     private static final ProcessTreeKiller DEFAULT = new ProcessTreeKiller() {
+        @Override
         public void kill(Process proc) {
             proc.destroy();
         }
 
+        @Override
         public void kill(Process proc, Map<String, String> modelEnvVars) {
             proc.destroy();
         }
@@ -165,6 +167,7 @@ public abstract class ProcessTreeKiller {
         /**
          * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process)
          */
+        @Override
         public void kill(Process proc) {
             new WinProcess(proc).killRecursively();
         }
@@ -172,6 +175,7 @@ public abstract class ProcessTreeKiller {
         /**
          * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process, java.util.Map)
          */
+        @Override
         public void kill(Process proc, Map<String, String> modelEnvVars) {
             kill(proc);
 
@@ -204,6 +208,7 @@ public abstract class ProcessTreeKiller {
         /**
          * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process)
          */
+        @Override
         public void kill(Process proc) {
             kill(proc, null);
         }
@@ -213,6 +218,7 @@ public abstract class ProcessTreeKiller {
         /**
          * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process, java.util.Map)
          */
+        @Override
         public void kill(Process proc, Map<String, String> modelEnvVars) {
             S system = createSystem();
             UnixProcess p;
@@ -390,11 +396,13 @@ public abstract class ProcessTreeKiller {
      * Implementation for Linux that uses <tt>/proc</tt>.
      */
     private static final class Linux extends Unix<Linux.LinuxSystem> {
+        @Override
         protected LinuxSystem createSystem() {
             return new LinuxSystem();
         }
 
         static class LinuxSystem extends Unix.UnixSystem<LinuxProcess> {
+            @Override
             protected LinuxProcess createProcess(int pid) throws IOException {
                 return new LinuxProcess(this, pid);
             }
@@ -425,14 +433,17 @@ public abstract class ProcessTreeKiller {
                     throw new IOException("Failed to parse PPID from /proc/" + pid + "/status");
             }
 
+            @Override
             public int getPid() {
                 return pid;
             }
 
+            @Override
             public LinuxProcess getParent() {
                 return system.get(ppid);
             }
 
+            @Override
             public synchronized EnvVars getEnvVars() {
                 if (envVars != null)
                     return envVars;
@@ -463,11 +474,13 @@ public abstract class ProcessTreeKiller {
      * that does a lot of pointer manipulation and what not.
      */
     private static final class Solaris extends Unix<Solaris.SolarisSystem> {
+        @Override
         protected SolarisSystem createSystem() {
             return new SolarisSystem();
         }
 
         static class SolarisSystem extends Unix.UnixSystem<SolarisProcess> {
+            @Override
             protected SolarisProcess createProcess(int pid) throws IOException {
                 return new SolarisProcess(this, pid);
             }
@@ -546,14 +559,17 @@ public abstract class ProcessTreeKiller {
                     return i;
             }
 
+            @Override
             public int getPid() {
                 return pid;
             }
 
+            @Override
             public SolarisProcess getParent() {
                 return system.get(ppid);
             }
 
+            @Override
             public synchronized EnvVars getEnvVars() {
                 if (envVars != null)
                     return envVars;

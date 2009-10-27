@@ -44,6 +44,7 @@ import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
 
 public class TreeLabelProvider extends ColumnLabelProvider {
 
+    @Override
     public Image getImage(Object obj) {
         switch (((TreeLeafElement) obj).getType()) {
             case HOST:
@@ -68,26 +69,32 @@ public class TreeLabelProvider extends ColumnLabelProvider {
         return null;
     }
 
+    @Override
     public String getText(Object element) {
         return element.toString();
     }
 
+    @Override
     public int getToolTipDisplayDelayTime(Object object) {
         return 800;
     }
 
+    @Override
     public int getToolTipTimeDisplayed(Object object) {
         return 3000;
     }
 
+    @Override
     public Point getToolTipShift(Object object) {
         return new Point(5, 5);
     }
 
+    @Override
     public boolean useNativeToolTip(Object object) {
         return false;
     }
 
+    @Override
     public String getToolTipText(Object obj) {
         if (((TreeLeafElement) obj).getType() == TreeElementType.NODE) {
             switch (((Node) obj).getState()) {

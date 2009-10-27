@@ -61,6 +61,7 @@ public class JVMView extends View {
         }
     }
 
+    @Override
     public String toString() {
         return "JVM: " + element.getName();
     }

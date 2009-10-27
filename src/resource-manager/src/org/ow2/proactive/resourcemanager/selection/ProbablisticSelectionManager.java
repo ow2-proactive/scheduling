@@ -86,6 +86,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @param exclusionNodes - exclusion nodes list
      * @return candidates node list for script execution
      */
+    @Override
     public Collection<RMNode> arrangeNodesForScriptExecution(List<SelectionScript> selectionScriptList,
             final Collection<RMNode> freeNodes, NodeSet exclusionNodes) {
 
@@ -172,6 +173,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @param rmnode - target node
      * @return true if script will pass on the node
      */
+    @Override
     public boolean isPassed(SelectionScript script, RMNode rmnode) {
         if (probabilities.containsKey(script) && probabilities.get(script).containsKey(rmnode)) {
             Probability p = probabilities.get(script).get(rmnode);
@@ -191,6 +193,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @param rmnode - node on which script has been executed
      * @return whether node is selected
      */
+    @Override
     public boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
             RMNode rmnode) {
 

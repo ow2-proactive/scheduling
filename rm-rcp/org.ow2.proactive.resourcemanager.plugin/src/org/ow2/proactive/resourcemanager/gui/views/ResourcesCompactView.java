@@ -52,6 +52,7 @@ public class ResourcesCompactView extends ViewPart {
         instance = this;
     }
 
+    @Override
     public void createPartControl(Composite parent) {
         compactView = new CompactViewer(parent);
 
@@ -75,6 +76,7 @@ public class ResourcesCompactView extends ViewPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
      */
+    @Override
     public void dispose() {
         super.dispose();
         compactView.dispose();

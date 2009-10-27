@@ -12,6 +12,7 @@ public class NodeSourceEventMonitor extends RMEventMonitor {
         this.nodeSourceName = nodeSourceName;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (super.equals(o)) {
             return (((NodeSourceEventMonitor) o).getNodeSourceName().equals(nodeSourceName));

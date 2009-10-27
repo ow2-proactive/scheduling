@@ -148,6 +148,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
      * @throws RMException
      *             invalid parameters, policy creation fails
      */
+    @Override
     public void configure(Object... params) throws RMException {
         super.configure(params);
         try {
@@ -212,6 +213,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     /**
      * {@inheritDoc}
      */
+    @Override
     public BooleanWrapper activate() {
         thisStub = (EC2Policy) PAActiveObject.getStubOnThis();
         BooleanWrapper activationStatus = super.activate();
@@ -240,6 +242,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     /**
      * {@inheritDoc}
      */
+    @Override
     protected SchedulerEvent[] getEventsList() {
         return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED,
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED };
@@ -248,6 +251,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     /**
      * {@inheritDoc}
      */
+    @Override
     protected SchedulerEventListener getSchedulerListener() {
         return thisStub;
     }
@@ -417,6 +421,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     /**
      * @return compact Policy status
      */
+    @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [release cycle: " +
             releaseCycle + "s refresh frequency: " + refreshTime + "s load factor: " + loadFactor + "]";
@@ -425,6 +430,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     /**
      * @return quick Policy description
      */
+    @Override
     public String getDescription() {
         return "Allocates resources according to the Scheduler loading factor,\n"
             + "releases resources considering EC2 instances are paid by the hour";

@@ -188,6 +188,7 @@ public class PluginDescriptor implements Serializable {
         return buffer.toString();
     }
 
+    @Override
     public String toString() {
         String result = "Name: " + beautifyName(pluginName) + "\n";
         result += "Description: " + pluginDescription + "\n";

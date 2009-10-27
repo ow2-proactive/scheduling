@@ -53,6 +53,7 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
      *
      * @return LDAP configuration file name defined in scheduler configuration file
      */
+    @Override
     protected String getLDAPConfigFileName() {
         String ldapFile = PASchedulerProperties.SCHEDULER_LDAP_CONFIG_FILE_PATH.getValueAsString();
         //test that ldap file path is an absolute path or not
@@ -68,6 +69,7 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
      * Used for authentication fall-back
      * @return login file name from scheduler configuration file
      */
+    @Override
     protected String getLoginFileName() {
         String loginFile = PASchedulerProperties.SCHEDULER_LOGIN_FILENAME.getValueAsString();
         //test that login file path is an absolute path or not
@@ -84,6 +86,7 @@ public class SchedulerLDAPLoginModule extends LDAPLoginModule {
      * Used for group membership verification fall-back.
      * @return group file name from scheduler configuration file
      */
+    @Override
     protected String getGroupFileName() {
         String groupFile = PASchedulerProperties.SCHEDULER_GROUP_FILENAME.getValueAsString();
         //test that group file path is an absolute path or not

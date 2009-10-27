@@ -116,6 +116,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void acquireAllNodes() {
         if (timer == null) {
             timer = new Timer(true);
@@ -141,6 +142,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void acquireNode() {
         if (timer == null) {
             timer = new Timer(true);
@@ -174,6 +176,7 @@ public class EC2Infrastructure extends InfrastructureManager {
      * @throws RMException
      *             when the configuration could not be set
      */
+    @Override
     public void configure(Object... parameters) throws RMException {
 
         /** parameters look fine */
@@ -225,6 +228,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeNode(Node node) throws RMException {
 
         synchronized (this.ec2d) {
@@ -344,6 +348,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return "EC2 Infrastructure";
     }
@@ -351,6 +356,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void registerAcquiredNode(Node node) throws RMException {
         synchronized (this.ec2d) {
             InetAddress nodeAddr = node.getVMInformation().getInetAddress();

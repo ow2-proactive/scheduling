@@ -122,6 +122,7 @@ public class MatlabConfiguration implements Serializable {
         return matlabCommandName;
     }
 
+    @Override
     public String toString() {
         return "Matlab home : " + matlabHome + nl + "Matlab version : " + matlabVersion + nl +
             "Matlab lib directory name : " + matlabLibDirName + nl + "Matlab bin directory  : " +

@@ -411,6 +411,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
     }
 
     /** @return a string describing the object */
+    @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName());
     }
@@ -1069,18 +1070,21 @@ public class VirtualInfrastructure extends InfrastructureManager {
      */
     private enum InfrastructureType implements Serializable {
         XEN_SERVER("xenserver") {
+            @Override
             protected VirtualMachineManager2 getVMM(String url, String user, String pwd)
                     throws VirtualServiceException {
                 return new XenServerVMM(url, user, pwd);
             }
         },
         VMWARE("vmware") {
+            @Override
             protected VirtualMachineManager2 getVMM(String url, String user, String pwd)
                     throws VirtualServiceException {
                 return new VMwareVMM(url, user, pwd);
             }
         },
         VIRTUALBOX("virtualbox") {
+            @Override
             protected VirtualMachineManager2 getVMM(String url, String user, String pwd)
                     throws VirtualServiceException {
                 return new VirtualboxVMM(url, user, pwd);

@@ -61,6 +61,7 @@ public class ResultsAndLogs implements Serializable {
         return logs;
     }
 
+    @Override
     public String toString() {
         return result.toString();
     }

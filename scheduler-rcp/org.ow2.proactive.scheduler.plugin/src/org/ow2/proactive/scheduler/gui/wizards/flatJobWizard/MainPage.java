@@ -186,6 +186,7 @@ public class MainPage extends WizardPage implements ModifyListener {
         getWizard().getContainer().updateButtons();
     }
 
+    @Override
     public boolean canFlipToNextPage() {
         setErrorMessage(this.findMostSevere());
         if ("".equals(jobNameText.getText()) || "".equals(commandPathText.getText())) {
@@ -195,6 +196,7 @@ public class MainPage extends WizardPage implements ModifyListener {
         }
     }
 
+    @Override
     public IWizardPage getNextPage() {
         String selectionScriptPath = null;
 

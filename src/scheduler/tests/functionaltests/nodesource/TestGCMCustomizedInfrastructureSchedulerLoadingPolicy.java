@@ -58,6 +58,7 @@ import functionaltests.SchedulerTHelper;
 public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy {
 
+    @Override
     protected Object[] getPolicyParams() throws Exception {
         SchedulerAuthenticationInterface auth = SchedulerConnection
                 .join(SchedulerTHelper.schedulerDefaultURL);
@@ -71,11 +72,13 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         };
     }
 
+    @Override
     protected String getDescriptor() {
         return TestGCMInfrastructureReleaseWhenIdlePolicy.class.getResource(
                 "/functionaltests/nodesource/1node.xml").getPath();
     }
 
+    @Override
     protected void createDefaultNodeSource(String sourceName) throws Exception {
 
         byte[] hosts = InetAddress.getLocalHost().getHostName().getBytes();
@@ -87,6 +90,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
+    @Override
     @org.junit.Test
     public void action() throws Exception {
 

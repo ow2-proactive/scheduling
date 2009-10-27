@@ -64,6 +64,7 @@ public class TestConcurrentUsers extends FunctionalTest {
         assertTrue(admin.getFreeNodesNumber().intValue() == 0);
 
         Thread t = new Thread() {
+            @Override
             public void run() {
                 try {
                     RMAuthentication auth = RMConnection.join(null);

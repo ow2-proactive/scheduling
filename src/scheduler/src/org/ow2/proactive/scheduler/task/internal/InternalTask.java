@@ -194,6 +194,7 @@ public abstract class InternalTask extends TaskState {
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskState#getTaskInfo()
      */
+    @Override
     public TaskInfo getTaskInfo() {
         return taskInfo;
     }
@@ -201,6 +202,7 @@ public abstract class InternalTask extends TaskState {
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskState#update(org.ow2.proactive.scheduler.common.task.TaskInfo)
      */
+    @Override
     public synchronized void update(TaskInfo taskInfo) {
         if (!getId().equals(taskInfo.getTaskId())) {
             throw new IllegalArgumentException(
@@ -369,6 +371,7 @@ public abstract class InternalTask extends TaskState {
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskState#getMaxNumberOfExecutionOnFailure()
      */
+    @Override
     public int getMaxNumberOfExecutionOnFailure() {
         return maxNumberOfExecutionOnFailure;
     }

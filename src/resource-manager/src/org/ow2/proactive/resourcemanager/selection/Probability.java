@@ -92,6 +92,7 @@ public class Probability {
     /**
      * Returns string probability representation
      */
+    @Override
     public String toString() {
         return String.valueOf(probability);
     }

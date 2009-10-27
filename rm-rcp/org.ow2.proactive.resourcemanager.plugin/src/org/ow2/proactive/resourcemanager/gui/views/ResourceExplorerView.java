@@ -157,6 +157,7 @@ public class ResourceExplorerView extends ViewPart {
      * Called when view is closed
      * sacrifices treeViewer to garbage collector
      */
+    @Override
     public void dispose() {
         super.dispose();
         treeViewer = null;

@@ -107,6 +107,7 @@ public class TaskEventMonitor extends JobEventMonitor {
         this.taskInfo = info;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (super.equals(o)) {
             return (((TaskEventMonitor) o).getTaskName().equals(taskName));

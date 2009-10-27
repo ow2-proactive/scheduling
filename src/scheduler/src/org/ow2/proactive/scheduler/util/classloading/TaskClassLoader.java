@@ -92,6 +92,7 @@ public class TaskClassLoader extends ClassLoader {
     /* (non-Javadoc)
      * @see java.lang.ClassLoader#loadClass(java.lang.String)
      */
+    @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
         return this.findClass(className);
     }
@@ -99,6 +100,7 @@ public class TaskClassLoader extends ClassLoader {
     /* (non-Javadoc)
      * @see java.lang.ClassLoader#findClass(java.lang.String)
      */
+    @Override
     public Class<?> findClass(String className) throws ClassNotFoundException {
         logger_dev.debug("Looking for class " + className);
         Class<?> res = this.findLoadedClass(className);

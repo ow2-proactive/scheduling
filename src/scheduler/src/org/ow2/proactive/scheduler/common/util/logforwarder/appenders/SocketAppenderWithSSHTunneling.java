@@ -89,6 +89,7 @@ public class SocketAppenderWithSSHTunneling extends SocketAppender {
         this.setPort(tunnel.getPort());
     }
 
+    @Override
     public void close() {
         super.close();
         try {

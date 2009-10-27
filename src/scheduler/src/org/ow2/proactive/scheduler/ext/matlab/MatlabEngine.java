@@ -40,10 +40,7 @@ import ptolemy.matlab.Engine.ConversionParameters;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.TimeUnit;
 
@@ -314,6 +311,7 @@ public class MatlabEngine {
             released = true;
         }
 
+        @Override
         protected void finalize() throws Throwable {
             release();
         }

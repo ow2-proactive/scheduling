@@ -129,6 +129,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      * @param propertyName the name of the property to set.
      * @param value the value of the property.
      */
+    @Override
     public void setProperty(String propertyName, String value) {
         if (sessionFactory != null) {
             logger.warn("WARNING : Property set while session factory have already been built ! (" +
@@ -149,6 +150,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      * Use the associated configuration to set the desired property to the desired value.<br />
      * See hibernate.cfg.xml for more details about the keys and values.
      */
+    @Override
     public void build() {
         try {
             if (sessionFactory == null) {
@@ -167,6 +169,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
     /**
      * Close the hibernate session factory.
      */
+    @Override
     public void close() {
         try {
             logger_dev.info("Closing current session");
@@ -190,6 +193,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      * then, (when multiple modifications are done) a call to {@link #commitTransaction()} OR {@link #rollbackTransaction()}
      * will terminate the transaction.
      */
+    @Override
     public void startTransaction() {
         synchronized (sessionlock) {
             Session s = globalSession.get();
@@ -205,6 +209,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      * Force a manually opened transaction to be committed.
      * See {@link #startTransaction()} for details.
      */
+    @Override
     public void commitTransaction() {
         synchronized (sessionlock) {
             Session s = globalSession.get();
@@ -224,6 +229,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      * Force a manually opened transaction to be rolledback.
      * See {@link #startTransaction()} for details.
      */
+    @Override
     public void rollbackTransaction() {
         synchronized (sessionlock) {
             Session s = globalSession.get();
@@ -294,6 +300,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      *
      * @param o the new object to store.
      */
+    @Override
     public void register(Object o) {
         checkIsEntity(o);
         Session session = beginTransaction();
@@ -314,6 +321,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      *
      * @param o the new object to delete.
      */
+    @Override
     public void delete(Object o) {
         checkIsEntity(o);
         Session session = beginTransaction();
@@ -335,6 +343,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      *
      * @param o the entity to update.
      */
+    @Override
     public void update(Object o) {
         checkIsEntity(o);
         Session session = beginTransaction();
@@ -356,6 +365,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      * @param egClass The class that represents the real type to be recover. (This type must be an Hibernate entity)
      * @return a list of every <T> type stored in the database.
      */
+    @Override
     public <T> List<T> recover(Class<T> egClass) {
         return recover(egClass, new Condition[] {});
     }
@@ -368,6 +378,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      * @param conditions a list of condition that represents the conditions of the request.
      * @return a list of every <T> type stored matching the given conditions.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> recover(Class<T> egClass, Condition... conditions) {
         //the goal is take advantage of polymorphism, so don't check if the class is an entity
@@ -414,6 +425,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      *
      * @return The list of unloaded job entities.
      */
+    @Override
     public List<InternalJob> recoverAllJobs() {
         return recoverAllJobs(null);
     }
@@ -428,6 +440,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      * 			then it will call the jobRecovered method each time a job is recovered.
      * @return The list of unloaded job entities.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public List<InternalJob> recoverAllJobs(RecoverCallback callback) {
         if (callback == null) {
@@ -508,6 +521,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      *
      * @param o the object entity to synchronize.
      */
+    @Override
     public void synchronize(Object o) {
         Class<?> clazz = o.getClass();
         checkIsEntity(clazz);
@@ -567,6 +581,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      *
      * @param o the object entity to load.
      */
+    @Override
     public void load(Object o) {
         Class<?> clazz = o.getClass();
         checkIsEntity(clazz);
@@ -658,6 +673,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
      *
      * @param o the object to unload.
      */
+    @Override
     public void unload(Object o) {
         Class<?> clazz = o.getClass();
         Field[] fields = getDeclaredFields(clazz, true);

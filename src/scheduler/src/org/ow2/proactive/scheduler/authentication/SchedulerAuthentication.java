@@ -215,6 +215,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
     /**
      * @see org.ow2.proactive.authentication.AuthenticationImpl#getLoginMethod()
      */
+    @Override
     protected String getLoginMethod() {
         return PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString();
     }

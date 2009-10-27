@@ -77,6 +77,7 @@ public class EventMonitor {
         return this.waitedEvent;
     }
 
+    @Override
     public boolean equals(Object o) {
         if ((o != null) && o instanceof EventMonitor) {
             return ((EventMonitor) o).getWaitedEvent() == waitedEvent;

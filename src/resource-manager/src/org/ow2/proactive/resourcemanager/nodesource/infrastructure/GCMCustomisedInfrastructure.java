@@ -70,6 +70,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * Do not initiate a real nodes deployment/acquisition as it's up to the
      * policy.
      */
+    @Override
     public void configure(Object... parameters) throws RMException {
         if (parameters == null) {
             // nothing to do
@@ -102,6 +103,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * Asynchronous request of all nodes acquisition.
      * Nodes should register themselves by calling {@link RMCore#addNode(String, String)}
      */
+    @Override
     public void acquireAllNodes() {
         logger.debug("Acquire all nodes request");
         for (String host : hosts.keySet()) {
@@ -124,6 +126,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * Asynchronous node acquisition request.
      * Proactive node should register itself by calling {@link RMCore#addNode(String, String)}
      */
+    @Override
     public void acquireNode() {
         logger.debug("Acquire node request");
         for (String host : hosts.keySet()) {
@@ -148,6 +151,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * @param node node to release
      * @throws RMException if any problems occurred
      */
+    @Override
     public void removeNode(Node node) throws RMException {
         super.removeNode(node);
 
@@ -164,6 +168,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
     /**
      * Node source description
      */
+    @Override
     public String getDescription() {
         return "Handles hosts from the list using specified gcm deployment descriptor\n"
             + "template with HOST java variable contract (see proactive documentation)";

@@ -46,6 +46,7 @@ public class RMEventMonitor {
         return this.waitedEvent;
     }
 
+    @Override
     public boolean equals(Object o) {
         if ((o != null) && o instanceof RMEventMonitor) {
             return ((RMEventMonitor) o).getWaitedEvent() == waitedEvent;

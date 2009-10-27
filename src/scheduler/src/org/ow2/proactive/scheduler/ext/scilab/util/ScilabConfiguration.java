@@ -73,6 +73,7 @@ public class ScilabConfiguration implements Serializable {
         return scilabScidir;
     }
 
+    @Override
     public String toString() {
         return "Scilab Home : " + scilabHome + nl + "Scilab libDir : " + scilabLibdir + nl +
             "Scilab SCIDir : " + scilabScidir;

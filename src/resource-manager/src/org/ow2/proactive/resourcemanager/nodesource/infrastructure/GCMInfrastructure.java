@@ -122,6 +122,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * Do not initiate a real nodes deployment/acquisition as it's up to the
      * policy.
      */
+    @Override
     public void configure(Object... parameters) throws RMException {
         if (parameters == null) {
             // nothing to add
@@ -143,6 +144,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * Asynchronous node acquisition request.
      * Not supported by this infrastructure manager.
      */
+    @Override
     public void acquireNode() {
         logger.error("acquireNode() is not a valid operation for GCM infrastructure");
     }
@@ -151,6 +153,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * Asynchronous request of all nodes acquisition.
      * Nodes should register themselves by calling {@link RMCore#addNode(String, String)}
      */
+    @Override
     public void acquireAllNodes() {
         logger.debug("Acquire all nodes request");
         if (!deploymentData.deployed) {
@@ -171,6 +174,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * @param node node to release
      * @throws RMException if any problems occurred
      */
+    @Override
     public void removeNode(Node node) throws RMException {
         try {
             super.removeNode(node);
@@ -259,6 +263,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
     /**
      * Node source string representation
      */
+    @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName());
     }
@@ -266,6 +271,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
     /**
      * Node source description
      */
+    @Override
     public String getDescription() {
         return "Infrastructure described in GCM deployment descriptor";
     }
@@ -273,6 +279,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void registerAcquiredNode(Node node) throws RMException {
         nodesCount++;
     }

@@ -153,6 +153,7 @@ public class JobEventMonitor extends EventMonitor {
         this.jobState = jState;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (super.equals(o)) {
             return (((JobEventMonitor) o).getJobId().equals(jobId));

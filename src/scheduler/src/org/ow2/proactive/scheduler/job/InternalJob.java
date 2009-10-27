@@ -176,6 +176,7 @@ public abstract class InternalJob extends JobState {
      *
      * @param info a taskInfo containing new information about the task.
      */
+    @Override
     public synchronized void update(TaskInfo info) {
         //ensure that is a JobInfoImpl
         //if not, we are in client side and client brings its own JobInfo Implementation
@@ -198,6 +199,7 @@ public abstract class InternalJob extends JobState {
      *
      * @param info the JobInfo to set
      */
+    @Override
     public synchronized void update(JobInfo info) {
         if (!getId().equals(info.getJobId())) {
             throw new IllegalArgumentException(
@@ -226,6 +228,7 @@ public abstract class InternalJob extends JobState {
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobState#getJobInfo()
      */
+    @Override
     public JobInfo getJobInfo() {
         return jobInfo;
     }
@@ -577,6 +580,7 @@ public abstract class InternalJob extends JobState {
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobState#getTasks()
      */
+    @Override
     public ArrayList<TaskState> getTasks() {
         return new ArrayList<TaskState>(tasks.values());
     }
@@ -584,6 +588,7 @@ public abstract class InternalJob extends JobState {
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobState#getHMTasks()
      */
+    @Override
     public Map<TaskId, TaskState> getHMTasks() {
         Map<TaskId, TaskState> tmp = new HashMap<TaskId, TaskState>();
         for (Entry<TaskId, InternalTask> e : tasks.entrySet()) {
@@ -735,6 +740,7 @@ public abstract class InternalJob extends JobState {
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobState#getOwner()
      */
+    @Override
     public String getOwner() {
         return owner;
     }

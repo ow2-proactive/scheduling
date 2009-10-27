@@ -56,11 +56,13 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfras
 
     protected byte[] hostsListData;
 
+    @Override
     protected void init() throws Exception {
         super.init();
         hostsListData = InetAddress.getLocalHost().getHostName().getBytes();
     }
 
+    @Override
     protected void createEmptyNodeSource(String sourceName) throws Exception {
         RMTHelper.getAdminInterface().createNodesource(sourceName,
                 GCMCustomisedInfrastructure.class.getName(), null, TimeSlotPolicy.class.getName(),
@@ -69,6 +71,7 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfras
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
+    @Override
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
         RMTHelper.getAdminInterface().createNodesource(sourceName,

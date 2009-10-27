@@ -64,6 +64,7 @@ public class ThreadReader implements Runnable {
         final boolean[] stop = new boolean[] { false };
 
         new Thread() {
+            @Override
             public void run() {
                 String str = null;
                 try {

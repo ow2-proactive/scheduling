@@ -53,6 +53,7 @@ public class PriorityPolicy extends Policy {
      *
      * @see org.ow2.proactive.scheduler.common.policy.Policy#getOrderedTasks(java.util.List)
      */
+    @Override
     public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();
         //sort jobs by priority

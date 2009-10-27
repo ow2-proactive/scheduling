@@ -190,6 +190,7 @@ public class CompactViewer implements ISelectionProvider {
             start();
         }
 
+        @Override
         public void run() {
             while (!stop) {
                 int numberOfReloadRequests = 0;

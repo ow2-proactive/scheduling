@@ -172,6 +172,7 @@ public class AdminController extends UserController {
         return false;
     }
 
+    @Override
     protected void connectJMXClient() throws JMXProviderException {
         try {
             PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(auth
@@ -186,6 +187,7 @@ public class AdminController extends UserController {
         }
     }
 
+    @Override
     protected String getCommandName() {
         return "scheduler-admin";
     }

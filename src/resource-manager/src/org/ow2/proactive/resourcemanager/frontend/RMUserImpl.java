@@ -366,6 +366,7 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
             start();
         }
 
+        @Override
         public void run() {
 
             // registering trusted service in order to call freeNodes of RMUser active object

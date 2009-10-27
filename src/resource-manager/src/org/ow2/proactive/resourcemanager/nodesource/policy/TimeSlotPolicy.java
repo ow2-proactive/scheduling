@@ -65,6 +65,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * Timer task acquired all node from infrastructure
      */
     private class AcquireTask extends TimerTask {
+        @Override
         public void run() {
             synchronized (timer) {
                 acquireAllNodes();
@@ -76,6 +77,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * Timer task released all node from infrastructure
      */
     private class ReleaseTask extends TimerTask {
+        @Override
         public void run() {
             synchronized (timer) {
                 // security trick
@@ -129,6 +131,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
      */
+    @Override
     public void configure(Object... policyParameters) throws RMException {
         try {
             // validation of date parameters
@@ -165,6 +168,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     /**
      * Activates the policy. Schedules acquire/release tasks with specified period.
      */
+    @Override
     public BooleanWrapper activate() {
 
         try {
@@ -187,6 +191,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     /**
      * Shutdown the policy and clears the timer.
      */
+    @Override
     public void shutdown() {
         synchronized (timer) {
             timer.cancel();
@@ -207,6 +212,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * Policy description for UI
      * @return policy description
      */
+    @Override
     public String getDescription() {
         return "Acquires and releases nodes at specified time.";
     }
@@ -214,6 +220,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     /**
      * Policy string representation.
      */
+    @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [Acquire Time: " +
             acquireTime + " Release Time: " + releaseTime + " Period: " + period + " ms]";

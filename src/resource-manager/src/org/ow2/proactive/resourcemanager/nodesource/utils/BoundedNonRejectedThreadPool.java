@@ -42,6 +42,7 @@ public class BoundedNonRejectedThreadPool extends ThreadPoolExecutor {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
     }
 
+    @Override
     public void execute(Runnable command) {
 
         //we need atomicity for the execute method.
@@ -71,6 +72,7 @@ public class BoundedNonRejectedThreadPool extends ThreadPoolExecutor {
         }
     }
 
+    @Override
     protected void afterExecute(Runnable r, Throwable t) {
         super.afterExecute(r, t);
         pauseLock.lock();

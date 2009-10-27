@@ -31,7 +31,6 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;

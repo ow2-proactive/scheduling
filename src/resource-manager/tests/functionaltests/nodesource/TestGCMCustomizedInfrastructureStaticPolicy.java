@@ -54,6 +54,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
 
     protected byte[] hostsListData;
 
+    @Override
     protected void init() throws Exception {
         // using localhost deployment for customized infrastructure
         String oneNodeescriptor = RMTHelper.class.getResource("/functionaltests/nodesource/1node.xml")
@@ -63,6 +64,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
         hostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostList)));
     }
 
+    @Override
     protected void createEmptyNodeSource(String sourceName) throws Exception {
         RMTHelper.getAdminInterface().createNodesource(sourceName,
                 GCMCustomisedInfrastructure.class.getName(), null, StaticPolicy.class.getName(), null);
@@ -70,6 +72,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
+    @Override
     protected void createNodeSourceWithNodes(String sourceName) throws Exception {
 
         // creating node source

@@ -160,6 +160,7 @@ public class AdminRMModel extends ConsoleModel {
     /**
      * @see org.ow2.proactive.utils.console.ConsoleModel#startModel()
      */
+    @Override
     public void startModel() throws Exception {
         checkIsReady();
         console.start(" > ");
@@ -492,6 +493,7 @@ public class AdminRMModel extends ConsoleModel {
 
     //***************** HELP SCREEN *******************
 
+    @Override
     protected String helpScreen() {
         StringBuilder out = new StringBuilder("Resource Manager controller commands are :" + newline +
             newline);

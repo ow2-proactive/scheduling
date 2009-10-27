@@ -59,6 +59,7 @@ public class SourceView extends View {
         }
     }
 
+    @Override
     public String toString() {
         return "Node source: " + element;
     }

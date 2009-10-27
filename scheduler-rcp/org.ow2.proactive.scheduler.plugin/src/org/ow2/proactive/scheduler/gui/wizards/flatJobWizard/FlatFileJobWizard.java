@@ -58,6 +58,7 @@ public class FlatFileJobWizard extends Wizard implements IWorkbenchWizard {
     /* (non-Javadoc)
      * @see org.eclipse.jface.wizard.Wizard#performFinish()
      */
+    @Override
     public boolean performFinish() {
         if (createdJob != null) {
             try {
@@ -78,6 +79,7 @@ public class FlatFileJobWizard extends Wizard implements IWorkbenchWizard {
     /* (non-Javadoc)
      * @see org.eclipse.jface.wizard.IWizard#addPages()
      */
+    @Override
     public void addPages() {
         mainPage = new MainPage();
         addPage(mainPage);
@@ -88,6 +90,7 @@ public class FlatFileJobWizard extends Wizard implements IWorkbenchWizard {
     public void init(IWorkbench workbench, IStructuredSelection selection) {
     }
 
+    @Override
     public boolean canFinish() {
         return canFinish;
     }

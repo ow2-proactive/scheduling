@@ -46,12 +46,14 @@ public class StaticPolicy extends NodeSourcePolicy {
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
      */
+    @Override
     public void configure(Object... policyParameters) {
     }
 
     /**
      * Activates static policy. Register a listener in RMMonitoring
      */
+    @Override
     public BooleanWrapper activate() {
         acquireAllNodes();
         return new BooleanWrapper(true);
@@ -60,6 +62,7 @@ public class StaticPolicy extends NodeSourcePolicy {
     /**
      * Description for the UI
      */
+    @Override
     public String getDescription() {
         return "Static nodes acquisition.";
     }
@@ -67,6 +70,7 @@ public class StaticPolicy extends NodeSourcePolicy {
     /**
      * Creates string representation of the policy
      */
+    @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName());
     }

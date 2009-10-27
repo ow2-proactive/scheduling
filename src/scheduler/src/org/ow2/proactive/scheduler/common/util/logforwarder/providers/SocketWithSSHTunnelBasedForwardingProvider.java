@@ -52,6 +52,7 @@ public class SocketWithSSHTunnelBasedForwardingProvider extends SocketBasedForwa
     /* (non-Javadoc)
      * @see org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider#createAppenderProvider(java.net.URI)
      */
+    @Override
     public AppenderProvider createAppenderProvider(URI serverURI) {
         // use ProActive defined ssh port if any
         if (PAProperties.PA_RMISSH_REMOTE_PORT.isSet()) {

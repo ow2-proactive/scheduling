@@ -53,6 +53,7 @@ public class SchedulerFileLoginModule extends FileLoginModule {
      *
      * @return login file name from scheduler configuration file
      */
+    @Override
     protected String getLoginFileName() {
         String loginFile = PASchedulerProperties.SCHEDULER_LOGIN_FILENAME.getValueAsString();
         //test that login file path is an absolute path or not
@@ -69,6 +70,7 @@ public class SchedulerFileLoginModule extends FileLoginModule {
      *
      * @return group file name from scheduler configuration file
      */
+    @Override
     protected String getGroupFileName() {
         String groupFile = PASchedulerProperties.SCHEDULER_GROUP_FILENAME.getValueAsString();
         //test that group file path is an absolute path or not

@@ -66,6 +66,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
      */
+    @Override
     public void configure(Object... policyParameters) throws RMException {
         super.configure(policyParameters);
         try {
@@ -79,6 +80,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
         thisStub = (ReleaseResourcesWhenSchedulerIdle) PAActiveObject.getStubOnThis();
     }
 
+    @Override
     public BooleanWrapper activate() {
         BooleanWrapper activationStatus = super.activate();
         if (!activationStatus.booleanValue()) {
@@ -90,23 +92,28 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
         return new BooleanWrapper(true);
     }
 
+    @Override
     protected SchedulerEvent[] getEventsList() {
         return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED };
     }
 
+    @Override
     protected SchedulerEventListener getSchedulerListener() {
         return thisStub;
     }
 
+    @Override
     public String getDescription() {
         return "Releases all resources when scheduler is idle for specified\ntime. Acquires them back on job submission.";
     }
 
+    @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [idle time: " + idleTime +
             " ms]";
     }
 
+    @Override
     public void jobSubmittedEvent(JobState jobState) {
         activeJobs++;
         debug("Job is submitted. Total number of jobs is " + activeJobs);
@@ -119,6 +126,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
         }
     }
 
+    @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
             case JOB_RUNNING_TO_FINISHED:
@@ -128,6 +136,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
                     debug("Schedule task to release resources in " + idleTime);
                     timer = new Timer(true);
                     timer.schedule(new TimerTask() {
+                        @Override
                         public void run() {
                             synchronized (timer) {
                                 thisStub.removeAllNodes(preemptive);

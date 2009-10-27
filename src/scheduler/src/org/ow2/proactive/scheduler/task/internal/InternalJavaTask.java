@@ -94,6 +94,7 @@ public class InternalJavaTask extends InternalTask {
      * @throws ActiveObjectCreationException If an active object creation failed.
      * @throws NodeException 
      */
+    @Override
     public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
             NodeException {
 

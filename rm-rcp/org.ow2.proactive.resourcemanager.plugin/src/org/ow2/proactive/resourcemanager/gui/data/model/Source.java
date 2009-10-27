@@ -54,6 +54,7 @@ public class Source extends TreeParentElement {
         return description;
     }
 
+    @Override
     public String toString() {
         return getName() + " [" + description + "]";
     }

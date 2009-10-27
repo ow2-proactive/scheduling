@@ -205,6 +205,7 @@ public class JobFactory_xpath extends JobFactory {
     /**
      * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.lang.String)
      */
+    @Override
     public Job createJob(String filePath) throws JobCreationException {
         Job job = null;
 
@@ -228,6 +229,7 @@ public class JobFactory_xpath extends JobFactory {
     /**
      * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.net.URI)
      */
+    @Override
     public Job createJob(URI filePath) throws JobCreationException {
         Job job = null;
 

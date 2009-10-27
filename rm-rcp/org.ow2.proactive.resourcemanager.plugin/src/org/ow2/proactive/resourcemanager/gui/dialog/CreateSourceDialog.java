@@ -119,6 +119,7 @@ public class CreateSourceDialog extends Dialog {
             pack();
         }
 
+        @Override
         protected void checkSubclass() {
         }
 

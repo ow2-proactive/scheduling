@@ -559,6 +559,7 @@ public class EC2Deployer implements java.io.Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return "EC2Deployer :: " + "User[" + this.AWS_USER + "] " + "Status[" +
             ((this.active) ? "active" : "unactive") + "] ";

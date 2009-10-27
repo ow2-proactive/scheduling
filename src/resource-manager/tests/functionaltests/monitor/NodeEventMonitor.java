@@ -21,6 +21,7 @@ public class NodeEventMonitor extends RMEventMonitor {
         this.nodeEvent = event;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (super.equals(o)) {
             if (o instanceof NodeEventMonitor) {

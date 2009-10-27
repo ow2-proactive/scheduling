@@ -30,7 +30,6 @@
  */
 package org.ow2.proactive.scheduler;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchConfigurer;

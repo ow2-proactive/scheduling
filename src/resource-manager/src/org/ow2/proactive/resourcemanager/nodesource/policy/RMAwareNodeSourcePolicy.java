@@ -59,6 +59,7 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
      * Activates the policy.
      * @return true if the policy has been activated successfully, false otherwise.
      */
+    @Override
     public BooleanWrapper activate() {
         rmMonitoring = nodeSource.getRMCore().getMonitoring();
         initialState = rmMonitoring.addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
@@ -68,6 +69,7 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
     /**
      * {@inheritDoc}
      */
+    @Override
     public void shutdown() {
         if (!rmShuttingDown) {
             try {

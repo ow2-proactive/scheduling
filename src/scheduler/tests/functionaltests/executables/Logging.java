@@ -51,6 +51,7 @@ public class Logging extends JavaExecutable {
     public Logging() {
     }
 
+    @Override
     public Serializable execute(TaskResult... results) throws Throwable {
 
         if (this.stream.equals("out")) {
@@ -68,6 +69,7 @@ public class Logging extends JavaExecutable {
         return RESULT;
     }
 
+    @Override
     public void init(Map<String, Serializable> args) throws Exception {
         this.numberOfLines = Integer.parseInt((String) args.get("lines"));
         this.sleepTime = Long.parseLong((String) args.get("sleep"));

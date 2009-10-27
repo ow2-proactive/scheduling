@@ -32,8 +32,6 @@
 package functionaltests;
 
 import java.util.Map;
-import java.util.Map.Entry;
-
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;

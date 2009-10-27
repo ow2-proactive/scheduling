@@ -82,6 +82,7 @@ public class ConnectionTest2 extends FunctionalTest {
         try {
 
             Thread t = new Thread() {
+                @Override
                 public void run() {
                     try {
                         Thread.sleep(1000);

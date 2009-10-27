@@ -65,12 +65,14 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void configure(Object... parameters) throws RMException {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void acquireNode() {
         logger.error("acquireNode() is invalid operation");
     }
@@ -78,6 +80,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void acquireAllNodes() {
         logger.error("acquireAllNodes() is invalid operation");
     }
@@ -87,6 +90,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      * @param node node to release
      * @throws RMException if any problems occurred
      */
+    @Override
     public void removeNode(Node node) throws RMException {
         try {
             logger.info("Terminating the node " + node.getNodeInformation().getName());
@@ -112,6 +116,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     /**
      * Node source string representation
      */
+    @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName());
     }
@@ -145,6 +150,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void registerAcquiredNode(Node node) throws RMException {
         nodesCount++;
     }

@@ -64,6 +64,7 @@ public class NodeView extends View {
         }
     }
 
+    @Override
     public String toString() {
 
         String nodeName = element.getName();
@@ -81,11 +82,13 @@ public class NodeView extends View {
         return tooltip;
     }
 
+    @Override
     public void dispose() {
         if (label != null)
             label.dispose();
     }
 
+    @Override
     public void update() {
         if (label != null) {
             label.setImage(images[((Node) element).getState().ordinal()]);

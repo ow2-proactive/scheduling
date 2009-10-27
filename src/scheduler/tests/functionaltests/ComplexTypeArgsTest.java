@@ -53,6 +53,7 @@ public class ComplexTypeArgsTest extends FunctionalTest {
             return this.value;
         }
 
+        @Override
         public String toString() {
             return "[UserTypeA : " + this.value + "]";
         }

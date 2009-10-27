@@ -101,6 +101,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
      */
+    @Override
     public void configure(Object... policyParameters) throws RMException {
         super.configure(policyParameters);
 
@@ -149,6 +150,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         }
     }
 
+    @Override
     public BooleanWrapper activate() {
         BooleanWrapper activationStatus = super.activate();
         if (!activationStatus.booleanValue()) {
@@ -167,11 +169,13 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         return new BooleanWrapper(true);
     }
 
+    @Override
     protected SchedulerEvent[] getEventsList() {
         return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED,
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED };
     }
 
+    @Override
     protected SchedulerEventListener getSchedulerListener() {
         return thisStub;
     }
@@ -362,6 +366,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         timer.scheduleAtFixedRate(new TimerTask() {
             int maxNumberOfAttempts = 100;
 
+            @Override
             public void run() {
                 synchronized (monitor) {
                     if (releaseNodesNumber == 0) {
@@ -392,10 +397,12 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         }, releasePeriod, releasePeriod);
     }
 
+    @Override
     public String getDescription() {
         return "Allocates as many resources as scheduler required according\nto loading factor. Releases resources smoothly.";
     }
 
+    @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [Max Nodes: " + maxNodes +
             " Min Nodes: " + minNodes + " Job Per Node: " + loadingFactor + "]";

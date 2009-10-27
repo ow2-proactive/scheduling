@@ -207,6 +207,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      *			<code>Configuration</code> for this particular
      *			<code>LDAPLoginModule</code>.
      */
+    @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
         this.callbackHandler = callbackHandler;
@@ -237,6 +238,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      *                if this <code>LDAPLoginModule</code> is unable to
      *                perform the authentication.
      */
+    @Override
     public boolean login() throws LoginException {
         succeeded = false;
         if (callbackHandler == null) {
@@ -319,6 +321,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication and group membership fails.
      */
+    @Override
     protected boolean logUser(String username, String password, String reqGroup,
             GroupHierarchy groupsHierarchy) throws LoginException {
 
@@ -385,6 +388,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return true if this LDAPLoginModule's own login and commit attempts
      *         succeeded, or false otherwise.
      */
+    @Override
     public boolean commit() throws LoginException {
         return succeeded;
     }
@@ -409,6 +413,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return false if this LoginModule's own login and/or commit attempts
      *         failed, and true otherwise.
      */
+    @Override
     public boolean abort() throws LoginException {
         boolean result = succeeded;
         succeeded = false;
@@ -425,6 +430,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return true in all cases since this <code>LoginModule</code> should
      *         not be ignored.
      */
+    @Override
     public boolean logout() throws LoginException {
         succeeded = false;
         return true;

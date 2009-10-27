@@ -59,6 +59,7 @@ public class HostView extends View {
         }
     }
 
+    @Override
     public String toString() {
         return "Host: " + element.getName();
     }
