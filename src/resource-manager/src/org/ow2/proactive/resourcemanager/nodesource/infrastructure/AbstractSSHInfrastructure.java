@@ -89,6 +89,11 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
     @Configurable
     protected String javaOptions;
 
+    /**
+     * Shutdown flag
+     */
+    protected boolean shutdown = false;
+
     protected static org.apache.log4j.Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /**
@@ -169,4 +174,10 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
         }
         return p;
     }
+
+    @Override
+    public void shutDown() {
+        shutdown = true;
+    }
+
 }

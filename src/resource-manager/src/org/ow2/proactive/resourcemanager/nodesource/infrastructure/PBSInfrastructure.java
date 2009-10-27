@@ -239,7 +239,7 @@ public class PBSInfrastructure extends AbstractSSHInfrastructure {
         long t1 = System.currentTimeMillis();
         while (true) {
             long t2 = System.currentTimeMillis();
-            if (t2 - t1 > timeout) {
+            if (t2 - t1 > timeout || shutdown) {
                 throw new RMException("Request timed out");
             }
             boolean done = false;
@@ -310,10 +310,6 @@ public class PBSInfrastructure extends AbstractSSHInfrastructure {
                 }
             }
         }
-    }
-
-    @Override
-    public void shutDown() {
     }
 
     /**

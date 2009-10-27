@@ -324,7 +324,7 @@ public class NodeSource implements InitActive {
                             }
                         }
                     }
-                } catch (NodeException e) {
+                } catch (Exception e) {
                     logger.info(e.getMessage());
                 }
                 isAlive = true;

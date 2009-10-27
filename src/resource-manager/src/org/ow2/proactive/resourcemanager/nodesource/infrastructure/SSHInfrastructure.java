@@ -45,7 +45,6 @@ import java.util.Random;
 
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -174,7 +173,7 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
         long t1 = System.currentTimeMillis();
         while (true) {
             long t2 = System.currentTimeMillis();
-            if (t2 - t1 > timeout) {
+            if (t2 - t1 > timeout || shutdown) {
                 logger.info("Node at " + host.getHostName() + " timed out.");
                 synchronized (running) {
                     p.destroy();
@@ -320,10 +319,6 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
         }
         logger.info("Could not find node at " + node.getVMInformation().getInetAddress() + " to remove");
 
-    }
-
-    @Override
-    public void shutDown() {
     }
 
     /**

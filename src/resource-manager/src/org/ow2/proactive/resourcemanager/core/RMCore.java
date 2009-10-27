@@ -462,6 +462,11 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * {@inheritDoc}
      */
     public BooleanWrapper addNode(String nodeUrl, String sourceName) {
+
+        if (toShutDown) {
+            throw new AddingNodesException("The resource manager is shutting down");
+        }
+
         boolean existingNodeSource = nodeSources.containsKey(sourceName);
 
         if (!existingNodeSource && sourceName.equals(NodeSource.DEFAULT)) {
