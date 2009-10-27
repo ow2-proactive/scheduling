@@ -37,6 +37,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -195,6 +196,7 @@ public class JobFactory_stax extends JobFactory {
     /**
      * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.lang.String)
      */
+    @Override
     public Job createJob(String filePath) throws JobCreationException {
         clean();
         try {
@@ -209,6 +211,7 @@ public class JobFactory_stax extends JobFactory {
     /**
      * @see org.ow2.proactive.scheduler.common.job.factories.JobFactory#createJob(java.net.URI)
      */
+    @Override
     public Job createJob(URI filePath) throws JobCreationException {
         clean();
         try {
@@ -316,12 +319,13 @@ public class JobFactory_stax extends JobFactory {
     private void createAndFillJob(XMLStreamReader cursorJob) throws JobCreationException {
         //create a job that will just temporary store the common properties of the job
         Job jtmp = new Job() {
-            private static final long serialVersionUID = -1860047809844693058L;
 
+            @Override
             public JobId getId() {
                 throw new RuntimeException("Not Available !");
             }
 
+            @Override
             public JobType getType() {
                 throw new RuntimeException("Not Available !");
             }
@@ -593,7 +597,6 @@ public class JobFactory_stax extends JobFactory {
         try {
             Task toReturn = null;
             Task tmpTask = (taskToFill != null) ? taskToFill : new Task() {
-                private static final long serialVersionUID = -1584736279517084273L;
             };
             //parse job attributes and fill the temporary one
             int attrLen = cursorTask.getAttributeCount();
@@ -1303,8 +1306,10 @@ public class JobFactory_stax extends JobFactory {
     private static <T> void autoCopyfields(Class<T> klass, T from, T to) throws IllegalArgumentException,
             IllegalAccessException {
         for (Field f : klass.getDeclaredFields()) {
-            f.setAccessible(true);
-            f.set(to, f.get(from));
+            if (!Modifier.isStatic(f.getModifiers())) {
+                f.setAccessible(true);
+                f.set(to, f.get(from));
+            }
         }
     }
 

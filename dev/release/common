@@ -82,7 +82,8 @@ function build_and_clean() {
 	cd ${TMP_DIR} || warn_and_exit "Cannot move in ${TMP_DIR}"
 	if [ "$(find src/ -name "*.java" | xargs grep serialVersionUID | grep -v `echo $VERSION | sed 's@\(.\)\.\(.\)\..@\1\2@'` | wc -l)" -gt 0 ] ; then
 		if [ -z "${RELAX}" ] ; then
-			warn_and_exit " [E] serialVersionUID are NOT defined"
+			find src/ -name "*.java" | xargs grep serialVersionUID | grep -v `echo $VERSION | sed 's@\(.\)\.\(.\)\..@\1\2@'`
+			warn_and_exit " [E] Previous files does not define proper serialVersionUID !"
 		fi
 	fi
 
@@ -101,14 +102,13 @@ function build_and_clean() {
 	echo " [i] Clean"
 
 	# Clean RCP plugins
-	find ./scheduler_plugins/ -name "*.jar" -exec rm -rf {} \;
-	find ./scheduler_plugins/ -name "*.class" -exec rm -rf {} \;
+	find ./*-rcp/ -name "*.jar" -exec rm -rf {} \;
+	find ./*-rcp/ -name "*.class" -exec rm -rf {} \;
 
 	# Git
 	rm -rf .git
 
 	# Remove useless parts of ProActive
-	rm ./doc-src/ProActiveRefBook.doc
 	find . -type f -a -name "*.svg" -exec rm {} \; # svg are converted in png by hands
 
 	# Remove non GPL stuff
@@ -118,10 +118,16 @@ function build_and_clean() {
 	rm compile/junit*properties
 	rm -rf classes/
 	rm -rf docs/tmp/
-	rm -rf doc-src/*_snippets/
 
 	# Remove dev directory
 	rm -rf dev/
+}
+
+function generate_credential(){
+	echo "********************** Generating credential ************************"
+	../bin/unix/key-gen -P ../config/authentication/keys/pub.key -p ../config/authentication/keys/priv.key
+	../bin/unix/create-cred -F ../config/authentication/keys/pub.key -l admin -p admin -o ../config/authentication/rm.cred
+	cp ../config/authentication/rm.cred ../config/authentication/scheduler.cred
 }
 
 function replace_version() {

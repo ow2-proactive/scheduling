@@ -14,6 +14,13 @@ then
 	echo
 	echo "    Example :"
 	echo "    ./makeRCP_arch.sh ../Public/RCP 1.0.2 ../Workspace/ProActiveScheduling.git/scheduler_plugins/org.ow2.proactive.scheduler/proactive-log4j ../Public/RCP"
+	echo "    "
+	echo "    To export plugins (via Eclipse) Root directory must be :"
+	echo "       'ResourceManager'    for RM"
+	echo "       'Scheduler'          for Scheduler"
+	echo "    Generated plugins directories must be :"
+	echo "       'RCPs_directory/rm'          for RM"
+        echo "       'RCPs_directory/scheduler'   for Scheduler"
 	exit
 fi
 

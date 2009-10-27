@@ -335,7 +335,7 @@ public class InternalJobFactory {
     private static <T> void autoCopyfields(Class<T> klass, T from, T to) throws IllegalArgumentException,
             IllegalAccessException {
         for (Field f : klass.getDeclaredFields()) {
-            if (!Modifier.isPrivate(f.getModifiers())) {
+            if (!Modifier.isPrivate(f.getModifiers()) && !Modifier.isStatic(f.getModifiers())) {
                 f.setAccessible(true);
                 f.set(to, f.get(from));
             }

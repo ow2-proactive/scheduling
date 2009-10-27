@@ -1,4 +1,4 @@
-. common
+. dev/release/common
 
 function build() {
 	# Replace version tag in main java file
@@ -10,10 +10,13 @@ function build() {
 	./build clean
 	./build -Dversion="${VERSION}" deploy.all
 	./build -Dversion="${VERSION}" doc.Scheduler.manualPdf
+
+	generate_credential
 }
 
 init_env ProActiveScheduler $*
 copy_to_tmp
+build_and_clean
 clean_repository
 replace_version
 build_archive

@@ -1,4 +1,4 @@
-. common
+. dev/release/common
 
 function build() {
 	# Replace version tag in main java file
@@ -10,6 +10,8 @@ function build() {
 	./build clean
 	./build -Dversion="${VERSION}" deploy.rm deploy.rm.client
 	./build -Dversion="${VERSION}" doc.rm.manualPdf
+
+	generate_credential
 }
 
 function separate_rm() {
