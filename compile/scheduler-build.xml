@@ -311,7 +311,7 @@
 			RCP
 		-->
 
-	<target name="rcp.libClean.scheduler" depends="clean" description="Clean all required libraries for scheduler RCP">
+	<target name="rcp.libClean.scheduler" description="Clean all required libraries for scheduler RCP">
 		<delete dir="${rcp.scheduler.dir}/${rcp.scheduler.lib}/lib" />
 	</target>
 

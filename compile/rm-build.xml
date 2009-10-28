@@ -101,7 +101,7 @@
 			RCP
 		-->
 
-	<target name="rcp.libClean.rm" depends="clean" description="Clean all required libraries for rm RCP">
+	<target name="rcp.libClean.rm" description="Clean all required libraries for rm RCP">
 		<delete dir="${rcp.rm.dir}/${rcp.rm.lib}/lib" />
 	</target>
 

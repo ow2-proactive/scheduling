@@ -12,7 +12,7 @@
 	<!-- ************
 		Deploy
 	-->
-	<target name="deploy.all" depends="deploy.common, deploy.common.client, deploy.scheduler, deploy.rm, deploy.scheduler.client, deploy.scheduler.worker, deploy.rm.client, deploy.scheduler.splitmerge, deploy.scheduler.matlab" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
+	<target name="deploy.all" depends="clean, deploy.common, deploy.common.client, deploy.scheduler, deploy.rm, deploy.rm.client, deploy.scheduler.client, deploy.scheduler.worker, deploy.scheduler.splitmerge, deploy.scheduler.matlab" description="Populate Scheduler and Resource Manager dist/ with all needed files (same as deploy.scheduler)"/>
 
 
 	<!-- ************
@@ -79,6 +79,6 @@
 		RCP plugins
 	-->
 
-	<target name="rcp.libClean.all" depends="rcp.libClean.scheduler,rcp.libClean.rm"  description="Clean RCPs lib directories"/>
+	<target name="rcp.libClean.all" depends="rcp.libClean.scheduler, rcp.libClean.rm"  description="Clean RCPs lib directories"/>
 	<target name="rcp.libCopy.all" depends="rcp.libCopy.rm, rcp.libCopy.scheduler"  description="Copy needed libraries to RCPs lib directories"/>
 </project>
