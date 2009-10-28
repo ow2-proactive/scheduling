@@ -59,7 +59,7 @@ nodesNumber_t = ## number of cores needed for the task (identifier)
     attribute numberOfNodes { xsd:positiveInteger | variableRefType }
 taskDescription = ## Textual description of this task
     element description { text }
-walltime = ## Defines walltime - maximum execution time of the task in second
+walltime = ## Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')
 	attribute walltime { walltimePattern | variableRefType}
 cancelJobOnError_t = ## Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)
     attribute cancelJobOnError {xsd:boolean | variableRefType}

@@ -287,7 +287,7 @@
           </xs:attribute>
           <xs:attribute name="walltime">
             <xs:annotation>
-              <xs:documentation>Defines walltime - maximum execution time of the task in second</xs:documentation>
+              <xs:documentation>Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:union memberTypes="jd:walltimePattern jd:variableRefType"/>
@@ -342,7 +342,7 @@
   <xs:attributeGroup name="walltime">
     <xs:attribute name="walltime" use="required">
       <xs:annotation>
-        <xs:documentation>Defines walltime - maximum execution time of the task in second</xs:documentation>
+        <xs:documentation>Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="jd:walltimePattern jd:variableRefType"/>

@@ -275,7 +275,7 @@
   </define>
   <define name="walltime">
     <attribute name="walltime">
-      <doc:documentation>Defines walltime - maximum execution time of the task in second</doc:documentation>
+      <doc:documentation>Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')</doc:documentation>
       <choice>
         <ref name="walltimePattern"/>
         <ref name="variableRefType"/>
