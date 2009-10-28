@@ -172,6 +172,22 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
 
         long t1 = System.currentTimeMillis();
         while (true) {
+            try {
+                int exitCode = p.exitValue();
+                if (exitCode != 0) {
+                    logger.info("SSH subprocess at " + host.getHostName() + " exited abnormally (" +
+                        exitCode + ").");
+                    synchronized (running) {
+                        p.destroy();
+                        running.remove(host);
+                        freeHosts.add(host);
+                    }
+                    break;
+                }
+            } catch (IllegalThreadStateException e) {
+                // process has not returned yet
+            }
+
             long t2 = System.currentTimeMillis();
             if (t2 - t1 > timeout || shutdown) {
                 logger.info("Node at " + host.getHostName() + " timed out.");

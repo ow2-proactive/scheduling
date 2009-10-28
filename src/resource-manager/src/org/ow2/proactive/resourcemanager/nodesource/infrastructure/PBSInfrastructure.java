@@ -238,8 +238,20 @@ public class PBSInfrastructure extends AbstractSSHInfrastructure {
         final long timeout = 1000 * 60 * 5; // 5mn
         long t1 = System.currentTimeMillis();
         while (true) {
+            try {
+                int exitCode = p.exitValue();
+                if (exitCode != 0) {
+                    p.destroy();
+                    throw new RMException("SSH subprocess at " + host.getHostName() + " exited abnormally (" +
+                        exitCode + ").");
+                }
+            } catch (IllegalThreadStateException e) {
+                // process has not returned yet
+            }
+
             long t2 = System.currentTimeMillis();
             if (t2 - t1 > timeout || shutdown) {
+                p.destroy();
                 throw new RMException("Request timed out");
             }
             boolean done = false;
