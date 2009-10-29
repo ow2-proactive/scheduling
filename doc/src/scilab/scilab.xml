@@ -75,16 +75,14 @@
 					be executed inside the scheduler
 				</para>
 				<example xml:id="Scheduler_Scilab_Descriptor_Example"><info><title>Scilab Job descriptor Example</title></info>
-				<para/>
+					<programlisting language="xml"><textobject><textdata fileref="scilab/jobs_descriptors/Job_scilab.xml"/></textobject></programlisting>
 				</example>
 					
-					<programlisting language="xml"><textobject><textdata fileref="scilab/jobs_descriptors/Job_scilab.xml"/></textobject></programlisting>
 				<para>
 					Here is the Scilab script that calculates individual
 					integrals
 				</para>
 				<example xml:id="Scheduler_Scilab_Int_Script"><info><title>Integral script</title></info>
-					
 					<programlisting><textobject><textdata fileref="../../extensions/scilab/examples/intsin.sci"/></textobject></programlisting>
 				</example>
 				<para>
@@ -92,7 +90,6 @@
 					results and computes the final answer
 				</para>
 				<example xml:id="Scheduler_Scilab_Merge_Script"><info><title>Merging script</title></info>
-					
 					<programlisting><textobject><textdata fileref="../../extensions/scilab/examples/merge.sci"/></textobject></programlisting>
 				</example>
 				<para>
