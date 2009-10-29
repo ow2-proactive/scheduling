@@ -73,11 +73,11 @@
 	<target name="doc.clean">
 	      <clean/>
 	</target>
-
+	
 	<target name="javadoc.checkstyle">
 	  <javadoc.checkstyle/>
 	</target>
-
+    
     <target name="schemas">
         <schemas/>
     </target>

@@ -1,6 +1,6 @@
 <project>
 	<import file="doc_paths.xml" />
-
+	
 	<!-- ==================================================================== -->
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
@@ -85,7 +85,7 @@
 				<param name="url.file.prefix" expression="${url.file.prefix}" />
 				<classpath refid="docs.utils.classpath" />
 			</xslt>
-
+			
 			<java classname="com.icl.saxon.StyleSheet" fork="true" dir="@{docbookOutputDir}">
 				<classpath refid="docs.utils.classpath" />
 				<jvmarg value="-Dxslthl.config=${xslthl.path}"/>
@@ -240,8 +240,8 @@
         <sequential>
             <property name="gcmd.dir" value="${docs.schemas.dir}/gcmd" />
             <mkdir dir="${gcmd.dir}"/>
-            <xsddoc out="${gcmd.dir}"
-                    title="GCM Deployment Schema"
+            <xsddoc out="${gcmd.dir}" 
+                    title="GCM Deployment Schema" 
                     verbose="true"
                     header="&lt;img width='70%' src='${base.dir}/doc/pa/images/Logo-ProActive.png' /&gt;"
                     bottom=" "
@@ -253,8 +253,8 @@
         <sequential>
             <property name="gcma.dir" value="${docs.schemas.dir}/gcma" />
             <mkdir dir="${gcma.dir}"/>
-            <xsddoc out="${gcma.dir}"
-                    title="GCM Application Schema"
+            <xsddoc out="${gcma.dir}" 
+                    title="GCM Application Schema" 
                     verbose="true"
                     header="&lt;img width='70%' src='${base.dir}/doc/pa/images/Logo-ProActive.png' /&gt;"
                     bottom=" "

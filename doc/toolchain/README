@@ -1,10 +1,10 @@
 Version 0.6
 =Changes=
 
-Added  a checkstyle folder with configuration files and the corresponding
-macros for checking the javadoc style and the java files header. The
-checkstyle jar file should be present in the compile/lib folder in the
-project being checked.
+Added  a checkstyle folder with configuration files and the corresponding 
+macros for checking the javadoc style and the java files header. The 
+checkstyle jar file should be present in the compile/lib folder in the 
+project being checked. 
 
 See http://checkstyle.sourceforge.net/
 

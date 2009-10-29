@@ -42,10 +42,23 @@
           <xsl:value-of select="@spacing"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:apply-templates 
-            select="listitem
-                    |comment()[preceding-sibling::listitem]
-                    |processing-instruction()[preceding-sibling::listitem]"/>
+
+	  <xsl:choose>
+		  <xsl:when test="@role='sortbysurname'">
+			  <xsl:apply-templates
+					select="listitem
+							|comment()[preceding-sibling::listitem]
+							|processing-instruction()[preceding-sibling::listitem]">
+				  <xsl:sort select="para/person/personname/surname" />
+			  </xsl:apply-templates>
+		  </xsl:when>
+		  <xsl:otherwise>
+			  <xsl:apply-templates
+					select="listitem
+							|comment()[preceding-sibling::listitem]
+							|processing-instruction()[preceding-sibling::listitem]"/>
+		  </xsl:otherwise>
+	  </xsl:choose>
     </ul>
   </div>
 </xsl:template>
