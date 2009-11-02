@@ -369,7 +369,10 @@ public class ForkedJavaExecutable extends JavaExecutable {
         //No need to terminate current taskLauncher for both cases because :
         //If the schedulerCore call it, the task is killed and the taskLauncher terminated.
         //If the TimerTask call it, so the taskLauncher is already terminated by throwing an exception.
-        logs = (TaskLogs) PAFuture.getFutureValue(newJavaTaskLauncher.getLogs());
+        try {
+            logs = (TaskLogs) PAFuture.getFutureValue(newJavaTaskLauncher.getLogs());
+        } catch (Throwable t) {
+        }
         clean();
         super.kill();
     }

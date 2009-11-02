@@ -392,6 +392,7 @@ public abstract class TaskLauncher implements InitActive {
 
     /**
      * Return a TaskLogs object that contains the logs produced by the executed tasks
+     * 
      * @return a TaskLogs object that contains the logs produced by the executed tasks
      */
     public TaskLogs getLogs() {
