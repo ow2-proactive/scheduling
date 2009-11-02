@@ -188,10 +188,11 @@ public class ForkedJavaExecutable extends JavaExecutable {
                 }
             }
 
-            logs = newJavaTaskLauncher.getLogs();
             execState = ExecutableState.TERMINATED;
 
-            if (isKilled()) {
+            if (!isKilled()) {
+                logs = newJavaTaskLauncher.getLogs();
+            } else {
                 logger_dev.debug("Task has been killed");
                 FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
                 throw new SchedulerException("Walltime exceeded");
@@ -368,6 +369,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
         //No need to terminate current taskLauncher for both cases because :
         //If the schedulerCore call it, the task is killed and the taskLauncher terminated.
         //If the TimerTask call it, so the taskLauncher is already terminated by throwing an exception.
+        logs = (TaskLogs) PAFuture.getFutureValue(newJavaTaskLauncher.getLogs());
         clean();
         super.kill();
     }
@@ -384,8 +386,11 @@ public class ForkedJavaExecutable extends JavaExecutable {
             }
             // if the process did not register then childRuntime will be null and/or process will be null
             if (childRuntime != null) {
-                childRuntime.killAllNodes();
-                childRuntime = null;
+                try {
+                    childRuntime.killAllNodes();
+                    childRuntime = null;
+                } catch (Exception e) {
+                }
             }
             if (process != null) {
                 process.destroy();

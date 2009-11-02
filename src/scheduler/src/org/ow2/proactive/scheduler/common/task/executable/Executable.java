@@ -54,7 +54,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 public abstract class Executable {
 
     /** Executable state. True if the executable has been killed */
-    private boolean killed = false;
+    private volatile boolean killed = false;
 
     /**
      * The content of this method will be executed once after being scheduled.<br>
@@ -80,7 +80,7 @@ public abstract class Executable {
      * 
      * @return true if the task has been killed, false otherwise.
      */
-    public synchronized boolean isKilled() {
+    public boolean isKilled() {
         return this.killed;
     }
 
