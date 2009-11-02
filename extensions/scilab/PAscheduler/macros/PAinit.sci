@@ -32,9 +32,9 @@ function [] = PAinit()
      end
        
 
-     cp = [fullfile(schedulerdir,'dist','lib','ProActive_ResourceManager.jar'); initcp];
-     cp = [fullfile(schedulerdir,'dist','lib','ProActive_Scheduler-core.jar'); cp];
-     cp = [fullfile(schedulerdir,'dist','lib','ProActive_SRM-common.jar'); cp];
+     cp = [fullfile(schedulerdir,'dist','lib','ProActive_Scheduler-client.jar'); initcp];
+     cp = [fullfile(schedulerdir,'dist','lib','ProActive_Scheduler-matlab.jar'); cp];
+     cp = [fullfile(schedulerdir,'dist','lib','ProActive_SRM-common-client.jar'); cp];
      cp = [fullfile(schedulerdir,'dist','lib','ProActive.jar'); cp];
      cp = [fullfile(schedulerdir,'dist','lib','javasci.jar'); cp];
 

@@ -103,25 +103,28 @@ else
             [s,w] = dos('dir /x ProActive.jar');
             p1 = [dist_lib_dir filesep shortname(w,'ProActive.jar')];
             [s,w] = dos('dir /x ProActive_Scheduler-core.jar');
-            p2 = [dist_lib_dir filesep shortname(w,'ProActive_Scheduler-core.jar')];
+            p2 = [dist_lib_dir filesep shortname(w,'ProActive_Scheduler-client.jar')];
             [s,w] = dos('dir /x ProActive_ResourceManager.jar');
-            p3 = [dist_lib_dir filesep shortname(w,'ProActive_ResourceManager.jar')];
+            p3 = [dist_lib_dir filesep shortname(w,'ProActive_ResourceManager-client.jar')];
             [s,w] = dos('dir /x ProActive_SRM-common.jar');
-            p4 = [dist_lib_dir filesep shortname(w,'ProActive_SRM-common.jar')];
+            p4 = [dist_lib_dir filesep shortname(w,'ProActive_SRM-common-client.jar')];
+            [s,w] = dos('dir /x ProActive_Scheduler-matlab.jar');
+            p5 = [dist_lib_dir filesep shortname(w,'ProActive_Scheduler-matlab.jar')];
             cd(old_dir);
         else
             p1 = [dist_lib_dir filesep 'ProActive.jar'];
-            p2 = [dist_lib_dir filesep 'ProActive_Scheduler-core.jar'];
-            p3 = [dist_lib_dir filesep 'ProActive_ResourceManager.jar'];
-            p4 = [dist_lib_dir filesep 'ProActive_SRM-common.jar'];
+            p2 = [dist_lib_dir filesep 'ProActive_Scheduler-client.jar'];
+ %           p3 = [dist_lib_dir filesep 'ProActive_ResourceManager-client.jar'];
+            p4 = [dist_lib_dir filesep 'ProActive_SRM-common-client.jar'];
+            p5 = [dist_lib_dir filesep 'ProActive_Scheduler-matlab.jar'];
 
         end
 
         javaaddpath(p1);
         javaaddpath(p2);
-        javaaddpath(p3);
+  %      javaaddpath(p3);
         javaaddpath(p4);
-
+        javaaddpath(p5);
 
     end
 end
