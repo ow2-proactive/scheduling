@@ -34,7 +34,9 @@ package org.ow2.proactive.scheduler.task;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**

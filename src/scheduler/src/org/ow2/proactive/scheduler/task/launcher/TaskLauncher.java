@@ -195,7 +195,8 @@ public abstract class TaskLauncher implements InitActive {
         // see SCHEDULING-263
         PAActiveObject.setImmediateService("activateLogs");
         PAActiveObject.setImmediateService("terminate");
-        logger_dev.debug("Immediate services : activateLogs, terminate");
+        PAActiveObject.setImmediateService("getLogs");
+        logger_dev.debug("Immediate services : activateLogs, terminate, getLogs");
 
         // plug stdout/err into a socketAppender
         this.initLoggers();

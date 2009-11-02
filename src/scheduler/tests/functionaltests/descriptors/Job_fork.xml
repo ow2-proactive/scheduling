@@ -37,7 +37,7 @@
 			</nativeExecutable>
 		</task>
 		<!-- walltime automatically fork -->
-		<task name="Fork2" walltime="5" >
+		<task name="Fork2" walltime="3" >
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
 			<forkEnvironment jvmParameters="-Dproactive.test=true" />
 				<parameters>

@@ -461,11 +461,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
             //used to read the enumerate schedulerStatus in order to know when submit is possible.
             //have to be immediate service
-            body.setImmediateService("isSubmitPossible");
+            body.setImmediateService("isSubmitPossible", false);
             //Fix SCHEDULING-337, it could remains a better solution to avoid race condition in DB
             //body.setImmediateService("getTaskResult");
-            body.setImmediateService("getJobResult");
-            body.setImmediateService("getJobState");
+            body.setImmediateService("getJobResult", false);
+            body.setImmediateService("getJobState", false);
             logger_dev.debug("Core immediate services : isSubmitPossible, getJobResult, getJobState");
 
             //set the filter for serveAll method (user action are privileged)

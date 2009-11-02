@@ -12,10 +12,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jython.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/script-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/script-js.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jetty-6.1.11.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jetty-util-6.1.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ajo.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/asm-2.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/axis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/batik-awt-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/batik-dom.jar"/>
@@ -73,7 +70,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/puretls.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/relaxngDatatype.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rngpack-1.1a.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/saaj-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saxon8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saxon8-dom.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/scriptPlugin.jar"/>
@@ -90,8 +86,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/tablelayout.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/trilead-ssh2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/winp-1.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xercesImpl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xsdlib.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

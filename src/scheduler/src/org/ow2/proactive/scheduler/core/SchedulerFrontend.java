@@ -191,8 +191,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      */
     public void initActivity(Body body) {
         try {
-            body.setImmediateService("getTaskResult");
-            body.setImmediateService("getJobResult");
+            body.setImmediateService("getTaskResult", false);
+            body.setImmediateService("getJobResult", false);
             logger_dev.debug("Front-end immediate services : getTaskResult,getJobResult");
 
             // creating the scheduler authentication interface.

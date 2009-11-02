@@ -210,22 +210,23 @@ public class SchedulerStarter {
                 }
             }
         } catch (MissingArgumentException e) {
-            logger_dev.error(e.getLocalizedMessage());
+            logger_dev.error("", e);
             displayHelp = true;
         } catch (MissingOptionException e) {
-            logger_dev.error(e.getLocalizedMessage());
+            logger_dev.error("", e);
             displayHelp = true;
         } catch (UnrecognizedOptionException e) {
-            logger_dev.error(e.getLocalizedMessage());
+            logger_dev.error("", e);
+            logger_dev.error("", e);
             displayHelp = true;
         } catch (AlreadySelectedException e) {
-            logger_dev.error(e.getLocalizedMessage());
+            logger_dev.error("", e);
             displayHelp = true;
         } catch (ParseException e) {
-            logger_dev.error(e.getLocalizedMessage());
+            logger_dev.error("", e);
             displayHelp = true;
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("", e);
             System.exit(6);
         }
 

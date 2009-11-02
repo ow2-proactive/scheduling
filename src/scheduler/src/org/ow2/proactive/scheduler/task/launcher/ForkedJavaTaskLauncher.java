@@ -103,7 +103,6 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
             //schedule timer at any time
             scheduleTimer();
-
             //launch task : here, result is obviously a TaskResult
             TaskResult userResult = (TaskResult) currentExecutable.execute(results);
 

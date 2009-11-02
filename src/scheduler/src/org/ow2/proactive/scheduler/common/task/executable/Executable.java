@@ -34,7 +34,9 @@ package org.ow2.proactive.scheduler.common.task.executable;
 import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
