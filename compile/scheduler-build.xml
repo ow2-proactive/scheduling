@@ -75,7 +75,10 @@
 	<target name="deploy.scheduler.matlab" depends="-deployCopy, compile.scheduler, deploy.common.client" description="Creates scheduler matlab/scilab jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.matlab.jar}" manifest="${basedir}/scheduler-Manifest-base.mf">
 			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/common/Main.class" />
-			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/common/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/matlab/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/scilab/**" />
+			<fileset dir="${cl.scheduler.dir}" includes="org/ow2/proactive/scheduler/ext/masterworker/**" />
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
