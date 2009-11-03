@@ -1,5 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/annogen-0.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/apputils.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/asm-2.2.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/axiom-api-1.2.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/axiom-impl-1.2.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/axis2-adb-1.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/axis2-kernel-1.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/backport-util-concurrent-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bcel-5.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-discovery-0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-httpclient-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-vfs-patched-2.0-SNAPSHOTr13526-tests.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-vfs-patched-2.0-SNAPSHOTr13526.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cxf-2.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/FastInfoset-1.2.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/geronimo-activation_1.1_spec-1.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/geronimo-annotation_1.0_spec-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/geronimo-javamail_1.4_spec-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jackrabbit-jcr-commons-1.5.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jackrabbit-webdav-1.5.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jaxb-api-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jaxb-impl-2.1.9.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jetty-6.1.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jetty-util-6.1.18.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jna.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsch-0.1.31.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsch-0.1.38.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jta-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-5.1.7-bin.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/neethi-2.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.apache.servicemix.bundles.wsdl4j-1.6.1_1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-fsm.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-matlab.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_utils.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/saaj-api-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/saaj.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/servlet-api-2.5-6.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-log4j12-1.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-beans-2.5.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-context-2.5.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-core-2.5.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ssj.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/typica.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/vi-java.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/vim.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/vim25.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualbox-wsdl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-libvirt.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-virtualbox.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-vmware-vi.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-vmware-vix.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-xenserver.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/woden-api-1.0M8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ws-commons-util-1.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/wstx-asl-3.2.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xenserver-5.0.0-3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xercesImpl-2.8.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-client-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-common-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/XmlSchema-1.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_Scheduler-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-net-1.4.1.jar"/>
@@ -64,7 +135,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/oscar.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/osgi.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ow_deployment_scheduling.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ProActive.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ptolemy.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/puretls.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/relaxngDatatype.jar"/>
