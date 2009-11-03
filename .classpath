@@ -152,7 +152,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/virtualization-xenserver.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/woden-api-1.0M8.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ws-commons-util-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/wsdl4j-1.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/wstx-asl-3.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xenserver-5.0.0-3.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/xercesImpl-2.8.1.jar"/>
