@@ -276,6 +276,7 @@
 	            <include name="org/ow2/proactive/scheduler/ext/scilab/*.java"/>
 	            <include name="org/ow2/proactive/scheduler/ext/scilab/exception/*.java"/>
 	            <include name="org/ow2/proactive/scheduler/ext/scilab/util/*.java"/>
+                <include name="org/ow2/proactive/scheduler/ext/masterworker/SchedulerExecutableAdapter.java"/>
 				<include name="org/ow2/proactive/scheduler/ext/**/*.sh"/>
                 <include name="org/ow2/proactive/scheduler/ext/**/*.bat"/>
 			</fileset>

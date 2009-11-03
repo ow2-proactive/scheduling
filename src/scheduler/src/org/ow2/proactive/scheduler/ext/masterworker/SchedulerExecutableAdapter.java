@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -52,17 +54,16 @@ public class SchedulerExecutableAdapter extends JavaExecutable implements Worker
 
     private static Map<String, Object> memory = new HashMap<String, Object>();
 
-    @Deprecated
     public SchedulerExecutableAdapter() {
 
     }
 
-    /**
-     * Wraps a Master/Worker task to a Scheduler task
-     * @param task
-     */
-    public SchedulerExecutableAdapter(TaskIntern<Serializable> task) {
-        this.task = task;
+    public void init(Map<String, Serializable> args) throws Exception {
+        Serializable code = args.get("taskCode");
+        task = (TaskIntern<Serializable>) code;
+        if (task.getTask() instanceof DivisibleTask) {
+            throw new IllegalStateException("Divisible tasks can't be submitted to the ProActive Scheduler");
+        }
     }
 
     /*
@@ -72,6 +73,7 @@ public class SchedulerExecutableAdapter extends JavaExecutable implements Worker
      */
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
+
         return task.run(this);
     }
 

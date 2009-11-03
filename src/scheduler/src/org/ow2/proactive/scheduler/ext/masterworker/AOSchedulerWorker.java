@@ -31,17 +31,8 @@
  */
 package org.ow2.proactive.scheduler.ext.masterworker;
 
-import java.io.Serializable;
-import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-
-import javax.security.auth.login.LoginException;
-
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -52,26 +43,19 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Resul
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.KeyException;
+import java.util.*;
 
 
 public class AOSchedulerWorker extends AOWorker implements SchedulerEventListener {
@@ -102,6 +86,11 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     private String password;
 
     /**
+     * User classpath (i.e. where to find user classes
+     */
+    private String[] jobclasspath;
+
+    /**
      * ProActive no arg contructor
      */
     public AOSchedulerWorker() {
@@ -119,12 +108,13 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
      * @throws LoginException 
      */
     public AOSchedulerWorker(final String name, final WorkerMaster provider,
-            final Map<String, Serializable> initialMemory, String schedulerUrl, String user, String passwd)
-            throws SchedulerException, LoginException {
+            final Map<String, Serializable> initialMemory, String schedulerUrl, String user, String passwd,
+            String[] jobclasspath) throws SchedulerException, LoginException {
         super(name, provider, initialMemory);
         this.schedulerUrl = schedulerUrl;
         this.user = user;
         this.password = passwd;
+        this.jobclasspath = jobclasspath;
 
     }
 
@@ -183,6 +173,8 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             }
         }
         processing.clear();
+        Service service = new Service(PAActiveObject.getBodyOnThis());
+        service.flushAll();
         provider.isCleared(stubOnThis);
     }
 
@@ -197,23 +189,34 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         while (pendingTasksFutures.size() > 0) {
             pendingTasks.addAll(pendingTasksFutures.remove());
         }
-        if (pendingTasks.size() > 0) {
+        if (!suspended && pendingTasks.size() > 0) {
 
             TaskFlowJob job = new TaskFlowJob();
             job.setName("Master-Worker Framework Job " + pendingTasks.peek().getId());
             job.setPriority(JobPriority.NORMAL);
             job.setCancelJobOnError(true);
             job.setDescription("Set of parallel master-worker tasks");
+
+            JobEnvironment je = new JobEnvironment();
+            try {
+                je.setJobClasspath(jobclasspath);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            job.setEnvironment(je);
+
             Collection<TaskIntern<Serializable>> newTasks = new ArrayList<TaskIntern<Serializable>>();
             while (pendingTasks.size() > 0) {
                 TaskIntern<Serializable> task = pendingTasks.remove();
                 newTasks.add(task);
-                JavaExecutable schedExec = new SchedulerExecutableAdapter(task);
 
                 JavaTask schedulerTask = new JavaTask();
-                schedulerTask.setName("" + task.getId());
+                schedulerTask.setName("MasterWorker" + task.getId());
                 schedulerTask.setPreciousResult(true);
-                //                schedulerTask.setTaskInstance(schedExec);
+                schedulerTask.setExecutableClassName(SchedulerExecutableAdapter.class.getName());
+                schedulerTask.addArgument("taskCode", task);
 
                 try {
                     job.addTask(schedulerTask);
@@ -236,6 +239,8 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                 logger.debug(name + " sleeps...");
             }
         }
+        wakingup = false;
+
     }
 
     /**
@@ -318,7 +323,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                             logger.debug(this.getName() + ": looking for result of task: " + task.getId());
                         }
                         ResultIntern<Serializable> intres = new ResultInternImpl(task.getId());
-                        TaskResult result = allTaskResults.get("" + task.getId());
+                        TaskResult result = allTaskResults.get("MasterWorker" + task.getId());
 
                         if (result == null) {
                             intres.setException(new TaskException(new SchedulerException("Task id=" +
