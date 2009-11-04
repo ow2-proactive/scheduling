@@ -41,6 +41,9 @@ public class Working extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
+        if (results == null) {
+            throw new Exception("Results cannot be null : expected empty array.");
+        }
         return "Working";
     }
 

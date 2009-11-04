@@ -770,7 +770,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             launcher.activateLogs(this.lfs.getAppenderProvider());
                         }
 
-                        TaskResult[] params = null;
+                        // Set to empty array to emulate varargs behavior (i.e. not defined is
+                        // equivalent to empty array, not null.
+                        TaskResult[] params = new TaskResult[0];
                         //if job is TASKSFLOW, preparing the list of parameters for this task.
                         int resultSize = taskDescriptor.getParents().size();
                         if ((currentJob.getType() == JobType.TASKSFLOW) && (resultSize > 0)) {
