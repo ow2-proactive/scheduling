@@ -78,6 +78,8 @@ public class AOScilabWorker implements Serializable {
      */
     protected boolean debug = true;
 
+    private boolean initialized = false;
+
     /**
      * Definition of user-functions
      */
@@ -91,62 +93,69 @@ public class AOScilabWorker implements Serializable {
      *
      * @param scilabConfig the configuration for scilab
      */
-    public AOScilabWorker(ScilabConfiguration scilabConfig) throws UnknownHostException {
+    public AOScilabWorker(ScilabConfiguration scilabConfig) throws Exception {
 
         this.config = scilabConfig;
 
-        try {
-            if (debug) {
-                System.out.println("Scilab Initialization...");
-                System.out.println("PATH=" + System.getenv("PATH"));
-                System.out.println("LD_LIBRARY_PATH=" + System.getenv("LD_LIBRARY_PATH"));
-                System.out.println("java.library.path=" + System.getProperty("java.library.path"));
+    }
+
+    private void initializeEngine() throws Exception {
+        if (!initialized) {
+            try {
+                if (debug) {
+                    System.out.println("Scilab Initialization...");
+                    System.out.println("PATH=" + System.getenv("PATH"));
+                    System.out.println("LD_LIBRARY_PATH=" + System.getenv("LD_LIBRARY_PATH"));
+                    System.out.println("java.library.path=" + System.getProperty("java.library.path"));
+                }
+                System.out.println("Starting a new Scilab engine:");
+                System.out.println(config);
+                Scilab.init();
+                if (debug) {
+                    System.out.println("Initialization Complete!");
+                }
+            } catch (UnsatisfiedLinkError e) {
+                StringWriter error_message = new StringWriter();
+                PrintWriter pw = new PrintWriter(error_message);
+                pw.println("Can't find the Scilab libraries in host " + java.net.InetAddress.getLocalHost());
+                pw.println("PATH=" + System.getenv("PATH"));
+                pw.println("LD_LIBRARY_PATH=" + System.getenv("LD_LIBRARY_PATH"));
+                pw.println("java.library.path=" + System.getProperty("java.library.path"));
+
+                UnsatisfiedLinkError ne = new UnsatisfiedLinkError(error_message.toString());
+                ne.initCause(e);
+                throw ne;
+            } catch (NoClassDefFoundError e) {
+                StringWriter error_message = new StringWriter();
+                PrintWriter pw = new PrintWriter(error_message);
+                pw.println("Classpath Error in " + java.net.InetAddress.getLocalHost());
+                pw.println("java.class.path=" + System.getProperty("java.class.path"));
+
+                NoClassDefFoundError ne = new NoClassDefFoundError(error_message.toString());
+                ne.initCause(e);
+                throw ne;
+            } catch (Throwable e) {
+                StringWriter error_message = new StringWriter();
+                PrintWriter pw = new PrintWriter(error_message);
+                pw.println("Error initializing Scilab in " + java.net.InetAddress.getLocalHost());
+                pw.println("PATH=" + System.getenv("PATH"));
+                pw.println("LD_LIBRARY_PATH=" + System.getenv("LD_LIBRARY_PATH"));
+                pw.println("java.library.path=" + System.getProperty("java.library.path"));
+                pw.println("java.class.path=" + System.getProperty("java.class.path"));
+
+                IllegalStateException ne = new IllegalStateException(error_message.toString());
+                ne.initCause(e);
+                throw ne;
             }
-            System.out.println("Starting a new Scilab engine:");
-            System.out.println(config);
-            Scilab.init();
-            if (debug) {
-                System.out.println("Initialization Complete!");
-            }
-        } catch (UnsatisfiedLinkError e) {
-            StringWriter error_message = new StringWriter();
-            PrintWriter pw = new PrintWriter(error_message);
-            pw.println("Can't find the Scilab libraries in host " + java.net.InetAddress.getLocalHost());
-            pw.println("PATH=" + System.getenv("PATH"));
-            pw.println("LD_LIBRARY_PATH=" + System.getenv("LD_LIBRARY_PATH"));
-            pw.println("java.library.path=" + System.getProperty("java.library.path"));
 
-            UnsatisfiedLinkError ne = new UnsatisfiedLinkError(error_message.toString());
-            ne.initCause(e);
-            throw ne;
-        } catch (NoClassDefFoundError e) {
-            StringWriter error_message = new StringWriter();
-            PrintWriter pw = new PrintWriter(error_message);
-            pw.println("Classpath Error in " + java.net.InetAddress.getLocalHost());
-            pw.println("java.class.path=" + System.getProperty("java.class.path"));
-
-            NoClassDefFoundError ne = new NoClassDefFoundError(error_message.toString());
-            ne.initCause(e);
-            throw ne;
-        } catch (Throwable e) {
-            StringWriter error_message = new StringWriter();
-            PrintWriter pw = new PrintWriter(error_message);
-            pw.println("Error initializing Scilab in " + java.net.InetAddress.getLocalHost());
-            pw.println("PATH=" + System.getenv("PATH"));
-            pw.println("LD_LIBRARY_PATH=" + System.getenv("LD_LIBRARY_PATH"));
-            pw.println("java.library.path=" + System.getProperty("java.library.path"));
-            pw.println("java.class.path=" + System.getProperty("java.class.path"));
-
-            IllegalStateException ne = new IllegalStateException(error_message.toString());
-            ne.initCause(e);
-            throw ne;
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                public void run() {
+                    Scilab.Finish();
+                }
+            }));
+            initialized = true;
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            public void run() {
-                Scilab.Finish();
-            }
-        }));
     }
 
     public void init(String inputScript, String functionsDefinition, ArrayList<String> scriptLines,
@@ -160,26 +169,31 @@ public class AOScilabWorker implements Serializable {
 
     public Serializable execute(TaskResult... results) throws Throwable {
 
+        initializeEngine();
+
         boolean ok = true;
 
         HashMap<String, List<SciData>> newEnv = new HashMap<String, List<SciData>>();
 
-        for (TaskResult res : results) {
-            if (!(res.value() instanceof List)) {
-                throw new InvalidParameterException(res.value().getClass());
-            }
+        if (results != null) {
 
-            for (SciData in : (List<SciData>) res.value()) {
-                if (newEnv.containsKey(in.getName())) {
-                    List<SciData> ldata = newEnv.get(in.getName());
-                    ldata.add(in);
-                } else {
-                    ArrayList<SciData> ldata = new ArrayList<SciData>();
-                    ldata.add(in);
-                    newEnv.put(in.getName(), ldata);
+            for (TaskResult res : results) {
+                if (!(res.value() instanceof List)) {
+                    throw new InvalidParameterException(res.value().getClass());
                 }
 
-                //Scilab.sendData(in);
+                for (SciData in : (List<SciData>) res.value()) {
+                    if (newEnv.containsKey(in.getName())) {
+                        List<SciData> ldata = newEnv.get(in.getName());
+                        ldata.add(in);
+                    } else {
+                        ArrayList<SciData> ldata = new ArrayList<SciData>();
+                        ldata.add(in);
+                        newEnv.put(in.getName(), ldata);
+                    }
+
+                    //Scilab.sendData(in);
+                }
             }
         }
 

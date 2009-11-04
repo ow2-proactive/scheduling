@@ -142,9 +142,11 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
      */
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        for (TaskResult res : results) {
-            if (res.hadException()) {
-                throw res.getException();
+        if (results != null) {
+            for (TaskResult res : results) {
+                if (res.hadException()) {
+                    throw res.getException();
+                }
             }
         }
         nodeName = PAActiveObject.getNode().getNodeInformation().getName();
@@ -321,6 +323,7 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
             sw.init(inputScript, functionsDefinition, scriptLines, out_set, debug);
         } catch (Exception e) {
             // in case the active object died
+            e.printStackTrace();
             if (debug) {
                 System.out.println("[" + host + " ScilabTask] Re-deploying Worker");
             }
@@ -379,6 +382,9 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
         }
 
         env.put("PATH", addScilabToPath(path));
+
+        // This tells scilab to run without graphical interface
+        env.put("SCI_JAVA_ENABLE_HEADLESS", "1");
 
         // Classpath specific
         String classpath = addScilabJarsToClassPath(javaCommandBuilder.getClasspath());
