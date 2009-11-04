@@ -22,10 +22,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
+ *  Initial developer(s): ActiveEon Team - www.activeeon.com
  *
+ *  Contributor(s):
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$

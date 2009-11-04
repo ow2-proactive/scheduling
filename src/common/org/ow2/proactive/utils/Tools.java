@@ -24,7 +24,7 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - www.activeeon.com
  *
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTORS$$
