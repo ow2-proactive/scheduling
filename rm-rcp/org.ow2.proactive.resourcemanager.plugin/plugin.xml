@@ -241,7 +241,7 @@
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
-                  icon="icons/rm_shutdown.png"
+                  icon="icons/rm_shutdown.gif"
                   label="Shutdown"
                   tooltip="Shutdown connected Resource Manager">
             </command>
@@ -260,8 +260,7 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
          <toolbar
-               id="toolbar"
-               sibling_order="&lt;command&#x0A;                  commandId=&quot;org.ow2.proactive.resourcemanager.plugin.removeNodes&quot;&#x0A;                  icon=&quot;classes/org/ow2/proactive/resourcemanager/gui/icons/remove_node.gif&quot;&#x0A;                  label=&quot;Remove nodes&quot;&#x0A;                  tooltip=&quot;remove nodes&quot;&gt;&#x0A;            &lt;/command&gt;">
+               id="toolbar">
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
                   icon="icons/connect.gif"
@@ -307,7 +306,7 @@
             </command>
             <command
                   commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
-                  icon="icons/rm_shutdown.png"
+                  icon="icons/rm_shutdown.gif"
                   label="Shutdown"
                   tooltip="Shutdown connected Resource Manager">
             </command>
@@ -322,39 +321,46 @@
             parentId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </scheme>
       <key
-            commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
+            commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
+            contextId="org.eclipse.ui.contexts.window"
             schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
-            sequence="DEL">
+            sequence="M1+A">
+      </key>
+      <key
+            commandId="org.ow2.proactive.resourcemanager.plugin.removeNodes"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
+            sequence="M1+DEL">
       </key>
       <key
             commandId="org.ow2.proactive.resourcemanager.plugin.gui.connectCommand"
+            contextId="org.eclipse.ui.contexts.window"
             schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
-            sequence="C">
+            sequence="M1+C">
       </key>
       <key
             commandId="org.ow2.proactive.resourcemanager.plugin.gui.disconnectCommand"
+            contextId="org.eclipse.ui.contexts.window"
             schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
-            sequence="D">
-      </key>
-      <key
-            commandId="org.ow2.proactive.resourcemanager.plugin.addNodes"
-            schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
-            sequence="A">
+            sequence="M1+D">
       </key>
       <key
             commandId="org.ow2.proactive.resourcemanager.plugin.shutdown"
+            contextId="org.eclipse.ui.contexts.window"
             schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
-            sequence="S">
+            sequence="M1+S">
       </key>
       <key
             commandId="org.ow2.proactive.resourcemanager.plugin.createNodesource"
+            contextId="org.eclipse.ui.contexts.window"
             schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
-            sequence="N">
+            sequence="M1+N">
       </key>
       <key
             commandId="org.ow2.proactive.resourcemanager.plugin.removeNodesource"
+            contextId="org.eclipse.ui.contexts.window"
             schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
-            sequence="R">
+            sequence="M1+R">
       </key>
    </extension>
 
