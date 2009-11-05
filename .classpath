@@ -26,17 +26,12 @@
 	<classpathentry kind="lib" path="lib/ProActive/batik-svggen.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/batik-util.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/batik-xml.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/bcel-5.1.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/bcel-5.1-fixes-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/bouncycastle.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/bundlerepository.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/classad.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/cog-jglobus.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cog-jglobus-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cog-ogce.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/colobus-0.1.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/colt.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/commons-discovery.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cryptix.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/cryptix32.jar"/>
@@ -102,10 +97,8 @@
 	<classpathentry kind="lib" path="lib/ProActive/ProActive_utils.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/servlet-api-2.5-6.1.11.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ssj.jar"/>
-	<classpathentry kind="lib" path="lib/ec2/activation.jar"/>
 	<classpathentry kind="lib" path="lib/ec2/typica.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/annogen-0.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/apputils.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/asm-2.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/axiom-api-1.2.7.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/axiom-impl-1.2.7.jar"/>
@@ -135,7 +128,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/jsch-0.1.31.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/neethi-2.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/saaj-api-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/ProActive/saaj.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/spring-beans-2.5.5.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/spring-context-2.5.5.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/spring-core-2.5.5.jar"/>
