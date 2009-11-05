@@ -171,12 +171,12 @@ public class CreateCredentials {
 
         int acc = 0;
         if (scheduler != null) {
-            url = normalize(scheduler, "SCHEDULER");
+            url = Connection.normalize(scheduler) + "SCHEDULER";
             acc++;
 
         }
         if (rm != null) {
-            url = normalize(rm, "RMAUTHENTICATION");
+            url = Connection.normalize(rm) + "RMAUTHENTICATION";
             acc++;
         }
         if (pubKeyPath != null) {
@@ -271,11 +271,4 @@ public class CreateCredentials {
         System.exit(0);
     }
 
-    private static String normalize(String url, String name) {
-        if (url.endsWith("/")) {
-            return url + name;
-        } else {
-            return url + "/" + name;
-        }
-    }
 }
