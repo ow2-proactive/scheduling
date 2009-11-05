@@ -68,6 +68,9 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @AccessType("field")
 @Proxy(lazy = false)
 public class GenerationScript extends Script<String> {
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /** Loggers */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);
 

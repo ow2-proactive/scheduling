@@ -57,6 +57,8 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 @PublicAPI
 public class SchedulerUsers implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     /** List of connected user. */
     private Set<UserIdentification> users = new HashSet<UserIdentification>();
 

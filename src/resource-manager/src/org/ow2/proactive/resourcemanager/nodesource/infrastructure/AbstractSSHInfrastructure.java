@@ -64,6 +64,8 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  */
 public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     /**
      * Path to the Java executable on the remote hosts
      */

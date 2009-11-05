@@ -52,6 +52,9 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 public class JobDataSpaceApplication implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.DATASPACE);
 
     private long applicationId;

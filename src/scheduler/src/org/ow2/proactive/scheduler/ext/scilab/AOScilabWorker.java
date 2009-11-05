@@ -41,7 +41,6 @@ import org.ow2.proactive.scheduler.ext.scilab.util.ScilabConfiguration;
 import org.ow2.proactive.scheduler.ext.scilab.exception.InvalidParameterException;
 
 import java.io.*;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +52,9 @@ import java.util.Map;
  * @author The ProActive Team
  */
 public class AOScilabWorker implements Serializable {
+
+    /**  */
+    private static final long serialVersionUID = 20;
 
     static String nl = System.getProperty("line.separator");
 

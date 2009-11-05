@@ -42,6 +42,9 @@ package org.ow2.proactive.scheduler.core.db;
  */
 public class DatabaseManagerException extends RuntimeException {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /**
      * Create a new instance of DatabaseManagerException.
      */

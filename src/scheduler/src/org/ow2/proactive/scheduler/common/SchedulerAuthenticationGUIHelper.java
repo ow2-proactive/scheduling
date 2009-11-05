@@ -228,6 +228,8 @@ public class SchedulerAuthenticationGUIHelper {
 
     static class AuthGraphicHelper extends JFrame implements ActionListener, WindowListener, KeyListener {
 
+        /**  */
+        private static final long serialVersionUID = 20;
         private static final String TMP_FILE_NAME = "AuthGrapHelpGUI.tmp";
         private static final File TMP_AUTH_FILE = new File(System.getProperty("java.io.tmpdir") +
             File.separator + TMP_FILE_NAME);

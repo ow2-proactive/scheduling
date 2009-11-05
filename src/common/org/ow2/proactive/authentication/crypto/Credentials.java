@@ -87,6 +87,8 @@ import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 @PublicAPI
 public class Credentials implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     /** symmetric encryption parameters */
     // more than that breaks with default provider / config, it *is* secure nonetheless
     private static final int AES_KEYSIZE = 128;
@@ -136,6 +138,9 @@ public class Credentials implements Serializable {
      * will be serialized and encrypted
      */
     public static class CredData implements Serializable {
+        /**  */
+        private static final long serialVersionUID = 20;
+
         public CredData() {
         }
 

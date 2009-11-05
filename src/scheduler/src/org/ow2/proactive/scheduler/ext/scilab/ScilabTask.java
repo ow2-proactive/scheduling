@@ -501,6 +501,9 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
      */
     private static class DummyJVMProcess extends JVMProcessImpl {
 
+        /**  */
+        private static final long serialVersionUID = 20;
+
         /**
          *
          */

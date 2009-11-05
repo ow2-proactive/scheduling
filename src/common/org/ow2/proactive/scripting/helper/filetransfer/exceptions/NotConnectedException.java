@@ -42,6 +42,9 @@ package org.ow2.proactive.scripting.helper.filetransfer.exceptions;
  */
 public class NotConnectedException extends Exception {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     public NotConnectedException() {
         super();
     }

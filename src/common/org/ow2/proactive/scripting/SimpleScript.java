@@ -64,6 +64,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @AccessType("field")
 @Proxy(lazy = false)
 public class SimpleScript extends Script {
+    /**  */
+    private static final long serialVersionUID = 20;
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

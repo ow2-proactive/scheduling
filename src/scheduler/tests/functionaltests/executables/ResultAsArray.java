@@ -60,6 +60,8 @@ public class ResultAsArray extends JavaExecutable {
     }
 
     static class RenderedBucket implements Serializable {
+        /**  */
+        private static final long serialVersionUID = 20;
         private int x, y, w, h;
         private float[] color;
 

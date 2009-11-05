@@ -48,6 +48,8 @@ import java.util.LinkedList;
  */
 public class BoundedLinkedList<E> extends LinkedList<E> {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     private int size;
 
     /**

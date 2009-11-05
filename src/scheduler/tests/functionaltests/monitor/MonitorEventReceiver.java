@@ -53,6 +53,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  */
 public class MonitorEventReceiver implements SchedulerEventListener {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     private SchedulerMonitorsHandler monitorsHandler;
 
     /**

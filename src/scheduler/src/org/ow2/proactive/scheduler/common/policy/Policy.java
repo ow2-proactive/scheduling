@@ -54,6 +54,8 @@ import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
 @PublicAPI
 public abstract class Policy implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     /**
      * Resources manager state. Can be used in an inherit policy to be aware
      * of resources informations like total nodes number, used nodes, etc.

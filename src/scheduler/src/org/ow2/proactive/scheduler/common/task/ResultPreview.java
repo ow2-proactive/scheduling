@@ -50,6 +50,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public abstract class ResultPreview implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     /**
      * The textual preview of the result, evaluated on computing node side
      * after the task completion.

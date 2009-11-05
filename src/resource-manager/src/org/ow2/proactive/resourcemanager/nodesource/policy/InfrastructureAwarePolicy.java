@@ -41,4 +41,7 @@ package org.ow2.proactive.resourcemanager.nodesource.policy;
  * TODO add implementation
  */
 public abstract class InfrastructureAwarePolicy extends NodeSourcePolicy {
+
+    /**  */
+    private static final long serialVersionUID = 20;
 }

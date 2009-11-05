@@ -73,6 +73,9 @@ import org.ow2.proactive.utils.Tools;
 public class SchedulerAuthentication extends AuthenticationImpl implements InitActive,
         SchedulerAuthenticationInterface {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /** Scheduler logger */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CONNECTION);
 

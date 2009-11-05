@@ -46,6 +46,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class ExecutableCreationException extends SchedulerException {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /**
      * Attaches a message to the Exception.
      *

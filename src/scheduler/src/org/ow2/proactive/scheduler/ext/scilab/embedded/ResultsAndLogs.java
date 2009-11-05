@@ -46,6 +46,8 @@ import java.io.Serializable;
  */
 public class ResultsAndLogs implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     private SciData result;
     private String logs;
     private Throwable exception;

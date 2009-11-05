@@ -68,6 +68,9 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @Proxy(lazy = false)
 public class InternalJavaTask extends InternalTask {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     @Id

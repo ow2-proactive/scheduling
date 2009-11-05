@@ -62,6 +62,8 @@ public class RestartMode implements java.io.Serializable {
     // WARNING, DO NOT CHANGE index property in RestartMode construction,
     // 1="Anywhere", 2="Elsewhere" (Changing the index can create inconsistent state in DB)
 
+    /**  */
+    private static final long serialVersionUID = 20;
     /**
      * The task will be restarted according to its possible resources.
      */

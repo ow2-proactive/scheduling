@@ -77,6 +77,8 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  */
 public class PBSInfrastructure extends AbstractSSHInfrastructure {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     /**
      * maximum number of nodes this infrastructure can ask simultaneously to the pbs scheduler
      */

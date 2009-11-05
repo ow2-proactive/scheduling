@@ -63,6 +63,9 @@ import java.util.*;
 
 public class AOSchedulerWorker extends AOWorker implements SchedulerEventListener {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /**
      * interface to scheduler
      */

@@ -41,4 +41,7 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
  *
  */
 public abstract class DrmaaInfrastructure extends InfrastructureManager {
+
+    /**  */
+    private static final long serialVersionUID = 20;
 }

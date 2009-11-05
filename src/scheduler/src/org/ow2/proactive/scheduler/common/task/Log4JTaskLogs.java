@@ -64,6 +64,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @AccessType("field")
 @Proxy(lazy = false)
 public class Log4JTaskLogs implements TaskLogs {
+    /**  */
+    private static final long serialVersionUID = 20;
+
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

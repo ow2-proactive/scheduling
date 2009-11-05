@@ -51,6 +51,9 @@ import ptolemy.data.Token;
  */
 public class AOMatlabWorker implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     protected boolean debug;
 
     static String nl = System.getProperty("line.separator");

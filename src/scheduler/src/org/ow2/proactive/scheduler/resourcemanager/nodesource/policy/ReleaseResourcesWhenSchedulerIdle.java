@@ -54,6 +54,8 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy implements InitActive,
         SchedulerEventListener {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     private transient Timer timer = new Timer(true);
     private int activeJobs = 0;
 

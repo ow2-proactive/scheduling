@@ -71,6 +71,9 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure" })
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
     private Map<JobId, Integer> activeTasks = new HashMap<JobId, Integer>();

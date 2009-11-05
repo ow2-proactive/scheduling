@@ -82,6 +82,8 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
  */
 public class SchedulerProxy implements AdminSchedulerInterface {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     private static final long SCHEDULER_SERVER_PING_FREQUENCY = 5000;
     public static final int CONNECTED = 0;
     public static final int LOGIN_OR_PASSWORD_WRONG = 1;

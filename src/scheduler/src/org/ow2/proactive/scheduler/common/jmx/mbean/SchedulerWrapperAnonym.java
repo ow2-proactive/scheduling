@@ -58,6 +58,9 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  * @since ProActive Scheduling 1.0
  */
 public class SchedulerWrapperAnonym implements SchedulerWrapperAnonymMBean, SchedulerEventListener {
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /** Scheduler current state */
     protected SchedulerStatus schedulerStatus = SchedulerStatus.STOPPED;
 

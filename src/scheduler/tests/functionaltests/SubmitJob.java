@@ -20,6 +20,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 public class SubmitJob implements SchedulerEventListener {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     private JobId myJobId;
     private UserSchedulerInterface user;
     private int terminated = 0;

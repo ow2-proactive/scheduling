@@ -62,6 +62,9 @@ import org.ow2.proactive.utils.Tools;
  * @since ProActive Scheduling 1.0
  */
 public class SchedulerWrapperAdmin extends SchedulerWrapperAnonym implements SchedulerWrapperAdminMBean {
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /** Scheduler logger device */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
 

@@ -84,6 +84,9 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 @Proxy(lazy = true)
 public class JavaExecutableContainer extends ExecutableContainer {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     @Id
     @GeneratedValue
     protected long hId;

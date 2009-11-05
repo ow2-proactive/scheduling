@@ -104,6 +104,9 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 @AccessType("field")
 @Proxy(lazy = false)
 public abstract class InternalJob extends JobState {
+    /**  */
+    private static final long serialVersionUID = 20;
+
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /** Owner of the job */

@@ -49,6 +49,8 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 @PublicAPI
 public abstract class TaskState extends Task implements Comparable<TaskState> {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     /** Sorting constant, this will allow the user to sort the descriptor. */
     public static final int SORT_BY_ID = 1;
     public static final int SORT_BY_NAME = 2;

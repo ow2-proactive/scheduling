@@ -448,6 +448,9 @@ public class HibernateDatabaseManager extends DatabaseManager {
     public List<InternalJob> recoverAllJobs(RecoverCallback callback) {
         if (callback == null) {
             callback = new RecoverCallback() {
+                /**  */
+                private static final long serialVersionUID = 20;
+
                 public void init(int nb) {
                 }
 

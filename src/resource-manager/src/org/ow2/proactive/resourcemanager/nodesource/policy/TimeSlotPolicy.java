@@ -64,6 +64,9 @@ import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
  */
 public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /**
      * Timer task acquired all node from infrastructure
      */

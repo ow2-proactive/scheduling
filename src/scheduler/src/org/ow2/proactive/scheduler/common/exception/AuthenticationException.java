@@ -44,6 +44,9 @@ package org.ow2.proactive.scheduler.common.exception;
  */
 public class AuthenticationException extends SchedulerException {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /**
      * Create a new instance of AuthenticationException
      * 

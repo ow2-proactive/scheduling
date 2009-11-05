@@ -60,6 +60,9 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 @PublicAPI
 public class RMInitialState implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /** Nodes events */
     private ArrayList<RMNodeEvent> nodesList = new ArrayList<RMNodeEvent>();
 

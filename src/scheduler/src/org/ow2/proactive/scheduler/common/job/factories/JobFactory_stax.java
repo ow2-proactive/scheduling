@@ -323,6 +323,9 @@ public class JobFactory_stax extends JobFactory {
         //create a job that will just temporary store the common properties of the job
         Job jtmp = new Job() {
 
+            /**  */
+            private static final long serialVersionUID = 20;
+
             @Override
             public JobId getId() {
                 throw new RuntimeException("Not Available !");
@@ -600,6 +603,9 @@ public class JobFactory_stax extends JobFactory {
         try {
             Task toReturn = null;
             Task tmpTask = (taskToFill != null) ? taskToFill : new Task() {
+
+                /**  */
+                private static final long serialVersionUID = 20;
             };
             //parse job attributes and fill the temporary one
             int attrLen = cursorTask.getAttributeCount();

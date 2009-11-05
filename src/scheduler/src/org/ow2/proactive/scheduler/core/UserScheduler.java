@@ -61,6 +61,8 @@ import org.ow2.proactive.utils.Tools;
  */
 public class UserScheduler implements UserSchedulerInterface {
 
+    /**  */
+    private static final long serialVersionUID = 20;
     /** Scheduler proxy as an active object */
     public SchedulerFrontend schedulerFrontend;
 

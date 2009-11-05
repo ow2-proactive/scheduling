@@ -61,6 +61,9 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 @PublicAPI
 public class RMNodeSourceEvent extends RMEvent {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /** name of the source concerned by the event. */
     private String nodeSourceName = null;
 

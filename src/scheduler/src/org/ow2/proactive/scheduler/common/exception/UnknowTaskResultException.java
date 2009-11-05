@@ -46,6 +46,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class UnknowTaskResultException extends SchedulerException {
 
+    /**  */
+    private static final long serialVersionUID = 20;
+
     /**
      * Create a new instance of UnknowTaskResultException
      * 
