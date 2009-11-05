@@ -95,5 +95,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/ejb3-persistence.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-commons-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-6.1.18.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-util-6.1.18.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

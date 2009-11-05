@@ -73,6 +73,11 @@
 				<include name="hibernate/**/*.jar"/>
         </fileset>
     </path>
+	
+	<path id="common.classpath">
+		<path refid="common.libs"/>
+		<pathelement location="${cl.common.dir}" />
+	</path>
 
     <fileset id="jar.index.fileset" dir="${lib.dir}">
             <include name="common/**/*.jar" />

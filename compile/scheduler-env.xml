@@ -59,8 +59,7 @@
 	</path>
 
 	<path id="scheduler.classpath">
-		<path refid="common.libs"/>
-		<pathelement location="${cl.common.dir}" />
+		<path refid="common.classpath"/>
 		<pathelement location="${cl.scheduler.dir}" />
 	</path>
 

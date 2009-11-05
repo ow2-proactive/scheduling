@@ -27,6 +27,26 @@
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
 
 	<!-- ************
+		MacroDef Stub generator
+	-->
+
+    <macrodef name="generate_stub_for_class">
+            <attribute name="targetedClasspath"/>
+            <attribute name="srcDir"/>
+            <attribute name="class"/>
+            <element name="extra.exclusion.pattern" optional="yes"/>
+            <sequential>
+                    <java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+                            <classpath refid="@{targetedClasspath}" />
+                            <arg value="-srcDir"/>
+                            <arg value="@{srcDir}"/>
+                            <arg value="-class"/>
+                            <arg value="@{class}"/>
+                    </java>
+            </sequential>
+    </macrodef>
+	
+	<!-- ************
 		Classpath
 	-->
 
@@ -47,22 +67,24 @@
 	-->
 
 	 <target name="compile.common" description="Compile commmon stuffs">
-                <mkdir dir="${cl.common.dir}"/>
+            <mkdir dir="${cl.common.dir}"/>
 
-				<copy toDir="${cl.common.dir}">
-						<fileset dir="${src.common}" excludes="**/*.java"/>
-				</copy>
+			<copy toDir="${cl.common.dir}">
+					<fileset dir="${src.common}" excludes="**/*.java"/>
+			</copy>
 
-                <javac
-                        srcdir="${src.common}"
-                        destdir="${cl.common.dir}"
-                        deprecation="on"
-                        source="${source}"
-                        debug="${debug}"  >
+            <javac
+                    srcdir="${src.common}"
+                    destdir="${cl.common.dir}"
+                    deprecation="on"
+                    source="${source}"
+                    debug="${debug}"  >
 
-                        <classpath refid="common.libs"/>
-                        <include name="**/*.java"/>
-                </javac>
+                    <classpath refid="common.libs"/>
+                    <include name="**/*.java"/>
+            </javac>
+ 	
+	 		<generate_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/scripting/ScriptHandler" />
       </target>
 
 

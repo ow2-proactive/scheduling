@@ -43,11 +43,10 @@
 	</path>
 
 	<path id="rm.classpath">
-		<path refid="common.libs"/>
+		<path refid="common.classpath"/>
 		<fileset dir="${lib.dir}">
 		    <include name="ec2/**/*.jar"/>
 		</fileset>
-		<pathelement location="${cl.common.dir}" />
 		<pathelement location="${cl.rm.dir}" />
 	</path>
 

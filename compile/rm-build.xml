@@ -43,10 +43,25 @@
 			<include name="**/*.java"/>
 		</javac>
 
-		<java classname="${stubgenerator.class}" fork="true">
+		<!--<java classname="${stubgenerator.class}" fork="true">
 			<classpath refid="rm.classpath" />
 			<arg line="-srcDir ${cl.rm.dir} -pkg org.ow2.proactive.resourcemanager" />
-		</java>
+		</java>-->
+		
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthenticationImpl" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMAdminImpl" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMUserImpl" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMMonitoringImpl" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/selection/ProbablisticSelectionManager" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/NodeSource" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/examples/windowsagent/Test" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/utils/Pinger" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/dataspace/DataSpaceNodeConfigurationAgent" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/core/RMCore" />
+		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/policy/NodeSourcePolicy" />
+		<generate_stub_for_class targetedClasspath="rm.test.classpath" srcDir="${cl.rm.tests.dir}" class="functionaltests/RMLauncherAO" />
+		<generate_stub_for_class targetedClasspath="rm.test.classpath" srcDir="${cl.rm.tests.dir}" class="functionaltests/monitor/RMMonitorEventReceiver" />
+		
 	</target>
 
     <!-- ************
