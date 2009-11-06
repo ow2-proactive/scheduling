@@ -4,7 +4,6 @@
 
 	<property name="src.rm.dir"          value="${src.dir}/resource-manager/src" />
 	<property name="src.rm.tests.dir"    value="${src.dir}/resource-manager/tests" />
-	<property name="doc.name" 			 value="ResourceManager" />
 
 	<!-- ================================================================ -->
 	<!--                   		Class  paths                              -->

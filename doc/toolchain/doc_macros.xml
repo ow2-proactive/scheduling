@@ -210,8 +210,8 @@
 
 	<macrodef name="javadoc.checkstyle" description="Generate javadoc violation reports">
 	  <sequential>
-	    <property name="checkstyle.plain.file" value="${docs.built.dir}/${doc.name}_javadoc.txt"/>
-	    <property name="checkstyle.xml.file" value="${docs.built.dir}/${doc.name}_javadoc.xml"/>
+	    <var name="checkstyle.plain.file" value="${docs.built.dir}/${doc.name}_javadoc.txt"/>
+	    <var name="checkstyle.xml.file" value="${docs.built.dir}/${doc.name}_javadoc.xml"/>
 	    <property name="translation.severity" value="ignore"/>
 	    <mkdir dir="${docs.built.dir}"/>
 	    <checkstyle config="${checkstyle.config}"

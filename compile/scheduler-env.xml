@@ -8,8 +8,7 @@
 
 	<property name="src.scheduler.dir"   	 value="${src.dir}/scheduler/src" />
 	<property name="src.scheduler.tests.dir" value="${src.dir}/scheduler/tests" />
-	<property name="doc.name" 			 	 value="Scheduler" />
-
+	
 	<!-- ================================================================ -->
 	<!--                   		Class  paths                              -->
 	<!--  =============================================================== -->

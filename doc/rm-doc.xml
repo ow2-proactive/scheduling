@@ -26,9 +26,8 @@
 	<!--          Make just the html files for the manual                     -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualHtml" description="Generate the Resource Manager HTML manual">
+		<build_doc_vars docName="ResourceManager" />
 		<subant target="manualHtml" 			inheritall="true">
-			<property name="docs.src.dir"           value="${rm.src.dir}" />
-			<property name="docs.mainFile" 			value="rm-main.xml" />
 			<fileset dir="${rm.file.set}" 	includes="doc.xml"/>
 		</subant>
 	</target>
@@ -36,8 +35,8 @@
 	<!--   Make an archive from the files for the multiple html manual        -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualHtmlZip" description="Generate the Resource Manager HTML manual zip" depends="doc.rm.manualHtml" >
+		<build_doc_vars docName="ResourceManager" />
 		<subant target="manualHtmlZip" inheritall="true">
-			<property name="docs.src.dir"           value="${rm.src.dir}" />
 			<fileset dir="${rm.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -46,9 +45,8 @@
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualPdf" description="Generate the Resource Manager PDF manual">
+		<build_doc_vars docName="ResourceManager" />
 		<subant target="manualPdf" inheritall="true">
-			<property name="docs.src.dir"           value="${rm.src.dir}" />
-			<property name="docs.mainFile" 			value="rm-main.xml" />
 			<fileset dir="${rm.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -56,9 +54,8 @@
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualSingleHtml" description="Generate the Resource Manager single HTML manual">
+		<build_doc_vars docName="ResourceManager" />
 		<subant target="manualSingleHtml" inheritall="true">
-			<property name="docs.src.dir"           value="${rm.src.dir}" />
-			<property name="docs.mainFile" 			value="rm-main.xml" />
 			<fileset dir="${rm.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -67,8 +64,8 @@
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualSingleHtmlZip" description="Generate the Resource Manager single HTML manual zip" depends="doc.rm.manualSingleHtml" >
+		<build_doc_vars docName="ResourceManager" />
 		<subant target="manualSingleHtmlZip" inheritall="true">
-			<property name="docs.src.dir"           value="${rm.src.dir}" />
 			<fileset dir="${rm.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -77,6 +74,7 @@
 	<!--      Make an archive from the published javadoc       -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.javadoc.publishedZip" description="Generate the Resource Manager published javadoc zip" depends="doc.rm.javadoc.published">
+		<build_doc_vars docName="ResourceManager" />
 		<subant target="javadoc.publishedZip" inheritall="true">
 			<fileset dir="${rm.file.set}" includes="doc.xml"/>
 		</subant>
@@ -86,6 +84,7 @@
 	<!--      Make an archive from the complete javadoc       -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.javadoc.completeZip" description="Generate the Resource Manager complete javadoc zip" depends="doc.rm.javadoc.complete">
+		<build_doc_vars docName="ResourceManager" />
 		<subant target="javadoc.completeZip" inheritall="true">
 			<fileset dir="${rm.file.set}" includes="doc.xml"/>
 		</subant>
@@ -106,7 +105,8 @@
 
 
       <target name="doc.rm.javadoc.complete"  depends="compile.rm" description="Generate the Resource Manager complete javadoc">
-        <javadoc
+      	<build_doc_vars docName="ResourceManager" />
+      	<javadoc
             destdir="${docs.built.dir}/api_complete"
             author="true"
             version="true"
@@ -137,7 +137,8 @@
 
     <property name="javadoc.published.core" value="${docs.tmp.dir}/publishedCoreClasses"/>
     <target name="doc.rm.javadoc.published" depends="compile.rm" description="Generate the Resource Manager published javadoc">
-        <mkdir dir="${docs.tmp.dir}" />
+    	<build_doc_vars docName="ResourceManager" />
+    	<mkdir dir="${docs.tmp.dir}" />
         <javadoc source="${source}"	classpathref="rm.libs">
             <doclet name="doc.PublishedAPIDoclet">
 		<path refid="docs.utils.classpath.javadoc"/>
