@@ -40,11 +40,6 @@
 			<classpath path="${cl.scheduler.dir}"/>
 			<include name="**/*.java"/>
 		</javac>
-
-		<!--<java classname="${stubgenerator.class}" fork="true">
-			<classpath refid="scheduler.classpath" />
-            <arg line="-srcDir ${cl.scheduler.dir} -pkg org.ow2.proactive.scheduler" />
-		</java>-->
 		
 		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerFrontend" />
 		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/authentication/SchedulerAuthentication" />

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="deploy.rm" basedir=".">
+	
+	<taskdef name="var" classname="ise.antelope.tasks.Variable"/>
+	
 	<import file="rm-env.xml" />
 	<import file="common-build.xml" />
 
@@ -42,11 +45,6 @@
 			<classpath path="${cl.rm.dir}"/>
 			<include name="**/*.java"/>
 		</javac>
-
-		<!--<java classname="${stubgenerator.class}" fork="true">
-			<classpath refid="rm.classpath" />
-			<arg line="-srcDir ${cl.rm.dir} -pkg org.ow2.proactive.resourcemanager" />
-		</java>-->
 		
 		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthenticationImpl" />
 		<generate_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMAdminImpl" />
