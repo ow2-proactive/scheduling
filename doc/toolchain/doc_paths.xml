@@ -21,6 +21,28 @@
 	<property name="docs.toolchain.dir"		value="${docs.dir}/toolchain" /> <!-- doc/toolchain folder -->
 	<property name="docs.xsl.dir"			value="${docs.toolchain.dir}/xsl" />
 	
+	<!-- DocBook --> 
+	<property name="docbook.version" 		value="1.74.0" />
+	<property name="docbook.archive"        value="docbook-xsl-ns-${docbook.version}" />
+	<property name="docs.lib.dir"			value="${docs.toolchain.dir}/lib/" />
+
+	<path id="docs.utils.classpath">
+		<fileset dir="${docs.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		
+	</path>
+	
+	<!-- javadoc paths are not include through subant-->
+	<path id="docs.utils.classpath.javadoc">
+		<fileset dir="${docs.lib.dir}/trunk/doc/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+		
+	</path>
+	
+	<property name="docs.log4j.properties"	value="${docs.lib.dir}/log4j.properties" />
+
 	<macrodef name="build_doc_vars">
 	
 		<attribute name="docName" />
@@ -41,29 +63,6 @@
 			<var name="snippets.start.default"	value="${docs.dir}/../src" />
 			<var name="snippets.location"		value="${docs.tmp.dir}/automatic_snippets" />
 			
-			
-			
-			<!-- DocBook --> 
-			<var name="docbook.version" 		value="1.74.0" />
-			<var name="docbook.archive"        value="docbook-xsl-ns-${docbook.version}" />
-			<var name="docs.lib.dir"			value="${docs.toolchain.dir}/lib/" />
-		
-			<path id="docs.utils.classpath">
-				<fileset dir="${docs.lib.dir}">
-					<include name="**/*.jar"/>
-				</fileset>
-				
-			</path>
-			
-			<!-- javadoc paths are not include through subant-->
-			<path id="docs.utils.classpath.javadoc">
-				<fileset dir="${docs.lib.dir}/trunk/doc/lib">
-					<include name="**/*.jar"/>
-				</fileset>
-				
-			</path>
-			
-			<var name="docs.log4j.properties"	value="${docs.lib.dir}/log4j.properties" />
 			
 			<var name="extra.format.dir" 		value=""/>
 			<!-- ================================================================ -->
