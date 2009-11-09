@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: scheduler-rm libraries Plug-in
+Bundle-Name: scheduler libraries Plug-in
 Bundle-SymbolicName: org.ow2.proactive.scheduler.lib
 Bundle-Version: 11.22.33
 Require-Bundle: org.eclipse.core.runtime,
