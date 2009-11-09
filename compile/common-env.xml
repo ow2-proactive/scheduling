@@ -82,5 +82,6 @@
     <fileset id="jar.index.fileset" dir="${lib.dir}">
             <include name="common/**/*.jar" />
             <include name="hibernate/**/*.jar" />
+    		<include name="ec2/**/*.jar" />
     </fileset>
 </project>
