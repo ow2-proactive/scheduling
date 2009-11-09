@@ -35,9 +35,12 @@
 package org.ow2.proactive.authentication;
 
 import java.io.Serializable;
+import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -145,6 +148,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
                     // success
                     break;
                 } catch (Exception e) {
+                    logger.debug("", e);
                     Thread.sleep(Math.min(PERIOD, leftTime));
                     leftTime -= (System.currentTimeMillis() - startTime);
                     if (leftTime <= 0) {
@@ -189,7 +193,15 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      */
     public static String normalize(String url) {
         if (url == null || url.trim().equals("")) {
-            url = "//localhost/";
+            if (PAProperties.PA_NET_NOLOOPBACK.isTrue()) {
+                try {
+                    url = "//" + URIBuilder.fromLocalhostToHostname(null) + "/";
+                } catch (UnknownHostException e) {
+                    url = "//localhost/";
+                }
+            } else {
+                url = "//localhost/";
+            }
         } else {
             url = url.trim();
         }
