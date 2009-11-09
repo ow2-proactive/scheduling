@@ -68,7 +68,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure",
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure",
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure",
-        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure" })
+        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure",
+        "org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure"})
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive {
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);

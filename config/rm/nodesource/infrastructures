@@ -17,3 +17,6 @@ org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
 
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure
+
+# Windows HPC 2008 infrastructure
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure
