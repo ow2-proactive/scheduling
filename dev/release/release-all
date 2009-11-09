@@ -14,7 +14,7 @@ function build() {
 	generate_credential
 }
 
-init_env ProActiveScheduler $*
+init_env ProActiveScheduling $*
 copy_to_tmp
 build_and_clean
 clean_repository
