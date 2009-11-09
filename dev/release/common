@@ -55,7 +55,7 @@ function init_env() {
 
 function copy_to_tmp() {
 	echo "********************** Copying the product to tmp dir ************************"
-	TMP_DIR="${TMP}/$RELEASE_BASENAME-${VERSION}"
+	TMP_DIR="${TMP}/$RELEASE_BASENAME-${VERSION}_core"
 	output=$(mkdir ${TMP_DIR} 2>&1)
 	if [ "$?" -ne 0 ] ; then
 		if [ -e ${TMP_DIR} ] ; then
@@ -143,6 +143,6 @@ function replace_version() {
 function build_archive() {
 	echo "********************** Building archive ************************"
 	cd ${TMP} || warn_and_exit "Cannot move in ${TMP}"
-	tar cvfz $RELEASE_BASENAME-${VERSION}.tar.gz $RELEASE_BASENAME-${VERSION}
-	zip -r   $RELEASE_BASENAME-${VERSION}.zip    $RELEASE_BASENAME-${VERSION}
+	tar cvfz $RELEASE_BASENAME-${VERSION}_core.tar.gz $RELEASE_BASENAME-${VERSION}_core
+	zip -r   $RELEASE_BASENAME-${VERSION}_core.zip    $RELEASE_BASENAME-${VERSION}_core
 }

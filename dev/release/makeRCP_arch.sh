@@ -13,7 +13,7 @@ then
 	echo "    destination      : Destination path for the final generated archive"
 	echo
 	echo "    Example :"
-	echo "    ./makeRCP_arch.sh ../Public/RCP 1.0.2 ../Workspace/ProActiveScheduling.git/scheduler_plugins/org.ow2.proactive.scheduler/proactive-log4j ../Public/RCP"
+	echo "    ./makeRCP_arch.sh ../Public/RCP 1.0.2 ../Workspace/ProActiveScheduling.git/scheduler_rcp/org.ow2.proactive.scheduler/proactive-log4j ../Public/RCP"
 	echo "    "
 	echo "    To export plugins (via Eclipse) Root directory must be :"
 	echo "       'ResourceManager'    for RM"
@@ -38,7 +38,7 @@ then
 	PRODUCT_NAME=Scheduler
 elif [ "$PRODUCT" = "rm" ]
 then
-	PREFIX=ProActiveResourceManager-
+	PREFIX=ProActiveResourcing-
 	PRODUCT_NAME=ResourceManager
 else
 	echo unknown product name : $PRODUCT

@@ -30,7 +30,7 @@ function separate_rm() {
 	mv RM-README.txt README.txt
 };
 
-init_env ProActiveResourceManager $*
+init_env ProActiveResourcing $*
 copy_to_tmp
 build_and_clean
 separate_rm
