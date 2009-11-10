@@ -185,7 +185,7 @@ public abstract class SelectionManager extends RestrictedService implements Init
                     // could not create script execution handler
                     // probably the node id down
                     logger.warn("Cannot execute script " + swr.getScript().hashCode() + " on the node " +
-                        rmnode.getNodeURL() + " - " + scriptResult.getException().getMessage());
+                        rmnode.getNodeURL(), scriptResult.getException());
                     logger.warn("Checking if the node " + rmnode.getNodeURL() + " is still alive");
                     rmnode.getNodeSource().getPinger().pingNode(rmnode.getNodeURL());
                     continue;
