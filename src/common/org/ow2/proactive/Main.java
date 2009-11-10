@@ -52,7 +52,7 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-        if (version.equals("{srm-version-main}")) {
+        if (version.equals("{srm-vers" + "ion-main}")) {
             Date d = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             version = sdf.format(d) + " - (Unreleased Version)";

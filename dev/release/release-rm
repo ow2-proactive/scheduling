@@ -2,6 +2,7 @@
 
 function build() {
 	# Replace version tag in main java file
+	sed -i "s/{srm-version-main}/$VERSION/" src/common/org/ow2/proactive/Main.java
 	sed -i "s/{rm-version-main}/$VERSION/" src/resource-manager/src/org/ow2/proactive/resourcemanager/common/Main.java
 
 	echo "********************** Building the resource manager ************************"
