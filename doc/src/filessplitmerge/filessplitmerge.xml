@@ -12,14 +12,14 @@
 
 		<para>
 			The
-			<emphasis>"Files Split Merge"</emphasis>
+			<emphasis role="bold">"Files Split Merge"</emphasis>
 			generic framework provides an easy way to develop a
 			distribution layer for a native application in order to run
 			it on a ProActive managed infrastructure through the
-			ProActive Scheduler and Resource Manager.Here is a short
+			ProActive Scheduler and Resource Manager. Here is a short
 			description of this framework: A distribution layer can be
 			implemented, with this framework, for native
-			applicationsthat meet these requirements:
+			applications that meet these requirements:
 
 			<itemizedlist>
 				<listitem>
@@ -42,15 +42,15 @@
 		</para>
 
 		<para>
-			The framework implements the «split input data/ execute
-			multiple instances/merge results» pipeline, so that the
+			The framework implements the <quote>split input data | execute
+			multiple instances | merge results</quote> pipeline, so that
 			applications built over this framework provide features
 			like:
 		</para>
 		<itemizedlist>
 			<listitem>
 				<para>
-					disconnected mode: the user can disconnect from the
+					<emphasis role="bold">disconnected mode</emphasis>: the user can disconnect from the
 					application (close the application) during the
 					execution of his "run" by the ProActive Scheduler
 					Server. Once the application restarted, it will ask
@@ -60,7 +60,7 @@
 			</listitem>
 			<listitem>
 				<para>
-					fault tolerance: the entire system is fault tolerant
+					<emphasis role="bold">fault tolerance</emphasis>: the entire system is fault tolerant
 					- the application itself and the ProActive Scheduler
 					and Resource Manager servers. The granularity of the
 					fault tolerance is a task (an instance of the native
@@ -72,26 +72,26 @@
 			</listitem>
 			<listitem>
 				<para>
-					keep track of the advancement of the "run", notify
+					<emphasis role="bold">keep track of the advancement of the "run"</emphasis> and notify
 					the user when the results are available
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					manage the pushing of the input slices to the remote
-					compute resources and pulling of the results
+					<emphasis role="bold">manage the pushing of the input slices</emphasis> to the remote
+					compute resources and <emphasis role="bold">the pulling of the results</emphasis>
 					(several copy protocols are available)
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					a textual user interface for the distribution layer
+					<emphasis role="bold">a textual user interface</emphasis> for the distribution layer
 					application
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					a graphical user interface, provided as plugin for
+					<emphasis role="bold">a graphical user interface</emphasis>, provided as plugin for
 					the Scheduler User Interface
 				</para>
 			</listitem>
@@ -124,26 +124,23 @@
 		</para>
 
 		<para>
-			<emphasis>
-				Implement MyJobCreator class by extending JobCreator
+			<emphasis role="bold">
+				Implement <literal>MyJobCreator</literal> class by extending <literal>JobCreator</literal>
 				class
 			</emphasis>
 		</para>
 
 		<para>
-			Initiate your Jobcreator: provide an init() method or a
+			Initiate your <literal>Jobcreator</literal>: provide an <literal>init()</literal> method or a
 			constructor which takes in argument the data you need for
 			creating the job (i.e. input files, input parameters, etc.)
 		</para>
 		<para>
-			Implement the split data operation: implement the method:
-			<programlisting language="java">
-				protected abstract List &lt;File&gt;splitData() throws
-				IOException;
-			</programlisting>
+			Implement the split data operation:
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_splitData.snip"/></textobject></programlisting>
 		</para>
 		<para>
-			The method is responsible with splitting the input data for
+			This method is responsible for splitting the input data for
 			a job in n "slices", one for each task. The size of the
 			returned list will determine the number of tasks that will
 			be created. This list could contain, for instance, one input
@@ -152,31 +149,18 @@
 			this list will be sent as argument, during the task creation
 			process, to these methods (see details bellow):
 		</para>
-		<programlisting language="java">
-			getGenerationScriptArgs(..),createCommandLineForTask(..),
-			getPreScriptArgs(..), getPostScriptArgs(..),
-			getCleanScriptArgs(..)
-		</programlisting>
-
+		<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_MethodsArgs.snip"/></textobject></programlisting>
 		<para>
 			Define what command should be executed on the remote
 			machines. You can implement this method
-			<programlisting language="java">
-				protected abstract String createCommandLineForTask(File
-				file, int taskNb);
-			</programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_createCommandLineForTask.snip"/></textobject></programlisting>
 			and provide the command line to be executed as return of
 			this method. If the command line to be executed depends on
 			the remote operating system (or some remote parameters), you
 			can override the methods
-			<programlisting language="java">
-				protected String getGenerationScriptFilePath()
-			</programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_getGenerationScriptFilePath.snip"/></textobject></programlisting>
 			and
-			<programlisting language="java">
-				protected List&lt;String&gt; getGenerationScriptArgs(int
-				taskNb, File inputFile)
-			</programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_getGenerationScriptArgs.snip"/></textobject></programlisting>
 			in order to provide the file path for the script that will
 			generate the command and its arguments.
 		</para>
@@ -193,50 +177,33 @@
 			provided in the Scheduler release 1.0, as well as sample
 			java scripts for file transfer. You must implement the
 			methods
-			<programlisting language="java">
-				protected abstract String getPreScriptFilePath();
-			</programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_getPreScriptFilePath.snip"/></textobject></programlisting>
 			and
-			<programlisting language="java">
-				protected abstract String getPostScriptFilePath();
-			</programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_getPostScriptFilePath.snip"/></textobject></programlisting>
 			in order to specify the files containing your pre and post
 			scripts, as well as the methods
-			<programlisting language="java">
-				protected abstract List &lt;String&gt;
-				getPreScriptArgs(int taskNb, File taskInputDirOnServer);
-			</programlisting>
-			<programlisting language="java">
-				protected abstract List&lt;String&gt;
-				getPostScriptArgs(int taskNb, File
-				taskWorkingDirOnServer);
-			</programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_getPreScriptArgs.snip"/></textobject></programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_getPostScriptArgs.snip"/></textobject></programlisting>
 			in order to provide the input arguments for the scripts.
 			These methods will be called when the tasks are created.
 		</para>
 		<para>
 			Provide a script and arguments for cleaning the remote
 			resources after use, by implementing the methods
-			<programlisting language="java">
-				protected abstract String getCleanScriptFilePath();
-			</programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_getCleanScriptFilePath.snip"/></textobject></programlisting>
 			and
-			<programlisting language="java">
-				protected abstract List &lt;String&gt;
-				getCleanScriptArgs(int taskNb, File
-				taskWorkingDirOnServer);
-			</programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_getCleanScriptArgs.snip"/></textobject></programlisting>
 		</para>
 
 
 
 		<para>
-			<emphasis>
-				Implement the JobConfiguration interface
+			<emphasis role="bold">
+				Implement the <literal>JobConfiguration</literal> interface
 			</emphasis>
 		</para>
 		<para>
-			A JobConfiguration object will be attached to a job when
+			A <literal>JobConfiguration</literal> object will be attached to a job when
 			submitted to the Scheduler. This object should contain all
 			the information needed in order to merge the results in the
 			post- treatment process. This object should be implemented
@@ -244,67 +211,63 @@
 			getters and setters methods for all attributes, by
 			respecting the template
 			<programlisting language="java">
-				public String getAttribute()/ public void
-				setAttribute(String val)
+public String getAttribute();
+public void	setAttribute(String val);
 			</programlisting>
 			The JobConfiguration object will be passed as argument for
-			the mergeResults(..) method in the PostTreatmentManager. The
-			JobConfiguration object should provide all the information
+			the <literal>mergeResults(..)</literal> method in the <literal>PostTreatmentManager</literal>. The
+			<literal>JobConfiguration</literal> object should provide all the information
 			necessary to the merging of results.
 		</para>
 
 		<para>
-			<emphasis>
-				Implement MyPostTreatmentManager class by extending
-				JobPostTreatmentManager
+			<emphasis role="bold">
+				Implement <literal>MyPostTreatmentManager</literal> class by extending
+				<literal>JobPostTreatmentManager</literal>
 			</emphasis>
 		</para>
 
 		<para>
 			Implement the method:
-			<programlisting language="java">
-				protected abstract void mergeResults(JobConfiguration
-				jc, int numberOfTasks);
-			</programlisting>
-			The JobConfiguration object should contain all the
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/FileSplitMerge_mergeResults.snip"/></textobject></programlisting>
+			The <literal>JobConfiguration</literal> object should contain all the
 			information needed to merge the results (result file names
-			and locations, parameters, output file names, etc ..)
+			and locations, parameters, output file names, etc.)
 		</para>
 		<para>
-			<emphasis>(Optional) Write a ResultPreviw class</emphasis>
+			<emphasis role="bold">(Optional) Write a <literal>ResultPreview</literal> class</emphasis>
 		</para>
 
 		<para>
-			extend org.ow2.proactive.scheduler.common.task.ResultPreview
+			Extend <literal>org.ow2.proactive.scheduler.common.task.ResultPreview</literal>
 			in order to define how the partial results will be displayed
 			in the Scheduler User Interface.
 		</para>
 		<para>
-			<emphasis>(Optional) Write a MenuCreator class</emphasis>
+			<emphasis role="bold">(Optional) Write a <literal>MenuCreator</literal> class</emphasis>
 		</para>
 		<para>
-			extend GeneralMenuCreator class in order to define a menu
+			Extend <literal>GeneralMenuCreator</literal> class in order to define a menu
 			for the Textual User Interface (if you need one). Also write
-			command classes (extend Command) and add them to the
-			MenuCreator (i.e. SubmitJobCommand).
+			command classes (extend <literal>Command</literal>) and add them to the
+			<literal>MenuCreator</literal> (i.e. <literal>SubmitJobCommand</literal>).
 
 			Once you have implemented the classes described above, you
 			have to
-			<emphasis>initialize your application</emphasis>
+			<emphasis role="bold">initialize your application</emphasis>
 			by calling:
 		</para>
 		<programlisting language="java">
-			EmbarrasinglyParrallelApplication.instance().initApplication(url,userName,passwd,Go
-			ldMenuCreator.class, GoldJobPostTreatmentManager.class,
-			GoldJobConfiguration.class);
+EmbarrasinglyParrallelApplication.instance().initApplication(url, userName, passwd, GoldMenuCreator.class, 
+	GoldJobPostTreatmentManager.class, GoldJobConfiguration.class);
 		</programlisting>
 		<para>
 			If you don't need a textual user interface, just pass null
-			for the MenuCreatorClass argument. In order to submit a job
+			for the <literal>MenuCreatorClass</literal> argument. In order to submit a job
 			(from your main class or from a command in the textual user
-			interface) you will only have to create a MyJobConfiguration
-			object, initiate a MyJobCreator object and call the
-			MyJobCreator#submitJob() method.
+			interface) you will only have to create a <literal>MyJobConfiguration</literal>
+			object, initiate a <literal>MyJobCreator</literal> object and call the
+			<literal>MyJobCreator#submitJob()</literal> method.
 		</para>
 	</section>
 
@@ -312,13 +275,13 @@
 		<info>
 			<title>
 				The framework functioning – what you don't need to
-				implement because it's already there
+				implement since it's already there
 			</title>
 		</info>
 
 		<para>
 			When the Application is initiated
-			(EmbarrassinglyParallelApplication.#initApplication(..)
+			(<literal>EmbarrassinglyParallelApplication.#initApplication(..)</literal>
 			method is called) these steps are performed:
 		</para>
 		<itemizedlist>
@@ -334,7 +297,7 @@
 			</listitem>
 			<listitem>
 				<para>
-					a proxy to the scheduler (SchedulerProxy) is
+					a proxy to the scheduler (<literal>SchedulerProxy</literal>) is
 					created, which is an active object which keeps a
 					connection to the Scheduler and plays the Scheduler
 					role for the local application.
@@ -342,40 +305,40 @@
 			</listitem>
 			<listitem>
 				<para>
-					the ProstTreatmentManager object is initiated; it
+					the <literal>ProstTreatmentManager</literal> object is initiated. It
 					reads a file on system to find out if there are any
 					jobs submitted in previous sessions that need post
 					treatment operations. If there are any, it will
-					start the post treatment process in asynchronous
+					start the post treatment process in an asynchronous
 					way.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					a SchedulerEventListener is created which is an
+					a <literal>SchedulerEventListener</literal> is created which is an
 					active object that will listen for events from the
-					scheduler. It will notify the PostTreatmentManager
+					scheduler. It will notify the <literal>PostTreatmentManager</literal>
 					and the user interface when results are available on
 					the Scheduler.
 				</para>
 			</listitem>
 			<listitem>
-				<para>the user interface (if any) is started</para>
+				<para>the user interface (if any) is started.</para>
 			</listitem>
 		</itemizedlist>
 
 		<para>
-			When a job is submitted by calling method, these steps are
-			performed: MyJobCreator.submitJob(..)
+			When a job is submitted by calling <literal>MyJobCreator.submitJob(..)</literal>, these steps are
+			performed: 
 		</para>
 		<itemizedlist>
 			<listitem>
-				<para>a TaskFlowJob is created</para>
+				<para>a <literal>TaskFlowJob</literal> is created</para>
 			</listitem>
 
 			<listitem>
 				<para>
-					the splitData() method is called – the return is a
+					the <literal>splitData()</literal> method is called – the return is a
 					list of File objects, of size n
 				</para>
 			</listitem>
@@ -384,18 +347,20 @@
 				<para>
 					n native tasks are created. During the creation of
 					each task, these methods are called:
-					getPreScriptFilePath(), getPreScriptArgs(..),
-					getPostScriptFilePath(), getPostScriptArgs(..),
-					getCleanScriptFilePath(), getCleanScriptArgs(..),
-					createCommandLineForTask(..),
-					getGenerationScriptFilePath(),
-					getGenerationScriptArgs(...).
+					<literal>
+						getPreScriptFilePath(), getPreScriptArgs(..),
+						getPostScriptFilePath(), getPostScriptArgs(..),
+						getCleanScriptFilePath(), getCleanScriptArgs(..),
+						createCommandLineForTask(..),
+						getGenerationScriptFilePath(),
+						getGenerationScriptArgs(...).
+					</literal>
 				</para>
 			</listitem>
 
 			<listitem>
 				<para>
-					the JobConfiguration object is attached to the job
+					the <literal>JobConfiguration</literal> object is attached to the job
 					as generic information.
 				</para>
 			</listitem>
@@ -409,7 +374,7 @@
 
 			<listitem>
 				<para>
-					the PostTreatment Manager is informed that results
+					the Post Treatment Manager is informed that results
 					are awaited for this job
 				</para>
 			</listitem>
@@ -433,7 +398,7 @@
 				<para>
 					if the job succeed the Post Treatment Manager will
 					get the results from the Scheduler, recreate the
-					JobConfiguration object (that has been attached to
+					<literal>JobConfiguration</literal> object (that has been attached to
 					the job) and merge the results in an asynchronous
 					way.
 				</para>

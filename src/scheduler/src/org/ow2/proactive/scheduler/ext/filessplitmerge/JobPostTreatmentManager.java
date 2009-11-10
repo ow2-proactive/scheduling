@@ -492,7 +492,10 @@ public abstract class JobPostTreatmentManager implements Observer {
      *            the JobConfiguration object that have been provided at job submissin time
      * @param numberOfTasks
      */
+    //@snippet-start FileSplitMerge_mergeResults
     protected abstract void mergeResults(JobConfiguration jc, int numberOfTasks);
+
+    //@snippet-end FileSplitMerge_mergeResults
 
     // ---util methods ---
 
