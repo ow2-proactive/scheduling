@@ -368,12 +368,15 @@ public abstract class JobCreator {
      * Note: a generation script offers the possibility to generate different command lines for a task, depending on the environment it is executed
      * 
      */
+    //@snippet-start FileSplitMerge_getGenerationScriptFilePath
     protected String getGenerationScriptFilePath() {
         return null;
     }
 
+    //@snippet-end FileSplitMerge_getGenerationScriptFilePath
+
     /**
-     * Override this method if you you are using a generation script in your
+     * Override this method if you are using a generation script in your
      * application. See {@link #getGenerationScriptFilePath()}
      * <p>
      * This method is called by
@@ -383,9 +386,14 @@ public abstract class JobCreator {
      * @param taskFileOnServer
      * @return a list containing the arguments for the generation script
      */
+    //@snippet-start FileSplitMerge_MethodsArgs
+    //@snippet-start FileSplitMerge_getGenerationScriptArgs
     protected List<String> getGenerationScriptArgs(int taskNb, File taskFileOnServer) {
         return new LinkedList<String>();
     }
+    //@snippet-end FileSplitMerge_getGenerationScriptArgs
+
+    //@snippet-break FileSplitMerge_MethodsArgs
 
     /**
      * Creates a NativeTask.
@@ -543,7 +551,9 @@ public abstract class JobCreator {
      * 
      * @return
      */
+    //@snippet-start FileSplitMerge_getPreScriptFilePath
     protected abstract String getPreScriptFilePath();
+    //@snippet-end FileSplitMerge_getPreScriptFilePath
 
     /**
      * This method should return a list of arguments that will be given to the
@@ -556,7 +566,12 @@ public abstract class JobCreator {
      *            refers to the file or folder, on the application's storage location, corresponding to that task
      * @return
      */
+    //@snippet-resume FileSplitMerge_MethodsArgs
+    //@snippet-start FileSplitMerge_getPreScriptArgs
     protected abstract List<String> getPreScriptArgs(int taskNb, File taskInputFileOnServer);
+    //@snippet-end FileSplitMerge_getPreScriptArgs
+
+    //@snippet-break FileSplitMerge_MethodsArgs
 
     /**
      * Creates the preScript for a task. This script should create, on the
@@ -598,7 +613,9 @@ public abstract class JobCreator {
      *  Arguments for the script are given by <{@link #getPostScriptArgs(int taskNb, File taskInputDirOnServer)} method
      *  @return the file containing the post script for a task <p>
      */
+    //@snippet-start FileSplitMerge_getPostScriptFilePath
     protected abstract String getPostScriptFilePath();
+    //@snippet-end FileSplitMerge_getPostScriptFilePath
 
     /**
      * This method should return a list of arguments that will be given to the
@@ -611,7 +628,12 @@ public abstract class JobCreator {
      *            refers to the file or folder, on the application's storage location, corresponding to that task
      * @return a List of arguments of type java.lang.String
      */
+    //@snippet-resume FileSplitMerge_MethodsArgs
+    //@snippet-start FileSplitMerge_getPostScriptArgs
     protected abstract List<String> getPostScriptArgs(int taskNb, File taskFileOnServer);
+    //@snippet-end FileSplitMerge_getPostScriptArgs
+
+    //@snippet-break FileSplitMerge_MethodsArgs
 
     /**
      * Creates the postScript for a task. This script should copy the output
@@ -648,7 +670,9 @@ public abstract class JobCreator {
      * @return the file containing the clean script for a task <p>
      * Arguments for the script are given by <{@link #getCleanScriptArgs(int taskNb, File taskInputDirOnServer)} method
      */
+    //@snippet-start FileSplitMerge_getCleanScriptFilePath
     protected abstract String getCleanScriptFilePath();
+    //@snippet-end FileSplitMerge_getCleanScriptFilePath
 
     /**
      * 
@@ -656,7 +680,12 @@ public abstract class JobCreator {
      * @param taskFileOnServer
      * @return a list of arguments to be provided as input to the script located in the file returned by {@link #getCleanScriptFilePath()}
      */
+    //@snippet-resume FileSplitMerge_MethodsArgs
+    //@snippet-start FileSplitMerge_getCleanScriptArgs
     protected abstract List<String> getCleanScriptArgs(int taskNb, File taskFileOnServer);
+    //@snippet-end FileSplitMerge_getCleanScriptArgs
+
+    //@snippet-break FileSplitMerge_MethodsArgs
 
     /**
      * Creates a clean script by calling {@link #getCleanScriptFilePath()} and {@link #getCleanScriptArgs(int, File)} methods
@@ -706,7 +735,9 @@ public abstract class JobCreator {
      * 
      * @throws IOException
      */
+    //@snippet-start FileSplitMerge_splitData
     protected abstract List<File> splitData() throws IOException;
+    //@snippet-end FileSplitMerge_splitData
 
     /**
      * 		This method provides a string with the command line to be executed by a
@@ -722,8 +753,12 @@ public abstract class JobCreator {
      *            on a remote node
      * @return The command line, including arguments, separated by SPACE character
      */
+    //@snippet-resume FileSplitMerge_MethodsArgs
+    //@snippet-start FileSplitMerge_createCommandLineForTask
     protected String createCommandLineForTask(File taskFileOnServer, int taskNb) {
         return "";
     }
+    //@snippet-end FileSplitMerge_createCommandLineForTask
+    //@snippet-end FileSplitMerge_MethodsArgs
 
 }
