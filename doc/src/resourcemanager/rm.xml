@@ -98,7 +98,7 @@
 				
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="scheduler/pics/core/rm_overview.jpg" format="JPG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="resourcemanager/pics/rm_overview.jpg" format="JPG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>

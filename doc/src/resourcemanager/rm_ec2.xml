@@ -120,7 +120,7 @@
       <figure xml:id="RM_EC2_NS"><info><title>EC2 NodeSource creation dialog</title></info>
 	<mediaobject>
 	  <imageobject>
-	    <imagedata scalefit="1" width="55%" contentdepth="55%" fileref="scheduler/pics/core/rm_ec2nodeSource.gif" format="GIF"/>
+	    <imagedata scalefit="1" width="55%" contentdepth="55%" fileref="resourcemanager/pics/rm_ec2nodeSource.gif" format="GIF"/>
 	  </imageobject>
 	</mediaobject>
       </figure>

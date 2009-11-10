@@ -410,7 +410,7 @@ test.example.net 5
 				<figure xml:id="pic_scheduler_loading_policy"><info><title>Scheduler loading policy configuration panel</title></info>
 					<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="resourcemanager_plugin/pics/scheduler_loading_policy.png" format="PNG"/>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="resourcemanager_plugin/pics/loading_policy.png" format="PNG"/>
 					</imageobject>
 					</mediaobject>
 				</figure>
