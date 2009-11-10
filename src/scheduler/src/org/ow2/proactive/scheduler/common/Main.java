@@ -52,7 +52,7 @@ public final class Main {
      * @param args
      */
     public static void main(String[] args) {
-        if (version.equals("{scheduler-version-main}")) {
+        if (version.equals("{scheduler-ver" + "sion-main}")) {//avoid pattern replacement here
             Date d = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             version = sdf.format(d) + " - (Unreleased Version)";
