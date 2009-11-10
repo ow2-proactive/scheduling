@@ -5,6 +5,7 @@
 	
 	<import file="rm-env.xml" />
 	<import file="common-build.xml" />
+	<import file="../doc/rm-doc.xml" optional="true"/>
 
 	<!-- ************
 		Compilation
@@ -124,5 +125,4 @@
 		</copy>
 	</target>
 
-	<import file="../doc/rm-doc.xml" optional="true"/>
 </project>

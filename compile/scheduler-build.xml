@@ -2,6 +2,7 @@
 <project default="deploy.scheduler" basedir=".">
 	<import file="common-build.xml" />
 	<import file="scheduler-env.xml" />
+	<import file="../doc/scheduler-doc.xml" optional="true"/>
 	<import file="rm-build.xml" />
 
 	<target name="compile.scheduler" depends="compile.rm" description="Compile all Scheduler's stuffs">
@@ -337,10 +338,5 @@
 			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.jar}, ${rm.client.jar}, ${scheduler.client.jar}, ${scheduler.worker.jar}, ${srm.common.client.jar}"/>
 		</copy>
 	</target>
-
-	<!-- ************
-		Documentation
-	-->
-	<import file="../doc/scheduler-doc.xml" optional="true"/>
 
 </project>
