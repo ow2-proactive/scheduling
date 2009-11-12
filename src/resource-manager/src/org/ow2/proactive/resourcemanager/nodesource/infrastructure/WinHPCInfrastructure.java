@@ -110,6 +110,15 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     protected File RMCredentialsPath;
 
     /**
+     * Additional java options to append to the command executed on the remote host
+     */
+    @Configurable
+    protected String javaOptions;
+
+    @Configurable
+    protected String extraClassPath;
+
+    /**
      * Credentials used by remote nodes to register to the NS
      */
     private Credentials credentials = null;
@@ -265,6 +274,9 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             throw new RMException("Could not retrieve base64 credentials", e);
         }
 
+        javaOptions = parameters[10].toString();
+        extraClassPath = parameters[11].toString();
+
         String classpath = rmPath + "/dist/lib/ProActive.jar;";
         classpath += rmPath + "/dist/lib/ProActive_ResourceManager.jar;";
         classpath += rmPath + "/dist/lib/ProActive_Scheduler-worker.jar;";
@@ -274,11 +286,15 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         classpath += rmPath + "/dist/lib/jython-engine.jar;";
         classpath += rmPath + "/dist/lib/commons-logging-1.0.4.jar";
 
+        if (extraClassPath.length() > 0) {
+            classpath += ";" + extraClassPath;
+        }
+
         command = this.javaPath + " -cp " + classpath;
         command += " " + PAProperties.JAVA_SECURITY_POLICY.getCmdLine();
         command += rmPath + "/config/security.java.policy";
         command += " -Dproactive.useIPaddress=true ";
-        //command += " " + this.javaOptions + " ";
+        command += " " + this.javaOptions + " ";
         command += " org.ow2.proactive.resourcemanager.utils.PAAgentServiceRMStarter ";
 
         command += " -r " + RMUrl;
