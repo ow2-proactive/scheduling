@@ -365,6 +365,9 @@ public abstract class Task extends CommonAttribute {
      * Set a selection script. It is the script that will be in charge of selecting a node.
      */
     public void setSelectionScript(SelectionScript selScript) {
+        if (selScript == null) {
+            throw new IllegalArgumentException("The given selection script cannot be null !");
+        }
         List<SelectionScript> selScriptsList = new ArrayList<SelectionScript>();
         selScriptsList.add(selScript);
         setSelectionScripts(selScriptsList);
@@ -384,6 +387,9 @@ public abstract class Task extends CommonAttribute {
      *            the selectionScript to add.
      */
     public void addSelectionScript(SelectionScript selectionScript) {
+        if (selectionScript == null) {
+            throw new IllegalArgumentException("The given selection script cannot be null !");
+        }
         if (this.sScripts == null) {
             this.sScripts = new ArrayList<SelectionScript>();
         }
