@@ -776,11 +776,13 @@ path_to_scheduler\dist\lib\ProActive_SRM-common.jar</screen>
                         You're now ready to run some parallel scripts. In order to run a Matlab function in parallel you'll need to call the function PAsolve() as
                         follows:
                     </para>
-                    <screen>&gt;&gt; resl = PAsolve( @factorial, {1, 2, 3, 4, 5} );</screen>
+                    <screen>&gt;&gt; resl = PAsolve( @factorial, {{1}, {2}, {3}, {4}, {5}} );</screen>
                     <para>
                         This for example will execute the factorial function on 5 different machines, the first machine
                         using the parameter 1, the second, the parameter 2, etc...
-                        The function used must take one argument and return one result. It cannot be a Mex function, unless the same mex function is made manually available on the remote engines.
+                        The second argument to PAsolve is a cell array of cell arrays. Each internal cell array represents the list of arguments to give to the desired function.
+                        Here factorial takes only one argument, accordingly each internal cell array is of length 1.
+                        The function used cannot be a Mex function, unless the same mex function is made manually available on the remote engines.
                     </para>
                     <para>
                         The file system between your Matlab session and the remote engines needs to be shared (through
