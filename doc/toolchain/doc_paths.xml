@@ -16,21 +16,22 @@
 	<!--  =============================================================== -->
 	<property name="base.dir"      			value="${basedir}" /> <!-- doc/toolchain folder -->		
 	<property name="docs.dir"      			value="${base.dir}/doc" /> <!-- doc folder -->	
-	<property name="docs.src.dir"       		value="${docs.dir}/src" /> <!-- doc/src folder -->	
 	<property name="docs.tmp.dir"  			value="${docs.dir}/tmp" /> <!-- doc/tmp folder -->
 	<property name="docs.toolchain.dir"		value="${docs.dir}/toolchain" /> <!-- doc/toolchain folder -->
 	<property name="docs.xsl.dir"			value="${docs.toolchain.dir}/xsl" />
-	
+
+	<property name="snippets.start.default"	value="${docs.dir}/../src" />
+	<property name="snippets.location"		value="${docs.tmp.dir}/automatic_snippets" />
+
 	<!-- DocBook --> 
 	<property name="docbook.version" 		value="1.74.0" />
-	<property name="docbook.archive"        value="docbook-xsl-ns-${docbook.version}" />
+	<property name="docbook.archive"                value="docbook-xsl-ns-${docbook.version}" />
 	<property name="docs.lib.dir"			value="${docs.toolchain.dir}/lib/" />
 
 	<path id="docs.utils.classpath">
 		<fileset dir="${docs.lib.dir}">
 			<include name="**/*.jar"/>
 		</fileset>
-		
 	</path>
 	
 	<!-- javadoc paths are not include through subant-->
@@ -38,107 +39,51 @@
 		<fileset dir="${docs.lib.dir}/trunk/doc/lib">
 			<include name="**/*.jar"/>
 		</fileset>
-		
 	</path>
 	
 	<property name="docs.log4j.properties"	value="${docs.lib.dir}/log4j.properties" />
-
-	<macrodef name="build_doc_vars">
 	
-		<attribute name="docName" />
-		<sequential>
+	<property name="extra.format.dir" 		value=""/>
+	<!-- ================================================================ -->
+	<!--                Documentation files:   XSL,XML,PDF,etc            -->
+	<!--  =============================================================== -->
 
-			<var name="doc.name"			value="@{docName}" />
-			<var name="docs.built.dir"			value="${docs.dir}/built/${doc.name}" /> <!--why-->
-			
-			<var name="docs.api.complete.dir"		value="${docs.built.dir}/api_complete" />
-			<var name="docs.api.published.dir"		value="${docs.built.dir}/api_published" />
-			
-			<var name="docs.html.multiple.dir"		value="${docs.built.dir}/multiple_html/" />
-			<var name="docs.html.single.dir"		value="${docs.built.dir}/single_html/" />
-			<var name="docs.pdf.dir"			value="${docs.built.dir}/pdf/" />
-			<var name="docs.schemas.dir"          value="${docs.built.dir}/schemas/" />
-			
-			<var name="docs.mainFile" 			value="main.xml" />
-			<var name="snippets.start.default"	value="${docs.dir}/../src" />
-			<var name="snippets.location"		value="${docs.tmp.dir}/automatic_snippets" />
-			
-			
-			<var name="extra.format.dir" 		value=""/>
-			<!-- ================================================================ -->
-			<!--                Documentation files:   XSL,XML,PDF,etc            -->
-			<!--  =============================================================== -->
-			<var name="docs.pdf.name"			value="${doc.name}Manual.pdf" />
-			
-		
-			<var name="docs.xsl.profiling"		value="${docs.xsl.dir}/profiling.xsl" />
-			<var name="docs.xsl.pdf"			value="${docs.xsl.dir}/pdf.xsl" />
-			<var name="docs.xsl.html.chunked"		value="${docs.xsl.dir}/chunkedhtml.xsl" />
-			<var name="docs.xsl.html.one"		value="${docs.xsl.dir}/onehtml.xsl" />
-			<var name="docs.xsl.removenewlines" 	value="${docs.xsl.dir}/remove_newlines.xsl" />
-			
-			<var name="docs.html.multiple.zip"		value="${docs.built.dir}/${doc.name}ManualMultipleHtml.zip" />
-			<var name="docs.html.single.zip"		value="${docs.built.dir}/${doc.name}ManualSingleHtml.zip" />
-			<var name="docs.javadoc.published.zip"	value="${docs.built.dir}/${doc.name}JavadocPublished.zip" />
-			<var name="docs.javadoc.complete.zip"	value="${docs.built.dir}/${doc.name}JavadocComplete.zip" />
-			
-			
-			<var name="docs.html.multiple.output"	value="${docs.html.multiple.dir}/empty.html" />
-			<var name="docs.html.single.name"		value="${doc.name}Manual.html" />
-			<var name="docs.html.single.output"	value="${docs.html.single.dir}/${docs.html.single.name}" />
-			<var name="docs.pdf.output"		value="${docs.pdf.dir}/${docs.pdf.name}" />
-			
-			
-			<var name="docs.docbook.dtd.name"		value="docbook.dtd" />
-			<var name="docs.docbook.dtd"		value="${docs.src.dir}/${docs.docbook.dtd.name}" />
-			<!--//FIXME ? for html files this is defined in html.xsl -->
-			<var name="docs.html.css.name"		value="main.css" />
-			
-			<!-- ================================================================ -->
-			<!--                   Javadoc build properties                       -->
-			<!--  =============================================================== -->
-			
-			<var name="javadoc.title" 			value="${doc.name} "/>
-			<var name="javadoc.copyright" 		value="Copyright 1997-2009 INRIA All Rights Reserved."/>
-			<var name="docs.fractal.link"		value="http://fractal.objectweb.org/current/doc/javadoc/fractal/"/>
-			<var name="docs.java.api.link" 		value="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-			<var name="docs.javadoc.window.title" 	value="${doc.name}"/>
-			<var name="javadoc.tmp.dir"  		value="../doc/tmp" />
-		
-			<!-- ================================================================ -->
-			<!--                   checkstyle properties                          -->
-			<!--  =============================================================== -->
-		
-			<var name="checkstyle.path"		value="${docs.toolchain.dir}/checkstyle/" />	
-			<var name="checkstyle.suppressions.file"	value="${checkstyle.path}/suppressions.xml"/>
-			<var name="checkstyle.header.file" 	value="${checkstyle.path}/proactive.header"/>
-			<var name="checkstyle.importcontrol.file" 	value="${checkstyle.path}/import-control.xml"/>
-			<var name="checkstyle.config" 		value="${checkstyle.path}/proactive_checks.xml"/>
-			
-		  <!-- Directory of xml configuration files for highlighting -->
-		   <var name="docs.highlighting.dir" value="${docs.toolchain.dir}/highlighting"/>
-		
-		    <if name="isWindows">
-		        <var name="url.file.prefix" value="file:///" />
-		        <else>
-		            <var name="url.file.prefix" value="file://" />
-		        </else>
-		    </if>
-		    <var name="xslthl.path" value="${url.file.prefix}${docs.highlighting.dir}/xml/xslthl-config.xml" />
+	<property name="docs.xsl.profiling"		value="${docs.xsl.dir}/profiling.xsl" />
+	<property name="docs.xsl.pdf"			value="${docs.xsl.dir}/pdf.xsl" />
+	<property name="docs.xsl.html.chunked"		value="${docs.xsl.dir}/chunkedhtml.xsl" />
+	<property name="docs.xsl.html.one"		value="${docs.xsl.dir}/onehtml.xsl" />
+	<property name="docs.xsl.removenewlines" 	value="${docs.xsl.dir}/remove_newlines.xsl" />
+
+	<!--//FIXME ? for html files this is defined in html.xsl -->
+	<property name="docs.html.css.name"		value="main.css" />
 	
-			<if>
-				<bool>
-		        	<equals arg1="@{docName}" arg2="Scheduler" />
-				</bool>
-	        	<var name="docs.src.dir"           value="${scheduler.src.dir}" />
-	        	<var name="docs.mainFile" 			value="main.xml" />
-				<else>
-					<var name="docs.src.dir"           value="${rm.src.dir}" />
-					<var name="docs.mainFile" 			value="rm-main.xml" />
-		        </else>
-			</if>
+	<!-- ================================================================ -->
+	<!--                   Javadoc build properties                       -->
+	<!--  =============================================================== -->
 
-		</sequential>
-	</macrodef>
+	<property name="javadoc.copyright" 		value="Copyright 1997-2009 INRIA All Rights Reserved."/>
+	<property name="docs.fractal.link"		value="http://fractal.objectweb.org/current/doc/javadoc/fractal/"/>
+	<property name="docs.java.api.link" 		value="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+	<property name="javadoc.tmp.dir"  		value="../doc/tmp" />
 
+	<!-- ================================================================ -->
+	<!--                   checkstyle properties                          -->
+	<!--  =============================================================== -->
+
+	<property name="checkstyle.path"		value="${docs.toolchain.dir}/checkstyle/" />
+	<property name="checkstyle.suppressions.file"	value="${checkstyle.path}/suppressions.xml"/>
+	<property name="checkstyle.header.file" 	value="${checkstyle.path}/proactive.header"/>
+	<property name="checkstyle.importcontrol.file" 	value="${checkstyle.path}/import-control.xml"/>
+	<property name="checkstyle.config" 		value="${checkstyle.path}/proactive_checks.xml"/>
+
+	<!-- Directory of xml configuration files for highlighting -->
+	<property name="docs.highlighting.dir" value="${docs.toolchain.dir}/highlighting"/>
+
+    <if name="isWindows">
+        <property name="url.file.prefix" value="file:///" />
+        <else>
+            <property name="url.file.prefix" value="file://" />
+        </else>
+    </if>
+    <property name="xslthl.path" value="${url.file.prefix}${docs.highlighting.dir}/xml/xslthl-config.xml" />
 </project>

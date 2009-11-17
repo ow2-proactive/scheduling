@@ -20,12 +20,14 @@
 	<!--          Make just the html files for the manual                     -->
 	<!-- ==================================================================== -->
 	<target name="manualHtml" description="Make only the html files in the manual">
+		<setProperties/>
 		<manualHtml/>
 	</target>
 	<!-- ==================================================================== -->
 	<!--   Make an archive from the files for the multiple html manual        -->
 	<!-- ==================================================================== -->
 	<target name="manualHtmlZip" description="Create a zip of the html filed in the manual" depends="manualHtml">
+		<setProperties/>
 		<manualHtmlZip/>
 	</target>
 
@@ -33,12 +35,14 @@
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
 	<target name="manualPdf" description="Make only the pdf files in the manual">
+		<setProperties/>
 		<manualPdf/>
 	</target>
 	<!-- ==================================================================== -->
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<target name="manualSingleHtml" description="Make only the big html file in the manual">
+		<setProperties/>
 		<manualSingleHtml/>
 	</target>
 	
@@ -60,6 +64,7 @@
 	<!--      Make an archive from the published javadoc       -->
 	<!-- ==================================================================== -->
 	<target name="javadoc.publishedZip">
+		<setProperties/>
 		<javadoc.publishedZip /> 
 	</target>
 	
@@ -67,6 +72,7 @@
 	<!--      Make an archive from the complete javadoc       -->
 	<!-- ==================================================================== -->
 	<target name="javadoc.completeZip"> 
+		<setProperties/>
 		<javadoc.completeZip /> 
 	</target>
 	
@@ -75,10 +81,12 @@
 	</target>
 	
 	<target name="javadoc.checkstyle">
-	  <javadoc.checkstyle/>
+		<setProperties/>
+		<javadoc.checkstyle/>
 	</target>
     
     <target name="schemas">
+		<setProperties/>
         <schemas/>
     </target>
 </project>

@@ -134,17 +134,17 @@
 	<!-- ==================================================================== -->
 	<macrodef name="manualSingleHtml" description="Make only the big html file in the manual">
 		<sequential>
-		  <docbookPreProcess output.docs.dir="${docs.html.single.dir}" />
-		  <docbookTransform docbookInputFile="${docs.mainFile}" 
-			  docbookOutputFile="${docs.html.single.output}" 
-			  docbookStyle="${docs.xsl.html.one}" 
-			  docbook.profile="html" 
-			  docbookOutputDir="${docs.html.single.dir}"/>
+			<docbookPreProcess output.docs.dir="${docs.html.single.dir}" />
+			<docbookTransform docbookInputFile="${docs.mainFile}"
+				docbookOutputFile="${docs.html.single.output}"
+				docbookStyle="${docs.xsl.html.one}"
+				docbook.profile="html"
+				docbookOutputDir="${docs.html.single.dir}"/>
 			<!-- remove temporary folder -->
 			<delete dir="${docs.tmp.dir}"/>
 		</sequential>
-	</macrodef> 
-	
+	</macrodef>
+
 	<!-- ==================================================================== -->
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
@@ -209,18 +209,17 @@
 	<taskdef resource="checkstyletask.properties" classpath="${compile.dir}/lib/checkstyle-all-5.0-beta01.jar"/>
 
 	<macrodef name="javadoc.checkstyle" description="Generate javadoc violation reports">
-	  <sequential>
-	    <var name="checkstyle.plain.file" value="${docs.built.dir}/${doc.name}_javadoc.txt"/>
-	    <var name="checkstyle.xml.file" value="${docs.built.dir}/${doc.name}_javadoc.xml"/>
-	    <property name="translation.severity" value="ignore"/>
-	    <mkdir dir="${docs.built.dir}"/>
-	    <checkstyle config="${checkstyle.config}"
-		  failOnViolation="false">
-		<formatter type="plain"  tofile="${checkstyle.plain.file}"/>
-		<formatter type="xml" tofile="${checkstyle.xml.file}"/>
-		<fileset dir="${checkstyle.src.set}" includes="**/*.java"/>
-	    </checkstyle>
-	  </sequential>
+		<sequential>
+			<property name="checkstyle.plain.file" value="${docs.built.dir}/${doc.name}_javadoc.txt"/>
+			<property name="checkstyle.xml.file" value="${docs.built.dir}/${doc.name}_javadoc.xml"/>
+			<property name="translation.severity" value="ignore"/>
+			<mkdir dir="${docs.built.dir}"/>
+			<checkstyle config="${checkstyle.config}" failOnViolation="false">
+				<formatter type="plain"  tofile="${checkstyle.plain.file}"/>
+				<formatter type="xml" tofile="${checkstyle.xml.file}"/>
+				<fileset dir="${checkstyle.src.set}" includes="**/*.java"/>
+			</checkstyle>
+		</sequential>
 	</macrodef>
 
 
@@ -240,9 +239,10 @@
         <sequential>
             <property name="gcmd.dir" value="${docs.schemas.dir}/gcmd" />
             <mkdir dir="${gcmd.dir}"/>
+			<echo message="Processing GCMD schema documentation..." />
             <xsddoc out="${gcmd.dir}" 
                     title="GCM Deployment Schema" 
-                    verbose="true"
+                    verbose="false"
                     header="&lt;img width='70%' src='${base.dir}/doc/pa/images/Logo-ProActive.png' /&gt;"
                     bottom=" "
                     file="${src.extensions.dir}/${extensions.path}/gcmdeployment/schema/ExtensionSchemas.xsd" />
@@ -253,9 +253,10 @@
         <sequential>
             <property name="gcma.dir" value="${docs.schemas.dir}/gcma" />
             <mkdir dir="${gcma.dir}"/>
+			<echo message="Processing GCMA schema documentation..." />
             <xsddoc out="${gcma.dir}" 
                     title="GCM Application Schema" 
-                    verbose="true"
+                    verbose="false"
                     header="&lt;img width='70%' src='${base.dir}/doc/pa/images/Logo-ProActive.png' /&gt;"
                     bottom=" "
                     file="${src.extensions.dir}/${extensions.path}/gcmdeployment/schema/ApplicationDescriptorSchema.xsd" />
@@ -268,4 +269,27 @@
             <xsddoc.gcma/>
         </sequential>
     </macrodef>
+
+	<macrodef name="setProperties">
+		<sequential>
+			<property name="docs.built.dir"			value="${docs.dir}/built/${doc.name}" />
+			<property name="docs.api.complete.dir"		value="${docs.built.dir}/api_complete" />
+			<property name="docs.api.published.dir"		value="${docs.built.dir}/api_published" />
+			<property name="docs.html.multiple.dir"		value="${docs.built.dir}/multiple_html/" />
+			<property name="docs.html.single.dir"		value="${docs.built.dir}/single_html/" />
+			<property name="docs.pdf.dir"			value="${docs.built.dir}/pdf/" />
+			<property name="docs.schemas.dir"          value="${docs.built.dir}/schemas/" />
+			<property name="docs.pdf.name"			value="${doc.name}Manual.pdf" />
+			<property name="docs.html.multiple.zip"		value="${docs.built.dir}/${doc.name}ManualMultipleHtml.zip" />
+			<property name="docs.html.single.zip"		value="${docs.built.dir}/${doc.name}ManualSingleHtml.zip" />
+			<property name="docs.javadoc.published.zip"	value="${docs.built.dir}/${doc.name}JavadocPublished.zip" />
+			<property name="docs.javadoc.complete.zip"	value="${docs.built.dir}/${doc.name}JavadocComplete.zip" />
+			<property name="docs.html.multiple.output"	value="${docs.html.multiple.dir}/empty.html" />
+			<property name="docs.html.single.name"		value="${doc.name}Manual.html" />
+			<property name="docs.html.single.output"	value="${docs.html.single.dir}/${docs.html.single.name}" />
+			<property name="docs.pdf.output"		value="${docs.pdf.dir}/${docs.pdf.name}" />
+			<property name="javadoc.title" 			value="${doc.name} "/>
+			<property name="docs.javadoc.window.title" 	value="${doc.name}"/>
+		</sequential>
+	</macrodef>
 </project>
