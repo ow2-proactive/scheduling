@@ -248,7 +248,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             }
         }
 
-        // consistency checks
+        // consistence checks
         if (currentNodeNumberInNodeSource == minNodes && pendingNodesNumberRel > 0) {
             logger
                     .warn("Incorrect node source state: [the node source has min number of nodes but pendingNodesNumberRel > 0] : " +

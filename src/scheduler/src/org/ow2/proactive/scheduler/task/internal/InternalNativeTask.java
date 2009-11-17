@@ -109,4 +109,11 @@ public class InternalNativeTask extends InternalTask {
         return launcher;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean handleResultsArguments() {
+        return false;
+    }
+
 }

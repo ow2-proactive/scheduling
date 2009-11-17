@@ -683,7 +683,7 @@ public class JobFactory_stax extends JobFactory {
                     toReturn.setMaxNumberOfExecution(toReturn.getMaxNumberOfExecution());
                 }
             }
-            //check if walltime and fork are consistency
+            //check if walltime and fork are consistent
             if ((toReturn instanceof JavaTask) && toReturn.getWallTime() > 0 &&
                 !((JavaTask) toReturn).isFork()) {
                 ((JavaTask) toReturn).setFork(true);

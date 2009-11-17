@@ -391,6 +391,7 @@ public abstract class JobCreator {
     protected List<String> getGenerationScriptArgs(int taskNb, File taskFileOnServer) {
         return new LinkedList<String>();
     }
+
     //@snippet-end FileSplitMerge_getGenerationScriptArgs
 
     //@snippet-break FileSplitMerge_MethodsArgs
@@ -553,6 +554,7 @@ public abstract class JobCreator {
      */
     //@snippet-start FileSplitMerge_getPreScriptFilePath
     protected abstract String getPreScriptFilePath();
+
     //@snippet-end FileSplitMerge_getPreScriptFilePath
 
     /**
@@ -569,6 +571,7 @@ public abstract class JobCreator {
     //@snippet-resume FileSplitMerge_MethodsArgs
     //@snippet-start FileSplitMerge_getPreScriptArgs
     protected abstract List<String> getPreScriptArgs(int taskNb, File taskInputFileOnServer);
+
     //@snippet-end FileSplitMerge_getPreScriptArgs
 
     //@snippet-break FileSplitMerge_MethodsArgs
@@ -615,6 +618,7 @@ public abstract class JobCreator {
      */
     //@snippet-start FileSplitMerge_getPostScriptFilePath
     protected abstract String getPostScriptFilePath();
+
     //@snippet-end FileSplitMerge_getPostScriptFilePath
 
     /**
@@ -631,6 +635,7 @@ public abstract class JobCreator {
     //@snippet-resume FileSplitMerge_MethodsArgs
     //@snippet-start FileSplitMerge_getPostScriptArgs
     protected abstract List<String> getPostScriptArgs(int taskNb, File taskFileOnServer);
+
     //@snippet-end FileSplitMerge_getPostScriptArgs
 
     //@snippet-break FileSplitMerge_MethodsArgs
@@ -672,6 +677,7 @@ public abstract class JobCreator {
      */
     //@snippet-start FileSplitMerge_getCleanScriptFilePath
     protected abstract String getCleanScriptFilePath();
+
     //@snippet-end FileSplitMerge_getCleanScriptFilePath
 
     /**
@@ -683,6 +689,7 @@ public abstract class JobCreator {
     //@snippet-resume FileSplitMerge_MethodsArgs
     //@snippet-start FileSplitMerge_getCleanScriptArgs
     protected abstract List<String> getCleanScriptArgs(int taskNb, File taskFileOnServer);
+
     //@snippet-end FileSplitMerge_getCleanScriptArgs
 
     //@snippet-break FileSplitMerge_MethodsArgs
@@ -737,6 +744,7 @@ public abstract class JobCreator {
      */
     //@snippet-start FileSplitMerge_splitData
     protected abstract List<File> splitData() throws IOException;
+
     //@snippet-end FileSplitMerge_splitData
 
     /**

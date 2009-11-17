@@ -109,4 +109,11 @@ public class InternalJavaTask extends InternalTask {
         return launcher;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean handleResultsArguments() {
+        return true;
+    }
+
 }

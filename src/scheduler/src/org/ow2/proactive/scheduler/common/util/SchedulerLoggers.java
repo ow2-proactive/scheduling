@@ -50,6 +50,8 @@ public interface SchedulerLoggers {
 
     static final public String CORE = SCHEDULER + ".core";
 
+    static final public String SCHEDULE = CORE + ".schedule";
+
     static final public String DATABASE = SCHEDULER + ".database";
 
     static final public String FRONTEND = SCHEDULER + ".frontend";

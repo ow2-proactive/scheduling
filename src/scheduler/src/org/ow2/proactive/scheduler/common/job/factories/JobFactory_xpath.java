@@ -524,7 +524,7 @@ public class JobFactory_xpath extends JobFactory {
 
                 task = createTask(taskNode, task);
 
-                //check if walltime and fork attribute are consistency.
+                //check if walltime and fork attribute are consistent.
                 //if the walltime is set and fork not, fork must be true.
                 if ((task instanceof JavaTask) && task.getWallTime() > 0 && !((JavaTask) task).isFork()) {
                     ((JavaTask) task).setFork(true);

@@ -56,7 +56,6 @@ import org.apache.log4j.AsyncAppender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
@@ -65,7 +64,6 @@ import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
@@ -73,7 +71,6 @@ import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scheduler.common.AdminMethodsInterface;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -84,16 +81,13 @@ import org.ow2.proactive.scheduler.common.UserSchedulerInterface_;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UnknowJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknowTaskResultException;
-import org.ow2.proactive.scheduler.common.job.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.policy.Policy;
-import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
@@ -119,14 +113,12 @@ import org.ow2.proactive.scheduler.job.InternalJobWrapper;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
-import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
-import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -157,35 +149,34 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
             .getValueAsInt() * 1000;
 
-    /** Number of time to retry an active object creation if it fails to create */
-    private static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
-
-    /** Implementation of Resource Manager */
-    private ResourceManagerProxy resourceManager;
-
-    /** Scheduler front-end. */
-    private SchedulerFrontend frontend;
-
     /** Direct link to the current job to submit. */
     private InternalJobWrapper currentJobToSubmit;
 
+    /** Implementation of Resource Manager */
+    ResourceManagerProxy resourceManager;
+
+    /** Scheduler front-end. */
+    SchedulerFrontend frontend;
+
     /** Scheduler current policy */
-    private Policy policy;
+    Policy policy;
 
     /** list of all jobs managed by the scheduler */
-    private Map<JobId, InternalJob> jobs;
+    Map<JobId, InternalJob> jobs;
 
     /** list of pending jobs among the managed jobs */
-    private Vector<InternalJob> pendingJobs;
+    Vector<InternalJob> pendingJobs;
 
     /** list of running jobs among the managed jobs */
-    private Vector<InternalJob> runningJobs;
+    Vector<InternalJob> runningJobs;
+
+    /** Scheduler current status */
+    SchedulerStatus status;
 
     /** list of finished jobs among the managed jobs */
     private Vector<InternalJob> finishedJobs;
 
-    /** Scheduler current status */
-    private SchedulerStatus status;
+    private SchedulingMethod schedulingMethod;
 
     /** Thread that will ping the running nodes */
     private Thread pinger;
@@ -196,17 +187,17 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private Timer restartTaskTimer;
 
     /** Log forwarding service for nodes */
-    private LogForwardingService lfs;
+    LogForwardingService lfs;
 
     /** Jobs that must be logged into the corresponding appenders */
-    private Hashtable<JobId, AsyncAppender> jobsToBeLogged;
+    Hashtable<JobId, AsyncAppender> jobsToBeLogged;
     /** jobs that must be logged into a file */
     //TODO cdelbe : file are logged on core side...
-    private Hashtable<JobId, FileAppender> jobsToBeLoggedinAFile;
+    Hashtable<JobId, FileAppender> jobsToBeLoggedinAFile;
     private static final String FILEAPPENDER_SUFFIX = "_FILE";
 
     /** Currently running tasks for a given jobId*/
-    private Hashtable<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks;
+    Hashtable<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks;
 
     /** ClassLoading */
     // contains taskCLassServer for currently running jobs
@@ -214,7 +205,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private static Hashtable<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers = new Hashtable<JobId, RemoteObjectExposer<TaskClassServer>>();
 
     /** Dataspaces Naming service */
-    private DataSpaceServiceStarter dataSpaceNSStarter;
+    DataSpaceServiceStarter dataSpaceNSStarter;
 
     /**
      * Return the task classserver for the job jid.<br>
@@ -418,7 +409,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param currentJob the job where the task info are.
      * @param eventType the type of event to send with the job state updated
      */
-    private void updateTaskInfosList(InternalJob currentJob, SchedulerEvent eventType) {
+    void updateTaskInfosList(InternalJob currentJob, SchedulerEvent eventType) {
         logger_dev.info("Send multiple changes to front-end for job '" + currentJob.getId() + "' (event='" +
             eventType + "')");
         //send event to listeners.
@@ -476,7 +467,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 "getSchedulerState");
             createPingThread();
 
-            // default scheduler status is started
+            //create scheduling method
+            schedulingMethod = new SchedulingMethodImpl(this);
+
+            //default scheduler status is started
             ((SchedulerCore) PAActiveObject.getStubOnThis()).start();
 
             do {
@@ -490,7 +484,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         //serve all important methods
                         service.serveAll(filter);
                         //schedule
-                        schedule();
+                        schedulingMethod.schedule();
                     } catch (Throwable e) {
                         //this point is reached in case of big problem, sometimes unknown
                         logger
@@ -547,7 +541,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //block the loop until a method is invoked and serve it
                     service.blockingServeOldest(SCHEDULER_TIME_OUT);
                     service.serveAll(filter);
-                    schedule();
+                    schedulingMethod.schedule();
                 } catch (Exception e) {
                     logger_dev.error("", e);
                 }
@@ -578,296 +572,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         logger.info("Scheduler is now shutdown !");
         //exit
         System.exit(0);
-    }
-
-    /**
-     * Schedule computing method
-     */
-    private void schedule() {
-        //Number of time to retry an active object creation before leaving scheduling loop
-        int activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-
-        //get job Descriptor list with eligible jobs (running and pending)
-        ArrayList<JobDescriptor> jobDescriptorList = new ArrayList<JobDescriptor>();
-
-        for (InternalJob j : runningJobs) {
-            if (j.getJobDescriptor().getEligibleTasks().size() > 0) {
-                jobDescriptorList.add(j.getJobDescriptor());
-            }
-        }
-
-        //if scheduler is paused it only finishes running jobs
-        if (status != SchedulerStatus.PAUSED) {
-            for (InternalJob j : pendingJobs) {
-                if (j.getJobDescriptor().getEligibleTasks().size() > 0) {
-                    jobDescriptorList.add(j.getJobDescriptor());
-                }
-            }
-        }
-
-        if (jobDescriptorList.size() > 0) {
-            logger_dev.info("Number of jobs containing tasks to be scheduled : " + jobDescriptorList.size());
-        }
-
-        //ask the policy all the tasks to be schedule according to the jobs list.
-        Vector<EligibleTaskDescriptor> taskRetrivedFromPolicy = policy.getOrderedTasks(jobDescriptorList);
-
-        if (taskRetrivedFromPolicy == null || taskRetrivedFromPolicy.size() == 0) {
-            return;
-        }
-
-        if (taskRetrivedFromPolicy.size() > 0) {
-            logger_dev.info("Number of tasks ready to be scheduled : " + taskRetrivedFromPolicy.size());
-        }
-
-        while (!taskRetrivedFromPolicy.isEmpty()) {
-            //number of nodes to ask for
-            int nbNodesToAskFor = 0;
-            RMState rmState = resourceManager.getRMState();
-            policy.RMState = rmState;
-            int freeResourcesNb = rmState.getNumberOfFreeResources().intValue();
-            logger_dev.info("Number of free resources : " + freeResourcesNb);
-            if (freeResourcesNb == 0) {
-                break;
-            }
-            int taskToCheck = 0;
-            //select first task to define the selection script ID
-            TaskDescriptor taskDescriptor = taskRetrivedFromPolicy.get(taskToCheck);
-            InternalJob currentJob = jobs.get(taskDescriptor.getJobId());
-            InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
-            InternalTask sentinel = internalTask;
-            SchedulingTaskComparator referentComp = new SchedulingTaskComparator(internalTask);
-            SchedulingTaskComparator currentComp = referentComp;
-            logger_dev.debug("Get the most nodes matching the current selection");
-            //if free resources are available and (selection script ID and Node Exclusion) are the same as the first
-            while (freeResourcesNb > 0 && referentComp.equals(currentComp)) {
-                taskDescriptor = taskRetrivedFromPolicy.get(taskToCheck);
-                currentJob = jobs.get(taskDescriptor.getJobId());
-                internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
-                //last task to be launched
-                sentinel = internalTask;
-                if (internalTask.getNumberOfNodesNeeded() > freeResourcesNb) {
-                    //TODO what do we want for multi-nodes task?
-                    //Improve scheduling policy to avoid starvation
-                    break;
-                } else {
-                    //update number of nodes to ask to the RM
-                    nbNodesToAskFor += internalTask.getNumberOfNodesNeeded();
-                    freeResourcesNb -= internalTask.getNumberOfNodesNeeded();
-                }
-                //get next task
-                taskToCheck++;
-                //if there is no task anymore, break
-                if (taskToCheck >= taskRetrivedFromPolicy.size()) {
-                    break;
-                }
-                {
-                    //create next comparator
-                    TaskDescriptor td = taskRetrivedFromPolicy.get(taskToCheck);
-                    InternalTask it = jobs.get(td.getJobId()).getIHMTasks().get(td.getId());
-                    currentComp = new SchedulingTaskComparator(it);
-                }
-            }
-
-            logger.debug("Number of nodes to ask for : " + nbNodesToAskFor);
-            NodeSet nodeSet = null;
-
-            if (nbNodesToAskFor > 0) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Referent task              : " + internalTask.getId());
-                    logger.debug("Selection script(s)        : " +
-                        ((referentComp.getSsHashCode() == 0) ? "no" : "yes (" + referentComp.getSsHashCode() +
-                            ")"));
-                    logger.debug("Node(s) exclusion          : " + internalTask.getNodeExclusion());
-                }
-
-                try {
-                    nodeSet = resourceManager.getAtMostNodes(nbNodesToAskFor, internalTask
-                            .getSelectionScripts(), internalTask.getNodeExclusion());
-                    //the following line is used to unwrap the future, warning when moving or removing
-                    //it may also throw a ScriptException which is a RuntimeException
-                    logger.debug("Got " + nodeSet.size() + " node(s)");
-                } catch (ScriptException e) {
-                    Throwable t = e;
-                    while (t.getCause() != null) {
-                        t = t.getCause();
-                    }
-                    logger_dev.info("Selection script throws an exception : " + t);
-                    //simulate job starting if needed
-                    // set the different informations on job
-                    if (currentJob.getStartTime() < 0) {
-                        // if it is the first task of this job
-                        currentJob.start();
-                        pendingJobs.remove(currentJob);
-                        runningJobs.add(currentJob);
-                        //update tasks events list and send it to front-end
-                        updateTaskInfosList(currentJob, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-                        logger.info("Job '" + currentJob.getId() + "' started");
-                    }
-                    //selection script has failed : end the job
-                    endJob(currentJob, internalTask, "Selection script has failed : " + t, JobStatus.CANCELED);
-                    //leave the method to recreate lists of tasks to start
-                    return;
-                }
-
-            }
-
-            //remove unschedulable task
-            if (nbNodesToAskFor <= 0 || nodeSet.size() == 0) {
-                //if RM returns 0 nodes, i.e. no nodes satisfy selection script (or no nodes at all)
-                //remove these tasks from the tasks list to Schedule, and then prevent infinite loop :
-                //always trying to Schedule in vein these tasks (scheduler Core AO stay blocked on this Schedule loop,
-                //and can't treat terminate request asked by ended tasks for example).
-                //try again to schedule these tasks on next call to schedule() seems reasonable 
-                while (!taskRetrivedFromPolicy.get(0).getId().equals(sentinel.getId())) {
-                    taskRetrivedFromPolicy.remove(0);
-                }
-                taskRetrivedFromPolicy.remove(0);
-            }
-
-            Node node = null;
-
-            //start selected tasks
-            try {
-                while (nodeSet != null && !nodeSet.isEmpty()) {
-                    taskDescriptor = taskRetrivedFromPolicy.get(0);
-                    currentJob = jobs.get(taskDescriptor.getJobId());
-                    internalTask = currentJob.getIHMTasks().get(taskDescriptor.getId());
-
-                    // load and Initialize the executable container
-                    DatabaseManager.getInstance().load(internalTask);
-                    logger_dev.debug("Load and Initialize the executable container for task '" +
-                        internalTask.getId() + "'");
-
-                    // Initialize executable container
-                    ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
-                    // TCS can be null for non-java task
-                    eci.setClassServer(getTaskClassServer(currentJob.getId()));
-                    internalTask.getExecutableContainer().init(eci);
-
-                    node = nodeSet.get(0);
-                    TaskLauncher launcher = null;
-
-                    //enough nodes to be launched at same time for a communicating task
-                    if (nodeSet.size() >= internalTask.getNumberOfNodesNeeded()) {
-
-                        nodeSet.remove(0);
-                        //start dataspace app for this job
-                        currentJob.startDataSpaceApplication(dataSpaceNSStarter.getNamingService(),
-                                dataSpaceNSStarter.getNamingServiceURL());
-                        //create launcher
-                        launcher = internalTask.createLauncher(currentJob, node);
-                        activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-                        this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
-                                launcher);
-                        NodeSet nodes = new NodeSet();
-
-                        for (int i = 0; i < (internalTask.getNumberOfNodesNeeded() - 1); i++) {
-                            nodes.add(nodeSet.remove(0));
-                        }
-                        internalTask.getExecuterInformations().addNodes(nodes);
-
-                        // activate loggers for this task if needed
-                        if (this.jobsToBeLogged.containsKey(currentJob.getId()) ||
-                            this.jobsToBeLoggedinAFile.containsKey(currentJob.getId())) {
-                            launcher.activateLogs(this.lfs.getAppenderProvider());
-                        }
-
-                        // Set to empty array to emulate varargs behavior (i.e. not defined is
-                        // equivalent to empty array, not null.
-                        TaskResult[] params = new TaskResult[0];
-                        //if job is TASKSFLOW, preparing the list of parameters for this task.
-                        int resultSize = taskDescriptor.getParents().size();
-                        if ((currentJob.getType() == JobType.TASKSFLOW) && (resultSize > 0)) {
-                            params = new TaskResult[resultSize];
-                            for (int i = 0; i < resultSize; i++) {
-                                //get parent task number i
-                                InternalTask parentTask = currentJob.getIHMTasks().get(
-                                        taskDescriptor.getParents().get(i).getId());
-                                //set the task result in the arguments array.
-                                params[i] = currentJob.getJobResult().getResult(parentTask.getName());
-                                //if this result has been unloaded, (extremely rare but possible)
-                                if (params[i].getOutput() == null) {
-                                    //get the result and load the content from database
-                                    DatabaseManager.getInstance().load(params[i]);
-                                }
-                            }
-                        }
-
-                        //set nodes in the executable container
-                        internalTask.getExecutableContainer().setNodes(nodes);
-
-                        logger_dev.info("Starting deployment of task '" + internalTask.getName() +
-                            "' for job '" + currentJob.getId() + "'");
-
-                        //TODO if the next task is a native task, it's no need to pass params
-                        ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask.getName(),
-                                launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(), internalTask
-                                        .getExecutableContainer(), params));
-
-                    }
-
-                    //if a task has been launched
-                    if (launcher != null) {
-                        logger.info("Task '" + internalTask.getId() + "' started on " +
-                            node.getNodeInformation().getVMInformation().getHostName());
-
-                        // set the different informations on job
-                        if (currentJob.getStartTime() < 0) {
-                            // if it is the first task of this job
-                            currentJob.start();
-                            pendingJobs.remove(currentJob);
-                            runningJobs.add(currentJob);
-                            //update tasks events list and send it to front-end
-                            updateTaskInfosList(currentJob, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-                            logger.info("Job '" + currentJob.getId() + "' started");
-                        }
-
-                        // set the different informations on task
-                        currentJob.startTask(internalTask);
-                        // send task event to front-end
-                        frontend.taskStateUpdated(currentJob.getOwner(), new NotificationData<TaskInfo>(
-                            SchedulerEvent.TASK_PENDING_TO_RUNNING, internalTask.getTaskInfo()));
-                        //no need to set this status in database
-                    }
-                    //if everything were OK (or if the task could not be launched, 
-                    //removed this task from the processed task.
-                    taskRetrivedFromPolicy.remove(0);
-                    //if every task that should be launched have been removed
-                    if (internalTask == sentinel) {
-                        //get back unused nodes to the RManager
-                        if (!nodeSet.isEmpty())
-                            resourceManager.freeNodes(nodeSet);
-                        //and leave the loop
-                        break;
-                    }
-                }
-
-            } catch (ActiveObjectCreationException e1) {
-                //Something goes wrong with the active object creation (createLauncher)
-                logger.warn("", e1);
-                //so try to get back every remaining nodes to the resource manager
-                try {
-                    resourceManager.freeNodes(nodeSet);
-                } catch (Exception e2) {
-                    logger_dev.info("Unable to get back the nodeSet to the RM", e2);
-                }
-                if (--activeObjectCreationRetryTimeNumber == 0) {
-                    return;
-                }
-            } catch (Exception e1) {
-                //if we are here, it is that something append while launching the current task.
-                logger.warn("", e1);
-                //so try to get back every remaining nodes to the resource manager
-                try {
-                    resourceManager.freeNodes(nodeSet);
-                } catch (Exception e2) {
-                    logger_dev.info("Unable to get back the nodeSet to the RM", e2);
-                }
-            }
-
-        }
-
     }
 
     /**
@@ -998,7 +702,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param errorMsg the error message to send in the task result.
      * @param jobStatus the type of the end for this job. (failed/canceled/killed)
      */
-    private void endJob(InternalJob job, InternalTask task, String errorMsg, JobStatus jobStatus) {
+    void endJob(InternalJob job, InternalTask task, String errorMsg, JobStatus jobStatus) {
         TaskResult taskResult = null;
 
         if (task != null) {

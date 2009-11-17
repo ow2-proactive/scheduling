@@ -162,6 +162,13 @@ public abstract class InternalTask extends TaskState {
             throws ActiveObjectCreationException, NodeException;
 
     /**
+     * Return true if this task can handle parent results arguments in its executable
+     *
+     * @return true if this task can handle parent results arguments in its executable, false if not.
+     */
+    public abstract boolean handleResultsArguments();
+
+    /**
      * Return a container for the user executable represented by this task descriptor.
      * 
      * @return the user executable represented by this task descriptor.

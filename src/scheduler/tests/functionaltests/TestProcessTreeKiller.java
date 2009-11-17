@@ -43,6 +43,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        Runtime.getRuntime().exec("killall " + unixPTKProcessName);
 
         SchedulerTHelper.log("Test 1 : Creating jobs...");
 

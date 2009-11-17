@@ -113,9 +113,9 @@ public class InternalJobFactory {
      * 
      * @return true if every tasks can be accessed, false if not.
      */
-    private static boolean isConsistency(TaskFlowJob userJob) {
+    private static boolean isConsistent(TaskFlowJob userJob) {
         logger_dev.info("Check if job '" + userJob.getName() +
-            "' is consistency : ie Every task can be accessed");
+            "' is consistent : ie Every task can be accessed");
         HashSet<Task> tasks = new HashSet<Task>();
         HashSet<Task> reached = new HashSet<Task>();
         for (Task t : userJob.getTasks()) {
@@ -155,7 +155,7 @@ public class InternalJobFactory {
         }
 
         //check tasks flow
-        if (!isConsistency(userJob)) {
+        if (!isConsistent(userJob)) {
             String msg = "One or more tasks in this job cannot be reached !";
             logger_dev.info(msg);
             throw new SchedulerException(msg);
