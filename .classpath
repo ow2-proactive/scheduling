@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="classes/resource-managerTests" path="src/resource-manager/tests"/>
+	<classpathentry kind="src" output="classes/forecaster" path="src/forecaster"/>
 	<classpathentry kind="src" output="classes/common" path="src/common"/>
 	<classpathentry kind="src" output="classes/resource-manager" path="src/resource-manager/src"/>
 	<classpathentry kind="src" output="classes/scheduler" path="src/scheduler/src"/>
