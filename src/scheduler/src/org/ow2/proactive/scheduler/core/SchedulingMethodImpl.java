@@ -315,9 +315,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
         InternalJob currentJob = core.jobs.get(etd.getJobId());
         InternalTask internalTask = currentJob.getIHMTasks().get(etd.getId());
-        SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask);
 
         if (logger.isDebugEnabled()) {
+            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask);
             logger.debug("Referent task         : " + internalTask.getId());
             logger.debug("Selection script(s)   : " +
                 ((referent.getSsHashCode() == 0) ? "no" : "yes (" + referent.getSsHashCode() + ")"));

@@ -318,11 +318,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /**
      * Create a new scheduler Core with the given arguments.<br>
      * 
-     * @param imp the resource manager on which the scheduler will interact.
+     * @param rmp the resource manager on which the scheduler will interact.
      * @param frontend a reference to the frontend.
      * @param policyFullName the fully qualified name of the policy to be used.
      */
-    public SchedulerCore(ResourceManagerProxy imp, SchedulerFrontend frontend, String policyFullName,
+    public SchedulerCore(ResourceManagerProxy rmp, SchedulerFrontend frontend, String policyFullName,
             InternalJobWrapper jobSubmitLink) {
         try {
             this.jobs = new HashMap<JobId, InternalJob>();
@@ -336,7 +336,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             this.jobsToBeLoggedinAFile = new Hashtable<JobId, FileAppender>();
             this.currentlyRunningTasks = new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
 
-            this.resourceManager = imp;
+            this.resourceManager = rmp;
             this.frontend = frontend;
             this.currentJobToSubmit = jobSubmitLink;
             //loggers
