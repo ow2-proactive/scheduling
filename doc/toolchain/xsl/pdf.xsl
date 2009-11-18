@@ -1579,7 +1579,7 @@
 				<xsl:call-template name="fo-external-image">
 					<xsl:with-param name="filename" select="@url" />
 				</xsl:call-template>
-    		</xsl:attribute>
+			</xsl:attribute>
 
 			<xsl:choose>
 				<xsl:when test="count(child::node())=0">
