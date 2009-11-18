@@ -1,7 +1,12 @@
 = Documentation toolchain update = 
-1. Run "build toolchain"  from the compile folder. The files generated are
+1. Commit your modification into the svn repository
+2. Create a new tag:
+svn copy svn+ssh://scm.gforge.inria.fr/svn/proactive/documentation/trunk svn+ssh://scm.gforge.inria.fr/svn/proactive/documentation/tags/docchain_x.y.z -m "my commit message"
+where x.y.z is the next toolchain version.
+3. Run "build toolchain"  from the compile folder. The files generated are
 placed in "built" in the main folder. 
-2. Copy the files inside "built" in  "doc/toolchain"  in the project   
+4. Copy the files inside "built" into the "doc/toolchain" directory of your project
+5. Commit the toolchain updating indicating its version (x.y.z)
 
 
 

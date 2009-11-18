@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="deploy.all" basedir=".">
 	
-	<taskdef name="var" classname="ise.antelope.tasks.Variable"/>
-	
 	<import file="scheduler-build.xml" />
 	<import file="rm-build.xml" />
 	

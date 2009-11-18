@@ -740,7 +740,7 @@
   </para>
 
   <para>
-    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://mail.ow2.org/wws/arc/proactive">http://mail.ow2.org/wws/arc/proactive</uri>
+    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://mail.ow2.org/wws/arc/proactive" />
   </para>
 
   <para>
@@ -749,7 +749,7 @@
   </para>
 
   <para>
-    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://galpage-exp.inria.fr:8181/jira">https://galpage-exp.inria.fr:8181/jira</uri>
+    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://galpage-exp.inria.fr:8181/jira"/>
   </para>
 
   <para>
@@ -757,7 +757,7 @@
   </para>
 
   <para>
-    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/index.php?page=documentation">http://proactive.inria.fr/index.php?page=documentation</uri>
+    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/index.php?page=documentation" />
   </para>
   <!-- List to be completed and kept up-to-date, sorted alphabeticly -->
 </dedication>

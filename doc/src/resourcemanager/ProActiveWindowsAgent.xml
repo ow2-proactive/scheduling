@@ -145,7 +145,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 			<title>Installation</title>
 		</info>
 		<para>The ProActive Windows Agent installation pack is available on
-			the official <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/">ProActive website</uri>. Follow the links and get the latest
+			the official <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/">ProActive website</link>. Follow the links and get the latest
 			version.</para>
 		<note>
 			<para>
@@ -153,7 +153,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 				<listitem>
 					<para>.Net framework v3.5 or later should be installed on your
 						system. If not, the installer will ask you to install it.
-						Go to <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.microsoft.com/downloads">http://www.microsoft.com/downloads</uri> and download
+						Go to <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.microsoft.com/downloads" /> and download
 						Microsoft .NET Framework Version 3.5 (or later) Redistributable
 						Package.</para>
 				</listitem>
