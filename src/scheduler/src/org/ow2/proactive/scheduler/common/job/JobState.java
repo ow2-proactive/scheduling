@@ -201,6 +201,15 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     }
 
     /**
+     * To know if the job is finished or not.
+     *
+     * @return true if the job is finished, false otherwise.
+     */
+    public boolean isFinished() {
+        return this.getNumberOfFinishedTasks() == this.getTotalNumberOfTasks();
+    }
+
+    /**
      * To get the finishedTime
      *
      * @return the finishedTime

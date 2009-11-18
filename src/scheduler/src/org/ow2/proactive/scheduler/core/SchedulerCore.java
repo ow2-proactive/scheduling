@@ -1021,7 +1021,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //if this job is finished (every task have finished)
             logger_dev.info("Number of finished tasks : " + job.getNumberOfFinishedTasks() +
                 " - Number of tasks : " + job.getTotalNumberOfTasks());
-            if (job.getNumberOfFinishedTasks() == job.getTotalNumberOfTasks()) {
+            if (job.isFinished()) {
                 //terminating job
                 job.terminate();
                 runningJobs.remove(job);
