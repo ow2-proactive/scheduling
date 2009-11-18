@@ -10,11 +10,12 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
 /**
- * To be used by the resource Manager Simulator 
+ * To be used by the resource Manager Simulator
+ * 
  * @author esalagea
- *
+ * 
  */
-public class FakeNode implements org.objectweb.proactive.core.node.Node{
+public class FakeNode implements org.objectweb.proactive.core.node.Node {
 
 	@Override
 	public Object[] getActiveObjects() throws NodeException,
@@ -55,7 +56,7 @@ public class FakeNode implements org.objectweb.proactive.core.node.Node{
 
 	@Override
 	public void killAllActiveObjects() throws NodeException, IOException {
-	
+
 	}
 
 	@Override

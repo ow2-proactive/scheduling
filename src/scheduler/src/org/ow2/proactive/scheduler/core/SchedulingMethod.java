@@ -37,11 +37,11 @@ package org.ow2.proactive.scheduler.core;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-interface SchedulingMethod {
+public interface SchedulingMethod {
 
     /**
      * Scheduling process.
      */
-    void schedule();
+    public void schedule();
 
 }

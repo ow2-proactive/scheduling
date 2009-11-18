@@ -180,8 +180,8 @@ public class SchedulerCoreSimulator {
 	 * respective nodes
 	 * 
 	 * TODO: - save this information in the local state among the running tasks
-	 * in the local state choose the one that is supposed to finish first
-	 *  - finish the chosen task (call the terminate method)
+	 * in the local state choose the one that is supposed to finish first -
+	 * finish the chosen task (call the terminate method)
 	 * 
 	 * 
 	 * IMPORTANT: this method may be called with an empty map if there are no

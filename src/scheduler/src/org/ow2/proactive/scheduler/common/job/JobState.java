@@ -329,4 +329,11 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         return getClass().getSimpleName() + "[" + getId() + "]";
     }
 
+    
+    public boolean isFinished()
+    {
+    	return this.getNumberOfFinishedTasks() == this.getTotalNumberOfTasks();
+    }
+    
+    
 }
