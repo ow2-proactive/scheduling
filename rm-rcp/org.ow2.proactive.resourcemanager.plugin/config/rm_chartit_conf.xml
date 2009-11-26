@@ -8,25 +8,6 @@
     <string>BAR</string> 
    </object> 
   </void> 
-  <void property="labels"> 
-   <array class="java.lang.String" length="5"> 
-    <void index="0"> 
-     <string>Total</string> 
-    </void> 
-    <void index="1"> 
-     <string>Free</string> 
-    </void> 
-    <void index="2"> 
-     <string>Busy</string> 
-    </void> 
-    <void index="3"> 
-     <string>ToBeReleased</string> 
-    </void> 
-    <void index="4"> 
-     <string>Down</string> 
-    </void> 
-   </array> 
-  </void> 
   <void property="name"> 
    <string>Node States</string> 
   </void> 
@@ -50,19 +31,98 @@
    </array> 
   </void> 
  </object> 
+ <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="5"> 
+  <void index="0"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Total</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>128</int> 
+     </void> 
+     <void index="1"> 
+      <int>255</int> 
+     </void> 
+     <void index="2"> 
+      <int>255</int> 
+     </void> 
+    </void> 
+   </object> 
+  </void> 
+  <void index="1"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Free</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>53</int> 
+     </void> 
+     <void index="1"> 
+      <int>168</int> 
+     </void> 
+     <void index="2"> 
+      <int>73</int> 
+     </void> 
+    </void> 
+   </object> 
+  </void> 
+  <void index="2"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Busy</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>201</int> 
+     </void> 
+     <void index="1"> 
+      <int>156</int> 
+     </void> 
+     <void index="2"> 
+      <int>1</int> 
+     </void> 
+    </void> 
+   </object> 
+  </void> 
+  <void index="3"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>ToBeReleased</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>192</int> 
+     </void> 
+     <void index="1"> 
+      <int>192</int> 
+     </void> 
+     <void index="2"> 
+      <int>192</int> 
+     </void> 
+    </void> 
+   </object> 
+  </void> 
+  <void index="4"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Down</string> 
+    </void> 
+    <void property="rgb"> 
+     <void index="0"> 
+      <int>255</int> 
+     </void> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
    <object id="ChartType0" class="org.objectweb.proactive.ic2d.chartit.data.ChartType" method="valueOf"> 
     <class>org.objectweb.proactive.ic2d.chartit.data.ChartType</class> 
     <string>TIME_SERIES</string> 
    </object> 
-  </void> 
-  <void property="labels"> 
-   <array class="java.lang.String" length="1"> 
-    <void index="0"> 
-     <string>Total Nodes</string> 
-    </void> 
-   </array> 
   </void> 
   <void property="name"> 
    <string>Total Nodes History</string> 
@@ -75,16 +135,18 @@
    </array> 
   </void> 
  </object> 
+ <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="1"> 
+  <void index="0"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Total Nodes</string> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
    <object idref="ChartType0"/> 
-  </void> 
-  <void property="labels"> 
-   <array class="java.lang.String" length="1"> 
-    <void index="0"> 
-     <string>Free Nodes</string> 
-    </void> 
-   </array> 
   </void> 
   <void property="name"> 
    <string>Free Nodes History</string> 
@@ -97,16 +159,18 @@
    </array> 
   </void> 
  </object> 
+ <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="1"> 
+  <void index="0"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Free Nodes</string> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
    <object idref="ChartType0"/> 
-  </void> 
-  <void property="labels"> 
-   <array class="java.lang.String" length="1"> 
-    <void index="0"> 
-     <string>Busy Nodes</string> 
-    </void> 
-   </array> 
   </void> 
   <void property="name"> 
    <string>Busy Nodes History</string> 
@@ -119,19 +183,21 @@
    </array> 
   </void> 
  </object> 
+ <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="1"> 
+  <void index="0"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Busy Nodes</string> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
    <object idref="ChartType0"/> 
   </void> 
-  <void property="labels"> 
-   <array class="java.lang.String" length="1"> 
-    <void index="0"> 
-     <string>ToBeReleased Nodes</string> 
-    </void> 
-   </array> 
-  </void> 
   <void property="name"> 
-   <string>To Be Released Nodes History</string> 
+   <string>ToBeReleased Nodes History</string> 
   </void> 
   <void property="runtimeNames"> 
    <array class="java.lang.String" length="1"> 
@@ -141,16 +207,18 @@
    </array> 
   </void> 
  </object> 
+ <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="1"> 
+  <void index="0"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>ToBeReleased Nodes</string> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
    <object idref="ChartType0"/> 
-  </void> 
-  <void property="labels"> 
-   <array class="java.lang.String" length="1"> 
-    <void index="0"> 
-     <string>Down Nodes</string> 
-    </void> 
-   </array> 
   </void> 
   <void property="name"> 
    <string>Down Nodes History</string> 
@@ -163,4 +231,13 @@
    </array> 
   </void> 
  </object> 
+ <array class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement" length="1"> 
+  <void index="0"> 
+   <object class="org.objectweb.proactive.ic2d.chartit.data.ChartDataElement"> 
+    <void property="label"> 
+     <string>Down Nodes</string> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
 </java> 
