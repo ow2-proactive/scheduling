@@ -275,7 +275,7 @@
                         Edit the file <emphasis>SCILAB_DIR/share/scilab/modules/jvm/etc/jvm_options.xml</emphasis>. In this file add the two following lines :
                     </para>
                     <screen><![CDATA[<option value="-Djava.security.manager"/>
-<option value="-Djava.security.policy="HOMEDIR/scilab.java.policy""/>]]></screen>
+<option value="-Djava.security.policy=HOMEDIR/scilab.java.policy"/>]]></screen>
                     <para>
                         Where HOMEDIR is the full path to the current user HOME directory as explained above.
                     </para>
