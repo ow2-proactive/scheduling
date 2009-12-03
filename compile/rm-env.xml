@@ -36,6 +36,7 @@
 			<include name="hibernate/**/*.jar"/>
 			<!-- Amazon EC2 libs -->
 			<include name="ec2/**/*.jar"/>
+			<include name="winhpc/**/*.jar"/>
 		</fileset>
 		<pathelement location="${cl.common.dir}" />
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>

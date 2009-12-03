@@ -152,5 +152,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/bcel-5.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-discovery-0.4.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/ProActive.jar"/>
+	<classpathentry kind="lib" path="lib/winhpc/WinHPCWebserviceStubs.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
