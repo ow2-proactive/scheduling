@@ -42,6 +42,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.Column;
 import javax.persistence.Lob;
@@ -218,10 +220,32 @@ public abstract class Script<E> implements Serializable {
     }
 
     /**
+     * Add a binding to the script that will be handle by this handler.
+     *
+     * @param name the name of the variable
+     * @param value the value of the variable
+     */
+    public void addBinding(String name, Object value) {
+
+    }
+
+    /**
      * Execute the script and return the ScriptResult corresponding.
+     *
      * @return a ScriptResult object.
      */
     public ScriptResult<E> execute() {
+        return execute(null);
+    }
+
+    /**
+     * Execute the script and return the ScriptResult corresponding.
+     * This method can add an additional user bindings if needed.
+     *
+     * @param aBindings the additional user bindings to add if needed. Can be null or empty.
+     * @return a ScriptResult object.
+     */
+    public ScriptResult<E> execute(Map<String, Object> aBindings) {
         ScriptEngine engine = getEngine();
 
         if (engine == null) {
@@ -230,6 +254,12 @@ public abstract class Script<E> implements Serializable {
 
         try {
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+            //add additional bindings
+            if (aBindings != null) {
+                for (Entry<String, Object> e : aBindings.entrySet()) {
+                    bindings.put(e.getKey(), e.getValue());
+                }
+            }
             prepareBindings(bindings);
             engine.eval(getReader());
 

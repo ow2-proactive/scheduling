@@ -98,6 +98,7 @@ import org.ow2.proactive.scripting.ScriptResult;
 public abstract class TaskLauncher implements InitActive {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+    public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
 
     protected DataSpacesFileObject SCRATCH = null;
     protected DataSpacesFileObject INPUT = null;
@@ -430,15 +431,18 @@ public abstract class TaskLauncher implements InitActive {
     /**
      * Execute the postScript on the node n, or on the default node if n is null.
      * 
+     * @param Node the node on which to execute the post script
+     * @param executionSucceed a boolean describing the state of the task execution.(true if execution succeed, false if not)
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occurred during the execution of the script
      */
     @SuppressWarnings("unchecked")
-    protected void executePostScript(Node n) throws ActiveObjectCreationException, NodeException,
-            UserException {
+    protected void executePostScript(Node n, boolean executionSucceed) throws ActiveObjectCreationException,
+            NodeException, UserException {
         logger_dev.info("Executing post-script");
         ScriptHandler handler = ScriptLoader.createHandler(n);
+        handler.addBinding(EXECUTION_SUCCEED_BINDING_NAME, executionSucceed);
         ScriptResult<String> res = handler.handle(post);
 
         if (res.errorOccured()) {

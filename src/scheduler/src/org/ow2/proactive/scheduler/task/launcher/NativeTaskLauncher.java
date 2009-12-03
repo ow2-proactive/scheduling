@@ -121,21 +121,32 @@ public class NativeTaskLauncher extends TaskLauncher {
             //replace dataspace tags in command (if needed) by local scratch directory
             replaceCommandDSTags();
 
-            //launch task
-            logger_dev.debug("Starting execution of task '" + taskId + "'");
-            Serializable userResult = currentExecutable.execute(results);
+            Throwable exception = null;
+            Serializable userResult = null;
+            try {
+                //launch task
+                logger_dev.debug("Starting execution of task '" + taskId + "'");
+                userResult = currentExecutable.execute(results);
+            } catch (Throwable t) {
+                exception = t;
+            }
 
-            //execute post-script only if user task return code is 0
-            int retCode = Integer.parseInt(userResult.toString());
-            if (post != null && retCode == 0) {
-                this.executePostScript(PAActiveObject.getNode());
+            //copy output file
+            copyScratchDataToOutput();
+
+            //launch post script
+            if (post != null) {
+                int retCode = Integer.parseInt(userResult.toString());
+                this.executePostScript(PAActiveObject.getNode(), retCode == 0 && exception == null);
+            }
+
+            //throw exception if needed
+            if (exception != null) {
+                throw exception;
             }
 
             //logBuffer is filled up
             TaskResult result = new TaskResultImpl(taskId, userResult, this.getLogs());
-
-            //copy output file
-            copyScratchDataToOutput();
 
             //return result
             return result;

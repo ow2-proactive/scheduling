@@ -35,6 +35,8 @@
 package org.ow2.proactive.scripting;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -50,6 +52,7 @@ public class ScriptHandler implements Serializable {
 
     /**  */
     private static final long serialVersionUID = 20;
+    Map<String, Object> additionalBindings = null;
 
     /**
      * ProActive Constructor
@@ -64,10 +67,23 @@ public class ScriptHandler implements Serializable {
      */
     public ScriptResult handle(Script script) {
         try {
-            return script.execute();
+            return script.execute(additionalBindings);
         } catch (Throwable t) {
             return new ScriptResult(t);
         }
+    }
+
+    /**
+     * Add a binding to the script that will be handle by this handler.
+     *
+     * @param name the name of the variable
+     * @param value the value of the variable
+     */
+    public void addBinding(String name, Object value) {
+        if (additionalBindings == null) {
+            additionalBindings = new HashMap<String, Object>();
+        }
+        additionalBindings.put(name, value);
     }
 
     /**

@@ -101,16 +101,27 @@ public class JavaTaskLauncher extends TaskLauncher {
             callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, executableContainer
                     .createExecutableInitializer());
 
-            //launch task            
-            Serializable userResult = currentExecutable.execute(results);
-
-            //launch post script
-            if (post != null) {
-                this.executePostScript(PAActiveObject.getNode());
+            Throwable exception = null;
+            Serializable userResult = null;
+            try {
+                //launch task
+                userResult = currentExecutable.execute(results);
+            } catch (Throwable t) {
+                exception = t;
             }
 
             //copy output file
             copyScratchDataToOutput();
+
+            //launch post script
+            if (post != null) {
+                this.executePostScript(PAActiveObject.getNode(), exception == null);
+            }
+
+            //throw exception if needed
+            if (exception != null) {
+                throw exception;
+            }
 
             //return result
             return new TaskResultImpl(taskId, userResult, this.getLogs());
