@@ -60,22 +60,4 @@ feel free to contact us at proactive@ow2.org
 Details can be found on the ProActive Jira bug-tracking system
 (https://galpage-exp.inria.fr:8181/jira):
 
-- SCHEDULING-266 GCMD/Static empty node sources redeploy all nodes
-  when some nodes are added.
-
-- SCHEDULING-267 Scheduler and RM can be impacted by network latency.
-
-- SCHEDULING-127 MacOSX and JSR223 :
-Some features of ProActive Scheduling and RM rely on Java Scripting API (JSR
-223), which is bugged under MacOSX/Java 1.5.0_16: some JSR 223
-specific classes contained in the AppleScriptEngine.jar (loaded from
-the boot classpath) are compiled under Java 1.6. As a consequence,
-using default Java 1.5.0_16 for starting any part of ProActive
-Scheduling (including graphical clients and worker nodes) can lead to
-the following exception (if scripts capabilities are used):
-java.lang.UnsupportedClassVersionError: Bad version number in
-.classfile To fix this issue, you must remove or rename the
-AppleScriptEngine.jar from /System/Library/Java/Extensions directory.
-
-
 *** Enjoy The ProActive Resource Manager
