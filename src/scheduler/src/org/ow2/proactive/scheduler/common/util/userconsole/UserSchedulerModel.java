@@ -480,7 +480,8 @@ public class UserSchedulerModel extends ConsoleModel {
             list.add("NAME");
             list.add("STATUS");
             list.add("HOSTNAME");
-            list.add("DURATION");
+            list.add("EXEC DURATION");
+            list.add("TOT DURATION");
             list.add("#EXECUTIONS");
             list.add("#NODES KILLED");
             oaf.setTitle(list);
@@ -494,7 +495,8 @@ public class UserSchedulerModel extends ConsoleModel {
                 list.add(ts.getId().toString());
                 list.add(ts.getName());
                 list.add(ts.getStatus().toString());
-                list.add(ts.getExecutionHostName());
+                list.add((ts.getExecutionHostName() == null) ? "unknown" : ts.getExecutionHostName());
+                list.add(Tools.getFormattedDuration(0, ts.getExecutionDuration()));
                 list.add(Tools.getFormattedDuration(ts.getFinishedTime(), ts.getStartTime()));
                 if (ts.getMaxNumberOfExecution() - ts.getNumberOfExecutionLeft() < ts
                         .getMaxNumberOfExecution()) {

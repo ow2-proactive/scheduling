@@ -105,8 +105,11 @@ public class TaskComposite extends Composite {
     /** the unique id and the title for the column "Finished time" */
     public static final String COLUMN_FINISHED_TIME_TITLE = "Finished time";
 
-    /** the unique id and the title for the column "Duration" */
-    public static final String COLUMN_DURATION_TITLE = "Duration";
+    /** the unique id and the title for the column "Total Duration" */
+    public static final String COLUMN_DURATION_TITLE = "Tot Duration";
+
+    /** the unique id and the title for the column "Exec Duration" */
+    public static final String COLUMN_EXEC_DURATION_TITLE = "Exec Duration";
 
     /** the unique id and the title for the column "host name" */
     public static final String COLUMN_HOST_NAME_TITLE = "Host name";
@@ -171,6 +174,7 @@ public class TaskComposite extends Composite {
         TableColumn tc7 = new TableColumn(table, SWT.LEFT);
         TableColumn tc8 = new TableColumn(table, SWT.LEFT);
         TableColumn tc9 = new TableColumn(table, SWT.LEFT);
+        TableColumn tc10 = new TableColumn(table, SWT.LEFT);
 
         // addSelectionListener
         tc1.addSelectionListener(new SelectionAdapter() {
@@ -212,16 +216,22 @@ public class TaskComposite extends Composite {
         tc7.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, SORT_BY_DURATION);
+                sort(event, TaskState.SORT_BY_EXEC_DURATION);
             }
         });
         tc8.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                sort(event, TaskState.SORT_BY_EXECUTIONLEFT);
+                sort(event, SORT_BY_DURATION);
             }
         });
         tc9.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, TaskState.SORT_BY_EXECUTIONONFAILURELEFT);
+            }
+        });
+        tc10.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 sort(event, TaskState.SORT_BY_DESCRIPTION);
@@ -234,9 +244,10 @@ public class TaskComposite extends Composite {
         tc4.setText(COLUMN_HOST_NAME_TITLE);
         tc5.setText(COLUMN_START_TIME_TITLE);
         tc6.setText(COLUMN_FINISHED_TIME_TITLE);
-        tc7.setText(COLUMN_DURATION_TITLE);
-        tc8.setText(COLUMN_NODEFAILURE_TITLE);
-        tc9.setText(COLUMN_DESCRIPTION_TITLE);
+        tc7.setText(COLUMN_EXEC_DURATION_TITLE);
+        tc8.setText(COLUMN_DURATION_TITLE);
+        tc9.setText(COLUMN_NODEFAILURE_TITLE);
+        tc10.setText(COLUMN_DESCRIPTION_TITLE);
         // setWidth
         tc1.setWidth(68);
         tc2.setWidth(110);
@@ -245,8 +256,9 @@ public class TaskComposite extends Composite {
         tc5.setWidth(130);
         tc6.setWidth(130);
         tc7.setWidth(110);
-        tc8.setWidth(100);
-        tc9.setWidth(200);
+        tc8.setWidth(110);
+        tc9.setWidth(100);
+        tc10.setWidth(200);
         // setMoveable
         tc1.setMoveable(true);
         tc2.setMoveable(true);
@@ -257,6 +269,7 @@ public class TaskComposite extends Composite {
         tc7.setMoveable(true);
         tc8.setMoveable(true);
         tc9.setMoveable(true);
+        tc10.setMoveable(true);
 
         table.addListener(SWT.Selection, new Listener() {
 
@@ -569,6 +582,8 @@ public class TaskComposite extends Composite {
                 } else if (title.equals(COLUMN_DURATION_TITLE)) {
                     item.setText(i, Tools.getFormattedDuration(taskState.getFinishedTime(), taskState
                             .getStartTime()));
+                } else if (title.equals(COLUMN_EXEC_DURATION_TITLE)) {
+                    item.setText(i, Tools.getFormattedDuration(0, taskState.getExecutionDuration()));
                 } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
                     if (taskState.getStatus() == TaskStatus.FAILED) {
                         item.setText(i, taskState.getMaxNumberOfExecutionOnFailure() + "/" +

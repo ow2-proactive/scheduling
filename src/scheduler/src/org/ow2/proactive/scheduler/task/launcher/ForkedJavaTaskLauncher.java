@@ -89,6 +89,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
     @Override
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
+        long duration = -1;
         try {
             // create the executable (will set the context class loader to the taskclassserver)
             currentExecutable = executableContainer.getExecutable();
@@ -106,14 +107,17 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
             //schedule timer at any time
             scheduleTimer();
+
+            duration = System.currentTimeMillis();
             //launch task : here, result is obviously a TaskResult
             TaskResult userResult = (TaskResult) currentExecutable.execute(results);
+            duration = System.currentTimeMillis() - duration;
 
             return userResult;
 
         } catch (Throwable ex) {
             logger_dev.info("", ex);
-            return new TaskResultImpl(taskId, ex, this.getLogs());
+            return new TaskResultImpl(taskId, ex, this.getLogs(), duration);
         } finally {
             cancelTimer();
             finalizeTask(core);

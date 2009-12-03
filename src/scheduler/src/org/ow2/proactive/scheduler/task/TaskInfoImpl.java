@@ -99,6 +99,11 @@ public class TaskInfoImpl implements TaskInfo {
     @Column(name = "FINISHED_TIME")
     private long finishedTime = -1;
 
+    /** task real execution time : DEFAULT HAS TO BE SET TO -1 */
+    @Alterable
+    @Column(name = "EXEC_DURATION")
+    private long executionDuration = -1;
+
     /** Current taskStatus of the task */
     @Alterable
     @Column(name = "TASK_STATE")
@@ -314,6 +319,22 @@ public class TaskInfoImpl implements TaskInfo {
      */
     public void decreaseNumberOfExecutionOnFailureLeft() {
         numberOfExecutionOnFailureLeft--;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getExecutionDuration() {
+        return executionDuration;
+    }
+
+    /**
+     * Set the execution duration value to the given executionDuration value
+     * 
+     * @param executionDuration the executionDuration to be set
+     */
+    public void setExecutionDuration(long executionDuration) {
+        this.executionDuration = executionDuration;
     }
 
     /**
