@@ -14,6 +14,8 @@ log4j.additivity.proactive.scheduler.dev.admin=true
 # avoid displaying additivity of the inherit loggers
 log4j.additivity.proactive.resourceManager=false
 
+#log4j.logger.proactive.scheduler.dev.dataspace=DEBUG
+
 # CONSOLE uses PatternLayout
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout

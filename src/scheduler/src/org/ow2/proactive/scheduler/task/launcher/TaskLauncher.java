@@ -98,6 +98,8 @@ import org.ow2.proactive.scripting.ScriptResult;
 public abstract class TaskLauncher implements InitActive {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+    public static final Logger logger_dev_dataspace = ProActiveLogger
+            .getLogger(SchedulerDevLoggers.DATASPACE);
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
 
     protected DataSpacesFileObject SCRATCH = null;
@@ -527,8 +529,8 @@ public abstract class TaskLauncher implements InitActive {
                 INPUT = PADataSpaces.resolveDefaultInput();
                 OUTPUT = PADataSpaces.resolveDefaultOutput();
             } catch (Throwable t) {
-                logger_dev.warn("There was a problem while initializing dataSpaces, they won't be activated",
-                        t);
+                logger_dev_dataspace.warn(
+                        "There was a problem while initializing dataSpaces, they won't be activated", t);
                 //print for user task
                 System.err
                         .println("There was a problem while initializing dataSpaces, they won't be activated : " +
@@ -540,8 +542,11 @@ public abstract class TaskLauncher implements InitActive {
     protected void terminateDataSpace() {
         if (isDataspaceAware()) {
             try {
-                DataSpacesNodes.tryCloseNodeApplicationConfig(PAActiveObject
-                        .getActiveObjectNode(PAActiveObject.getStubOnThis()));
+                //in dataspace debug mode, scratch directory are not cleaned after task execution
+                if (!logger_dev_dataspace.isDebugEnabled()) {
+                    DataSpacesNodes.tryCloseNodeApplicationConfig(PAActiveObject
+                            .getActiveObjectNode(PAActiveObject.getStubOnThis()));
+                }
             } catch (Exception e) {
                 //dwooooo !
             }
@@ -551,12 +556,12 @@ public abstract class TaskLauncher implements InitActive {
     protected void copyInputDataToScratch() throws FileSystemException {
         if (isDataspaceAware()) {
             if (inputFiles == null) {
-                logger_dev.debug("Input selector is empty, no file to copy");
+                logger_dev_dataspace.debug("Input selector is empty, no file to copy");
                 return;
             }
             //check first the OUTPUT and then the INPUT, take care if not set
             if (INPUT == null && OUTPUT == null) {
-                logger_dev.debug("Job INPUT/OUTPUT spaces are not defined, cannot copy file.");
+                logger_dev_dataspace.debug("Job INPUT/OUTPUT spaces are not defined, cannot copy file.");
                 return;
             }
 
@@ -575,7 +580,7 @@ public abstract class TaskLauncher implements InitActive {
                             if (INPUT.getType().hasChildren()) {
                                 Selector.findFiles(INPUT, ant, true, results);
                             } else {
-                                logger_dev
+                                logger_dev_dataspace
                                         .debug("Cannot list files for this INPUT, switch to non-pattern mode and try again");
                                 for (String incl : is.getInputFiles().getIncludes()) {
                                     try {
@@ -584,13 +589,13 @@ public abstract class TaskLauncher implements InitActive {
                                             results.add(dsfo);
                                         }
                                     } catch (FileSystemException fse2) {
-                                        logger_dev.debug("Cannot read file " + incl, fse2);
+                                        logger_dev_dataspace.debug("Cannot read file " + incl, fse2);
                                         toBeThrown = new FileSystemException("Cannot read file " + incl);
                                     }
                                 }
                             }
                         } catch (FileSystemException fse) {
-                            logger_dev.info("", fse);
+                            logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact INPUT space. Check that INPUT space is still reachable !");
                         } catch (NullPointerException npe) {
@@ -602,7 +607,7 @@ public abstract class TaskLauncher implements InitActive {
                         try {
                             Selector.findFiles(OUTPUT, ant, true, results);
                         } catch (FileSystemException fse) {
-                            logger_dev.info("", fse);
+                            logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact OUTPUT space. Check that OUTPUT space is still reachable !");
                             ;
@@ -651,13 +656,13 @@ public abstract class TaskLauncher implements InitActive {
     protected void copyScratchDataToOutput() throws FileSystemException {
         if (isDataspaceAware()) {
             if (outputFiles == null) {
-                logger_dev.debug("Output selector is empty, no file to copy");
+                logger_dev_dataspace.debug("Output selector is empty, no file to copy");
                 return;
             }
             //check first the OUTPUT and then the INPUT, take care if not set
             if (OUTPUT == null) {
 
-                logger_dev.debug("Job OUTPUT space is not defined, cannot copy file.");
+                logger_dev_dataspace.debug("Job OUTPUT space is not defined, cannot copy file.");
                 return;
             }
 
@@ -683,12 +688,12 @@ public abstract class TaskLauncher implements InitActive {
                                                     dsfo,
                                                     org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
                                 } catch (FileSystemException fse) {
-                                    logger_dev.warn("", fse);
+                                    logger_dev_dataspace.warn("", fse);
                                     toBeThrown = fse;
                                 }
                             }
                         } catch (FileSystemException fse) {
-                            logger_dev.warn("", fse);
+                            logger_dev_dataspace.warn("", fse);
                             toBeThrown = fse;
                         }
                         break;
