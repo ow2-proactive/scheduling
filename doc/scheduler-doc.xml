@@ -122,8 +122,6 @@
 
       <target name="doc.Scheduler.javadoc.complete"  depends="compile.all" description="Generate the Scheduler complete javadoc">
 		<property name="doc.name" value="Scheduler" />
-	<property name="docs.src.dir"           value="${scheduler.src.dir}" />
-	<property name="docs.mainFile" 			value="main.xml" />
 		<setProperties />
       	<javadoc
             destdir="${docs.built.dir}/api_complete"
@@ -149,7 +147,7 @@
 			<link href="http://proactive.inria.fr/release-doc/pa/api_complete/"/>
             <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
             <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-            <doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
+            <doctitle><![CDATA[Scheduler ${version}<br><a href='../multiple_html/index.html'>(documentation is here)</a><br>]]></doctitle>
             <bottom><![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
 
             <group title="Scheduler">
@@ -166,8 +164,6 @@
 
 	<target name="doc.Scheduler.javadoc.published" depends="compile.all" description="Generate the Scheduler published javadoc">
 		<property name="doc.name" value="Scheduler" />
-	<property name="docs.src.dir"           value="${scheduler.src.dir}" />
-	<property name="docs.mainFile" 			value="main.xml" />
 		<setProperties />
     	<mkdir dir="${docs.tmp.dir}" />
         <javadoc source="${source}"	classpathref="scheduler.libs">
@@ -197,11 +193,11 @@
                 <pathelement path="${cl.rm.dir}"/>
             </classpath>
 
-
+        	<fileset dir="${src.rm.dir}" includesfile="../doc/tmp/publishedCoreClasses"/>
             <fileset dir="${src.scheduler.dir}" includesfile="../doc/tmp/publishedCoreClasses"/>
             <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
             <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-            <doctitle><![CDATA[Scheduler ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
+            <doctitle><![CDATA[Scheduler ${version}<br><a href='../multiple_html/index.html'>(documentation is here)</a><br>]]></doctitle>
             <bottom><![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
 
             <group title="Scheduler">
