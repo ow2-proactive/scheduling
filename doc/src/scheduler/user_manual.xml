@@ -1010,7 +1010,10 @@ task2.setGenerationScript(gscript);
 							<listitem>
 								<para>
 									<emphasis>post-script</emphasis>  - the post-script is executed on the same node
-									<emphasis>after</emphasis> the task itself and only if this last one has succeed.
+									<emphasis>after</emphasis> the task itself in any case.
+									A boolean variable named "success" is available in this script in order to
+									inform user about the success of the task execution. if success is true, the execution
+									has finished successfully, if not, execution has generated an exception.
 									The same helper than for pre-script can be used in the post-script.
 								</para>
 							</listitem>
