@@ -44,7 +44,7 @@
         </para>
         <para>
             Follow the instructions for the installation of the <emphasis> Open Modelica Compiler  </emphasis>
-            <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.ida.liu.se/labs/pelab/modelica/OpenModelica.html#Download">http://www.ida.liu.se/labs/pelab/modelica/OpenModelica.html#Download</uri>
+            <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.ida.liu.se/labs/pelab/modelica/OpenModelica.html#Download" />
         </para>
         <para>
             Set the environment variable <emphasis>SENDDATALIBS</emphasis> with the following value:

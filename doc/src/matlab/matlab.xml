@@ -255,9 +255,7 @@
                         specific Toolboxes are installed... We provide a
                         generic script which simply tests if Matlab is
                         installed. The script is retrieved from the URL
-                        <uri xlink:href="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js">
-                            http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js
-                        </uri>
+                        <link xlink:href="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js" />
                     </para>
                     <programlisting language="xml"><![CDATA[        <task id="root1" preciousResult="true">
             <description>Calculates the root of a polynomial</description>

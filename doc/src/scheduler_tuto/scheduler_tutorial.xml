@@ -730,7 +730,7 @@ public class HelloTask extends JavaExecutable{
 	<para>
 	There is also another way to start the Resource Manager directly with nodes using a deployment descriptor file.
 	Please refer to the ProActive documentation at 
-    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/index.php?page=documentation">http://proactive.inria.fr/index.php?page=documentation</uri>
+    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/index.php?page=documentation" />
 	to have more information about deployment/acquisition of nodes with the ProActive library.
 	Such a deployment descriptor file is given in <code>[Scheduler_Home_Dir]/config/rm/deployment/Local4JVMDeployment.xml</code>. It is the file which is used when you proceed by the easy way.
 	You can create your own deployment file and, then type the following line (with you own file) to start the RM:

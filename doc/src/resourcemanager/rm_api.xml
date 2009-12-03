@@ -188,7 +188,7 @@ user.disconnect();
 		<para>
 	Above code examples show a short overview of Resource Manager API. You can refer to Java documentation
 	of Resource Manager
-   (<uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/scheduler/api_complete/">http://proactive.inria.fr/release-doc/scheduler/api_complete/</uri>
+   (<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/scheduler/api_complete/" />).
 	</para>
 	</section>
 </chapter>
