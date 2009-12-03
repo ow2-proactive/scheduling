@@ -91,7 +91,7 @@
 &lt;property name="connection.url"&gt;jdbc:derby:../../SCHEDULER_DB;create=true&lt;/property&gt;
 &lt;property name="connection.username"&gt;scheduler&lt;/property&gt;
 &lt;property name="connection.password"&gt;&lt;/property&gt;
-&lt;!-- SQL dialect  --&gt;
+&lt;!-- Derby dialect  --&gt;
 &lt;property name="dialect"&gt;org.hibernate.dialect.DerbyDialect&lt;/property&gt;
 						</programlisting>
 						<itemizedlist>
