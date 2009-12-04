@@ -9,3 +9,5 @@ For a major release (aka x.y.0):
 		- release can now be found in /tmp/ProActiveScheduling-x.y.z(.tar.gz)
 
 
+NB : Do not forget XSD schema export for major release !
+
