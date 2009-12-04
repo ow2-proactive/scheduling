@@ -58,9 +58,7 @@ public abstract class JobFactory {
 
     public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
 
-    private static final String[] CURRENT_IMPL = new String[] {
-            "org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax",
-            "org.ow2.proactive.scheduler.common.job.factories.JobFactory_xpath" };
+    private static final String[] CURRENT_IMPL = new String[] { "org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax" };
 
     /**
      * Try to instantiate the known factories.
