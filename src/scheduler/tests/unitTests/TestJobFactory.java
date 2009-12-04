@@ -69,9 +69,6 @@ public class TestJobFactory {
         //test default behavior as well (null is STAX)
         log("TEST jobFactory STAX");
         run_(null);
-        //test XPATH factory
-        log("TEST jobFactory XPATH");
-        run_(org.ow2.proactive.scheduler.common.job.factories.JobFactory_xpath.class.getCanonicalName());
     }
 
     private void run_(String impl) throws Throwable {
