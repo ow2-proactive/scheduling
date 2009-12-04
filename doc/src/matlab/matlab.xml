@@ -212,8 +212,8 @@
                         job (a job containing several tasks).
                     </para>
                     <programlisting language="xml"><![CDATA[<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="urn:proactive:jobdescriptor:dev http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:dev" id="Matlab_job_simplest">
+    xsi:schemaLocation="urn:proactive:jobdescriptor:2.0 http://proactive.inria.fr/schemas/jobdescriptor/2.0/schedulerjob.xsd"
+    xmlns="urn:proactive:jobdescriptor:2.0" id="Matlab_job_simplest">
     <description>A simple Matlab job, which computes the roots of several polynomials</description>
     <taskFlow>]]></programlisting>
                 </section>
