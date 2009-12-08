@@ -38,12 +38,16 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.compact.CompactViewer;
 import org.ow2.proactive.resourcemanager.gui.compact.Filter;
+import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
+import org.ow2.proactive.resourcemanager.gui.handlers.ConnectHandler;
 
 
 /**
@@ -62,6 +66,14 @@ public class ResourcesCompactView extends ViewPart {
     @Override
     public void createPartControl(Composite parent) {
         compactView = new CompactViewer(parent);
+
+        if (!RMStore.isConnected()) {
+            Display.getCurrent().asyncExec(new Runnable() {
+                public void run() {
+                    ConnectHandler.getHandler().execute(Display.getDefault().getActiveShell());
+                }
+            });
+        }
 
         compactView.init();
         hookContextMenu();
