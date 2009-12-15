@@ -770,7 +770,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             boolean noResult = (jobStatus == JobStatus.CANCELED && taskResult == null);
             if (jobStatus == JobStatus.FAILED || noResult) {
                 taskResult = new TaskResultImpl(task.getId(), new Exception(errorMsg), new SimpleTaskLogs("",
-                    errorMsg));
+                    errorMsg), -1);
                 ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
                         .isPreciousResult());
             } else if (jobStatus == JobStatus.CANCELED) {
@@ -983,14 +983,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             }
 
-            //to be done before terminating the task, once terminated it is not running anymore..
-            TaskDescriptor currentTD = job.getRunningTaskDescriptor(taskId);
-            descriptor = job.terminateTask(errorOccurred, taskId);
             //store this task result in the job result.
             ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), res, descriptor
                     .isPreciousResult());
             logger_dev.info("TaskResult added to job '" + job.getId() + "' - task name is '" +
                 descriptor.getName() + "'");
+            //to be done before terminating the task, once terminated it is not running anymore..
+            TaskDescriptor currentTD = job.getRunningTaskDescriptor(taskId);
+            descriptor = job.terminateTask(errorOccurred, taskId);
 
             //and update database
             DatabaseManager.getInstance().startTransaction();

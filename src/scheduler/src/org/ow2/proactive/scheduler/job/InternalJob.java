@@ -83,6 +83,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
@@ -333,7 +334,8 @@ public abstract class InternalJob extends JobState {
         InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
-        descriptor.setExecutionDuration(getJobResult().getResult(descriptor.getName()).getTaskDuration());
+        descriptor.setExecutionDuration(((TaskResultImpl) getJobResult().getResult(descriptor.getName()))
+                .getTaskDuration());
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
 
