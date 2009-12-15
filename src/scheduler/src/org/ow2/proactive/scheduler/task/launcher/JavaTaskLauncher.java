@@ -84,15 +84,19 @@ public class JavaTaskLauncher extends TaskLauncher {
     @Override
     public TaskResult doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
+        long duration = -1;
+        long sample = 0;
         try {
 
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
 
+            sample = System.currentTimeMillis();
             //launch pre script
             if (pre != null) {
                 this.executePreScript(PAActiveObject.getNode());
             }
+            duration = System.currentTimeMillis() - sample;
 
             // create the executable (will set the context class loader to the taskclassserver)
             currentExecutable = executableContainer.getExecutable();
@@ -103,20 +107,24 @@ public class JavaTaskLauncher extends TaskLauncher {
 
             Throwable exception = null;
             Serializable userResult = null;
+            sample = System.currentTimeMillis();
             try {
                 //launch task
                 userResult = currentExecutable.execute(results);
             } catch (Throwable t) {
                 exception = t;
             }
+            duration += System.currentTimeMillis() - sample;
 
             //copy output file
             copyScratchDataToOutput();
 
+            sample = System.currentTimeMillis();
             //launch post script
             if (post != null) {
                 this.executePostScript(PAActiveObject.getNode(), exception == null);
             }
+            duration += System.currentTimeMillis() - sample;
 
             //throw exception if needed
             if (exception != null) {
@@ -124,11 +132,11 @@ public class JavaTaskLauncher extends TaskLauncher {
             }
 
             //return result
-            return new TaskResultImpl(taskId, userResult, this.getLogs());
+            return new TaskResultImpl(taskId, userResult, this.getLogs(), duration);
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, this.getLogs());
+            return new TaskResultImpl(taskId, ex, this.getLogs(), duration);
         } finally {
             terminateDataSpace();
             if (core != null) {

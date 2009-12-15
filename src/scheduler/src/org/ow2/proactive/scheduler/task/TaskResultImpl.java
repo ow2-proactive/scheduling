@@ -151,8 +151,16 @@ public class TaskResultImpl implements TaskResult {
     @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.CharacterLargeOBject")
     private String[] jobClasspath;
 
+    @Transient
+    private long taskDuration = -1;
+
     /** ProActive empty constructor. */
     public TaskResultImpl() {
+    }
+
+    private TaskResultImpl(TaskId id, TaskLogs output) {
+        this.id = id;
+        this.output = output;
     }
 
     /**
@@ -163,14 +171,13 @@ public class TaskResultImpl implements TaskResult {
      * @param output the output of the task.
      */
     public TaskResultImpl(TaskId id, Serializable value, TaskLogs output) {
-        this.id = id;
+        this(id, output);
         this.value = value;
         try {
             this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
         } catch (IOException e) {
             logger_dev.error("", e);
         }
-        this.output = output;
     }
 
     /**
@@ -181,14 +188,39 @@ public class TaskResultImpl implements TaskResult {
      * @param output the output of the task.
      */
     public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output) {
-        this.id = id;
+        this(id, output);
         this.exception = exception;
         try {
             this.serializedException = ObjectToByteConverter.ObjectStream.convert(exception);
         } catch (IOException e) {
             logger_dev.error("", e);
         }
-        this.output = output;
+    }
+
+    /**
+     * Return a new instance of task result represented by a task id, its result and its output.
+     *
+     * @param id the identification of the task that send this result.
+     * @param value the result of the task.
+     * @param output the output of the task.
+     * @param execDuration the execution duration of the task itself
+     */
+    public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration) {
+        this(id, value, output);
+        this.taskDuration = execDuration;
+    }
+
+    /**
+     * Return a new instance of task result represented by a task id and its exception.
+     *
+     * @param id the identification of the task that send this result.
+     * @param exception the exception that occurred in the task.
+     * @param output the output of the task.
+     * @param execDuration the execution duration of the task itself
+     */
+    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration) {
+        this(id, exception, output);
+        this.taskDuration = execDuration;
     }
 
     /**
@@ -459,6 +491,13 @@ public class TaskResultImpl implements TaskResult {
      */
     public String[] getJobClasspath() {
         return jobClasspath;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getTaskDuration() {
+        return taskDuration;
     }
 
     /**

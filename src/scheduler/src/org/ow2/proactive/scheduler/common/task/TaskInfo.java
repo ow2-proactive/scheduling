@@ -130,4 +130,11 @@ public interface TaskInfo extends Serializable {
      */
     public int getNumberOfExecutionOnFailureLeft();
 
+    /**
+     * Get the execution duration of the task. It is the real execution time, CPU usage.
+     *
+     * @return the execution duration in millis
+     */
+    public long getExecutionDuration();
+
 }

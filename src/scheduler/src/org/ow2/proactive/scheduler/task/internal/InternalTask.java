@@ -283,6 +283,15 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
+     * Set the real execution duration for the task.
+     * 
+     * @param duration the real duration of the execution of the task
+     */
+    public void setExecutionDuration(long duration) {
+        taskInfo.setExecutionDuration(duration);
+    }
+
+    /**
      * To get the dependences of this task as internal tasks.
      * Return null if this task has no dependence.
      *

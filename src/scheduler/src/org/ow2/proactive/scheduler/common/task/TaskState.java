@@ -61,6 +61,7 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     public static final int SORT_BY_STARTED_TIME = 8;
     public static final int SORT_BY_FINISHED_TIME = 9;
     public static final int SORT_BY_HOST_NAME = 10;
+    public static final int SORT_BY_EXEC_DURATION = 11;
     public static final int ASC_ORDER = 1;
     public static final int DESC_ORDER = 2;
     protected static int currentSort = SORT_BY_ID;
@@ -132,6 +133,10 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
                 return (currentOrder == ASC_ORDER) ? (getExecutionHostName().compareTo(task
                         .getExecutionHostName())) : (task.getExecutionHostName()
                         .compareTo(getExecutionHostName()));
+            case SORT_BY_EXEC_DURATION:
+                return (currentOrder == ASC_ORDER) ? (int) (getExecutionDuration() - task
+                        .getExecutionDuration())
+                        : (int) (task.getExecutionDuration() - getExecutionDuration());
             default:
                 return (currentOrder == ASC_ORDER) ? (getId().compareTo(task.getId())) : (task.getId()
                         .compareTo(getId()));
@@ -225,6 +230,17 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      */
     public int getNumberOfExecutionOnFailureLeft() {
         return getTaskInfo().getNumberOfExecutionOnFailureLeft();
+    }
+
+    /**
+     * Get the real task duration in millis. It is the CPU time used by the task not including
+     * communication and initialization.
+     * It also include time spent in Pre and Post scripts.
+     *
+     * @return the real task duration in millis
+     */
+    public long getExecutionDuration() {
+        return getTaskInfo().getExecutionDuration();
     }
 
     /**

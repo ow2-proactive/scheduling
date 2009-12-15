@@ -103,4 +103,13 @@ public interface TaskResult extends Serializable {
      * @return a string describing this result.
      */
     public String getTextualDescription();
+
+    /**
+     * Get the real task duration in millis. It is the CPU time used by the task not including
+     * communication and initialization.
+     * It also include time spent in Pre and Post scripts.
+     *
+     * @return the real task duration in millis
+     */
+    public long getTaskDuration();
 }

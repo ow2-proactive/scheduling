@@ -336,6 +336,7 @@ public abstract class InternalJob extends JobState {
         InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
+        descriptor.setExecutionDuration(getJobResult().getResult(descriptor.getName()).getTaskDuration());
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
 
