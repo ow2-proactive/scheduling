@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 public class UserIdentificationImpl extends UserIdentification {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /** user name */
     private String username;

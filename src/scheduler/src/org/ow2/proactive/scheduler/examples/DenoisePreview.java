@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleImag
  */
 public class DenoisePreview extends ResultPreview {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     private static final String MATCH_PATTERN = "Saving output image '";
 
     /**

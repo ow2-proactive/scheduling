@@ -53,7 +53,7 @@ import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerP
 public class InternalSchedulerEventListener extends Observable implements SchedulerEventListener {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     private static InternalSchedulerEventListener localView = null;
 

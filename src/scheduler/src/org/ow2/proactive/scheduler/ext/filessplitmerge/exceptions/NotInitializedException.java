@@ -11,7 +11,7 @@ package org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions;
 public class NotInitializedException extends Exception {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     public NotInitializedException(String message) {
         super(message);

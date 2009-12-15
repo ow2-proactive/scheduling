@@ -63,7 +63,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public abstract class NodeSourcePolicy implements Serializable {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     /** logger */
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
     /** Node source of the policy */

@@ -77,7 +77,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @Proxy(lazy = false)
 public class JobResultImpl implements JobResult {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     @Id
     @GeneratedValue

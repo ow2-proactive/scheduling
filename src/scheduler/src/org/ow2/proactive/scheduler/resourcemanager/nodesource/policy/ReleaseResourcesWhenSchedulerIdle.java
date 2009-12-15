@@ -55,7 +55,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
         SchedulerEventListener {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     private transient Timer timer = new Timer(true);
     private int activeJobs = 0;
 

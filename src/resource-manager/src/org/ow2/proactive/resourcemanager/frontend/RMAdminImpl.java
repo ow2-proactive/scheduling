@@ -84,7 +84,7 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class RMAdminImpl extends RMUserImpl implements RMAdmin, Serializable, InitActive {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /** RMCore active object of the RM */
     private RMCoreInterface rmcore;

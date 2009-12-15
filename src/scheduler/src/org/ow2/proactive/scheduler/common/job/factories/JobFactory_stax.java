@@ -324,7 +324,7 @@ public class JobFactory_stax extends JobFactory {
         Job jtmp = new Job() {
 
             /**  */
-            private static final long serialVersionUID = 20;
+            private static final long serialVersionUID = 200;
 
             @Override
             public JobId getId() {
@@ -605,7 +605,7 @@ public class JobFactory_stax extends JobFactory {
             Task tmpTask = (taskToFill != null) ? taskToFill : new Task() {
 
                 /**  */
-                private static final long serialVersionUID = 20;
+                private static final long serialVersionUID = 200;
             };
             //parse job attributes and fill the temporary one
             int attrLen = cursorTask.getAttributeCount();

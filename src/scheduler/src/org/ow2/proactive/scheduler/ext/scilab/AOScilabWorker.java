@@ -54,7 +54,7 @@ import java.util.Map;
 public class AOScilabWorker implements Serializable {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     static String nl = System.getProperty("line.separator");
 

@@ -47,7 +47,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class JobCreationException extends Exception {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /**
      * Create a new instance of JobCreationException with the given message and cause

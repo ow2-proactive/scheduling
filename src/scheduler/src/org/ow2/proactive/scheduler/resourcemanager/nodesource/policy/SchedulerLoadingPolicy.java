@@ -73,7 +73,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 

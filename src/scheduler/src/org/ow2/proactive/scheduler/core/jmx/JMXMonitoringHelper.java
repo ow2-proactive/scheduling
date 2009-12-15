@@ -71,7 +71,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class JMXMonitoringHelper implements SchedulerEventListener {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /** logger device */
     private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);

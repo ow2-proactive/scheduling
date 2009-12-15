@@ -106,7 +106,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, AdminSchedulerInterface {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);

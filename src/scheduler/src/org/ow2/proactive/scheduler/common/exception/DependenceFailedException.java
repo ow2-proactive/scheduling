@@ -49,7 +49,7 @@ public class DependenceFailedException extends RuntimeException {
     /**  */
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /**
      * Create a new instance of JobCreationException with the given messag

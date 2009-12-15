@@ -60,7 +60,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements SchedulerEventListener {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 

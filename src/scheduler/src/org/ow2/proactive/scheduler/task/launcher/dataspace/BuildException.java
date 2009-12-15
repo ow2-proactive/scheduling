@@ -27,7 +27,7 @@ import java.io.PrintWriter;
 class BuildException extends RuntimeException {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     /** Exception that might have caused this one. */
     private Throwable cause;
 

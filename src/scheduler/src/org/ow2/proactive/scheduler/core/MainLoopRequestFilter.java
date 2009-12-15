@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
  */
 public class MainLoopRequestFilter implements RequestFilter, Serializable {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     private ArrayList<String> methodNames = new ArrayList<String>();
 
     /**

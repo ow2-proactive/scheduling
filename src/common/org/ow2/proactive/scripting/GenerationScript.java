@@ -69,7 +69,7 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 @Proxy(lazy = false)
 public class GenerationScript extends Script<String> {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /** Loggers */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);

@@ -72,7 +72,7 @@ import org.ow2.proactive.scripting.GenerationScript;
 public class NativeExecutableContainer extends ExecutableContainer {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 

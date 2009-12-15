@@ -43,7 +43,7 @@ import java.io.Serializable;
  */
 public class SelectSchedulerDialogResult implements Serializable {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     private String url = null;
     private String login = null;
     private String password = null;

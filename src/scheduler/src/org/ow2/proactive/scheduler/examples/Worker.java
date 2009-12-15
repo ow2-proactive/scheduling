@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  */
 public class Worker implements java.io.Serializable {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     // primeNumbers already known by the worker
     private ArrayList<Integer> primeNumbers = new ArrayList<Integer>();
 

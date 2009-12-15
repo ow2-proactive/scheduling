@@ -81,7 +81,7 @@ import org.ow2.proactive.utils.SchedulerLoggers;
 public abstract class Script<E> implements Serializable {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /** Loggers */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.SCRIPT);

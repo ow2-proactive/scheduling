@@ -40,7 +40,7 @@ import java.io.Serializable;
 public class MatlabConfiguration implements Serializable {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /**
      * The home dir of Matlab on this machine

@@ -143,7 +143,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         TaskTerminateNotification, RunActive {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);

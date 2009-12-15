@@ -59,7 +59,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @Proxy(lazy = false)
 public class InternalParameterSweepingJob extends InternalJob {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")

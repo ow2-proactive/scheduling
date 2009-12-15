@@ -67,7 +67,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  */
 public class JobDescriptorImpl implements JobDescriptor {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 

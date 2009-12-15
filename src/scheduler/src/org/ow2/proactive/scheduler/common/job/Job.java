@@ -76,7 +76,7 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 public abstract class Job extends CommonAttribute {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /** Name of the job */
     @Column(name = "NAME")

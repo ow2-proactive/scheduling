@@ -581,7 +581,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
     public static class DummyJVMProcess extends JVMProcessImpl implements Serializable {
 
         /**  */
-        private static final long serialVersionUID = 20;
+        private static final long serialVersionUID = 200;
 
         public DummyJVMProcess() {
             super();

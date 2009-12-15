@@ -60,7 +60,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 public class SimpleTaskLogs implements TaskLogs {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     @Id
     @GeneratedValue

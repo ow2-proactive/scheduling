@@ -44,7 +44,7 @@ public class ComplexTypeArgsTest extends FunctionalTest {
 
     public static class UserTypeA implements Serializable {
         /**  */
-        private static final long serialVersionUID = 20;
+        private static final long serialVersionUID = 200;
         private int value;
 
         public UserTypeA(int v) {

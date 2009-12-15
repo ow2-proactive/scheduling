@@ -45,7 +45,7 @@ package org.ow2.proactive.scheduler.exception;
 public class AdminException extends Exception {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /**
      * Attaches a message to the Exception

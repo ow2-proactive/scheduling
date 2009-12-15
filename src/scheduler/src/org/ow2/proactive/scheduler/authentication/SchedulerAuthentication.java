@@ -74,7 +74,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         SchedulerAuthenticationInterface {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /** Scheduler logger */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CONNECTION);

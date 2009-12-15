@@ -69,7 +69,7 @@ import org.ow2.proactive.utils.BoundedLinkedList;
 public class VisualConsole extends JFrame implements Console, KeyListener {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     private int HISTORY_SIZE = 40;
     private Color CARET_COLOR = Color.GREEN;
     private Color BACKGROUND_COLOR = Color.BLACK;

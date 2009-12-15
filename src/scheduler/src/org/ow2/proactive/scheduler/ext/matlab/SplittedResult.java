@@ -43,7 +43,7 @@ import java.io.Serializable;
 public class SplittedResult implements Serializable {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     /**
      *
      */

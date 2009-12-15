@@ -77,7 +77,7 @@ import com.xerox.amazonws.ec2.ReservationDescription.Instance;
 public class EC2Infrastructure extends InfrastructureManager {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     @Configurable(fileBrowser = true)
     protected File configurationFile;
     @Configurable

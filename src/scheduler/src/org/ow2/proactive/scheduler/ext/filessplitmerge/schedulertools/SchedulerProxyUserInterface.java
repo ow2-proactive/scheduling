@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
 public class SchedulerProxyUserInterface implements UserSchedulerInterface {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     private UserSchedulerInterface uischeduler;
 

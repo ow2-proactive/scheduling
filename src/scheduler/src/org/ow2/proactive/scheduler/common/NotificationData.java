@@ -52,7 +52,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class NotificationData<T extends Object> implements Serializable {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     /** Event type of the update */
     private SchedulerEvent eventType;
     /** The data to be sent in the update */

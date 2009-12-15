@@ -109,7 +109,7 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
     public static class ProActiveAppenderProvider implements AppenderProvider {
 
         /**  */
-        private static final long serialVersionUID = 20;
+        private static final long serialVersionUID = 200;
 
         /**
          * Default flusing period of the ProActive appender.

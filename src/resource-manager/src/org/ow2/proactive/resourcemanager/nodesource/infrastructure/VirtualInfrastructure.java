@@ -83,7 +83,7 @@ import org.xml.sax.SAXException;
 /** This class provides a way to manager Virtualized Infrastructure. */
 public class VirtualInfrastructure extends InfrastructureManager {
 
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     @Configurable(description = "Virtual Infrastructure Type")
@@ -964,7 +964,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
      */
     private class VirtualMachineManagerHolder implements Serializable {
         /**  */
-        private static final long serialVersionUID = 20;
+        private static final long serialVersionUID = 200;
         /** The kind of infrastructure to manage */
         protected final InfrastructureType infrastructureType;
         /** The hypervisor's url and authentication credentials */
@@ -1004,7 +1004,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
     /** This class allows to cache registered nodes. */
     private class VMNodeCache implements Serializable {
         /**  */
-        private static final long serialVersionUID = 20;
+        private static final long serialVersionUID = 200;
         private HashMap<String, ArrayList<String>> vmNodeCache = new HashMap<String, ArrayList<String>>();
 
         void addNode(String holdingVM, String node) {

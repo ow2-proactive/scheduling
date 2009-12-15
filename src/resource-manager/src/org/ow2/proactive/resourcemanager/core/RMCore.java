@@ -131,7 +131,7 @@ import org.ow2.proactive.utils.NodeSet;
 public class RMCore extends RestrictedService implements RMCoreInterface, InitActive, Serializable {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);

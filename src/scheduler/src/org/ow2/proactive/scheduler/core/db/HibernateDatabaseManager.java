@@ -449,7 +449,7 @@ public class HibernateDatabaseManager extends DatabaseManager {
         if (callback == null) {
             callback = new RecoverCallback() {
                 /**  */
-                private static final long serialVersionUID = 20;
+                private static final long serialVersionUID = 200;
 
                 public void init(int nb) {
                 }

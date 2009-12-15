@@ -50,7 +50,7 @@ import java.util.ArrayList;
 public class AOMatlabSplitter extends AOMatlabWorker {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
     /**
      *
      */

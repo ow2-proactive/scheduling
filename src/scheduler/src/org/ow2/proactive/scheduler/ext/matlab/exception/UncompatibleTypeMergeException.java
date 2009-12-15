@@ -40,7 +40,7 @@ import ptolemy.data.type.Type;
 public class UncompatibleTypeMergeException extends RuntimeException {
 
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     /**
      *

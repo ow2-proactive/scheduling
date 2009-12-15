@@ -36,7 +36,7 @@ package org.ow2.proactive.scheduler.ext.matlab.exception;
 
 public class MatlabInitException extends RuntimeException {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     public MatlabInitException(String string) {
         super(string);

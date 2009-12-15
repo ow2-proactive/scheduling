@@ -85,7 +85,7 @@ import org.ow2.proactive.scheduler.gui.views.TaskView;
  */
 public class JobsController implements SchedulerEventListener {
     /**  */
-    private static final long serialVersionUID = 20;
+    private static final long serialVersionUID = 200;
 
     // The shared instance view as a direct reference
     private static JobsController localView = null;
