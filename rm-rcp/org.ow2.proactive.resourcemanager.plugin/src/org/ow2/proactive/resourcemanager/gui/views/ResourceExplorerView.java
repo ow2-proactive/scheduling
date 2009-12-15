@@ -52,6 +52,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.resourcemanager.gui.actions.CollapseAllAction;
 import org.ow2.proactive.resourcemanager.gui.actions.ExpandAllAction;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
+import org.ow2.proactive.resourcemanager.gui.handlers.ConnectHandler;
 import org.ow2.proactive.resourcemanager.gui.tree.RMTreeViewer;
 import org.ow2.proactive.resourcemanager.gui.tree.TreeLabelProvider;
 import org.ow2.proactive.resourcemanager.gui.tree.TreeSelectionListener;
@@ -108,6 +109,12 @@ public class ResourceExplorerView extends ViewPart {
         if (RMStore.isConnected()) {
             init();
             treeViewer.expandAll();
+        } else {
+            Display.getCurrent().asyncExec(new Runnable() {
+                public void run() {
+                    ConnectHandler.getHandler().execute(Display.getDefault().getActiveShell());
+                }
+            });
         }
 
         if (rmShell == null) {

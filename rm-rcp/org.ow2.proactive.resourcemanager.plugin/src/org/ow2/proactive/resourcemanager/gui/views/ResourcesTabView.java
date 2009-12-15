@@ -104,15 +104,16 @@ public class ResourcesTabView extends ViewPart {
         table.setSortColumn(table.getColumn(1));
         hookContextMenu();
         tabViewer.addSelectionChangedListener(new TableSelectionListener());
+
         if (RMStore.isConnected()) {
             tabViewer.init();
+        } else {
+            Display.getCurrent().asyncExec(new Runnable() {
+                public void run() {
+                    ConnectHandler.getHandler().execute(Display.getDefault().getActiveShell());
+                }
+            });
         }
-
-        Display.getCurrent().asyncExec(new Runnable() {
-            public void run() {
-                ConnectHandler.getHandler().execute(Display.getDefault().getActiveShell());
-            }
-        });
     }
 
     private void hookContextMenu() {
