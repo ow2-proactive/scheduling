@@ -105,7 +105,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             copyInputDataToScratch();
 
             // set exported vars
-            this.setExportedProperties(results);
+            this.setPropagatedProperties(results);
 
             //get Executable before schedule timer
             currentExecutable = executableContainer.getExecutable();
@@ -159,11 +159,11 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             //return result
             return new TaskResultImpl(taskId, userResult, this.getLogs(), duration,
-                retreiveExportedProperties());
+                retreivePropagatedProperties());
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, retreiveExportedProperties());
+            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, retreivePropagatedProperties());
         } finally {
             terminateDataSpace();
             if (isWallTime()) {

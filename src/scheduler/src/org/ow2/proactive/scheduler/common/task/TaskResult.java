@@ -106,11 +106,11 @@ public interface TaskResult extends Serializable {
     public String getTextualDescription();
 
     /**
-     * Returns a map containing all the java properties that has been exported by this task
+     * Returns a map containing all the java properties that has been propagated by this task
      * (by the executable or by scripts).
      * @see org.ow2.proactive.scripting.Exporter
-     * @return a map containing all the java properties that has been exported by this task,
-     * null if no property has been exported
+     * @return a map containing all the java properties that has been propagated by this task,
+     * null if no property has been propagated
      */
-    public Map<String, String> getExportedProperties();
+    public Map<String, String> getPropagatedProperties();
 }

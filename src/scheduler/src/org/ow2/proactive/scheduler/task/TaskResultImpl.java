@@ -161,12 +161,12 @@ public class TaskResultImpl implements TaskResult {
     @Transient
     private long taskDuration = -1;
 
-    /** All the properties export through Exporter.exportProperty() */
-    @Unloadable
+    /** All the properties propagated through Exporter.propagateProperty() */
+    // @Unloadable // BUG ? DON't WORK WITH UNLOADABLE
     @OneToMany(cascade = javax.persistence.CascadeType.ALL)
     @Cascade(CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
-    private Map<String, BigString> exportedProperties;
+    private Map<String, BigString> propagatedProperties;
 
     /** ProActive empty constructor. */
     public TaskResultImpl() {
@@ -184,14 +184,14 @@ public class TaskResultImpl implements TaskResult {
      * @param value the result of the task.
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
-     * @param exportedProperties the map of all properties that has been exported through Exporter.exportProperty
+     * @param propagatedProperties the map of all properties that has been propagated through Exporter.propagateProperty
      */
     public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration,
-            Map<String, BigString> exportedProperties) {
+            Map<String, BigString> propagatedProperties) {
         this(id, output);
         this.taskDuration = execDuration;
         this.value = value;
-        this.exportedProperties = exportedProperties;
+        this.propagatedProperties = propagatedProperties;
         try {
             this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
         } catch (IOException e) {
@@ -206,14 +206,14 @@ public class TaskResultImpl implements TaskResult {
      * @param exception the exception that occurred in the task.
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
-     * @param exportedProperties the map of all properties that has been exported through Exporter.exportProperty
+     * @param propagatedProperties the map of all properties that has been propagated through Exporter.propagateProperty
      */
     public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration,
-            Map<String, BigString> exportedProperties) {
+            Map<String, BigString> propagatedProperties) {
         this(id, output);
         this.taskDuration = execDuration;
         this.exception = exception;
-        this.exportedProperties = exportedProperties;
+        this.propagatedProperties = propagatedProperties;
         try {
             this.serializedException = ObjectToByteConverter.ObjectStream.convert(exception);
         } catch (IOException e) {
@@ -519,16 +519,15 @@ public class TaskResultImpl implements TaskResult {
     /**
      * {@inheritDoc}
      */
-    public Map<String, String> getExportedProperties() {
-        // null if no prop has been exported
-        if (this.exportedProperties == null) {
+    public Map<String, String> getPropagatedProperties() {
+        // null if no prop has been propagated
+        if (this.propagatedProperties == null) {
             return null;
         } else {
-            // do not return to user internal type BigString
-            Map<String, String> convertedProperties = new Hashtable<String, String>(this.exportedProperties
+            Map<String, String> convertedProperties = new Hashtable<String, String>(this.propagatedProperties
                     .size());
-            for (String k : this.exportedProperties.keySet()) {
-                convertedProperties.put(k, this.exportedProperties.get(k).getValue());
+            for (String k : this.propagatedProperties.keySet()) {
+                convertedProperties.put(k, this.propagatedProperties.get(k).getValue());
             }
             return convertedProperties;
         }

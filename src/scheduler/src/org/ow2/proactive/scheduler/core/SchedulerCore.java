@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -1279,6 +1280,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
                     return;
                 }
+            }
+
+            try {
+                File.createTempFile("MK_CORE_", ((res.getPropagatedProperties() != null) ? "" +
+                    res.getPropagatedProperties().size() : "null"));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
 
             //store this task result in the job result.
