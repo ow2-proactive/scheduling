@@ -11,6 +11,7 @@ function build() {
 	./build clean
 	./build -Dversion="${VERSION}" deploy.all
 	./build -Dversion="${VERSION}" doc.Scheduler.manualPdf
+	./build -Dversion="${VERSION}" doc.rm.manualPdf
 
 	generate_credential
 }

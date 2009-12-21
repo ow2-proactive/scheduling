@@ -14,7 +14,7 @@
 			also to manage issues related to distributed
 			environment, such as failing resources.
 			The ProActive Scheduler is connected to a Resource Manager providing therefore the resource
-			abstraction (see <xref linkend="Resource_Manager"/>).
+			abstraction.
 		</para>
 
 		<para>

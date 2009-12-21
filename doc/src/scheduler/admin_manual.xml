@@ -15,7 +15,7 @@
 					In order to launch jobs, the ProActive Scheduler has to obtain nodes (resources) from the Resources Manager.
 					As described hereafter, the user interacts only with the ProActive Scheduler entity and
 					the managed resources can be simple hosts or peer to peer resources. For full documentation about the Resource Manager,
-					please refer to <xref linkend="Resource_Manager"/>.
+					please refer to its own documentation.
 				</para>
 				<figure xml:id="Scheduler_2_entities"><info><title>The ProActive Scheduler Entities</title></info>
 					<mediaobject>
@@ -506,7 +506,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 			<section xml:id="Start_scheduler_java"><info><title>Start the Scheduler using the Java API</title></info>
 				<para>
 					You can start the ProActive Scheduler using the Java API. Supposing that a Resource Manager is already started on toto
-					(see Resource Manager documentation <xref linkend="Resource_Manager"/> to create a resource Manager),
+					(see Resource Manager documentation to create a resource Manager),
 					here's a complete example showing how to start both Scheduler and Resource Manager (assuming the JVM is totally clean ):
 				</para>
 				<programlisting language="java">

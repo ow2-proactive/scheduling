@@ -13,14 +13,6 @@
 	  <!ENTITY Scheduler_admin_manual SYSTEM "scheduler/admin_manual.xml">
 	  <!ENTITY Scheduler_plugin SYSTEM "scheduler_plugin/scheduler_plugin.xml">
 	  
-	  <!ENTITY RM SYSTEM "resourcemanager/rm.xml">
-	  <!ENTITY RM_deployment SYSTEM "resourcemanager/rm_deployment.xml">
-	  <!ENTITY RM_admin SYSTEM "resourcemanager/rm_admin.xml">
-	  <!ENTITY RM_API SYSTEM "resourcemanager/rm_api.xml">
-	  <!ENTITY RM_EC2 SYSTEM "resourcemanager/rm_ec2.xml">
-	  <!ENTITY RM_Virtualization SYSTEM "resourcemanager/rm_virtualization.xml">
-	  <!ENTITY RM_plugin SYSTEM "resourcemanager_plugin/rm_plugin.xml">
-	  
 	  <!ENTITY Matlab SYSTEM "matlab/matlab.xml">
 	  <!ENTITY Scilab SYSTEM "scilab/scilab.xml">
 	  <!ENTITY FilesSplitMerge SYSTEM "filessplitmerge/filessplitmerge.xml">
@@ -28,8 +20,6 @@
       <!ENTITY Modelica SYSTEM "modelica/modelica.xml">
 	  
 	  <!ENTITY SchedulerTutorial SYSTEM "scheduler_tuto/scheduler_tutorial.xml">
-	  
-	  <!ENTITY RM_WindowsAgent SYSTEM "resourcemanager/ProActiveWindowsAgent.xml">
 ]>
 
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
@@ -45,20 +35,6 @@
 		&Scheduler_admin_manual;
 		&SchedulerTutorial;
 		&Scheduler_plugin;
-	</part>
-
-	<part xml:id="ResourceManager">
-		<info>
-			<title>ProActive Resource Manager</title>
-		</info>
-		&RM;
-		&RM_deployment;
-		&RM_admin;
-		&RM_plugin;
-		&RM_EC2;
-		&RM_Virtualization;
-		&RM_API;
-		&RM_WindowsAgent;
 	</part>
 
 	<part xml:id="SchedulingWithMatlab">
@@ -90,9 +66,5 @@
 		</info>
 		&FilesSplitMerge;
 	</part>
-
-
-
-
 
 </book>
