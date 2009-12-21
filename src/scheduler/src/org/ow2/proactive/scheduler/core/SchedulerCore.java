@@ -1068,7 +1068,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             boolean noResult = (jobStatus == JobStatus.CANCELED && taskResult == null);
             if (jobStatus == JobStatus.FAILED || noResult) {
                 taskResult = new TaskResultImpl(task.getId(), new Exception(errorMsg), new SimpleTaskLogs("",
-                    errorMsg), -1);
+                    errorMsg), -1, null);
                 ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
                         .isPreciousResult());
             } else if (jobStatus == JobStatus.CANCELED) {
