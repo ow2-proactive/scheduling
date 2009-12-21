@@ -60,7 +60,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
-import org.ow2.proactive.scripting.Exporter;
+import org.ow2.proactive.scripting.PropertyUtils;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -221,10 +221,10 @@ public class NativeExecutable extends Executable {
                 .getProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString()));
 
         // exported properties
-        String allVars = System.getProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
+        String allVars = System.getProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
         Map<String, String> taskExportedProperties = null;
         if (allVars != null) {
-            StringTokenizer parser = new StringTokenizer(allVars, Exporter.VARS_VAR_SEPARATOR);
+            StringTokenizer parser = new StringTokenizer(allVars, PropertyUtils.VARS_VAR_SEPARATOR);
             taskExportedProperties = new Hashtable<String, String>(parser.countTokens());
             while (parser.hasMoreTokens()) {
                 String key = parser.nextToken();
@@ -236,7 +236,7 @@ public class NativeExecutable extends Executable {
                     logger_dev.warn("Exported property " + key + " is not set !");
                 }
             }
-            System.clearProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
+            System.clearProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
         }
 
         // current env

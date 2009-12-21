@@ -1006,6 +1006,16 @@ task2.setGenerationScript(gscript);
 									for file transfer purposes to manage file copies. 
 									Some script samples are available in 'samples/scripts/filetransfer' directory.
 								</para>
+								<para>
+									Another helper is provided for transmitting Java properties to either forked environment (native
+									or forked Java task) or to all dependent tasks, namely the org.ow2.proactive.scripting.helper.PropertyUtils
+									class. The exportProperty(String name) method makes the property available in the native environment as a
+									system variable (renamed like my.java.property becomes MY_JAVA_PROPERTY). The propagateProperty(String name)
+									makes the property available in the java environment as a Java property (not renamed) of all the dependent tasks.
+									Note that if several value for a single property a propagated to a single task (i.e. a task with several parents),
+									the resulting value is not specified and can be any of the propagated value.
+
+								</para>
 							</listitem>
 							<listitem>
 								<para>
@@ -1014,7 +1024,9 @@ task2.setGenerationScript(gscript);
 									A boolean variable named "success" is available in this script in order to
 									inform user about the success of the task execution. if success is true, the execution
 									has finished successfully, if not, execution has generated an exception.
-									The same helper than for pre-script can be used in the post-script.
+									The same helpers than for pre-script can be used in the post-script, except the
+									org.ow2.proactive.scripting.helper.PropertyUtils.exportProperty(String name) which has no effect
+									since no process can be forked after the post-script.
 								</para>
 							</listitem>
 							<listitem>

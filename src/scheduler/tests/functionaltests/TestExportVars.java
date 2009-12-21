@@ -60,18 +60,9 @@ public class TestExportVars extends FunctionalTest {
         SchedulerTHelper.waitForEventJobFinished(id);
         JobResult res = SchedulerTHelper.getJobResult(id);
 
-        for (String i : res.getAllResults().keySet()) {
-            System.out.println("====> Output " + i + " : " + res.getResult(i).getOutput().getAllLogs(true));
-        }
-
         String taskid = "task1";
         TaskResult r = res.getResult(taskid);
         Map<String, String> exVal = r.getPropagatedProperties();
-
-        System.out.println("+++++++++++++");
-        for (String k : r.getPropagatedProperties().keySet()) {
-            System.out.println("+++++++++++++" + k);
-        }
 
         Assert.assertTrue(exVal != null);
         Assert.assertTrue(exVal.get("key1").equals("value1"));
@@ -92,7 +83,6 @@ public class TestExportVars extends FunctionalTest {
         taskid = "task5";
         r = res.getResult(taskid);
         // exception in post script evaluation
-        System.out.println("***************************************" + r.value());
         Assert.assertEquals(0, (Integer) r.value());
 
     }
