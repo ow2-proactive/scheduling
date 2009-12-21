@@ -181,11 +181,14 @@ public class TaskResultImpl implements TaskResult {
      * @param value the result of the task.
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
+     * @param exportedProperties the map of all properties that has been exported through Exporter.exportProperty
      */
-    public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration) {
+    public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration,
+            Map<String, BigString> exportedProperties) {
         this(id, output);
         this.taskDuration = execDuration;
         this.value = value;
+        this.exportedProperties = exportedProperties;
         try {
             this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
         } catch (IOException e) {
@@ -200,11 +203,14 @@ public class TaskResultImpl implements TaskResult {
      * @param exception the exception that occurred in the task.
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
+     * @param exportedProperties the map of all properties that has been exported through Exporter.exportProperty
      */
-    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration) {
+    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration,
+            Map<String, BigString> exportedProperties) {
         this(id, output);
         this.taskDuration = execDuration;
         this.exception = exception;
+        this.exportedProperties = exportedProperties;
         try {
             this.serializedException = ObjectToByteConverter.ObjectStream.convert(exception);
         } catch (IOException e) {
