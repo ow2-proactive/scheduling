@@ -49,6 +49,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -60,6 +61,8 @@ import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.MetaValue;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
@@ -74,6 +77,7 @@ import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
@@ -152,11 +156,14 @@ public class TaskResultImpl implements TaskResult {
 
     //Managed by taskInfo, this field is here only to bring taskDuration to core AO
     @Transient
-    private long taskDuration = -1; // TODO : jlscheef transient ?
+    private long taskDuration = -1;
 
-    @Transient
-    // TODO jlscheef ?
-    private Map<String, String> exportedProperties;
+    /** All the properties export through Exporter.exportProperty() */
+    @Unloadable
+    @OneToMany(cascade = javax.persistence.CascadeType.ALL)
+    @Cascade(CascadeType.ALL)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    private Map<String, BigString> exportedProperties;
 
     /** ProActive empty constructor. */
     public TaskResultImpl() {
@@ -500,7 +507,21 @@ public class TaskResultImpl implements TaskResult {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Map<String, String> getExportedProperties() {
-        return this.exportedProperties;
+        // null if no prop has been exported
+        if (this.exportedProperties == null) {
+            return null;
+        } else {
+            // do not return to user internal type BigString
+            Map<String, String> convertedProperties = new Hashtable<String, String>(this.exportedProperties
+                    .size());
+            for (String k : this.exportedProperties.keySet()) {
+                convertedProperties.put(k, this.exportedProperties.get(k).getValue());
+            }
+            return convertedProperties;
+        }
     }
 }

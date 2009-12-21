@@ -74,6 +74,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppenderWithStorage;
@@ -313,8 +314,6 @@ public abstract class TaskLauncher implements InitActive {
                 .getReadableName());
         System.setProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
         System.setProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId.getReadableName());
-
-        // set exported vars
     }
 
     /**
@@ -353,19 +352,19 @@ public abstract class TaskLauncher implements InitActive {
      * @see org.ow2.proactive.scripting.Exporter
      * @return a map that contains [name->value] of all exported properties.
      */
-    protected Map<String, String> retreiveExportedProperties() {
+    protected Map<String, BigString> retreiveExportedProperties() {
         // get all names of exported vars
         String allVars = System.getProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
         if (allVars != null) {
             logger_dev.info("Exported properties for task " + this.taskId + " are : " + allVars);
             StringTokenizer parser = new StringTokenizer(allVars, Exporter.EXPORTED_VARS_VAR_SEPARATOR);
-            Map<String, String> exportedVars = new Hashtable<String, String>();
+            Map<String, BigString> exportedVars = new Hashtable<String, BigString>();
             while (parser.hasMoreTokens()) {
                 String key = parser.nextToken();
                 String value = System.getProperty(key);
                 if (value != null) {
                     logger_dev.debug("Value of exported property " + key + " is " + value);
-                    exportedVars.put(key, value);
+                    exportedVars.put(key, new BigString(value));
                     System.clearProperty(key);
                 } else {
                     logger_dev.warn("Exported property " + key + " is not set !");

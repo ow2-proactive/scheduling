@@ -278,6 +278,7 @@
 				<include name="org/ow2/proactive/scheduler/common/util/ObjectArrayFormatter.java" />
 				<include name="org/ow2/proactive/scheduler/common/TaskTerminateNotification.java" />
 				<include name="org/ow2/proactive/scheduler/examples/PropertyTask.java" />
+				<include name="org/ow2/proactive/scheduler/examples/EmptyTask.java" />
 				<include name="org/ow2/proactive/scheduler/examples/NativeTestWithRandomDefault.java" />
 				<include name="org/ow2/proactive/scheduler/examples/MonteCarlo.java" />
 				<include name="org/ow2/proactive/scheduler/examples/JoinPreview.java" />
