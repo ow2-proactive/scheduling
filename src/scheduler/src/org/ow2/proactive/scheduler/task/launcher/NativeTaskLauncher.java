@@ -104,6 +104,9 @@ public class NativeTaskLauncher extends TaskLauncher {
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
 
+            // set exported vars
+            this.setExportedProperties(results);
+
             //get Executable before schedule timer
             currentExecutable = executableContainer.getExecutable();
             //start walltime if needed
@@ -154,15 +157,13 @@ public class NativeTaskLauncher extends TaskLauncher {
                 throw exception;
             }
 
-            //logBuffer is filled up
-            TaskResult result = new TaskResultImpl(taskId, userResult, this.getLogs(), duration);
-
             //return result
-            return result;
+            return new TaskResultImpl(taskId, userResult, this.getLogs(), duration,
+                retreiveExportedProperties());
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, this.getLogs(), duration);
+            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, retreiveExportedProperties());
         } finally {
             terminateDataSpace();
             if (isWallTime()) {

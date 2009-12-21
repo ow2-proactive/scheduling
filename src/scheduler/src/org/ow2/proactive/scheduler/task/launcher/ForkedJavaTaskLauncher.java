@@ -117,7 +117,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
 
         } catch (Throwable ex) {
             logger_dev.info("", ex);
-            return new TaskResultImpl(taskId, ex, this.getLogs(), duration);
+            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, null);
         } finally {
             cancelTimer();
             finalizeTask(core);

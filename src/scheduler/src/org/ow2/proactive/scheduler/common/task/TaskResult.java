@@ -35,6 +35,7 @@
 package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
@@ -104,4 +105,11 @@ public interface TaskResult extends Serializable {
      */
     public String getTextualDescription();
 
+    /**
+     * Returns a map containing all the java properties that has been exported by this task
+     * (by the executable or by scripts).
+     * @see org.ow2.proactive.scripting.Exporter
+     * @return a map containing all the java properties that has been exported by this task.
+     */
+    public Map<String, String> getExportedProperties();
 }

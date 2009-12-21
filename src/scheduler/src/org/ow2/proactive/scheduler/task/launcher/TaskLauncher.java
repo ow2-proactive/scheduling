@@ -38,8 +38,11 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Appender;
@@ -79,6 +82,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.task.launcher.dataspace.AntFileSelector;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.scripting.Exporter;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -303,11 +307,14 @@ public abstract class TaskLauncher implements InitActive {
      * Set scheduler related variables for the current task. 
      */
     protected void initEnv() {
+        // set task vars
         System.setProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), this.taskId.getJobId().value());
         System.setProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), this.taskId.getJobId()
                 .getReadableName());
         System.setProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
         System.setProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId.getReadableName());
+
+        // set exported vars
     }
 
     /**
@@ -318,6 +325,58 @@ public abstract class TaskLauncher implements InitActive {
         System.clearProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString());
         System.clearProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString());
         System.clearProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString());
+    }
+
+    /**
+     * Set as Java Property all the properties that comes with incoming results, i.e.
+     * properties that have been exported in parent tasks.
+     * @see org.ow2.proactive.scripting.Exporter
+     */
+    protected void setExportedProperties(TaskResult[] incomingResults) {
+        for (int i = 0; i < incomingResults.length; i++) {
+            Map<String, String> properties = incomingResults[i].getExportedProperties();
+            if (properties != null) {
+                logger_dev.info("Imported properties for task " + this.taskId + " are " + properties);
+                for (String key : properties.keySet()) {
+                    logger_dev.debug("Value of imported property " + key + " is " + properties.get(key));
+                    System.setProperty(key, properties.get(key));
+                }
+            } else {
+                logger_dev.info(" No imported properties for task " + this.taskId);
+            }
+        }
+    }
+
+    /**
+     * Extract name and value of all the properties that have been exported during the execution
+     * of this task launcher (on scripts and executable).
+     * @see org.ow2.proactive.scripting.Exporter
+     * @return a map that contains [name->value] of all exported properties.
+     */
+    protected Map<String, String> retreiveExportedProperties() {
+        // get all names of exported vars
+        String allVars = System.getProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
+        if (allVars != null) {
+            logger_dev.info("Exported properties for task " + this.taskId + " are : " + allVars);
+            StringTokenizer parser = new StringTokenizer(allVars, Exporter.EXPORTED_VARS_VAR_SEPARATOR);
+            Map<String, String> exportedVars = new Hashtable<String, String>();
+            while (parser.hasMoreTokens()) {
+                String key = parser.nextToken();
+                String value = System.getProperty(key);
+                if (value != null) {
+                    logger_dev.debug("Value of exported property " + key + " is " + value);
+                    exportedVars.put(key, value);
+                    System.clearProperty(key);
+                } else {
+                    logger_dev.warn("Exported property " + key + " is not set !");
+                }
+            }
+            System.clearProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
+            return exportedVars;
+        } else {
+            logger_dev.info("No exported properties for task " + this.taskId);
+            return null;
+        }
     }
 
     /**

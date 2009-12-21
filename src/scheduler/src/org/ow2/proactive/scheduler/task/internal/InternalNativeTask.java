@@ -113,7 +113,7 @@ public class InternalNativeTask extends InternalTask {
      * {@inheritDoc}
      */
     public boolean handleResultsArguments() {
-        return false;
+        return true; // Needed for exported properties
     }
 
 }
