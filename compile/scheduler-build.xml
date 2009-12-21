@@ -15,7 +15,7 @@
 		<copy toDir="${cl.scheduler.tests.dir}">
 				<fileset dir="${src.scheduler.tests.dir}" excludes="**/*.java"/>
 		</copy>
-
+		<chmod file="${cl.scheduler.tests.dir}/functionaltests/executables/exportedVars.sh" perm="ugo+x"/>
 		<javac
 			srcdir="${src.scheduler.dir}"
 			destdir="${cl.scheduler.dir}"

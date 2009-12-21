@@ -12,12 +12,12 @@
 			<pre>
 				<script>
 					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.Exporter);
+						importClass(org.ow2.proactive.scripting.PropertyUtils);
 						java.lang.System.setProperty("key1", "value1");
 						print("Setting system property key1 = " + java.lang.System.getProperty("key1") + "\n");
 						java.lang.System.setProperty("key2", "value2");
 						print("Setting system property key2 = " + java.lang.System.getProperty("key2") + "\n");
-						Exporter.propagateProperty("key1");
+						PropertyUtils.propagateProperty("key1");
 					</code>
 				</script>
 			</pre>
@@ -25,8 +25,8 @@
 			<post>
 				<script>
 					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.Exporter);
-						Exporter.propagateProperty("key2");
+						importClass(org.ow2.proactive.scripting.PropertyUtils);
+						PropertyUtils.propagateProperty("key2");
 					</code>
 				</script>
 			</post>
@@ -59,8 +59,8 @@
 			<pre>
 				<script>
 					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.Exporter);
-						Exporter.propagateProperty("prohibited%name");
+						importClass(org.ow2.proactive.scripting.PropertyUtils);
+						PropertyUtils.propagateProperty("prohibited%name");
 					</code>
 				</script>
 			</pre>
@@ -72,9 +72,9 @@
 			<pre>
 				<script>
 					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.Exporter);
+						importClass(org.ow2.proactive.scripting.PropertyUtils);
 						java.lang.System.setProperty("user.var.1", ".User Value 1.");
-						Exporter.propagateProperty("user.var.1");
+						PropertyUtils.propagateProperty("user.var.1");
 					</code>
 				</script>
 			</pre>
@@ -89,10 +89,10 @@
 			<pre>
 				<script>
 					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.Exporter);
+						importClass(org.ow2.proactive.scripting.PropertyUtils);
 						java.lang.System.setProperty("user.var.2", ".User Value 2.");
-						Exporter.exportProperty("user.var.2");
-						Exporter.exportProperty("user.var.1");
+						PropertyUtils.exportProperty("user.var.2");
+						PropertyUtils.exportProperty("user.var.1");
 					</code>
 				</script>
 			</pre>

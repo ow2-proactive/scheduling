@@ -85,7 +85,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.task.launcher.dataspace.AntFileSelector;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
-import org.ow2.proactive.scripting.Exporter;
+import org.ow2.proactive.scripting.PropertyUtils;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -317,8 +317,8 @@ public abstract class TaskLauncher implements InitActive {
         System.setProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
         System.setProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId.getReadableName());
         // previously exported and propagated vars must be deleted
-        System.clearProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
-        System.clearProperty(Exporter.PROPAGATED_PROPERTIES_VAR_NAME);
+        System.clearProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
+        System.clearProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
     }
 
     /**
@@ -334,7 +334,7 @@ public abstract class TaskLauncher implements InitActive {
     /**
      * Set as Java Property all the properties that comes with incoming results, i.e.
      * properties that have been propagated in parent tasks.
-     * @see org.ow2.proactive.scripting.Exporter
+     * @see org.ow2.proactive.scripting.PropertyUtils
      */
     protected void setPropagatedProperties(TaskResult[] incomingResults) {
         for (int i = 0; i < incomingResults.length; i++) {
@@ -354,15 +354,15 @@ public abstract class TaskLauncher implements InitActive {
     /**
      * Extract name and value of all the properties that have been propagated during the execution
      * of this task launcher (on scripts and executable).
-     * @see org.ow2.proactive.scripting.Exporter
+     * @see org.ow2.proactive.scripting.PropertyUtils
      * @return a map that contains [name->value] of all propagated properties.
      */
     protected Map<String, BigString> retreivePropagatedProperties() {
         // get all names of propagated vars
-        String allVars = System.getProperty(Exporter.PROPAGATED_PROPERTIES_VAR_NAME);
+        String allVars = System.getProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
         if (allVars != null) {
             logger_dev.info("Propagated properties for task " + this.taskId + " are : " + allVars);
-            StringTokenizer parser = new StringTokenizer(allVars, Exporter.VARS_VAR_SEPARATOR);
+            StringTokenizer parser = new StringTokenizer(allVars, PropertyUtils.VARS_VAR_SEPARATOR);
             Map<String, BigString> exportedVars = new Hashtable<String, BigString>();
             while (parser.hasMoreTokens()) {
                 String key = parser.nextToken();
@@ -375,7 +375,7 @@ public abstract class TaskLauncher implements InitActive {
                     logger_dev.warn("Propagated property " + key + " is not set !");
                 }
             }
-            System.clearProperty(Exporter.PROPAGATED_PROPERTIES_VAR_NAME);
+            System.clearProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
             return exportedVars;
         } else {
             logger_dev.info("No Propagated properties for task " + this.taskId);

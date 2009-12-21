@@ -35,10 +35,13 @@
 package org.ow2.proactive.scripting;
 
 /**
- * This class is used for exporting java property, i.e. make this property available for all dependent tasks.
+ * This class defines utils for java property, e.g propagating java property, i.e. make this
+ * property available for all dependent tasks.
+ *
+ * @since Scheduling 2.0
  */
 
-public class Exporter {
+public class PropertyUtils {
 
     /** Name of the java property that contains the names of currently exported properties */
     public final static String PROPAGATED_PROPERTIES_VAR_NAME = "pa.scheduler.propagated.properties.names";

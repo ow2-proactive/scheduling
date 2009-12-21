@@ -108,7 +108,7 @@ public interface TaskResult extends Serializable {
     /**
      * Returns a map containing all the java properties that has been propagated by this task
      * (by the executable or by scripts).
-     * @see org.ow2.proactive.scripting.Exporter
+     * @see org.ow2.proactive.scripting.PropertyUtils
      * @return a map containing all the java properties that has been propagated by this task,
      * null if no property has been propagated
      */
