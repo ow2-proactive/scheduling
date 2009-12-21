@@ -52,7 +52,12 @@ public class Exporter {
     public static void exportProperty(String key) {
         if (System.getProperty(key) == null) {
             throw new IllegalArgumentException(key + " is not set as Java Property");
-            // CHECK SIZE < 255
+        } else if (key.length() > 255) {
+            throw new IllegalArgumentException(key +
+                " name is too long (exported property name length must be less than 256).");
+        } else if (key.contains(EXPORTED_VARS_VAR_SEPARATOR)) {
+            throw new IllegalArgumentException(key + " cannot contain character " +
+                EXPORTED_VARS_VAR_SEPARATOR);
         } else {
             String allExportedVars = System.getProperty(EXPORTED_PROPERTIES_VAR_NAME);
             if (allExportedVars == null) {

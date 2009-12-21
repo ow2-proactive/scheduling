@@ -34,7 +34,7 @@
  */
 package functionaltests;
 
-import java.util.Map.Entry;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -57,25 +57,29 @@ public class TestExportVars extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
         JobId id = SchedulerTHelper.submitJob(jobDescriptor);
-        //        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
         SchedulerTHelper.waitForEventJobFinished(id);
-
-        // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
-        //        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
-        //
-        //        for (Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
-        //            Assert.assertNotNull(entry.getValue().value());
-        //        }
-        //        //remove job
-        //        SchedulerTHelper.removeJob(id);
-        //        SchedulerTHelper.waitForEventJobRemoved(id);
 
-        for (String n : res.getAllResults().keySet()) {
-            TaskResult r = res.getResult(n);
-            System.out.println(n + " result : [" + r + "]");
-            System.out.println(n + " logs : [" + r.getOutput().getAllLogs(false) + "]");
+        for (String i : res.getAllResults().keySet()) {
+            System.out.println("==>" + i);
         }
 
+        String taskid = "task1";
+        TaskResult r = res.getResult(taskid);
+        Map<String, String> exVal = r.getExportedProperties();
+        Assert.assertTrue(exVal != null);
+        Assert.assertTrue(exVal.get("key1").equals("value1"));
+        Assert.assertTrue(exVal.get("key2").equals("value2"));
+
+        taskid = "task2";
+        r = res.getResult(taskid);
+        // no exception in post script evaluation
+        Assert.assertTrue(!r.hadException());
+
+        taskid = "task3ex";
+        r = res.getResult(taskid);
+        // exception in post script evaluation
+        Assert.assertTrue(r.hadException());
     }
+
 }
