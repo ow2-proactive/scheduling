@@ -92,7 +92,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             copyInputDataToScratch();
 
             // set exported vars
-            this.setExportedProperties(results);
+            this.setPropagatedProperties(results);
 
             sample = System.currentTimeMillis();
             //launch pre script
@@ -136,11 +136,11 @@ public class JavaTaskLauncher extends TaskLauncher {
 
             //return result
             return new TaskResultImpl(taskId, userResult, this.getLogs(), duration,
-                retreiveExportedProperties());
+                retreivePropagatedProperties());
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, retreiveExportedProperties());
+            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, retreivePropagatedProperties());
         } finally {
             terminateDataSpace();
             if (core != null) {

@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -52,12 +53,14 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.common.task.util.BigString;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
+import org.ow2.proactive.scripting.Exporter;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -217,14 +220,36 @@ public class NativeExecutable extends Executable {
         taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString()));
 
+        // exported properties
+        String allVars = System.getProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
+        Map<String, String> taskExportedProperties = null;
+        if (allVars != null) {
+            StringTokenizer parser = new StringTokenizer(allVars, Exporter.VARS_VAR_SEPARATOR);
+            taskExportedProperties = new Hashtable<String, String>(parser.countTokens());
+            while (parser.hasMoreTokens()) {
+                String key = parser.nextToken();
+                String value = System.getProperty(key);
+                if (value != null) {
+                    logger_dev.debug("Value of exported property " + key + " is " + value);
+                    taskExportedProperties.put(key, value);
+                } else {
+                    logger_dev.warn("Exported property " + key + " is not set !");
+                }
+            }
+            System.clearProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
+        }
+
+        // current env
         Map<String, String> systemEnvVariables = System.getenv();
 
         int i = 0;
+        int nbVars = taskEnvVariables.size() + systemEnvVariables.size() +
+            ((taskExportedProperties != null) ? taskExportedProperties.size() : 0);
         if (nodesFiles != null) {
-            envVarsTab = new String[taskEnvVariables.size() + systemEnvVariables.size() + 3];
+            envVarsTab = new String[nbVars + 3];
             envVarsTab[i++] = CORE_FILE_ENV + "=" + nodesFiles.getAbsolutePath();
         } else {
-            envVarsTab = new String[taskEnvVariables.size() + systemEnvVariables.size() + 2];
+            envVarsTab = new String[nbVars + 2];
         }
 
         envVarsTab[i++] = CORE_NB + "=" + coresNumber;
@@ -233,14 +258,23 @@ public class NativeExecutable extends Executable {
         for (Map.Entry<String, String> entry : taskEnvVariables.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            envVarsTab[i++] = ("" + name + "=" + value).toUpperCase().replace('.', '_');
+            envVarsTab[i++] = convertJavaenvNameToSysenvName(name) + "=" + value;
         }
 
         //after we add to the returnTab the system environment variables
         for (Map.Entry<String, String> entry : systemEnvVariables.entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            envVarsTab[i++] = "" + name + "=" + value;
+            envVarsTab[i++] = name + "=" + value;
+        }
+
+        //then we add exported properties
+        if (taskExportedProperties != null) {
+            for (Map.Entry<String, String> entry : taskExportedProperties.entrySet()) {
+                String name = entry.getKey();
+                String value = entry.getValue();
+                envVarsTab[i++] = convertJavaenvNameToSysenvName(name) + "=" + value;
+            }
         }
 
         //then the cookie used by ProcessTreeKiller
@@ -319,4 +353,13 @@ public class NativeExecutable extends Executable {
         return command;
     }
 
+    /**
+     * Convert the Java Property name to the System environment name
+     *
+     * @param javaPropName the java Property name.
+     * @return the System environment name.
+     */
+    private static String convertJavaenvNameToSysenvName(String javaPropName) {
+        return javaPropName.toUpperCase().replace('.', '_');
+    }
 }

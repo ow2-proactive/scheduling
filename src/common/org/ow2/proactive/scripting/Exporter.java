@@ -41,31 +41,52 @@ package org.ow2.proactive.scripting;
 public class Exporter {
 
     /** Name of the java property that contains the names of currently exported properties */
+    public final static String PROPAGATED_PROPERTIES_VAR_NAME = "pa.scheduler.propagated.properties.names";
     public final static String EXPORTED_PROPERTIES_VAR_NAME = "pa.scheduler.exported.properties.names";
-    public final static String EXPORTED_VARS_VAR_SEPARATOR = "%";
+    public final static String VARS_VAR_SEPARATOR = "%";
 
     /**
-     * This method allows to export a java property, i.e. make this property available for all dependent tasks.
-     * @param key the name of the exported property.
+     * This method allows to propagate a java property, i.e. make this property available for all dependent tasks.
+     * @param key the name of the propagated property.
+     * @throws IllegalArgumentException if the property key is not set.
+     */
+    public static void propagateProperty(String key) {
+        checkPropertyName(key);
+        // an exception is thrown key is not valid
+        String allPropagatedVars = System.getProperty(PROPAGATED_PROPERTIES_VAR_NAME);
+        if (allPropagatedVars == null) {
+            System.setProperty(PROPAGATED_PROPERTIES_VAR_NAME, "");
+            allPropagatedVars = "";
+        }
+        System.setProperty(PROPAGATED_PROPERTIES_VAR_NAME, allPropagatedVars + VARS_VAR_SEPARATOR + key);
+    }
+
+    /**
+     * This method allows to export a java property, i.e. make this property available in native and
+     * forked java task. For native task, the property is exported
+     * @param key
      * @throws IllegalArgumentException if the property key is not set.
      */
     public static void exportProperty(String key) {
+        checkPropertyName(key);
+        // an exception is thrown key is not valid
+        String allExportedVars = System.getProperty(EXPORTED_PROPERTIES_VAR_NAME);
+        if (allExportedVars == null) {
+            System.setProperty(EXPORTED_PROPERTIES_VAR_NAME, "");
+            allExportedVars = "";
+        }
+        System.setProperty(EXPORTED_PROPERTIES_VAR_NAME, allExportedVars + VARS_VAR_SEPARATOR + key);
+    }
+
+    private static void checkPropertyName(String key) {
         if (System.getProperty(key) == null) {
             throw new IllegalArgumentException(key + " is not set as Java Property");
         } else if (key.length() > 255) {
             throw new IllegalArgumentException(key +
-                " name is too long (exported property name length must be less than 256).");
-        } else if (key.contains(EXPORTED_VARS_VAR_SEPARATOR)) {
-            throw new IllegalArgumentException(key + " cannot contain character " +
-                EXPORTED_VARS_VAR_SEPARATOR);
-        } else {
-            String allExportedVars = System.getProperty(EXPORTED_PROPERTIES_VAR_NAME);
-            if (allExportedVars == null) {
-                System.setProperty(EXPORTED_PROPERTIES_VAR_NAME, "");
-                allExportedVars = "";
-            }
-            System.setProperty(EXPORTED_PROPERTIES_VAR_NAME, allExportedVars + EXPORTED_VARS_VAR_SEPARATOR +
-                key);
+                " name is too long (propagated property name length must be less than 256).");
+        } else if (key.contains(VARS_VAR_SEPARATOR)) {
+            throw new IllegalArgumentException(key + " cannot contain character " + VARS_VAR_SEPARATOR);
         }
     }
+
 }

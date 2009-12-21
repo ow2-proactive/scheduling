@@ -34,6 +34,8 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -314,6 +316,9 @@ public abstract class TaskLauncher implements InitActive {
                 .getReadableName());
         System.setProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
         System.setProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId.getReadableName());
+        // previously exported and propagated vars must be deleted
+        System.clearProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
+        System.clearProperty(Exporter.PROPAGATED_PROPERTIES_VAR_NAME);
     }
 
     /**
@@ -328,52 +333,52 @@ public abstract class TaskLauncher implements InitActive {
 
     /**
      * Set as Java Property all the properties that comes with incoming results, i.e.
-     * properties that have been exported in parent tasks.
+     * properties that have been propagated in parent tasks.
      * @see org.ow2.proactive.scripting.Exporter
      */
-    protected void setExportedProperties(TaskResult[] incomingResults) {
+    protected void setPropagatedProperties(TaskResult[] incomingResults) {
         for (int i = 0; i < incomingResults.length; i++) {
-            Map<String, String> properties = incomingResults[i].getExportedProperties();
+            Map<String, String> properties = incomingResults[i].getPropagatedProperties();
             if (properties != null) {
-                logger_dev.info("Imported properties for task " + this.taskId + " are " + properties);
+                logger_dev.info("Incoming properties for task " + this.taskId + " are " + properties);
                 for (String key : properties.keySet()) {
-                    logger_dev.debug("Value of imported property " + key + " is " + properties.get(key));
+                    logger_dev.debug("Value of Incoming property " + key + " is " + properties.get(key));
                     System.setProperty(key, properties.get(key));
                 }
             } else {
-                logger_dev.info(" No imported properties for task " + this.taskId);
+                logger_dev.info("No Incoming properties for task " + this.taskId);
             }
         }
     }
 
     /**
-     * Extract name and value of all the properties that have been exported during the execution
+     * Extract name and value of all the properties that have been propagated during the execution
      * of this task launcher (on scripts and executable).
      * @see org.ow2.proactive.scripting.Exporter
-     * @return a map that contains [name->value] of all exported properties.
+     * @return a map that contains [name->value] of all propagated properties.
      */
-    protected Map<String, BigString> retreiveExportedProperties() {
-        // get all names of exported vars
-        String allVars = System.getProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
+    protected Map<String, BigString> retreivePropagatedProperties() {
+        // get all names of propagated vars
+        String allVars = System.getProperty(Exporter.PROPAGATED_PROPERTIES_VAR_NAME);
         if (allVars != null) {
-            logger_dev.info("Exported properties for task " + this.taskId + " are : " + allVars);
-            StringTokenizer parser = new StringTokenizer(allVars, Exporter.EXPORTED_VARS_VAR_SEPARATOR);
+            logger_dev.info("Propagated properties for task " + this.taskId + " are : " + allVars);
+            StringTokenizer parser = new StringTokenizer(allVars, Exporter.VARS_VAR_SEPARATOR);
             Map<String, BigString> exportedVars = new Hashtable<String, BigString>();
             while (parser.hasMoreTokens()) {
                 String key = parser.nextToken();
                 String value = System.getProperty(key);
                 if (value != null) {
-                    logger_dev.debug("Value of exported property " + key + " is " + value);
+                    logger_dev.debug("Value of Propagated property " + key + " is " + value);
                     exportedVars.put(key, new BigString(value));
                     System.clearProperty(key);
                 } else {
-                    logger_dev.warn("Exported property " + key + " is not set !");
+                    logger_dev.warn("Propagated property " + key + " is not set !");
                 }
             }
-            System.clearProperty(Exporter.EXPORTED_PROPERTIES_VAR_NAME);
+            System.clearProperty(Exporter.PROPAGATED_PROPERTIES_VAR_NAME);
             return exportedVars;
         } else {
-            logger_dev.info("No exported properties for task " + this.taskId);
+            logger_dev.info("No Propagated properties for task " + this.taskId);
             return null;
         }
     }
