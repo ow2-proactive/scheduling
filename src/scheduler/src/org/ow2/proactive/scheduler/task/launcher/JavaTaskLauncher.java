@@ -91,6 +91,9 @@ public class JavaTaskLauncher extends TaskLauncher {
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
 
+            // set exported vars
+            this.setExportedProperties(results);
+
             sample = System.currentTimeMillis();
             //launch pre script
             if (pre != null) {
@@ -132,11 +135,12 @@ public class JavaTaskLauncher extends TaskLauncher {
             }
 
             //return result
-            return new TaskResultImpl(taskId, userResult, this.getLogs(), duration);
+            return new TaskResultImpl(taskId, userResult, this.getLogs(), duration,
+                retreiveExportedProperties());
         } catch (Throwable ex) {
             logger_dev.info("", ex);
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex, this.getLogs(), duration);
+            return new TaskResultImpl(taskId, ex, this.getLogs(), duration, retreiveExportedProperties());
         } finally {
             terminateDataSpace();
             if (core != null) {

@@ -39,6 +39,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Hashtable;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -153,7 +155,11 @@ public class TaskResultImpl implements TaskResult {
 
     //Managed by taskInfo, this field is here only to bring taskDuration to core AO
     @Transient
-    private long taskDuration = -1;
+    private long taskDuration = -1; // TODO : jlscheef transient ?
+
+    @Transient
+    // TODO jlscheef ?
+    private Map<String, String> exportedProperties;
 
     /** ProActive empty constructor. */
     public TaskResultImpl() {
@@ -497,4 +503,7 @@ public class TaskResultImpl implements TaskResult {
         }
     }
 
+    public Map<String, String> getExportedProperties() {
+        return this.exportedProperties;
+    }
 }
