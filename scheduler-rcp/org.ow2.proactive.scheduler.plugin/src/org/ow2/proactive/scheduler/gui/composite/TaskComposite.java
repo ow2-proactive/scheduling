@@ -50,6 +50,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -70,19 +71,19 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
-import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.Colors;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.views.ResultPreview;
+import org.ow2.proactive.utils.Tools;
 
 
 /**
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class TaskComposite extends Composite {
+public class TaskComposite extends Composite implements Comparator<TaskState> {
 
     /** the unique id and the title for the column "Id" */
     public static final String COLUMN_ID_TITLE = "Id";
@@ -126,14 +127,12 @@ public class TaskComposite extends Composite {
     /** Add this sort as it is an additional one : 1000 has been chosen in order to have no interaction with provided sorting */
     protected static final int SORT_BY_DURATION = 1000;
 
-    /**
-     * the background color of tasks that couldn't be started due to dependencies failure
-     */
+    /** The background color of tasks that couldn't be started due to dependencies failure */
     public static final Color TASKS_NOT_STARTED_BACKGROUND_COLOR = Colors.DEEP_SKY_BLUE;
 
     private List<TaskState> tasks = null;
-    private Label label = null;
-    private Table table = null;
+    private final Label label;
+    private final Table table;
     private int order = TaskState.ASC_ORDER;
     private int lastSorting = TaskState.SORT_BY_ID;
 
@@ -142,24 +141,24 @@ public class TaskComposite extends Composite {
      *
      * @param parent
      */
-    public TaskComposite(Composite parent) {
+    public TaskComposite(final Composite parent) {
         super(parent, SWT.NONE);
         this.setLayout(new GridLayout());
         this.label = createLabel(parent);
         this.table = createTable(parent);
     }
 
-    private Label createLabel(Composite parent) {
-        Label label = new Label(this, SWT.CENTER);
+    private Label createLabel(final Composite parent) {
+        final Label label = new Label(this, SWT.CENTER);
         label.setText("No job selected");
         label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         label.setForeground(Colors.RED);
         return label;
     }
 
-    private Table createTable(Composite parent) {
+    private Table createTable(final Composite parent) {
         //The table must be create with the SWT.SINGLE option !
-        table = new Table(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
+        final Table table = new Table(this, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
@@ -400,7 +399,7 @@ public class TaskComposite extends Composite {
     }
 
     // TODO TMP MKRIS
-    private static Hashtable<TaskId, TaskResult> cachedTaskResult = new Hashtable<TaskId, TaskResult>();
+    private static final Hashtable<TaskId, TaskResult> cachedTaskResult = new Hashtable<TaskId, TaskResult>();
 
     public static TaskResult getTaskResult(JobId jid, TaskId tid) {
         // TODO : NO ACCESS TO SCHED HERE ...
@@ -420,186 +419,160 @@ public class TaskComposite extends Composite {
 
     // END TMP MKRIS
 
-    private void sort(SelectionEvent event, int field) {
-        if (tasks != null) {
-            if (lastSorting == field) {
+    private void sort(final SelectionEvent event, final int field) {
+        if (this.tasks != null) {
+            if (this.lastSorting == field) {
                 // if the new sort is the same as the last sort, invert order.
-                order = (order == TaskState.DESC_ORDER) ? TaskState.ASC_ORDER : TaskState.DESC_ORDER;
-                TaskState.setSortingOrder(order);
+                this.order = (this.order == TaskState.DESC_ORDER) ? TaskState.ASC_ORDER
+                        : TaskState.DESC_ORDER;
+                TaskState.setSortingOrder(this.order);
             }
             TaskState.setSortingBy(field);
-            lastSorting = field;
+            this.lastSorting = field;
 
             if (field == SORT_BY_DURATION) {
-                sortByDuration();
+                Collections.sort(this.tasks, this);
             } else {
-                sort();
+                Collections.sort(this.tasks);
             }
 
-            table.setSortColumn((TableColumn) event.widget);
-            table.setSortDirection((order == TaskState.DESC_ORDER) ? SWT.DOWN : SWT.UP);
+            refreshTable();
+
+            this.table.setSortColumn((TableColumn) event.widget);
+            this.table.setSortDirection((this.order == TaskState.DESC_ORDER) ? SWT.DOWN : SWT.UP);
         }
-    }
-
-    private void sortByDuration() {
-        Comparator<TaskState> comp = new Comparator<TaskState>() {
-
-            public int compare(TaskState t1, TaskState t2) {
-                try {
-                    long t1Duration = t1.getFinishedTime() - t1.getStartTime();
-                    long t2Duration = t2.getFinishedTime() - t2.getStartTime();
-                    if (order == TaskState.ASC_ORDER) {
-                        return (int) (t1Duration - t2Duration);
-                    } else {
-                        return (int) (t2Duration - t1Duration);
-                    }
-                } catch (Exception e) {
-                    return 0;
-                }
-            }
-
-        };
-        Collections.sort(tasks, comp);
-        refreshTable();
-    }
-
-    private void sort() {
-        Collections.sort(tasks);
-        refreshTable();
     }
 
     private void refreshTable() {
-        if (!isDisposed()) {
-            // Turn off drawing to avoid flicker
-            table.setRedraw(false);
-
-            // We remove all the table entries
-            table.removeAll();
-
-            int i = 0;
-
-            // then add the entries
-            for (TaskState td : tasks) {
-                createItem(td, i++);
-            }
-
-            // Turn drawing back on
-            table.setRedraw(true);
-
+        if (this.isDisposed()) {
+            return;
         }
-    }
+        // Turn off drawing to avoid flicker
+        this.table.setRedraw(false);
 
-    private void createItem(TaskState taskState, int itemIndex) {
-        if (!table.isDisposed()) {
-            TableItem item = new TableItem(table, SWT.NONE);
+        // Dispose old bold fonts (see SCHEDULING-535)
+        for (final TableItem item : this.table.getItems()) {
+            final Font font = item.getFont();
+            if ((font.getFontData()[0].getStyle() & SWT.BOLD) != 0) {
+                font.dispose();
+            }
+        }
+
+        // We remove all the table entries
+        this.table.removeAll();
+
+        // then add the entries
+        for (final TaskState taskState : this.tasks) {
+            final TableItem item = new TableItem(this.table, SWT.BOLD);
             // To have a unique identifier for this TableItem
             item.setData(taskState.getId());
-            if (itemIndex == 0) {
-                fillItem(item, taskState, null);
-            } else {
-                fillItem(item, taskState, table.getItem(itemIndex - 1).getBackground());
-            }
+            this.internalFillItem(item, taskState);
         }
+
+        // Turn drawing back on
+        this.table.setRedraw(true);
     }
 
-    private void fillItem(TableItem item, TaskState taskState, Color col) {
-        if (!table.isDisposed()) {
-            boolean setFont = false;
-            switch (taskState.getStatus()) {
-                case ABORTED:
-                    setFont = true;
-                    item.setForeground(TASKS_ABORTED_BACKGROUND_COLOR);
-                    break;
-                case FAULTY:
-                    setFont = true;
-                    item.setForeground(TASKS_FAULTY_BACKGROUND_COLOR);
-                    break;
-                case FAILED:
-                    setFont = true;
-                    item.setForeground(TASKS_FAILED_BACKGROUND_COLOR);
-                    break;
-                case NOT_STARTED:
-                case NOT_RESTARTED:
-                    setFont = true;
-                    item.setForeground(TASKS_NOT_STARTED_BACKGROUND_COLOR);
-                    break;
-                case FINISHED:
-                case PAUSED:
-                case PENDING:
-                case RUNNING:
-                case SUBMITTED:
-            }
-
-            if (!setFont &&
-                ((taskState.getMaxNumberOfExecution() - taskState.getNumberOfExecutionLeft()) > 0)) {
+    // Called by following methods:
+    // - changeLine()
+    // - refreshTable()
+    private void internalFillItem(final TableItem item, final TaskState taskState) {
+        // The table CAN'T be disposed no need to check !
+        boolean setFont = false;
+        switch (taskState.getStatus()) {
+            case ABORTED:
                 setFont = true;
-            }
-            if (setFont) {
-                Font font = item.getFont();
-                item.setFont(new Font(font.getDevice(), font.getFontData()[0].getName(),
-                    font.getFontData()[0].getHeight(), font.getFontData()[0].getStyle() | SWT.BOLD));
-            }
+                item.setForeground(TASKS_ABORTED_BACKGROUND_COLOR);
+                break;
+            case FAULTY:
+                setFont = true;
+                item.setForeground(TASKS_FAULTY_BACKGROUND_COLOR);
+                break;
+            case FAILED:
+                setFont = true;
+                item.setForeground(TASKS_FAILED_BACKGROUND_COLOR);
+                break;
+            case NOT_STARTED:
+            case NOT_RESTARTED:
+                setFont = true;
+                item.setForeground(TASKS_NOT_STARTED_BACKGROUND_COLOR);
+                break;
+            case FINISHED:
+            case PAUSED:
+            case PENDING:
+            case RUNNING:
+            case SUBMITTED:
+        }
 
-            TableColumn[] cols = table.getColumns();
+        if (!setFont && ((taskState.getMaxNumberOfExecution() - taskState.getNumberOfExecutionLeft()) > 0)) {
+            setFont = true;
+        }
 
-            // I must fill item by this way, because all columns are movable
-            // !
-            // So i don't know if the column "Id" is at the first or the "nth"
-            // position
-            for (int i = 0; i < cols.length; i++) {
-                String title = cols[i].getText();
-                if (title.equals(COLUMN_ID_TITLE)) {
-                    item.setText(i, "" + taskState.getId().hashCode());
-                } else if (title.equals(COLUMN_STATUS_TITLE)) {
-                    String tmp = taskState.getStatus().toString();
-                    switch (taskState.getStatus()) {
-                        case RUNNING:
-                        case FINISHED:
-                        case FAULTY:
-                            int nb = (taskState.getMaxNumberOfExecution() -
-                                taskState.getNumberOfExecutionLeft() + 1);
-                            if (nb > taskState.getMaxNumberOfExecution()) {
-                                nb = taskState.getMaxNumberOfExecution();
-                            }
-                            tmp = tmp + " (" + nb + "/" + taskState.getMaxNumberOfExecution() + ")";
-                            break;
-                        case WAITING_ON_ERROR:
-                            tmp = tmp + " (" +
-                                (taskState.getMaxNumberOfExecution() - taskState.getNumberOfExecutionLeft()) +
-                                "/" + taskState.getMaxNumberOfExecution() + ")";
-                            break;
-                    }
-                    item.setText(i, tmp);
-                } else if (title.equals(COLUMN_NAME_TITLE)) {
-                    item.setText(i, taskState.getName());
-                } else if (title.equals(COLUMN_DESCRIPTION_TITLE)) {
-                    item.setText(i, (taskState.getDescription() == null) ? "no description available"
-                            : taskState.getDescription());
-                } else if (title.equals(COLUMN_START_TIME_TITLE)) {
-                    item.setText(i, Tools.getFormattedDate(taskState.getStartTime()));
-                } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
-                    item.setText(i, Tools.getFormattedDate(taskState.getFinishedTime()));
-                } else if (title.equals(COLUMN_DURATION_TITLE)) {
-                    item.setText(i, Tools.getFormattedDuration(taskState.getFinishedTime(), taskState
-                            .getStartTime()));
-                } else if (title.equals(COLUMN_EXEC_DURATION_TITLE)) {
-                    item.setText(i, Tools.getFormattedDuration(0, taskState.getExecutionDuration()));
-                } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
-                    if (taskState.getStatus() == TaskStatus.FAILED) {
-                        item.setText(i, taskState.getMaxNumberOfExecutionOnFailure() + "/" +
-                            taskState.getMaxNumberOfExecutionOnFailure());
-                    } else {
-                        item.setText(i, (taskState.getMaxNumberOfExecutionOnFailure() - taskState
-                                .getNumberOfExecutionOnFailureLeft()) +
-                            "/" + taskState.getMaxNumberOfExecutionOnFailure());
-                    }
-                } else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
-                    String hostName = taskState.getExecutionHostName();
-                    if (hostName == null) {
-                        item.setText(i, "n/a");
-                    } else {
-                        item.setText(i, hostName);
-                    }
+        if (setFont) {
+            final Font font = item.getFont();
+            final FontData fontData = font.getFontData()[0];
+            fontData.setStyle(fontData.getStyle() | SWT.BOLD);
+            // A new font is created see refreshTable() for disposing
+            item.setFont(new Font(font.getDevice(), fontData));
+        }
+
+        final TableColumn[] cols = table.getColumns();
+
+        // I must fill item by this way, because all columns are movable
+        // So i don't know if the column "Id" is at the first or the "nth"
+        // position
+        for (int i = 0; i < cols.length; i++) {
+            String title = cols[i].getText();
+            if (title.equals(COLUMN_ID_TITLE)) {
+                item.setText(i, "" + taskState.getId().hashCode());
+            } else if (title.equals(COLUMN_STATUS_TITLE)) {
+                String tmp = taskState.getStatus().toString();
+                switch (taskState.getStatus()) {
+                    case RUNNING:
+                    case FINISHED:
+                    case FAULTY:
+                        int nb = (taskState.getMaxNumberOfExecution() - taskState.getNumberOfExecutionLeft() + 1);
+                        if (nb > taskState.getMaxNumberOfExecution()) {
+                            nb = taskState.getMaxNumberOfExecution();
+                        }
+                        tmp = tmp + " (" + nb + "/" + taskState.getMaxNumberOfExecution() + ")";
+                        break;
+                    case WAITING_ON_ERROR:
+                        tmp = tmp + " (" +
+                            (taskState.getMaxNumberOfExecution() - taskState.getNumberOfExecutionLeft()) +
+                            "/" + taskState.getMaxNumberOfExecution() + ")";
+                        break;
+                }
+                item.setText(i, tmp);
+            } else if (title.equals(COLUMN_NAME_TITLE)) {
+                item.setText(i, taskState.getName());
+            } else if (title.equals(COLUMN_DESCRIPTION_TITLE)) {
+                item.setText(i, (taskState.getDescription() == null) ? "no description available" : taskState
+                        .getDescription());
+            } else if (title.equals(COLUMN_START_TIME_TITLE)) {
+                item.setText(i, Tools.getFormattedDate(taskState.getStartTime()));
+            } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
+                item.setText(i, Tools.getFormattedDate(taskState.getFinishedTime()));
+            } else if (title.equals(COLUMN_DURATION_TITLE)) {
+                item.setText(i, Tools.getFormattedDuration(taskState.getFinishedTime(), taskState
+                        .getStartTime()));
+            } else if (title.equals(COLUMN_EXEC_DURATION_TITLE)) {
+                item.setText(i, Tools.getFormattedDuration(0, taskState.getExecutionDuration()));
+            } else if (title.equals(COLUMN_NODEFAILURE_TITLE)) {
+                if (taskState.getStatus() == TaskStatus.FAILED) {
+                    item.setText(i, taskState.getMaxNumberOfExecutionOnFailure() + "/" +
+                        taskState.getMaxNumberOfExecutionOnFailure());
+                } else {
+                    item.setText(i, (taskState.getMaxNumberOfExecutionOnFailure() - taskState
+                            .getNumberOfExecutionOnFailureLeft()) +
+                        "/" + taskState.getMaxNumberOfExecutionOnFailure());
+                }
+            } else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
+                String hostName = taskState.getExecutionHostName();
+                if (hostName == null) {
+                    item.setText(i, "n/a");
+                } else {
+                    item.setText(i, hostName);
                 }
             }
         }
@@ -613,8 +586,8 @@ public class TaskComposite extends Composite {
      * "No job selected"
      */
     public void clear() {
-        table.removeAll();
-        label.setText("No selected job");
+        this.table.removeAll();
+        this.label.setText("No selected job");
     }
 
     /**
@@ -628,9 +601,8 @@ public class TaskComposite extends Composite {
     public void setTasks(JobId jobId, ArrayList<TaskState> tasks) {
         this.tasks = tasks;
         int tmp = tasks.size();
-
-        if (!label.isDisposed()) {
-            label.setText("Job " + jobId + " has " + tmp + ((tmp == 1) ? " task" : " tasks"));
+        if (!this.label.isDisposed()) {
+            this.label.setText("Job " + jobId + " has " + tmp + ((tmp == 1) ? " task" : " tasks"));
         }
         refreshTable();
     }
@@ -643,12 +615,10 @@ public class TaskComposite extends Composite {
      *
      * @param tasks
      */
-    public void setTasks(int numberOfJobs, ArrayList<TaskState> tasks) {
+    public void setTasks(final int numberOfJobs, final ArrayList<TaskState> tasks) {
         this.tasks = tasks;
-        int tmp = tasks.size();
-
-        if (!label.isDisposed()) {
-            label.setText(numberOfJobs + " jobs selected / " + tmp + " tasks selected");
+        if (!this.label.isDisposed()) {
+            this.label.setText(numberOfJobs + " jobs selected / " + tasks.size() + " tasks selected");
         }
         refreshTable();
     }
@@ -660,19 +630,13 @@ public class TaskComposite extends Composite {
      * @param taskState all informations for fill item
      */
     public void changeLine(TaskState taskState) {
-        if (!table.isDisposed()) {
-            TableItem[] items = table.getItems();
-            int itemIndex = 0;
-            for (TableItem item : items) {
-                if (((TaskId) item.getData()).equals(taskState.getId())) {
-                    if (itemIndex == 0) {
-                        fillItem(item, taskState, null);
-                    } else {
-                        fillItem(item, taskState, items[itemIndex - 1].getBackground());
-                    }
-                    break;
-                }
-                itemIndex++;
+        if (this.table.isDisposed()) {
+            return;
+        }
+        for (final TableItem item : this.table.getItems()) {
+            if (((TaskId) item.getData()).equals(taskState.getId())) {
+                this.internalFillItem(item, taskState);
+                break;
             }
         }
     }
@@ -719,5 +683,26 @@ public class TaskComposite extends Composite {
             return null;
         }
         return (TaskId) items[0].getData();
+    }
+
+    // -------------------------------------------------------------------- //
+    // ------------------ implements Comparable<TaskState> ---------------- //
+    // -------------------------------------------------------------------- //    
+
+    /**
+     * Implementation of the {@see Comparable<TaskSate>} interface.
+     */
+    public int compare(final TaskState t1, final TaskState t2) {
+        try {
+            final long t1Duration = t1.getFinishedTime() - t1.getStartTime();
+            final long t2Duration = t2.getFinishedTime() - t2.getStartTime();
+            if (this.order == TaskState.ASC_ORDER) {
+                return (int) (t1Duration - t2Duration);
+            } else {
+                return (int) (t2Duration - t1Duration);
+            }
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }
