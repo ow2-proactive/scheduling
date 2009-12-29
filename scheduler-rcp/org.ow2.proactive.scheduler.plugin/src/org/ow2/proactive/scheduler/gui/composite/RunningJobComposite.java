@@ -164,9 +164,9 @@ public class RunningJobComposite extends AbstractJobComposite implements Running
      * @see org.ow2.proactive.scheduler.gui.composite.AbstractJobComposite#createItem(org.ow2.proactive.scheduler.common.job.JobState, int)
      */
     @Override
-    protected TableItem createItem(JobState job, int itemIndex) {
+    protected TableItem createItem(JobState job) {
         Table table = getTable();
-        TableItem item = super.createItem(job, itemIndex);
+        TableItem item = super.createItem(job);
         TableColumn[] cols = table.getColumns();
         for (int i = 0; i < cols.length; i++) {
             String title = cols[i].getText();

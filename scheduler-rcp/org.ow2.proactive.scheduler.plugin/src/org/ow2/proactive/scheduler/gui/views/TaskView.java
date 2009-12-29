@@ -84,15 +84,16 @@ public class TaskView extends ViewPart {
      *
      * @param job a job
      */
-    public void fullUpdate(JobState job) {
-        if (!taskComposite.isDisposed()) {
-            final JobState aJob = job;
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    taskComposite.setTasks(aJob.getId(), aJob.getTasks());
+    public void fullUpdate(final JobState job) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                if (taskComposite.isDisposed()) {
+                    return;
                 }
-            });
-        }
+                taskComposite.setTasks(job.getId(), job.getTasks());
+            }
+        });
+
     }
 
     /**
@@ -100,19 +101,19 @@ public class TaskView extends ViewPart {
      *
      * @param jobs a list of job
      */
-    public void fullUpdate(List<JobState> jobs) {
-        if (!taskComposite.isDisposed()) {
-            final int numberOfJobs = jobs.size();
-            final ArrayList<TaskState> tasks = new ArrayList<TaskState>();
-            for (JobState job : jobs)
-                tasks.addAll(job.getTasks());
-
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    taskComposite.setTasks(numberOfJobs, tasks);
-                }
-            });
+    public void fullUpdate(final List<JobState> jobs) {
+        final ArrayList<TaskState> tasks = new ArrayList<TaskState>();
+        for (JobState job : jobs) {
+            tasks.addAll(job.getTasks());
         }
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                if (taskComposite.isDisposed()) {
+                    return;
+                }
+                taskComposite.setTasks(jobs.size(), tasks);
+            }
+        });
     }
 
     /**

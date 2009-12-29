@@ -111,8 +111,8 @@ public abstract class AbstractJobComposite extends Composite {
 
     /* the jobs canceled background color */
     public static final Color JOB_CANCELED_BACKGROUND_COLOR = Colors.DARK_ORANGE;
-    private Label label = null;
-    private Table table = null;
+    private final Label label;
+    private final Table table;
     private int count = 0;
     private String title = null;
     private int order = JobState.ASC_ORDER;
@@ -143,15 +143,15 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     // ----------------------------- private ------------------------------ //
     // -------------------------------------------------------------------- //
-    private void setCount(int count) {
-        if (!this.isDisposed()) {
-            final int c = count;
-            getDisplay().asyncExec(new Runnable() {
-                public void run() {
-                    label.setText(title + " (" + c + ")");
+    private void setCount(final int count) {
+        getDisplay().asyncExec(new Runnable() {
+            public final void run() {
+                if (label.isDisposed()) {
+                    return;
                 }
-            });
-        }
+                label.setText(title + " (" + count + ")");
+            }
+        });
     }
 
     private void refreshTable() {
@@ -162,10 +162,8 @@ public abstract class AbstractJobComposite extends Composite {
             // We remove all the table entries and then add the new entries
             table.removeAll();
 
-            Vector<JobId> jobsId = getJobs();
-            int i = 0;
-            for (JobId jobId : jobsId) {
-                addJobInTable(jobId, i++);
+            for (final JobId jobId : getJobs()) {
+                addJobInTable(jobId);
             }
 
             // Turn drawing back on
@@ -173,16 +171,16 @@ public abstract class AbstractJobComposite extends Composite {
         }
     }
 
-    private void addJobInTable(JobId jobId, int anItemIndex) {
-        if (!isDisposed()) {
-            final JobState job = JobsController.getLocalView().getJobById(jobId);
-            final int itemIndex = anItemIndex;
-            getDisplay().syncExec(new Runnable() {
-                public void run() {
-                    createItem(job, itemIndex);
+    private void addJobInTable(final JobId jobId) {
+        final JobState job = JobsController.getLocalView().getJobById(jobId);
+        getDisplay().syncExec(new Runnable() {
+            public void run() {
+                if (isDisposed()) {
+                    return;
                 }
-            });
-        }
+                createItem(job);
+            }
+        });
     }
 
     private void sort(SelectionEvent event, int field) {
@@ -200,7 +198,7 @@ public abstract class AbstractJobComposite extends Composite {
         table.setSortDirection((order == JobState.DESC_ORDER) ? SWT.DOWN : SWT.UP);
     }
 
-    private void fillBackgroundColor(TableItem item, JobStatus status, Color col) {
+    private void fillBackgroundColor(final TableItem item, final JobStatus status) {
         boolean setFont = false;
         switch (status) {
             case CANCELED:
@@ -227,34 +225,28 @@ public abstract class AbstractJobComposite extends Composite {
     // -------------------------------------------------------------------- //
     // ---------------------------- protected ----------------------------- //
     // -------------------------------------------------------------------- //
-    /*
-     * Create and return a Label
-     *
+    /**
+     * Create and return a label widget to show the job count.
      * @param parent the parent
-     *
-     * @param title a title
-     *
-     * @return
+     * @param title a title     
+     * @return the created label
      */
-    protected Label createLabel(Composite parent, String title) {
-        Label label = new Label(this, SWT.CENTER);
+    protected Label createLabel(final Composite parent, final String title) {
+        final Label label = new Label(this, SWT.CENTER);
         label.setText(title + " (" + count + ")");
         label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         label.setForeground(Colors.RED);
         return label;
     }
 
-    /*
-     * Create and return a table
-     *
+    /**
+     * Create and return a table widget to show the job information.     
      * @param parent the parent
-     *
-     * @param tableId an unique id for the table
-     *
-     * @return
+     * @param tableId an unique id for the table     
+     * @return the created table widget
      */
-    protected Table createTable(Composite parent, int tableId) {
-        table = new Table(this, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+    protected Table createTable(final Composite parent, final int tableId) {
+        final Table table = new Table(this, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
@@ -401,15 +393,11 @@ public abstract class AbstractJobComposite extends Composite {
      *
      * @return the new item
      */
-    protected TableItem createItem(JobState job, int itemIndex) {
+    protected TableItem createItem(JobState job) {
         TableColumn[] cols = table.getColumns();
         TableItem item = new TableItem(table, SWT.NONE);
         item.setData(job.getId());
-        if (itemIndex == 0) {
-            fillBackgroundColor(item, job.getStatus(), null);
-        } else {
-            fillBackgroundColor(item, job.getStatus(), table.getItem(itemIndex - 1).getBackground());
-        }
+        fillBackgroundColor(item, job.getStatus());
 
         for (int i = 0; i < cols.length; i++) {
             String title = cols[i].getText();
@@ -432,34 +420,25 @@ public abstract class AbstractJobComposite extends Composite {
         return item;
     }
 
-    protected void stateUpdate(JobId aJobId) {
+    protected void stateUpdate(final JobId jobId) {
         if (!this.isDisposed()) {
-            final JobId jobId = aJobId;
-
             getDisplay().syncExec(new Runnable() {
-                public void run() {
-                    Table table = getTable();
-                    TableItem[] items = table.getItems();
+                public final void run() {
+                    final Table table = getTable();
                     TableItem item = null;
-                    int itemIndex = 0;
-                    for (TableItem it : items) {
+                    for (TableItem it : table.getItems()) {
                         if (((JobId) (it.getData())).equals(jobId)) {
                             item = it;
                             break;
                         }
-                        itemIndex++;
                     }
 
-                    TableColumn[] cols = table.getColumns();
-                    JobState job = JobsController.getLocalView().getJobById(jobId);
+                    final TableColumn[] cols = table.getColumns();
+                    final JobState job = JobsController.getLocalView().getJobById(jobId);
                     for (int i = 0; i < cols.length; i++) {
                         String title = cols[i].getText();
                         if ((title != null) && (title.equals(COLUMN_STATE_TITLE))) {
-                            if (itemIndex == 0) {
-                                fillBackgroundColor(item, job.getStatus(), null);
-                            } else {
-                                fillBackgroundColor(item, job.getStatus(), items[itemIndex].getBackground());
-                            }
+                            fillBackgroundColor(item, job.getStatus());
                             if (JobStatus.RUNNING.equals(job.getStatus())) {
                                 item.setText(i, job.getStatus() + " (" + job.getNumberOfRunningTasks() + ")");
                             } else {
@@ -473,23 +452,20 @@ public abstract class AbstractJobComposite extends Composite {
         }
     }
 
-    protected void priorityUpdate(JobId aJobId) {
+    protected void priorityUpdate(final JobId jobId) {
         if (!this.isDisposed()) {
-            final JobId jobId = aJobId;
-
             getDisplay().syncExec(new Runnable() {
                 public void run() {
-                    Table table = getTable();
-                    TableItem[] items = table.getItems();
+                    final Table table = getTable();
                     TableItem item = null;
-                    for (TableItem it : items)
+                    for (TableItem it : table.getItems())
                         if (((JobId) (it.getData())).equals(jobId)) {
                             item = it;
                             break;
                         }
 
-                    TableColumn[] cols = table.getColumns();
-                    JobState job = JobsController.getLocalView().getJobById(jobId);
+                    final TableColumn[] cols = table.getColumns();
+                    final JobState job = JobsController.getLocalView().getJobById(jobId);
                     for (int i = 0; i < cols.length; i++) {
                         String title = cols[i].getText();
                         if ((title != null) && (title.equals(COLUMN_PRIORITY_TITLE))) {
@@ -534,7 +510,7 @@ public abstract class AbstractJobComposite extends Composite {
      * @return the table
      */
     public Table getTable() {
-        return table;
+        return this.table;
     }
 
     /*
@@ -544,7 +520,7 @@ public abstract class AbstractJobComposite extends Composite {
      */
     public void addJob(JobId jobId) {
         increaseCount();
-        addJobInTable(jobId, count - 1);
+        addJobInTable(jobId);
     }
 
     /*
@@ -565,6 +541,9 @@ public abstract class AbstractJobComposite extends Composite {
             final int i = tmp;
             getDisplay().syncExec(new Runnable() {
                 public void run() {
+                    if (table.isDisposed()) {
+                        return;
+                    }
                     int[] j = table.getSelectionIndices();
 
                     table.remove(i);
