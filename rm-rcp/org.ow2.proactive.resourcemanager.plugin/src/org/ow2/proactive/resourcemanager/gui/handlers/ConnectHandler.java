@@ -53,6 +53,8 @@ import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialogR
 public class ConnectHandler extends AbstractHandler implements IHandler {
 
     private boolean previousState = true;
+    /** A boolean value to know if the dialog box is already open */
+    private boolean isDialogOpen;
     private static ConnectHandler thisHandler;
 
     public ConnectHandler() {
@@ -79,6 +81,10 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
     }
 
     public Object execute(Shell parent) {
+        if (this.isDialogOpen) {
+            return null;
+        }
+        this.isDialogOpen = true;
         SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(parent);
         if (dialogResult != null && !dialogResult.isCanceled()) {
             try {
@@ -92,6 +98,7 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
             }
         }
         fireHandlerChanged(new HandlerEvent(this, true, false));
+        this.isDialogOpen = false;
         return null;
     }
 }
