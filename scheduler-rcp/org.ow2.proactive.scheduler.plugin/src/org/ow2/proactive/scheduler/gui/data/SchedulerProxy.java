@@ -449,8 +449,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             startPinger();
             connected = true;
             ControllerView.getInstance().connectedEvent(logAsAdmin);
-            JMXChartItAction.getInstance().initJMXClient(sai, dialogResult.getLogin(),
-                    dialogResult.getPassword(), logAsAdmin);
+            JMXChartItAction.getInstance().initJMXClient(sai,
+                    new Object[] { creds, dialogResult.getLogin() }, logAsAdmin);
             return CONNECTED;
         } catch (LoginException e) {
             e.printStackTrace();
