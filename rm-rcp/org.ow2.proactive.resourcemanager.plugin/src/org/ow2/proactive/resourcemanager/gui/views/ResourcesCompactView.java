@@ -46,7 +46,6 @@ import org.ow2.proactive.resourcemanager.gui.Activator;
 import org.ow2.proactive.resourcemanager.gui.compact.CompactViewer;
 import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.handlers.ConnectHandler;
 
 

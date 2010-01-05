@@ -35,7 +35,6 @@
 package org.ow2.proactive.resourcemanager.gui.compact.view;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -51,9 +50,6 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
  *
  */
 public class JVMView extends View {
-    // JVM image
-    private static Image jvmImage = PlatformUI.getWorkbench().getSharedImages().getImage(
-            ISharedImages.IMG_OBJ_ELEMENT);
 
     public JVMView(TreeLeafElement element, Filter filter) {
         super(element);
@@ -62,7 +58,8 @@ public class JVMView extends View {
             label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
             label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
 
-            label.setImage(jvmImage);
+            label.setImage(PlatformUI.getWorkbench().getSharedImages()
+                    .getImage(ISharedImages.IMG_OBJ_ELEMENT));
             label.setToolTipText(toString());
             label.addMouseListener(new LabelMouseListener(this));
         }

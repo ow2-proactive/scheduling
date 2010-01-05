@@ -37,7 +37,7 @@ package org.ow2.proactive.resourcemanager.gui.table;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.ow2.proactive.resourcemanager.gui.Activator;
+import org.ow2.proactive.resourcemanager.gui.Internal;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 
 
@@ -59,16 +59,7 @@ public class TableLabelProvider extends ColumnLabelProvider {
     @Override
     public Image getImage(Object element) {
         if (element instanceof Node && columnIndex == STATE_COLUMN_NUMBER) {
-            switch (((Node) element).getState()) {
-                case DOWN:
-                    return Activator.getImageDescriptor("icons/down.gif").createImage();
-                case FREE:
-                    return Activator.getImageDescriptor("icons/free.gif").createImage();
-                case BUSY:
-                    return Activator.getImageDescriptor("icons/busy.gif").createImage();
-                case TO_BE_RELEASED:
-                    return Activator.getImageDescriptor("icons/to_release.gif").createImage();
-            }
+            return Internal.getImageByNodeState(((Node) element).getState());
         }
         return null;
     }

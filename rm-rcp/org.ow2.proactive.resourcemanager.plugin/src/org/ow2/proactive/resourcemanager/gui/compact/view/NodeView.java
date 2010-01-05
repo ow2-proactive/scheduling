@@ -35,9 +35,8 @@
 package org.ow2.proactive.resourcemanager.gui.compact.view;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Label;
-import org.ow2.proactive.resourcemanager.gui.Activator;
+import org.ow2.proactive.resourcemanager.gui.Internal;
 import org.ow2.proactive.resourcemanager.gui.compact.Filter;
 import org.ow2.proactive.resourcemanager.gui.compact.LabelMouseListener;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
@@ -52,20 +51,13 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
  */
 public class NodeView extends View {
 
-    public static Image[] images = new Image[] {
-            Activator.getImageDescriptor("icons/free.gif").createImage(),
-            Activator.getImageDescriptor("icons/busy.gif").createImage(),
-            Activator.getImageDescriptor("icons/down.gif").createImage(),
-            Activator.getImageDescriptor("icons/to_release.gif").createImage(), };
-
     public NodeView(TreeLeafElement element, Filter filter) {
         super(element);
 
         if (filter.showNodes) {
             label = new Label(ResourcesCompactView.getCompactViewer().getComposite(), SWT.SHADOW_NONE);
             label.setBackground(ResourcesCompactView.getCompactViewer().getComposite().getBackground());
-
-            label.setImage(images[((Node) element).getState().ordinal()]);
+            label.setImage(Internal.getImageByNodeState(((Node) element).getState()));
             label.addMouseListener(new LabelMouseListener(this));
             label.setToolTipText(toString());
         }
@@ -98,7 +90,7 @@ public class NodeView extends View {
     @Override
     public void update() {
         if (label != null) {
-            label.setImage(images[((Node) element).getState().ordinal()]);
+            label.setImage(Internal.getImageByNodeState(((Node) element).getState()));
             label.setToolTipText(toString());
         }
     }

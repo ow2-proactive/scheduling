@@ -40,6 +40,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.resourcemanager.gui.Activator;
+import org.ow2.proactive.resourcemanager.gui.Internal;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeElementType;
 import org.ow2.proactive.resourcemanager.gui.data.model.TreeLeafElement;
@@ -51,21 +52,11 @@ public class TreeLabelProvider extends ColumnLabelProvider {
     public Image getImage(Object obj) {
         switch (((TreeLeafElement) obj).getType()) {
             case HOST:
-                return Activator.getImageDescriptor("icons/host.gif").createImage();
+                return Activator.getDefault().getImageRegistry().get(Internal.IMG_HOST);
             case NODE:
-                switch (((Node) obj).getState()) {
-                    case DOWN:
-                        return Activator.getImageDescriptor("icons/down.gif").createImage();
-                    case FREE:
-                        return Activator.getImageDescriptor("icons/free.gif").createImage();
-                    case BUSY:
-                        return Activator.getImageDescriptor("icons/busy.gif").createImage();
-                    case TO_BE_RELEASED:
-                        return Activator.getImageDescriptor("icons/to_release.gif").createImage();
-                }
-                break;
+                return Internal.getImageByNodeState(((Node) obj).getState());
             case SOURCE:
-                return Activator.getImageDescriptor("icons/source.gif").createImage();
+                return Activator.getDefault().getImageRegistry().get(Internal.IMG_SOURCE);
             case VIRTUAL_MACHINE:
                 return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
         }
