@@ -39,6 +39,7 @@ import java.util.List;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.JobsOutputController;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
 
@@ -51,7 +52,8 @@ public class ObtainJobOutputAction extends SchedulerGUIAction {
     public ObtainJobOutputAction() {
         this.setText("Get job output");
         this.setToolTipText("Get the job output");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/job_output.gif"));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_JOBOUTPUT));
         this.setEnabled(false);
     }
 

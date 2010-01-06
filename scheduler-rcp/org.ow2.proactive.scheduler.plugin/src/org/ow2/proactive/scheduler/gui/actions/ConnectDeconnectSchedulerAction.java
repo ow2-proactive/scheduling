@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.data.ActionsManager;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
@@ -91,7 +92,8 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                     SelectSchedulerDialog.saveInformations();
                     this.setText("Disconnect");
                     this.setToolTipText("Disconnect from the ProActive Scheduler");
-                    this.setImageDescriptor(Activator.getImageDescriptor("icons/disconnect.gif"));
+                    this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                            Internal.IMG_DISCONNECT));
                     waitShell = new Shell(parent.getShell(), SWT.PRIMARY_MODAL);
                     FormLayout layout = new FormLayout();
                     layout.marginHeight = 20;
@@ -160,7 +162,9 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
         isConnected = false;
         this.setText("Connect the ProActive Scheduler");
         this.setToolTipText("Connect the started ProActive Scheduler by its url");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/connect.gif"));
+        this
+                .setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                        Internal.IMG_CONNECT));
     }
 
     @Override

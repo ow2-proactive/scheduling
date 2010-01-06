@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.JobsController;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
@@ -82,7 +83,8 @@ public class PauseResumeJobAction extends SchedulerGUIAction {
     private void setPauseResumeMode() {
         this.setText("Pause/Resume job");
         this.setToolTipText("Pause or resume a job");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/job_pause_resume.gif"));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_JOBPAUSERESUME));
     }
 
     @Override
