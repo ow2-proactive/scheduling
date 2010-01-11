@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.gui.data.TableManager;
 
@@ -56,7 +57,9 @@ public class KillRemoveJobAction extends SchedulerGUIAction {
         this.shell = shell;
         this.setText("Kill job");
         this.setToolTipText("Kill selected job (this will remove this job from the scheduler)");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/job_kill.gif"));
+        this
+                .setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                        Internal.IMG_JOBKILL));
         this.setEnabled(false);
     }
 

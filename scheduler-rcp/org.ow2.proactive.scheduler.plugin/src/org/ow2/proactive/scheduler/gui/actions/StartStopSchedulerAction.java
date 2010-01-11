@@ -36,6 +36,7 @@ package org.ow2.proactive.scheduler.gui.actions;
 
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -49,7 +50,8 @@ public class StartStopSchedulerAction extends SchedulerGUIAction {
     public StartStopSchedulerAction() {
         this.setText("Start/Stop scheduler");
         this.setToolTipText("Start or stop the scheduler");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/scheduler_start.png"));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERSTART));
         this.setEnabled(false);
     }
 
@@ -68,7 +70,8 @@ public class StartStopSchedulerAction extends SchedulerGUIAction {
 
         this.setText("Start scheduler");
         this.setToolTipText("Start the scheduler (this will finish start or restart the scheduler)");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/scheduler_start.png"));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERSTART));
     }
 
     public void setStopMode() {
@@ -77,7 +80,8 @@ public class StartStopSchedulerAction extends SchedulerGUIAction {
 
         this.setText("Stop scheduler");
         this.setToolTipText("Stop the scheduler (this will finish all pending and running jobs)");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/scheduler_stop.png"));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERSTOP));
     }
 
     @Override

@@ -40,6 +40,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 
 
 /**
@@ -51,7 +52,7 @@ public class ChangeMaximizeListAction extends Action implements IMenuCreator {
     public ChangeMaximizeListAction() {
         setText("Maximize list");
         setToolTipText("Maximize a job list");
-        setImageDescriptor(Activator.getImageDescriptor("icons/maximize.gif"));
+        setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Internal.IMG_MAXIMIZE));
         setMenuCreator(this);
     }
 

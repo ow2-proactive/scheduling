@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -53,7 +54,7 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
     public ChangePriorityJobAction() {
         setText("Change job priority");
         setToolTipText("Change job priority");
-        setImageDescriptor(Activator.getImageDescriptor("icons/job_priority.png"));
+        setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(Internal.IMG_JOBPRIORITY));
         setMenuCreator(this);
     }
 

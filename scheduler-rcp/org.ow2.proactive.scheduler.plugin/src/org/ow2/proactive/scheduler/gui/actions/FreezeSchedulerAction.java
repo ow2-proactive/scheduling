@@ -36,6 +36,7 @@ package org.ow2.proactive.scheduler.gui.actions;
 
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -47,7 +48,8 @@ public class FreezeSchedulerAction extends SchedulerGUIAction {
     public FreezeSchedulerAction() {
         this.setText("Freeze scheduler");
         this.setToolTipText("Freeze the scheduler (Only running Tasks will be terminated)");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/scheduler_freeze.gif"));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERFREEZE));
         this.setEnabled(false);
     }
 

@@ -34,10 +34,10 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 
 
@@ -46,13 +46,11 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
  */
 public class ChangeViewModeAction extends SchedulerGUIAction {
 
-    private static final String HORIZONTAL_ICON_URL = "icons/horizontal.gif";
-    private static final String VERTICAL_ICON_URL = "icons/vertical.gif";
-
     public ChangeViewModeAction() {
         this.setText("Switch view mode");
         this.setToolTipText("Switch view to horizontal mode");
-        this.setImageDescriptor(Activator.getImageDescriptor(HORIZONTAL_ICON_URL));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_HORIZONTAL));
         this.setEnabled(false);
     }
 
@@ -62,12 +60,14 @@ public class ChangeViewModeAction extends SchedulerGUIAction {
             case SWT.HORIZONTAL:
                 SeparatedJobView.getSashForm().setOrientation(SWT.VERTICAL);
                 this.setToolTipText("Switch view to vertical mode");
-                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), VERTICAL_ICON_URL));
+                this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                        Internal.IMG_VERTICAL));
                 break;
             case SWT.VERTICAL:
                 SeparatedJobView.getSashForm().setOrientation(SWT.HORIZONTAL);
                 this.setToolTipText("Switch view to horizontal mode");
-                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), HORIZONTAL_ICON_URL));
+                this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                        Internal.IMG_HORIZONTAL));
                 break;
         }
     }

@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.gui.Activator;
+import org.ow2.proactive.scheduler.gui.Internal;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
@@ -67,7 +68,8 @@ public class SubmitJobAction extends SchedulerGUIAction {
         this.parent = parent;
         this.setText("Submit an XML job file");
         this.setToolTipText("Submit job from an XML file containing a job description");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/job_submit.gif"));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_JOBSUBMIT));
         this.setEnabled(false);
     }
 

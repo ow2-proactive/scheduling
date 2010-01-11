@@ -37,6 +37,7 @@ package org.ow2.proactive.scheduler.gui;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -82,6 +83,11 @@ public class Activator extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         terminateLoggerServer();
         plugin = null;
+        // Dispose the image registry
+        final ImageRegistry reg = super.getImageRegistry();
+        if (reg != null) {
+            reg.dispose();
+        }
         super.stop(context);
     }
 
@@ -150,7 +156,40 @@ public class Activator extends AbstractUIPlugin {
         IStatus status = new Status(severity, Activator.getDefault().getBundle().getSymbolicName(),
             IStatus.OK, message, t);
         Activator.getDefault().getLog().log(status);
-
     }
 
+    /**
+     * Initializes an image registry with images which are frequently used by the plugin.
+     * @see the registry to initialize
+     */
+    @Override
+    protected void initializeImageRegistry(final ImageRegistry reg) {
+        super.initializeImageRegistry(reg);
+        reg.put(Internal.IMG_CONNECT, Activator.getImageDescriptor("icons/" + Internal.IMG_CONNECT));
+        reg.put(Internal.IMG_DISCONNECT, Activator.getImageDescriptor("icons/" + Internal.IMG_DISCONNECT));
+        reg.put(Internal.IMG_FILEOBJ, Activator.getImageDescriptor("icons/" + Internal.IMG_FILEOBJ));
+        reg.put(Internal.IMG_HORIZONTAL, Activator.getImageDescriptor("icons/" + Internal.IMG_HORIZONTAL));
+        reg.put(Internal.IMG_JOBKILL, Activator.getImageDescriptor("icons/" + Internal.IMG_JOBKILL));
+        reg.put(Internal.IMG_JOBOUTPUT, Activator.getImageDescriptor("icons/" + Internal.IMG_JOBOUTPUT));
+        reg.put(Internal.IMG_JOBPAUSERESUME, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_JOBPAUSERESUME));
+        reg.put(Internal.IMG_JOBPRIORITY, Activator.getImageDescriptor("icons/" + Internal.IMG_JOBPRIORITY));
+        reg.put(Internal.IMG_JOBSUBMIT, Activator.getImageDescriptor("icons/" + Internal.IMG_JOBSUBMIT));
+        reg.put(Internal.IMG_MAXIMIZE, Activator.getImageDescriptor("icons/" + Internal.IMG_MAXIMIZE));
+        reg.put(Internal.IMG_SCHEDULERFREEZE, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERFREEZE));
+        reg.put(Internal.IMG_SCHEDULERKILL, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERKILL));
+        reg.put(Internal.IMG_SCHEDULERPAUSE, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERPAUSE));
+        reg.put(Internal.IMG_SCHEDULERRESUME, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERRESUME));
+        reg.put(Internal.IMG_SCHEDULERSHUTDOWN, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERSHUTDOWN));
+        reg.put(Internal.IMG_SCHEDULERSTART, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERSTART));
+        reg.put(Internal.IMG_SCHEDULERSTOP, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERSTOP));
+        reg.put(Internal.IMG_VERTICAL, Activator.getImageDescriptor("icons/" + Internal.IMG_VERTICAL));
+    }
 }
