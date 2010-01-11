@@ -77,9 +77,7 @@ import org.ow2.proactive.resourcemanager.gui.Activator;
  */
 public final class JMXChartItAction extends Action {
 
-    /**
-     * The name of the JMX ChartIt editor
-     */
+    /** The name of the JMX ChartIt editor */
     private static final String JMX_CHARTIT_EDITOR_NAME = "JMX Monitoring";
 
     /** The static reference on the single instance of this class */
@@ -121,12 +119,10 @@ public final class JMXChartItAction extends Action {
      * Initializes the JMX client and if the initialization was successful enables this action if
      * not sets as tool tip a message.
      * @param auth the resource manager authentication interface
-     * @param login the login used to connect to the Resource Manager
-     * @param password the password used for the connection
+     * @param creds the credentials required for authentication
      * @param isAdmin used to distinguish the admin user from anonymous user
      */
-    public void initJMXClient(final RMAuthentication auth, final String login, final String password,
-            final boolean isAdmin) {
+    public void initJMXClient(final RMAuthentication auth, final Object[] creds, final boolean isAdmin) {
         // Try to get the URL of the JMX connector
         String connectorURL = null;
         try {
@@ -147,7 +143,7 @@ public final class JMXChartItAction extends Action {
         this.predefinedChartItConfigURL = FileLocator.find(Activator.getDefault().getBundle(), new Path(path +
             ".xml"), null);
         // Try to create the connector to the given URL
-        if (this.jmxClient.createConnector(connectorURL, mBeanName, new String[] { login, password })) {
+        if (this.jmxClient.createConnector(connectorURL, mBeanName, creds)) {
             this.setEnabled(true);
         }
     }
