@@ -1282,14 +1282,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             }
 
-            try {
-                File.createTempFile("MK_CORE_", ((res.getPropagatedProperties() != null) ? "" +
-                    res.getPropagatedProperties().size() : "null"));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
             //store this task result in the job result.
             ((JobResultImpl) job.getJobResult()).addTaskResult(descriptor.getName(), res, descriptor
                     .isPreciousResult());
