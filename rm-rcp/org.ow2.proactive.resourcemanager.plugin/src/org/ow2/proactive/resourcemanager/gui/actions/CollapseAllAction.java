@@ -37,6 +37,7 @@ package org.ow2.proactive.resourcemanager.gui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.ow2.proactive.resourcemanager.gui.Activator;
+import org.ow2.proactive.resourcemanager.gui.Internal;
 
 
 /**
@@ -56,7 +57,8 @@ public class CollapseAllAction extends Action {
         this.viewer = viewer;
         this.setText("Collapse All");
         this.setToolTipText("To collapse all items");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/collapseall.gif"));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_COLLAPSEALL));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 

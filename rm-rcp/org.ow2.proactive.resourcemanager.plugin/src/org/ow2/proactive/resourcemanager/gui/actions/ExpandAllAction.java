@@ -37,6 +37,7 @@ package org.ow2.proactive.resourcemanager.gui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.ow2.proactive.resourcemanager.gui.Activator;
+import org.ow2.proactive.resourcemanager.gui.Internal;
 
 
 /**
@@ -52,7 +53,8 @@ public class ExpandAllAction extends Action {
         this.viewer = viewer;
         this.setText("Expand All");
         this.setToolTipText("To expand all items");
-        this.setImageDescriptor(Activator.getImageDescriptor("icons/expandall.gif"));
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_EXPANDALL));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
