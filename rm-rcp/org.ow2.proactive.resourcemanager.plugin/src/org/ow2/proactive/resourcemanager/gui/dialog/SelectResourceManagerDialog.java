@@ -434,6 +434,9 @@ public class SelectResourceManagerDialog extends Dialog {
      */
     public static SelectResourceManagerDialogResult showDialog(Shell parent) {
         new SelectResourceManagerDialog(parent);
+        if (url == null) {
+            return null;
+        }
         url = url.trim();
         return new SelectResourceManagerDialogResult(hasBeenCanceled, url, login, pwd, logAsAdmin);
     }
