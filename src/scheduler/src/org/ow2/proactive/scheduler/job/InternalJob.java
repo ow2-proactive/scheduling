@@ -88,6 +88,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
@@ -495,7 +496,9 @@ public abstract class InternalJob extends JobState {
         setStatus(JobStatus.FINISHED);
         setFinishedTime(System.currentTimeMillis());
         if (jobDataSpaceApplication != null) {
-            jobDataSpaceApplication.terminateDataSpaceApplication();
+            if (!TaskLauncher.logger_dev_dataspace.isDebugEnabled()) {
+                jobDataSpaceApplication.terminateDataSpaceApplication();
+            }
         }
     }
 
