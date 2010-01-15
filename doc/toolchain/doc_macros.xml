@@ -93,12 +93,20 @@
 				<classpath refid="docs.utils.classpath" />
 			</xslt>
 			
+			<if name="release.date">
+				<property name="release.date.arg" value="${release.date}" />
+				<else>
+					<property name="release.date.arg" value="RELEASE DATE NOT SET" />
+				</else>
+			</if>
+
 			<java classname="com.icl.saxon.StyleSheet" fork="true" dir="@{docbookOutputDir}">
 				<classpath refid="docs.utils.classpath" />
 				<jvmarg value="-Dxslthl.config=${xslthl.path}"/>
 				<arg line="-o @{docbookOutputFile} ${docs.tmp.dir}/profiled.xml @{docbookStyle}"/>
 				<arg value="TODAY=${TODAY}" />
 				<arg value="VERSION=${version}" />
+				<arg value="RELEASEDATE=${release.date.arg}" />
 			</java>
 		</sequential>
 	</macrodef>
