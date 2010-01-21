@@ -754,7 +754,6 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     //enough nodes to be launched at same time for a communicating task
                     if (nodeSet.size() >= internalTask.getNumberOfNodesNeeded()) {
 
-                        nodeSet.remove(0);
                         //start dataspace app for this job
                         currentJob.startDataSpaceApplication(dataSpaceNSStarter.getNamingService(),
                                 dataSpaceNSStarter.getNamingServiceURL());
@@ -763,6 +762,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
                         this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
                                 launcher);
+                        nodeSet.remove(0);
                         NodeSet nodes = new NodeSet();
 
                         for (int i = 0; i < (internalTask.getNumberOfNodesNeeded() - 1); i++) {
