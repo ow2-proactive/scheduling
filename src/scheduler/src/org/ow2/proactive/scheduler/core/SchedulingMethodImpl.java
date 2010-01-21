@@ -400,8 +400,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         //enough nodes to be launched at same time for a communicating task
         if (nodeSet.size() >= task.getNumberOfNodesNeeded()) {
-
-            nodeSet.remove(0);
             //start dataspace app for this job
             job.startDataSpaceApplication(core.dataSpaceNSStarter.getNamingService(), core.dataSpaceNSStarter
                     .getNamingServiceURL());
@@ -410,6 +408,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             launcher = task.createLauncher(job, node);
             activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
             core.currentlyRunningTasks.get(task.getJobId()).put(task.getId(), launcher);
+
+            nodeSet.remove(0);
 
             NodeSet nodes = new NodeSet();
             try {
