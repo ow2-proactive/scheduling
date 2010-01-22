@@ -34,8 +34,6 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -692,6 +690,19 @@ public abstract class TaskLauncher implements InitActive {
             String inuri = (INPUT == null) ? "" : INPUT.getVirtualURI();
 
             Set<String> relPathes = new HashSet<String>();
+
+            //debug ---
+            if (!logger_dev_dataspace.isDebugEnabled()) {
+                if (results == null || results.size() == 0) {
+                    logger_dev_dataspace
+                            .debug("No file found to copy from INPUT or OUTPUT space to LOCAL space");
+                } else {
+                    logger_dev_dataspace
+                            .debug("Files that will be copied from INPUT or OUTPUT space to LOCAL space :");
+                }
+            }
+            //debug ---
+
             for (DataSpacesFileObject dsfo : results) {
                 try {
                     String relativePath;
@@ -700,6 +711,7 @@ public abstract class TaskLauncher implements InitActive {
                     } else {
                         relativePath = dsfo.getVirtualURI().replaceFirst(inuri + "/?", "");
                     }
+                    logger_dev_dataspace.debug("* " + relativePath);
                     if (!relPathes.contains(relativePath)) {
                         SCRATCH.resolveFile(relativePath).copyFrom(dsfo,
                                 org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
@@ -741,10 +753,22 @@ public abstract class TaskLauncher implements InitActive {
                     case TransferToOutputSpace:
                         try {
                             Selector.findFiles(SCRATCH, ant, true, results);
+                            //debug ---
+                            if (!logger_dev_dataspace.isDebugEnabled()) {
+                                if (results == null || results.size() == 0) {
+                                    logger_dev_dataspace
+                                            .debug("No file found to copy from LOCAL space to OUTPUT space");
+                                } else {
+                                    logger_dev_dataspace
+                                            .debug("Files that will be copied from LOCAL space to OUTPUT space :");
+                                }
+                            }
+                            //debug ---
                             String buri = SCRATCH.getVirtualURI();
                             for (DataSpacesFileObject dsfo : results) {
                                 try {
                                     String relativePath = dsfo.getVirtualURI().replaceFirst(buri + "/?", "");
+                                    logger_dev_dataspace.debug("* " + relativePath);
                                     OUTPUT
                                             .resolveFile(relativePath)
                                             .copyFrom(
