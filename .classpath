@@ -82,7 +82,6 @@
 	<classpathentry kind="lib" path="lib/ProActive/trilead-ssh2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/winp-1.5.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
-	<classpathentry kind="lib" path="lib/common/jsr173_1.0_api.jar"/>
 	<classpathentry kind="lib" path="lib/common/wstx-lgpl-3.9.2.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-cli-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate/annotation/ejb3-persistence.jar"/>
