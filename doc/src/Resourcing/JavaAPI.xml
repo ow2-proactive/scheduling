@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_API"><info><title>Use Resource Manager with Java API</title></info>
+<!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
+
+	<section xml:id="RM_API_INTRO"><info><title>Introduction</title></info>
+		<para>
+		Resource Manager can be used directly from the Java code through its Java API. This chapter explains
+		how to do that, namely how to start and stop the Resource Manager, add already deployed nodes,
+		deploy nodes with GCM deployment descriptors and finally create peer to peer node source
+		Resource Manager is developed with ProActive API, so its main components are the following active objects:
+		<emphasis>RMCore</emphasis>, <emphasis>RMAdmin</emphasis>, <emphasis>RMUser</emphasis>, <emphasis>RMMonitoring</emphasis> and <emphasis>NodeSources</emphasis>.
+		For more information about active objects, take a look at ProActive API in ProActive manual
+		Part III. <emphasis> Programming With Active Objects</emphasis>.
+		</para>
+	</section>
+	<section xml:id="RM_API_start"><info><title>Start and stop Resource Manager</title></info>
+		<para>
+			Resource Manager can be started locally using a static method of RMFactory class:
+		</para>
+		<programlisting language="java">
+//create initializer for the resource manager.
+//the 6 following lines are mandatory if starting RM in a clean JVM
+//But each variable can be set as JVM argument (ie. -Dvar=value) instead of as API.
+RMInitializer init = new RMInitializer();
+init.setRMHomePath("/path/to/RM/home");
+init.setLog4jConfiguration("/path/to/log4j");
+init.setJavaSecurityPolicy("/path/to/securityPolicy");
+init.setProActiveConfiguration("/path/to/PAconfigurationFile");
+init.setResourceManagerPropertiesConfiguration("/path/to/RMPropertiesFile");
+
+//start an empty RM...
+System.out.println("Starting RM, please wait...");
+
+RMAuthentication auth = RMFactory.startLocal(init);
+
+//retreiving connection URL for RM : auth.getHostURL()
+System.out.println("RM successfully started at : " + auth.getHostURL());
+
+		</programlisting>
+		<para>
+		In order to perform any operations with the Resource Manager, you have to authorize and
+		acquire either RMAdmin or RMUser interface. This action is made by using RMConnection class:
+		</para>
+		<programlisting language="java">
+RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
+UserSchedulerInterface scheduler = null;
+try {
+    // (1) preferred authentication method
+    scheduler = auth.logAsAdmin(Credentials.getCredentials());
+} catch (KeyException e) {
+    try {
+        // (2) valid authentication method
+        PublicKey pubKey = auth.getPubKey();
+        if (pubKey == null) {
+             pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
+        }
+    } catch (KeyException e) {
+        // (3) deprecated authentication method
+        scheduler = auth.logAsAdmin("username", "password");
+    }
+}</programlisting>
+		<para>
+		  Connecting to the Resource Manager implicates using a keypair infrastructure to establish a secure channel on
+		  which the credentials (username and password) will be sent securely. There are three ways to connect
+		  to the Resource Manager, as described in the example above:
+		  <orderedlist>
+		    <listitem><para>
+			Retreive the Credentials from disk: supposes the script <emphasis>create-cred[.bat]</emphasis> was previously used to generate those credentials.
+			It requires knowing the location of the public key corresponding to the private key that will be used for decryption on server side.
+			To obtain the key, you need to contact the administrator of the Scheduler.
+		      </para>
+		      <para>
+			<screen><![CDATA[
+# use local public key to generate credentials for user 'demo'
+/bin/unix $ ./create-cred -P $HOME/.proactive/rm_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
+# use rmi://example.com/RMAUTHENTICATION's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
+/bin/unix $ ./create-cred -U rmi://example.com/RMAUTHENTICATION -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+]]></screen>
+			Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; ie using
+			<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>.
+		    </para></listitem>
+		    <listitem><para>
+			Create the encrypted Credentials on client side: as safe as the previous method, but requires user input, which prevents automation,
+			or storing clear credentials on the disk, which can result to security breaches. This method also requires knowing the public key,
+			which should be offered by the Resource Manager through the Authentication object with the getPubKey() method.
+			If the Resource Manager doesn't know the public key, it can be stored locally on client side and designated by the
+			<emphasis>pa.common.auth.pubkey</emphasis> Java property; ie using <emphasis>java -Dpa.common.auth.pubkey=$HOME/.proactive/pub.key</emphasis>.
+		    </para></listitem>
+		    <listitem><para>
+			If you can not retrieve the public key, you can use the old deprecated API, which sends clear credentials on the network, and requires user input.
+		    </para></listitem>
+		  </orderedlist>
+		</para>
+		<para>
+		Besides the RMAdmin or RMUser interfaces, RMConnection allows to obtain RMMonitoring
+		interface which can be used to track resources and their states.
+		Once you have a reference to RMAdmin active object, you can perform all administrator actions such as shutdown of the Resource Manager
+		</para>
+		<programlisting language="java">
+admin.shutdown(true); //performs preemptive shutdown	</programlisting>
+		<para>
+		This method terminates all RM's active objects and stops JVM where RMCore is running. The boolean parameter that it takes in argument
+		defines whether the Resource Manager stops immediately, even if there are some busy
+		nodes (i.e. some nodes have been provided to an application) or waits while applications
+		give them back.
+		</para>
+	</section>
+
+	<section xml:id="RM_API_add_node"><info><title>Add an already deployed node</title></info>
+	<para>
+	RMAdmin provides a way to add ProActive nodes that are already deployed. Nodes are added using
+	their URLs.
+	</para>
+	<programlisting language="java">
+admin.addNode("rmi://host_1/comptingNode"); //adds a node identified with an URL
+	</programlisting>
+	</section>
+	<section xml:id="RM_API_remove_node"><info><title>Remove a node from RM</title></info>
+	<para>
+	You can remove a node from Resource Manager with the code:
+	</para>
+	<programlisting language="java">
+admin.removeNode("rmi://nodeToRemove", true);
+	</programlisting>
+	<para>
+		The first parameter is the URL of the node to remove and the second one is a boolean.
+		If this boolean is set to true, then Resource Manager removes immediately the node even if it is busy.
+		If this boolean is set to false and the node is busy, then
+		Resource Manager waits that the applications that use RM's nodes give all the busy nodes back.
+		Removal is next performed.
+	</para>
+	</section>
+	<section xml:id="RM_API_custom_node_source"><info><title>Create custom node sources</title></info>
+		<para>
+		You can create different node sources using the admin interface of RM.
+		Let's take a look at the following example to know how to create the most complex node source:
+		</para>
+		<programlisting language="java">
+// creating infrastructure manager parameters
+Object[] imParameters = new Object[] { hostsList, GCMDeploymentData };
+// creating policy parameters
+Object[] policyParameters = new Object[] {
+           schedulerURL, // scheduler url
+           username, // scheduler user name
+           password, // scheduler user password
+           "true", // preemptive removal
+           "0", // min modes
+           "1", // max modes
+           "1", // nodes per task
+           "1000" // releasing period
+};
+admin.createNodesource("Scheduler loading node source", GCMCustomisedInfrastructure.class.getName(), imParameters,
+	SchedulerLoadingPolicy.class.getName(), policyParameters);
+		</programlisting>
+		<para>
+		The node source is created with GCM customized infrastructure manager and scheduler loading policy.
+		In order to create the infrastructure manager, host list and GCM deployment template files are preliminary loaded and their
+		contents is transformed to byte arrays. Then, parameters of infrastructure manager and node source policy are defined and the
+		<literal> admin.createNodesource(...)</literal> method is used to create new node sources. It is required that a scheduler is running somewhere at the
+		moment of the node source creation.
+		</para>
+	</section>
+	<section xml:id="RM_API_user"><info><title>Use Resource Manager as a nodes provider for your application</title></info>
+		<para>
+		You can obviously use Resource Manager as a node provider for your distributed application. RMUser active object
+		provides a way to get computing nodes and give them:
+		</para>
+		<programlisting language="java">
+RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
+RMUser user = auth.logAsUser(Credentials.getCredentials());
+
+NodeSet nodes = user.getAtMostNodes(new IntWrapper(4), null);
+
+//performs some tasks on nodes provided by Resource Manager
+	.
+	.
+	.
+//and gives nodes back
+user.freeNodes(nodes);
+
+// disconnects from the resource manager
+user.disconnect();
+		</programlisting>
+	<para>
+	First, a reference to RMUser active object is retrieved.
+	Then, a set of nodes to is required Resource Manager
+	and some tasks are performed on these nodes. Finally, nodes are given back and disconnected.
+	</para>
+		<para>
+	Above code examples show a short overview of Resource Manager API. You can refer to Java documentation
+	of Resource Manager
+   (<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/scheduler/api_complete/" />).
+	</para>
+	</section>
+</chapter>

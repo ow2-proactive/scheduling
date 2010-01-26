@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted by db4-upgrade version 1.0
+	!DOCTYPE book PUBLIC "-//INRIA//DTD DocBook V5.0-Based Subset V0.1//EN"-->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN"
+                "docbook.dtd" [
+	  <!-- WARNING: Please do not edit with XXE -->
+	  <!-- This file is only meant as a concatenation of the other xml files -->
+	  <!ENTITY BookInfo SYSTEM "BookInfo.xml">
+	  <!ENTITY Contributors SYSTEM "Contributors.xml">
+
+	  <!ENTITY Presentation SYSTEM "Presentation.xml">
+	  <!ENTITY Deployment SYSTEM "Deployment.xml">
+	  <!ENTITY Admin SYSTEM "Admin.xml">
+	  <!ENTITY JavaAPI SYSTEM "JavaAPI.xml">
+	  <!ENTITY EC2 SYSTEM "EC2.xml">
+	  <!ENTITY Plugin SYSTEM "Plugin.xml">
+	  <!ENTITY Virtualization SYSTEM "Virtualization.xml">
+	  <!ENTITY WindowsAgent SYSTEM "WindowsAgent.xml">
+]>
+
+<book xmlns="http://docbook.org/ns/docbook" version="5.0">
+	&BookInfo;
+	&Contributors;
+
+	<part xml:id="ResourceManager">
+		<info>
+			<title>ProActive Resource Manager</title>
+		</info>
+		&Presentation;
+		&Deployment;
+		&Admin;
+		&JavaAPI;
+		&EC2;
+		&Plugin;
+		&Virtualization;
+		&WindowsAgent;
+	</part>
+
+</book>

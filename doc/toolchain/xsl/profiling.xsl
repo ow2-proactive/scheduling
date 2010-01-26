@@ -18,6 +18,7 @@
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 	<xsl:param name="tmp.dir"/>
     <xsl:param name="url.file.prefix" />
+	<xsl:param name="docs.output.dir" />
 
 	<xsl:template match="/">
 			 <xsl:apply-templates/>
@@ -37,6 +38,11 @@
 			<xsl:when test="name()='fileref' and name(..)='textdata'">
 				<xsl:attribute name="fileref">
                     <xsl:value-of select="concat($url.file.prefix,$tmp.dir,$filename)"/>
+				</xsl:attribute>
+			</xsl:when>
+			<xsl:when test="name()='xlink:href' and name(..)='link' and not(starts-with($filename,'http://') or starts-with($filename,'https://'))">
+				<xsl:attribute name="href" namespace="http://www.w3.org/1999/xlink">
+                    <xsl:value-of select="concat($url.file.prefix,$docs.output.dir,$filename)"/>
 				</xsl:attribute>
 			</xsl:when>
 			<xsl:otherwise>

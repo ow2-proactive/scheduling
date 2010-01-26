@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="ProActive_Scheduler_Scilab"><info><title>ProActive Scheduler's Scilab Extension</title></info>
+
+		<section xml:id="Scheduler_Scilab_Overwiew"><info><title>Presentation</title></info>
+
+			<para>
+				<emphasis>Scilab</emphasis>
+				is a scientific software for numerical computations.
+				Developed since 1990 by researchers from INRIA and ENPC,
+				it is now maintained and developed by Scilab Consortium
+				since its creation in May 2003. Scilab includes hundreds
+				of mathematical functions with the possibility to add
+				interactively programs from various languages (C,
+				Fortran...). It has sophisticated data structures
+				(including lists, polynomials, rational functions,
+				linear systems...), an interpreter and a high level
+				programming language. Scilab works on most Unix systems
+				(including GNU/Linux) and Windows (9X/2000/XP).
+			</para>
+			<para>
+				Similarly to ProActive Scheduler's Matlab extension, the
+				Scilab Extension comes in two different ways :
+			</para>
+			<itemizedlist>
+                <listitem>
+                    <para>
+                        The ability to write simple Scilab tasks workflows and
+                        submit these workflows to the ProActive Scheduler (with the possibility to define dependencies
+                        between tasks and transfering results from one task to the other).
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        A parallelization facility directly integrated in the Scilab environment (such
+                        as Scilab Toolboxes). Scilab will create a connection to the scheduler, and
+                        users will be able, directly from Scilab, to parallelize scripts and retrieve results.
+                        Monitoring of these tasks will still be possible through the Scheduler interface.
+                        The usage of this feature is explained in
+                        <xref linkend="Scheduler_Scilab_Embedded"/>
+                    </para>
+                </listitem>
+            </itemizedlist>
+		</section>
+		<section xml:id="Scheduler_Scilab_Jobs">
+			<info>
+				<title>Scilab Scheduler Jobs
+				</title>
+			</info>
+
+			<para>
+				We'll write a simple Scilab job example. This example
+				will assume that you are familiar with the example in
+				<xref linkend="Scheduler_Matlab_More_Complex"/>
+				. This example will compute the numerical integration of
+				sin(x) between 0 and PI.
+			</para>
+			<section xml:id="Scheduler_Scilab_Installation_Prerequisite"><info><title>Installation</title></info>
+
+				<para>
+					Before starting to use the Scilab interface, you
+					need to install Scilab in your environment. You'll
+					find all the instructions on
+					PROACTIVE/extensions/scilab/README_Scheduler
+					(Scilab section).
+				</para>
+				<para>
+					Once Scilab is installed, you won't need at runtime
+					to bother where Scilab is installed, the Scheduler
+					will determine it for you.
+				</para>
+			</section>
+			<section xml:id="Scheduler_Scilab_Job_Descriptor"><info><title>The Scilab Job descriptor</title></info>
+
+				<para>
+					This is the descriptor of the scilab job which will
+					be executed inside the scheduler
+				</para>
+				<example xml:id="Scheduler_Scilab_Descriptor_Example"><info><title>Scilab Job descriptor Example</title></info>
+					<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/Job_scilab.xml"/></textobject></programlisting>
+				</example>
+
+				<para>
+					Here is the Scilab script that calculates individual
+					integrals
+				</para>
+				<example xml:id="Scheduler_Scilab_Int_Script"><info><title>Integral script</title></info>
+					<programlisting><textobject><textdata fileref="../../../extensions/scilab/examples/intsin.sci"/></textobject></programlisting>
+				</example>
+				<para>
+					Here is the Scilab script that merges the individual
+					results and computes the final answer
+				</para>
+				<example xml:id="Scheduler_Scilab_Merge_Script"><info><title>Merging script</title></info>
+					<programlisting><textobject><textdata fileref="../../../extensions/scilab/examples/merge.sci"/></textobject></programlisting>
+				</example>
+				<para>
+					This descriptor is very similar to the descriptor
+					<xref linkend="Scheduler_Matlab_Complex_Descriptor_Example"/>
+					. We'll go through the similarities and differences
+					of these two descriptors.
+				</para>
+				<section xml:id="Scheduler_Scilab_Job_Descriptor_Similarities"><info><title>
+						Similarities with Matlab job descriptor
+					</title></info>
+
+					<itemizedlist>
+						<listitem>
+							<para>
+								Concepts of job, tasks and dependences
+								are common to all ProActive Scheduler
+								jobs, so we find here the same concepts
+								than in Matlab's.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Definitions of task's main and input
+								scripts are done through the same task
+								parameters
+								<emphasis>script</emphasis>
+								,
+								<emphasis>scriptFile</emphasis>
+								,
+								<emphasis>scriptUrl</emphasis>
+								and
+								<emphasis>input</emphasis>
+							</para>
+						</listitem>
+					</itemizedlist>
+
+				</section>
+				<section xml:id="Scheduler_Scilab_Job_Descriptor_Differences"><info><title>
+						Differences with Matlab job descriptor
+					</title></info>
+
+					<para>For example in the following task :</para>
+					<programlisting language="xml">&lt;javaExecutable
+ class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab"&gt;
+    &lt;parameters&gt;
+        &lt;parameter name="scriptFile"
+          value="${SCILAB_SCRIPTS}/intsin.sci" /&gt;
+        &lt;parameter name="input" value="i=3;n=5;" /&gt;
+        &lt;parameter name="outputs" value="out" /&gt;
+    &lt;/parameters&gt;
+&lt;/javaExecutable&gt;</programlisting>
+					<itemizedlist>
+						<listitem>
+							<para>
+								The main Scilab task is now called
+								<emphasis>SimpleScilab</emphasis>
+								. There exists no splitting mechanism
+								yet, but there is a merging mechanism
+								explained below.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								A new important task parameter appears :
+								<emphasis>outputs</emphasis>
+								. This parameter is used to specify
+								which variables will be extracted from
+								the Scilab environment at task's end.
+								You can specify multiple output
+								variables by separating them with
+								commas. If you don't specify an output
+								parameter, the variable called
+								<emphasis>out</emphasis>
+								will be extracted (leading to an error
+								if it doesn't exist).
+							</para>
+
+						</listitem>
+						<listitem>
+							<para>
+								The merging mechanism is different than
+								for Matlab's. If a task depends from a
+								bunch of other tasks. An automatic
+								environment merging will be done. For
+								example if we have 3 tasks A,B,C and C
+								depends of A and B. if task A outputs a
+								variable "a" and task B outputs a
+								variable "b", task C will get as input
+								both variable "a" and "b". Now a problem
+								arise when several tasks output the same
+								variable name. In order to avoid
+								overlapping, and to allow merging of
+								results, this variable will be renamed
+								by appending index at the end of the
+								conflicting variable name. In the
+								current example, each tasks t1 - t5
+								output the same variable "out". task t6
+								will accordingly get as input variable
+								out1 - out5. The index starts from 1 and
+								the order matches the depends list
+								order.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</section>
+			</section>
+		</section>
+		<section xml:id="Scheduler_Scilab_Embedded">
+        <info>
+            <title>Scilab embedded parallelization</title>
+        </info>
+        <para>
+            This section describes the integration of ProActive Scheduler inside the Scilab environment.
+        </para>
+        <para>
+            The purpose of this toolkit is to allow parallel execution directly inside the Scilab environment, similarly to the Matlab extension (see <xref linkend="Scheduler_Matlab_Embedded"/>). The user
+            can transparently launch parallel scripts and functions using its familiar way of programming within Matlab.
+            The feature currently supports embarassingly parrallel problems only, meaning that for a set of scripts
+            launched in parallel, each script's execution must be independant from other script's execution.
+        </para>
+        <section xml:id="Scilab_Embedded_installation">
+            <info>
+                <title>Installation</title>
+            </info>
+            <para>
+		The toolkit requires to have a version of Scilab >= 5.1. It is not mandatory to have Scilab 5.1 installed in remote machines that will be used for computation, but Scilab 5.1 must be used for the main session(client).
+                The toolkit requires as well a connection to the
+                <emphasis>ProActive Scheduler</emphasis>
+                and<emphasis>Resource Manager</emphasis>. In consequence the scheduler needs to be installed and
+                running. Explanation on how to install and use the ProActive Scheduler and Resource Manager are detailed
+                in the Scheduler documentation. When a parallel script is executed, the toolkit wraps the scripts
+                inside a job definition and submits it to the running scheduler. Execution of the job can therefore be
+                monitored using the Scheduler GUI. The scheduler will run several Scilab engines in order to parallelize
+                scripts.
+            </para>
+            <para>
+		The toolkit must also be built on the main machine. In order to do that :
+            </para>
+            <orderedlist>
+                <listitem>
+                    <para>
+                        Start a Scilab session.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Change your current directory to <emphasis>SCHEDULER/extensions/scilab/PAscheduler</emphasis>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Build the toolkit by executing the following command on the Scilab prompt:
+                    </para>
+                    <screen>&gt;&gt; exec builder.sce</screen>
+                </listitem>
+                <listitem>
+                    <para>
+			Load the toolkit in memory by executing :
+                    </para>
+                    <screen>&gt;&gt; exec loader.sce</screen>
+                </listitem>
+            </orderedlist>
+            <para>
+		This last step (loading the toolkit must be done at each Scilab session before using the toolkit.
+            </para>
+
+            <para>
+                One other step needed before using the toolkit it to create a file that grants the scilab jvm the necessary rights to work with ProActive.
+                Here is the procedure for creating such file :
+            </para>
+            <itemizedlist>
+
+                <listitem>
+                    <para>
+                        Create a file called <emphasis>scilab.java.policy</emphasis> in the <emphasis>HOME</emphasis> directory of the current user.
+                For Windows users the HOME directory is the folder "\Documents And Settings\username". The file must contain the following text:
+                    </para>
+                    <screen>grant {
+  permission java.security.AllPermission;
+};</screen>
+                    <para>
+                        Edit the file <emphasis>SCILAB_DIR/share/scilab/modules/jvm/etc/jvm_options.xml</emphasis>. In this file add the two following lines :
+                    </para>
+                    <screen><![CDATA[<option value="-Djava.security.manager"/>
+<option value="-Djava.security.policy=HOMEDIR/scilab.java.policy"/>]]></screen>
+                    <para>
+                        Where HOMEDIR is the full path to the current user HOME directory as explained above.
+                    </para>
+                </listitem>
+            </itemizedlist>
+
+
+        </section>
+        <section xml:id="Scilab_Embedded_Usage">
+            <info>
+                <title>Usage</title>
+            </info>
+            <para>
+                Once the Scheduler and Resource Mananger are running, here is the procedure to use the toolkit :
+            </para>
+            <orderedlist>
+                <listitem>
+                    <para>
+                        Start a Scilab session.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Load the toolkit (see previous section).
+                    </para>
+                </listitem>
+                <listitem>
+                     <para>
+                         Define the path to the ProActive scheduler by using the environment variable <emphasis>SCHEDULER_HOME</emphasis>:
+                     </para>
+                    <screen>setenv('SCHEDULER_HOME','/my_path_to_scheduler/')</screen>
+                </listitem>
+                <listitem>
+                    <para>
+                        Execute the following command on the Scilab prompt:
+                    </para>
+                    <screen>&gt;&gt; PAconnect('//machine-where-the scheduler-is-running');</screen>
+                    <para>
+                        This will try to connect to the Scheduler at the specified location.
+                        If the scheduler can be found on the machine you specified, a pop up window will
+                        appear asking you to enter your login information. In order to create accounts for the
+                        scheduler, read the scheduler documentation.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        You're now ready to run some parallel scripts. In order to run a Scilab function in parallel you'll need to call the function PAsolve() as
+                        follows:
+                    </para>
+                    <screen>&gt;&gt; resl = PAsolve( 'cosh', list(1, 2, 3, 4, 5) );</screen>
+                    <para>
+                        This for example will execute the factorial function on 5 different machines, the first machine
+                        using the parameter 1, the second, the parameter 2, etc...
+
+                    </para>
+                    <para>
+                        The function used must take one argument and return one result. It cannot be a compiled function, and it can be a user-defined function.
+                        The interface will take-care of transfering the function definition to the remote engine.
+                        This is a difference with the Matlab version, which doesn't tranfer function definitions, but affects the same paths to the matlab session.
+                        For the matlab version, it is mandatory to have a shared file system for function definitions, here it is not mandatory. But if the function does some input/output and writes results to a file. A shared file system becomes again mandatory.
+                    </para>
+                    <para>
+                        The result of the PAsolve function will be a scilab list. Again here there is a difference with the matlab version, as the call to PAsolve is not made asynchronously and blocks the execution of the scilab interpretor until the results are received.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        A second syntax is avaible for the PAsolve function. This syntax is used to avoid the following limitation : in the code above the 'cosh' function can be replaced of course by a user-defined function, but this function must not depend on others user-defined ones. The second syntax, thus allow users to run functions which have dependencies. Here is how it works:
+                    </para>
+                    <screen>getf('path_to_myfunc/myfunc.sci');
+&gt;&gt; resl = PAsolve( 'myfunc', list(1, 2, 3, 4, 5), 'path_to_myfunc/myfunc.sci' );</screen>
+                    <para>
+                        The first line loads the function into scilab (necessary for checking purpose). The second line, actually runs the function, and specifies where the function definition can be found. The file myfunc.sci must contain the code to every dependant functions used by 'myfunc'.
+                    </para>
+                </listitem>
+            </orderedlist>
+        </section>
+    </section>
+
+</chapter>

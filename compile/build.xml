@@ -3,6 +3,7 @@
 	
 	<import file="scheduler-build.xml" />
 	<import file="rm-build.xml" />
+	<import file="../doc/src/build.xml" optional="true"/>
 	
 	<!-- ************
 		Compilation		

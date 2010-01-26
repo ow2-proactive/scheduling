@@ -1,8 +1,0 @@
-cd [Your ProActive install directory]
-PA_PATH=$(pwd)
-export CLASSPATH=.:${PA_PATH}/lib/dist/ProActive_examples.jar:\
-	${PA_PATH}/lib/dist/ProActive/ProActive.jar:${PA_PATH}/lib/dist/ibis:\
-	${PA_PATH}/lib/dist/asm-2.2.1.jar:\
-	${PA_PATH}/lib/dist/log4j.jar:${PA_PATH}/lib/dist/xercesImpl.jar:\
-	${PA_PATH}/lib/dist/fractal.jar:${PA_PATH}/lib/dist/bouncycastle.jar:\
-	${PA_PATH}/lib/dist/javassist.jar

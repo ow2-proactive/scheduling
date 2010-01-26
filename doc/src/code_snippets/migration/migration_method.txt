@@ -1,7 +1,0 @@
-public void moveTo(String t) {
-   try {
-      PAMobileAgent.migrateTo(t);
-    } catch (Exception e) {
-       e.printStackTrace();
-    }
-}

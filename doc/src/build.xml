@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+
+	<import file="../toolchain/doc_macros.xml" />
+	<import file="Resourcing/build.xml" />
+	<import file="Scheduling/build.xml" />
+
+	<property name="doc.root.name" value="" />
+	<property name="snippets.start" value="${docs.dir}/../src:${docs.dir}/../samples" />
+
+	<!-- javadoc paths are not include through subant-->
+	<path id="docs.utils.classpath.javadoc">
+		<fileset dir="../doc/toolchain/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- ================================================================ -->
+	<!--            Create docs, which is the javadoc + manual            -->
+	<!--  =============================================================== -->
+<!--	<target name="doc.ProActive.docs" depends="doc.ProActive.javadoc.all, doc.GetStarted.manual, doc.ReferenceManual.manual, doc.AdvancedFeatures.manual, doc.ProActive.doc.zips" description="Generate the ProActive Programming javadoc, manual, and zip archives" />-->
+<!--	-->
+	<!-- ================================================================ -->
+	<!--            Create docs, which is the javadoc + manual            -->
+	<!--  =============================================================== -->
+<!--	<target name="doc.ProActive.doc.zips" depends="doc.GetStarted.manualSingleHtmlZip, doc.GetStarted.manualHtmlZip, doc.ReferenceManual.manualSingleHtmlZip, doc.ReferenceManual.manualHtmlZip, doc.AdvancedFeatures.manualSingleHtmlZip, doc.AdvancedFeatures.manualHtmlZip, doc.ProActive.javadoc.publishedZip, doc.ProActive.javadoc.completeZip" description="Generate the ProActive Programming javadoc and manual zip archives" />-->
+<!---->
+	<!-- ================================================================ -->
+	<!--                     Create javadoc                               -->
+	<!-- ================================================================ -->
+<!--	<target name="doc.ProActive.javadoc.all" depends="doc.ProActive.javadoc.published,doc.ProActive.javadoc.complete"/>-->
+<!---->
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the published javadoc       -->
+	<!-- ==================================================================== -->
+<!--	<target name="doc.ProActive.javadoc.publishedZip" description="Generate the ProActive Programming published javadoc zip" depends="doc.ProActive.javadoc.published">-->
+<!--		<subant target="javadoc.publishedZip" inheritall="true">-->
+<!--			<property name="doc.name"               value="${docs.dir.name}" />-->
+<!--			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>-->
+<!--		</subant>-->
+<!--	</target>-->
+<!--	-->
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the complete javadoc       -->
+	<!-- ==================================================================== -->
+<!--	<target name="doc.ProActive.javadoc.completeZip" description="Generate the ProActive Programming complete javadoc zip" depends="doc.ProActive.javadoc.complete"> -->
+<!--		<subant target="javadoc.completeZip" inheritall="true">-->
+<!--			<property name="doc.name"               value="${docs.dir.name}" />-->
+<!--			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>-->
+<!--		</subant>-->
+<!--	</target>-->
+<!---->
+<!--	<target name="doc.ProActive.javadoc.complete" depends="compile.util, deploy" description="Generate the ProActive Programming complete javadoc ">-->
+<!--		<property name="doc.name"               value="${docs.dir.name}" />-->
+<!--		<setProperties />-->
+<!--		<javadoc  -->
+<!--			destdir="${docs.built.dir}/api_complete" -->
+<!--			author="true" -->
+<!--			version="true" -->
+<!--			source="${source}" -->
+<!--			use="true" -->
+<!--			windowtitle="ProActive Programming Complete API" -->
+<!--			breakiterator="yes" -->
+<!--			additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> -->
+<!--			-->
+<!--			<classpath>-->
+<!--			<path refid="compile.libs"/>-->
+<!--			<pathelement path="${cl.proactive.dir}"/>-->
+<!--			<pathelement path="${cl.extensions.dir}"/>-->
+<!--			</classpath>-->
+<!--			-->
+<!--			<packageset dir="${src.proactive.dir}" />-->
+<!--			<packageset dir="${src.extensions.dir}" />-->
+<!--			<packageset dir="${src.extra.dir}" />-->
+<!--			-->
+<!--			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />-->
+<!--			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>-->
+<!--			<doctitle>ProActive Programming</doctitle>-->
+<!--			<bottom>${javadoc.copyright}</bottom>-->
+<!--			-->
+<!--			<group title="ProActive packages for end user" packages="org.objectweb.proactive" />-->
+<!--			<group title="ProActive Core" packages="org.objectweb.proactive.core*" />-->
+<!--			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />-->
+<!--			<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />-->
+<!--			<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.extra.p2p*" />-->
+<!--			<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />-->
+<!--			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />-->
+<!--			<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.extra.branchnbound*" />-->
+<!--			<group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />-->
+<!--			<group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />-->
+<!--			<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />-->
+<!--			<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />-->
+<!--			<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />-->
+<!--			<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />-->
+<!--			<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />-->
+<!--	  </javadoc>-->
+<!--    </target>-->
+<!---->
+    <!-- the javadoc need trunk/doc/  because the paths are not from a subant task-->
+<!--    <target name="doc.ProActive.javadoc.published" depends="compile.util, deploy" description="Generate the ProActive Programming published javadoc">-->
+<!--		<property name="doc.name"               value="${docs.dir.name}" />-->
+<!--		<setProperties />-->
+<!--        <mkdir dir="${docs.tmp.dir}" />-->
+<!--		<javadoc source="${source}"	classpathref="compile.libs">-->
+<!--			<doclet name="doc.PublishedAPIDoclet" > -->
+<!--				<path refid="docs.utils.classpath.javadoc"/>-->
+<!--				<param name="-file" value="${docs.tmp.dir}/publishedCoreClasses" />-->
+<!--            </doclet>-->
+<!--            <packageset dir="${src.proactive.dir}"/>-->
+<!--        </javadoc>-->
+<!--        -->
+<!--        <javadoc source="${source}">-->
+<!--            <classpath>-->
+<!--                <path refid="compile.libs"/>-->
+<!--                <pathelement path="${cl.proactive.dir}"/>-->
+<!--            </classpath>-->
+<!--            <doclet name="doc.PublishedAPIDoclet">-->
+<!--                <path refid="docs.utils.classpath.javadoc"/>-->
+<!--                <param name="-file" value="${docs.tmp.dir}/publishedExtensionClasses" />-->
+<!--            </doclet>-->
+<!--            <packageset dir="${src.extensions.dir}"/>-->
+<!--        </javadoc>-->
+<!--        -->
+<!--        <javadoc source="${source}">-->
+<!--            <classpath>-->
+<!--                <path refid="compile.libs"/>-->
+<!--                <pathelement path="${cl.proactive.dir}"/>-->
+<!--                <pathelement path="${cl.extensions.dir}"/>-->
+<!--            </classpath>-->
+<!--            <doclet name="doc.PublishedAPIDoclet">-->
+<!--                <path refid="docs.utils.classpath.javadoc"/>-->
+<!--                <param name="-file" value="${docs.tmp.dir}/publishedExtraClasses" />-->
+<!--            </doclet>-->
+<!--            <packageset dir="${src.extra.dir}"/>-->
+<!--        </javadoc>-->
+<!--        -->
+<!--        <javadoc  -->
+<!--            destdir="${docs.built.dir}/api_published" -->
+<!--            author="true" -->
+<!--            version="true" -->
+<!--            source="${source}" -->
+<!--            use="true" -->
+<!--            windowtitle="ProActive Programming API" -->
+<!--            breakiterator="yes" -->
+<!--            additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> -->
+<!--            -->
+<!--            <classpath>-->
+<!--                <path refid="compile.libs"/>-->
+<!--                <pathelement path="${cl.proactive.dir}"/>-->
+<!--                <pathelement path="${cl.extensions.dir}"/>-->
+<!--                <pathelement path="${cl.extra.dir}"/>-->
+<!--            </classpath>-->
+<!--            -->
+<!--            -->
+<!--            <fileset dir="${src.proactive.dir}" includesfile="${docs.tmp.dir}/publishedCoreClasses"/>-->
+<!--            <fileset dir="${src.extensions.dir}" includesfile="${docs.tmp.dir}/publishedExtensionClasses"/>-->
+<!--            <fileset dir="${src.extra.dir}" includesfile="${docs.tmp.dir}/publishedExtraClasses"/>-->
+<!--            -->
+<!--            <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />-->
+<!--            <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>-->
+<!--            <doctitle><![CDATA[ProActive Programming ${version}<br>]]></doctitle>-->
+<!--            <bottom>${javadoc.copyright}</bottom>-->
+<!--            -->
+<!--            <group title="ProActive entry point">-->
+<!--                <package name="org.objectweb.proactive.api" />-->
+<!--            </group>-->
+<!--            -->
+<!--            <group title="ProActive Core">-->
+<!--                <package name="org.objectweb.proactive.core*" />-->
+<!--                <package name="org.objectweb.proactive.core.filetransfer*" />-->
+<!--                <package name="org.objectweb.proactive.ext*" />-->
+<!--                <package name="org.objectweb.proactive.gcmdeployment*" />-->
+<!--                <package name="org.objectweb.proactive.mpi*" />  -->
+<!--                <package name="org.objectweb.proactive.benchmarks*" />-->
+<!--                <package name="org.objectweb.proactive" />-->
+<!--                <package name="org.objectweb.proactive.annotation" /> -->
+<!--                -->
+<!--            </group>-->
+<!--            -->
+<!--            <group title="ProActive Extensions">-->
+<!--                <package name="org.objectweb.proactive.extensions.*" />-->
+<!--            </group>-->
+<!--            -->
+<!--            <group title="ProActive Extra">-->
+<!--                <package name="org.objectweb.proactive.extra.*" /> -->
+<!--            </group>-->
+<!--            -->
+<!--        </javadoc>-->
+<!--		<delete dir="${docs.tmp.dir}" />-->
+<!--    </target>-->
+</project>

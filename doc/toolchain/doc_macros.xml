@@ -7,7 +7,7 @@
 		to know how to do it properly.
 -->
 	<import file="doc_paths.xml" />
-	
+
 	<!-- ==================================================================== -->
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
@@ -34,7 +34,7 @@
 		</sequential>
 	</macrodef>
 
-	
+
 	<!-- ==================================================================== -->
 	<!--   Make an archive from the files for the multiple html manual        -->
 	<!-- ==================================================================== -->
@@ -66,10 +66,10 @@
 			</java>
 		</sequential>
 	</macrodef>
-	
-	
-	
-	
+
+
+
+
 	<!-- ==================================================================== -->
 	<!--      Converts docbook xml into ??? - uses the trax processor         -->
 	<!-- ==================================================================== -->
@@ -84,15 +84,16 @@
 			<taskdef name="xml_validate" classname="org.apache.tools.ant.taskdefs.optional.XMLValidateTask" description="XML Validation">
 				<classpath refid="docs.utils.classpath" />
 			</taskdef>
-			<xml_validate file="${docs.src.dir}/${docs.mainFile}"  warn="true" />
+			<xml_validate file="${docs.tmp.dir}/@{docbookInputFile}"  warn="true" />
 			<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
-			<xslt basedir="${docs.src.dir}"  in="${docs.tmp.dir}/@{docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${docs.xsl.profiling}" force="yes">
+			<xslt basedir="${docs.tmp.dir}"  in="${docs.tmp.dir}/@{docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${docs.xsl.profiling}" force="yes">
 				<param name="profile.os" expression="@{docbook.profile}" />
 				<param name="tmp.dir" expression="${docs.tmp.dir}/" />
 				<param name="url.file.prefix" expression="${url.file.prefix}" />
+				<param name="docs.output.dir" expression="@{docbookOutputDir}" />
 				<classpath refid="docs.utils.classpath" />
 			</xslt>
-			
+
 			<if name="release.date">
 				<property name="release.date.arg" value="${release.date}" />
 				<else>
@@ -119,11 +120,37 @@
 		<sequential>
 			<!-- Call the code for generating the snippets -->
 			<snippetscreation/>
-			
+
 			<!-- as this file gets edited, make sure it's a fresh copy-->
-			<delete file="${docs.tmp.dir}/${docs.mainFile}" />
-			
+			<delete file="${docs.tmp.dir}/${docs.main.file}" />
+
+			<available file="${docs.shared.dir}" type="dir" property="shared.dir.exists"/>
+
 			<!-- Copy the files needed for the html files (pics and maybe others) -->
+
+			<if>
+				<bool>
+					<istrue value="${shared.dir.exists}" />
+				</bool>
+				<copy toDir="@{output.docs.dir}" includeemptydirs="no" >
+					<!-- Copy shared images and style sheet -->
+					<fileset dir="${docs.shared.dir}">
+						<include name="**/*.png" />
+						<include name="**/*.jpg" />
+						<include name="**/*.svg" />
+						<include name="**/*.gif" />
+						<include name="${docs.html.css.name}" />
+					</fileset>
+				</copy>
+				<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
+					<fileset dir="${docs.shared.dir}">
+						<include name="**/*" />
+						<exclude name="**/.svn" />
+						<exclude name="xsl" />
+					</fileset>
+				</copy>
+			</if>
+
 			<copy toDir="@{output.docs.dir}" includeemptydirs="no" >
 				<fileset dir="${docs.src.dir}">
 					<include name="**/*.png" />
@@ -133,6 +160,7 @@
 					<include name="${docs.html.css.name}" />
 				</fileset>
 			</copy>
+
 			<!-- Copying xml files so they can be edited (beautify programlistings) -->
 			<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
 				<fileset dir="${docs.src.dir}">
@@ -143,20 +171,20 @@
 			</copy>
 		</sequential>
 	</macrodef>
-	
+
 	<!-- ==================================================================== -->
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<macrodef name="manualSingleHtml" description="Make only the big html file in the manual">
 		<sequential>
 			<docbookPreProcess output.docs.dir="${docs.html.single.dir}" />
-			<docbookTransform docbookInputFile="${docs.mainFile}"
+			<docbookTransform docbookInputFile="${docs.main.file}"
 				docbookOutputFile="${docs.html.single.output}"
 				docbookStyle="${docs.xsl.html.one}"
 				docbook.profile="html"
 				docbookOutputDir="${docs.html.single.dir}"/>
-			<!-- remove temporary folder -->
-			<delete dir="${docs.tmp.dir}"/>
+
+			<cleanTmpDir />
 		</sequential>
 	</macrodef>
 
@@ -167,28 +195,28 @@
 		<sequential>
 			<docbookPreProcess output.docs.dir="${docs.pdf.dir}" />
 			<!--   First translate into intermediate fo format -->
-			<docbookTransform docbookInputFile="${docs.mainFile}"
-					  docbookOutputFile="${docs.pdf.output}.fo" 
-					  docbookStyle="${docs.xsl.pdf}" 
-					 docbook.profile="pdf"
-					 docbookOutputDir="${docs.pdf.dir}"/>
+			<docbookTransform docbookInputFile="${docs.main.file}"
+				docbookOutputFile="${docs.pdf.output}.fo"
+				docbookStyle="${docs.xsl.pdf}"
+				docbook.profile="pdf"
+				docbookOutputDir="${docs.pdf.dir}"/>
 			<!-- declare how to transform fo xml file in pdf through a new 'fop' task -->
 			<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
 				<classpath refid="docs.utils.classpath" />
 			</taskdef>
 			<!-- Then use the newly defined fop task to translate fo into pdf -->
-			<fop format="application/pdf" fofile="${docs.pdf.output}.fo" outfile="${docs.pdf.output}" basedir="${docs.src.dir}" />
-			
+			<fop format="application/pdf" fofile="${docs.pdf.output}.fo" outfile="${docs.pdf.output}" basedir="${docs.tmp.dir}" />
+
 			<delete file="${fo.output}" />
 			<!-- remove all files except the PDF -->
 
-<!--  needed because docbookPreProcess copies all the files -->
+			<!--  needed because docbookPreProcess copies all the files -->
 			<delete includeemptydirs="true">
 				<fileset dir="${docs.pdf.dir}" defaultexcludes="false"
 					includes="**/*"  excludes="${docs.pdf.name}" />
 			</delete>
-			<!-- remove temporary folder -->
-			<delete dir="${docs.tmp.dir}"/>
+
+			<cleanTmpDir />
 		</sequential>
 	</macrodef>
 
@@ -198,13 +226,13 @@
 	<macrodef name="manualHtml" description="Make only the html files in the manual">
 		<sequential>
 			<docbookPreProcess output.docs.dir="${docs.html.multiple.dir}" />
-			<docbookTransform docbookInputFile="${docs.mainFile}" 
-					docbookOutputFile="${docs.html.multiple.output}" 
-					docbookStyle="${docs.xsl.html.chunked}" 
-					docbook.profile="html" 
+			<docbookTransform docbookInputFile="${docs.main.file}"
+					docbookOutputFile="${docs.html.multiple.output}"
+					docbookStyle="${docs.xsl.html.chunked}"
+					docbook.profile="html"
 					docbookOutputDir="${docs.html.multiple.dir}"/>
-			<!-- remove temporary folder -->
-			<delete dir="${docs.tmp.dir}"/>
+
+			<cleanTmpDir />
 		</sequential>
 	</macrodef>
 	<!-- ==================================================================== -->
@@ -216,8 +244,8 @@
 		      <delete dir="${docs.dir}/built" />
 		</sequential>
 	</macrodef>
-	
-	
+
+
 	<!-- ==================================================================== -->
 	<!--                            Javadoc checkstyle                        -->
 	<!-- ==================================================================== -->
@@ -225,8 +253,8 @@
 
 	<macrodef name="javadoc.checkstyle" description="Generate javadoc violation reports">
 		<sequential>
-			<property name="checkstyle.plain.file" value="${docs.built.dir}/${doc.name}_javadoc.txt"/>
-			<property name="checkstyle.xml.file" value="${docs.built.dir}/${doc.name}_javadoc.xml"/>
+			<property name="checkstyle.plain.file" value="${docs.built.dir}/${docs.output.name}_javadoc.txt"/>
+			<property name="checkstyle.xml.file" value="${docs.built.dir}/${docs.output.name}_javadoc.xml"/>
 			<property name="translation.severity" value="ignore"/>
 			<mkdir dir="${docs.built.dir}"/>
 			<checkstyle config="${checkstyle.config}" failOnViolation="false">
@@ -255,8 +283,8 @@
             <property name="gcmd.dir" value="${docs.schemas.dir}/gcmd" />
             <mkdir dir="${gcmd.dir}"/>
 			<echo message="Processing GCMD schema documentation..." />
-            <xsddoc out="${gcmd.dir}" 
-                    title="GCM Deployment Schema" 
+            <xsddoc out="${gcmd.dir}"
+                    title="GCM Deployment Schema"
                     verbose="false"
                     header="&lt;img width='70%' src='${base.dir}/doc/pa/images/Logo-ProActive.png' /&gt;"
                     bottom=" "
@@ -269,8 +297,8 @@
             <property name="gcma.dir" value="${docs.schemas.dir}/gcma" />
             <mkdir dir="${gcma.dir}"/>
 			<echo message="Processing GCMA schema documentation..." />
-            <xsddoc out="${gcma.dir}" 
-                    title="GCM Application Schema" 
+            <xsddoc out="${gcma.dir}"
+                    title="GCM Application Schema"
                     verbose="false"
                     header="&lt;img width='70%' src='${base.dir}/doc/pa/images/Logo-ProActive.png' /&gt;"
                     bottom=" "
@@ -285,26 +313,74 @@
         </sequential>
     </macrodef>
 
+	<macrodef name="cleanTmpDir">
+		<sequential>
+			<!-- remove temporary folder -->
+			<delete dir="${docs.tmp.dir}"/>
+
+			<!--
+				 if a doc.relative.name property exists, only the tmp/${doc.relative.name}
+				 directory has been removed.
+				 In this case, we remove the tmp/ directory if and only if it is empty
+				 (if it is not empty, it means that another documentation computation is
+				 running.)
+			-->
+			<if name="doc.relative.name">
+				<!-- Tricky instruction coming from http://ant.apache.org/faq.html#delete-directory-only-if-empty -->
+				<delete includeemptydirs="true">
+					<fileset dir="${docs.tmp.dir}/.." excludes="**/*" />
+				</delete>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!--
+		 The use of var is normally discouraged but we do not have really the choice.
+		 Setting properties only after entering the target works find for single targets but not
+		 for multiple target call or for dependencies.
+	-->
+	<taskdef name="var" classname="ise.antelope.tasks.Variable"/>
+
 	<macrodef name="setProperties">
 		<sequential>
-			<property name="docs.built.dir"			value="${docs.dir}/built/${doc.name}" />
-			<property name="docs.api.complete.dir"		value="${docs.built.dir}/api_complete" />
-			<property name="docs.api.published.dir"		value="${docs.built.dir}/api_published" />
-			<property name="docs.html.multiple.dir"		value="${docs.built.dir}/multiple_html/" />
-			<property name="docs.html.single.dir"		value="${docs.built.dir}/single_html/" />
-			<property name="docs.pdf.dir"			value="${docs.built.dir}/pdf/" />
-			<property name="docs.schemas.dir"          value="${docs.built.dir}/schemas/" />
-			<property name="docs.pdf.name"			value="${doc.name}Manual.pdf" />
-			<property name="docs.html.multiple.zip"		value="${docs.built.dir}/${doc.name}ManualMultipleHtml.zip" />
-			<property name="docs.html.single.zip"		value="${docs.built.dir}/${doc.name}ManualSingleHtml.zip" />
-			<property name="docs.javadoc.published.zip"	value="${docs.built.dir}/${doc.name}JavadocPublished.zip" />
-			<property name="docs.javadoc.complete.zip"	value="${docs.built.dir}/${doc.name}JavadocComplete.zip" />
-			<property name="docs.html.multiple.output"	value="${docs.html.multiple.dir}/empty.html" />
-			<property name="docs.html.single.name"		value="${doc.name}Manual.html" />
-			<property name="docs.html.single.output"	value="${docs.html.single.dir}/${docs.html.single.name}" />
-			<property name="docs.pdf.output"		value="${docs.pdf.dir}/${docs.pdf.name}" />
-			<property name="javadoc.title" 			value="${doc.name} "/>
-			<property name="docs.javadoc.window.title" 	value="${doc.name}"/>
+			<if name="doc.relative.name">
+				<var name="docs.built.dir"			value="${docs.dir}/built/${doc.root.name}/${doc.relative.name}" />
+				<var name="docs.src.dir"      		value="${docs.dir}/src/${doc.relative.name}" />
+				<var name="docs.tmp.dir"  			value="${docs.dir}/tmp/${doc.relative.name}" />
+				<if name="docs.output.name">
+					<else>
+						<var name="docs.output.name"		value="ProActive${doc.root.name}${doc.relative.name}" />
+					</else>
+				</if>
+				<else>
+					<var name="docs.built.dir"		value="${docs.dir}/built/${doc.root.name}" />
+					<var name="docs.src.dir"      	value="${docs.dir}/src" />
+					<var name="docs.tmp.dir"  		value="${docs.dir}/tmp" />
+					<if name="docs.output.name">
+						<else>
+							<var name="docs.output.name"	value="ProActive${doc.root.name}" />
+						</else>
+					</if>
+				</else>
+			</if>
+			<var name="snippets.location"			value="${docs.tmp.dir}/automatic_snippets" />
+			<var name="docs.api.complete.dir"		value="${docs.built.dir}/api_complete" />
+			<var name="docs.api.published.dir"		value="${docs.built.dir}/api_published" />
+			<var name="docs.html.multiple.dir"		value="${docs.built.dir}/multiple_html/" />
+			<var name="docs.html.single.dir"		value="${docs.built.dir}/single_html/" />
+			<var name="docs.pdf.dir"				value="${docs.built.dir}/pdf/" />
+			<var name="docs.schemas.dir"			value="${docs.built.dir}/schemas/" />
+			<var name="docs.pdf.name"				value="${docs.output.name}.pdf" />
+			<var name="docs.html.multiple.zip"		value="${docs.built.dir}/${docs.output.name}MultipleHtml.zip" />
+			<var name="docs.html.single.zip"		value="${docs.built.dir}/${docs.output.name}SingleHtml.zip" />
+			<var name="docs.javadoc.published.zip"	value="${docs.built.dir}/${docs.output.name}JavadocPublished.zip" />
+			<var name="docs.javadoc.complete.zip"	value="${docs.built.dir}/${docs.output.name}JavadocComplete.zip" />
+			<var name="docs.html.multiple.output"	value="${docs.html.multiple.dir}/empty.html" />
+			<var name="docs.html.single.name"		value="${docs.output.name}.html" />
+			<var name="docs.html.single.output"		value="${docs.html.single.dir}/${docs.html.single.name}" />
+			<var name="docs.pdf.output"				value="${docs.pdf.dir}/${docs.pdf.name}" />
+			<var name="javadoc.title" 				value="${docs.output.name} "/>
+			<var name="docs.javadoc.window.title" 	value="${docs.output.name}"/>
 		</sequential>
 	</macrodef>
 </project>

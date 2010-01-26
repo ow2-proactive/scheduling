@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Scheduler_Eclipse_Plugin"><info><title>ProActive Scheduler Eclipse Plugin</title></info>
+
+	<para>
+		<emphasis role="bold">
+			Scheduler Eclipse Plugin
+		</emphasis>
+		is a
+		<emphasis role="bold">graphical client</emphasis>
+		for remote monitoring and control of ProActive Scheduler
+		(see
+		<xref linkend="user_manual"/>
+		), including remote submission of XML-defined jobs (see
+		<xref linkend="Create_job_xml"/>
+		).
+	</para>
+	<para>
+		The Scheduler Eclipse Plugin is available in two forms:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				A
+				<emphasis role="bold">
+					Java stand alone application
+				</emphasis>
+				based on
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
+					Eclipse Rich Client Platform (RCP)
+				</link>
+				, available for any platform (Windows, Linux, Mac
+				OSX, Solaris...).
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				A set of
+				<emphasis role="bold">
+					<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org">
+						Eclipse
+					</link>
+					plugins
+				</emphasis>:
+				with all functionalities within the stand
+				alone application, enhanced with a tool that makes
+				easier the scheduling and monitoring of jobs and
+				applications.
+			</para>
+		</listitem>
+	</itemizedlist>
+
+	<section xml:id="Starting_GUI"><info><title>Starting  Scheduler Graphical User Interface</title></info>
+		<para>
+			Depending on the way you get the Scheduler plugin, just follow one of this step:
+			<itemizedlist>
+				<listitem><para>
+					<emphasis role="bold">If you are using the stand alone application</emphasis>, just start it using
+					provided executable ("Scheduler" on unix, "Scheduler.exe" on Windows).</para>
+				</listitem>
+				<listitem><para>
+					<emphasis role="bold">If you are using the Eclipse plugins set</emphasis>, install it as an eclipse plugin
+					and restart Eclipse. Then select the Scheduler Perspective.</para>
+				</listitem>
+			</itemizedlist>
+			Then, go to <emphasis role="bold">Window-&gt;Open Perspective-&gt;Other...-&gt;Scheduler</emphasis>
+			(it could be already opened as it is the default perspective).
+		</para>
+		<para>
+			Once started, the first screen displayed is the following one:
+			<figure xml:id="Scheduler_Welcome_screen"><info><title>Scheduler welcome screen</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="220%" contentdepth="220%" fileref="images/png/plugin/Screen1.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+	</section>
+
+	<section xml:id="Connect_GUI"><info><title>Connect to an existing Scheduler</title></info>
+		<para>
+			A Scheduler has to be already started before connecting the Scheduler GUI. If no scheduler has been started, please refer
+			to <xref linkend="scheduler_installation"/>.
+		</para>
+		<para>
+			To connect to an existing Scheduler, just right click on the empty area in the middle of the windows and click on
+			"Connect the ProActive Scheduler" in the context menu as shown below:
+			<figure xml:id="RC_screen"><info><title>Scheduler connection (1)</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="220%" contentdepth="220%" fileref="images/png/plugin/RC_screen.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+		<para>
+			Some information are now requested in order to establish the connection:
+			<figure xml:id="connectToSchedulerDialog"><info><title>Connection dialog</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="70%" fileref="images/png/plugin/connectToSchedulerDialog.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+		<para>
+			<emphasis role="bold">Enter required information</emphasis> about the remote scheduler
+			and click on <emphasis role="bold">OK</emphasis>.
+			Url is made of the protocol, the host name on which the Scheduler is started and the port on
+			which it is listening.
+			Then, enter your user/admin name and password.
+		</para>
+		<para>
+			<emphasis>Note</emphasis>: If you check "log as admin" and your login is an admin one,
+			you'll be able to do more actions than an "simple" user (see <xref linkend="Scheduler_composing_controlPanel_admin"/>).
+			Connection right is performed by Scheduler itself, you won't be able to connect as admin with a 'user' name.
+		</para>
+	</section>
+
+	<section xml:id="Scheduler_perspective"><info><title>Scheduler perspective</title></info>
+		<para>
+			Scheduler plugin provides the
+			<emphasis role="bold">
+				Scheduler
+				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
+					perspective
+				</link>
+			</emphasis>
+			displayed in the <xref linkend="schedulerPerspective"/>.
+		</para>
+
+		<figure xml:id="schedulerPerspective"><info><title>Scheduler Perspective</title></info>
+			<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="220%" contentdepth="220%" fileref="images/png/plugin/GUI_perspective.png" format="PNG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+
+		<para>
+			This perspective defines the following set of
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">
+				views
+			</link>:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">Jobs</emphasis> view - shows pending, running and finished jobs in the scheduler.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Console</emphasis> view - shows jobs standard and error output (on demand).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Tasks</emphasis> view - displays detailed informations on tasks contained
+					in the selected job.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Users</emphasis> view - displays information about connected user.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Jobs Info</emphasis> view - displays all information of the selected job.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 <emphasis role="bold">Result Preview</emphasis> view - displays a textual or graphical preview on
+					the selected task result. A simple click will show the internal view while the double click start
+					an external result preview (as a pictures editor or viewer) if provided.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A <emphasis role="bold">Control panel</emphasis> is provided at the top right of the windows in order
+					to manage jobs and the Scheduler itself.
+				</para>
+			</listitem>
+		</itemizedlist>
+	</section>
+
+
+	<section xml:id="Scheduler_composing"><info><title>Views composing the perspective</title></info>
+		<section xml:id="Scheduler_composing_jobs"><info><title>Jobs view</title></info>
+			<para>
+				The main view is obviously the jobs one:
+			</para>
+			<figure xml:id="jobsView"><info><title>Jobs view</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="90%" fileref="images/png/plugin/jobsView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				The control panel (on upper right) is described in the <xref linkend="Scheduler_composing_controlPanel"/>
+			</para>
+			<para>
+				This view is composed of 3 panels that represent respectively pending, running and finished jobs. In each panel you
+				can watch many different information about jobs, like their states, names, IDs, progress...
+				It is also possible to switch between vertical panel presentation and horizontal panel presentation as it will be described later.
+			</para>
+			<para>
+				In each panel, the list of jobs can be ordered by column.
+			</para>
+			<note><para>
+			 You can connect the same existing Scheduler with
+				more than one interface on more than one host if you want to monitor it from different hosts.</para>
+			</note>
+
+		</section>
+
+		<section xml:id="Scheduler_composing_console"><info><title>Console view</title></info>
+			<figure xml:id="consoleView"><info><title>Console view</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="70%" fileref="images/png/plugin/consoleView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This view displays selected job standard and error output (only on demand).
+			</para>
+		</section>
+
+		<section xml:id="Scheduler_composing_tasks"><info><title>Tasks view</title></info>
+			<figure xml:id="tasksView"><info><title>Tasks view</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="85%" fileref="images/png/plugin/tasksView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This view provides a lot of information on every tasks composing a job like:
+				<itemizedlist>
+					<listitem>
+						<para><emphasis>Id</emphasis> - task id generated by the Scheduler</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>State</emphasis> - task status to know if it is finished, running, etc...</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Name</emphasis> - task name given by the user</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Host name</emphasis> - host name on which the task is executed</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Start time</emphasis> - task start time</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Finished time</emphasis> - task finished time</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Re-run</emphasis> -
+							In the column "Re-run", the first number represents how many times the task
+							<emphasis>has already been</emphasis> re-executed, and the second number represents how many times the task <emphasis>can be</emphasis> re-executed
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Description</emphasis> - The user description of the task</para>
+					</listitem>
+				</itemizedlist>
+				</para>
+				<para>
+					In this view, the list of tasks can be ordered by column.
+				</para>
+		</section>
+
+		<section xml:id="Scheduler_composing_info"><info><title>Job Info view</title></info>
+			<figure xml:id="jobInfoView"><info><title>Job Info view</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="55%" fileref="images/png/plugin/jobInfoView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This view provides many informations on the selected job like:
+				<itemizedlist>
+					<listitem>
+						<para><emphasis>Id</emphasis> - job id generated by the Scheduler, can be useful to get the result of your job outside of the GUI.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>State</emphasis> - job status to know if it is pending, running, paused...</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Name</emphasis> - job name given by the user that has submitted this job</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Priority</emphasis> - current job priority (this can be changed to accelerate its execution)</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Pending tasks number</emphasis> - number of pending tasks</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Running tasks number</emphasis> - number of running tasks</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Finished tasks number</emphasis> - number of finished tasks</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Total tasks number</emphasis> - total number of tasks composing the job</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Submitted time</emphasis> - job submitted time</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Started time</emphasis> - job start time</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Finished time</emphasis> - job finished time</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>Description</emphasis> - user description of the job</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		</section>
+
+		<section xml:id="Scheduler_composing_result"><info><title>Result Preview</title></info>
+			<figure xml:id="resultPreviewView"><info><title>Result Preview</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata width="60%" fileref="images/png/plugin/resultPreviewView.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This view displays result of the selected task (selected in task view), according to the ResultPreview field.
+				This preview is powerful because of the generic way that will be used to perform the display.
+				It is possible to redefine the displaying behavior by implementing the <emphasis>ResultPreview</emphasis> abstract class.
+				Using this mechanism, it is possible to use an external tool or soft to display the result like an image viewer for picture
+				(see <xref linkend="Create_task_explanation"/> for details). Here is an example of what can be done:
+			</para>
+			<figure xml:id="resultPreviewView2"><info><title>custom Result Preview</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata  width="50%" fileref="images/png/plugin/resultPreviewView2.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</section>
+
+		<section xml:id="Scheduler_composing_controlPanel"><info><title>Scheduler control panel</title></info>
+			<para>
+				This part explains how to use the control panel available at the top right of the Scheduler.
+				The control panel goal is to manage the different jobs and the Scheduler itself.
+				Let's start with the possibilities offered to a user:
+			</para>
+			<para>
+				<figure xml:id="control_panel"><info><title>Control Panel</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="150%" contentdepth="150%" fileref="images/png/plugin/control_panel.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+			<section xml:id="Scheduler_composing_controlPanel_user"><info><title>User controls</title></info>
+				<itemizedlist>
+					<listitem><para>
+						<emphasis>[1] Connect/Disconnect the Scheduler</emphasis> - use this button to
+						display the "Connect to scheduler" dialog in order to establish a connection to a remote ProActive Scheduler.
+						Once connected this button disconnects the user from the current connected Scheduler.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[2] Switch between vertical and horizontal jobs view</emphasis> - use this button to
+						switch between the view that displays the three list of jobs vertically and the one that
+						displays them horizontally. Horizontal view can be used to see more informations about the listed jobs but
+						less jobs can be seen.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[3] Enlarge the job queue of your choice</emphasis> - use this button to
+						enlarge the queue (pending/running/finished) of your choice. This will display the selected view in
+						the whole space.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[4] Submit a Job from an XML file</emphasis> - use this button to
+						submit a new job to the Scheduler. This action will request you for an XML job descriptor.
+						If you don't know how to create such a descriptor, please refer to <xref linkend="Create_job_xml"/>.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[5] Submit a file containing native commands</emphasis> - use this button to submit a job defined in flat file.
+						If you don't know how to create such a job descriptor, please refer to <xref linkend="flat_file_job"/>.
+						This button opens a wizard for submitting this kind of job (see section  <xref linkend="flat_file_wizard"/>).</para>
+					</listitem>
+					</itemizedlist>
+					<para>
+						For the next actions, note that you can also interact with the jobs that <emphasis>you</emphasis> have submitted (that you own).
+						To use these actions, just select a job and click on the desired button. Multiple selection is allowed.
+					</para>
+					<itemizedlist>
+					<listitem><para>
+						<emphasis>[6] Pause/Resume a Job</emphasis> - use this button to
+						pause a pending or running job, and to resume a paused job. Note that it is not possible to pause a running task.
+						So once a job paused, each running task will be finished. If a task has to restart for any reasons,
+						it will be paused instead of restarted.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[7] Select Job priority</emphasis> - use this button to
+						change the priority of your job. Allowed priorities for a user are:</para>
+						<itemizedlist>
+							<listitem><para>
+								Normal</para>
+							</listitem>
+							<listitem><para>
+								Low</para>
+							</listitem>
+							<listitem><para>
+								Lowest</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+					<listitem><para>
+						<emphasis>[8] View selected job output</emphasis> - use this button to
+						view the selected job output. Job output is in fact the output that comes from the different
+						tasks from both standard output and standard error stream.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[9] Kill the selected job</emphasis> - use this button to
+						kill a job. The job will be terminated immediately, removed from the queue where it was, and its
+						results will be lost.</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					All these actions that can be performed in the control panel can be also executed from the right click context menu.
+					To view the result of your task, select one in the tasks view and the result preview will be displayed automatically.
+				</para>
+			</section>
+			<section xml:id="Scheduler_composing_controlPanel_admin"><info><title>Administrator controls</title></info>
+				<para>
+					All actions allowed in user mode are also allowed in Administrator mode.
+					Moreover, you can execute any action on any job even you are not the owner of this job.
+					It is also possible for an administrator to do the following operations:
+				</para>
+				<itemizedlist>
+					<listitem><para>
+						<emphasis>[6] Select Job priority</emphasis> - use this button to
+						change the priority of a job. Allowed priorities for an Administrator are the same
+						as the user plus the following one:</para>
+						<itemizedlist>
+							<listitem><para>
+								Idle: Priority lower than the 3 User priorities.</para>
+							</listitem>
+							<listitem><para>
+								High: Priority higher than the 3 User priorities.</para>
+							</listitem>
+							<listitem><para>
+								Highest: Highest priority that can be affected.</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+					<listitem><para>
+						<emphasis>[A] Stop the Scheduler</emphasis> - This action places the Scheduler in a mode
+						where no job can be submitted anymore until a restart.
+						Nevertheless, all running tasks will be terminated.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[B] Freeze the Scheduler</emphasis> - The behavior is the same as those of the stop
+						button except that job can still be submitted.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[C] Pause the Scheduler</emphasis> - This action put the Scheduler in a Pause status.
+						Job can be submitted again but no job will go to the running queue. Every running job will terminate.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[D] Resume the Scheduler</emphasis> - Put the Scheduler to the normal scheduling mode, that is, to the Started mode.
+						This action can be performed when the scheduler is Frozen or Paused.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[E] Shutdown the Scheduler</emphasis> - Put the Scheduler in its shutdown sequence.
+						Submitting job is no longer available. It will wait for every pending and running job to be terminated.
+						Once done, the Scheduler will shutdown and disconnect.</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>[F] Kill the Scheduler</emphasis> - Force the Scheduler to terminate immediately.
+						This action kills every task and job, get the resources back to the Resource Manager and kill the Scheduler.</para>
+					</listitem>
+				</itemizedlist>
+			</section>
+		</section>
+		<section xml:id="flat_file_wizard"><info><title>Command file job submission</title></info>
+			<para>Once you have defined a file containing the path to native commands to submit (see <xref linkend="flat_file_job"/>), this wizard allows you to submit it.
+			Main page provides you with a way to specify additional parameters for your job:
+			</para>
+			<para>
+				<figure xml:id="flat_wizard1"><info><title>Control Panel</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata width="60%" fileref="images/png/plugin/flat_wizard1.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+			<para>
+			<itemizedlist>
+					<listitem><para>
+						<emphasis>job name</emphasis> - enter a name for your job.
+						</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>command file</emphasis> - click on browse button for choosing your file containing native commands using a file chooser dialog.
+						This file chooser dialog shows only files suffixed by ".cmd".
+						</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>selection script</emphasis> - click on browse button and choose a selection script to associate to each native task of your job.
+						</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>path for log file</emphasis> - enter a path to a log file that will contain all STDOUT and STDERR of job execution.
+								This file is created (emptied if exits) at each beginning of job execution.
+						</para>
+					</listitem>
+					<listitem><para>
+						<emphasis>Cancel whole job if one of the commands fails</emphasis> - if you check that, the Scheduler will stop all executions of your commands if one fails.
+						Scheduler assumes that a failed native command is a command that has a return code different from 0.
+						</para>
+					</listitem>
+			</itemizedlist>
+			</para>
+			<para>
+			Clicking on  the Next button, you will see a brief summary of your job:
+			</para>
+			<para>
+				<figure xml:id="flat_wizard2"><info><title>Control Panel</title></info>
+					<mediaobject>
+						<imageobject>
+							<imagedata width="60%" fileref="images/png/plugin/flat_wizard2.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+			<para>
+			Click on Finish to launch submission. Native commands are scheduled in parallel.
+			If there are enough free resources (nodes) for every command, all commands will be launched simultaneously.
+			</para>
+		</section>
+	</section>
+</chapter>

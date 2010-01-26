@@ -2,7 +2,6 @@
 <project default="deploy.scheduler" basedir=".">
 	<import file="common-build.xml" />
 	<import file="scheduler-env.xml" />
-	<import file="../doc/scheduler-doc.xml" optional="true"/>
 	<import file="rm-build.xml" />
 
 	<target name="compile.scheduler" depends="compile.rm" description="Compile all Scheduler's stuffs">

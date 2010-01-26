@@ -21,7 +21,7 @@
 
 <xsl:param name="admon.graphics.extension">.png</xsl:param>
 <xsl:param name="admon.graphics" select="0"/>
-<xsl:param name="admon.graphics.path">images/</xsl:param>
+<xsl:param name="admon.graphics.path">images/png/</xsl:param>
 <xsl:param name="admon.style">
   <xsl:text>margin-left: 0.5in; margin-right: 0.5in;</xsl:text>
 </xsl:param>

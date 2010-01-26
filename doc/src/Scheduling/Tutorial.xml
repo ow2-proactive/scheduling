@@ -1,0 +1,1167 @@
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="scheduler_tutorial"><info><title> Scheduler Tutorial</title></info>
+
+
+<section xml:id="Sched_tuto"><info><title>ProActive Scheduler Tutorial</title></info>
+
+	<section xml:id="proactive_scheduler_tutorial_intro"><info><title>introduction</title></info>
+
+		<para>
+		This chapter is a guide on using the ProActive Scheduler.
+		The Scheduler is a tool for deployment, administration and maintenance of a job queue
+		over a Grid or a P2P infrastructure and over various platforms
+		following one of many set of rules regarding the job management.
+		</para>
+		<para>The chapter is structured in the following sections:</para>
+		<itemizedlist>
+		<listitem><para>
+			Scheduler architecture <xref linkend="sched_archi"/></para>
+		</listitem>
+		<listitem><para>
+			Task flow concept: <xref linkend="taskflow_concept"/></para>
+		</listitem>
+<!--
+		<listitem>
+			We will create our first Scheduler job: <xref linkend="first_job"/>
+		</listitem>
+		<listitem>
+			Then we will launch the scheduler and submit the job created:<xref linkend="launching"/>
+		</listitem>
+		</itemizedlist>
+		<para>
+		After we will see some additional functionalities and different kinds of job runnable on the scheduler:
+		</para>
+		<itemizedlist>
+		<listitem>
+			Adding init parameters to a task: <xref linkend="add_parameters"/>
+		</listitem>
+		<listitem>
+			How to pass result of a task to another task: <xref linkend="result_passing_mechanism"/>
+		</listitem>
+-->
+		<listitem><para>
+			Schedule a native executable: <xref linkend="native_job"/></para>
+		</listitem>
+		<listitem><para>
+			Launch Scheduler and submit a job:<xref linkend="launching"/></para>
+		</listitem>
+		<listitem><para>
+			Node selection mechanism: <xref linkend="add_sel_script"/></para>
+		</listitem>
+		<listitem><para>
+			PreScript and PostScript features: <xref linkend="pre_post"/></para>
+		</listitem>
+		<listitem><para>
+			How to generate dynamically a native command to execute,
+			 depending on the node architecture: <xref linkend="command_generator"/></para>
+		</listitem>
+		<listitem><para>
+			Exported Environment variables introduced into the
+			 task's execution environment: <xref linkend="tasks_env_var"/></para>
+		</listitem>
+		</itemizedlist>
+
+<!--		<section xml:id="prerequisites"><info><title>Prerequisites and conventions:</title></info>-->
+		<warning><para>Prerequisites and conventions:</para>
+
+		<para>
+		<itemizedlist>
+		<listitem>
+			<para>
+			You must have an Eclipse 3.2 IDE installed, and the ProActive Project open in your Eclipse.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+			The directory of ProActive in your system project is represented by the tag: <literal>[ProActive_dir]</literal>.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+			You need  a working directory in your system, represented here by <literal>[working_dir]</literal>.
+			</para>
+		</listitem>
+		</itemizedlist>
+		</para></warning>
+<!--		</section>-->
+	</section>
+	<section xml:id="sched_archi"><info><title>Scheduler architecture</title></info>
+
+		<para>
+			The scheduler is made of two main components: the Scheduler and the Resource Manager.
+			Each of them has its own functionality:
+		<itemizedlist>
+		<listitem>
+			<para>
+			The scheduler is in charge of registering jobs submitted
+			and put them in a queue according to a scheduling policy.
+			Then, it has to ask for resources at the Resource Manager,
+			and execute jobs on those retrieved resources.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+			The Resource Manager (RM) handles a set of available resource available for scheduling jobs.
+			It benefits from the Proactive Library, so it can handle resources from LAN,
+			on cluster of workstations, on P2P desktop Grids, or on Internet Grids.
+			Resource Manager provides the scheduler with resources, according to criteria (Operating System, dynamic libraries,
+			Memory...). Resources, at ProActive point of view, are called nodes.
+			Resource Manager therefore supplies ProActive nodes to the Scheduler.
+			</para>
+		</listitem>
+		</itemizedlist>
+		</para>
+
+		<figure xml:id="scheduler_arch"><info><title>Scheduler architecture</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/png/tutorial/arch.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>
+
+
+	<para>
+		These two components (Scheduler and IM) are independent and run as non GUI daemon/service.
+		Thus, they can run on two different hosts.
+	</para>
+</section>
+<section xml:id="taskflow_concept"><info><title>Task-flow Concept</title></info>
+
+	<para> Submit a job to the ProActive Scheduler means submitting a <emphasis role="bold">task flow</emphasis>,
+	which is a set of tasks. A task can be defined as a part of the job, i.e. a step to be executed in the job.
+	Jobs can also be made of different tasks, i.e. different steps to execute.
+	Task is the most little part of a job, the smallest schedulable entity. ProActive Scheduler has
+	computing nodes to execute jobs and basically, it launches an execution
+	of a task on each node. When task is ended, it launches another one and so on and so forth.
+	</para>
+	<section xml:id="task_flow_illust"><info><title>Parallel tasks,  predecessor tasks</title></info>
+
+	<para>
+		When you build your job, you create a graph of tasks, with a definition of predecessor/successor between tasks:
+	</para>
+	<figure xml:id="scheduler_job"><info><title>Scheduler architecture</title></info>
+
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/png/schedulerJob.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+	</figure>
+	<para>
+	In this tasks graph, we see that task 4 is preceded by task 1, that means scheduler waits the end of task 1 execution
+	before launching task 4. In a more concrete way, task 1 could be the calculation of a part of the problem to solve,
+	and task 4 takes result provided by task 1 and compute another step of the calculation.
+	We introduce here the concept of <emphasis role="bold">result passing</emphasis> between tasks, explained later.
+	This relation is called a dependence, and we say that task 4 <emphasis role="bold">depends</emphasis> on task 1.
+	</para>
+	<para>
+	We see that task 1, 2 and 3 are not linked, so these three tasks can be executed in <emphasis role="bold">parallel</emphasis>,
+	because there are independent from each other.
+	</para>
+	<para>
+	Definition of the task-flow graph is made at job definition, before scheduling, and cannot be modified during
+	the job execution, this kind of work flow is called a <emphasis role="bold">static work flow</emphasis>.
+	A task flow job is described in XML language.
+	</para>
+	</section>
+</section>
+
+<!--
+
+
+
+<sect2 id="first_job">
+	<title>Developing my first job</title>
+	<para>
+	In this part we will build a basic job 's example which can be submitted to the scheduler.
+	For the first example we will create a job containing just one task. We have two files to provide:
+		<itemizedlist>
+		<listitem>
+			a Java Class file representing the computing code of the task.
+		</listitem>
+		<listitem>
+			an XML file describing the job (tasks composing the job).
+		</listitem>
+		</itemizedlist>
+	</para>
+
+		<sect3 id="Task_Code.">
+			<title>Task Code</title>
+			<para>
+				We will create a Java class derived from JavaExecutable and containing the primitive execute.
+				This function should be declared to implement the "business code" of the task.
+				When the task is deployed on a resource (a node), this function is called to complete task's objective.
+				Open ProActive project in your Eclipse IDE and create a new Java class called HelloTask.java
+				in the the src/Extensions/org/objectweb/proactive/extensions/scheduler/examples directory.
+				Type in the file the code below:
+			</para>
+			<para>
+			 <emphasis role="bold">project: </emphasis>ProActive
+			</para>
+			<para>
+			 <emphasis role="bold">directory: </emphasis>src/Extensions/org/objectweb/proactive/extensions/scheduler/examples
+			</para>
+			<para>
+			 <emphasis role="bold">file: </emphasis>HelloTask.java
+			</para>
+			<programlisting lang="java">
+package org.objectweb.proactive.extensions.scheduler.examples;
+
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+
+public class HelloTask extends JavaExecutable{
+
+	public Object execute(TaskResult... results) {
+			String result= "HelloWorld task, host: ";
+            result += ProActiveInet.getInstance().getHostname();
+            System.out.println(result);
+		return result;
+	  }
+}
+			</programlisting>
+	<para>
+	In this example, the task says Hello, and display host address of the resource (node) where the task is executed.
+	We see that primitive execute() have TaskResult objects in arguments, and must return an Object,
+	which is considered as the result of the task. these two aspects of the primitive are made
+	for the result passing mechanism between tasks, and will be explained later.
+	</para>
+	<para>
+	Compile these file. You can compile with your eclipse IDE,  or type this command (For Unix systems):
+	</para>
+	<para>
+	<literal>
+	[ProActive_dir]/compile/build compile
+	</literal>
+	</para>
+	<para>
+	If your a are on a windows system, type:
+	</para>
+	<para>
+	<literal>
+	[ProActive_dir]/compile/build.bat compile
+	</literal>
+	</para>
+	</sect3>
+	<sect3 id="XML_description">
+	<title>XML job description</title>
+		<para>
+		Now we need to write an XML file which describe the job.
+		In this XML file we specify tasks composing the job, and the "predecessor/successor" orders in tasks.
+		Create a file job_HelloWorld.xml in your [working_dir],
+		and type the XML description of our simple Hello World job example.
+		</para>
+		<para>
+		<emphasis role="bold">directory: </emphasis><literal>[working_dir]</literal>.
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis>job_HelloWorld.xml
+		</para>
+		<programlisting lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/java_job_1_task.xml"></textdata></textobject>
+		</programlisting>
+		<para>
+	<emphasis role="bold">Job tag:</emphasis>
+	</para>
+	<para>
+	Specifies XML schema related to a job descriptor: schedulerjob.xsd
+	Job have a specified name (here "Job_Hello").
+	We specify the scheduling priority of the job, there are tree priority levels: lowest, low, normal (for the user, actually there are five levels,
+	but the two other levels, high and highest, can only be setted by scheduler's administrator).
+	We specify a log file for the Job (don't forget to replace <literal>[working_dir]</literal> by the path of your “real” working directory. standard and error outputs of All tasks are written in this file.
+	</para>
+	<para>
+	<emphasis role="bold">Description tag of the job: </emphasis>
+	</para>
+	<para>
+	A literary description of the job.
+	</para>
+	<para>
+	<emphasis role="bold">Taskflow tag:</emphasis>
+	</para>
+	<para>
+	Specifies that the job is made of tasks that need to be executed in a certain order.
+	This is not very interesting here because we have just one task ! (This Scheduler tutorial presents only this kind of job).
+	</para>
+	<para>
+	<emphasis role="bold">Task tag:</emphasis>
+	</para>
+	<para>
+	specifies task of the job. The task name (here "hello") is used to
+	identify the task from each other in the job, this parameter is mandatory
+	and must be unique for each task in the XML job descriptor.
+	Parameter preciousResult="true" is here to said that the task's result
+	is needed and have to be recoverable at end the of the job.
+	Taskflow specification in job descriptor will be explained later.
+	</para>
+	<para>
+	<emphasis role="bold">Description tag of the task:</emphasis>
+	</para>
+	<para>
+	A literary description of the task.
+	</para>
+	<para>
+	<emphasis role="bold">javaExecutable tag:</emphasis>
+	</para>
+	<para>
+	In this tag we will define the kind of the task to schedule,
+	and where is "the business code", developed earlier.
+	So our task is a Java process and the class name of the task is
+	org.objectweb.proactive.extensions.scheduler.examples.HelloTask.
+	</para>
+	<para>
+	Now our job is defined and ready to be scheduled !
+	</para>
+	</sect3>
+</sect2>
+<sect2 id="add_parameters">
+	<title>Adding init parameters to the task</title>
+	<para>
+	We can specify “init" parameters for a task, these parameters are specified in the XML descriptor,
+	and are then available for the task. Let's add to our example an integer parameter
+	which specify how many times the task has to say “hello”.
+	</para>
+	<sect3 id="xml_desc_add_para">
+		<title>XML job description</title>
+		<para>
+		<emphasis role="bold">directory: </emphasis><literal>[working_dir]</literal>.
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis>job_HelloWorld.xml
+		</para>
+		<programlisting lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/java_job_1_task_with_param.xml"></textdata></textobject>
+		</programlisting>
+		<para>
+		We can see the new tag <emphasis role="bold">&lt;Parameters&gt;</emphasis> with its child “parameter”,
+		included in the javaExecutable tag. A parameter is made of a name (identifier) and a value.
+		You can specify as parameters as you need.
+		</para>
+	</sect3>
+	<sect3 id="get_params">
+		<title>Getting parameters in the task code</title>
+	<para>
+		Complete java code of the task as below:
+	</para>
+	<para>
+			<emphasis role="bold">project: </emphasis>ProActive
+			</para>
+			<para>
+			 <emphasis role="bold">directory: </emphasis>src/Extensions/org/objectweb/proactive/extensions/scheduler/examples
+			</para>
+			<para>
+			 <emphasis role="bold">file: </emphasis>HelloTask.java
+			</para>
+			<programlisting lang="java">
+package org.objectweb.proactive.extensions.scheduler.examples;
+
+import java.util.Map;
+
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+
+public class HelloTask extends JavaExecutable{
+
+	private int hello_number;
+
+	public void init(Map&lt;String, Object&gt; args) {
+	   if (args.containsKey("hello_number")){
+	       try {
+			hello_number =
+			Integer.parseInt(args.get("hello_number").toString());
+	       } catch (NumberFormatException e) {
+	       }
+	   }
+	}
+
+	public Object execute(TaskResult... results) {
+		String result="";
+		for(int i=0; i&lt;this.hello_number; i++)
+		{
+			result += "HelloWorld task, host: "+
+			ProActiveInet.getInstance().getHostname()+"\n";
+		}
+        System.out.println(result);
+		return result;
+	  }
+}
+			</programlisting>
+			<para>
+			We have implemented the init() function, which have in argument a Java HashMap object
+			containing init parameters, so parameters are available by their names given in the XML descriptor.
+			</para>
+
+	</sect3>
+</sect2>
+<sect2 id="result_passing_mechanism">
+	<title>result passing mechanism</title>
+	<para>
+	Now we will complete our HelloWorld example, we will create a task flow made of two tasks
+	(called "Hello1" and "Hello2"), and the second task Hello2, will be executed after the termination
+	of the Hello1 task. We will see the mechanism of results passing between two tasks,
+	for example the Hello1 task will give a String with its execution date to the Hello2 task.
+	</para>
+	<sect3 id="task_flow_job_desc">
+		<title>XML job description</title>
+		<para>
+		<emphasis role="bold">directory: </emphasis><literal>[working_dir]</literal>.
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis>job_HelloWorld.xml
+		</para>
+		<programlisting lang="xml"><textobject><textdata fileref="scheduler/job_descriptors/java_job_2_task.xml"></textdata></textobject></programlisting>
+		<para>
+		The job is made of two tasks. We can see that first task Hello1 hasn't got a precious
+		result anymore, but task Hello2  has it. A task-flow job must have at least one task
+		with a preciousResult parameter set true. We can see in Hello2 task description a new Tag
+		called <emphasis role="bold">&lt;depends&gt;</emphasis> which specify a list of tasks that have to be executed and terminated before task execution. So here, Hello2 task can be launched only if Hello1 task is terminated.
+		</para>
+		<para>
+		We can see a new parameter in job tag: cancelOnError="false". The job continues even
+		if a problem occurred on a task. With this parameter set to true, the whole job is aborted
+		if an error occurs on a task.
+		</para>
+		<para>
+		The two tasks launch the same Java process. Let's complete our HelloTask.java file.
+		</para>
+</sect3>
+<sect3 id="result_passing_task_code">
+		<title>Task Code </title>
+	<para>
+		Complete java code of the task as below:
+	</para>
+	<para>
+			 <emphasis role="bold">project: </emphasis>ProActive
+			</para>
+			<para>
+			 <emphasis role="bold">directory: </emphasis>src/Extensions/org/objectweb/proactive/extensions/scheduler/examples
+			</para>
+			<para>
+			 <emphasis role="bold">file: </emphasis>HelloTask.java
+			</para>
+			<programlisting lang="java">
+package org.objectweb.proactive.extensions.scheduler.examples;
+
+import java.util.Date;
+
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+
+public class HelloTask extends JavaExecutable{
+
+	public Object execute(TaskResult... results) throws Throwable{
+		String predecessor_result=null;
+		String result="";
+
+		try{
+			//get results of predecessors tasks
+			for (TaskResult res: results)
+				predecessor_result = ((String)res.value());
+			}
+			catch (Throwable e){
+				   throw new Throwable("getting task input failed",e);
+			}
+
+			if(predecessor_result !=null)
+				result= "my predecessor has send : "+ predecessor_result + "\n";
+
+			result+= "HelloWorld task, "+ new Date().toString() + " host: "
+			+ProActiveInet.getInstance().getHostname()+"\n";
+			System.out.println(result);
+			return result;
+		  } //execute()
+}
+			</programlisting>
+			<para>
+			We access to results of predecessor tasks by the TaskResult array in input of execute() primitive.
+			This array have a size corresponding to the number of predecessor tasks defined in the job.
+			Each member of this array is a Java Object, and is accessible by the TaskResult.value() primitive.
+			</para>
+			<para>
+			It's interesting to see the "throw Throwable" added to the primitive execute,
+			and the try/catch blocks. When we access to result of the previous task,
+			this result could be result of a task which has failed on its execution. When an error occurs on a task,
+			task 's result is a Java Throwable object. That's why we have added a try/catch block for accessing
+			to the TaskResult array, because one these results could be an error.
+			The method which throws a Throwable is TaskResult.value(), you can verify if result is an exception
+			by using TaskResult.hadException() method which returns a boolean, set to true if result is an error.
+			</para>
+			<para>
+			So the catch block here is the way to implement what to do when a predecessor task has failed.
+			We have chosen here to throw again a Throwable which wrap the first Throwable received.
+			</para>
+			<para>
+			If you don't want to be annoyed with error management, you can just let the "throw Throwable" clause
+			in the execute primitive, and suppress the try/catch block. If your access to a value of the TaskResult object
+			(input of the primitive) which throws any Throwable, this Throwable will be automatically forwarded to the next tasks.
+			</para>
+			<para>
+			If you set cancelOnException="true" in the XML descriptor of the job, any Throwable (or exception)
+			launched by the primitive execute of a task will cancel the whole job.
+			</para>
+	</sect3>
+</sect2>
+-->
+
+<section xml:id="native_job"><info><title>Schedule a native task</title></info>
+
+	<para>
+	The scheduler provides the possibility to launch jobs containing tasks which are native executables,
+	like a C/C++ program. The following example is a native C executable called nativTask which
+	displays ten dots, waiting a number of seconds given in argument between each display.
+	</para>
+	<section xml:id="native_c_code"><info><title>Native C code of the task</title></info>
+
+	<para>
+		Complete native C code of the task:
+	</para>
+	<para>
+			<emphasis role="bold">project: </emphasis>ProActive
+			</para>
+			<para>
+			 <emphasis role="bold">directory: </emphasis>descriptors/deployments/scheduler/jobs/job_native_linux
+			</para>
+			<para>
+			 <emphasis role="bold">file: </emphasis>nativTask.c
+			</para>
+			<programlisting language="c"><textobject><textdata fileref="code_snippets/native_code_c.txt"/></textobject></programlisting>
+			<para>
+			You have also an unix compiled version of this program named nativTask in the same directory. Compile the native code above (or take the already compiled version), and place the executable in your <literal>[working_dir]</literal>.
+			Now, you need to write an XML file which describes the job.
+			</para>
+	</section>
+	<section xml:id="native_job_desc"><info><title>XML job description</title></info>
+
+		<para>
+		<emphasis role="bold">directory: </emphasis><literal>[working_dir]</literal>.
+		</para>
+		<para>
+		In this XML file, tasks composing the job and the "predecessor/successor" orders are specified.
+		Create a file job_HelloWorld.xml in your [working_dir]
+		and write the following code:
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis>job_native.xml
+		</para>
+		<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/native_job.xml"/></textobject></programlisting>
+		<para>
+		<emphasis role="bold">Job tag:</emphasis>
+		</para>
+		<para>
+		Here are attribute functions:
+		</para>
+		<para>
+		<itemizedlist>
+			<listitem>
+				<para>
+				<emphasis>schemaLocation</emphasis> - XML schema related to a job descriptor.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				<emphasis>name</emphasis> - name of the job.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				<emphasis>priority</emphasis> - priority of the job.
+				</para>
+				<para>
+				There are tree priority levels: lowest, low, normal. Actually, there are five levels,
+		but the two other levels (high and highest) can only be setted by the administrator of the scheduler.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+				<emphasis>logFile</emphasis> - path of the log file.
+				</para>
+				<para>
+				Standard and error outputs of all launched native programs are written in this file.
+				You can notice the use of the ${EXE_PATH} variable. That will be explained later.
+				</para>
+			</listitem>
+		</itemizedlist>
+		</para>
+		<para>
+		<emphasis role="bold">Variables tag:</emphasis>
+		</para>
+		<para>
+		In this tag, the directory path variable called “EXEC_PATH” has been defined.
+		Thus, ${EXEC_PATH} represents the string defined in this variable.
+		This a convenient way for not repeating strings and for doing changes rapidly.
+		</para>
+		<para>
+		<emphasis role="bold">Description tag: </emphasis>
+		</para>
+		<para>
+		A literary human readable description of the job.
+		</para>
+		<para>
+		<emphasis role="bold">Taskflow tag:</emphasis>
+		</para>
+		<para>
+		Specifies that the job is made of tasks that need to be executed in a certain order.
+		</para>
+		<para>
+		<emphasis role="bold">Task tag:</emphasis>
+		</para>
+		<para>
+		Specifies a task of the job. The task name is used to
+		identify the task from the others. This parameter is mandatory
+		and has to be unique in the XML job descriptor.
+		The parameter preciousResult="true" precises that the result
+		is needed and have to be retrieved at the end of the job.
+		The task2 task contains a tag
+		called <emphasis role="bold">&lt;depends&gt;</emphasis> which specifies a list of tasks that have to be executed
+		and terminated before the execution of the task2. Therefore, task2 can be launched only if task1 is terminated.
+		</para>
+		<para>
+		<emphasis role="bold">Description tag of the task:</emphasis>
+		</para>
+		<para>
+		A literary description of the task.
+		</para>
+		<para>
+		<emphasis role="bold">nativeExecutable tag:</emphasis>
+		</para>
+		<para>
+		This tag is used in order to specify that the task is an execution of a native program.
+		This tag has a sub-tag called staticCommand whose value represents the command to be executed.
+		This sub-tag also contains a arguments tag where command parameters are written.
+		Thus, you can specify parameters for execution as if you write parameters in a command line.
+		</para>
+		<para>
+		Now the job is defined and ready to be scheduled!
+		</para>
+	</section>
+</section>
+<section xml:id="launching"><info><title>Launch the scheduler, submit a job and retrieve the result</title></info>
+
+	<para>
+	In this part, you will learn how to launch the Scheduler program and submit your job made of the two native tasks.
+	Two ways of launching the Scheduler will be exposed: a simple one which enables you to directly submit a job without worrying by the nodes handling and another one which is more flexible but a little bit longer.
+	These actions are performed by scripts located into the directory:
+	<code>[Scheduler_Home_Dir]/bin/[OS]/</code>
+	</para>
+	<para>
+	<note><para>We assume in the whole section that we are working on a Unix system. However, scripts for windows with the .bat extension are also available.</para></note>
+	</para>
+
+
+	<section xml:id="launch_sched"><info><title>Launch the scheduler (easy way)</title></info>
+
+	<para>
+	This way of doing enables you to launch a scheduler without manually launching a Resources Manager before and adding nodes to it. It uses either the <emphasis>scheduler-start</emphasis> script or the <emphasis>scheduler-start-clean</emphasis> one.
+	Type the following command:
+	</para>
+	<para>
+	<code>$ scheduler-start[-clean] -u //localhost/</code>
+	</para>
+	<para>
+	The <emphasis>"-u URL"</emphasis> option specifies the location of a running Resource Manager.
+	If you don't specify a URL for the RM, the Scheduler will first try to connect to a local Resource Manager (at the address <code>//localhost/</code>)
+	and if it cannot find one, it will create a new one.
+	You can choose either to use the previous database if you have already launched a scheduler before and to create a new one using the scheduler-start-clean script.
+	This script will launch the Scheduler service, and the Scheduler will connect
+	to the Resource Manager which has been previously launched.
+	Once started, you can see on the standard output the line:
+	</para>
+	<para>
+	<code>Scheduler successfully created on rmi://hostname:port/</code>
+	</para>
+	</section>
+
+	<section xml:id="launch_RM"><info><title>Launch the Resource Manager and then the Scheduler (flexible way)</title></info>
+
+	<para>
+	Launching the Resource Manager before the Scheduler gives you more flexibility. To do this, you have first to use the <emphasis>rm-start</emphasis> script.
+	Type:
+	</para>
+	<para>
+	<code>$ rm-start</code>
+	</para>
+	<para>That will start a Resource Manager with no node.
+	Once started, you can see on the standard output the line:</para>
+	<para>
+		<code>
+			Resource Manager successfully created on rmi://hostname:port/
+		</code>
+	</para>
+	<para>
+	Then, you can add as many nodes as you want.
+	For this, you have to use both the <emphasis>rm-start-node</emphasis> and the <emphasis>rm-admin</emphasis> scripts.
+	So, you first have to start a new node. Type the following command to start a node called 'MyNode':
+	</para>
+	<para>
+		<code>rm-start-node MyNode</code>
+	</para>
+	<para>
+		You can see that your node has well been created and started when the line hereafter has been displayed:
+	</para>
+	<para>
+		<code>
+			OK. Node MyNode ( rmi://hostname:port/MyNode )  is created in VM id=5530b46abee98f42:-633de542:120c87e3365:-8000
+		</code>
+	</para>
+	<para>
+	Now, you are ready to add this node to the Resource Manager. Type:
+	</para>
+	<para>
+		<code>rm-admin -a rmi://hostname:port/MyNode</code>
+	</para>
+	<para>
+	In order to have the right to use this command, you have to use the login and the password of an administrator. By default, an administrator whose login is <emphasis>jl</emphasis> and whose password is also <emphasis>jl</emphasis> is defined. After this operation, you can see the line:</para>
+	<para>
+		<code>
+	Adding node 'rmi://hostname:port/MyNode' request sent to Resource Manager
+		</code>
+	</para>
+	<para>
+	This line indicates that your node has well been added to the RM.
+	You can also check all the nodes of your Resource Manager by typing:
+	</para>
+	<para>
+		<code>rm-admin -ln</code>
+	</para>
+	<para>
+	Finally, it just remains to launch the Scheduler as it was done in <xref linkend="launch_sched"/>. The Scheduler will automatically look for an existing Resource Manager first. It will therefore find the one you have launched and use it. If you have launched the Resource Manager on a host different from those on which you want to start the Scheduler, you have to precise its URL to the 'scheduler-start' script.
+	</para>
+	<para>
+	There is also another way to start the Resource Manager directly with nodes using a deployment descriptor file.
+	Please refer to the ProActive documentation at
+    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/index.php?page=documentation" />
+	to have more information about deployment/acquisition of nodes with the ProActive library.
+	Such a deployment descriptor file is given in <code>[Scheduler_Home_Dir]/config/rm/deployment/Local4JVMDeployment.xml</code>. It is the file which is used when you proceed by the easy way.
+	You can create your own deployment file and, then type the following line (with you own file) to start the RM:
+	</para>
+	<para>
+		<code>rm-admin -d ../../config/rm/deployment/Local4JVMDeployment.xml</code>
+	</para>
+	<para>
+	This command is strictly equivalent to this one:
+	</para>
+	<para>
+		<code>rm-admin -localNodes</code>
+	</para>
+	<note><para>The command <emphasis>rm-admin</emphasis> can also be used in iteractive mode. Just type <code>rm-admin</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
+	</section>
+
+	<section xml:id="submission"><info><title>Submit the job</title></info>
+
+	<para>
+	Finally, submit your job using the <emphasis>scheduler-user</emphasis> script. This script can be used not only for submitting a job, but also, for instance, for retrieving a result (see <xref linkend="retrieve_result"/>).
+	Type <code>scheduler-user -h</code> to find out all you can do wiht this script.
+	</para>
+	<para>
+	For submitting your job, type the following line:
+	</para>
+	<para>
+		<code>scheduler-user -l user1 -submit ../../samples/jobs_descriptors/Job_nativ.xml</code>
+	</para>
+	<para>
+		The <emphasis>"-submit ../../samples/jobs_descriptors/Job_nativ.xml"</emphasis> option specifies that you want to submit a job whose xml description file is ../../samples/jobs_descriptors/Job_nativ.xml. As for the <emphasis>"-l user1"</emphasis> option, it specifies the login to use.
+		By default, a login "user1" exists and its password is "pwd1". If no login is given to the script, a prompt will ask one and, in both cases (with or without specified login), the password will be asked to you.
+	</para>
+	<para>
+	Once done, you can see the line <code>Job successfully submitted ! (id=1)</code> which informs you that your job has well been submitted and gives you its ID (1 in this example).
+	This ID will be used for retrieving the result of the job.
+	</para>
+	</section>
+	<section xml:id="retrieve_result"><info><title>Retrieving the result</title></info>
+
+	<para>
+	When the scheduling of a job is finished, scheduler stores its result and waits for the user to retrieve it.
+	As it has already been said, the <emphasis>scheduler-user</emphasis> script is used to retrieve results.
+	Launch on scheduler host this following command
+	(still into the <code>[Scheduler_Home_Dir]/bin/[OS]/</code> directory):
+	</para>
+	<para>
+		<code>$ scheduler-user -l user1 -result ID</code>
+	</para>
+	<para>
+		Type the user1's password.
+		The job result is then displayed:
+	</para>
+	<para>
+	<code>Job 1 Result =&gt;</code>
+	</para>
+	<para>
+	<code>      task1: 0</code>
+	</para>
+	<para>
+   <code>      task2: 0</code>
+	</para>
+	<para>
+	You have two return codes of the native programs.
+	</para>
+	<para>
+	If you want to see the output of your job, you can use the <emphasis>scheduler-user</emphasis> script with the <emphasis>output</emphasis> option.
+	Type:
+	</para>
+	<para>
+		<code>$ scheduler-user -l user1 -output ID</code>
+	</para>
+	<note><para>In the same way that for the command <emphasis>rm-admin</emphasis>, you can also use the command <emphasis>scheduler-user</emphasis> in interactive mode. Just type <code>scheduler-user</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
+	</section>
+	</section>
+	<section xml:id="sched_gui"><info><title>Using the GUI client application for job submission</title></info>
+
+	<para>
+		An RCP graphical user interface exists for jobs submition and results consultation.
+		Download the <emphasis>Scheduler RCP Client</emphasis> from
+    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.activeeon.com/downloads.html">http://www.activeeon.com/downloads.html</uri> and uncompress the application.
+		Then, go to the Scheduler directory of uncompressed files, and launch the program:
+	</para>
+	<para>
+	<code>$ ./Scheduler </code>
+	</para>
+	<para>
+	You should have a window like this:
+	</para>
+	<figure xml:id="rcp_startup"><info><title>Scheduler GUI Client on startup</title></info>
+
+		<mediaobject>
+		<imageobject>
+		<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/png/tutorial/rcp_startup.png" format="PNG"/>
+		</imageobject>
+	</mediaobject>
+	</figure>
+	<para>
+	Right click to open connection dialog, and fill fields as follows:
+	</para>
+	<figure xml:id="rcp_connect"><info><title>connection window of Scheduler GUI</title></info>
+
+		<mediaobject>
+		<imageobject>
+		<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/png/tutorial/connect.png" format="PNG"/>
+		</imageobject>
+	</mediaobject>
+	</figure>
+	<para>
+	Once connected to the Scheduler, you can see a first
+	glimpse of the Scheduler activity. You have on the top left the list of pending jobs,
+	on the top middle the list of currently running jobs with a progress bar, and on the top right the
+	list of finished jobs which are waiting to be retrieved by their submitters.
+	</para>
+	<para>
+	Now Launch again your job developped earlier,
+	right click in a blank area and <emphasis role="bold">choose submit a job: </emphasis>
+	</para>
+	<figure xml:id="rcp_submit"><info><title>Context menu</title></info>
+
+		<mediaobject>
+		<imageobject>
+		<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/png/tutorial/context_menu.png" format="PNG"/>
+		</imageobject>
+	</mediaobject>
+	</figure>
+
+	<para>
+	This action creates a file explorer window. Go to your <code>[working_dir]</code>,
+	and double click on <code>job_native.xml</code>. The job is then submitted.
+	</para>
+	<para>
+	You can see your job staying in pending jobs area, which corresponds to the waiting queue.
+	Then you can see your job's execution until it finally comes to the finished jobs list.
+	Execution is then terminated. Note that you can submit several jobs at the same time.
+	</para>
+	<para>
+	If you click on the job line, you have at the bottom right of the interface,
+	a description of the job, its execution time and a brief description.
+	There is also in the task tab the list of tasks composing the jobs.
+	Clicking on task's line, you will see on tab right below, the result obtained by the task.
+	</para>
+	</section>
+</section>
+<section xml:id="add_sel_script"><info><title>Adding a selection script to the task</title></info>
+
+		<para>
+		A very useful functionality is the possibility to add a selection script to a task.
+		This selection script provides ability for the scheduler to find and select a node
+		respecting criteria for the good execution of a task. Let's complete our previous nativ
+		job example with a verification script, specifying that the executable nativTask must be
+		executed on a Unix/Linux system.
+		</para>
+		<section xml:id="add_sel_script_xml_code"><info><title>XML job description</title></info>
+
+		<para>
+		Complete your xml job descriptor as follows:
+		</para>
+		<para>
+		<emphasis role="bold">directory: </emphasis><code>[working_dir]</code>.
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis><code>job_native.xml</code>
+		</para>
+		<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/job_native_with_s_script.xml"/></textobject></programlisting>
+		<para>
+		We can see in the two tasks definitions, after the task's description,
+		that there is a new “selection” tag which contains a path to a Javascript file.
+		When the task is executed, the scheduler will launch this script to nodes,
+		and will select a node that has answered "yes" at the execution of this script and
+		then will deploy the task to this node.
+		</para>
+		</section>
+		<section xml:id="select_script_js"><info><title>Code of the node selection Javascript</title></info>
+
+		<para>
+		Create in your <code>[working_dir]</code> a file as follows:
+		</para>
+		<para>
+		<emphasis role="bold">directory: </emphasis><code>[working_dir]</code>.
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis><code>check_unix_os.js</code>
+		</para>
+			<programlisting language="java">
+importPackage(java.lang);
+
+if(System.getProperty("os.name").contains("Windows"))
+	selected=false;
+else
+	selected=true;
+			</programlisting>
+		<para>
+		There is just one rule to know for verifying scripts creation: the script has to contain a variable
+		named "<emphasis role="bold">selected</emphasis>" which has to be setted to true or false at the end of script execution.
+		Node selection mechanism is simple: Scheduler asks to Resource Manager one or several nodes that verify that script.
+		So Resource Manager will execute this script on its nodes. If after execution, one of its node has its "selected" variable set to true,
+		Resource manager considers that this node verify selection script and gives node to scheduler
+		which will execute the task on it.
+		If a node return "selected" variable set to false,
+		Resource manager will try to provide scheduler with another node which validates this selection script.
+		</para>
+		</section>
+
+</section>
+<section xml:id="pre_post"><info><title>PreScript and PostScript</title></info>
+
+		<para>
+		Another functionality is the possibility to define pre and post scripts.
+		For a given task (Java task or native task), it is possible to launch a script before
+		and after its execution. This possibility can be useful to copy files to a node,
+		or clean a directory before or after task execution, for example. This is a way to separate from business code the preparation of execution environment and its cleaning.
+		This section proposes you to add to your native job example a script which removes a list of files from a specified directory.
+		</para>
+		<section xml:id="pre_post_script_xml_code"><info><title>XML job description</title></info>
+
+		<para>
+		Complete your xml job descriptor as follows:
+		</para>
+		<para>
+		<emphasis role="bold">directory: </emphasis><code>[working_dir]</code>
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis><code>job_native.xml</code>
+		</para>
+				<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/pre_post_script.xml"/></textobject></programlisting>
+		</section>
+
+		<section xml:id="java_script_code"><info><title>Code of the removing files Javascript</title></info>
+
+		<para>
+		Create in your <code>[working_dir]</code> a file as follows:
+		</para>
+		<para>
+		<emphasis role="bold">directory: </emphasis><code>[working_dir]</code>
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis><code>remove_files.js</code>
+		</para>
+			<programlisting language="java">
+importPackage(java.io);
+print("clean working directory \n");
+for(i=0; i&lt;args.length;i++)
+{
+	var f= new File(args[i]);
+	if(f["delete"]()) {
+		print(args[i] +" deleted\n");
+	} else {
+		print("deleting "+ args[i] +" failed\n");
+        }
+}
+			</programlisting>
+
+		<para>
+		Create in your [working_dir] two files 1.tmp and 2.tmp, and execute the job.
+		You will see that 1.tmp is removed just  before task starting, and 2.tmp is removed at task's end.
+		</para>
+		</section>
+
+
+		<section xml:id="fthelpers"><info><title>File Transfer Helpers to be used from scripts</title></info>
+		<para>
+		The package <emphasis role="bold">org.ow2.proactive.scripting.helper.filetransfer</emphasis> provides several file transfer drivers that
+		can be used in the pre and post scripts. SCP, SFTP and FTP protocols are implemented.
+		You just have to specify, in the script code, the protocol to be used and, optionally, the implementation
+		(if several implementations are available for the given protocol).
+		</para>
+		<para>
+		Here is an example of a script that copies a set of files from a remote host to a local folder.
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis><code>getFiles.js</code>
+		</para>
+		<programlisting language="java">
+		      <textobject>
+				     <textdata fileref="code_snippets/getFiles.js"/>
+		     </textobject>
+	    </programlisting>
+
+		<para>
+		 The commented lines in the "Define Driver to be used for file transfer" section in the script shows how one can
+		 choose between different protocols and implementations.
+		</para>
+		<para>
+		 This script, as well as a putFiles.js script can be found in the samples/scripts/filetransfer folder of the Scheduler Project.
+		</para>
+		</section>
+
+</section>
+<section xml:id="command_generator"><info><title>Command generator script</title></info>
+
+	<para>
+	You have seen that a native task can be launched by the scheduler on different operating systems,
+	unix or Windows for example. That is because Resource Manager can handle nodes from different computer
+	architectures. You have also seen the possibility to select nodes compatible with the native task to execute.
+	But you can also adapt the native command to execute, corresponding to the node that Resource manager has provided.
+	 ProActive Scheduler provides the possibility to dynamically generate the native command to launch for a task.
+	 This functionality is convenient if you have versions of your native program for different OS,
+	 or different versions of the native executable, optimized for dynamic libraries which differ from a host to another.
+	</para>
+	<para>
+	This section shows you how to develop a job with a task able to launch our native executable “nativTask” on windows system or
+	on a UNIX system. First compile and build nativTask.c on a windows system in order to have a Windows specific
+	version. Let's implement a task with a command generator.
+	</para>
+		<section xml:id="cmd_generator_code"><info><title>XML job description</title></info>
+
+		<para>
+		Complete your xml job descriptor as below:
+		</para>
+		<para>
+		<emphasis role="bold">directory: </emphasis><code>[working_dir]</code>.
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis><code>job_native.xml</code>
+		</para>
+			<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/command_generator.xml"/></textobject></programlisting>
+		</section>
+		<section xml:id="cmd_generator_code_script"><info><title>Code of the command generator script</title></info>
+
+		<para>
+		Create in your <code>[working_dir]</code> a file as follows:
+		</para>
+		<para>
+		<emphasis role="bold">directory: </emphasis><code>[working_dir]</code>.
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis><code>commandGenerator.js</code>
+		</para>
+			<programlisting language="java">
+importPackage(java.lang);
+
+if(System.getProperty("os.name").contains("Windows"))
+command="c:\nativTask.exe"
+else
+command="[working_dir]/nativTask"
+		</programlisting>
+		<para>
+		The script gets the OS type and build a command corresponding to it.
+		A generation script has to define a variable named “command” which contains the native
+		command to execute. That is the only rule to respect. Then, scheduler will get this variable
+		and execute the native command defined by the Javascript.
+		</para>
+		</section>
+</section>
+
+<section xml:id="tasks_env_var"><info><title>Using exported environment variables</title></info>
+
+	<para>
+	Each job has a specified name in its deployment descriptor as well as a unique job ID given at the moment of job's submission.
+	All tasks have these two same parameters specified at the same time. You can access to these values in task's execution environment, during task's execution.
+	When a native task is launched, the task has also 4 exported environment variables:
+	</para>
+	<itemizedlist>
+		<listitem><para>
+			<emphasis role="bold">$PAS_JOB_NAME</emphasis> - Job's name defined in its XML descriptor</para>
+		</listitem>
+		<listitem><para>
+			<emphasis role="bold">$PAS_JOB_ID</emphasis> - unique job's ID given at submission time.</para>
+		</listitem>
+		<listitem>		<para>
+			<emphasis role="bold">$PAS_TASK_NAME</emphasis> - name of the task currently
+			 launched (name defined in XML descriptor).</para>
+		</listitem>
+		<listitem><para>
+			<emphasis role="bold">$PAS_TASK_ID</emphasis> - unique task's ID.</para>
+		</listitem>
+	</itemizedlist>
+
+	<para>
+	Now you will submit a native executable which produces a file in output.
+	The following example launches in parallel 4 executions of a native C executable which takes an integer in parameter
+	and produces a file named output.txt in its current (launching) directory.
+	If you launch simultaneously several executions instances, it will produce a collision in file output, because the different execution instances
+	will create and write into the same file in the same directory. As you don't want to be annoyed by creation of
+	directories for each execution instance, this job provides a launcher.sh Unix shell which performs
+	these operations automatically. launcher.sh creates before launching the executable, a temporary  dir for each task,
+	its name corresponds to current task's ID environment exported variable. So this job is made of a XMl job descriptor, a native executable,
+	and shell script which performs the launching.
+	</para>
+	<section xml:id="xml_file_output"><info><title>XML job description</title></info>
+
+		<para>
+		Create a new  xml job descriptor and complete as follows:
+		</para>
+		<para>
+		<emphasis role="bold">directory: </emphasis><code>[working_dir]</code>.
+		</para>
+		<para>
+		<emphasis role="bold">file: </emphasis><code>job_file_output.xml</code>
+		</para>
+			<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/job_file_output.xml"/></textobject></programlisting>
+	</section>
+	<section xml:id="native_c_code_exec"><info><title>Native C code of the executable which produces an output file</title></info>
+
+	<para>
+		Create your native C executable with the code below:
+	</para>
+	<para>
+			<emphasis role="bold">project: </emphasis><code>ProActive</code>
+			</para>
+			<para>
+			 <emphasis role="bold">directory: </emphasis><code>descriptors/deployments/scheduler/jobs/job_native_linux_file_output</code>
+			</para>
+			<para>
+			 <emphasis role="bold">file: </emphasis><code>nativTask.c</code>
+			</para>
+			<programlisting language="c"><textobject><textdata fileref="code_snippets/file_output_exe.txt"/></textobject></programlisting>
+			<para>
+			You have also a unix compiled version of this program, named <code>task_with_output</code>, in the same directory.
+			</para>
+	</section>
+	<section xml:id="launching_shell_script_code"><info><title>Launching shell script</title></info>
+
+	<para>
+			Finally, write your launching Shell:
+	</para>
+	<para>
+			<emphasis role="bold">project: </emphasis><code>ProActive</code>
+			</para>
+			<para>
+			 <emphasis role="bold">directory: </emphasis><code>descriptors/deployments/scheduler/jobs/job_native_linux_file_output</code>
+			</para>
+			<para>
+			 <emphasis role="bold">file: </emphasis><code>launcher.sh</code>
+			</para>
+			<programlisting><textobject><textdata fileref="code_snippets/launcher_sh.txt"/></textobject></programlisting>
+			<para>
+			Copy your compiled executable (<code>task_with_output</code>) and your launching shell script, and submit this job.
+			You will see, after job's execution, 4 directories created in your <code>[working_dir]</code> named by the 4 tasks ID of your execution,
+			and directories contains a file, <code>output.txt</code>, corresponding to outputs of the 4 execution instances launched by the job.
+			</para>
+	</section>
+</section>
+</chapter>

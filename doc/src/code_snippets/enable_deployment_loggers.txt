@@ -1,3 +1,0 @@
-log4j.logger.proactive.deployment = DEBUG, CONSOLE
-log4j.logger.proactive.deployment.log = DEBUG, CONSOLE
-log4j.logger.proactive.deployment.process = DEBUG, CONSOLE

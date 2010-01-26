@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager_plugin"><info><title>Resource Manager's Eclipse Plugin</title></info>
+<!--  <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "../docbook.dtd">  -->
+	<para>
+		<emphasis role="bold">
+		Resource Manager Eclipse Plugin</emphasis> is a <emphasis role="bold">graphical client</emphasis>
+		for remote monitoring and control of the ProActive Resource Manager. This stand alone application
+		allows you to perform administrative actions on Resource Manager, deployment and monitoring
+		of computing nodes, creation of node sources and removal of nodes.
+	</para>
+	<para>
+	The Resource Manager Eclipse Plugin is available in two forms:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+			A<emphasis role="bold"> Java stand alone application</emphasis> based on
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
+			Eclipse Rich Client Platform (RCP)
+			</link>, available for any platform (Windows, Linux, Mac OSX, Solaris...).
+			</para>
+		</listitem>
+		<listitem>
+			<para>A set of <emphasis role="bold"> <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org">
+			Eclipse</link> plugins</emphasis>: with all the functionalities of the stand
+			alone application.
+			</para>
+		</listitem>
+	</itemizedlist>
+
+<section xml:id="Starting_RM_GUI"><info><title>Starting the Resource Manager Graphical User Interface</title></info>
+		<para>
+			Depending on the way you get the RM plugin, just follow one of these steps:
+			<itemizedlist>
+				<listitem><para>
+					<emphasis role="bold">If you are using the stand alone application</emphasis>, just start it using the
+					provided executable. ("ResourceManager" on unix, "ResourceManager.exe" on Windows).
+					</para>
+				</listitem>
+				<listitem>
+				<para>
+					<emphasis role="bold">If you are using the Eclipse plugins set</emphasis>, install it as an eclipse plugin
+					and restart Eclipse. Then, select Resource Manager Perspective.
+					</para>
+				</listitem>
+			</itemizedlist>
+			Then, go to <emphasis role="bold">Window-&gt;Open Perspective-&gt;Other...-&gt;Resource Manager</emphasis>
+			(it could be already opened as it is the default perspective).
+		</para>
+		<para>
+			Once started, the first screen displayed is the following one:
+			<figure xml:id="Resources_Manager_Welcome_screen"><info><title>Resource Manager startup screen</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="55%" contentdepth="55%"  fileref="images/png/plugin/startup.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+	</section>
+	<section xml:id="Connect_RM_GUI"><info><title>Connect to an existing Resource Manager</title></info>
+		<para>
+			A Resource Manager has to be already started before connecting the Scheduler GUI. If no RM has been started, please refer
+			to <xref linkend="RM_start"/>.
+		</para>
+		<para>
+		Right click on Resource Explorer area. A pop-up menu with one activated action ("connect a Resource Manager") should appear.
+		Clicking on this action, the following dialog box will show up:
+		</para>
+		<figure xml:id="rm_connection_screen"><info><title>Connection screen</title></info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/rm_connect.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+		</figure>
+		<para>
+			Enter the URL of an existing Resource Manager and login information.
+			The URL is composed of the protocol, the host name on which the RM is started and the port on
+			which it is listening. Ticking "log as admin" check box allows to perform administrator actions
+			such as management of nodes and node sources, shutdown of resource manager and so on... Regular users
+			can only get information about resources and their states.
+		</para>
+		<para>
+			You are now connected and ready to perform administrative actions on the remote Resource Manager.
+		</para>
+	</section>
+	<section xml:id="RM_main_view"><info><title>Resource Manager main view</title></info>
+		<para>
+			Once you are connected, you will see all the information about RM resources:
+		</para>
+		<figure xml:id="main_screen"><info><title>Main screen</title></info>
+			<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="65%" contentdepth="65%"  fileref="images/png/plugin/tree_view.png" format="PNG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+			<section xml:id="rm_explore_view"><info><title>Icons and menu</title></info>
+			<para>This view presents all nodes handled
+			by Resource Manager, their URLs, and their states. This view uses a tree representation: tree's roots
+			represents node sources, the second level displays host names and, finally, leafs show
+			nodes deployed on this host. For each node, you can see its URL, and its state represented by an icon:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" fileref="images/png/plugin/free.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+					<para>
+					Node is <emphasis role="bold">free</emphasis>, ready to be provided to Scheduler to perform a task.
+					</para>
+				</listitem>
+				<listitem>
+					<mediaobject>
+						<imageobject>
+						<imagedata scalefit="1" fileref="images/png/plugin/busy.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+					<para>
+					Node is <emphasis role="bold">busy</emphasis>, it currently performs a task execution.</para>
+				</listitem>
+				<listitem>
+				<mediaobject>
+				<imageobject>
+						<imagedata scalefit="1" fileref="images/png/plugin/to_release.png" format="PNG"/>
+				</imageobject>
+				</mediaobject>
+				<para>
+					Node is <emphasis role="bold">to release</emphasis>, it currently performs a task execution,
+					and has to be removed at the end of this execution.
+					</para>
+				</listitem>
+				<listitem>
+					<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" fileref="images/png/plugin/down.png" format="PNG"/>
+				</imageobject>
+				</mediaobject>
+				<para>
+					Node is <emphasis role="bold">down</emphasis>, it is unreachable by Resource Manager or is broken. A failure
+					has occurred on the node (network failed, computer got down, Java runtime that manages this node got down...).
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+			This view presents a tool bar with different available actions:
+			</para>
+			<figure xml:id="rm_explorer_view_toolbar"><info><title>Resource Explorer view tool bar</title></info>
+			<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="140%" contentdepth="140%"  fileref="images/png/plugin/RM_panel.png" format="PNG"/>
+				</imageobject>
+			</mediaobject>
+		</figure>
+			<itemizedlist>
+				<listitem><para>
+					<emphasis role="bold">[1] Disconnect</emphasis> - Leave current Resource Manager, perform disconnection.</para>
+				</listitem>
+				<listitem><para>
+					<emphasis role="bold">[2] Create Node Source</emphasis> - Create a new static node source, with a deployment descriptor,
+					or a peer to peer node source. See below.</para>
+				</listitem>
+				<listitem><para>
+					<emphasis role="bold">[3] Remove Node Source</emphasis> - Remove a node source from Resource Manager, and release all its nodes.</para>
+				</listitem>
+				<listitem><para>
+					<emphasis role="bold">[4] Shutdown Resource Manager</emphasis> - Stop Resource Manager application, remove all the nodes, and stop
+					Resource Manager daemon.</para>
+				</listitem>
+				<listitem><para>
+					<emphasis role="bold">[5] Add node</emphasis> - Add existing node to Resource Manager providing its URL.</para>
+				</listitem>
+				<listitem><para>
+					<emphasis role="bold">[6] Remove nodes</emphasis> - Remove nodes that are handled by Resource Manager</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+			All these actions are explained later.
+			</para>
+		</section>
+		<section xml:id="rm_gui_other_views"><info><title>Other views</title></info>
+			<para>
+			Beside the tree view, there are two other views that display the same information in different ways:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+					A <emphasis>table view</emphasis> where each line corresponds to one node.
+					</para>
+					<para>
+					<figure xml:id="tab_view"><info><title>Tab view</title></info>
+						<mediaobject>
+							<imageobject>
+								<imagedata scalefit="1" width="65%" contentdepth="65%"  fileref="images/png/plugin/tab_view.png" format="PNG"/>
+							</imageobject>
+						</mediaobject>
+					</figure>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+					A <emphasis>compact view</emphasis> where all information is displayed in a compact form.
+					</para>
+					<para>
+					<figure xml:id="compact_view"><info><title>Compact view</title></info>
+						<mediaobject>
+							<imageobject>
+								<imagedata scalefit="1" width="65%" contentdepth="65%"  fileref="images/png/plugin/compact_view.png" format="PNG"/>
+							</imageobject>
+						</mediaobject>
+					</figure>
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section xml:id="rm_gui_create_ns"><info><title>Create a Node Source</title></info>
+			<para>
+			This action allows to create a new Node Source in Resource Manager.
+			A Node Source is a RM's component that is able to handle a set of nodes
+			(See <xref linkend="nodes_sources"/>).
+			In the dialog, fill in the node source name, then select infrastructure type and policy.
+			<figure xml:id="rm_create_ns"><info><title>Node Source creation dialog box</title></info>
+				<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/create_nodesource_dialog.png" format="PNG"/>
+				</imageobject>
+				</mediaobject>
+			</figure>
+			</para>
+
+			<section xml:id="rm_gui_gcm_infrastructure"><info><title>GCM infrastructure</title></info>
+				<para>If GCM infrastructure is chosen, then select a GCM deployment descriptor described an underlying infrastructure.
+				You can find more information concerning GCM deployment descriptors in <xref linkend="RM_GCM"/>.
+				</para>
+				<figure xml:id="pic_gcm_infrastructure"><info><title>GCM infrastructure configuration panel</title></info>
+					<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/gcm_infrastructure.png" format="PNG"/>
+					</imageobject>
+					</mediaobject>
+				</figure>
+			</section>
+			<section xml:id="rm_gui_gcm_customized_infrastructure"><info><title>GCM Customized infrastructure</title></info>
+				<para>If GCM Customized infrastructure is chosen, then select a GCM deployment template that describes how to deploy one node
+				to the host (for example see config/rm/deployment/deployment_ssh_hosts_list_template.xml). The template has to use HOST
+				java variable. This variable will be defined at runtime by the infrastructure manager. Host list should be a file
+				containing host names.
+				</para>
+				<figure xml:id="pic_gcm_customized_infrastructure"><info><title>GCM Customized infrastructure configuration panel</title></info>
+					<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/gcm_customized_infrastructure.png" format="PNG"/>
+					</imageobject>
+					</mediaobject>
+				</figure>
+			</section>
+			<section xml:id="rm_gui_ssh_infrastructure"><info><title>SSH infrastructure</title></info>
+			  <para>
+			    SSH Infrastructure provides a basic but functional way to acquire resources through an SSH connection.
+			    Although such acquisition can be achieved using a GCM descriptor, this Infrastructure can in some situations
+			    be easier to use for SSH-only use-cases.
+			  </para>
+			  <para>
+			    To acquire nodes, this infrastructure will need to start runtimes on remote hosts.
+			    To do so, it needs to know some information, assumed to be true for all hosts:
+			    <itemizedlist>
+			      <listitem><para>
+				  <emphasis role="bold">Java Path</emphasis>: path to the java executable on the remote hosts.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Scheduling Path</emphasis>: path to the Scheduling installation directory on the remote hosts.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Protocol</emphasis>: protocol (rmi, http...) used by the remote host to communicate with the RM.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Port</emphasis>: port used by the remote host to communicate with the RM.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Java Options</emphasis>: Java options appended to the command used to start the node
+				  on the remote host.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Hosts List</emphasis>: The path to a file containing the hosts on which resources should be acquired.
+				  This file should contain one host per line, described as a host name or a public IP address, optionally followed by a positive
+				  integer describing the number of runtimes to start on the related host (default to 1 if not specified). Example:
+				  <screen><![CDATA[
+rm.example.com
+test.example.net 5
+192.168.9.10 2
+]]></screen>
+			      </para></listitem>
+			    </itemizedlist>
+			  </para>
+			  <figure xml:id="pic_ssh_infrastructure"><info><title>SSH infrastructure configuration panel</title></info>
+			    <mediaobject>
+			      <imageobject>
+				<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/ssh_infrastructure.png" format="PNG"/>
+			      </imageobject>
+			    </mediaobject>
+			  </figure>
+			</section>
+			<section xml:id="rm_gui_pbs_infrastructure"><info><title>PBS infrastructure</title></info>
+			  <para>
+			    PBS Infrastructure acquires resources on an existing PBS (ie Torque) installation. Useful to add a NodeSource to manage
+			    nodes from a cluster on which the configuration is not alterable.
+			    To acquire nodes, this Infrastructure will connect to the PBS server through SSH, and submit commands
+			    using the qsub client.
+			    To start nodes, some information needs to be filled in:
+			    <itemizedlist>
+			      <listitem><para>
+				  <emphasis role="bold">Java Path</emphasis>: path to the java executable on the remote hosts (ie the PBS slaves).
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Scheduling Path</emphasis>: path to the Scheduling installation directory on the remote hosts.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Protocol</emphasis>: protocol (rmi, http...) used by the remote host to communicate with the RM.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Port</emphasis>: port used by the remote host to communicate with the RM.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Java Options</emphasis>: Java options appended to the command used to start the node
+				  on the remote host.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Max Nodes</emphasis>: maximum number of nodes this Infrastructure can simultaneously hold from the PBS server.
+				  Useful considering PBS does not provide a mechanism to evaluate the number of currently available or idle cores on the cluster;
+				  this can result to asking more resources than physically available, and waiting for the resources to come up for a very long time
+				  as the request would be queued until satisfiable.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">PBS Server</emphasis>: URL of the PBS server, which is responsible for acquiring PBS nodes.
+				  this server will be contacted by the Resource Manager through an SSH connection.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">RM Url</emphasis>: URL of the Resource Manager from the PBS nodes point of view:
+				  this is the URL the nodes will try to lookup when attempting to register to the RM upon creation.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">RM Credentials</emphasis>: Encrypted credentials file, as created by the create-cred[.bat] utility.
+				  These credentials will be used by the nodes to authenticate on the Resource Manager.
+			      </para></listitem>
+			      <listitem><para>
+				  <emphasis role="bold">Qsub Options</emphasis>: Options for the qsub command client when acquiring nodes on the PBS master.
+				  Default value should be enough in most cases, if not, refer to the documentation of the PBS cluster.
+			      </para></listitem>
+			    </itemizedlist>
+			  </para>
+			  <figure xml:id="pic_pbs_infrastructure"><info><title>PBS infrastructure configuration panel</title></info>
+			    <mediaobject>
+			      <imageobject>
+				<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/pbs_infrastructure.png" format="PNG"/>
+			      </imageobject>
+			    </mediaobject>
+			  </figure>
+			</section>
+			<section xml:id="rm_gui_static_policy"><info><title>Node source static policy</title></info>
+				<para>If static policy is selected, then node source will deploy all nodes once and never remove them.
+				</para>
+				<figure xml:id="pic_static_policy"><info><title>Static policy configuration panel</title></info>
+					<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/static_policy.png" format="PNG"/>
+					</imageobject>
+					</mediaobject>
+				</figure>
+			</section>
+			<section xml:id="rm_gui_time_slot"><info><title>Node source time slot policy</title></info>
+				<para>Time slot policy acquires nodes only at "Acquire time" and releases them at "Release time".
+				This action could be done periodically if period is specified. Preemptive option set to true means that
+				nodes will be released despite the fact that some jobs are still running.
+				</para>
+				<figure xml:id="pic_time_slot_policy"><info><title>Time slot policy configuration panel</title></info>
+					<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/time_slot_policy.png" format="PNG"/>
+					</imageobject>
+					</mediaobject>
+				</figure>
+			</section>
+			<section xml:id="rm_gui_idle_policy"><info><title>"Release resources when scheduler is idle" policy</title></info>
+				<para>This policy may be useful if there is no need to keep nodes alive permanently. Nodes will be released after a specified
+				"idle time". This policy will use a listener of the scheduler. That is why its URL, its user name and its password have to be
+				specified. Preemptive parameter still indicates the way of releasing nodes. If it's true, nodes will be released
+				preemptively without waiting the end of jobs.
+				</para>
+				<figure xml:id="pic_idle_policy"><info><title>"Release resources when scheduler is idle" policy configuration panel</title></info>
+					<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/idle_policy.png" format="PNG"/>
+					</imageobject>
+					</mediaobject>
+				</figure>
+			</section>
+			<section xml:id="rm_gui_scheduler_loading_policy"><info><title>Scheduler loading policy</title></info>
+				<para>This policy allows to configure the number of resources which will be always enough for the
+				scheduler. Nodes are acquired and released according to scheduler loading factor which is a number of tasks
+				per node. In the same manner as the previous policy, this one also requires scheduler URL, user name and password. It is important to
+				correctly configure maximum and minimum nodes that this policy will try to hold. Maximum number should not be
+				greater than potential nodes number which is possible to deploy to underlying infrastructure. If there are more
+				currently acquired nodes than necessary, policy will release them one by one after having waited for a "release period" delay.
+				This smooth release procedure is implemented because deployment time is greater than release one. Thus, this waiting time deters
+				policy from spending all its time trying to deploy nodes.
+				</para>
+				<figure xml:id="pic_scheduler_loading_policy"><info><title>Scheduler loading policy configuration panel</title></info>
+					<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="80%" contentdepth="80%"  fileref="images/png/plugin/loading_policy.png" format="PNG"/>
+					</imageobject>
+					</mediaobject>
+				</figure>
+			</section>
+		</section>
+
+		<section xml:id="rm_gui_remove_ns"><info><title>Remove a Node Source</title></info>
+			<para>
+			In order to remove a node source, select its name in removal dialog and press OK:
+			</para>
+			<figure xml:id="rm_create_d_ns"><info><title>Node Source removal dialog box</title></info>
+				<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="images/png/plugin/rm_remove_ns_dialog.png" format="PNG"/>
+				</imageobject>
+				</mediaobject>
+			</figure>
+		</section>
+		<section xml:id="rm_add_node"><info><title>Add node by URL</title></info>
+			<para>
+			You can add existing node to any Node Source by providing its URL:
+			</para>
+			<figure xml:id="rm_add_node_url_dialog"><info><title>Add Node by URL</title></info>
+				<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="images/png/plugin/rm_add_node_url.png" format="PNG"/>
+				</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+			Choose a Node Source's name from your nodes sources list, and fill the node's URL to add.
+			Node will be added and managed by the node source that you have chosen.
+			</para>
+		</section>
+		<section xml:id="rm_gui_remove_node"><info><title>Remove a node</title></info>
+			<figure xml:id="rm_del_node_dialog"><info><title>Node removal dialog</title></info>
+				<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="images/png/plugin/rm_remove_node_dialog.png" format="PNG"/>
+				</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+			Choose the node to remove in the list. As explained before, node's removal can be preemptive or not. If you don't choose
+			a preemptive removal and if the node is busy, then it will just put to the "to release" state, and will be removed at tasks' end.
+			</para>
+			<itemizedlist>
+				<listitem><para>
+				If the node to remove is handled by a Static node Source and the node's Java Virtual Machine contains only the node to remove
+				(RM doesn't handle other node from the same JVM), then the JVM is killed.</para>
+				</listitem>
+				<listitem><para>
+				If the node to remove is handled by a dynamic Node Source,
+				then the node's JVM is killed only if the node's removal is preemptive.
+				</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section xml:id="rm_gui_shutdown"><info><title>Shutdown</title></info>
+			<figure xml:id="rm_shutdown_dialog"><info><title>RM shutdown dialog box</title></info>
+				<mediaobject>
+				<imageobject>
+					<imagedata scalefit="1" width="70%" contentdepth="70%"  fileref="images/png/plugin/rm_shutdown_dialog.png" format="PNG"/>
+				</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+			A dialog asks you to confirm RM's shutdown. All nodes are removed from Resource Manager. Node handled by static nodes sources are destroyed.
+			Nodes handled by dynamic node source are released to their infrastructures.
+			You can tick the check-box  <emphasis role="bold">Wait tasks ends on busy nodes</emphasis>.
+			If checked, and RM has busy nodes, Resource Manager put these busy nodes to the "to release" state, and wait tasks' end on these nodes, before shutting down.
+			Otherwise, shutdown is performed immediately even if there are busy nodes, tasks are interrupted on these busy nodes.
+			</para>
+		</section>
+	</section>
+</chapter>

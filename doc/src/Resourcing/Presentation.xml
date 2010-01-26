@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager"><info><title>Presentation and architecture</title></info>
+
+		<section xml:id="Role"><info><title>Role</title></info>
+
+			<para>
+				The ProActive Resource Manager is a software for resource aggregation across the
+				network. It delivers compute units represented by ProActive nodes to the scheduler
+				which is in charge of handling a task flow and distribute tasks on accessible
+				resources. Thanks to the deployment framework, it can retrieves computing nodes
+				using different standards such as SSH, LSF, OAR, gLite, EC2, etc. Its main functions
+				are:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Deployment, acquisition and release of ProActive nodes to/from an underlying
+						infrastructure.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Supplying ProActive Scheduler with nodes for tasks executions, based on required
+						properties.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Maintaining and monitoring its list of
+						resources and managing their states (free, busy, down...).
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section xml:id="architecture"><info><title>Resource Manager architecture</title></info>
+
+			<para>
+				Resource Manager is aimed to hide the nature of a dynamic infrastructure and
+				simplify effective utilization of multiple computing resources, enabling the exploitation
+				of resources from different providers on a single application. In order to achieve
+				this goal the Resource Manager is split into several components:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis>User</emphasis> -
+						Resource Manager's frontend for the Scheduler.
+						This component provides Scheduler with an entry
+						to get nodes for further job execution and gives them back after.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>Admin</emphasis> -
+						Frontend for RM's administrator which provides
+						administrator actions: add and remove nodes, add
+						and remove different node sources, shut down
+						the Resource manager.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>Core</emphasis> -
+						Main component which selects and gives nodes to
+						scheduler, maintains different nodes states for
+						each node, and receives new available nodes
+						acquired by Node Sources. All requests to Resource
+						Manager finally come through the core.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>Monitoring component</emphasis> -
+						Resource Manager can have monitors connected to
+						it. Monitors are external programs (such as
+						monitor GUI) that want to be informed about RM
+						current activity (number of nodes and their
+						availabilities for example). The Monitoring
+						component is in charge of sending RM
+						information to its listeners.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>Node Sources</emphasis> -
+						Resource manager can handle nodes coming from
+						heterogeneous environments. A Node source
+						component is in charge of nodes acquisition,
+						deployment and monitoring for a dedicated
+						infrastructure. Each node source has its
+						own policy which defines conditions and rules of
+						nodes acquisition. For example, a time slot policy
+						will acquire nodes only for specified period of time
+						(see detailed description in the section below).
+					</para>
+				</listitem>
+			</itemizedlist>
+			<figure xml:id="RM_architecture"><info><title>Resource Manager architecture</title></info>
+
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%" align="center" fileref="images/png/rm_overview.png" format="PNG"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</section>
+		<section xml:id="nodes_sources"><info><title>Node Sources</title></info>
+			<para>
+				Node source is an entity which is in charge of nodes acquisition/release from particular
+				underlying infrastructure. It consists of two components: <emphasis>infrastructure manager</emphasis> and
+				<emphasis>node source policy</emphasis>.</para>
+			<para>
+				<emphasis>Infrastructure manager</emphasis> is responsible for communication with an infrastructure.
+				When a new node has to be acquired, an infrastructure manager may deploy the node or just request an already existing
+				node from another resource manager like LSF. All these details are specific to the infrastructure manager
+				implementation. There are two implemented infrastructure managers:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis>Default infrastructure manager</emphasis> is designed to be used with ProActive agent.
+						I cannot perform the deployment and knows nothing about underlying infrastructure but can register
+						already existing nodes and release them.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>GCM infrastructure manager</emphasis> is able to acquire/release nodes described in
+						GCM deployment descriptor. Nodes are deployed to the infrastructure at the moment of acquisition and
+						will be removed from it at the release time. It supports only "acquire all" / "release all" operations
+						and cannot acquire a single node.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>GCM customized infrastructure</emphasis> can deploy / release
+						a single node to / from the infrastructure. It can be used by advanced node source policies which
+						allow to have as many nodes in the resource pool as needed. It holds the
+						list of nodes and the GCM deployment descriptor template described how to deploy one node to the host.
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				<emphasis>Node source policy</emphasis> is a set of rules and conditions which describes when and how many nodes
+				have to be acquired or released. Policies use node source API to manage the node acquisition. There are four
+				policies implemented which should cover the most common scenarios:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis>Static node source policy</emphasis> - starts node acquisition when nodes are added to
+						the node source and never removes them. Nevertheless, nodes can be removed by user request.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>Time slot policy</emphasis> - is aimed at acquiring nodes for particular time with an ability to do it periodically.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>"Release when scheduler is idle" policy</emphasis> - releases all nodes from the infrastructure
+						when the scheduler is idle and acquires them when a new job is submitted.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>"Scheduler loading" policy</emphasis> - acquires/releases nodes
+						according to the scheduler loading factor (number of nodes per task). For example,
+						if the policy is configured to "1 node per task" and if a job with 10 tasks is submitted, then
+						10 nodes will be dynamically acquired from the infrastructure.
+					</para>
+				</listitem>
+			</itemizedlist>
+
+
+			<para>
+				Node sources were designed in a way that:
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						All logic related to node acquisition is encapsulated in the infrastructure manager.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Conditions and rules of node acquisition is described in
+						the node source policy.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						New infrastructure manager or node source policy can be dynamically plugged into the Resource Manager.
+						In order to do that, it is just required to add new implemented classes in the class path and update
+						corresponding list in the configuration file (<code>[SCHEDULER_HOME]/config/rm/nodesource</code>).
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				Node source is always a combination of <emphasis>infrastructure manager</emphasis> and <emphasis>node source policy</emphasis>.
+				Since GCM infrastructure manager is not able to deploy a single node to the underlying system,
+				it cannot be used with policies which requires such ability i.e. "scheduler loading" policy.
+				Various node sources can be created though the GUI by an administrator of the Resource Manager. By
+				default, RM uses GCM infrastructure and static policy.
+			</para>
+
+		</section>
+		<section xml:id="nodes_states"><info><title>Nodes states</title></info>
+			<para>
+				Resource Manager has to maintain states of its handled
+				nodes. Here are the different nodes states:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis>Free</emphasis> -
+						Node is available, and there is no task launched
+						on it. Node can be supplied to a scheduler.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>Busy</emphasis> -
+						Node has been given to a scheduler and a task is
+						executed on it.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>To be released</emphasis> -
+						Node is busy, and administrator or its (dynamic)
+						Node Source has asked to remove the node. So the
+						node will be removed from RM after tasks' end.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis>Down</emphasis> -
+						Node has a problem (unreachable, fallen...) and
+						cannot execute tasks anymore.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+</chapter>

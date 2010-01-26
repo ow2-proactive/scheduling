@@ -46,7 +46,7 @@
 					<td>
 						<a href="http://www.inria.fr">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-INRIA.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-INRIA.png</xsl:attribute>
 								<xsl:attribute name="alt">INRIA</xsl:attribute>
 								<xsl:attribute name="title">A CNRS-INRIA-UNSA Research team</xsl:attribute>
 							</img>
@@ -58,7 +58,7 @@
 					<td>
 						<a href="http://www.unice.fr">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-UNSA.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-UNSA.png</xsl:attribute>
 								<xsl:attribute name="alt">UNSA</xsl:attribute>
 								<xsl:attribute name="title">A CNRS-INRIA-UNSA Research team</xsl:attribute>
 							</img>
@@ -70,7 +70,7 @@
 					<td>
 						<a href="http://www.cnrs.fr">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-CNRS.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-CNRS.png</xsl:attribute>
 								<xsl:attribute name="alt">CNRS-I3S</xsl:attribute>
 								<xsl:attribute name="title">A CNRS-INRIA-UNSA Research team</xsl:attribute>
 							</img>
@@ -81,7 +81,7 @@
 					<td colspan="2">
 						<a href="http://www.ow2.org/">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-OW2.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-OW2.png</xsl:attribute>
 								<xsl:attribute name="alt">OW2</xsl:attribute>
 								<xsl:attribute name="title">OW2 Consortium</xsl:attribute>
 								<xsl:attribute name="height">50%</xsl:attribute>
@@ -94,7 +94,7 @@
 					<td colspan="2">
 						<a href="http://www.activeeon.com/">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-ActiveEon.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-ActiveEon.png</xsl:attribute>
 								<xsl:attribute name="alt">ActiveEon</xsl:attribute>
 								<xsl:attribute name="title">ActiveEon: a Professional Open Source company, co-developing and providing support for ProActive Parallel Suite®</xsl:attribute>
 							</img>

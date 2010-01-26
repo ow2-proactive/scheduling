@@ -1,7 +1,0 @@
-if (activity is non null and implements RunActive)
-	we invoke the method runActivity defined in the object activity
-else
-	if (the class of the reified object implements RunActive)
-		we invoke the method runActivity of the reified object
-else
-	we run the standard FIFO activity

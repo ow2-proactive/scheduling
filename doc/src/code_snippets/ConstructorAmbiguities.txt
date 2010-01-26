@@ -1,9 +1,0 @@
-//class for which passing null as 
-//an argument for the constructor 
-//leads to the generation of an exception
-class DontPassNullForTheConstructor{
-	public DontPassNullForTheConstructor (String s){
-	}
-	public DontPassNullForTheConstructor (Vector v){
-	}
-}

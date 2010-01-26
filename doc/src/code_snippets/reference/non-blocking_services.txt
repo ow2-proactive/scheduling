@@ -1,8 +1,0 @@
-// Serves the oldest request in the request queue <emphasis role="bold">
-void serveOldest(); 
-
-// Serves the oldest request aimed at a method of name methodName 
-void serveOldest(String methodName) 
-
-// Serves the oldest request matching the criteria given be the filter
-void serveOldest(RequestFilter requestFilter) 

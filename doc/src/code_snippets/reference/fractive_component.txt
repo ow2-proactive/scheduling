@@ -1,4 +1,0 @@
-// This method is used in primitive components. 
-// It generates a client collective interface named itfName, and typed as itfSignature. 
-// This collective interface is a typed ProActive group.
-ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature); 

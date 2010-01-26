@@ -192,7 +192,7 @@
 		<xsl:variable name="line">
 			<fo:inline keep-with-next.within-line="always">
 				<xsl:choose>
-					<xsl:when test="self::chapter or self::appendix or self::bibliography or self::index">
+					<xsl:when test="self::chapter or self::appendix or self::bibliography or self::index or self::preface">
 						<xsl:attribute name="font-weight">
 							bold
 						</xsl:attribute>
@@ -222,8 +222,7 @@
 					</xsl:variable>
 					<xsl:if test="$toc_line_name = 'chapter' or $toc_line_name = 'part'  or $toc_line_name = 'appendix'">
 						<xsl:call-template name="gentext">
-							<xsl:with-param name="key" select="$toc_line_name">
-							</xsl:with-param>
+							<xsl:with-param name="key" select="$toc_line_name" />
 						</xsl:call-template>
 						<xsl:call-template name="gentext.space">
 						</xsl:call-template>
@@ -256,6 +255,12 @@
 			</xsl:when>
 			<xsl:when test="self::chapter or self::appendix or self::bibliography or self::index">
 				<fo:block end-indent="{$toc.indent.width}pt" last-line-end-indent="-{$toc.indent.width}pt" space-after="1mm" space-before="3mm" text-align-last="justify">
+					<xsl:copy-of select="$line">
+					</xsl:copy-of>
+				</fo:block>
+			</xsl:when>
+			<xsl:when test="self::preface">
+				<fo:block end-indent="{$toc.indent.width}pt" last-line-end-indent="-{$toc.indent.width}pt" space-after="0mm" space-before="8mm" text-align-last="justify">
 					<xsl:copy-of select="$line">
 					</xsl:copy-of>
 				</fo:block>
@@ -802,7 +807,7 @@
 							<fo:block text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-INRIA.png
+										images/png/logo-INRIA.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										40px
@@ -817,7 +822,7 @@
 							<fo:block text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-UNSA.png
+										images/png/logo-UNSA.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										40px
@@ -832,7 +837,7 @@
 							<fo:block text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-CNRS.png
+										images/png/logo-CNRS.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										45px
@@ -857,7 +862,7 @@
 							<fo:block space-after="15mm" text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-OW2.png
+										images/png/logo-OW2.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										25pt
@@ -872,7 +877,7 @@
 							<fo:block space-after="15mm" text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-ActiveEon.png
+										images/png/logo-ActiveEon.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										35pt
@@ -963,11 +968,7 @@
 		</xsl:apply-templates>
 		<xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/legalnotice">
 		</xsl:apply-templates>
-		<!--   <xsl:apply-templates mode="titlepage.mode" select="preface"/> -->
-		<xsl:if test="preface">
-			<xsl:call-template name="toto.tutu">
-			</xsl:call-template>
-		</xsl:if>
+<!--		<xsl:apply-templates mode="titlepage.mode" select="preface"/>-->
 	</xsl:template>
 	<xsl:template name="book.verso.title">
 		<fo:block>
@@ -1232,12 +1233,7 @@
 			</xsl:if>
 		</fo:block>
 	</xsl:template>
-	<!-- DEBUG METHOD. -->
-	<xsl:template name="toto.tutu">
-		<fo:block background-color="#FF0000">
-			Toto Tutu
-		</fo:block>
-	</xsl:template>
+
 	<!-- emphasis in programlistings contains color, specified by the @role -->
 	<xsl:template match="emphasis">
 		<xsl:variable name="depth">

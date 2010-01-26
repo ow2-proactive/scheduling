@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0"
+	xml:id="ProActiveWindowsAgent_89">
+	<info>
+		<title xml:id="ProActiveWindowsAgent">ProActive Windows Agent</title>
+	</info>
+	<indexterm>
+		<primary>ProActive Windows Agent</primary>
+	</indexterm>
+	<section xml:id="PWA_Context">
+		<info>
+			<title>Context</title>
+		</info>
+		<para>In distributed systems, desktop computers can be an important
+			source of computational power. Moreover, one of the definitions of
+			grid stands for a type of parallel and distributed system that
+			enables the sharing, selection, and aggregation of resources
+			distributed across multiple administrative domains based on theirs
+			(resources) criteria: availability, capacity and performance. In such
+			a context the main purpose of the ProActive Windows Agent is to make
+			the configuration of these criteria achievable (schedule working plan
+			and limit the shared amount of RAM and CPU).</para>
+	</section>
+	<section xml:id="PWA_Functionalities">
+		<info>
+			<title>Functionalities</title>
+		</info>
+		<para>The ProActive Windows Agent is a Windows Service: a
+			long-running executable that performs specific functions and which is
+			designed not to require user intervention. The agent is able to
+			create a ProActive computational resource on the local machine. This
+			resource will be provided to ProActive applications (such as Resource
+			Manager) according to a user defined schedule. A tray icon shows the
+			state of the agent and allows the user to start/stop it, or modify
+			its schedule. The ProActive Windows Agent does not interfere with the
+			day-to-day usage of the desktop Windows machine.</para>
+		<para>Understanding of ProActive basic concepts is
+			required for the comprehension of the following description.</para>
+		<para>The core client is a process which:</para>
+		<itemizedlist>
+			<listitem>
+				<para>Loads the user's configuration.</para>
+			</listitem>
+			<listitem>
+				<para>Creates schedules according to the working plan
+					specified in the configuration.</para>
+			</listitem>
+			<listitem>
+				<para>Spawns a JVM process that will run a specified java
+					class depending on the selected connection type. 3 types of
+					connections are available:</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">RMI Registration</emphasis>
+							- The specified java class will create a ProActive local node as
+							a computational resource and register it in a local RMI registry.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Resource Manager Registration
+							</emphasis>
+							- The specified java class will create a ProActive local node as
+							a computational resource and register it in the specified
+							Resource Manager, thus being able to execute java or native tasks
+							received from the Scheduler.
+						</para>
+						<para>It's is important to note that a JVM process running tasks
+							can potentially spawn child processes.</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Custom</emphasis>
+							- The user can specify its own java class.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>Watches the spawned JVM process in order to comply to
+					the following limitations:</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">RAM limitation</emphasis>
+							- The user can specify a maximum amount of memory allowed for a
+							JVM process and its children. If the limit is reached, then all
+							processes are automatically killed.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">CPU limitation</emphasis>
+							- The user can specify a maximum CPU usage allowed for a JVM
+							process and its children. If the limit is exceeded by the sum of
+							CPU usages of all processes, they are automatically throttled to
+							reach the given limit.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>Restarts the spawned JVM process in case of failures
+					with a timeout policy.</para>
+			</listitem>
+		</itemizedlist>
+	</section>
+	<section xml:id="PWA_Example">
+		<info>
+			<title>Example</title>
+		</info>
+		<para>This simple example illustrates how to create an active
+			object on a ProActive node created with the ProActive Windows Agent.
+			We suppose that the following conditions are verified:</para>
+		<itemizedlist>
+			<listitem>
+				<para>The agent is installed (see <xref linkend="PWA_Installation"/> for installation) on a
+					host with IP address equal to 192.168.1.62</para>
+			</listitem>
+			<listitem>
+				<para>
+					It is configured with the
+					<emphasis role="bold">RMI registration</emphasis>
+					as selected connection type and "toto" as node name.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>Once the agent is started, the following java code gets a
+			reference on a remote node and creates an active object on the remote
+			node identified by the url "rmi://192.168.1.62:1099/toto"</para>
+		<para>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/ProActiveWindowsAgent.snip" /></textobject></programlisting>
+		</para>
+
+		<para>The output is:</para>
+		<screen> --> This ClassFileServer is listening on port 2027
+Detected an existing RMI Registry on port 1099
+Nb of active objects on the remote node: 0 local runtime hashcode 6588476
+Generating class : pa.stub.org.ow2.proactive.resourcemanager.utils._StubTest
+Nb of active objects on the remote node: 1 received message: A message from 26670261</screen>
+	</section>
+	<section xml:id="PWA_Installation">
+		<info>
+			<title>Installation</title>
+		</info>
+		<para>The ProActive Windows Agent installation pack is available on
+			the official <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/">ProActive website</link>. Follow the links and get the latest
+			version.</para>
+		<note>
+			<para>
+			<itemizedlist>
+				<listitem>
+					<para>.Net framework v3.5 or later should be installed on your
+						system. If not, the installer will ask you to install it.
+						Go to <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.microsoft.com/downloads" /> and download
+						Microsoft .NET Framework Version 3.5 (or later) Redistributable
+						Package.</para>
+				</listitem>
+				<listitem>
+					<para>Visual C++ 2008 (or later) Redistributable Package is
+						also needed. The installer will install it for you, if not found.
+					</para>
+				</listitem>
+			</itemizedlist>
+			</para>
+		</note>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Run the
+					<emphasis role="bold">setup.exe</emphasis>
+					file.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Accept the licence agreement.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Select the components you want to install.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose the installation folder of the ProActive agent.
+				</para>
+			</listitem>
+			<listitem>
+				<para>Then, the following windows will appear:</para>
+				<figure xml:id="PWA_install_config_FIGURE">
+					<info>
+						<title>Configuration during installation</title>
+					</info>
+					<mediaobject>
+						<imageobject>
+							<imagedata scalefit="1" width="100%" contentdepth="100%"
+								fileref="images/png/install_config.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<itemizedlist>
+					<listitem>
+						<para>
+							Enter the Java location, usually
+							<emphasis role="bold">C:\Program Files\Java\jdk1.6.0_12</emphasis>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>Enter the ProActive location. If you want to use only the "Local Registration" connection (see the "Connection" tab description for more information), the path to a ProActive (programming) directory is sufficient but
+							if want to use also the "Resource Manager" connection, you have to specified a path to a
+							ProActive Scheduler directory.</para>
+					</listitem>
+					<listitem>
+						<para>Select the service account, if you want to install the
+							agent under a specific user account enter the domain ("." or
+							hostname is the local domain), user and location.</para>
+						<para>Note that you can change these settings at anytime in the
+							"services.msc" utility. ("Control Panel->Administrative
+							Tools->Services")</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>The installer will check whether the selected user account have the log on service right assignment.</para>
+				<para>If not, follow the following steps to add the log on service right assignment:</para>
+				<itemizedlist>
+					<listitem><para>In the 'Administrative Tools' of the 'Control Panel', open the 'Local Security Policy'.</para></listitem>
+					<listitem><para>In 'Security Settings', select 'Local Policies' then select 'User Rights Assignments'.</para></listitem>
+					<listitem><para>Finally, in the list of policies, open the properties of 'Log on as a service' policy and add the needed user.</para></listitem>
+				</itemizedlist>
+			</listitem>
+		</itemizedlist>
+		<para> At the end of the installation, the user can choose to run the
+			ProActive Agent Control utility. This is explained in the next section.
+		</para>
+
+		<para>To uninstall the ProActive Windows Agent, simply run
+			"Start/Programs/ProActiveAgent/uninstall".</para>
+	</section>
+	<section xml:id="PWA_Configuration">
+		<info>
+			<title>Configuration</title>
+		</info>
+		<para> Launch "Start/Programs/ProActiveAgent/AgentControl" program or
+			click on the notify icon if the "Automatic launch" is activated.
+			Double click on the tray icon to open the ProActive Agent Control
+			window. The dollowing window will appear:</para>
+		<para>
+			<figure xml:id="PWA_agent_control_FIGURE">
+				<info>
+					<title>ProActive Agent Control window</title>
+				</info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"
+							fileref="images/png/agent_control.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+		<para> From the ProActive Agent Control window, the user can load a
+			configuration file, edit it, start/stop the service and view logs. A
+			GUI for editing is provided (explained below). Even if it is not
+			recommended, you can edit the configuration file by yourself with
+			your favorite text editor.</para>
+		<note>
+			<para>Configuration files are not compatible from one major release to another.</para>
+		</note>
+		<para>
+			Clicking on "GUI Edit", the following windows appears:
+		</para>
+		<para>
+			<figure xml:id="PWA_config_editor_general_FIGURE">
+				<info>
+					<title>Configuration Editor window - General Tab
+					</title>
+				</info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"
+							fileref="images/png/config_editor_general.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+		<para>In the general tab, the user can specify:</para>
+		<itemizedlist>
+			<listitem>
+				<para>The ProActive (or Scheduler) location.</para>
+			</listitem>
+			<listitem>
+				<para>The JVM location (usually something like C:\Program
+					Files\Java\jdk1.6.0_12).</para>
+			</listitem>
+			<listitem>
+				<para>The number of Runtimes (the number of spawned JVMs).</para>
+			</listitem>
+			<listitem>
+				<para>The JVM parameters.</para>
+				<para>Note that if the parameter contains <literal>${rank}</literal>, it will be dynamically replaced by the Runtime rank starting from 0.</para>
+			</listitem>
+			<listitem>
+				<para>The "On Runtime Exit" script. A script executed after a Runtime exits. This can be useful to perform additional cleaning operation.</para>
+				<para>Note that the script receives as parameter the pid of the Runtime.</para>
+			</listitem>
+			<listitem>
+				<para>The user can enable the memory management (disabled by
+					default) in order to limit the amount of RAM used by the JVM
+					process.</para>
+				<para>By default the limit is set to 96 mbytes. Thus, each time the
+					JVM process requires more memory, it will be killed as well as its child
+					processes.</para>
+				<para>The user can extend this limit by giving more memory for
+					java tasks (executed by the JVM process) or for native tasks (child
+					processes spawned by the JVM process).</para>
+			</listitem>
+			<listitem>
+				<para>It is possible to list all available network interfaces by
+					clicking on the "Refresh" button and add the selected network
+					interface name as a value of the "proactive.net.interface" property
+					by clicking on "Use" button. See the ProActive documentation for
+					further information.</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			Clicking on the "Connection" tab, the windows will look like this:
+		</para>
+		<para>
+			<figure xml:id="PWA_config_editor_connection_FIGURE">
+				<info>
+					<title>Configuration Editor window - Connection Tab
+						(Resource Manager Registration)</title>
+				</info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"
+							fileref="images/png/config_editor_connection.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+		<para>In the "Connection" tab, the user can select between three types
+			of connections:</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">Local Registration</emphasis>
+					- creates a local ProActive node and registers (advertises) it in a
+					local RMI registry. The node name is optional.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Resource Manager Registration
+					</emphasis>
+					- creates a local ProActive node and registers it in the specified
+					Resource Manager. The mandatory Resource Manager's url must be like 'protocol://host:port/'. The
+					node name and the node source name are optional. Since the Resource Manager requires an
+					authentication the user specify the file that contains the credential or use the default one
+					usually located in "%USERPROFILE%\.proactive\security" folder.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Custom</emphasis>
+					- the user specifies its own java starter class and the arguments
+					to be given to the main method. The java starter class must be in
+					the classpath when the JVM process is started.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+		The user can specify the protocol (rmi or http) to be used by the Runtime for incoming communications.
+		</para>
+		<para>
+		To ensure that a unique port is used by a Runtime, the initial port value will be incremented
+		for each Runtime and given as value of the "-Dproactive.SELECTED_PROTOCOL.port" JVM property.
+		If the port chosen for a runtime is already used, it is incremented until
+		an available port number is found.
+		</para>
+		<para>
+			Finally, clicking on the "Planning" tab, the windows will look like this:
+		</para>
+		<para>
+			<figure xml:id="PWA_config_editor_planning_FIGURE">
+				<info>
+					<title>Configuration Editor window - Planning Tab
+					</title>
+				</info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"
+							fileref="images/png/config_editor_planning.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+		<para> In the Planning Tab, depending on the selected connection type,
+			the agent will initiate it according to a weekly planning where each
+			plan specifies the connection start time as well as the working
+			duration. The agent will end the connection as well as the ProActive
+			Runtime process and its child processes when the plan duration has
+			expired.</para>
+		<para> Moreover, it is possible to specify the JVM process Priority and
+			it's CPU usage limit. The behavior of the CPU usage limit works as
+			follows: if the JVM process spawns other processes, they will also be
+			part of the limit so that if the sum of CPU% of all processes exceeds the user limit they will be throttled to reach the given limit.
+			Note that if the Priority is set to RealTime the CPU % throttling will be disabled.
+		</para>
+
+		<para>
+			The "Always available" makes the agent to run permanently with a Normal Priority and Max CPU usage at 100%.
+		</para>
+
+	</section>
+
+	<section xml:id="PWA_StartTheAgent">
+		<info>
+			<title>Start the agent</title>
+		</info>
+		<para>
+			Once you have configured the agent, you can start it clicking on the "Start" button of the ProActive Agent Control window. However, before that, you have to ensure that a resource manager has been started
+			on the address you specified in the agent configuration. You do not need to start a node since it is exactly the job of the agent.
+		</para>
+		<para>
+			Once started, you may face some problems. You can realise that an error occurred by first glancing at the color of the agent tray icon. If everything goes right, it should keep the blue color. If its color changes to yellow, it means that the agent has been stopped.
+			To see exactly what happened, you can look at the runtime log file located into the agent installation directory and named <emphasis role="bold">Executor&lt;runtime number&gt;Process-log.txt</emphasis>.
+		</para>
+		<para>
+			The main troubles you may have to face are the following ones:
+			<itemizedlist>
+				<listitem><para>You get an access denied error: this is probably due to your default java.security.policy file which cannot be found. If you want to specify another policy file, you have to add a JVM parameter
+				in the agent configuration. A policy file is supplied in the scheduling directory. To use it, add the following line in the JVM parameter box of the agent configuration (<xref linkend="PWA_config_editor_general_FIGURE"/>):</para>
+				<screen>-Djava.security.poly=&lt;scheduler directory&gt;/config/security.java.policy</screen>
+				</listitem>
+				<listitem>
+					<para>
+						You get an authentication error: this is probably due to your default credentials file which cannot be found. In the "Connection" tab of the Configuration Editor (<xref linkend="PWA_config_editor_connection_FIGURE" />), you can choose the credentials file you want.
+						You can select, for instance, the credentials file located at <literal>&lt;scheduler directory&gt;/config/authentication/scheduler.cred</literal> or your own credentials file.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The node seems to be well started but you cannot retrieve it in a Java code for example: in this case, make sure that the port number is the good one.
+						Do not forget that the runtime port number is incremented from the initial resource manager port number.
+						You can see exactly on which port your runtime has been started looking at the log file describing above.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+
+	</section>
+	<section xml:id="PWA_OtherInformation"><info><title>Other information</title></info>
+
+		<para>
+			The agent was successfully tested on Windows XP, 2003, Windows Vista.
+			Some problems with service installation can occur on Windows NT.
+		</para>
+
+		<para>
+			The ProActive Windows Agent is written in C# and uses .Net Framework 3.5
+		</para>
+
+		<para>
+			Third-party libs used:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>C# JobObjectWrapper Api (JobManagement.dll) under Microsoft Permissive License (Ms-PL) v1.1</para>
+			</listitem>
+
+			<listitem>
+				<para>C# Log4Net Api (log4net.dll - 1.2.10.0) under Apache License v2.0</para>
+			</listitem>
+		</itemizedlist>
+	</section>
+
+</chapter>

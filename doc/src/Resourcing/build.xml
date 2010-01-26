@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+
+	<!-- ================================================================ -->
+	<!--            Create docs, which is the javadoc + manual            -->
+	<!--  =============================================================== -->
+	<target name="doc.rm.docs" depends="doc.rm.javadoc.all, doc.rm.manual, doc.rm.doc.zips" description="Generate the Resource Manager javadoc and manual" />
+
+	<!-- ================================================================ -->
+	<!--            Create docs, which is the javadoc + manual            -->
+	<!--  =============================================================== -->
+	<target name="doc.rm.doc.zips" depends="doc.rm.manualSingleHtmlZip, doc.rm.manualHtmlZip, doc.rm.javadoc.publishedZip, doc.rm.javadoc.completeZip" description="Generate the Resource Manager javadoc and manual zip archives" />
+
+
+	<!-- ================================================================ -->
+	<!--                     Create javadoc                               -->
+	<!-- ================================================================ -->
+
+	<target name="doc.rm.javadoc.all" depends="doc.rm.javadoc.published,doc.rm.javadoc.complete"/>
+
+	<!-- ==================================================================== -->
+	<!--          Make just the html files for the manual                     -->
+	<!-- ==================================================================== -->
+	<target name="doc.rm.manualHtml" description="Generate the Resource Manager HTML manual">
+		<subant target="manualHtml" 			inheritall="true">
+			<property name="doc.relative.name"		value="Resourcing" />
+			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
+		</subant>
+	</target>
+	<!-- ==================================================================== -->
+	<!--   Make an archive from the files for the multiple html manual        -->
+	<!-- ==================================================================== -->
+	<target name="doc.rm.manualHtmlZip" description="Generate the Resource Manager HTML manual zip" depends="doc.rm.manualHtml" >
+		<subant target="manualHtmlZip" inheritall="true">
+			<property name="doc.relative.name"		value="Resourcing" />
+			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--               Make just the pdf files for the manual                 -->
+	<!-- ==================================================================== -->
+	<target name="doc.rm.manualPdf" description="Generate the Resource Manager PDF manual">
+		<subant target="manualPdf" inheritall="true">
+			<property name="doc.relative.name"		value="Resourcing" />
+			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
+		</subant>
+	</target>
+	<!-- ==================================================================== -->
+	<!--           Make only one huge html-file from the doc                  -->
+	<!-- ==================================================================== -->
+	<target name="doc.rm.manualSingleHtml" description="Generate the Resource Manager single HTML manual">
+		<subant target="manualSingleHtml" inheritall="true">
+			<property name="doc.relative.name"		value="Resourcing" />
+			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the files for the single html manual       -->
+	<!-- ==================================================================== -->
+	<target name="doc.rm.manualSingleHtmlZip" description="Generate the Resource Manager single HTML manual zip" depends="doc.rm.manualSingleHtml" >
+		<subant target="manualSingleHtmlZip" inheritall="true">
+			<property name="doc.relative.name"		value="Resourcing" />
+			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the published javadoc       -->
+	<!-- ==================================================================== -->
+	<target name="doc.rm.javadoc.publishedZip" description="Generate the Resource Manager published javadoc zip" depends="doc.rm.javadoc.published">
+		<subant target="javadoc.publishedZip" inheritall="true">
+			<property name="doc.relative.name"		value="Resourcing" />
+			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!--      Make an archive from the complete javadoc       -->
+	<!-- ==================================================================== -->
+	<target name="doc.rm.javadoc.completeZip" description="Generate the Resource Manager complete javadoc zip" depends="doc.rm.javadoc.complete">
+		<subant target="javadoc.completeZip" inheritall="true">
+			<property name="doc.relative.name"		value="Resourcing" />
+			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
+		</subant>
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!-- Construct the manual from the XML files in {docs.src}                -->
+	<!-- ==================================================================== -->
+	<target name="doc.rm.manual" description="Generate the Resource Manager manuals (html, single html, pdf)" depends="doc.rm.manualSingleHtml,doc.rm.manualHtml,doc.rm.manualPdf" />
+
+      <!-- javadoc paths are not include through subant-->
+      <path id="docs.utils.classpath.javadoc">
+	      <fileset dir="../doc/toolchain/lib">
+		      <include name="**/*.jar"/>
+	      </fileset>
+      </path>
+
+
+	<target name="doc.rm.javadoc.complete"  depends="compile.rm" description="Generate the Resource Manager complete javadoc">
+		<property name="doc.relative.name"		value="Resourcing" />
+		<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+		<setProperties />
+	<javadoc
+            destdir="${docs.built.dir}/api_complete"
+            author="true"
+            version="true"
+            source="${source}"
+            use="true"
+            windowtitle="Resource Manager Complete API"
+            breakiterator="yes"
+            additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
+
+            <classpath>
+                <path refid="rm.libs"/>
+                <pathelement path="${cl.rm.dir}"/>
+            </classpath>
+
+            <packageset dir="${src.rm.dir}" />
+
+			<link href="http://proactive.inria.fr/release-doc/pa/api_complete/"/>
+            <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+            <doctitle><![CDATA[Resource Manager ${version}<br><a href='../multiple_html/index.html'>(documentation is here)</a><br>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+
+            <group title="Resource Manager">
+                <package name="org.ow2.proactive.resourcemanager*" />
+            </group>
+        </javadoc>
+    </target>
+
+	<target name="doc.rm.javadoc.published" depends="compile.rm" description="Generate the Resource Manager published javadoc">
+		<property name="doc.relative.name"		value="Resourcing" />
+		<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+		<setProperties />
+	<mkdir dir="${docs.tmp.dir}" />
+        <javadoc source="${source}"	classpathref="rm.libs">
+            <doclet name="doc.PublishedAPIDoclet">
+				<path refid="docs.utils.classpath.javadoc"/>
+                <param name="-file" value="${docs.tmp.dir}/publishedCoreClasses"/>
+            </doclet>
+            <packageset dir="${src.rm.dir}"/>
+        </javadoc>
+
+
+        <javadoc
+            destdir="${docs.built.dir}/api_published"
+            author="true"
+            version="true"
+            source="${source}"
+            use="true"
+            windowtitle="Resource Manager User API"
+            breakiterator="yes"
+            additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
+
+            <classpath>
+                <path refid="rm.libs"/>
+                <pathelement path="${cl.rm.dir}"/>
+            </classpath>
+
+
+            <fileset dir="${src.rm.dir}" includesfile="${docs.tmp.dir}/publishedCoreClasses"/>
+            <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+            <doctitle><![CDATA[Resource Manager ${version}<br><a href='../multiple_html/index.html'>(documentation is here)</a><br>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+
+            <group title="Resource Manager">
+                <package name="org.ow2.proactive.resourcemanager*" />
+            </group>
+
+        </javadoc>
+		<delete dir="${docs.tmp.dir}"/>
+    </target>
+</project>

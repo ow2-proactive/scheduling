@@ -37,7 +37,7 @@
 </xsl:attribute-set>
 <xsl:param name="admon.graphics.extension">.png</xsl:param>
 <xsl:param name="admon.graphics" select="0"/>
-<xsl:param name="admon.graphics.path">images/</xsl:param>
+<xsl:param name="admon.graphics.path">images/png/</xsl:param>
 <xsl:param name="admon.textlabel" select="1"/>
 <xsl:attribute-set name="admonition.properties"/>
 <xsl:attribute-set name="admonition.title.properties">

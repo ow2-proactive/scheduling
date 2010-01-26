@@ -1,8 +1,0 @@
-// Migrate the current AO to the same JVM as the AO 
-void migrateTo(Object o); 
-
-// Migrate the current AO to JVM given by the node URL 
-void migrateTo(String nodeURL); 
-
-// Migrate the current AO to JVM given by the node
-int void migrateTo(Node node); 

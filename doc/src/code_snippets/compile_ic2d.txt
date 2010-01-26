@@ -1,3 +1,0 @@
-cd [Your ProActive install directory]/compile
-./build deploy
-./build ic2d.libCopy

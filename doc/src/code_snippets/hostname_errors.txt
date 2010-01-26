@@ -1,5 +1,0 @@
-$>hostname
-localhost     //This is an error!
-
-$>hostname -i
-127.0.0.1     //This is an error!

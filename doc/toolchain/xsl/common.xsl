@@ -71,11 +71,11 @@
  </xsl:param>
 
  <!-- The header image -->
- <xsl:param name="header.image.filename">images/ProActiveLogoSmall.png</xsl:param>
+ <xsl:param name="header.image.filename">images/png/ProActiveLogoSmall.png</xsl:param>
  <!-- the 3 institutes images -->
- <xsl:param name="threeinstitutes.image.filename">images/logo-cnrs-inria-unsa.png</xsl:param>
+<!-- <xsl:param name="threeinstitutes.image.filename">images/logo-cnrs-inria-unsa.png</xsl:param>-->
  <!--  The objectweb logo -->
- <xsl:param name="objectweb.image.filename">images/logoOW2.png</xsl:param>
+<!-- <xsl:param name="objectweb.image.filename">images/logoOW2.png</xsl:param>-->
 
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
