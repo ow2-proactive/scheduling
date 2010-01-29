@@ -125,7 +125,7 @@
 
 >
 
-<!ELEMENT procedure (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (step)+)>
+<!ELEMENT procedure (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (step)+)>
 
 <!ATTLIST procedure
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -135,7 +135,7 @@
 
 >
 
-<!ELEMENT step (((title|titleabbrev)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((substeps|stepalternatives), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*)?)|((substeps|stepalternatives), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*)))>
+<!ELEMENT step (((title|titleabbrev)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((substeps|stepalternatives), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*)?)|((substeps|stepalternatives), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*)))>
 
 <!ATTLIST step
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -168,7 +168,7 @@
 
 >
 
-<!ELEMENT sidebar (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT sidebar (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST sidebar
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -178,7 +178,7 @@
 
 >
 
-<!ELEMENT abstract (((title|titleabbrev)*, (info)?), (anchor|para|formalpara|simpara)+)>
+<!ELEMENT abstract (((title|titleabbrev)*, (info)?), (anchor|para|newline|formalpara|simpara)+)>
 
 <!ATTLIST abstract
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -188,7 +188,7 @@
 
 >
 
-<!ELEMENT personblurb (((title|titleabbrev)*, (info)?), (anchor|para|formalpara|simpara)+)>
+<!ELEMENT personblurb (((title|titleabbrev)*, (info)?), (anchor|para|newline|formalpara|simpara)+)>
 
 <!ATTLIST personblurb
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -198,7 +198,7 @@
 
 >
 
-<!ELEMENT blockquote (((title|titleabbrev)*, (info)?), (attribution)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT blockquote (((title|titleabbrev)*, (info)?), (attribution)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST blockquote
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -240,7 +240,7 @@
 
 >
 
-<!ELEMENT epigraph ((info)?, (attribution)?, (anchor|para|formalpara|simpara|literallayout)+)>
+<!ELEMENT epigraph ((info)?, (attribution)?, (anchor|para|newline|formalpara|simpara|literallayout)+)>
 
 <!ATTLIST epigraph
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -250,7 +250,7 @@
 
 >
 
-<!ELEMENT footnote ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT footnote ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST footnote
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -271,7 +271,7 @@
 
 >
 
-<!ELEMENT para (#PCDATA|info|inlinemediaobject|remark|superscript|subscript|xref|link|olink|anchor|biblioref|alt|annotation|indexterm|abbrev|acronym|date|emphasis|footnote|footnoteref|foreignphrase|phrase|quote|wordasword|firstterm|glossterm|coref|trademark|productnumber|productname|database|application|hardware|citation|citerefentry|citetitle|citebiblioid|author|person|personname|org|orgname|editor|jobtitle|replaceable|package|parameter|termdef|nonterminal|systemitem|option|optional|property|inlineequation|tag|markup|token|symbol|literal|code|constant|email|uri|guiicon|guibutton|guimenuitem|guimenu|guisubmenu|guilabel|menuchoice|mousebutton|keycombo|keycap|keycode|keysym|shortcut|accel|prompt|envar|filename|command|computeroutput|userinput|function|varname|returnvalue|type|classname|exceptionname|interfacename|methodname|modifier|initializer|ooclass|ooexception|oointerface|errorcode|errortext|errorname|errortype|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning)*>
+<!ELEMENT para (#PCDATA|info|inlinemediaobject|remark|superscript|subscript|xref|link|olink|anchor|biblioref|alt|annotation|indexterm|abbrev|acronym|date|emphasis|footnote|footnoteref|foreignphrase|phrase|quote|wordasword|firstterm|glossterm|coref|trademark|productnumber|productname|database|application|hardware|citation|citerefentry|citetitle|citebiblioid|author|person|personname|org|orgname|editor|jobtitle|replaceable|package|parameter|termdef|nonterminal|systemitem|option|optional|property|inlineequation|tag|markup|token|symbol|literal|code|constant|email|uri|guiicon|guibutton|guimenuitem|guimenu|guisubmenu|guilabel|menuchoice|mousebutton|keycombo|keycap|keycode|keysym|shortcut|accel|prompt|envar|filename|command|computeroutput|userinput|function|varname|returnvalue|type|classname|exceptionname|interfacename|methodname|modifier|initializer|ooclass|ooexception|oointerface|errorcode|errortext|errorname|errortype|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|newline)*>
 
 <!ATTLIST para
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -291,7 +291,7 @@
 
 >
 
-<!ELEMENT itemizedlist (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (listitem)+)>
+<!ELEMENT itemizedlist (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (listitem)+)>
 
 <!ATTLIST itemizedlist
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -303,7 +303,7 @@
 
 >
 
-<!ELEMENT orderedlist (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (listitem)+)>
+<!ELEMENT orderedlist (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (listitem)+)>
 
 <!ATTLIST orderedlist
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -318,7 +318,7 @@
 
 >
 
-<!ELEMENT listitem ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT listitem ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST listitem
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -391,7 +391,7 @@
 
 >
 
-<!ELEMENT variablelist (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (varlistentry)+)>
+<!ELEMENT variablelist (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (varlistentry)+)>
 
 <!ATTLIST variablelist
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -423,7 +423,7 @@
 
 >
 
-<!ELEMENT example (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, (caption)?)>
+<!ELEMENT example (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, (caption)?)>
 
 <!ATTLIST example
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -437,7 +437,7 @@
 
 >
 
-<!ELEMENT informalexample ((info)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, (caption)?)>
+<!ELEMENT informalexample ((info)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, (caption)?)>
 
 <!ATTLIST informalexample
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -491,7 +491,7 @@
 
 >
 
-<!ELEMENT figure (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, (caption)?)>
+<!ELEMENT figure (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, (caption)?)>
 
 <!ATTLIST figure
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -504,7 +504,7 @@
 
 >
 
-<!ELEMENT informalfigure ((info)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, (caption)?)>
+<!ELEMENT informalfigure ((info)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, (caption)?)>
 
 <!ATTLIST informalfigure
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -567,7 +567,7 @@
 
 >
 
-<!ELEMENT textobject ((info)?, (phrase|textdata|(itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+))>
+<!ELEMENT textobject ((info)?, (phrase|textdata|(itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+))>
 
 <!ATTLIST textobject
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -642,7 +642,7 @@
 
 >
 
-<!ELEMENT caption (#PCDATA|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|caution|important|note|tip|warning|example|figure|table|informalexample|informalfigure|informaltable|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|programlisting|screen|literallayout|synopsis|programlistingco|screenco|cmdsynopsis|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|bridgehead|remark|revhistory|indexterm|equation|informalequation|anchor|para|formalpara|simpara|html:form|annotation)*>
+<!ELEMENT caption (#PCDATA|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|caution|important|note|tip|warning|example|figure|table|informalexample|informalfigure|informaltable|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|programlisting|screen|literallayout|synopsis|programlistingco|screenco|cmdsynopsis|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|bridgehead|remark|revhistory|indexterm|equation|informalequation|anchor|para|newline|formalpara|simpara|html:form|annotation)*>
 
 <!ATTLIST caption
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1003,7 +1003,7 @@
 
 >
 
-<!ELEMENT cover ((anchor|para|formalpara|simpara|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis)+)>
+<!ELEMENT cover ((anchor|para|newline|formalpara|simpara|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis)+)>
 
 <!ATTLIST cover
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1107,7 +1107,7 @@
 
 >
 
-<!ELEMENT legalnotice (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT legalnotice (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST legalnotice
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1199,7 +1199,7 @@
 
 >
 
-<!ELEMENT printhistory ((anchor|para|formalpara|simpara)+)>
+<!ELEMENT printhistory ((anchor|para|newline|formalpara|simpara)+)>
 
 <!ATTLIST printhistory
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1289,7 +1289,7 @@
 
 >
 
-<!ELEMENT revdescription ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*)>
+<!ELEMENT revdescription ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*)>
 
 <!ATTLIST revdescription
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1635,7 +1635,7 @@
 
 >
 
-<!ELEMENT dedication (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT dedication (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST dedication
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1647,7 +1647,7 @@
 
 >
 
-<!ELEMENT acknowledgements (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT acknowledgements (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST acknowledgements
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1659,7 +1659,7 @@
 
 >
 
-<!ELEMENT colophon (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT colophon (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST colophon
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1671,7 +1671,7 @@
 
 >
 
-<!ELEMENT appendix (((title|titleabbrev|subtitle)*, (info)?), ((glossary|bibliography|index|toc)*, (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+), (glossary|bibliography|index|toc)*))>
+<!ELEMENT appendix (((title|titleabbrev|subtitle)*, (info)?), ((glossary|bibliography|index|toc)*, (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+), (glossary|bibliography|index|toc)*))>
 
 <!ATTLIST appendix
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1683,7 +1683,7 @@
 
 >
 
-<!ELEMENT chapter (((title|titleabbrev|subtitle)*, (info)?), ((glossary|bibliography|index|toc)*, (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+), (glossary|bibliography|index|toc)*))>
+<!ELEMENT chapter (((title|titleabbrev|subtitle)*, (info)?), ((glossary|bibliography|index|toc)*, (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+), (glossary|bibliography|index|toc)*))>
 
 <!ATTLIST chapter
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1707,7 +1707,7 @@
 
 >
 
-<!ELEMENT preface (((title|titleabbrev|subtitle)*, (info)?), ((glossary|bibliography|index|toc)*, (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+), (glossary|bibliography|index|toc)*))>
+<!ELEMENT preface (((title|titleabbrev|subtitle)*, (info)?), ((glossary|bibliography|index|toc)*, (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+), (glossary|bibliography|index|toc)*))>
 
 <!ATTLIST preface
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1719,7 +1719,7 @@
 
 >
 
-<!ELEMENT partintro (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))>
+<!ELEMENT partintro (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))>
 
 <!ATTLIST partintro
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1731,7 +1731,7 @@
 
 >
 
-<!ELEMENT section (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|(refentry)+), (glossary|bibliography|index|toc)*)>
+<!ELEMENT section (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|(refentry)+), (glossary|bibliography|index|toc)*)>
 
 <!ATTLIST section
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1743,7 +1743,9 @@
 
 >
 
-<!ELEMENT simplesect (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT newline EMPTY >
+
+<!ELEMENT simplesect (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST simplesect
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1755,7 +1757,7 @@
 
 >
 
-<!ELEMENT article (((title|titleabbrev|subtitle)*, (info)?), (glossary|bibliography|index|toc|appendix|acknowledgements|colophon)*, (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+), (glossary|bibliography|index|toc|appendix|acknowledgements|colophon)*)>
+<!ELEMENT article (((title|titleabbrev|subtitle)*, (info)?), (glossary|bibliography|index|toc|appendix|acknowledgements|colophon)*, (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+))?)|((section)+, (simplesect)*)|(simplesect)+|((sect1)+, (simplesect)*)|(refentry)+), (glossary|bibliography|index|toc|appendix|acknowledgements|colophon)*)>
 
 <!ATTLIST article
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1768,7 +1770,7 @@
 
 >
 
-<!ELEMENT annotation (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT annotation (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST annotation
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1808,7 +1810,7 @@
 
 >
 
-<!ELEMENT sect1 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((sect2)+, (simplesect)*)|(simplesect)+))?)|((sect2)+, (simplesect)*)|(simplesect)+), (glossary|bibliography|index|toc)*)>
+<!ELEMENT sect1 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((sect2)+, (simplesect)*)|(simplesect)+))?)|((sect2)+, (simplesect)*)|(simplesect)+), (glossary|bibliography|index|toc)*)>
 
 <!ATTLIST sect1
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1820,7 +1822,7 @@
 
 >
 
-<!ELEMENT sect2 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((sect3)+, (simplesect)*)|(simplesect)+))?)|((sect3)+, (simplesect)*)|(simplesect)+), (glossary|bibliography|index|toc)*)>
+<!ELEMENT sect2 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((sect3)+, (simplesect)*)|(simplesect)+))?)|((sect3)+, (simplesect)*)|(simplesect)+), (glossary|bibliography|index|toc)*)>
 
 <!ATTLIST sect2
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1832,7 +1834,7 @@
 
 >
 
-<!ELEMENT sect3 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((sect4)+, (simplesect)*)|(simplesect)+))?)|((sect4)+, (simplesect)*)|(simplesect)+), (glossary|bibliography|index|toc)*)>
+<!ELEMENT sect3 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((sect4)+, (simplesect)*)|(simplesect)+))?)|((sect4)+, (simplesect)*)|(simplesect)+), (glossary|bibliography|index|toc)*)>
 
 <!ATTLIST sect3
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1844,7 +1846,7 @@
 
 >
 
-<!ELEMENT sect4 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((((sect5)+, (simplesect)*)|(simplesect)+))?)|((sect5)+, (simplesect)*)|(simplesect)+), (glossary|bibliography|index|toc)*)>
+<!ELEMENT sect4 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((((sect5)+, (simplesect)*)|(simplesect)+))?)|((sect5)+, (simplesect)*)|(simplesect)+), (glossary|bibliography|index|toc)*)>
 
 <!ATTLIST sect4
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1856,7 +1858,7 @@
 
 >
 
-<!ELEMENT sect5 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((simplesect)+)?)|(simplesect)+), (glossary|bibliography|index|toc)*)>
+<!ELEMENT sect5 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((simplesect)+)?)|(simplesect)+), (glossary|bibliography|index|toc)*)>
 
 <!ATTLIST sect5
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1964,7 +1966,7 @@
 
 >
 
-<!ELEMENT refsynopsisdiv (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, (((refsection)+|(refsect2)+))?)|(refsection)+|(refsect2)+))>
+<!ELEMENT refsynopsisdiv (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, (((refsection)+|(refsect2)+))?)|(refsection)+|(refsect2)+))>
 
 <!ATTLIST refsynopsisdiv
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1974,7 +1976,7 @@
 
 >
 
-<!ELEMENT refsection (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, (refsection)*)|(refsection)+))>
+<!ELEMENT refsection (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, (refsection)*)|(refsection)+))>
 
 <!ATTLIST refsection
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1986,7 +1988,7 @@
 
 >
 
-<!ELEMENT refsect1 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((refsect2)+)?)|(refsect2)+))>
+<!ELEMENT refsect1 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((refsect2)+)?)|(refsect2)+))>
 
 <!ATTLIST refsect1
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -1998,7 +2000,7 @@
 
 >
 
-<!ELEMENT refsect2 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, ((refsect3)+)?)|(refsect3)+))>
+<!ELEMENT refsect2 (((title|titleabbrev|subtitle)*, (info)?), (((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, ((refsect3)+)?)|(refsect3)+))>
 
 <!ATTLIST refsect2
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2010,7 +2012,7 @@
 
 >
 
-<!ELEMENT refsect3 (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT refsect3 (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST refsect3
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2022,7 +2024,7 @@
 
 >
 
-<!ELEMENT glosslist ((((title|titleabbrev)*, (info)?))?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (glossentry)+)>
+<!ELEMENT glosslist ((((title|titleabbrev)*, (info)?))?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (glossentry)+)>
 
 <!ATTLIST glosslist
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2043,7 +2045,7 @@
 
 >
 
-<!ELEMENT glossdef ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+, (glossseealso)*)>
+<!ELEMENT glossdef ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+, (glossseealso)*)>
 
 <!ATTLIST glossdef
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2098,7 +2100,7 @@
 
 >
 
-<!ELEMENT glossary (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, ((glossdiv)*|(glossentry)*), (bibliography)?)>
+<!ELEMENT glossary (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, ((glossdiv)*|(glossentry)*), (bibliography)?)>
 
 <!ATTLIST glossary
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2110,7 +2112,7 @@
 
 >
 
-<!ELEMENT glossdiv (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (glossentry)+)>
+<!ELEMENT glossdiv (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (glossentry)+)>
 
 <!ATTLIST glossdiv
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2186,7 +2188,7 @@
 
 >
 
-<!ELEMENT bibliography (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, ((bibliodiv)+|(biblioentry|bibliomixed)+))>
+<!ELEMENT bibliography (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, ((bibliodiv)+|(biblioentry|bibliomixed)+))>
 
 <!ATTLIST bibliography
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2198,7 +2200,7 @@
 
 >
 
-<!ELEMENT bibliodiv (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (biblioentry|bibliomixed)+)>
+<!ELEMENT bibliodiv (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (biblioentry|bibliomixed)+)>
 
 <!ATTLIST bibliodiv
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2210,7 +2212,7 @@
 
 >
 
-<!ELEMENT bibliolist ((((title|titleabbrev)*, (info)?))?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (biblioentry|bibliomixed)+)>
+<!ELEMENT bibliolist ((((title|titleabbrev)*, (info)?))?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (biblioentry|bibliomixed)+)>
 
 <!ATTLIST bibliolist
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2315,7 +2317,7 @@
 
 >
 
-<!ELEMENT index (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, ((indexdiv)*|(indexentry)*|segmentedlist))>
+<!ELEMENT index (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, ((indexdiv)*|(indexentry)*|segmentedlist))>
 
 <!ATTLIST index
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2328,7 +2330,7 @@
 
 >
 
-<!ELEMENT setindex (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, ((indexdiv)*|(indexentry)*))>
+<!ELEMENT setindex (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, ((indexdiv)*|(indexentry)*))>
 
 <!ATTLIST setindex
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2341,7 +2343,7 @@
 
 >
 
-<!ELEMENT indexdiv (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, ((indexentry)+|segmentedlist))>
+<!ELEMENT indexdiv (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, ((indexentry)+|segmentedlist))>
 
 <!ATTLIST indexdiv
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2413,7 +2415,7 @@
 
 >
 
-<!ELEMENT toc (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (tocdiv|tocentry)*)>
+<!ELEMENT toc (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (tocdiv|tocentry)*)>
 
 <!ATTLIST toc
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2423,7 +2425,7 @@
 
 >
 
-<!ELEMENT tocdiv (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (tocdiv|tocentry)+)>
+<!ELEMENT tocdiv (((title|titleabbrev|subtitle)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (tocdiv|tocentry)+)>
 
 <!ATTLIST tocdiv
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2455,7 +2457,7 @@
 
 >
 
-<!ELEMENT tasksummary (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT tasksummary (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST tasksummary
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2465,7 +2467,7 @@
 
 >
 
-<!ELEMENT taskprerequisites (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT taskprerequisites (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST taskprerequisites
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2475,7 +2477,7 @@
 
 >
 
-<!ELEMENT taskrelated (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT taskrelated (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST taskrelated
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2485,7 +2487,7 @@
 
 >
 
-<!ELEMENT calloutlist (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, (callout)+)>
+<!ELEMENT calloutlist (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, (callout)+)>
 
 <!ATTLIST calloutlist
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2495,7 +2497,7 @@
 
 >
 
-<!ELEMENT callout ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT callout ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST callout
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2667,7 +2669,7 @@
 
 >
 
-<!ELEMENT constraintdef (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT constraintdef (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST constraintdef
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -2826,7 +2828,7 @@
 
 >
 
-<!ELEMENT entry (#PCDATA|inlinemediaobject|remark|superscript|subscript|xref|link|olink|anchor|biblioref|alt|annotation|indexterm|abbrev|acronym|date|emphasis|footnote|footnoteref|foreignphrase|phrase|quote|wordasword|firstterm|glossterm|coref|trademark|productnumber|productname|database|application|hardware|citation|citerefentry|citetitle|citebiblioid|author|person|personname|org|orgname|editor|jobtitle|replaceable|package|parameter|termdef|nonterminal|systemitem|option|optional|property|inlineequation|tag|markup|token|symbol|literal|code|constant|email|uri|guiicon|guibutton|guimenuitem|guimenu|guisubmenu|guilabel|menuchoice|mousebutton|keycombo|keycap|keycode|keysym|shortcut|accel|prompt|envar|filename|command|computeroutput|userinput|function|varname|returnvalue|type|classname|exceptionname|interfacename|methodname|modifier|initializer|ooclass|ooexception|oointerface|errorcode|errortext|errorname|errortype|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|para|formalpara|simpara)*>
+<!ELEMENT entry (#PCDATA|inlinemediaobject|remark|superscript|subscript|xref|link|olink|anchor|biblioref|alt|annotation|indexterm|abbrev|acronym|date|emphasis|footnote|footnoteref|foreignphrase|phrase|quote|wordasword|firstterm|glossterm|coref|trademark|productnumber|productname|database|application|hardware|citation|citerefentry|citetitle|citebiblioid|author|person|personname|org|orgname|editor|jobtitle|replaceable|package|parameter|termdef|nonterminal|systemitem|option|optional|property|inlineequation|tag|markup|token|symbol|literal|code|constant|email|uri|guiicon|guibutton|guimenuitem|guimenu|guisubmenu|guilabel|menuchoice|mousebutton|keycombo|keycap|keycode|keysym|shortcut|accel|prompt|envar|filename|command|computeroutput|userinput|function|varname|returnvalue|type|classname|exceptionname|interfacename|methodname|modifier|initializer|ooclass|ooexception|oointerface|errorcode|errortext|errorname|errortype|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|para|newline|formalpara|simpara)*>
 
 <!ATTLIST entry
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -3030,7 +3032,7 @@
 
 >
 
-<!ELEMENT th (#PCDATA|inlinemediaobject|remark|superscript|subscript|xref|link|olink|anchor|biblioref|alt|annotation|indexterm|abbrev|acronym|date|emphasis|footnote|footnoteref|foreignphrase|phrase|quote|wordasword|firstterm|glossterm|coref|trademark|productnumber|productname|database|application|hardware|citation|citerefentry|citetitle|citebiblioid|author|person|personname|org|orgname|editor|jobtitle|replaceable|package|parameter|termdef|nonterminal|systemitem|option|optional|property|inlineequation|tag|markup|token|symbol|literal|code|constant|email|uri|guiicon|guibutton|guimenuitem|guimenu|guisubmenu|guilabel|menuchoice|mousebutton|keycombo|keycap|keycode|keysym|shortcut|accel|prompt|envar|filename|command|computeroutput|userinput|function|varname|returnvalue|type|classname|exceptionname|interfacename|methodname|modifier|initializer|ooclass|ooexception|oointerface|errorcode|errortext|errorname|errortype|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|para|formalpara|simpara)*>
+<!ELEMENT th (#PCDATA|inlinemediaobject|remark|superscript|subscript|xref|link|olink|anchor|biblioref|alt|annotation|indexterm|abbrev|acronym|date|emphasis|footnote|footnoteref|foreignphrase|phrase|quote|wordasword|firstterm|glossterm|coref|trademark|productnumber|productname|database|application|hardware|citation|citerefentry|citetitle|citebiblioid|author|person|personname|org|orgname|editor|jobtitle|replaceable|package|parameter|termdef|nonterminal|systemitem|option|optional|property|inlineequation|tag|markup|token|symbol|literal|code|constant|email|uri|guiicon|guibutton|guimenuitem|guimenu|guisubmenu|guilabel|menuchoice|mousebutton|keycombo|keycap|keycode|keysym|shortcut|accel|prompt|envar|filename|command|computeroutput|userinput|function|varname|returnvalue|type|classname|exceptionname|interfacename|methodname|modifier|initializer|ooclass|ooexception|oointerface|errorcode|errortext|errorname|errortype|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|para|newline|formalpara|simpara)*>
 
 <!ATTLIST th
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -3062,7 +3064,7 @@
 
 >
 
-<!ELEMENT td (#PCDATA|inlinemediaobject|remark|superscript|subscript|xref|link|olink|anchor|biblioref|alt|annotation|indexterm|abbrev|acronym|date|emphasis|footnote|footnoteref|foreignphrase|phrase|quote|wordasword|firstterm|glossterm|coref|trademark|productnumber|productname|database|application|hardware|citation|citerefentry|citetitle|citebiblioid|author|person|personname|org|orgname|editor|jobtitle|replaceable|package|parameter|termdef|nonterminal|systemitem|option|optional|property|inlineequation|tag|markup|token|symbol|literal|code|constant|email|uri|guiicon|guibutton|guimenuitem|guimenu|guisubmenu|guilabel|menuchoice|mousebutton|keycombo|keycap|keycode|keysym|shortcut|accel|prompt|envar|filename|command|computeroutput|userinput|function|varname|returnvalue|type|classname|exceptionname|interfacename|methodname|modifier|initializer|ooclass|ooexception|oointerface|errorcode|errortext|errorname|errortype|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|para|formalpara|simpara)*>
+<!ELEMENT td (#PCDATA|inlinemediaobject|remark|superscript|subscript|xref|link|olink|anchor|biblioref|alt|annotation|indexterm|abbrev|acronym|date|emphasis|footnote|footnoteref|foreignphrase|phrase|quote|wordasword|firstterm|glossterm|coref|trademark|productnumber|productname|database|application|hardware|citation|citerefentry|citetitle|citebiblioid|author|person|personname|org|orgname|editor|jobtitle|replaceable|package|parameter|termdef|nonterminal|systemitem|option|optional|property|inlineequation|tag|markup|token|symbol|literal|code|constant|email|uri|guiicon|guibutton|guimenuitem|guimenu|guisubmenu|guilabel|menuchoice|mousebutton|keycombo|keycap|keycode|keysym|shortcut|accel|prompt|envar|filename|command|computeroutput|userinput|function|varname|returnvalue|type|classname|exceptionname|interfacename|methodname|modifier|initializer|ooclass|ooexception|oointerface|errorcode|errortext|errorname|errortype|itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|revhistory|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|para|newline|formalpara|simpara)*>
 
 <!ATTLIST td
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -3167,7 +3169,7 @@
 
 >
 
-<!ELEMENT msgtext ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT msgtext ((itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST msgtext
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -3217,7 +3219,7 @@
 
 >
 
-<!ELEMENT msgexplan (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT msgexplan (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST msgexplan
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -3227,7 +3229,7 @@
 
 >
 
-<!ELEMENT qandaset (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, ((qandadiv)+|(qandaentry)+))>
+<!ELEMENT qandaset (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, ((qandadiv)+|(qandaentry)+))>
 
 <!ATTLIST qandaset
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -3238,7 +3240,7 @@
 
 >
 
-<!ELEMENT qandadiv (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)*, ((qandadiv)+|(qandaentry)+))>
+<!ELEMENT qandadiv (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)*, ((qandadiv)+|(qandaentry)+))>
 
 <!ATTLIST qandadiv
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -3258,7 +3260,7 @@
 
 >
 
-<!ELEMENT question ((label)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT question ((label)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST question
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -3268,7 +3270,7 @@
 
 >
 
-<!ELEMENT answer ((label)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT answer ((label)?, (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST answer
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -4066,7 +4068,7 @@
 
 >
 
-<!ELEMENT caution (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT caution (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST caution
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -4076,7 +4078,7 @@
 
 >
 
-<!ELEMENT important (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT important (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST important
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -4086,7 +4088,7 @@
 
 >
 
-<!ELEMENT note (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT note (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST note
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -4096,7 +4098,7 @@
 
 >
 
-<!ELEMENT tip (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT tip (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST tip
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"
@@ -4106,7 +4108,7 @@
 
 >
 
-<!ELEMENT warning (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|formalpara|simpara|annotation)+)>
+<!ELEMENT warning (((title|titleabbrev)*, (info)?), (itemizedlist|orderedlist|procedure|simplelist|variablelist|segmentedlist|glosslist|bibliolist|calloutlist|qandaset|example|figure|table|equation|informalexample|informalfigure|informaltable|informalequation|sidebar|blockquote|address|epigraph|mediaobject|screenshot|task|productionset|constraintdef|msgset|screen|literallayout|programlistingco|screenco|programlisting|synopsis|bridgehead|remark|revhistory|indexterm|funcsynopsis|classsynopsis|methodsynopsis|constructorsynopsis|destructorsynopsis|fieldsynopsis|cmdsynopsis|caution|important|note|tip|warning|anchor|para|newline|formalpara|simpara|annotation)+)>
 
 <!ATTLIST warning
 	xmlns	CDATA	#FIXED	"http://docbook.org/ns/docbook"

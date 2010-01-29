@@ -2109,7 +2109,81 @@
 		<xsl:value-of select="$expandedText">
 		</xsl:value-of>
 	</xsl:template>
-</xsl:stylesheet><!-- 
+
+	<xsl:template match="text()" mode="mode1">
+		<xsl:param name="myName"/>
+		<xsl:choose>
+			<!-- This condition is true when the string is a zero-length string -->
+			<xsl:when test="not(boolean(normalize-space(string(.))))">
+				<xsl:apply-templates mode="mode1" select="following-sibling::node()[1]">
+					<xsl:with-param name="myName" select="$myName" />
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="'false'" />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template match="*" mode="mode1">
+		<xsl:param name="myName"/>
+		<xsl:choose>
+			<xsl:when test="name() = $myName">
+				<xsl:value-of select="'true'" />
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="'false'" />
+			</xsl:otherwise>
+		</xsl:choose>
+
+
+	</xsl:template>
+
+	<xsl:template name="isFollowedBySameElement">
+		<xsl:variable name="myName" select="name()"/>
+		<xsl:variable name="result">
+			<xsl:apply-templates mode="mode1" select="following-sibling::node()[1]">
+				<xsl:with-param name="myName" select="$myName" />
+			</xsl:apply-templates>
+		</xsl:variable>
+		<xsl:choose>
+			<!-- This condition is true when $result is a zero-length string -->
+			<!--
+				 It is in particular the case when there does not exist
+				 following siblings: templates are not called and so result
+				 is not set.
+			-->
+			<xsl:when test="not(boolean(normalize-space($result)))">
+				<xsl:value-of select="'false'" />
+			</xsl:when>
+			<!-- In this case, result has been set, so we return it as it is -->
+			<xsl:otherwise>
+				<xsl:value-of select="$result" />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+
+	<xsl:template match="newline">
+		<xsl:variable name="followedByNewLine">
+			<xsl:call-template name="isFollowedBySameElement" />
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$followedByNewLine = 'true'">
+				<fo:block>&#160;</fo:block>
+			</xsl:when>
+			<xsl:otherwise>
+				<fo:block
+					linefeed-treatment="preserve"
+					white-space-treatment="preserve"
+					white-space-collapse="false">
+					<fo:inline>&#010;</fo:inline>
+				</fo:block>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+</xsl:stylesheet>
+<!--
 	<xsl:message>
 	<xsl:text> OK, question.toc </xsl:text> <xsl:copy-of select="$id" /> 
 	</xsl:message>

@@ -151,6 +151,18 @@
 				</copy>
 			</if>
 
+			<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
+				<fileset dir="${docs.toolchain.dir}">
+					<include name="docbook.dtd" />
+				</fileset>
+			</copy>
+
+			<copy toDir="@{output.docs.dir}" includeemptydirs="no">
+				<fileset dir="${docs.toolchain.dir}">
+					<include name="main.css" />
+				</fileset>
+			</copy>
+
 			<copy toDir="@{output.docs.dir}" includeemptydirs="no" >
 				<fileset dir="${docs.src.dir}">
 					<include name="**/*.png" />

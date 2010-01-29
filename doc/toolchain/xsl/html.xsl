@@ -566,4 +566,8 @@
 		</xsl:variable>
 		<xsl:value-of select="$expandedText" />
 	</xsl:template>
+
+	<xsl:template match="newline">
+		<br />
+	</xsl:template>
 </xsl:stylesheet>

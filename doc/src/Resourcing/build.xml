@@ -22,9 +22,9 @@
 	<!--          Make just the html files for the manual                     -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualHtml" description="Generate the Resource Manager HTML manual">
+		<var name="doc.relative.name"		value="Resourcing" />
+		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
 		<subant target="manualHtml" 			inheritall="true">
-			<property name="doc.relative.name"		value="Resourcing" />
-			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
 	</target>
@@ -32,9 +32,9 @@
 	<!--   Make an archive from the files for the multiple html manual        -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualHtmlZip" description="Generate the Resource Manager HTML manual zip" depends="doc.rm.manualHtml" >
+		<var name="doc.relative.name"		value="Resourcing" />
+		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
 		<subant target="manualHtmlZip" inheritall="true">
-			<property name="doc.relative.name"		value="Resourcing" />
-			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
 			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -43,9 +43,9 @@
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualPdf" description="Generate the Resource Manager PDF manual">
+		<var name="doc.relative.name"		value="Resourcing" />
+		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
 		<subant target="manualPdf" inheritall="true">
-			<property name="doc.relative.name"		value="Resourcing" />
-			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
 			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -53,9 +53,9 @@
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualSingleHtml" description="Generate the Resource Manager single HTML manual">
+		<var name="doc.relative.name"		value="Resourcing" />
+		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
 		<subant target="manualSingleHtml" inheritall="true">
-			<property name="doc.relative.name"		value="Resourcing" />
-			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
 			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -64,9 +64,9 @@
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.manualSingleHtmlZip" description="Generate the Resource Manager single HTML manual zip" depends="doc.rm.manualSingleHtml" >
+		<var name="doc.relative.name"		value="Resourcing" />
+		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
 		<subant target="manualSingleHtmlZip" inheritall="true">
-			<property name="doc.relative.name"		value="Resourcing" />
-			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
 			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -75,9 +75,9 @@
 	<!--      Make an archive from the published javadoc       -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.javadoc.publishedZip" description="Generate the Resource Manager published javadoc zip" depends="doc.rm.javadoc.published">
+		<var name="doc.relative.name"		value="Resourcing" />
+		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
 		<subant target="javadoc.publishedZip" inheritall="true">
-			<property name="doc.relative.name"		value="Resourcing" />
-			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
 			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -86,9 +86,9 @@
 	<!--      Make an archive from the complete javadoc       -->
 	<!-- ==================================================================== -->
 	<target name="doc.rm.javadoc.completeZip" description="Generate the Resource Manager complete javadoc zip" depends="doc.rm.javadoc.complete">
+		<var name="doc.relative.name"		value="Resourcing" />
+		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
 		<subant target="javadoc.completeZip" inheritall="true">
-			<property name="doc.relative.name"		value="Resourcing" />
-			<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
 			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
 		</subant>
 	</target>
@@ -108,10 +108,10 @@
 
 
 	<target name="doc.rm.javadoc.complete"  depends="compile.rm" description="Generate the Resource Manager complete javadoc">
-		<property name="doc.relative.name"		value="Resourcing" />
-		<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+		<var name="doc.relative.name"		value="Resourcing" />
+		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
 		<setProperties />
-	<javadoc
+		<javadoc
             destdir="${docs.built.dir}/api_complete"
             author="true"
             version="true"
@@ -141,10 +141,10 @@
     </target>
 
 	<target name="doc.rm.javadoc.published" depends="compile.rm" description="Generate the Resource Manager published javadoc">
-		<property name="doc.relative.name"		value="Resourcing" />
-		<property name="docs.output.name"		value="ProActiveResourceManagerManual" />
+		<var name="doc.relative.name"		value="Resourcing" />
+		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
 		<setProperties />
-	<mkdir dir="${docs.tmp.dir}" />
+		<mkdir dir="${docs.tmp.dir}" />
         <javadoc source="${source}"	classpathref="rm.libs">
             <doclet name="doc.PublishedAPIDoclet">
 				<path refid="docs.utils.classpath.javadoc"/>

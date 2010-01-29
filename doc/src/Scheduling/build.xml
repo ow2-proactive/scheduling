@@ -22,9 +22,9 @@
 	<!--          Make just the html files for the manual                     -->
 	<!-- ==================================================================== -->
 	<target name="doc.Scheduler.manualHtml" description="Generate the Scheduler Programming HTML manual">
+		<var name="doc.relative.name"		value="Scheduling" />
+		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
 		<subant target="manualHtml" 			inheritall="true">
-			<property name="doc.relative.name"		value="Scheduling" />
-			<property name="docs.output.name"		value="ProActiveSchedulerManual" />
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
 	</target>
@@ -32,9 +32,9 @@
 	<!--   Make an archive from the files for the multiple html manual        -->
 	<!-- ==================================================================== -->
 	<target name="doc.Scheduler.manualHtmlZip" description="Generate the Scheduler Programming HTML manual zip" depends="doc.Scheduler.manualHtml" >
+		<var name="doc.relative.name"		value="Scheduling" />
+		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
 		<subant target="manualHtmlZip" inheritall="true">
-			<property name="doc.relative.name"		value="Scheduling" />
-			<property name="docs.output.name"		value="ProActiveSchedulerManual" />
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
 	</target>
@@ -43,9 +43,9 @@
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
 	<target name="doc.Scheduler.manualPdf" description="Generate the Scheduler Programming PDF manual">
+		<var name="doc.relative.name"		value="Scheduling" />
+		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
 		<subant target="manualPdf" inheritall="true">
-			<property name="doc.relative.name"		value="Scheduling" />
-			<property name="docs.output.name"		value="ProActiveSchedulerManual" />
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
 	</target>
@@ -53,9 +53,9 @@
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<target name="doc.Scheduler.manualSingleHtml" description="Generate the Scheduler Programming single HTML manual">
+		<var name="doc.relative.name"		value="Scheduling" />
+		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
 		<subant target="manualSingleHtml" inheritall="true">
-			<property name="doc.relative.name"		value="Scheduling" />
-			<property name="docs.output.name"		value="ProActiveSchedulerManual" />
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
 	</target>
@@ -64,9 +64,9 @@
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
 	<target name="doc.Scheduler.manualSingleHtmlZip" description="Generate the Scheduler Programming single HTML manual zip" depends="doc.Scheduler.manualSingleHtml" >
+		<var name="doc.relative.name"		value="Scheduling" />
+		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
 		<subant target="manualSingleHtmlZip" inheritall="true">
-			<property name="doc.relative.name"		value="Scheduling" />
-			<property name="docs.output.name"		value="ProActiveSchedulerManual" />
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
 	</target>
@@ -75,9 +75,9 @@
 	<!--      Make an archive from the published javadoc       -->
 	<!-- ==================================================================== -->
 	<target name="doc.Scheduler.javadoc.publishedZip" description="Generate the Scheduler Programming published javadoc zip" depends="doc.Scheduler.javadoc.published">
+		<var name="doc.relative.name"		value="Scheduling" />
+		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
 		<subant target="javadoc.publishedZip" inheritall="true">
-			<property name="doc.relative.name"		value="Scheduling" />
-			<property name="docs.output.name"		value="ProActiveSchedulerManual" />
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
 	</target>
@@ -86,9 +86,9 @@
 	<!--      Make an archive from the complete javadoc       -->
 	<!-- ==================================================================== -->
 	<target name="doc.Scheduler.javadoc.completeZip" description="Generate the Scheduler Programming complete javadoc zip" depends="doc.Scheduler.javadoc.complete">
+		<var name="doc.relative.name"		value="Scheduling" />
+		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
 		<subant target="javadoc.completeZip" inheritall="true">
-			<property name="doc.relative.name"		value="Scheduling" />
-			<property name="docs.output.name"		value="ProActiveSchedulerManual" />
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
 	</target>
@@ -107,10 +107,10 @@
 	</path>
 
 	<target name="doc.Scheduler.javadoc.complete"  depends="compile.all" description="Generate the Scheduler complete javadoc">
-		<property name="doc.relative.name"		value="Scheduling" />
-		<property name="docs.output.name"		value="ProActiveSchedulerManual" />
+		<var name="doc.relative.name"		value="Scheduling" />
+		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
 		<setProperties />
-	<javadoc
+		<javadoc
             destdir="${docs.built.dir}/api_complete"
             author="true"
             version="true"
@@ -148,10 +148,10 @@
     </target>
 
 	<target name="doc.Scheduler.javadoc.published" depends="compile.all" description="Generate the Scheduler published javadoc">
-		<property name="doc.relative.name"		value="Scheduling" />
-		<property name="docs.output.name"		value="ProActiveSchedulerManual" />
+		<var name="doc.relative.name"		value="Scheduling" />
+		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
 		<setProperties />
-	<mkdir dir="${docs.tmp.dir}" />
+		<mkdir dir="${docs.tmp.dir}" />
         <javadoc source="${source}"	classpathref="scheduler.libs">
             <doclet name="doc.PublishedAPIDoclet">
 				<path refid="docs.utils.classpath.javadoc"/>
