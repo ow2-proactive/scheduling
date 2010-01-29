@@ -179,10 +179,12 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @return true if script will pass on the node
      */
     @Override
-    public boolean isPassed(SelectionScript script, RMNode rmnode) {
+    public synchronized boolean isPassed(SelectionScript script, RMNode rmnode) {
         if (probabilities.containsKey(script) && probabilities.get(script).containsKey(rmnode)) {
             Probability p = probabilities.get(script).get(rmnode);
-            logger.debug("Known static script " + script.hashCode() + " for node " + rmnode.getNodeURL());
+            String scriptType = script.isDynamic() ? "dynamic" : "static";
+            logger.debug("Known " + scriptType + " script " + script.hashCode() + " for node " +
+                rmnode.getNodeURL());
             return p.value() == 1;
         }
         logger.debug("Unknown script " + script.hashCode() + " for node " + rmnode.getNodeURL());
@@ -199,8 +201,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @return whether node is selected
      */
     @Override
-    public boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
-            RMNode rmnode) {
+    public synchronized boolean processScriptResult(SelectionScript script,
+            ScriptResult<Boolean> scriptResult, RMNode rmnode) {
 
         boolean result = false;
 

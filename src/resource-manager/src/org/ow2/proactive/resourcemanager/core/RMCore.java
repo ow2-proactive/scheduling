@@ -1016,5 +1016,4 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     public ArrayList<RMNode> getFreeNodes() {
         return freeNodes;
     }
-
 }

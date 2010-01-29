@@ -36,14 +36,16 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -52,6 +54,9 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.network.NetworkCommunicator;
+import org.ow2.proactive.network.NetworkCommunicatorImpl;
+import org.ow2.proactive.network.Timed;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -62,8 +67,6 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
-import org.ow2.proactive.resourcemanager.nodesource.utils.BoundedNonRejectedThreadPool;
-import org.ow2.proactive.resourcemanager.nodesource.utils.Pinger;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -83,11 +86,12 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  * into account different external factors such as time, scheduling state, etc.
  *
  */
-public class NodeSource implements InitActive {
+public class NodeSource implements InitActive, RunActive {
 
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
     private static final int NODE_LOOKUP_TIMEOUT = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT
             .getValueAsInt();
+    private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
     /** Default name */
     public static final String GCM_LOCAL = "GCMLocalNodes";
@@ -100,16 +104,14 @@ public class NodeSource implements InitActive {
     private NodeSourcePolicy nodeSourcePolicy;
     private String description;
     private RMCore rmcore;
-    private Pinger pinger;
     private boolean toShutdown = false;
-    private int numberOfShutdownServices = 0;
 
     // all nodes except down
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
     private HashMap<String, Node> downNodes = new HashMap<String, Node>();
 
-    private transient BoundedNonRejectedThreadPool threadPool;
-    private transient NodeLookupThread nodeLookupThread;
+    private static transient NetworkCommunicator networkCommunicator;
+    private NodeSource stub;
 
     /**
      * Creates a new instance of NodeSource.
@@ -139,15 +141,13 @@ public class NodeSource implements InitActive {
      * @param body active object body
      */
     public void initActivity(Body body) {
+
+        stub = (NodeSource) PAActiveObject.getStubOnThis();
         infrastructureManager.setNodeSource(this);
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
-        threadPool = new BoundedNonRejectedThreadPool(0,
-            PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt(), 1L,
-            TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+
         try {
-            pinger = (Pinger) PAActiveObject.newActive(Pinger.class.getName(), new Object[] { PAActiveObject
-                    .getStubOnThis() });
-            nodeLookupThread = new NodeLookupThread();
+            getNetworkCommunicator();
 
             // description could be requested when the policy does not exist anymore
             // so initializing it here
@@ -156,10 +156,36 @@ public class NodeSource implements InitActive {
             // these methods are called from the rm core
             // mark them as immediate services in order to prevent the block of the core
             PAActiveObject.setImmediateService("getName");
+            PAActiveObject.setImmediateService("executeInParallel");
             PAActiveObject.setImmediateService("getDescription");
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+
+        long timeStamp = System.currentTimeMillis();
+        long delta = 0;
+
+        // recalculating nodes number only once per policy period
+        while (body.isActive()) {
+
+            service.blockingServeOldest(pingFrequency);
+
+            delta += System.currentTimeMillis() - timeStamp;
+            timeStamp = System.currentTimeMillis();
+
+            if (delta > pingFrequency) {
+                logger.info("[" + name + "] Pinging alive nodes");
+                for (Node node : getAliveNodes()) {
+                    pingNode(node.getNodeInformation().getURL());
+                }
+                delta = 0;
+            }
+        }
+
     }
 
     /**
@@ -286,86 +312,37 @@ public class NodeSource implements InitActive {
     /**
      * Dedicated thread for nodes lookup
      */
-    private class NodeLookupThread extends Thread {
-        private Node node;
+    private class NodeLocator implements Timed<Node> {
+        private Node result = null;
+        private boolean isDone = false;
         private String nodeUrl;
 
-        private boolean shutDown = false;
-        private Object monitor = new Object();
-        private boolean isAlive = true;
-        private boolean timeoutReached = false;
-
-        public NodeLookupThread() {
-            setDaemon(true);
-            start();
+        public NodeLocator(String url) {
+            nodeUrl = url;
         }
 
-        @Override
         public void run() {
-            while (!shutDown) {
-                synchronized (monitor) {
-                    try {
-                        monitor.notifyAll();
-                        monitor.wait();
-                    } catch (InterruptedException e) {
-                    }
-                }
+            try {
+                Node node = NodeFactory.getNode(nodeUrl);
 
-                if (shutDown) {
-                    synchronized (monitor) {
-                        monitor.notifyAll();
-                    }
-                    return;
+                synchronized (this) {
+                    result = node;
+                    isDone = true;
                 }
-
-                try {
-                    isAlive = false;
-                    // looking for a node
-                    if (nodeUrl != null) {
-                        node = NodeFactory.getNode(nodeUrl);
-
-                        synchronized (monitor) {
-                            if (timeoutReached) {
-                                node = null;
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.info(e.getMessage());
-                }
-                isAlive = true;
+            } catch (NodeException e) {
+                logger.warn("", e);
             }
         }
 
-        public Node lookup(String nodeUrl, long timeout) throws Exception {
-
-            synchronized (monitor) {
-                this.nodeUrl = nodeUrl;
-                timeoutReached = false;
-
-                monitor.notifyAll();
-                monitor.wait(timeout);
-
-                if (node == null) {
-                    timeoutReached = true;
-                    throw new NodeException("Cannot lookup node " + nodeUrl);
-                } else {
-                    Node n = node;
-                    node = null;
-                    return n;
-                }
-            }
+        public Node getResult() {
+            return result;
         }
 
-        public void shutDown() {
-            shutDown = true;
-            synchronized (monitor) {
-                monitor.notifyAll();
-            }
+        public boolean isDone() {
+            return isDone;
         }
 
-        public boolean isThreadAlive() {
-            return isAlive;
+        public void timeoutAction() {
         }
     }
 
@@ -378,19 +355,13 @@ public class NodeSource implements InitActive {
      * @throws Exception if node was not looked up
      */
     private Node lookupNode(String nodeUrl, long timeout) throws Exception {
-
-        if (!nodeLookupThread.isThreadAlive()) {
-            logger.debug("Lookup thread is dead - recreating it");
-            // do all what is possible to stop the thread
-            nodeLookupThread.shutDown();
-            nodeLookupThread.interrupt();
-
-            // creating a new one
-            nodeLookupThread = new NodeLookupThread();
-        }
-
         logger.debug("Looking up for the node " + nodeUrl + " with " + timeout + " ms timeout");
-        return nodeLookupThread.lookup(nodeUrl, timeout);
+        Collection<NodeLocator> locator = Collections.singletonList(new NodeLocator(nodeUrl));
+        Collection<Node> nodes = getNetworkCommunicator().execute(locator, timeout);
+        if (nodes.size() > 0) {
+            return nodes.iterator().next();
+        }
+        return null;
     }
 
     /**
@@ -474,7 +445,7 @@ public class NodeSource implements InitActive {
      * @return ping frequency
      */
     public IntWrapper getPingFrequency() {
-        return pinger.getPingFrequency();
+        return new IntWrapper(pingFrequency);
     }
 
     /**
@@ -482,7 +453,7 @@ public class NodeSource implements InitActive {
      * @param frequency new value of monitoring period
      */
     public void setPingFrequency(int frequency) {
-        pinger.setPingFrequency(frequency);
+        pingFrequency = frequency;
     }
 
     /**
@@ -507,7 +478,6 @@ public class NodeSource implements InitActive {
     public void activate() {
         logger.info("[" + name + "] Activating the policy " + nodeSourcePolicy);
         nodeSourcePolicy.activate();
-        pinger.ping();
     }
 
     /**
@@ -518,30 +488,17 @@ public class NodeSource implements InitActive {
 
         nodeSourcePolicy.shutdown();
         infrastructureManager.shutDown();
-
-        try {
-            threadPool.shutdown();
-            // join emulation
-            threadPool.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        nodeLookupThread.shutDown();
-        pinger.shutdown();
     }
 
     /**
      * Terminates a node source active object when shutdown confirmation is received from the pinger and the policy. 
      */
     public void finishNodeSourceShutdown() {
-        if (++numberOfShutdownServices == 2) {
-            PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this,
-                RMEventType.NODESOURCE_REMOVED)));
+        PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this,
+            RMEventType.NODESOURCE_REMOVED)));
 
-            // got confirmation from pinger and policy
-            PAActiveObject.terminateActiveObject(false);
-        }
+        // got confirmation from pinger and policy
+        PAActiveObject.terminateActiveObject(false);
     }
 
     /**
@@ -606,14 +563,36 @@ public class NodeSource implements InitActive {
      * @param command to execute
      */
     public void executeInParallel(Runnable command) {
-        threadPool.execute(command);
+        getNetworkCommunicator().execute(command);
     }
 
     /**
-     * Gets the pinger of the node source
-     * @return pinger object
+     * Instantiates the network communicator if it is null.
      */
-    public Pinger getPinger() {
-        return pinger;
+    private synchronized static NetworkCommunicator getNetworkCommunicator() {
+        if (networkCommunicator == null) {
+            networkCommunicator = new NetworkCommunicatorImpl(
+                PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt());
+        }
+
+        return networkCommunicator;
+    }
+
+    /**
+     * Pings the node with specified url.
+     * If the node is dead sends the request to the node source.
+     */
+    public void pingNode(final String url) {
+        executeInParallel(new Runnable() {
+            public void run() {
+                try {
+                    Node node = NodeFactory.getNode(url);
+                    node.getNumberOfActiveObjects();
+                    logger.debug("Node " + url + " is alive");
+                } catch (Throwable t) {
+                    stub.detectedPingedDownNode(url);
+                }
+            }
+        });
     }
 }

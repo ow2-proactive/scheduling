@@ -86,6 +86,5 @@ public interface NetworkCommunicator {
      * @return a list of every tasks that have terminated, can be an empty list.
      * @throws IllegalArgumentException if tasks collection is null or empty, or if timeout is not positive.
      */
-    public <T extends Timed<?>> Collection<T> execute(Collection<T> tasks, long timeout);
-
+    public <T> Collection<T> execute(Collection<? extends Timed<T>> tasks, long timeout);
 }

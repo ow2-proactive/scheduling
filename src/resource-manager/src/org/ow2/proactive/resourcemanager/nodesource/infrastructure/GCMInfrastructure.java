@@ -164,7 +164,11 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
         if (!deploymentData.deployed) {
             try {
                 logger.debug("Deploying nodes");
-                deployGCMD(convertGCMdeploymentDataToGCMappl(deploymentData.data, null));
+                if (deploymentData.data != null) {
+                    deployGCMD(convertGCMdeploymentDataToGCMappl(deploymentData.data, null));
+                } else {
+                    logger.warn("Empty gcmd descriptor");
+                }
                 deploymentData.deployed = true;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);

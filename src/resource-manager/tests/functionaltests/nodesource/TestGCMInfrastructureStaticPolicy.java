@@ -43,6 +43,7 @@ import java.io.File;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -67,8 +68,8 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
     protected int defaultDescriptorNodesNb = 3;
 
     protected void createEmptyNodeSource(String sourceName) throws Exception {
-        RMTHelper.getAdminInterface().createNodesource(sourceName, GCMInfrastructure.class.getName(), null,
-                StaticPolicy.class.getName(), null);
+        RMTHelper.getAdminInterface().createNodesource(sourceName,
+                DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class.getName(), null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
@@ -165,5 +166,6 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
 
         //wait for the event of the node source removal
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source2);
+
     }
 }

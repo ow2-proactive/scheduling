@@ -37,6 +37,7 @@
 package functionaltests.selectionscript;
 
 import java.io.File;
+import java.util.HashMap;
 
 import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
@@ -57,6 +58,9 @@ import functionaltests.RMTHelper;
  * but before performs a Thread.sleep() two time longer
  * than defined selection script max waiting time for selection
  * script execution. So no nodes a got for this selection script.
+ *
+ * The resource manager do not propagate the exception outside.
+ * Instead it just returns all the nodes where the selection script passed.
  *
  * @author ProActice team
  *
@@ -85,22 +89,55 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
 
         int scriptSleepingTime = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt() * 2;
 
-        RMTHelper.log("Test 1");
+        RMTHelper.log("Test 1 - selecting nodes with timeout script");
 
         //create the static selection script object
-        SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath),
+        SelectionScript script = new SelectionScript(new File(selectionScriptWithtimeOutPath),
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
-        NodeSet nodes = admin.getAtMostNodes(2, sScript);
+        NodeSet nodes = admin.getAtMostNodes(2, script);
 
         //wait node selection
         try {
             PAFuture.waitFor(nodes);
             System.out.println("Number of found nodes " + nodes.size());
-            Assert.assertTrue(false);
+            Assert.assertEquals(0, nodes.size());
         } catch (RuntimeException e) {
+            Assert.assertTrue(false);
         }
 
         Assert.assertEquals(RMTHelper.defaultNodesNumber, admin.getFreeNodesNumber().intValue());
+
+        RMTHelper.log("Test 2 - selecting nodes with script which is timed out only on some hosts");
+        String nodeName = "timeoutNode";
+
+        HashMap<String, String> vmProperties = new HashMap<String, String>();
+        vmProperties.put(nodeName, "dummy");
+
+        String nodeURL = RMTHelper.createNode(nodeName, vmProperties).getNodeInformation().getURL();
+        admin.addNode(nodeURL, NodeSource.GCM_LOCAL);
+        RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+
+        // now we have RMTHelper.defaultNodesNumber + 1 nodes
+        script = new SelectionScript(new File(selectionScriptWithtimeOutPath), new String[] {
+                Integer.toString(scriptSleepingTime), nodeName }, false);
+
+        // selecting all nodes
+        nodes = admin.getAtMostNodes(RMTHelper.defaultNodesNumber + 1, script);
+        // have to get RMTHelper.defaultNodesNumber due to the script timeout on one node
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, nodes.size());
+        Assert.assertEquals(1, admin.getFreeNodesNumber().intValue());
+
+        NodeSet nodes2 = admin.getAtMostNodes(1, null);
+        Assert.assertEquals(1, nodes2.size());
+        Assert.assertEquals(0, admin.getFreeNodesNumber().intValue());
+
+        admin.freeNodes(nodes);
+        admin.freeNodes(nodes2);
+
+        nodes = admin.getAtMostNodes(2, script);
+        Assert.assertEquals(2, nodes.size());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber - 1, admin.getFreeNodesNumber().intValue());
+        admin.freeNodes(nodes);
     }
 }

@@ -83,7 +83,7 @@ public abstract class RestrictedService implements Loggable, RunActive {
                 publicMethods.contains(request.getMethodName())) {
                 service.serve(request);
             } else {
-                logger.debug("Unauthorized request " + request.getMethodName() + " from " +
+                logger.warn("Unauthorized request " + request.getMethodName() + " from " +
                     request.getSender() + " to class " + this.getClass().getName());
                 continue;
             }

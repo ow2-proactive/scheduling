@@ -98,6 +98,7 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
     private RMAuthentication authentication;
 
     /** Hash stored an information about nodes and user who currently holds it */
+    // TODO fix performance
     protected Hashtable<Node, UniversalBody> userNodes;
 
     private static final Heartbeat hb = new Heartbeat();
@@ -281,7 +282,7 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
             logger.warn("An attempt to remove non existing node " + node.getNodeInformation().getURL());
         } else if (declaredOwner.getID().equals(owner.getID())) {
             logger.debug("FreeNode : " + node.getNodeInformation().getURL());
-            userNodes.remove(declaredOwner);
+            userNodes.remove(node);
             rmcore.freeNode(node);
         } else {
             logger.warn("An attempt to free a node by another user (won't be performed) " +
@@ -318,8 +319,15 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
      * An expensive operation and should be called rarely.
      */
     protected void freeNodes(UniversalBody owner) {
+        NodeSet nodes = new NodeSet();
         for (Node node : userNodes.keySet()) {
             if (owner.equals(userNodes.get(node))) {
+                nodes.add(node);
+            }
+        }
+
+        if (nodes.size() > 0) {
+            for (Node node : nodes) {
                 freeNode(node, owner);
             }
         }
