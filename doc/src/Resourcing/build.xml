@@ -76,7 +76,7 @@
 	<!-- ==================================================================== -->
 	<target name="doc.rm.javadoc.publishedZip" description="Generate the Resource Manager published javadoc zip" depends="doc.rm.javadoc.published">
 		<var name="doc.relative.name"		value="Resourcing" />
-		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
+		<var name="docs.output.name"		value="ProActiveResourceManager" />
 		<subant target="javadoc.publishedZip" inheritall="true">
 			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
 		</subant>
@@ -87,7 +87,7 @@
 	<!-- ==================================================================== -->
 	<target name="doc.rm.javadoc.completeZip" description="Generate the Resource Manager complete javadoc zip" depends="doc.rm.javadoc.complete">
 		<var name="doc.relative.name"		value="Resourcing" />
-		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
+		<var name="docs.output.name"		value="ProActiveResourceManager" />
 		<subant target="javadoc.completeZip" inheritall="true">
 			<fileset dir="${docs.toolchain.dir}" includes="doc.xml"/>
 		</subant>
@@ -109,7 +109,7 @@
 
 	<target name="doc.rm.javadoc.complete"  depends="compile.rm" description="Generate the Resource Manager complete javadoc">
 		<var name="doc.relative.name"		value="Resourcing" />
-		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
+		<var name="docs.output.name"		value="ProActiveResourceManager" />
 		<setProperties />
 		<javadoc
             destdir="${docs.built.dir}/api_complete"
@@ -142,7 +142,7 @@
 
 	<target name="doc.rm.javadoc.published" depends="compile.rm" description="Generate the Resource Manager published javadoc">
 		<var name="doc.relative.name"		value="Resourcing" />
-		<var name="docs.output.name"		value="ProActiveResourceManagerManual" />
+		<var name="docs.output.name"		value="ProActiveResourceManager" />
 		<setProperties />
 		<mkdir dir="${docs.tmp.dir}" />
         <javadoc source="${source}"	classpathref="rm.libs">
