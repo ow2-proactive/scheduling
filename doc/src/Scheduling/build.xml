@@ -76,7 +76,7 @@
 	<!-- ==================================================================== -->
 	<target name="doc.Scheduler.javadoc.publishedZip" description="Generate the Scheduler Programming published javadoc zip" depends="doc.Scheduler.javadoc.published">
 		<var name="doc.relative.name"		value="Scheduling" />
-		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
+		<var name="docs.output.name"		value="ProActiveScheduler" />
 		<subant target="javadoc.publishedZip" inheritall="true">
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
@@ -87,7 +87,7 @@
 	<!-- ==================================================================== -->
 	<target name="doc.Scheduler.javadoc.completeZip" description="Generate the Scheduler Programming complete javadoc zip" depends="doc.Scheduler.javadoc.complete">
 		<var name="doc.relative.name"		value="Scheduling" />
-		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
+		<var name="docs.output.name"		value="ProActiveScheduler" />
 		<subant target="javadoc.completeZip" inheritall="true">
 			<fileset dir="${docs.toolchain.dir}" 	includes="doc.xml"/>
 		</subant>
@@ -108,7 +108,7 @@
 
 	<target name="doc.Scheduler.javadoc.complete"  depends="compile.all" description="Generate the Scheduler complete javadoc">
 		<var name="doc.relative.name"		value="Scheduling" />
-		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
+		<var name="docs.output.name"		value="ProActiveScheduler" />
 		<setProperties />
 		<javadoc
             destdir="${docs.built.dir}/api_complete"
@@ -149,7 +149,7 @@
 
 	<target name="doc.Scheduler.javadoc.published" depends="compile.all" description="Generate the Scheduler published javadoc">
 		<var name="doc.relative.name"		value="Scheduling" />
-		<var name="docs.output.name"		value="ProActiveSchedulerManual" />
+		<var name="docs.output.name"		value="ProActiveScheduler" />
 		<setProperties />
 		<mkdir dir="${docs.tmp.dir}" />
         <javadoc source="${source}"	classpathref="scheduler.libs">
