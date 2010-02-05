@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds 
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,67 +34,34 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.network;
-
-import java.lang.reflect.Method;
-
+package org.ow2.proactive.threading;
 
 /**
- * MethodCall...
+ * Generic TimedRunnable interface can be used to execute a task in the {@link ThreadPoolController} thread pool.
+ * This interface provides methods to :<br>
+ * <ul>
+ * <li>Run the piece of code that should be threaded</li>
+ * <li>Retrieve the result at the end of the execution</li>
+ * <li>do a particular action when timeout has expired for this execution</li>
+ * </ul> 
+ * <br>
+ * The {@link #isDone()} method must return true as soon as the execution is considered as finished, false otherwise.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-public class NetworkMethodCall {
-
-    private Method method;
-    private Object[] arguments;
+public interface TimedRunnable extends Runnable {
 
     /**
-     * Create a new instance of MethodCall
-     *
-     * @param method
-     * @param arguments
+     * Return the status of the task, terminated or not.
+     * 
+     * @return true if the task is finished, false otherwise.
      */
-    public NetworkMethodCall(Method method, Object[] arguments) {
-        this.method = method;
-        this.arguments = arguments;
-    }
+    public boolean isDone();
 
     /**
-     * Get the method
-     *
-     * @return the method
+     * Executed if the timeout for this task is expired.
+     * <b>Warning</b> : This method must be non-blocking.
      */
-    public Method getMethod() {
-        return method;
-    }
-
-    /**
-     * Set the method value to the given method value
-     *
-     * @param method the method to set
-     */
-    public void setMethod(Method method) {
-        this.method = method;
-    }
-
-    /**
-     * Get the arguments
-     *
-     * @return the arguments
-     */
-    public Object[] getArguments() {
-        return arguments;
-    }
-
-    /**
-     * Set the arguments value to the given arguments value
-     *
-     * @param arguments the arguments to set
-     */
-    public void setArguments(Object[] arguments) {
-        this.arguments = arguments;
-    }
-
+    public void timeoutAction();
 }

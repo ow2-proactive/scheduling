@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds 
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,33 +34,40 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.network;
+package org.ow2.proactive.threading;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 /**
- * NetworkCommunicatorImpl is the default implementation if the network communicator.
+ * ThreadPoolControllerImpl is the default implementation of the threadpool controller.
  * This implementation uses fixed thread pool to handle tasks.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-public class NetworkCommunicatorImpl implements NetworkCommunicator {
+public class ThreadPoolControllerImpl implements ThreadPoolController {
 
     private ExecutorService executor;
+    private Map<TimedRunnable, CountDownLatch> countdownByTask;
 
     /**
-     * Create a new instance of NetworkCommunicatorImpl passing the number of threads to be used.
-     * 
+     * Create a new instance of ThreadPoolControllerImpl passing the number of threads to be used.
+     *
      * @param nThreads the number of thread in the thread pool
      */
-    public NetworkCommunicatorImpl(int nThreads) {
+    public ThreadPoolControllerImpl(int nThreads) {
         executor = Executors.newFixedThreadPool(nThreads);
+        countdownByTask = new ConcurrentHashMap<TimedRunnable, CountDownLatch>();
     }
 
     /**
@@ -87,7 +94,7 @@ public class NetworkCommunicatorImpl implements NetworkCommunicator {
             try {
                 executor.execute(task);
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }
@@ -95,50 +102,45 @@ public class NetworkCommunicatorImpl implements NetworkCommunicator {
     /**
      * {@inheritDoc}
      */
-    public <T> Collection<T> execute(Collection<? extends Timed<T>> tasks, long timeout) {
+    @SuppressWarnings("unchecked")
+    public <T extends TimedRunnable> Collection<T> execute(Collection<T> tasks, long timeout) {
         if (timeout <= 0) {
             throw new IllegalArgumentException("Timeout must be positive.");
         }
 
-        // do not touch initial collection
-        LinkedList<Timed<T>> internalTaskList = new LinkedList<Timed<T>>();
-        internalTaskList.addAll(tasks);
+        //create countdownlatch initialized to the number of tasks to execute
+        CountDownLatch cdl = new CountDownLatch(tasks.size());
+        //convert collection of tasks to collection of runnable callback wrapper
+        Collection<TimedRunnableCallbackWrapper> convertedTasks = new ArrayList<TimedRunnableCallbackWrapper>();
+        for (T t : tasks) {
+            countdownByTask.put(t, cdl);
+            convertedTasks.add(new TimedRunnableCallbackWrapper(this, t));
+        }
 
-        this.execute(internalTaskList);
+        this.execute(convertedTasks);
 
+        try {
+            //wait for the timeout or every task to be terminated
+            cdl.await(timeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e1) {
+        }
+
+        //fill result list with terminated task
         Collection<T> results = new LinkedList<T>();
-        long timeSpent = 0;
-        do {
-
-            // all results are available;
-            if (internalTaskList.size() == 0) {
-                break;
-            }
-
-            long start = System.currentTimeMillis();
-            Iterator<? extends Timed<T>> iter = internalTaskList.iterator();
-
-            while (iter.hasNext()) {
-                Timed<T> task = iter.next();
-                synchronized (task) {
-                    if (task.isDone()) {
-                        iter.remove();
-                        T result = task.getResult();
-                        if (result != null) {
-                            results.add(result);
-                        }
-                    }
+        Iterator<TimedRunnableCallbackWrapper> iter = convertedTasks.iterator();
+        while (iter.hasNext()) {
+            TimedRunnableCallbackWrapper task = iter.next();
+            synchronized (task) {
+                if (task.isDone()) {
+                    iter.remove();
+                    results.add((T) task.getRunnable());
                 }
             }
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-            }
-            timeSpent += (System.currentTimeMillis() - start);
-        } while (timeSpent < timeout);
+        }
 
+        //call timeout action for every non-terminated task
         RuntimeException pendingException = null;
-        for (Timed<T> task : internalTaskList) {
+        for (TimedRunnable task : convertedTasks) {
             synchronized (task) {
                 try {
                     task.timeoutAction();
@@ -147,12 +149,24 @@ public class NetworkCommunicatorImpl implements NetworkCommunicator {
                 }
             }
         }
-
+        //if a problem occurs while calling timeout action
         if (pendingException != null) {
             throw pendingException;
         }
 
         return results;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void taskTerminated(TimedRunnable task) {
+        //get concerned countdown
+        CountDownLatch cdl = countdownByTask.remove(task);
+        if (cdl != null) {
+            //decrement current count
+            cdl.countDown();
+        }
     }
 
 }

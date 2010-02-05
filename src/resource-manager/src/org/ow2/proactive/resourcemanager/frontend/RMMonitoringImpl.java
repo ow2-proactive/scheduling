@@ -49,8 +49,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.network.NetworkCommunicator;
-import org.ow2.proactive.network.NetworkCommunicatorImpl;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -63,6 +61,8 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.threading.ThreadPoolController;
+import org.ow2.proactive.threading.ThreadPoolControllerImpl;
 
 
 /**
@@ -85,7 +85,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     private RMCoreInterface rmcore;
     private Map<UniqueID, RMEventListener> listeners;
     private HashMap<ClientCommunicator, LinkedList<RMEvent>> pendingEvents = new HashMap<ClientCommunicator, LinkedList<RMEvent>>();
-    private transient NetworkCommunicator networkCommunicator;
+    private transient ThreadPoolController threadPoolController;
 
     /** Resource Manager's statistics */
     public static final AtomicRMStatisticsHolder rmStatistics = new AtomicRMStatisticsHolder();
@@ -113,7 +113,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
-            networkCommunicator = new NetworkCommunicatorImpl(
+            threadPoolController = new ThreadPoolControllerImpl(
                 PAResourceManagerProperties.RM_MONITORING_MAX_THREAD_NUMBER.getValueAsInt());
 
         } catch (ProActiveException e) {
@@ -276,7 +276,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                     events.add(event);
                 }
             }
-            networkCommunicator.execute(pendingEvents.keySet());
+            threadPoolController.execute(pendingEvents.keySet());
         }
     }
 

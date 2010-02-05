@@ -54,9 +54,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.ow2.proactive.network.NetworkCommunicator;
-import org.ow2.proactive.network.NetworkCommunicatorImpl;
-import org.ow2.proactive.network.Timed;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -70,6 +67,9 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+import org.ow2.proactive.threading.ThreadPoolController;
+import org.ow2.proactive.threading.ThreadPoolControllerImpl;
+import org.ow2.proactive.threading.TimedRunnable;
 
 
 /**
@@ -110,7 +110,7 @@ public class NodeSource implements InitActive, RunActive {
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
     private HashMap<String, Node> downNodes = new HashMap<String, Node>();
 
-    private static transient NetworkCommunicator networkCommunicator;
+    private static transient ThreadPoolController threadPoolController;
     private NodeSource stub;
 
     /**
@@ -147,7 +147,7 @@ public class NodeSource implements InitActive, RunActive {
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
         try {
-            getNetworkCommunicator();
+            getThreadPoolController();
 
             // description could be requested when the policy does not exist anymore
             // so initializing it here
@@ -312,8 +312,8 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Dedicated thread for nodes lookup
      */
-    private class NodeLocator implements Timed<Node> {
-        private Node result = null;
+    private class NodeLocator implements TimedRunnable {
+        private Node n = null;
         private boolean isDone = false;
         private String nodeUrl;
 
@@ -326,7 +326,7 @@ public class NodeSource implements InitActive, RunActive {
                 Node node = NodeFactory.getNode(nodeUrl);
 
                 synchronized (this) {
-                    result = node;
+                    n = node;
                     isDone = true;
                 }
             } catch (NodeException e) {
@@ -334,8 +334,8 @@ public class NodeSource implements InitActive, RunActive {
             }
         }
 
-        public Node getResult() {
-            return result;
+        public Node getNode() {
+            return n;
         }
 
         public boolean isDone() {
@@ -357,9 +357,9 @@ public class NodeSource implements InitActive, RunActive {
     private Node lookupNode(String nodeUrl, long timeout) throws Exception {
         logger.debug("Looking up for the node " + nodeUrl + " with " + timeout + " ms timeout");
         Collection<NodeLocator> locator = Collections.singletonList(new NodeLocator(nodeUrl));
-        Collection<Node> nodes = getNetworkCommunicator().execute(locator, timeout);
+        Collection<NodeLocator> nodes = getThreadPoolController().execute(locator, timeout);
         if (nodes.size() > 0) {
-            return nodes.iterator().next();
+            return nodes.iterator().next().getNode();
         }
         return null;
     }
@@ -563,19 +563,19 @@ public class NodeSource implements InitActive, RunActive {
      * @param command to execute
      */
     public void executeInParallel(Runnable command) {
-        getNetworkCommunicator().execute(command);
+        getThreadPoolController().execute(command);
     }
 
     /**
-     * Instantiates the network communicator if it is null.
+     * Instantiates the threadpool controller if it is null.
      */
-    private synchronized static NetworkCommunicator getNetworkCommunicator() {
-        if (networkCommunicator == null) {
-            networkCommunicator = new NetworkCommunicatorImpl(
+    private synchronized static ThreadPoolController getThreadPoolController() {
+        if (threadPoolController == null) {
+            threadPoolController = new ThreadPoolControllerImpl(
                 PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt());
         }
 
-        return networkCommunicator;
+        return threadPoolController;
     }
 
     /**

@@ -43,16 +43,16 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.network.Timed;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.threading.TimedRunnable;
 
 
-public class ScriptExecutor implements Timed<RMNode> {
+public class ScriptExecutor implements TimedRunnable {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
     private final static int TIMEOUT = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
@@ -60,8 +60,8 @@ public class ScriptExecutor implements Timed<RMNode> {
     private SelectionManager manager;
     private List<SelectionScript> selectionScriptList;
 
-    // put result here if node match all selection scripts
-    private RMNode result = null;
+    // put node here if node match all selection scripts
+    private RMNode node = null;
     private RuntimeException exception = null;
     private boolean isDone = false;
 
@@ -154,17 +154,17 @@ public class ScriptExecutor implements Timed<RMNode> {
             logger.debug("Node " + rmnode.getNodeURL() + " match:" + nodeMatch);
             manager.scriptExecutionFinished(rmnode.getNodeURL());
             if (nodeMatch && exception == null) {
-                result = rmnode;
+                node = rmnode;
             }
             isDone = true;
         }
     }
 
-    public RMNode getResult() {
+    public RMNode getNode() {
         if (exception != null) {
             throw exception;
         }
-        return result;
+        return node;
     }
 
     public boolean isDone() {
