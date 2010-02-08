@@ -39,6 +39,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -110,7 +111,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     private NodeState state;
 
     /** Time of the last status update */
-    private Calendar stateChangeTime = Calendar.getInstance();
+    private Date stateChangeTime = Calendar.getInstance().getTime();
 
     /** Create an RMNode Object.
      * A Created node begins to be free.
@@ -206,7 +207,7 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.BUSY;
-        this.stateChangeTime = Calendar.getInstance();
+        this.stateChangeTime = Calendar.getInstance().getTime();
     }
 
     /**
@@ -218,7 +219,7 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.FREE;
-        this.stateChangeTime = Calendar.getInstance();
+        this.stateChangeTime = Calendar.getInstance().getTime();
     }
 
     /**
@@ -226,7 +227,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public void setDown() {
         this.state = NodeState.DOWN;
-        this.stateChangeTime = Calendar.getInstance();
+        this.stateChangeTime = Calendar.getInstance().getTime();
     }
 
     /**
@@ -238,7 +239,7 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.TO_BE_RELEASED;
-        this.stateChangeTime = Calendar.getInstance();
+        this.stateChangeTime = Calendar.getInstance().getTime();
     }
 
     /**
@@ -398,7 +399,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
-    public Calendar getStateChangeTime() {
+    public Date getStateChangeTime() {
         return this.stateChangeTime;
     }
 }

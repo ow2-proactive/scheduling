@@ -36,7 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
-import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.node.Node;
@@ -210,5 +210,5 @@ public interface RMNode extends Comparable<RMNode> {
      * Gets the time when state changed the last time
      * @return the time when state changed the last time
      */
-    public Calendar getStateChangeTime();
+    public Date getStateChangeTime();
 }
