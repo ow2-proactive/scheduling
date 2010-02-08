@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -94,6 +97,8 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+import org.ow2.proactive.threading.ThreadPoolController;
+import org.ow2.proactive.threading.ThreadPoolControllerImpl;
 
 
 /**
@@ -115,8 +120,16 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
 
+    /** Maximum duration of a session for a useless client */
     private static final long USER_SESSION_DURATION = PASchedulerProperties.SCHEDULER_USER_SESSION_TIME
             .getValueAsInt() * 1000;
+
+    /** Number of threads used by the thread pool for clients events sending */
+    private static final int THREAD_NUMBER = PASchedulerProperties.SCHEDULER_LISTENERS_THREADNUMBER
+            .getValueAsInt();
+
+    /** Stores methods that will be called on clients */
+    private static Map<String, Method> eventMethods;
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
     private Map<UniqueID, UserIdentificationImpl> identifications;
@@ -146,13 +159,15 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     private Map<JobId, IdentifiedJob> jobs;
 
     /** scheduler listeners */
-    private Map<UniqueID, SchedulerEventListener> schedulerListeners;
+    private Map<UniqueID, TimedClientRequestQueue> schedulerListeners;
 
     /** Session timer */
     private Timer sessionTimer;
 
     /** JMX Helper reference */
     private JMXMonitoringHelper jmxHelper = new JMXMonitoringHelper();
+
+    private ThreadPoolController threadPoolController;
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -181,7 +196,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         this.connectedUsers = new SchedulerUsers();
         this.dirtyList = new HashSet<UniqueID>();
         this.currentJobToSubmit = new InternalJobWrapper();
-        this.schedulerListeners = new ConcurrentHashMap<UniqueID, SchedulerEventListener>();
+        this.schedulerListeners = new ConcurrentHashMap<UniqueID, TimedClientRequestQueue>();
 
         logger_dev.info("Creating scheduler Front-end...");
         resourceManager = imp;
@@ -189,6 +204,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         logger_dev.debug("Policy used is " + policyFullClassName);
         jobs = new HashMap<JobId, IdentifiedJob>();
         sessionTimer = new Timer("SessionTimer");
+        threadPoolController = new ThreadPoolControllerImpl(THREAD_NUMBER);
+        makeEventMethodsList();
+    }
+
+    /**
+     * Make the event list once
+     */
+    private void makeEventMethodsList() {
+        eventMethods = new HashMap<String, Method>();
+        for (Method m : SchedulerEventListener.class.getMethods()) {
+            eventMethods.put(m.getName(), m);
+        }
     }
 
     /**
@@ -618,7 +645,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         //set if the user wants to get its events only or every events
         uIdent.setMyEventsOnly(myEventsOnly);
         //add the listener to the list of listener for this user.
-        schedulerListeners.put(id, sel);
+        schedulerListeners.put(id, new TimedClientRequestQueue(this, id, sel));
         //cancel timer for this user : session is now managed by events
         uIdent.getSession().cancel();
         //get the scheduler State
@@ -659,7 +686,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         UniqueID id = checkAccess();
 
         UserIdentificationImpl uIdent = identifications.get(id);
-
         // check if listener is not null
         if (sel == null) {
             String msg = "Scheduler listener must not be null !";
@@ -677,7 +703,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         //set if the user wants to get its events only or every events
         uIdent.setMyEventsOnly(myEventsOnly);
         //add the listener to the list of listener for this user.
-        schedulerListeners.put(id, sel);
+        schedulerListeners.put(id, new TimedClientRequestQueue(this, id, sel));
         //cancel timer for this user : session is now managed by events
         uIdent.getSession().cancel();
         //get the scheduler State
@@ -1049,7 +1075,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * 
      * @param id the id of the user to be removed.
      */
-    private void markAsDirty(UniqueID id) {
+    void markAsDirty(UniqueID id) {
         dirtyList.add(id);
     }
 
@@ -1063,20 +1089,21 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + eventType.toString() + "'");
             }
-            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+            Collection<TimedClientRequestQueue> tasks = new ArrayList<TimedClientRequestQueue>();
+            for (Entry<UniqueID, TimedClientRequestQueue> entry : schedulerListeners.entrySet()) {
                 UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
-                try {
-                    userId = identifications.get(id);
-                    //if there is no specified event OR if the specified event is allowed
-                    if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(eventType)) {
-                        entry.getValue().schedulerStateUpdatedEvent(eventType);
+                userId = identifications.get(id);
+                //if there is no specified event OR if the specified event is allowed
+                if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(eventType)) {
+                    entry.getValue().addEvent(eventMethods.get("schedulerStateUpdatedEvent"), eventType);
+                    if (entry.getValue().shouldStart()) {
+                        tasks.add(entry.getValue());
                     }
-                } catch (Exception e) {
-                    markAsDirty(id);
                 }
             }
             clearListeners();
+            threadPoolController.execute(tasks);
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
@@ -1092,7 +1119,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
             }
-            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+            Collection<TimedClientRequestQueue> tasks = new ArrayList<TimedClientRequestQueue>();
+            for (Entry<UniqueID, TimedClientRequestQueue> entry : schedulerListeners.entrySet()) {
                 UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
                 try {
@@ -1103,17 +1131,19 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                         //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
-                            entry.getValue().jobSubmittedEvent(job);
+                            entry.getValue().addEvent(eventMethods.get("jobSubmittedEvent"), job);
+                            if (entry.getValue().shouldStart()) {
+                                tasks.add(entry.getValue());
+                            }
                         }
                     }
                 } catch (NullPointerException e) {
                     //can't do anything
                     logger_dev.debug("", e);
-                } catch (Exception e) {
-                    markAsDirty(id);
                 }
             }
             clearListeners();
+            threadPoolController.execute(tasks);
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
@@ -1130,25 +1160,26 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
-            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+            Collection<TimedClientRequestQueue> tasks = new ArrayList<TimedClientRequestQueue>();
+            for (Entry<UniqueID, TimedClientRequestQueue> entry : schedulerListeners.entrySet()) {
                 UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
-                try {
-                    userId = identifications.get(id);
-                    //if there is no specified event OR if the specified event is allowed
-                    if ((userId.getUserEvents() == null) ||
-                        userId.getUserEvents().contains(notification.getEventType())) {
-                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
-                        if (!userId.isMyEventsOnly() ||
-                            (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            entry.getValue().jobStateUpdatedEvent(notification);
+                userId = identifications.get(id);
+                //if there is no specified event OR if the specified event is allowed
+                if ((userId.getUserEvents() == null) ||
+                    userId.getUserEvents().contains(notification.getEventType())) {
+                    //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                    if (!userId.isMyEventsOnly() ||
+                        (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
+                        entry.getValue().addEvent(eventMethods.get("jobStateUpdatedEvent"), notification);
+                        if (entry.getValue().shouldStart()) {
+                            tasks.add(entry.getValue());
                         }
                     }
-                } catch (Exception e) {
-                    markAsDirty(id);
                 }
             }
             clearListeners();
+            threadPoolController.execute(tasks);
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
@@ -1165,25 +1196,26 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
-            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+            Collection<TimedClientRequestQueue> tasks = new ArrayList<TimedClientRequestQueue>();
+            for (Entry<UniqueID, TimedClientRequestQueue> entry : schedulerListeners.entrySet()) {
                 UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
-                try {
-                    userId = identifications.get(id);
-                    //if there is no specified event OR if the specified event is allowed
-                    if ((userId.getUserEvents() == null) ||
-                        userId.getUserEvents().contains(notification.getEventType())) {
-                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
-                        if (!userId.isMyEventsOnly() ||
-                            (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            entry.getValue().taskStateUpdatedEvent(notification);
+                userId = identifications.get(id);
+                //if there is no specified event OR if the specified event is allowed
+                if ((userId.getUserEvents() == null) ||
+                    userId.getUserEvents().contains(notification.getEventType())) {
+                    //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                    if (!userId.isMyEventsOnly() ||
+                        (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
+                        entry.getValue().addEvent(eventMethods.get("taskStateUpdatedEvent"), notification);
+                        if (entry.getValue().shouldStart()) {
+                            tasks.add(entry.getValue());
                         }
                     }
-                } catch (Exception e) {
-                    markAsDirty(id);
                 }
             }
             clearListeners();
+            threadPoolController.execute(tasks);
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
@@ -1200,29 +1232,30 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
-            for (Entry<UniqueID, SchedulerEventListener> entry : schedulerListeners.entrySet()) {
+            Collection<TimedClientRequestQueue> tasks = new ArrayList<TimedClientRequestQueue>();
+            for (Entry<UniqueID, TimedClientRequestQueue> entry : schedulerListeners.entrySet()) {
                 UniqueID id = entry.getKey();
                 UserIdentificationImpl userId = null;
-                try {
-                    userId = identifications.get(id);
-                    //if there is no specified event OR if the specified event is allowed
-                    if ((userId.getUserEvents() == null) ||
-                        userId.getUserEvents().contains(notification.getEventType())) {
-                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
-                        if (!userId.isMyEventsOnly() ||
-                            (userId.isMyEventsOnly() && userId.getUsername().equals(
-                                    notification.getData().getUsername()))) {
-                            entry.getValue().usersUpdatedEvent(notification);
+                userId = identifications.get(id);
+                //if there is no specified event OR if the specified event is allowed
+                if ((userId.getUserEvents() == null) ||
+                    userId.getUserEvents().contains(notification.getEventType())) {
+                    //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                    if (!userId.isMyEventsOnly() ||
+                        (userId.isMyEventsOnly() && userId.getUsername().equals(
+                                notification.getData().getUsername()))) {
+                        entry.getValue().addEvent(eventMethods.get("usersUpdatedEvent"), notification);
+                        if (entry.getValue().shouldStart()) {
+                            tasks.add(entry.getValue());
                         }
                     }
-                } catch (Exception e) {
-                    markAsDirty(id);
                 }
             }
             //Important condition to avoid recursive checks
             if (checkForDownUser) {
                 clearListeners();
             }
+            threadPoolController.execute(tasks);
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
