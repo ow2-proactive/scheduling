@@ -39,9 +39,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -112,9 +110,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     private NodeState state;
 
     /** Time of the last status update */
-    private Date stateChangeTime = Calendar.getInstance().getTime();
-
-    private ReentrantLock lock = new ReentrantLock();
+    private Calendar stateChangeTime = Calendar.getInstance();
 
     /** Create an RMNode Object.
      * A Created node begins to be free.
@@ -210,7 +206,7 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.BUSY;
-        this.stateChangeTime = Calendar.getInstance().getTime();
+        this.stateChangeTime = Calendar.getInstance();
     }
 
     /**
@@ -222,7 +218,7 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.FREE;
-        this.stateChangeTime = Calendar.getInstance().getTime();
+        this.stateChangeTime = Calendar.getInstance();
     }
 
     /**
@@ -230,7 +226,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public void setDown() {
         this.state = NodeState.DOWN;
-        this.stateChangeTime = Calendar.getInstance().getTime();
+        this.stateChangeTime = Calendar.getInstance();
     }
 
     /**
@@ -242,7 +238,7 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.TO_BE_RELEASED;
-        this.stateChangeTime = Calendar.getInstance().getTime();
+        this.stateChangeTime = Calendar.getInstance();
     }
 
     /**
@@ -402,7 +398,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
-    public Date getStateChangeTime() {
+    public Calendar getStateChangeTime() {
         return this.stateChangeTime;
     }
 }

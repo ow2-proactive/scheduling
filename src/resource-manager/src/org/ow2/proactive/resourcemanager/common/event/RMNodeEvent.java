@@ -37,7 +37,7 @@
 package org.ow2.proactive.resourcemanager.common.event;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -95,7 +95,7 @@ public final class RMNodeEvent extends RMEvent {
     private final NodeState previousNodeState;
 
     /** Time of the last status update */
-    private final Date stateChangeTime;
+    private final Calendar stateChangeTime;
 
     /**
      * ProActive empty constructor
