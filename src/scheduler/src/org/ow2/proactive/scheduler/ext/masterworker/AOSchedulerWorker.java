@@ -199,7 +199,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             TaskFlowJob job = new TaskFlowJob();
             job.setName("Master-Worker Framework Job " + pendingTasks.peek().getId());
             job.setPriority(JobPriority.NORMAL);
-            job.setCancelJobOnError(true);
+            job.setCancelJobOnError(false);
             job.setDescription("Set of parallel master-worker tasks");
 
             JobEnvironment je = new JobEnvironment();
@@ -338,14 +338,14 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                         TaskResult result = allTaskResults.get("MasterWorker" + task.getId());
 
                         if (result == null) {
-                            intres.setException(new TaskException(new SchedulerException("Task id=" +
-                                task.getId() + " was not returned by the scheduler")));
+                            intres.setException(new SchedulerException("Task id=" + task.getId() +
+                                " was not returned by the scheduler"));
                             if (debug) {
                                 logger.debug("Task result not found in job result: " +
                                     intres.getException().getMessage());
                             }
                         } else if (result.hadException()) { //Exception took place inside the framework
-                            intres.setException(new TaskException(result.getException()));
+                            intres.setException(result.getException());
                             if (debug) {
                                 logger.debug("Task result contains exception: " +
                                     intres.getException().getMessage());
@@ -357,7 +357,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                                 intres.setResult(computedResult);
 
                             } catch (Throwable e) {
-                                intres.setException(new TaskException(e));
+                                intres.setException(e);
                                 if (debug) {
                                     logger.debug(intres.getException().getMessage());
                                 }
