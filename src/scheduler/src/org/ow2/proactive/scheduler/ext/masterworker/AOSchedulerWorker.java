@@ -223,6 +223,8 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                 schedulerTask.setExecutableClassName(SchedulerExecutableAdapter.class.getName());
                 schedulerTask.addArgument("taskCode", task);
 
+                schedulerTask.addArgument("workerMem", (Serializable) initialMemory);
+
                 try {
                     job.addTask(schedulerTask);
                 } catch (UserException e) {
@@ -321,8 +323,13 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                     Collection<TaskIntern<Serializable>> tasksOld = processing.remove(info.getJobId());
 
                     ArrayList<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
-                    Map<String, TaskResult> allTaskResults = jResult.getAllResults();
-
+                    //Map<String, TaskResult> allTaskResults = jResult.getAllResults();
+                    Map<String, TaskResult> allTaskResults = null;
+                    if (jResult.hadException()) {
+                        allTaskResults = jResult.getExceptionResults();
+                    } else {
+                        allTaskResults = jResult.getAllResults();
+                    }
                     for (TaskIntern<Serializable> task : tasksOld) {
                         if (debug) {
                             logger.debug(this.getName() + ": looking for result of task: " + task.getId());
