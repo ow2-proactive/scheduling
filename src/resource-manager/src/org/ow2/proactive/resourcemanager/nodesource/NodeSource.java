@@ -36,10 +36,13 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -49,7 +52,6 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -67,9 +69,6 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
-import org.ow2.proactive.threading.ThreadPoolController;
-import org.ow2.proactive.threading.ThreadPoolControllerImpl;
-import org.ow2.proactive.threading.TimedRunnable;
 
 
 /**
@@ -110,7 +109,7 @@ public class NodeSource implements InitActive, RunActive {
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
     private HashMap<String, Node> downNodes = new HashMap<String, Node>();
 
-    private static transient ThreadPoolController threadPoolController;
+    private static transient ExecutorService networkOperationsThreadPool;
     private NodeSource stub;
 
     /**
@@ -147,7 +146,8 @@ public class NodeSource implements InitActive, RunActive {
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
         try {
-            getThreadPoolController();
+            // executor service initialization
+            getExecutorService();
 
             // description could be requested when the policy does not exist anymore
             // so initializing it here
@@ -236,7 +236,8 @@ public class NodeSource implements InitActive, RunActive {
             logger.debug("Removing existing node from down nodes list");
             BooleanWrapper result = rmcore.internalRemoveNodeFromCore(nodeUrl);
             if (result.booleanValue()) {
-                logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
+                if (logger.isDebugEnabled())
+                    logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
                 // just removing it from down nodes list
                 removeNode(nodeUrl);
             }
@@ -248,7 +249,8 @@ public class NodeSource implements InitActive, RunActive {
             if (nodeToAdd.equals(existingNode)) {
                 // adding the same node twice
                 // don't do anything
-                logger.debug("An attempt to add the same node twice " + nodeUrl + " - ignoring");
+                if (logger.isDebugEnabled())
+                    logger.debug("An attempt to add the same node twice " + nodeUrl + " - ignoring");
                 return new BooleanWrapper(false);
             } else {
                 // adding another node with the same url
@@ -257,7 +259,10 @@ public class NodeSource implements InitActive, RunActive {
                         .debug("Removing existing node from the RM without request propagation to the infrastructure manager");
                 BooleanWrapper result = rmcore.internalRemoveNodeFromCore(nodeUrl);
                 if (result.booleanValue()) {
-                    logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
+                    if (logger.isDebugEnabled())
+                        logger
+                                .debug("[" + name + "] successfully removed node " + nodeUrl +
+                                    " from the core");
                     // removing it from the nodes list but don't propagate
                     // the request the the infrastructure because the restarted node will be killed
                     nodes.remove(nodeUrl);
@@ -272,7 +277,6 @@ public class NodeSource implements InitActive, RunActive {
             throw new AddingNodesException(e);
         }
 
-        configureForDataSpace(nodeToAdd);
         RMNode rmnode = new RMNodeImpl(nodeToAdd, "noVn", (NodeSource) PAActiveObject.getStubOnThis());
         rmcore.internalAddNodeToCore(rmnode);
 
@@ -310,39 +314,19 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Dedicated thread for nodes lookup
+     * Looks up the node
      */
-    private class NodeLocator implements TimedRunnable {
-        private Node n = null;
-        private boolean isDone = false;
+    private class NodeLocator implements Callable<Node> {
         private String nodeUrl;
 
         public NodeLocator(String url) {
             nodeUrl = url;
         }
 
-        public void run() {
-            try {
-                Node node = NodeFactory.getNode(nodeUrl);
-
-                synchronized (this) {
-                    n = node;
-                    isDone = true;
-                }
-            } catch (NodeException e) {
-                logger.warn("", e);
-            }
-        }
-
-        public Node getNode() {
-            return n;
-        }
-
-        public boolean isDone() {
-            return isDone;
-        }
-
-        public void timeoutAction() {
+        public Node call() throws Exception {
+            Node node = NodeFactory.getNode(nodeUrl);
+            configureForDataSpace(node);
+            return node;
         }
     }
 
@@ -355,14 +339,15 @@ public class NodeSource implements InitActive, RunActive {
      * @throws Exception if node was not looked up
      */
     private Node lookupNode(String nodeUrl, long timeout) throws Exception {
-        logger.debug("Looking up for the node " + nodeUrl + " with " + timeout + " ms timeout");
-        Collection<NodeLocator> locator = Collections.singletonList(new NodeLocator(nodeUrl));
-        Collection<NodeLocator> nodes = getThreadPoolController().execute(locator, timeout);
-        //return the first non-null node
-        if (nodes.size() > 0) {
-            return nodes.iterator().next().getNode();
+        if (logger.isDebugEnabled())
+            logger.debug("Looking up for the node " + nodeUrl + " with " + timeout + " ms timeout");
+
+        Future<Node> futureNode = getExecutorService().submit(new NodeLocator(nodeUrl));
+        try {
+            return futureNode.get(timeout, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -405,7 +390,14 @@ public class NodeSource implements InitActive, RunActive {
             logger.info("[" + name + "] removing node : " + nodeUrl);
             Node node = nodes.remove(nodeUrl);
             try {
-                closeDataSpaceConfiguration(node);
+                // TODO it make sense to move this call to
+                // infrastructure manager level and not to use it
+                // if we need just to kill the node
+                //
+                // For now we don't have such infrastructures which
+                // just release nodes without killing them
+                //
+                //closeDataSpaceConfiguration(node);
                 infrastructureManager.removeNode(node);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage());
@@ -564,19 +556,20 @@ public class NodeSource implements InitActive, RunActive {
      * @param command to execute
      */
     public void executeInParallel(Runnable command) {
-        getThreadPoolController().execute(command);
+        getExecutorService().execute(command);
     }
 
     /**
      * Instantiates the threadpool controller if it is null.
      */
-    private synchronized static ThreadPoolController getThreadPoolController() {
-        if (threadPoolController == null) {
-            threadPoolController = new ThreadPoolControllerImpl(
-                PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt());
+    private synchronized static ExecutorService getExecutorService() {
+        if (networkOperationsThreadPool == null) {
+            networkOperationsThreadPool = Executors
+                    .newFixedThreadPool(PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER
+                            .getValueAsInt());
         }
 
-        return threadPoolController;
+        return networkOperationsThreadPool;
     }
 
     /**
@@ -589,7 +582,8 @@ public class NodeSource implements InitActive, RunActive {
                 try {
                     Node node = NodeFactory.getNode(url);
                     node.getNumberOfActiveObjects();
-                    logger.debug("Node " + url + " is alive");
+                    if (logger.isDebugEnabled())
+                        logger.debug("Node " + url + " is alive");
                 } catch (Throwable t) {
                     stub.detectedPingedDownNode(url);
                 }

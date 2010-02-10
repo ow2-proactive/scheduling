@@ -37,6 +37,7 @@ package org.ow2.proactive.resourcemanager.selection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAFuture;
@@ -49,21 +50,15 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.threading.TimedRunnable;
 
 
-public class ScriptExecutor implements TimedRunnable {
+public class ScriptExecutor implements Callable<RMNode> {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
     private final static int TIMEOUT = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
     private RMNode rmnode;
     private SelectionManager manager;
     private List<SelectionScript> selectionScriptList;
-
-    // put node here if node match all selection scripts
-    private RMNode node = null;
-    private RuntimeException exception = null;
-    private boolean isDone = false;
 
     public ScriptExecutor(RMNode rmnode, List<SelectionScript> selectionScriptList, SelectionManager manager) {
         this.rmnode = rmnode;
@@ -73,12 +68,14 @@ public class ScriptExecutor implements TimedRunnable {
 
     /**
      * Runs selection scripts and process the results
+     * returns node if it matches, null otherwise
      */
-    public void run() {
+    public RMNode call() throws Exception {
 
         LinkedList<ScriptResult<Boolean>> scriptExecitionResults = new LinkedList<ScriptResult<Boolean>>();
         boolean selectionScriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
         boolean nodeMatch = true;
+        ScriptException exception = null;
 
         if (selectionScriptSpecified) {
             // initializing parallel script execution
@@ -116,19 +113,15 @@ public class ScriptExecutor implements TimedRunnable {
                     try {
                         PAFuture.waitFor(scriptResult, TIMEOUT);
                     } catch (ProActiveTimeoutException e) {
-                        synchronized (this) {
-                            // do not produce an exception here
-                            nodeMatch = false;
-                            break;
-                        }
+                        // do not produce an exception here
+                        nodeMatch = false;
+                        break;
                     }
 
                     if (scriptResult != null && scriptResult.errorOccured()) {
-                        synchronized (this) {
-                            nodeMatch = false;
-                            exception = new ScriptException(scriptResult.getException());
-                            break;
-                        }
+                        nodeMatch = false;
+                        exception = new ScriptException(scriptResult.getException());
+                        break;
                     }
 
                     // processing script result and updating knowledge base of
@@ -146,37 +139,35 @@ public class ScriptExecutor implements TimedRunnable {
             rmnode.clean();
         } catch (Throwable t) {
             logger.warn("Exception while cleaning the node " + rmnode.getNodeURL() + ": " + t.getMessage());
-            logger.warn("Checking if node " + rmnode.getNodeURL() + " is alive");
+            logger.warn("Checking if the node " + rmnode.getNodeURL() + " is alive");
             rmnode.getNodeSource().pingNode(rmnode.getNodeURL());
         }
 
-        synchronized (this) {
-            logger.debug("Node " + rmnode.getNodeURL() + " match:" + nodeMatch);
-            manager.scriptExecutionFinished(rmnode.getNodeURL());
-            if (nodeMatch && exception == null) {
-                node = rmnode;
-            }
-            isDone = true;
-        }
-    }
+        manager.scriptExecutionFinished(rmnode.getNodeURL());
+        if (logger.isDebugEnabled())
+            logger.debug("Node " + rmnode.getNodeURL() + " matched: " + nodeMatch);
 
-    public RMNode getNode() {
         if (exception != null) {
             throw exception;
         }
-        return node;
+        if (nodeMatch) {
+            return rmnode;
+        }
+        return null;
     }
 
-    public boolean isDone() {
-        return isDone;
-    }
+    public String toString() {
+        boolean selectionScriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
+        if (selectionScriptSpecified) {
+            String result = "script execution on the node " + rmnode.getNodeURL() +
+                " using the following scripts\n";
+            for (SelectionScript ss : selectionScriptList) {
+                result += ss.getScript() + "\n";
+            }
 
-    public void timeoutAction() {
-        // no script result was obtained
-        String message = "Time out while executing script list " + selectionScriptList +
-            " script execution on the node " + rmnode.getNodeURL();
-        logger.warn(message);
-        // checking if node is still alive
-        rmnode.getNodeSource().pingNode(rmnode.getNodeURL());
+            return result;
+        } else {
+            return "the node communication " + rmnode.getNodeURL();
+        }
     }
 }

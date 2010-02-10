@@ -41,9 +41,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.NodeException;
@@ -54,8 +59,6 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.threading.ThreadPoolController;
-import org.ow2.proactive.threading.ThreadPoolControllerImpl;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -74,8 +77,8 @@ public abstract class SelectionManager {
 
     private RMCore rmcore;
 
-    private ThreadPoolController threadPoolController = new ThreadPoolControllerImpl(
-        PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt());
+    private ExecutorService scriptExecutorThreadPool = Executors
+            .newFixedThreadPool(PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt());
 
     private Set<String> inProgress = Collections.synchronizedSet(new HashSet<String>());
 
@@ -137,12 +140,13 @@ public abstract class SelectionManager {
         while (nodesIterator.hasNext() && result.size() < nb) {
             int numberOfNodesNeeded = nb - result.size();
 
-            Collection<ScriptExecutor> scriptExecutors = new LinkedList<ScriptExecutor>();
+            ArrayList<Callable<RMNode>> scriptExecutors = new ArrayList<Callable<RMNode>>();
             for (int i = 0; i < numberOfNodesNeeded && nodesIterator.hasNext(); i++) {
                 RMNode rmnode = nodesIterator.next();
                 if (inProgress.contains(rmnode.getNodeURL())) {
-                    logger.debug("Script execution is in progress on node " + rmnode.getNodeURL() +
-                        " - skipping.");
+                    if (logger.isDebugEnabled())
+                        logger.debug("Script execution is in progress on node " + rmnode.getNodeURL() +
+                            " - skipping.");
                     i--;
                 } else {
                     inProgress.add(rmnode.getNodeURL());
@@ -150,20 +154,41 @@ public abstract class SelectionManager {
                 }
             }
 
-            Collection<ScriptExecutor> matchNodes = threadPoolController.execute(scriptExecutors,
-                    MAX_VERIF_TIMEOUT);
+            try {
+                Collection<Future<RMNode>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
+                        MAX_VERIF_TIMEOUT, TimeUnit.MILLISECONDS);
+                int index = 0;
 
-            for (ScriptExecutor se : matchNodes) {
-                RMNode node = se.getNode();
-                if (node != null) {
-                    try {
-                        rmcore.setBusyNode(node.getNodeURL());
-                        result.add(node.getNode());
-                    } catch (NodeException e) {
-                        rmcore.setDownNode(node.getNodeURL());
+                for (Future<RMNode> futureNode : matchedNodes) {
+                    if (!futureNode.isCancelled()) {
+                        RMNode node = null;
+                        try {
+                            node = futureNode.get();
+                        } catch (InterruptedException e) {
+                            logger.warn("Interrupting the selection manager");
+                            return result;
+                        } catch (ExecutionException e) {
+                            throw (RuntimeException) e.getCause();
+                        }
+                        if (node != null) {
+                            try {
+                                rmcore.setBusyNode(node.getNodeURL());
+                                result.add(node.getNode());
+                            } catch (NodeException e) {
+                                rmcore.setDownNode(node.getNodeURL());
+                            }
+                        }
+                    } else {
+                        // no script result was obtained
+                        logger.warn("Timeout on " + scriptExecutors.get(index));
                     }
+                    index++;
                 }
+            } catch (InterruptedException e1) {
+                logger.warn("Interrupting the selection manager");
+                return result;
             }
+
         }
 
         logger.info("Number of found nodes is " + result.size());

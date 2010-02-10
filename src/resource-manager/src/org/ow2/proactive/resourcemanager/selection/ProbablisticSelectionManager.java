@@ -183,11 +183,13 @@ public class ProbablisticSelectionManager extends SelectionManager {
         if (probabilities.containsKey(script) && probabilities.get(script).containsKey(rmnode)) {
             Probability p = probabilities.get(script).get(rmnode);
             String scriptType = script.isDynamic() ? "dynamic" : "static";
-            logger.debug("Known " + scriptType + " script " + script.hashCode() + " for node " +
-                rmnode.getNodeURL());
+            if (logger.isDebugEnabled())
+                logger.debug("Known " + scriptType + " script " + script.hashCode() + " for node " +
+                    rmnode.getNodeURL());
             return p.value() == 1;
         }
-        logger.debug("Unknown script " + script.hashCode() + " for node " + rmnode.getNodeURL());
+        if (logger.isDebugEnabled())
+            logger.debug("Unknown script " + script.hashCode() + " for node " + rmnode.getNodeURL());
         return false;
     }
 
@@ -235,8 +237,11 @@ public class ProbablisticSelectionManager extends SelectionManager {
             probabilities.put(script, new HashMap<RMNode, Probability>());
         }
 
-        logger.debug("Adding data to knowledge base - script: " + script.hashCode() + ", node: " +
-            rmnode.getNodeURL() + ", probability: " + probability);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Adding data to knowledge base - script: " + script.hashCode() + ", node: " +
+                rmnode.getNodeURL() + ", probability: " + probability);
+        }
+
         probabilities.get(script).put(rmnode, probability);
         return result;
     }
