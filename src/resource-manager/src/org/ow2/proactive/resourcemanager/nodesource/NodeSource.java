@@ -390,14 +390,8 @@ public class NodeSource implements InitActive, RunActive {
             logger.info("[" + name + "] removing node : " + nodeUrl);
             Node node = nodes.remove(nodeUrl);
             try {
-                // TODO it make sense to move this call to
-                // infrastructure manager level and not to use it
-                // if we need just to kill the node
-                //
-                // For now we don't have such infrastructures which
-                // just release nodes without killing them
-                //
-                //closeDataSpaceConfiguration(node);
+                // TODO this method call breaks parallel node removal - fix it
+                closeDataSpaceConfiguration(node);
                 infrastructureManager.removeNode(node);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage());
