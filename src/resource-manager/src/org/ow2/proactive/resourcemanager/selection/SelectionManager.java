@@ -51,6 +51,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -201,5 +202,14 @@ public abstract class SelectionManager {
      */
     public synchronized void scriptExecutionFinished(String nodeUrl) {
         inProgress.remove(nodeUrl);
+    }
+
+    /**
+     * Handles shut down of the selection manager
+     */
+    public void shutdown() {
+        // shutdown the thread pool without waiting for script execution completions
+        scriptExecutorThreadPool.shutdownNow();
+        PAActiveObject.terminateActiveObject(false);
     }
 }

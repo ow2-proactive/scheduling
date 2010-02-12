@@ -271,8 +271,10 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
-                    RMCore.this.registerTrustedService(PAActiveObject.getBodyOnThis().getID());
-                    rmcoreStub.shutdown(true);
+                    if (!toShutDown) {
+                        RMCore.this.registerTrustedService(PAActiveObject.getBodyOnThis().getID());
+                        rmcoreStub.shutdown(true);
+                    }
 
                     synchronized (nodeRM) {
                         if (!shutedDown) {
@@ -655,7 +657,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
     /**
      * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#shutdown(boolean)
      */
-    public synchronized void shutdown(boolean preempt) {
+    public void shutdown(boolean preempt) {
 
         // this method could be called twice from shutdown hook and user action
         if (toShutDown)
@@ -886,9 +888,11 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         // all nodes sources has been removed and RMCore in shutdown state,
         // finish the shutdown
         this.user.shutdown();
+        this.admin.shutdown();
         this.monitoring.shutdown();
-        PAActiveObject.terminateActiveObject(admin, false);
-        PAActiveObject.terminateActiveObject(true);
+        this.selectionManager.shutdown();
+
+        PAActiveObject.terminateActiveObject(false);
         try {
             Thread.sleep(2000);
             synchronized (nodeRM) {
