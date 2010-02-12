@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -66,8 +68,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.ScriptException;
-import org.ow2.proactive.threading.ThreadPoolController;
-import org.ow2.proactive.threading.ThreadPoolControllerImpl;
+import org.ow2.proactive.threading.ExecutorServiceTasksInvocator;
 import org.ow2.proactive.utils.NodeSet;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -98,11 +99,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     protected SchedulerCore core = null;
 
-    protected ThreadPoolController threadPoolController;
+    protected ExecutorService threadPool;
 
     SchedulingMethodImpl(SchedulerCore core) {
         this.core = core;
-        this.threadPoolController = new ThreadPoolControllerImpl(DOTASK_ACTION_THREADNUMBER);
+        this.threadPool = Executors.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER);
     }
 
     /**
@@ -457,7 +458,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 //enqueue next instruction, and execute whole process in the threadpool controller
                 TimedDoTaskAction tdta = new TimedDoTaskAction(this, job, task, launcher, node,
                     (SchedulerCore) PAActiveObject.getStubOnThis(), core.resourceManager, params);
-                threadPoolController.execute(Collections.singletonList(tdta), DOTASK_ACTION_TIMEOUT);
+                ExecutorServiceTasksInvocator.invokeAllWithTimeoutAction(threadPool, Collections
+                        .singletonList(tdta), DOTASK_ACTION_TIMEOUT);
 
             } catch (Exception t) {
                 try {

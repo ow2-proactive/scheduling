@@ -43,7 +43,7 @@ import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.threading.TimedRunnable;
+import org.ow2.proactive.threading.CallableWithTimeoutAction;
 
 
 /**
@@ -52,9 +52,8 @@ import org.ow2.proactive.threading.TimedRunnable;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-public class TimedDoTaskAction implements TimedRunnable {
+public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
-    private AtomicBoolean done = new AtomicBoolean(false);
     private AtomicBoolean timeoutCalled = new AtomicBoolean(false);
     private SchedulingMethodImpl schedulingMethod;
     private InternalJob job;
@@ -91,7 +90,7 @@ public class TimedDoTaskAction implements TimedRunnable {
     /**
      * {@inheritDoc}
      */
-    public void run() {
+    public Void call() throws Exception {
         try {
             //if a task has been launched
             if (launcher != null) {
@@ -110,7 +109,8 @@ public class TimedDoTaskAction implements TimedRunnable {
         } catch (Exception e) {
             freenodes();
         }
-        done.set(true);
+        //results is not needed
+        return null;
     }
 
     private void freenodes() {
@@ -122,10 +122,6 @@ public class TimedDoTaskAction implements TimedRunnable {
         } catch (Throwable ni) {
             //miam miam
         }
-    }
-
-    public boolean isDone() {
-        return done.get();
     }
 
     public void timeoutAction() {

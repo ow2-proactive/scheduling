@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -37,60 +37,51 @@
 package unitTests;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.ow2.proactive.threading.ThreadPoolController;
-import org.ow2.proactive.threading.ThreadPoolControllerImpl;
-import org.ow2.proactive.threading.TimedRunnable;
+import org.ow2.proactive.threading.CallableWithTimeoutAction;
+import org.ow2.proactive.threading.ExecutorServiceTasksInvocator;
 
 
 /**
- * Test the Thread pool controller
- * 
+ * Test the callableWithTimeoutActionInvocator method
+ *
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
-public class TestThreadPoolController {
+public class TestExecutorServiceTasksInvocator {
 
     private static int ID = 0;
 
     @Test
     public void run() throws Throwable {
-        log("Test Runnable");
-        ThreadPoolController controller = new ThreadPoolControllerImpl(4);
-        List<Runnable> col = new ArrayList<Runnable>();
-        col.add(new Task(400));
-        col.add(new Task(500));
-        col.add(new Task(600));
-        long start = System.currentTimeMillis();
-        controller.execute(col.get(0));
-        controller.execute(col);
-        Assert.assertTrue(System.currentTimeMillis() - start < 400);
-        Thread.sleep(1200);
-        Assert.assertTrue(((TimedRunnable) col.get(0)).isDone());
-        Assert.assertTrue(((TimedRunnable) col.get(1)).isDone());
-        Assert.assertTrue(((TimedRunnable) col.get(2)).isDone());
+        ExecutorService pool = Executors.newFixedThreadPool(4);
 
-        log("Test TimedRunnable");
+        log("Test CallableWithTimeoutAction");
         List<Task> list = new ArrayList<Task>();
         list.add(new Task(300));
         list.add(new Task(400));
         list.add(new Task(500));
         list.add(new Task(600));
-        start = System.currentTimeMillis();
-        Collection<Task> results = controller.execute(list, 700);
+        long start = System.currentTimeMillis();
+        List<Future<Integer>> results = ExecutorServiceTasksInvocator.invokeAllWithTimeoutAction(pool, list,
+                700);
         long end = System.currentTimeMillis();
         Assert.assertTrue(end - start >= 600);
-        Assert.assertTrue(end - start < 610);
-        Assert.assertEquals(4, results.size());
-        for (Task tr : results) {
-            Assert.assertTrue(tr.isDone());
-            Assert.assertFalse(tr.hasTimeout());
+        Assert.assertTrue(end - start < 650);
+        Integer i = 0;
+        for (Future<Integer> future : results) {
+            Assert.assertTrue(future.isDone());
+            Assert.assertFalse(future.isCancelled());
+            Assert.assertEquals(i++, (Integer) future.get());
         }
 
         list.clear();
@@ -99,17 +90,30 @@ public class TestThreadPoolController {
         list.add(new Task(500));
         list.add(new Task(700));
         start = System.currentTimeMillis();
-        results = controller.execute(list, 600);
+        results = ExecutorServiceTasksInvocator.invokeAllWithTimeoutAction(pool, list, 600);
         end = System.currentTimeMillis();
         Assert.assertTrue(end - start >= 600);
-        Assert.assertTrue(end - start < 610);
-        Assert.assertEquals(3, results.size());
-        for (Task tr : results) {
-            Assert.assertTrue(tr.isDone());
-            Assert.assertFalse(tr.hasTimeout());
+        Assert.assertTrue(end - start < 650);
+        i = 0;
+        int nbCanceled = 0;
+        for (Future<Integer> future : results) {
+            Assert.assertTrue(future.isDone());
+            if (future.isCancelled()) {
+                nbCanceled++;
+                Assert.assertTrue(list.get(i).hasTimeout());
+                try {
+                    future.get();
+                    throw new RuntimeException("Should be in the following catch clause !");
+                } catch (CancellationException ce) {
+                }
+            } else {
+                Assert.assertFalse(list.get(i).hasTimeout());
+                Assert.assertEquals((int) (i + 4), (int) future.get());
+            }
+            i++;
         }
-        Assert.assertFalse(list.get(3).isDone());
-        Assert.assertTrue(list.get(3).hasTimeout());
+        Assert.assertEquals(1, nbCanceled);
+        Assert.assertEquals(3, results.size() - nbCanceled);
 
         list.clear();
         list.add(new Task(1000));
@@ -122,29 +126,39 @@ public class TestThreadPoolController {
         list.add(new Task(300));
         list.add(new Task(500));
         start = System.currentTimeMillis();
-        results = controller.execute(list, 1200);
+        results = ExecutorServiceTasksInvocator.invokeAllWithTimeoutAction(pool, list, 1200);
         end = System.currentTimeMillis();
         Assert.assertTrue(end - start >= 1200);
-        Assert.assertTrue(end - start < 1210);
-        Assert.assertEquals(7, results.size());
-        for (Task tr : results) {
-            Assert.assertTrue(tr.isDone());
-            Assert.assertFalse(tr.hasTimeout());
+        Assert.assertTrue(end - start < 1250);
+        i = 0;
+        nbCanceled = 0;
+        for (Future<Integer> future : results) {
+            Assert.assertTrue(future.isDone());
+            if (future.isCancelled()) {
+                nbCanceled++;
+                Assert.assertTrue(list.get(i).hasTimeout());
+                try {
+                    future.get();
+                    throw new RuntimeException("Should be in the following catch clause !");
+                } catch (CancellationException ce) {
+                }
+            } else {
+                Assert.assertFalse(list.get(i).hasTimeout());
+                Assert.assertEquals((int) i + 8, (int) future.get());
+            }
+            i++;
         }
-        Assert.assertFalse(list.get(7).isDone());
-        Assert.assertTrue(list.get(7).hasTimeout());
-        Assert.assertFalse(list.get(8).isDone());
-        Assert.assertTrue(list.get(8).hasTimeout());
+        Assert.assertEquals(2, nbCanceled);
+        Assert.assertEquals(7, results.size() - nbCanceled);
     }
 
     private void log(String s) {
         System.out.println("------------------------------ " + s);
     }
 
-    class Task implements TimedRunnable {
+    class Task implements CallableWithTimeoutAction<Integer> {
 
         private int id = ID++;
-        private volatile boolean done = false;
         private volatile boolean timedout = false;
         private long sleep;
 
@@ -152,7 +166,7 @@ public class TestThreadPoolController {
             this.sleep = sleep;
         }
 
-        public void run() {
+        public Integer call() throws Exception {
             log("Starting : " + this + ", wait time : " + sleep);
             try {
                 Thread.sleep(sleep);
@@ -160,12 +174,8 @@ public class TestThreadPoolController {
             }
             if (!timedout) {
                 log("Ending   : " + this);
-                done = true;
             }
-        }
-
-        public boolean isDone() {
-            return done;
+            return id;
         }
 
         public void timeoutAction() {
