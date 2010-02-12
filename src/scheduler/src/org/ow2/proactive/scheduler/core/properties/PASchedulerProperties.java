@@ -87,6 +87,13 @@ public enum PASchedulerProperties {
     	negative number indicates that session is infinite (value specified in second) */
     SCHEDULER_USER_SESSION_TIME("pa.scheduler.core.usersessiontime", PAPropertiesType.INTEGER),
 
+    /** Timeout for the start task action. Time during which the scheduling could be waiting (in millis) */
+    SCHEDULER_STARTTASK_TIMEOUT("pa.scheduler.core.starttask.timeout", PAPropertiesType.INTEGER),
+
+    /** Maximum number of threads used for the start task action. This property defines the number of blocking resources
+     * until the scheduling loop will block as well.*/
+    SCHEDULER_STARTTASK_THREADNUMBER("pa.scheduler.core.starttask.threadnumber", PAPropertiesType.INTEGER),
+
     /** Maximum number of threads used to send events to clients. This property defines the number of clients
      * than can block at the same time. If this number is reached, every clients won't receive events until
      * a thread unlock. */

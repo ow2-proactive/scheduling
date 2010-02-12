@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -128,7 +127,7 @@ import org.ow2.proactive.utils.NodeSet;
 /**
  * <i><font size="2" color="#FF0000">** Scheduler core ** </font></i>
  * This is the main active object of the scheduler implementation,
- * it communicates with the entity manager to acquire nodes and with a policy
+ * it communicates with the resources manager to acquire nodes and with a policy
  * to insert and get jobs from the queue.
  *
  * @author The ProActive Team
@@ -826,7 +825,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             return;
         }
 
+        //get the internal task
         InternalTask descriptor = job.getIHMTasks().get(taskId);
+
         // job might have already been removed if job has failed...
         Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
         if (runningTasks != null) {

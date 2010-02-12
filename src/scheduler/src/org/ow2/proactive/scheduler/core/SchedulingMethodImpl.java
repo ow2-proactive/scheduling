@@ -59,14 +59,18 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.ScriptException;
+import org.ow2.proactive.threading.ThreadPoolController;
+import org.ow2.proactive.threading.ThreadPoolControllerImpl;
 import org.ow2.proactive.utils.NodeSet;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 
 /**
@@ -83,13 +87,22 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     /** Number of time to retry an active object creation if it fails to create */
     protected static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
+    /** Maximum blocking time for the do task action */
+    protected static final int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT
+            .getValueAsInt();
+    /** MAximum number of thread used for the doTask action */
+    protected static final int DOTASK_ACTION_THREADNUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
+            .getValueAsInt();
 
     protected int activeObjectCreationRetryTimeNumber;
 
     protected SchedulerCore core = null;
 
+    protected ThreadPoolController threadPoolController;
+
     SchedulingMethodImpl(SchedulerCore core) {
         this.core = core;
+        this.threadPoolController = new ThreadPoolControllerImpl(DOTASK_ACTION_THREADNUMBER);
     }
 
     /**
@@ -159,17 +172,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
                     //create launcher and try to start the task
                     node = nodeSet.get(0);
-                    TaskLauncher launcher = createExecution(nodeSet, node, currentJob, internalTask,
-                            taskDescriptor);
-
-                    //if a task has been launched
-                    if (launcher != null) {
-                        logger.info("Task '" + internalTask.getId() + "' started on " +
-                            node.getNodeInformation().getVMInformation().getHostName());
-                        //mark the task and job (if needed) as started and send events
-                        finalizeStarting(currentJob, internalTask);
-
-                    }
+                    createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
 
                     //if every task that should be launched have been removed
                     if (tasksToSchedule.isEmpty()) {
@@ -181,7 +184,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                         break;
                     }
                 }
-
             } catch (ActiveObjectCreationException e1) {
                 //Something goes wrong with the active object creation (createLauncher)
                 logger.warn("", e1);
@@ -386,7 +388,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     /**
      * Create launcher and try to start the task.
-     * This method return the created taskLauncher if success, null otherwise.
      *
      * @param nodeSet the node set containing every available nodes that can be used for execution
      * @param node the node on which to start the task
@@ -394,9 +395,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @param task the task to be started
      * @param taskDescriptor the descriptor of the task to be started
      *
-     * @return the created taskLauncher if success, null otherwise.
      */
-    protected TaskLauncher createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
+    @SuppressWarnings("unchecked")
+    protected void createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
             TaskDescriptor taskDescriptor) throws Exception {
         TaskLauncher launcher = null;
 
@@ -453,9 +454,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger_dev.info("Starting deployment of task '" + task.getName() + "' for job '" +
                     job.getId() + "'");
 
-                ((JobResultImpl) job.getJobResult()).storeFuturResult(task.getName(), launcher
-                        .doTask((SchedulerCore) PAActiveObject.getStubOnThis(),
-                                task.getExecutableContainer(), params));
+                //enqueue next instruction, and execute whole process in the threadpool controller
+                TimedDoTaskAction tdta = new TimedDoTaskAction(this, job, task, launcher, node,
+                    (SchedulerCore) PAActiveObject.getStubOnThis(), core.resourceManager, params);
+                threadPoolController.execute(Collections.singletonList(tdta), DOTASK_ACTION_TIMEOUT);
+
             } catch (Exception t) {
                 try {
                     //if there was a problem, free nodeSet for multi-nodes task
@@ -467,7 +470,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             }
 
         }
-        return launcher;
+
     }
 
     /**
@@ -475,8 +478,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      *
      * @param job the job that owns the task to be started
      * @param task the task to be started
+     * @param node the node on which the task will be started
      */
-    protected void finalizeStarting(InternalJob job, InternalTask task) {
+    void finalizeStarting(InternalJob job, InternalTask task, Node node) {
+        logger.info("Task '" + task.getId() + "' started on " +
+            node.getNodeInformation().getVMInformation().getHostName());
         // set the different informations on job
         if (job.getStartTime() < 0) {
             // if it is the first task of this job
