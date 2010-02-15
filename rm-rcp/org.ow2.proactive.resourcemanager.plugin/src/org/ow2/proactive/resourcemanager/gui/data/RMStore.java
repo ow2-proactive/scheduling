@@ -102,6 +102,7 @@ public class RMStore {
                 auth = RMConnection.join(url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
             } catch (RMException e) {
                 throw new RMException("Resource manager does not exist on the following url: " + url, e);
+
             }
 
             Credentials creds = null;
@@ -132,7 +133,7 @@ public class RMStore {
             RMStatusBarItem.getInstance().setText("connected");
 
             // Initialize the JMX chartit action
-            JMXChartItAction.getInstance().initJMXClient(auth, new Object[] { creds, login }, isAdmin);
+            JMXChartItAction.getInstance().initJMXClient(auth, new Object[] { login, creds }, isAdmin);
 
         } catch (ActiveObjectCreationException e) {
             RMStatusBarItem.getInstance().setText("disconnected");

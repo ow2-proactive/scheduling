@@ -38,7 +38,6 @@ package org.ow2.proactive.resourcemanager.gui.actions;
 
 import java.net.URL;
 
-import javax.management.JMException;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
@@ -56,7 +55,7 @@ import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
 import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
-import org.objectweb.proactive.ic2d.chartit.util.SimpleJMXClient;
+import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.gui.Activator;
 
@@ -78,15 +77,17 @@ import org.ow2.proactive.resourcemanager.gui.Activator;
  * @author The ProActive Team 
  */
 public final class JMXChartItAction extends Action {
-
     /** The name of the JMX ChartIt editor */
     private static final String JMX_CHARTIT_EDITOR_NAME = "JMX Monitoring";
 
     /** The static reference on the single instance of this class */
     private static JMXChartItAction instance;
 
+    /** The rm mbean name */
+    private ObjectName mBeanName;
+
     /** An instance of internal jmx client */
-    private final SimpleJMXClient jmxClient;
+    private JMXClientHelper jmxClient;
 
     /** The URL of the predefined ChartIt config */
     private URL predefinedChartItConfigURL;
@@ -114,7 +115,6 @@ public final class JMXChartItAction extends Action {
         // This action is disabled by default
         super.setEnabled(false);
         super.setToolTipText("Show JMX Monitoring");
-        this.jmxClient = new SimpleJMXClient();
     }
 
     /**
@@ -125,28 +125,30 @@ public final class JMXChartItAction extends Action {
      * @param isAdmin used to distinguish the admin user from anonymous user
      */
     public void initJMXClient(final RMAuthentication auth, final Object[] creds, final boolean isAdmin) {
-        // Try to get the URL of the JMX connector
-        String connectorURL = null;
-        try {
-            connectorURL = auth.getJMXConnectorURL();
-        } catch (JMException e) {
-            // By default the action is disabled just add the massage that comes from the exception as
-            // a ToolTip of the action
-            this.setToolTipText(e.getMessage());
-            return;
-        }
-        String mBeanName = "RMFrontend:name=RMBean";
+        String name = "RMFrontend:name=RMBean";
         String path = "config/rm_chartit_conf";
         if (isAdmin) {
-            connectorURL += "_admin";
-            mBeanName += "_admin";
+            name += "_admin";
             path += "_admin";
         }
-        this.predefinedChartItConfigURL = FileLocator.find(Activator.getDefault().getBundle(), new Path(path +
-            ".xml"), null);
-        // Try to create the connector to the given URL
-        if (this.jmxClient.createConnector(connectorURL, mBeanName, creds)) {
-            this.setEnabled(true);
+
+        try {
+            this.mBeanName = new ObjectName(name);
+            this.predefinedChartItConfigURL = FileLocator.find(Activator.getDefault().getBundle(), new Path(
+                path + ".xml"), null);
+
+            this.jmxClient = new JMXClientHelper(auth, creds);
+            // Connect the 
+            if (this.jmxClient.connect()) {
+                this.setEnabled(true);
+            } else {
+                // Show a tool tip text in case of connection failure
+                this.setToolTipText("Unable to show the JMX Monitoring due to " +
+                    this.jmxClient.getLastException());
+            }
+        } catch (Exception t) {
+            // Unable to init the JMX monitoring
+            t.printStackTrace();
         }
     }
 
@@ -158,7 +160,7 @@ public final class JMXChartItAction extends Action {
         this.jmxClient.disconnect();
         try {
             activateIfFound(JMX_CHARTIT_EDITOR_NAME, false); // false for close
-        } catch (Throwable t) {
+        } catch (Exception t) {
             MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to close the " +
                 JMXChartItAction.JMX_CHARTIT_EDITOR_NAME, t.getMessage());
             t.printStackTrace();
@@ -168,11 +170,14 @@ public final class JMXChartItAction extends Action {
     @Override
     public void run() {
         // Try to connect the JMX client
-        if (this.jmxClient.connect()) {
+        if (this.jmxClient.isConnected()) {
             try {
                 if (!activateIfFound(JMX_CHARTIT_EDITOR_NAME, true)) { // true for activate
+                    // Try to get the connection
+                    final MBeanServerConnection conn = this.jmxClient.getConnector()
+                            .getMBeanServerConnection();
                     // First build a ResourceDescriptor
-                    final IResourceDescriptor resourceDescriptor = new ResourceManagerChartItDescriptor();
+                    final IResourceDescriptor resourceDescriptor = new ResourceManagerChartItDescriptor(conn);
                     // Open new editor based on the descriptor
                     ChartItDataEditor.openNewFromResourceDescriptor(resourceDescriptor);
                 }
@@ -217,17 +222,22 @@ public final class JMXChartItAction extends Action {
     }
 
     final class ResourceManagerChartItDescriptor implements IResourceDescriptor {
+        final MBeanServerConnection connection;
+
+        public ResourceManagerChartItDescriptor(final MBeanServerConnection connection) {
+            this.connection = connection;
+        }
 
         public IDataProvider[] getCustomDataProviders() {
             return new IDataProvider[] {};
         }
 
         public String getHostUrlServer() {
-            return JMXChartItAction.this.jmxClient.getServiceURL().toString();
+            return JMXChartItAction.this.jmxClient.getConnector().toString();
         }
 
         public MBeanServerConnection getMBeanServerConnection() {
-            return JMXChartItAction.this.jmxClient.getConnection();
+            return this.connection;
         }
 
         public String getName() {
@@ -235,7 +245,7 @@ public final class JMXChartItAction extends Action {
         }
 
         public ObjectName getObjectName() {
-            return JMXChartItAction.this.jmxClient.getName();
+            return JMXChartItAction.this.mBeanName;
         }
 
         public URL getConfigFileURL() {
