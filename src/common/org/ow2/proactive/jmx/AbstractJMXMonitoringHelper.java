@@ -325,7 +325,7 @@ public abstract class AbstractJMXMonitoringHelper {
      * Returns the address of the JMX connector server depending on the specified protocol.
      * 
      * @param protocol the JMX transport protocol
-     * @return the address of the anonymous connector server
+     * @return the address of the connector server
      * @throws JMException in case of boot sequence failure
      */
     public JMXServiceURL getAddress(final JMXTransportProtocol protocol) throws JMException {
@@ -336,7 +336,7 @@ public abstract class AbstractJMXMonitoringHelper {
                     this.jmxRmiFailureReason = "Unknown failure. It is possible that the JMX-RMI monitoring infrastructure was not booted";
                 }
                 if (this.rmiCs == null) {
-                    throw new JMException(jmxRoFailureReason);
+                    throw new JMException(this.jmxRmiFailureReason);
                 }
                 address = this.rmiCs.getAddress();
                 if (address == null) {
@@ -348,7 +348,7 @@ public abstract class AbstractJMXMonitoringHelper {
                     this.jmxRoFailureReason = "Unknown failure. It is possible that the JMX-RO monitoring infrastructure was not booted";
                 }
                 if (this.roCs == null) {
-                    throw new JMException(jmxRoFailureReason);
+                    throw new JMException(this.jmxRoFailureReason);
                 }
                 address = this.roCs.getAddress();
                 if (address == null) {
