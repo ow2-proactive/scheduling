@@ -119,7 +119,7 @@
 
 	<target name="rcp.libCopy.rm" depends="rcp.libClean.rm, deploy.rm.client" description="Copy all required libraries to RM plugins">
 		<copy todir="${rcp.rm.dir}/${rcp.rm.lib}/lib" includeemptydirs="no">
-			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.jar}, ${srm.common.jar}"/>
+			<fileset dir="${deploy.lib.dir}" excludes="ProActive_tests.jar, ${rm.jar}" />
 		</copy>
 	</target>
 

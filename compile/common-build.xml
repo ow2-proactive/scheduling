@@ -129,6 +129,7 @@
 					<include name="org/ow2/proactive/authentication/Authentication.class" />
 					<include name="org/ow2/proactive/authentication/AuthenticationImpl.class" />
 					<include name="org/ow2/proactive/authentication/crypto/**" />
+					<include name="org/ow2/proactive/jmx/**" />
 					<include name="org/ow2/proactive/scripting/**" />
 					<include name="org/ow2/proactive/utils/**" />
 				</fileset>
