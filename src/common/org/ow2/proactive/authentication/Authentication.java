@@ -42,6 +42,8 @@ import java.security.PublicKey;
 import javax.management.JMException;
 import javax.security.auth.login.LoginException;
 
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
+
 
 /**
  * 
@@ -74,6 +76,15 @@ public interface Authentication extends Loggable, Serializable {
      * @throws JMException if the JMX connector server could not be started
      */
     public String getJMXConnectorURL() throws JMException;
+
+    /**
+     * Returns the address of the JMX connector server depending on the specified protocol.
+     * 
+     * @param protocol the JMX transport protocol
+     * @return the address of the anonymous connector server
+     * @throws JMException in case of boot sequence failure
+     */
+    public String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException;
 
     /**
      * Return the URL of this Resource Manager.

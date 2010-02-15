@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.authentication;
 
 import java.security.KeyException;
 
+import javax.management.JMException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -47,6 +48,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
@@ -229,8 +231,22 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
      * {@inheritDoc}
      */
     public String getJMXConnectorURL() {
-        return JMXMonitoringHelper.getDefaultJmxConnectorUrl() +
-            PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME.getValueAsString();
+        try {
+            return JMXMonitoringHelper.getInstance().getAddress(JMXTransportProtocol.RMI).toString();
+        } catch (JMException e) {
+            return null; // TODO: FORWARD THE JMException
+        }
+    }
+
+    /**
+     * Returns the address of the JMX connector server depending on the specified protocol.
+     * 
+     * @param protocol the JMX transport protocol
+     * @return the address of the anonymous connector server
+     * @throws JMException in case of boot sequence failure
+     */
+    public String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException {
+        return JMXMonitoringHelper.getInstance().getAddress(protocol).toString();
     }
 
     /**

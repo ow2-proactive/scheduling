@@ -36,20 +36,14 @@
  */
 package org.ow2.proactive.scheduler.core.jmx;
 
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.server.ExportException;
 import java.util.Set;
 
 import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.authentication.AuthenticationImpl;
-import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorServer;
+import org.ow2.proactive.jmx.AbstractJMXMonitoringHelper;
 import org.ow2.proactive.jmx.naming.JMXProperties;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -66,94 +60,86 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 
 /**
- * JMX Helper Class for the Scheduler to create the MBeanServer Views and the Connectors
- *
+ * This helper class represents the RMI and RO based JMX monitoring infrastructure of the Scheduler.
+ * @see org.ow2.proactive.jmx.AbstractJMXMonitoringHelper
+ * 
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class JMXMonitoringHelper implements SchedulerEventListener {
-    /** logger device */
-    private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);
-
-    private static final String SCHEDULER_BEAN_NAME = "SchedulerFrontend:name=SchedulerWrapperMBean";
-    private static final String JMX_CONNECTOR_NAME = PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME
-            .getValueAsString();
-
-    /**
-     * The default jmx Connector Server url for the scheduler
-     */
-    private static String DEFAULT_JMX_CONNECTOR_URL = null;
-
-    public static String getDefaultJmxConnectorUrl() {
-        if (DEFAULT_JMX_CONNECTOR_URL == null) {
-            String hostname = "localhost";
-            try {
-                hostname = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis())
-                        .getVMInformation().getHostName();
-            } catch (Throwable t) {
-                logger_dev.warn("Cannot set host name in JMX default connector URL", t);
-            }
-            DEFAULT_JMX_CONNECTOR_URL = "service:jmx:rmi:///jndi/rmi://" + hostname + ":" +
-                PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt() + "/";
-        }
-        return DEFAULT_JMX_CONNECTOR_URL;
-    }
+public class JMXMonitoringHelper extends AbstractJMXMonitoringHelper implements SchedulerEventListener {
+    private static final Logger LOGGER = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);
+    /** The single instance of this class */
+    private static final JMXMonitoringHelper instance = new JMXMonitoringHelper();
+    /** The name of the Resource Manager bean */
+    public static final String SCHEDULER_BEAN_NAME = "SchedulerFrontend:name=SchedulerWrapperMBean";
 
     /** Scheduler's MBean */
-    private static SchedulerWrapperAnonym schedulerBeanAnonym = new SchedulerWrapperAnonym();
-    private static SchedulerWrapperAdmin schedulerBeanAdmin = new SchedulerWrapperAdmin();
+    private SchedulerWrapperAnonym schedulerBeanAnonym;
+    private SchedulerWrapperAdmin schedulerBeanAdmin;
 
-    /** Scheduler`s MBeanServer */
-    private MBeanServer mbsAnonym;
-    private MBeanServer mbsAdmin;
-
-    /**
-     * Create the MBean Objects at the starting of the Scheduler
-     * and register them on the related MBeanServer based on the View
-     */
-    public void createMBeanServers() {
-        // Create one MBeanServer for each View
-        this.mbsAnonym = MBeanServerFactory.createMBeanServer();
-        this.mbsAdmin = MBeanServerFactory.createMBeanServer();
-        ObjectName mBeanNameAnonym = null;
-        ObjectName mBeanNameAdmin = null;
-        try {
-            // Create the Object Names
-            mBeanNameAnonym = new ObjectName(SCHEDULER_BEAN_NAME);
-            mBeanNameAdmin = new ObjectName(SCHEDULER_BEAN_NAME + "_" + JMXProperties.JMX_ADMIN);
-            // Register the MBean Views in the related MBeanServer
-            mbsAnonym.registerMBean(schedulerBeanAnonym, mBeanNameAnonym);
-            mbsAdmin.registerMBean(schedulerBeanAdmin, mBeanNameAdmin);
-        } catch (Exception e) {
-            logger_dev.error("", e);
-        }
+    private JMXMonitoringHelper() {
+        super(LOGGER);
     }
 
     /**
-     * method to create the MBeanServer Connectors for the Scheduler and to start them
+     * Returns the single instance of this class.
+     * 
+     * @return the single instance of this class
      */
-    public void createConnectors(AuthenticationImpl authentication) {
+    public static JMXMonitoringHelper getInstance() {
+        return JMXMonitoringHelper.instance;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectName registerAnonymMBean(final MBeanServer mbs) {
+        ObjectName mBeanNameAnonym = null;
         try {
-            LocateRegistry.createRegistry(PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt());
-        } catch (ExportException ee) {
-            //do nothing but continue starting JMX
-        } catch (RemoteException e) {
-            logger_dev.error("JMX : Cannot create registry on port " +
-                PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt(), e);
-            //do not start JMX service
-            return;
+            this.schedulerBeanAnonym = new SchedulerWrapperAnonym();
+            // Create the Object Names
+            mBeanNameAnonym = new ObjectName(SCHEDULER_BEAN_NAME);
+            // Register the MBean Views in the related MBeanServer
+            mbs.registerMBean(this.schedulerBeanAnonym, mBeanNameAnonym);
+        } catch (Exception e) {
+            LOGGER.error("", e);
         }
-        // Reference to the JMX Scheduler Connector Server Using the RMI Protocol 
-        PAAuthenticationConnectorServer rmiConnectorAnonym;
-        PAAuthenticationConnectorServer rmiConnectorAdmin;
-        // Create the RMI MBean Server Connectors
-        rmiConnectorAnonym = new PAAuthenticationConnectorServer(getDefaultJmxConnectorUrl(),
-            JMX_CONNECTOR_NAME, mbsAnonym, authentication, true, logger_dev);
-        rmiConnectorAdmin = new PAAuthenticationConnectorServer(getDefaultJmxConnectorUrl(),
-            JMX_CONNECTOR_NAME + "_" + JMXProperties.JMX_ADMIN, mbsAdmin, authentication, false, logger_dev);
-        // Start the Connectors	
-        rmiConnectorAnonym.start();
-        rmiConnectorAdmin.start();
+        return mBeanNameAnonym;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectName registerAdminMBean(final MBeanServer mbs) {
+        ObjectName mBeanNameAdmin = null;
+        try {
+            this.schedulerBeanAdmin = new SchedulerWrapperAdmin();
+            // Create the Object Names            
+            mBeanNameAdmin = new ObjectName(SCHEDULER_BEAN_NAME + "_" + JMXProperties.JMX_ADMIN);
+            // Register the MBean Views in the related MBeanServer            
+            mbs.registerMBean(this.schedulerBeanAdmin, mBeanNameAdmin);
+        } catch (Exception e) {
+            LOGGER.error("", e);
+        }
+        return mBeanNameAdmin;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getConnectorServerName() {
+        return PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME.getValueAsString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getJMXRMIConnectorServerPort() {
+        return PASchedulerProperties.SCHEDULER_JMX_PORT.getValueAsInt();
     }
 
     /**
@@ -214,5 +200,4 @@ public class JMXMonitoringHelper implements SchedulerEventListener {
         schedulerBeanAnonym.usersUpdatedEvent(notification);
         schedulerBeanAdmin.usersUpdatedEvent(notification);
     }
-
 }

@@ -36,16 +36,12 @@
  */
 package org.ow2.proactive.scheduler.util.adminconsole;
 
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXProviderException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
-import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorClient;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
@@ -178,15 +174,10 @@ public class AdminController extends UserController {
     }
 
     @Override
-    protected void connectJMXClient() throws JMXProviderException {
+    protected void connectJMXClient() {
         try {
-            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(auth
-                    .getJMXConnectorURL() +
-                "_admin");
-            cli.connect(credentials, user);
-            MBeanServerConnection conn = cli.getConnection();
-            ObjectName on = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean_admin");
-            model.setJMXInfo(new MBeanInfoViewer(conn, on));
+            final String name = "SchedulerFrontend:name=SchedulerWrapperMBean_admin";
+            model.setJMXInfo(MBeanInfoViewer.create(auth, name, user, credentials));
         } catch (Exception e) {
             logger.error("Error while connecting JMX : ", e);
         }

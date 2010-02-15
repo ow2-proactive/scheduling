@@ -157,7 +157,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     private Timer sessionTimer;
 
     /** JMX Helper reference */
-    private JMXMonitoringHelper jmxHelper = new JMXMonitoringHelper();
+    private JMXMonitoringHelper jmxHelper;
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -187,6 +187,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         this.dirtyList = new HashSet<UniqueID>();
         this.currentJobToSubmit = new InternalJobWrapper();
         this.schedulerListeners = new ConcurrentHashMap<UniqueID, ClientRequestHandler>();
+        this.jmxHelper = JMXMonitoringHelper.getInstance();
 
         logger_dev.info("Creating scheduler Front-end...");
         resourceManager = imp;
@@ -229,6 +230,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
             logger_dev.info("Registering scheduler...");
             PAActiveObject.registerByName(schedulerAuth, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
+
+            // Boot the JMX helper
+            logger_dev.info("Booting jmx...");
+            this.jmxHelper.boot(schedulerAuth);
+
             // run !!
         } catch (Exception e) {
             logger_console.error("", e);
@@ -279,13 +285,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         } else {
             logger_dev.info("job list empty");
         }
-        // Call the jmxHelper to create the MBean Views
-        jmxHelper.createMBeanServers();
-        //Register the JMX scheduler MBean
-        logger_dev.info("Registering scheduler MBean...");
-        // Call the jmxHelper to create the Server Connectors for the JMX Scheduler MBean Server and start them
-        jmxHelper.createConnectors(authentication);
-        //rebuild JMX object
+        // rebuild JMX object
         jmxHelper.recover(jobStates);
         //once recovered, activate scheduler communication
         authentication.setActivated(true);

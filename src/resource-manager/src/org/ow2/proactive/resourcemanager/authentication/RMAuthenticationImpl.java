@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
@@ -180,7 +181,18 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      * {@inheritDoc}
      */
     public String getJMXConnectorURL() throws JMException {
-        return JMXMonitoringHelper.getInstance().getAddress().toString();
+        return JMXMonitoringHelper.getInstance().getAddress(JMXTransportProtocol.RMI).toString();
+    }
+
+    /**
+     * Returns the address of the JMX connector server depending on the specified protocol.
+     * 
+     * @param protocol the JMX transport protocol
+     * @return the address of the anonymous connector server
+     * @throws JMException in case of boot sequence failure
+     */
+    public String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException {
+        return JMXMonitoringHelper.getInstance().getAddress(protocol).toString();
     }
 
     /**

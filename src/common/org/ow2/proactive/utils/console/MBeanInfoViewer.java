@@ -36,9 +36,16 @@
  */
 package org.ow2.proactive.utils.console;
 
+import java.util.HashMap;
+
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+
+import org.ow2.proactive.authentication.Authentication;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.jmx.JMXClientHelper;
 
 
 /**
@@ -47,19 +54,13 @@ import javax.management.ObjectName;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class MBeanInfoViewer {
-    private MBeanServerConnection connection;
-    private ObjectName mbeanName;
+public final class MBeanInfoViewer {
+    /** The connection to the MBeanServer */
+    private final MBeanServerConnection connection;
+    /** The name of the MBean to view */
+    private final ObjectName mbeanName;
 
-    /**
-     * Create a new instance of MBeanInfoViewer
-     *
-     * @param connection
-     * @param mbeanName
-     * @param info
-     */
-    public MBeanInfoViewer(MBeanServerConnection connection, ObjectName mbeanName) {
-        super();
+    private MBeanInfoViewer(final MBeanServerConnection connection, final ObjectName mbeanName) {
         this.connection = connection;
         this.mbeanName = mbeanName;
     }
@@ -87,6 +88,37 @@ public class MBeanInfoViewer {
             return out.toString();
         } catch (Exception e) {
             throw new RuntimeException("Cannot retrieve JMX informations from Selected Bean", e);
+        }
+    }
+
+    /**
+     * Before creating a MBeanInfoViewer this method connects to the JMX connector server.
+     * <p>
+     * The default behavior will try to establish a connection using RMI protocol, if it fails 
+     * the RO (Remote Object) protocol is used.
+     * 
+     * @param auth the authentication interface
+     * @param name a string representation of the object name
+     * @param user the user that wants to connect to the JMX infrastructure 
+     * @param creds the credentials of the user
+     * @return a new instance of MBeanInfoViewer
+     */
+    public static MBeanInfoViewer create(final Authentication auth, final String name, final String user,
+            final Credentials creds) {
+        final HashMap<String, Object> env = new HashMap<String, Object>(2);
+        // Fill the env with credentials 
+        env.put(JMXConnector.CREDENTIALS, new Object[] { user, creds });
+
+        // By default try the connector over RMI 
+        final JMXConnector jmxConnector = JMXClientHelper.tryJMXoverRMI(auth, env);
+
+        // Create the MBean viewer
+        try {
+            final ObjectName mBeanName = new ObjectName(name);
+            final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
+            return new MBeanInfoViewer(conn, mBeanName);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable create the MBeanInfoViewer about " + name, e);
         }
     }
 }
