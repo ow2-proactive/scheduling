@@ -65,7 +65,6 @@ import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.Selector;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
@@ -84,6 +83,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputSt
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.task.launcher.dataspace.AntFileSelector;
+import org.ow2.proactive.scheduler.task.launcher.dataspace.AntSelector;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.PropertyUtils;
 import org.ow2.proactive.scripting.Script;
@@ -641,7 +641,7 @@ public abstract class TaskLauncher implements InitActive {
                         //search in INPUT
                         try {
                             if (INPUT.getType().hasChildren()) {
-                                Selector.findFiles(INPUT, ant, true, results);
+                                AntSelector.findFiles(INPUT, ant, true, results);
                             } else {
                                 logger_dev_dataspace
                                         .debug("Cannot list files for this INPUT, switch to non-pattern mode and try again");
@@ -668,7 +668,7 @@ public abstract class TaskLauncher implements InitActive {
                     case TransferFromOutputSpace:
                         //search in OUTPUT
                         try {
-                            Selector.findFiles(OUTPUT, ant, true, results);
+                            AntSelector.findFiles(OUTPUT, ant, true, results);
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
@@ -754,7 +754,7 @@ public abstract class TaskLauncher implements InitActive {
                 switch (os.getMode()) {
                     case TransferToOutputSpace:
                         try {
-                            Selector.findFiles(SCRATCH, ant, true, results);
+                            AntSelector.findFiles(SCRATCH, ant, true, results);
                             //debug ---
                             if (!logger_dev_dataspace.isDebugEnabled()) {
                                 if (results == null || results.size() == 0) {
