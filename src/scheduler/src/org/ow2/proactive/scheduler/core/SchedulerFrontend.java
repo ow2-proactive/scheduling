@@ -830,16 +830,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         UserIdentificationImpl ident = identifications.remove(id);
         //remove listeners if needed
         schedulerListeners.remove(id);
-        //remove this user to the list of connected user
-        ident.setToRemove();
-        connectedUsers.update(ident);
-        //cancel the timer
-        ident.getSession().cancel();
-        //log and send events
-        String user = ident.getUsername();
-        logger_dev.info("User '" + user + "' has disconnect the scheduler !");
-        dispatchUsersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident),
-                false);
+        if (ident != null) {
+            //remove this user to the list of connected user if it has not already been removed
+            ident.setToRemove();
+            connectedUsers.update(ident);
+            //cancel the timer
+            ident.getSession().cancel();
+            //log and send events
+            String user = ident.getUsername();
+            logger_dev.info("User '" + user + "' has disconnect the scheduler !");
+            dispatchUsersUpdated(
+                    new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident), false);
+        }
     }
 
     /**
