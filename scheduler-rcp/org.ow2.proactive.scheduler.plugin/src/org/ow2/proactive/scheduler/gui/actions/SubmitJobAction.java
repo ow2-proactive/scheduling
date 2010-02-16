@@ -96,17 +96,21 @@ public class SubmitJobAction extends SchedulerGUIAction {
         String filePath = null;
 
         //create jobs
-        for (String fileName : filesNames) {
-            filePath = directoryPath + File.separator + fileName;
-            try {
-                Job job = JobFactory.getFactory().createJob(filePath);
-                JobId id = SchedulerProxy.getInstance().submit(job);
-                submittedJobs.put(id, fileName);
-            } catch (JobCreationException e) {
-                failedJobs.put(fileName, "Job creation error : " + e.getMessage());
-            } catch (SchedulerException e) {
-                failedJobs.put(fileName, "Job submission error : " + e.getMessage());
+        try {
+            for (String fileName : filesNames) {
+                filePath = directoryPath + File.separator + fileName;
+                try {
+                    Job job = JobFactory.getFactory().createJob(filePath);
+                    JobId id = SchedulerProxy.getInstance().submit(job);
+                    submittedJobs.put(id, fileName);
+                } catch (JobCreationException e) {
+                    failedJobs.put(fileName, "Job creation error : " + e.getMessage());
+                } catch (SchedulerException e) {
+                    failedJobs.put(fileName, "Job submission error : " + e.getMessage());
+                }
             }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
 
         if (failedJobs.size() != 0) {
