@@ -38,6 +38,7 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.objectweb.proactive.core.UniqueID;
@@ -61,6 +62,14 @@ public class ClientRequestHandler {
     /** thread pool */
     private static final ExecutorService threadPoolForNetworkCalls = Executors
             .newFixedThreadPool(THREAD_NUMBER);
+
+    public static void terminate() {
+        try {
+            threadPoolForNetworkCalls.shutdown();
+            threadPoolForNetworkCalls.awaitTermination(12, TimeUnit.SECONDS);
+        } catch (Exception e) {
+        }
+    }
 
     /** Busy state of this client request queue */
     private AtomicBoolean busy = new AtomicBoolean(false);

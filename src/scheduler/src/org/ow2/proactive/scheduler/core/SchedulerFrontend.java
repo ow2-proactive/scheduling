@@ -1039,6 +1039,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             authentication.terminate();
         }
 
+        ClientRequestHandler.terminate();
+
         PAActiveObject.terminateActiveObject(false);
         logger.info("Scheduler frontend is now shutdown !");
 
