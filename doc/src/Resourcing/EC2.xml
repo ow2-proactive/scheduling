@@ -103,13 +103,13 @@
       possible but requires manual configuration for deploying RSA keys.
       To configure your RM with HTTP, all you need to specify is a configuration file with the following properties,
       for both Resource Manager <emphasis>and</emphasis> Scheduler.
-      <screen><![CDATA[
-        <prop key="proactive.net.nolocal" value="true"/>
-        <prop key="proactive.communication.protocol" value="http" />
-        <prop key="proactive.http.port" value="PORT" />
-        <prop key="proactive.net.noprivate" value="true" />
-        <prop key="proactive.useIPaddress" value="true" />
-]]></screen>
+      <programlisting language="xml"><![CDATA[
+<prop key="proactive.net.nolocal" value="true"/>
+<prop key="proactive.communication.protocol" value="http" />
+<prop key="proactive.http.port" value="PORT" />
+<prop key="proactive.net.noprivate" value="true" />
+<prop key="proactive.useIPaddress" value="true" />
+]]></programlisting>
       Note that you need to specify a different port for both configurations.
       Sample configurations can be found in <emphasis>/samples/ec2</emphasis>.
     </para>

@@ -14,5 +14,6 @@
    <highlighter id='XML' file='./XML-hl.xml'/>
    <highlighter id='m2' file='./m2-hl.xml'/>
    <highlighter id='c' file='./c-hl.xml'/>
+   <highlighter id='sh' file='./sh-hl.xml'/>
    <namespace prefix="xslthl" uri="http://xslthl.sf.net"/>
 </xslthl-config>

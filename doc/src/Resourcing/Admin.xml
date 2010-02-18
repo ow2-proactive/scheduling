@@ -164,12 +164,12 @@ bin/unix $ ./key-gen -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 			This storage of users accounts can be managed in two ways: by files, or by LDAP. A Resource Manager property (in config/rm/settings.ini)
 			specifies which kind of authentication will be used:
 			</para>
-				<programlisting language="java">
-	#Property that defines the method that has to be used for logging users to the Resource Manager
-	#It can be one of the following values:
-	#	- "RMFileLoginMethod" to use file login and group management
-	#	- "RMLDAPLoginMethod" to use LDAP login management
-	pa.rm.authentication.loginMethod=RMFileLoginMethod
+				<programlisting language="sh">
+#Property that defines the method that has to be used for logging users to the Resource Manager
+#It can be one of the following values:
+#	- "RMFileLoginMethod" to use file login and group management
+#	- "RMLDAPLoginMethod" to use LDAP login management
+pa.rm.authentication.loginMethod=RMFileLoginMethod
 				</programlisting>
 			<para>
 			By default, authentication method is by file (RMFileLoginMethod). If you want to use the LDAP-based authentication,
@@ -581,7 +581,7 @@ Class name: org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
 		<para>
 			You can script a sequence of commands to send to Resource Manager in javascript file:
 		</para>
-		<programlisting>
+		<programlisting language="java">
 /* set exec mode in order to not display stack trace, and not ask for either.*/
 exMode(false,false);
 

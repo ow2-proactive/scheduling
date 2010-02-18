@@ -86,7 +86,7 @@
 							The database get its properties in the <emphasis>config/scheduler/database/hibernate/hibernate.cfg.xml</emphasis> configuration file.
 							Here is an example of configuration:
 						</para>
-						<programlisting>
+						<programlisting language="xml">
 &lt;property name="connection.driver_class"&gt;org.apache.derby.jdbc.EmbeddedDriver&lt;/property&gt;
 &lt;property name="connection.url"&gt;jdbc:derby:../../SCHEDULER_DB;create=true&lt;/property&gt;
 &lt;property name="connection.username"&gt;scheduler&lt;/property&gt;
@@ -1004,7 +1004,7 @@ bin/unix$ ./key-gen -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 			This storage of user accounts can be managed in two ways: by files, or by LDAP. A Scheduler property (in <literal>config/scheculer/settings.ini</literal>)
 			specifies which kind of authentication will be used:
 			</para>
-				<programlisting language="java">
+				<programlisting language="sh">
 #Property that defines the method that has to be used for logging users to the Scheduler
 #It can be one of the following values:
 #	- "SchedulerFileLoginMethod" to use file login and group management

@@ -6,9 +6,9 @@
 
 if [ $# -lt 1 ]
 then
-echo "you must specify at least the command to launch"
-echo "Usage: launcher.sh executable_to_launch  [parameters...]"
-exit 1
+	echo "you must specify at least the command to launch"
+	echo "Usage: launcher.sh executable_to_launch  [parameters...]"
+	exit 1
 fi
 
 cd $(dirname $0)
@@ -18,32 +18,31 @@ shift
 
 if [ -z $PAS_TASK_ID ]
 then
-echo "Error : environment var \$PAS_TASK_ID is not defined,"
-echo "Execution aborted"
-exit 1
+	echo "Error : environment var \$PAS_TASK_ID is not defined,"
+	echo "Execution aborted"
+	exit 1
 fi
 
 if [ -e $PAS_TASK_ID ]
 then
-echo "directory path exists !"
-echo "Execution aborted"
-
-exit 1
+	echo "directory path exists !"
+	echo "Execution aborted"
+	exit 1
 fi
 
 mkdir $PAS_TASK_ID
 if [ $? -ne 0 ]
 then
-echo "directory $PAS_TASK_ID creation failed"
-echo "Execution aborted"
-exit 1
+	echo "directory $PAS_TASK_ID creation failed"
+	echo "Execution aborted"
+	exit 1
 fi
 
 cd $PAS_TASK_ID
 $COMMAND $@
 if [ $? == 0 ]
 then
-echo "execution of $COMMAND ok"
+	echo "execution of $COMMAND ok"
 else
-echo  "problem during execution of $COMMAND $@"
+	echo  "problem during execution of $COMMAND $@"
 fi

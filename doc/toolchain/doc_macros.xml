@@ -153,12 +153,20 @@
 
 			<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
 				<fileset dir="${docs.toolchain.dir}">
+					<include name="images/**/*.png" />
+					<include name="images/**/*.jpg" />
+					<include name="images/**/*.svg" />
+					<include name="images/**/*.gif" />
 					<include name="docbook.dtd" />
 				</fileset>
 			</copy>
 
 			<copy toDir="@{output.docs.dir}" includeemptydirs="no">
 				<fileset dir="${docs.toolchain.dir}">
+					<include name="images/**/*.png" />
+					<include name="images/**/*.jpg" />
+					<include name="images/**/*.svg" />
+					<include name="images/**/*.gif" />
 					<include name="main.css" />
 				</fileset>
 			</copy>

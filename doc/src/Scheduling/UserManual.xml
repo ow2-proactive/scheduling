@@ -187,7 +187,7 @@ job.setEnv(je);
 			If you just need to launch a set of native tasks in parallel, <emphasis>without dependancies between tasks</emphasis>, you can create a simple text file
 			and write a list of native commands to submit:
 			</para>
-			<programlisting language="xml">
+			<programlisting language="sh">
 # a flat text file containing native commands to launch
 # one command per line
 #
@@ -1472,12 +1472,12 @@ JobId myJobId = scheduler.submit(job);
 					To obtain the key, you can either have it on your local drive, or ask the remote Scheduler:
 				      </para>
 				      <para>
-					<screen><![CDATA[
+					<programlisting language="sh"><![CDATA[
 # use local public key to generate credentials for user 'demo'
 /bin/unix $ ./create-cred -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
 # use rmi://example.com/SCHEDULER's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
 /bin/unix $ ./create-cred -U rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
-]]></screen>
+]]></programlisting>
 					Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; ie using
 					<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>.
 				    </para></listitem>
@@ -1715,12 +1715,12 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 				    </para></listitem>
 				    <listitem><para>
 					In batch mode, this public key will be used when encrypting the credentials with the bin/[os]/createCred[.bat] script:
-					<screen><![CDATA[
+					<programlisting language="sh"><![CDATA[
 # use local public key to generate credentials for user 'demo'
 /bin/unix $ ./create-cred -P $HOME/.proactive/scheduler_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
 # use rmi://example.com/SCHEDULER's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
 /bin/unix $ ./create-cred -U rmi://example.com/SCHEDULER -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
-]]></screen>
+]]></programlisting>
 					When running the controller, Credentials will now be retreived when properly designated by the
 					<emphasis>pa.common.auth.credentials</emphasis> property; ie. using
 					<emphasis>java -Dpa.common.auth.pubkey=$HOME/.proactive/my_encrypted_credentials</emphasis>,

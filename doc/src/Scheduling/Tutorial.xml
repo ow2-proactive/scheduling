@@ -1156,7 +1156,7 @@ command="[working_dir]/nativTask"
 			<para>
 			 <emphasis role="bold">file: </emphasis><code>launcher.sh</code>
 			</para>
-			<programlisting><textobject><textdata fileref="code_snippets/launcher_sh.txt"/></textobject></programlisting>
+			<programlisting language="sh"><textobject><textdata fileref="code_snippets/launcher_sh.txt"/></textobject></programlisting>
 			<para>
 			Copy your compiled executable (<code>task_with_output</code>) and your launching shell script, and submit this job.
 			You will see, after job's execution, 4 directories created in your <code>[working_dir]</code> named by the 4 tasks ID of your execution,

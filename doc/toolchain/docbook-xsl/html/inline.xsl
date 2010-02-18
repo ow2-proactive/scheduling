@@ -291,13 +291,13 @@
       </xsl:with-param>
     </xsl:call-template>
   </xsl:param>
-  <em>
+  <i>
     <xsl:apply-templates select="." mode="class.attribute"/>
     <xsl:call-template name="generate.html.title"/>
     <xsl:call-template name="dir"/>
     <xsl:copy-of select="$content"/>
     <xsl:call-template name="apply-annotations"/>
-  </em>
+  </i>
 </xsl:template>
 
 <xsl:template name="inline.boldmonoseq">
