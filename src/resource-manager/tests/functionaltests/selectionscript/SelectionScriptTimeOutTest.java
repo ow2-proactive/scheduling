@@ -128,6 +128,10 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         Assert.assertEquals(RMTHelper.defaultNodesNumber, nodes.size());
         Assert.assertEquals(1, admin.getFreeNodesNumber().intValue());
 
+        // waiting until selection manager finishes script execution for node "timeout"
+        // as we don't know how long should we wait roughly estimate it as scriptSleepingTime/2  
+        Thread.sleep(scriptSleepingTime / 2);
+
         NodeSet nodes2 = admin.getAtMostNodes(1, null);
         Assert.assertEquals(1, nodes2.size());
         Assert.assertEquals(0, admin.getFreeNodesNumber().intValue());
