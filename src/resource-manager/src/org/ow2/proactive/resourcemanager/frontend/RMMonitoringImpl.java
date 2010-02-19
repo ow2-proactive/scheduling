@@ -42,6 +42,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
@@ -311,6 +312,15 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         //throwing shutdown event
         rmEvent(new RMEvent(RMEventType.SHUTDOWN));
         PAActiveObject.terminateActiveObject(false);
+
+        // initiating shutdown
+        eventDispatcherThreadPool.shutdown();
+        try {
+            // waiting until all clients will be notified
+            eventDispatcherThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            logger.warn("", e);
+        }
     }
 
     public Logger getLogger() {

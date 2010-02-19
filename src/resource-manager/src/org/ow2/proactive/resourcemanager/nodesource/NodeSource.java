@@ -109,7 +109,8 @@ public class NodeSource implements InitActive, RunActive {
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
     private HashMap<String, Node> downNodes = new HashMap<String, Node>();
 
-    private static transient ExecutorService networkOperationsThreadPool;
+    private static int instanceCount = 0;
+    private static ExecutorService networkOperationsThreadPool;
     private NodeSource stub;
 
     /**
@@ -141,6 +142,7 @@ public class NodeSource implements InitActive, RunActive {
      */
     public void initActivity(Body body) {
 
+        instanceCount++;
         stub = (NodeSource) PAActiveObject.getStubOnThis();
         infrastructureManager.setNodeSource(this);
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
@@ -486,6 +488,20 @@ public class NodeSource implements InitActive, RunActive {
 
         // got confirmation from pinger and policy
         PAActiveObject.terminateActiveObject(false);
+
+        instanceCount--;
+
+        if (instanceCount == 0) {
+            // terminating thread pool
+            networkOperationsThreadPool.shutdown();
+            try {
+                // waiting until all nodes will be removed
+                networkOperationsThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                logger.warn("", e);
+            }
+            networkOperationsThreadPool = null;
+        }
     }
 
     /**
