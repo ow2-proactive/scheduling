@@ -40,6 +40,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
@@ -61,8 +63,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
-import org.ow2.proactive.threading.ThreadPoolController;
-import org.ow2.proactive.threading.ThreadPoolControllerImpl;
 
 
 /**
@@ -84,8 +84,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     // Attributes
     private RMCoreInterface rmcore;
     private Map<UniqueID, RMEventListener> listeners;
-    private HashMap<ClientCommunicator, LinkedList<RMEvent>> pendingEvents = new HashMap<ClientCommunicator, LinkedList<RMEvent>>();
-    private transient ThreadPoolController threadPoolController;
+    private HashMap<EventDispatcher, LinkedList<RMEvent>> pendingEvents = new HashMap<EventDispatcher, LinkedList<RMEvent>>();
+    private transient ExecutorService eventDispatcherThreadPool;
 
     /** Resource Manager's statistics */
     public static final AtomicRMStatisticsHolder rmStatistics = new AtomicRMStatisticsHolder();
@@ -113,8 +113,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
-            threadPoolController = new ThreadPoolControllerImpl(
-                PAResourceManagerProperties.RM_MONITORING_MAX_THREAD_NUMBER.getValueAsInt());
+            eventDispatcherThreadPool = Executors
+                    .newFixedThreadPool(PAResourceManagerProperties.RM_MONITORING_MAX_THREAD_NUMBER
+                            .getValueAsInt());
 
         } catch (ProActiveException e) {
             logger.debug("Cannot register RMMonitoring. Aborting...", e);
@@ -122,12 +123,12 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         }
     }
 
-    private class ClientCommunicator implements Runnable {
+    private class EventDispatcher implements Runnable {
 
         private UniqueID listenerId;
         private ReentrantLock lock = new ReentrantLock();
 
-        public ClientCommunicator(UniqueID listenerId) {
+        public EventDispatcher(UniqueID listenerId) {
             this.listenerId = listenerId;
         }
 
@@ -219,7 +220,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         }
 
         public boolean equals(Object obj) {
-            ClientCommunicator other = (ClientCommunicator) obj;
+            EventDispatcher other = (EventDispatcher) obj;
             return listenerId.equals(other.listenerId);
         }
     }
@@ -237,7 +238,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         synchronized (listeners) {
             this.listeners.put(id, listener);
-            this.pendingEvents.put(new ClientCommunicator(id), new LinkedList<RMEvent>());
+            this.pendingEvents.put(new EventDispatcher(id), new LinkedList<RMEvent>());
         }
         return rmcore.getRMInitialState();
     }
@@ -250,7 +251,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         synchronized (listeners) {
             if (listeners.containsKey(id)) {
                 listeners.remove(id);
-                pendingEvents.remove(new ClientCommunicator(id));
+                pendingEvents.remove(new EventDispatcher(id));
             } else {
                 throw new RMException("Listener is unknown");
             }
@@ -276,7 +277,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                     events.add(event);
                 }
             }
-            threadPoolController.execute(pendingEvents.keySet());
+            for (Runnable eventDispatcher : pendingEvents.keySet()) {
+                eventDispatcherThreadPool.submit(eventDispatcher);
+            }
         }
     }
 
