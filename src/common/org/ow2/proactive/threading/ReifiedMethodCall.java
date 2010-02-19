@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds 
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -33,29 +34,67 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.network;
+package org.ow2.proactive.threading;
 
-public interface Timed<T> extends Runnable {
+import java.lang.reflect.Method;
 
-    /**
-     * Performs the network operation(s)
-     */
-    public void run();
 
-    /**
-     * Return the status of the task, terminated or not.
-     * @return true if the task has been finished, false otherwise.
-     */
-    public boolean isDone();
+/**
+ * ReifiedMethodCall is a simple class used to store method call in order to make the call later.
+ *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 2.0
+ */
+public class ReifiedMethodCall {
 
-    /**
-     * Returns the result. Can be null if the task has reach the timeout
-     */
-    public T getResult();
+    private Method method;
+    private Object[] arguments;
 
     /**
-     * Executes if the time for the task is expired.
-     * Must be non-blocking.
+     * Create a new instance of MethodCall
+     *
+     * @param method
+     * @param arguments
      */
-    public void timeoutAction();
+    public ReifiedMethodCall(Method method, Object[] arguments) {
+        this.method = method;
+        this.arguments = arguments;
+    }
+
+    /**
+     * Get the method
+     *
+     * @return the method
+     */
+    public Method getMethod() {
+        return method;
+    }
+
+    /**
+     * Set the method value to the given method value
+     *
+     * @param method the method to set
+     */
+    public void setMethod(Method method) {
+        this.method = method;
+    }
+
+    /**
+     * Get the arguments
+     *
+     * @return the arguments
+     */
+    public Object[] getArguments() {
+        return arguments;
+    }
+
+    /**
+     * Set the arguments value to the given arguments value
+     *
+     * @param arguments the arguments to set
+     */
+    public void setArguments(Object[] arguments) {
+        this.arguments = arguments;
+    }
+
 }

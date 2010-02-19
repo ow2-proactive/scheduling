@@ -48,14 +48,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.network.NetworkCommunicator;
-import org.ow2.proactive.network.NetworkCommunicatorImpl;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.threading.ThreadPoolController;
+import org.ow2.proactive.threading.ThreadPoolControllerImpl;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -74,7 +74,7 @@ public abstract class SelectionManager {
 
     private RMCore rmcore;
 
-    private NetworkCommunicator networkCommunicator = new NetworkCommunicatorImpl(
+    private ThreadPoolController threadPoolController = new ThreadPoolControllerImpl(
         PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt());
 
     private Set<String> inProgress = Collections.synchronizedSet(new HashSet<String>());
@@ -150,9 +150,11 @@ public abstract class SelectionManager {
                 }
             }
 
-            Collection<RMNode> matchNodes = networkCommunicator.execute(scriptExecutors, MAX_VERIF_TIMEOUT);
+            Collection<ScriptExecutor> matchNodes = threadPoolController.execute(scriptExecutors,
+                    MAX_VERIF_TIMEOUT);
 
-            for (RMNode node : matchNodes) {
+            for (ScriptExecutor se : matchNodes) {
+                RMNode node = se.getNode();
                 try {
                     rmcore.setBusyNode(node.getNodeURL());
                     result.add(node.getNode());
