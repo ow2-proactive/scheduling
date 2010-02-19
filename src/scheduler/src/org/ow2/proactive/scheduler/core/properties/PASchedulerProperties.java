@@ -87,6 +87,11 @@ public enum PASchedulerProperties {
     	negative number indicates that session is infinite (value specified in second) */
     SCHEDULER_USER_SESSION_TIME("pa.scheduler.core.usersessiontime", PAPropertiesType.INTEGER),
 
+    /** Maximum number of threads used to send events to clients. This property defines the number of clients
+     * than can block at the same time. If this number is reached, every clients won't receive events until
+     * a thread unlock. */
+    SCHEDULER_LISTENERS_THREADNUMBER("pa.scheduler.core.listener.threadnumber", PAPropertiesType.INTEGER),
+
     /* ***************************************************************** */
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */
