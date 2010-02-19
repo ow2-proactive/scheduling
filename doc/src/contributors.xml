@@ -1,763 +1,573 @@
-<?xml version="1.0" encoding="utf-8"?><dedication xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="contributors"><info><title>Contributors and Contact Information</title></info>
-  
+<!--   <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd"> -->
+<dedication xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="contributors">
+	<info>
+		<title xml:id="ContributorsandContactInformation_19">Contributors and Contact Information</title>
+	</info>
 
-  <para>
-    <informaltable frame="none">
-      <tgroup cols="2">
-        <tbody>
-          <row>
-             <entry align="center">
-            	<para>
-                <emphasis role="bold">Team Leader:</emphasis>
-                <address>
-
-                  <personname>
-                    <!--<honorific>Prof.</honorific>-->
-
-                    <firstname>Denis</firstname>
-
-                    <surname>Caromel</surname>
-                    
-                  </personname>
-					
-                  <street>INRIA 2004, Route des Lucioles</street>
-
-                  <pob> BP 93</pob>
-
-                  <postcode>06902</postcode>
-
-                  <city>Sophia Antipolis Cedex</city>
-
-                  <country>France</country>
-
-                  <phone>+33 492 387 631</phone>
-
-                  <fax>+33 492 387 971</fax>
-
-                  <email>Denis.Caromel@inria.fr</email>
-                </address>
-                </para>
-            </entry>
-            <entry align="center" valign="top">
-              <emphasis role="bold">ActiveEon Team</emphasis>
-              <itemizedlist mark="none" role="sorted">
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Christian</firstname>
-
-                      <surname>Delbé</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Arnaud</firstname>
-
-                      <surname>Contes</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-			  <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Vladimir</firstname>
-
-                      <surname>Bodnartchouk</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-			  <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Emil</firstname>
-
-                      <surname>Salageanu</surname>
-                    </personname>
-                  </para>
-                </listitem>  
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Clement</firstname>
-
-                      <surname>Mathieu</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Cedric</firstname>
-
-                      <surname>Dalmasso</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Jean-Luc</firstname>
-
-                      <surname>Scheefer</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Jean-Michel</firstname>
-
-                      <surname>Guillaume</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Maxime</firstname>
-
-                      <surname>Menant</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-	          </itemizedlist>
-	          </entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </informaltable>
+	<informaltable frame="none">
+		<?dbhtml table-width="50%" ?>
+		<tgroup cols="1">
+			<thead>
+				<row>
+					<entry align="center">Team Leader</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry align="center">
+						<para>
+							<address>
+								<personname>
+									<!--<honorific>Prof.</honorific>-->
+									<firstname>Denis</firstname>
+									<surname>Caromel</surname>
+								</personname>
+								<street>INRIA 2004, Route des Lucioles</street>
+								<pob>BP 93</pob>
+								<postcode>06902</postcode>
+								<city>Sophia Antipolis Cedex</city>
+								<country>France</country>
+								<phone>+33 492 387 631</phone>
+								<fax>+33 492 387 971</fax>
+								<email>Denis.Caromel@inria.fr</email>
+							</address>
+						</para>
+					</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</informaltable>
 
     <!--   Oasis team and past contributors on two columns <==> in a two column table   -->
-	
-	
 	<informaltable colsep="0" frame="none">
-      <tgroup cols="2">
-        <tbody>
-          <row>
-            <entry align="center" valign="top">
-                <emphasis>OASIS Team</emphasis>
-   			</entry> 
-
-            <entry align="center" valign="top">
-				<emphasis>Past And External Important Contributors</emphasis>
-   			</entry> 
-   			</row>
-   		</tbody>
-        </tgroup>
-        
-    </informaltable>
-    
-    <informaltable colsep="0" frame="none">
-      <tgroup cols="4">
-        <tbody>
-          <row>
-            <entry align="center" valign="top">
-              <itemizedlist mark="none" role="sorted">
-
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Guillaume</firstname>
-
-                      <surname>Laurent</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Robert</firstname>
-
-                      <surname>Lovas</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Jonathan</firstname>
-
-                      <surname>Martin</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Elton</firstname>
-
-                      <surname>Mathias</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Guilherme</firstname>
-
-                      <surname>Perretti Pezzi</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Franca</firstname>
-
-                      <surname>Perrina</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Kamran</firstname>
-
-                      <surname>Qadir</surname>
-                    </personname>
-                  </para>
-                </listitem>
-                
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Bastien</firstname>
-
-                      <surname>Sauvan</surname>
-                    </personname>
-                  </para>
-                </listitem>
-              
-              
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Germain</firstname>
-
-                      <surname>Sigety</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Etienne</firstname>
-
-                      <surname>Vallette-De-Osia</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Laurent</firstname>
-
-                      <surname>Vanni</surname>
-                    </personname>
-                  </para>
-                </listitem>
-              
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Yulai</firstname>
-
-                      <surname>Yuan</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-              
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Sylvain</firstname>
-
-                      <surname>Cussat-Blanc</surname>
-                    </personname>
-                  </para>
-                </listitem>
-              
-              
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Boutheina</firstname>
-
-                      <surname>Bennour</surname>
-                    </personname>
-                  </para>
-                </listitem>
-              
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Vincent</firstname>
-
-                      <surname>Cave</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Guillaume</firstname>
-
-                      <surname>Chazarain</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Eric</firstname>
-
-                      <surname>Madelaine</surname>
-                    </personname>
-                  </para>
-                </listitem>
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Brian</firstname>
-
-                      <surname>Amedro</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Florin</firstname>
-
-                      <surname>Bratu</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Tomasz</firstname>
-
-                      <surname>Dobek</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Khan</firstname>
-
-                      <surname>Muhammad</surname>
-                    </personname>
-                  </para>
-                </listitem>
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Julian</firstname>
-
-                      <surname>Krzeminski</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Zhihui</firstname>
-
-                      <surname>Dai</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Fabrice</firstname>
-
-                      <surname>Fontenoy</surname>
-                    </personname>
-                  </para>
-                </listitem>
-				</itemizedlist>
-
- 			</entry>
- 			<entry align="center" valign="top">
-              <itemizedlist mark="none" role="sorted">
-              
-
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Baptiste</firstname>
-
-                      <surname>De Stefano</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Nicolas</firstname>
-
-                      <surname>Dodelin</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Yu</firstname>
-
-                      <surname>Feng</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Imen</firstname>
-
-                      <surname>Filiali</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Johann</firstname>
-
-                      <surname>Fradj</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Abhijeet</firstname>
-
-                      <surname>Gaikwad</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Regis</firstname>
-
-                      <surname>Gascon</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Abhishek-Rajeev</firstname>
-
-                      <surname>Gupta</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Elaine</firstname>
-
-                      <surname>Isnard</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Vasile</firstname>
-
-                      <surname>Jureschi</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-              
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Francoise</firstname>
-
-                      <surname>Baude</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Antonio</firstname>
-
-                      <surname>Cansado</surname>
-                    </personname>
-                  </para>
-                </listitem>
-              
-    	
-			  <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Marcela</firstname>
-
-                      <surname>Rivera</surname>
-                    </personname>
-                  </para>
-                </listitem>
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Ludovic</firstname>
-
-                      <surname>Henrio</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Fabrice</firstname>
-
-                      <surname>Huet</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Virginie</firstname>
-
-                      <surname>Contes</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Mario</firstname>
-
-                      <surname>Leyton</surname>
-                    </personname>
-                  </para>
-                </listitem>
-              
-			  <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Paul</firstname>
-
-                      <surname>Naoumenko</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-			  <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Viet</firstname>
-
-                      <surname>Dong Doan</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-
-			  <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Fabien</firstname>
-
-                      <surname>Viale</surname>
-                    </personname>
-                  </para>
-                </listitem>
-        	  
-        	  </itemizedlist>
-        	</entry>
-		
-
-            <entry align="center" valign="top">
-              <itemizedlist mark="none" role="sorted">
-          
-
-                <listitem>
-                	<para>
-                    <personname>
-                      <firstname>Lionel</firstname>
-
-                      <surname>Mestre</surname>
-                    </personname>
-                  </para>
-                </listitem>
-                
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Matthieu</firstname>
-
-                      <surname>Morel</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Guillaume</firstname>
-
-                      <surname>Chazarain</surname>
-                    </personname>
-                    
-                  </para>
-                </listitem>
-
-			
-              </itemizedlist>
-            </entry>
- 			<entry align="center" valign="top">
-              <itemizedlist mark="none" role="sorted">
-              
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Laurent</firstname>
-
-                      <surname>Baduel</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                    <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Alexandre</firstname>
-
-                      <surname>di Costanzo</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Romain</firstname>
-
-                      <surname>Quilici</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Nadia</firstname>
-
-                      <surname>Ranaldo</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Julien</firstname>
-
-                      <surname>Vayssiere</surname>
-                    </personname>
-                  </para>
-                </listitem>
-                
-              </itemizedlist>
-            </entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </informaltable>
-  </para>
-
-  <para>
-    <emphasis role="bold">Public questions, comments, or discussions can be
-    posted on the ProActive public mailing list</emphasis>
-  </para>
-
-  <para>
-    <email>proactive@ow2.org</email>
-  </para>
-
-  <para>
-    <emphasis role="bold">The mailing list archive is placed at</emphasis>
-  </para>
-
-  <para>
-    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://mail.ow2.org/wws/arc/proactive" />
-  </para>
-
-  <para>
-    <emphasis role="bold">Bugs can be posted on the ProActive Jira
-    bug-tracking system </emphasis>
-  </para>
-
-  <para>
-    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://galpage-exp.inria.fr:8181/jira"/>
-  </para>
-
-  <para>
-    <emphasis role="bold">The ProActive documentation is accessible from</emphasis>
-  </para>
-
-  <para>
-    <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/index.php?page=documentation" />
-  </para>
-  <!-- List to be completed and kept up-to-date, sorted alphabeticly -->
+		<?dbhtml table-width="50%" ?>
+		<tgroup cols="2">
+			<thead>
+				<row>
+					<entry align="center" valign="top">
+						Contributors from OASIS Team
+					</entry>
+					<entry align="center" valign="top">
+						Contributors from ActiveEon Company
+					</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<!-- OASIS TEAM -->
+					<entry align="center" valign="top">
+						<itemizedlist mark="none" role="sortbysurname">
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Amedro</surname>
+											<firstname>Brian</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Baude</surname>
+											<firstname>Francoise</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Bongiovanni</surname>
+											<firstname>Francesco</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Bratu</surname>
+											<firstname>Florin-Alexandru</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Legrand Contes</surname>
+											<firstname>Virginie</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Pellegrino</surname>
+											<firstname>Laurent</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Doan</surname>
+											<firstname>Viet Dung</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Feng</surname>
+											<firstname>Yu</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Filali</surname>
+											<firstname>Imen</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Fontenoy</surname>
+											<firstname>Fabrice</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Henrio</surname>
+											<firstname>Ludovic</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Huet</surname>
+											<firstname>Fabrice</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Isnard</surname>
+											<firstname>Elaine</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Jureschi</surname>
+											<firstname>Vasile</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Madelaine</surname>
+											<firstname>Eric</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Mathias</surname>
+											<firstname>Elton</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Naoumenko</surname>
+											<firstname>Paul</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Peretti-Pezzi</surname>
+											<firstname>Guilherme</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Perrina</surname>
+											<firstname>Franca</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Rivera</surname>
+											<firstname>Marcela</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Ruz</surname>
+											<firstname>Christian</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Sauvan</surname>
+											<firstname>Bastien</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Smirnov</surname>
+											<firstname>Oleg</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Viale</surname>
+											<firstname>Fabien</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+							  <para>
+								<person><personname>
+								  <firstname>Muhammad</firstname>
+								  <surname>Khan</surname>
+								</personname></person>
+							  </para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Valdener</surname>
+											<firstname>Marc</firstname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+						</itemizedlist>
+					</entry>
+
+					<!-- ACTIVEEON TEAM -->
+					<entry align="center" valign="top">
+						<itemizedlist mark="none" role="sortbysurname">
+
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Arnaud</firstname>
+											<surname>Contes</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Christian</firstname>
+											<surname>Delbé</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Emil</firstname>
+											<surname>Salageanu</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Vladimir</firstname>
+											<surname>Bodnartchouk</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Cédric</firstname>
+											<surname>Dalmasso</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Clément</firstname>
+											<surname>Mathieu</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Jean-Luc</firstname>
+											<surname>Scheefer</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Olivier</firstname>
+											<surname>Helin</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Maxime</firstname>
+											<surname>Menant</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Jean-Michel</firstname>
+											<surname>Guillaume</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Mathieu</firstname>
+											<surname>Schnoor</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Arnaud</firstname>
+											<surname>Gastinel</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+						</itemizedlist>
+					</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</informaltable>
+	<informaltable colsep="0" frame="none">
+		<?dbhtml table-width="50%" ?>
+		<tgroup cols="2">
+			<colspec colname='c1'/>
+			<colspec colname='c2'/>
+			<thead>
+				<row>
+					<entry namest="c1" nameend="c2" align="center" valign="top">
+						Former Important Contributors
+					</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry align="center" valign="top" namest="c1" nameend="c2">
+						<itemizedlist mark="none" role="sortbysurname">
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<surname>Gaikwad</surname>
+											<firstname>Abhijeet</firstname>
+										</personname>
+									</person>
+									(Option Pricing)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Germain</firstname>
+											<surname>Sigety</surname>
+										</personname>
+									</person>
+									(Scheduling)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Alexandre</firstname>
+											<surname>di Costanzo</surname>
+										</personname>
+									</person>
+									(P2P, B&amp;B)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Julien</firstname>
+											<surname>Vayssiere</surname>
+										</personname>
+									</person>
+									(MOP, Active Objects)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Vincent</firstname>
+											<surname>Cave</surname>
+										</personname>
+									</person>
+									(Legacy Wrapping)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Laurent</firstname>
+											<surname>Baduel</surname>
+										</personname>
+									</person>
+									(Group Communications)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Matthieu</firstname>
+											<surname>Morel</surname>
+										</personname>
+									</person>
+									(Initial Component Work)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Romain</firstname>
+											<surname>Quilici</surname>
+										</personname>
+									</person>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<person>
+										<personname>
+											<firstname>Mario</firstname>
+											<surname>Leyton</surname>
+										</personname>
+									</person>
+									(Skeleton)
+								</para>
+							</listitem>
+						</itemizedlist>
+					</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</informaltable>
+
+	<!-- List to be completed and kept up-to-date, sorted alphabeticaly -->
 </dedication>

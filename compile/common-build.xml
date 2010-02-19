@@ -12,6 +12,11 @@
 		Otherwise the timestamp is used
 	-->
 
+	<!-- Version setting example-->
+	<!-- <property name="version" value="2.0.0" /> -->
+	<!-- Release date -->
+	<!-- <property name="release.date" value="17 Dec. 2009" /> -->
+
 	<!-- ************
 		Imports
 	-->

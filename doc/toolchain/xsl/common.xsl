@@ -35,6 +35,7 @@
  </xsl:param>
 
  <xsl:param name="TODAY" select="'$TODAY NOT SET'"/>   <!--This variable should be passed as an ant argument -->
+ <xsl:param name="RELEASEDATE" />   <!--This variable should be passed as an ant argument -->
 
  <!-- if an empty toc element is found in a source document, an automated TOC is generated. -->
  <xsl:param name="process.empty.source.toc">1</xsl:param>
@@ -98,6 +99,7 @@
    <xsl:choose>
      <xsl:when test="@role='VERSION'">v<xsl:copy-of select="$VERSION"/></xsl:when>
      <xsl:when test="@role='TODAY'"><xsl:copy-of select="$TODAY"/></xsl:when>
+     <xsl:when test="@role='RELEASEDATE'"><xsl:copy-of select="$RELEASEDATE"/></xsl:when>
    </xsl:choose>
 </xsl:template>
 
