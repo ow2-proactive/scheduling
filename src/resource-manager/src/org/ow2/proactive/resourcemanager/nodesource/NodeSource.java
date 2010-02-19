@@ -358,6 +358,7 @@ public class NodeSource implements InitActive, RunActive {
         logger.debug("Looking up for the node " + nodeUrl + " with " + timeout + " ms timeout");
         Collection<NodeLocator> locator = Collections.singletonList(new NodeLocator(nodeUrl));
         Collection<NodeLocator> nodes = getThreadPoolController().execute(locator, timeout);
+        //return the first non-null node
         if (nodes.size() > 0) {
             return nodes.iterator().next().getNode();
         }

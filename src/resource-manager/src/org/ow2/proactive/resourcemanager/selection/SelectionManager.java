@@ -155,11 +155,13 @@ public abstract class SelectionManager {
 
             for (ScriptExecutor se : matchNodes) {
                 RMNode node = se.getNode();
-                try {
-                    rmcore.setBusyNode(node.getNodeURL());
-                    result.add(node.getNode());
-                } catch (NodeException e) {
-                    rmcore.setDownNode(node.getNodeURL());
+                if (node != null) {
+                    try {
+                        rmcore.setBusyNode(node.getNodeURL());
+                        result.add(node.getNode());
+                    } catch (NodeException e) {
+                        rmcore.setDownNode(node.getNodeURL());
+                    }
                 }
             }
         }

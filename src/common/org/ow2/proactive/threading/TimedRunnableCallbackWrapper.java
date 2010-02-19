@@ -44,17 +44,17 @@ package org.ow2.proactive.threading;
  */
 public class TimedRunnableCallbackWrapper implements TimedRunnable {
 
-    private ThreadPoolController communicator;
+    private ThreadPoolController controller;
     private TimedRunnable runnable;
 
     /**
      * Create a new instance of TimedRunnableCallbackWrapper
      * 
-     * @param communicator
+     * @param controller
      * @param runnable
      */
     TimedRunnableCallbackWrapper(ThreadPoolController communicator, TimedRunnable runnable) {
-        this.communicator = communicator;
+        this.controller = communicator;
         this.runnable = runnable;
     }
 
@@ -63,7 +63,7 @@ public class TimedRunnableCallbackWrapper implements TimedRunnable {
      */
     public void run() {
         runnable.run();
-        communicator.taskTerminated(runnable);
+        controller.taskTerminated(runnable);
     }
 
     /**
