@@ -56,7 +56,7 @@ public class SchedulerExecutableAdapter extends JavaExecutable implements Worker
 
     private TaskIntern<Serializable> task;
 
-    private static Map<String, Object> memory = new HashMap<String, Object>();
+    private static Map<String, Object> memory = null;
 
     public SchedulerExecutableAdapter() {
 
@@ -67,6 +67,15 @@ public class SchedulerExecutableAdapter extends JavaExecutable implements Worker
         task = (TaskIntern<Serializable>) code;
         if (task.getTask() instanceof DivisibleTask) {
             throw new IllegalStateException("Divisible tasks can't be submitted to the ProActive Scheduler");
+        }
+
+        Serializable mem = args.get("workerMem");
+        if (memory == null) {
+            if (mem == null) {
+                memory = new HashMap<String, Object>();
+            } else {
+                memory = (Map<String, Object>) mem;
+            }
         }
     }
 
