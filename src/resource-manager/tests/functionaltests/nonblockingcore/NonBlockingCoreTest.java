@@ -41,6 +41,7 @@ import static junit.framework.Assert.assertTrue;
 import java.io.File;
 
 import org.junit.Assert;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -54,6 +55,7 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastruc
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.NodeSet;
 
 import functionalTests.FunctionalTest;
 import functionaltests.RMTHelper;
@@ -61,8 +63,8 @@ import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 
 
 /**
- * Test starts node selection using timeout script. At the same time adds and removes node / standard node source to the RM.
- * Checks that blocking in the node selection does not prevent to use RMAdmin interface (means that core is not blocked by selection).
+ * Test starts node selection using timeout script. At the same time adds and removes node source and nodes to the RM.
+ * Checks that blocking in the node selection mechanism does not prevent usage of RMAdmin interface.
  *
  * @author ProActice team
  *
@@ -99,15 +101,13 @@ public class NonBlockingCoreTest extends FunctionalTest {
         SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath),
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
-        long startTime = System.currentTimeMillis();
-
         //mandatory to use RMUser AO, otherwise, getAtMostNode we be send in RMAdmin request queue
         RMAuthentication auth = RMConnection.waitAndJoin(null);
 
         Credentials cred = Credentials.createCredentials(RMTHelper.username, RMTHelper.password, auth
                 .getPublicKey());
         RMUser user = auth.logAsUser(cred);
-        user.getAtMostNodes(2, sScript);
+        NodeSet nodes = user.getAtMostNodes(2, sScript);
 
         String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";
@@ -150,9 +150,15 @@ public class NonBlockingCoreTest extends FunctionalTest {
         RMTHelper.log("Removing node source " + nsName);
         admin.removeSource(nsName, true);
 
-        long endTime = System.currentTimeMillis();
+        boolean selectionInProgress = PAFuture.isAwaited(nodes);
 
-        if ((endTime - startTime) > coreScriptExecutionTimeout) {
+        if (!selectionInProgress) {
+            // normally we are looking for 2 nodes with timeout script,
+            // so the selection procedure has to finish not earlier than
+            // coreScriptExecutionTimeout * RMTHelper.defaultNodesNumber
+            // it should be sufficient to perform all admin operations concurrently
+            //
+            // if the core is blocked admin operations will be performed after selection
             Assert.assertTrue("Blocked inside RMCore", false);
         } else {
             RMTHelper.log("No blocking inside RMCore");

@@ -35,7 +35,6 @@
  */
 package org.ow2.proactive.network;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -70,7 +69,7 @@ public class NetworkCommunicatorImpl implements NetworkCommunicator {
         if (task == null) {
             throw new IllegalArgumentException("Task must not be null.");
         }
-        executor.execute(task);
+        executor.submit(task);
     }
 
     /**
@@ -80,44 +79,53 @@ public class NetworkCommunicatorImpl implements NetworkCommunicator {
         if (tasks == null) {
             throw new IllegalArgumentException("Tasks collection must not be null.");
         }
+        if (tasks.size() == 0) {
+            return;
+        }
         for (Runnable task : tasks) {
-            executor.execute(task);
+            try {
+                executor.execute(task);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public <T extends Timed<?>> Collection<T> execute(Collection<T> tasks, long timeout) {
+    public <T> Collection<T> execute(Collection<? extends Timed<T>> tasks, long timeout) {
         if (timeout <= 0) {
             throw new IllegalArgumentException("Timeout must be positive.");
         }
 
-        if (tasks.size() == 0) {
-            return new ArrayList<T>();
-        }
+        // do not touch initial collection
+        LinkedList<Timed<T>> internalTaskList = new LinkedList<Timed<T>>();
+        internalTaskList.addAll(tasks);
 
-        //put each tasks in the thread pool queue
-        this.execute(tasks);
+        this.execute(internalTaskList);
 
         Collection<T> results = new LinkedList<T>();
         long timeSpent = 0;
-        //wait for all result to be available
         do {
+
             // all results are available;
-            if (tasks.size() == 0) {
+            if (internalTaskList.size() == 0) {
                 break;
             }
 
             long start = System.currentTimeMillis();
-            Iterator<T> iter = tasks.iterator();
+            Iterator<? extends Timed<T>> iter = internalTaskList.iterator();
 
             while (iter.hasNext()) {
-                T task = iter.next();
+                Timed<T> task = iter.next();
                 synchronized (task) {
                     if (task.isDone()) {
                         iter.remove();
-                        results.add(task);
+                        T result = task.getResult();
+                        if (result != null) {
+                            results.add(result);
+                        }
                     }
                 }
             }
@@ -126,14 +134,21 @@ public class NetworkCommunicatorImpl implements NetworkCommunicator {
             } catch (InterruptedException e) {
             }
             timeSpent += (System.currentTimeMillis() - start);
-            //time out reached
         } while (timeSpent < timeout);
 
-        //for every non-terminated task, call timeout action
-        for (T task : tasks) {
+        RuntimeException pendingException = null;
+        for (Timed<T> task : internalTaskList) {
             synchronized (task) {
-                task.timeoutAction();
+                try {
+                    task.timeoutAction();
+                } catch (RuntimeException e) {
+                    pendingException = e;
+                }
             }
+        }
+
+        if (pendingException != null) {
+            throw pendingException;
         }
 
         return results;

@@ -38,27 +38,23 @@ package org.ow2.proactive.resourcemanager.selection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.authentication.RestrictedService;
+import org.ow2.proactive.network.NetworkCommunicator;
+import org.ow2.proactive.network.NetworkCommunicatorImpl;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
-import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.scripting.ScriptWithResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -68,7 +64,7 @@ import org.ow2.proactive.utils.NodeSet;
  * nodes selection from a pool of free nodes for further scripts execution. 
  *
  */
-public abstract class SelectionManager extends RestrictedService implements InitActive {
+public abstract class SelectionManager {
 
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMSELECTION);
 
@@ -78,18 +74,16 @@ public abstract class SelectionManager extends RestrictedService implements Init
 
     private RMCore rmcore;
 
+    private NetworkCommunicator networkCommunicator = new NetworkCommunicatorImpl(
+        PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt());
+
+    private Set<String> inProgress = Collections.synchronizedSet(new HashSet<String>());
+
     public SelectionManager() {
     }
 
     public SelectionManager(RMCore rmcore) {
         this.rmcore = rmcore;
-    }
-
-    /**
-     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
-     */
-    public void initActivity(Body body) {
-        registerTrustedService(rmcore);
     }
 
     /**
@@ -127,112 +121,6 @@ public abstract class SelectionManager extends RestrictedService implements Init
     public abstract boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
             RMNode rmnode);
 
-    /**
-     * Executes set of scripts on "number" nodes.
-     * Returns "future" script results for further analysis.
-     */
-    private HashMap<RMNode, List<ScriptWithResult>> executeScripts(List<SelectionScript> selectionScriptList,
-            Iterator<RMNode> nodesIterator, int number) {
-        HashMap<RMNode, List<ScriptWithResult>> scriptExecutionResults = new HashMap<RMNode, List<ScriptWithResult>>();
-        while (nodesIterator.hasNext() && scriptExecutionResults.keySet().size() < number) {
-            RMNode rmnode = nodesIterator.next();
-            scriptExecutionResults.put(rmnode, executeScripts(rmnode, selectionScriptList));
-        }
-        return scriptExecutionResults;
-    }
-
-    /**
-    * Executes set of scripts on a given node.
-    * Returns "future" script results for further analysis.
-    */
-    private List<ScriptWithResult> executeScripts(RMNode rmnode, List<SelectionScript> selectionScriptList) {
-        List<ScriptWithResult> scriptExecitionResults = new LinkedList<ScriptWithResult>();
-
-        for (SelectionScript script : selectionScriptList) {
-            if (isPassed(script, rmnode)) {
-                // already executed static script
-                logger.info("Skipping script execution " + script.hashCode() + " on node " +
-                    rmnode.getNodeURL());
-                scriptExecitionResults.add(new ScriptWithResult(script, new ScriptResult<Boolean>(true)));
-                continue;
-            }
-
-            logger.info("Executing script " + script.hashCode() + " on node " + rmnode.getNodeURL());
-            ScriptResult<Boolean> scriptResult = rmnode.executeScript(script);
-            scriptExecitionResults.add(new ScriptWithResult(script, scriptResult));
-        }
-
-        return scriptExecitionResults;
-    }
-
-    /**
-     * Processes script execution results, updating selection manager knowledge base.
-     * Returns a set of selected nodes.
-     */
-    private NodeSet processScriptsResults(HashMap<RMNode, List<ScriptWithResult>> scriptsExecutionResults) {
-
-        // deadline for scripts execution
-        long deadline = System.currentTimeMillis() + MAX_VERIF_TIMEOUT;
-
-        NodeSet result = new NodeSet();
-        for (RMNode rmnode : scriptsExecutionResults.keySet()) {
-            // checking whether all scripts are passed or not for the node
-            boolean scriptPassed = true;
-            for (ScriptWithResult swr : scriptsExecutionResults.get(rmnode)) {
-                ScriptResult<Boolean> scriptResult = swr.getScriptResult();
-
-                // if script result is not reified it means either an exception occurred in
-                // handler creation or it's known static script and fake script result has been put
-                if (!MOP.isReifiedObject(scriptResult) && scriptResult.getException() != null) {
-                    // could not create script execution handler
-                    // probably the node id down
-                    logger.warn("Cannot execute script " + swr.getScript().hashCode() + " on the node " +
-                        rmnode.getNodeURL(), scriptResult.getException());
-                    logger.warn("Checking if the node " + rmnode.getNodeURL() + " is still alive");
-                    rmnode.getNodeSource().getPinger().pingNode(rmnode.getNodeURL());
-                    continue;
-                } else {
-                    try {
-                        // calculating time to wait script result
-                        long timeToWait = deadline - System.currentTimeMillis();
-                        if (timeToWait <= 0)
-                            timeToWait = 1; //ms
-                        PAFuture.waitFor(scriptResult, timeToWait);
-                    } catch (ProActiveTimeoutException e) {
-                        // no script result was obtained
-                        scriptResult = null;
-                        String message = "Time out while waiting the end of " + swr.getScript().hashCode() +
-                            " script execution on the node " + rmnode.getNodeURL();
-                        logger.warn(message);
-                        throw new ScriptException(message, e);
-                    }
-                }
-
-                if (scriptResult != null && scriptResult.errorOccured()) {
-                    throw new ScriptException(scriptResult.getException());
-                }
-
-                // processing script result and updating knowledge base of
-                // selection manager at the same time. Returns whether node is selected.
-                if (!processScriptResult(swr.getScript(), scriptResult, rmnode)) {
-                    scriptPassed = false;
-                }
-            }
-
-            if (scriptPassed) {
-                try {
-                    rmnode.clean();
-                    rmcore.setBusyNode(rmnode.getNodeURL());
-                    result.add(rmnode.getNode());
-                } catch (NodeException e) {
-                    rmcore.setDownNode(rmnode.getNodeURL());
-                }
-            }
-        }
-
-        return result;
-    }
-
     public NodeSet findAppropriateNodes(int nb, List<SelectionScript> selectionScriptList, NodeSet exclusion) {
 
         ArrayList<RMNode> freeNodes = rmcore.getFreeNodes();
@@ -240,44 +128,49 @@ public abstract class SelectionManager extends RestrictedService implements Init
         // getting sorted by probability candidates nodes from selection manager
         Collection<RMNode> candidatesNodes = arrangeNodesForScriptExecution(selectionScriptList, freeNodes,
                 exclusion);
-        boolean scriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
 
-        // if no script specified no execution is required
-        // in this case selection manager just return a list of free nodes
-        if (!scriptSpecified) {
-            for (RMNode rmnode : candidatesNodes) {
-                if (result.size() == nb) {
-                    break;
-                }
-                try {
-                    rmnode.clean();
-                    rmcore.setBusyNode(rmnode.getNodeURL());
-                    result.add(rmnode.getNode());
-                } catch (NodeException e) {
-                    rmcore.setDownNode(rmnode.getNodeURL());
-                }
-            }
-            return result;
-        }
-
-        // scripts were specified
-        // start execution on candidates set until we have enough
-        // candidates or test each node
+        // here we will contact the node either for script execution and cleaning or just
+        // for cleaning.
+        // So parallelizing this action and delegate execution to the thread pool
         Iterator<RMNode> nodesIterator = candidatesNodes.iterator();
-        HashMap<RMNode, List<ScriptWithResult>> scriptsExecutionResults;
 
         while (nodesIterator.hasNext() && result.size() < nb) {
-            scriptsExecutionResults = executeScripts(selectionScriptList, nodesIterator, nb - result.size());
-            try {
-                result.addAll(processScriptsResults(scriptsExecutionResults));
-            } catch (ScriptException e) {
-                rmcore.freeNodes(result);
-                throw e;
+            int numberOfNodesNeeded = nb - result.size();
+
+            Collection<ScriptExecutor> scriptExecutors = new LinkedList<ScriptExecutor>();
+            for (int i = 0; i < numberOfNodesNeeded && nodesIterator.hasNext(); i++) {
+                RMNode rmnode = nodesIterator.next();
+                if (inProgress.contains(rmnode.getNodeURL())) {
+                    logger.debug("Script execution is in progress on node " + rmnode.getNodeURL() +
+                        " - skipping.");
+                    i--;
+                } else {
+                    inProgress.add(rmnode.getNodeURL());
+                    scriptExecutors.add(new ScriptExecutor(rmnode, selectionScriptList, this));
+                }
+            }
+
+            Collection<RMNode> matchNodes = networkCommunicator.execute(scriptExecutors, MAX_VERIF_TIMEOUT);
+
+            for (RMNode node : matchNodes) {
+                try {
+                    rmcore.setBusyNode(node.getNodeURL());
+                    result.add(node.getNode());
+                } catch (NodeException e) {
+                    rmcore.setDownNode(node.getNodeURL());
+                }
             }
         }
 
         logger.info("Number of found nodes is " + result.size());
         return result;
 
+    }
+
+    /**
+     * Indicates that script execution is finished for the node with specified url.
+     */
+    public synchronized void scriptExecutionFinished(String nodeUrl) {
+        inProgress.remove(nodeUrl);
     }
 }

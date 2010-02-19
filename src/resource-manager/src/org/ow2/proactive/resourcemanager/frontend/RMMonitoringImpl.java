@@ -36,10 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Map.Entry;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -48,6 +49,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.network.NetworkCommunicator;
+import org.ow2.proactive.network.NetworkCommunicatorImpl;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -56,6 +59,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -79,10 +83,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     // Attributes
     private RMCoreInterface rmcore;
-    private HashMap<UniqueID, RMEventListener> RMListeners;
-    /** List used to mark the user that does not respond anymore */
-    private Set<UniqueID> dirtyList = new HashSet<UniqueID>();
-    private String MonitoringUrl = null;
+    private Map<UniqueID, RMEventListener> listeners;
+    private HashMap<ClientCommunicator, LinkedList<RMEvent>> pendingEvents = new HashMap<ClientCommunicator, LinkedList<RMEvent>>();
+    private transient NetworkCommunicator networkCommunicator;
 
     /** Resource Manager's statistics */
     public static final AtomicRMStatisticsHolder rmStatistics = new AtomicRMStatisticsHolder();
@@ -99,7 +102,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @param rmcore Stub of the RMCore active object.
      */
     public RMMonitoringImpl(RMCoreInterface rmcore) {
-        RMListeners = new HashMap<UniqueID, RMEventListener>();
+        listeners = new HashMap<UniqueID, RMEventListener>();
         this.rmcore = rmcore;
     }
 
@@ -110,10 +113,114 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
+            networkCommunicator = new NetworkCommunicatorImpl(
+                PAResourceManagerProperties.RM_MONITORING_MAX_THREAD_NUMBER.getValueAsInt());
 
         } catch (ProActiveException e) {
             logger.debug("Cannot register RMMonitoring. Aborting...", e);
             PAActiveObject.terminateActiveObject(true);
+        }
+    }
+
+    private class ClientCommunicator implements Runnable {
+
+        private UniqueID listenerId;
+        private ReentrantLock lock = new ReentrantLock();
+
+        public ClientCommunicator(UniqueID listenerId) {
+            this.listenerId = listenerId;
+        }
+
+        public void run() {
+            if (lock.isLocked()) {
+                logger.debug("Communication to the client " + listenerId.shortString() +
+                    " is in progress in one thread of the thread pool. " +
+                    "Either events come too quick or the client is slow. " +
+                    "Do not initiate connection from another thread.");
+                return;
+            }
+            lock.lock();
+
+            int numberOfEventDelivered = 0;
+            long timeStamp = System.currentTimeMillis();
+            logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" +
+                listenerId.shortString() + "'");
+
+            LinkedList<RMEvent> events = pendingEvents.get(this);
+            while (true) {
+                RMEvent event = null;
+                synchronized (events) {
+                    if (events.size() > 0) {
+                        event = events.removeFirst();
+                    }
+                }
+
+                if (event != null) {
+                    deliverEvent(event);
+                    numberOfEventDelivered++;
+                } else {
+                    lock.unlock();
+                    break;
+                }
+            }
+
+            logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
+                listenerId.shortString() + "'. " + numberOfEventDelivered + " events were delivered in " +
+                (System.currentTimeMillis() - timeStamp) + " ms");
+        }
+
+        private void deliverEvent(RMEvent event) {
+
+            RMEventListener listener = null;
+
+            synchronized (listeners) {
+                listener = listeners.get(listenerId);
+            }
+
+            if (listener == null) {
+                return;
+            }
+
+            //dispatch event
+            long timeStamp = System.currentTimeMillis();
+            logger
+                    .debug("Dispatching event '" + event.toString() + "' to client " +
+                        listenerId.shortString());
+            try {
+                if (event instanceof RMNodeEvent) {
+                    RMNodeEvent nodeEvent = (RMNodeEvent) event;
+                    RMMonitoringImpl.rmStatistics.nodeEvent(nodeEvent);
+                    listener.nodeEvent(nodeEvent);
+                } else if (event instanceof RMNodeSourceEvent) {
+                    RMNodeSourceEvent sourceEvent = (RMNodeSourceEvent) event;
+                    listener.nodeSourceEvent(sourceEvent);
+                } else {
+                    RMMonitoringImpl.rmStatistics.rmEvent(event);
+                    listener.rmEvent(event);
+                }
+
+                long time = System.currentTimeMillis() - timeStamp;
+                logger.debug("Event '" + event.toString() + "' has been delivered to client " +
+                    listenerId.shortString() + " in " + time + " ms");
+
+            } catch (Exception e) {
+                // probably listener was removed or became down
+                RMEventListener l = null;
+                synchronized (listeners) {
+                    l = listeners.remove(listenerId);
+                    pendingEvents.remove(this);
+                }
+                if (l != null) {
+                    logger.debug("", e);
+                    logger.info("User known as '" + listenerId.shortString() +
+                        "' has been removed from listeners");
+                }
+            }
+        }
+
+        public boolean equals(Object obj) {
+            ClientCommunicator other = (ClientCommunicator) obj;
+            return listenerId.equals(other.listenerId);
         }
     }
 
@@ -128,7 +235,10 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     public RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events) {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
-        this.RMListeners.put(id, listener);
+        synchronized (listeners) {
+            this.listeners.put(id, listener);
+            this.pendingEvents.put(new ClientCommunicator(id), new LinkedList<RMEvent>());
+        }
         return rmcore.getRMInitialState();
     }
 
@@ -137,10 +247,13 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void removeRMEventListener() throws RMException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        if (RMListeners.containsKey(id)) {
-            RMListeners.remove(id);
-        } else {
-            throw new RMException("Listener is unknown");
+        synchronized (listeners) {
+            if (listeners.containsKey(id)) {
+                listeners.remove(id);
+                pendingEvents.remove(new ClientCommunicator(id));
+            } else {
+                throw new RMException("Listener is unknown");
+            }
         }
     }
 
@@ -151,84 +264,41 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         return true;
     }
 
-    /**
-     * Clear every dirty listeners that are no more responding
-     */
-    private void clearListeners() {
-        for (UniqueID uId : dirtyList) {
-            RMListeners.remove(uId);
-            logger.info("User known as '" + uId.shortString() + "' has been removed from listeners");
+    public void queueEvent(RMEvent event) {
+        //dispatch event
+        if (logger.isDebugEnabled()) {
+            logger.debug("Queueing event '" + event.toString() + "'");
         }
-        dirtyList.clear();
-    }
 
-    /**
-     * Put this is to be removed in the dirty list.
-     *
-     * @param id the id of the user to be removed.
-     */
-    private void markAsDirty(UniqueID id) {
-        logger.info("User known as '" + id.shortString() + "' seems to be down");
-        dirtyList.add(id);
+        synchronized (listeners) {
+            for (Collection<RMEvent> events : pendingEvents.values()) {
+                synchronized (events) {
+                    events.add(event);
+                }
+            }
+            networkCommunicator.execute(pendingEvents.keySet());
+        }
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeEvent(RMNodeEvent event) {
-        event.setRMUrl(this.MonitoringUrl);
-        RMMonitoringImpl.rmStatistics.nodeEvent(event);
-        //dispatch event
-        if (logger.isDebugEnabled()) {
-            logger.debug("Dispatch event '" + event.toString() + "'");
-        }
-        for (Entry<UniqueID, RMEventListener> entry : RMListeners.entrySet()) {
-            try {
-                entry.getValue().nodeEvent(event);
-            } catch (Exception e) {
-                markAsDirty(entry.getKey());
-            }
-        }
-        clearListeners();
+        queueEvent(event);
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public void nodeSourceEvent(RMNodeSourceEvent event) {
-        event.setRMUrl(this.MonitoringUrl);
-        //dispatch event
-        if (logger.isDebugEnabled()) {
-            logger.debug("Dispatch event '" + event.toString() + "'");
-        }
-        for (Entry<UniqueID, RMEventListener> entry : RMListeners.entrySet()) {
-            try {
-                entry.getValue().nodeSourceEvent(event);
-            } catch (Exception e) {
-                markAsDirty(entry.getKey());
-            }
-        }
-        clearListeners();
+        queueEvent(event);
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
     public void rmEvent(RMEvent event) {
-        event.setRMUrl(this.MonitoringUrl);
-        RMMonitoringImpl.rmStatistics.rmEvent(event);
-        //dispatch event
-        if (logger.isDebugEnabled()) {
-            logger.debug("Dispatch event '" + event.toString() + "'");
-        }
-        for (Entry<UniqueID, RMEventListener> entry : RMListeners.entrySet()) {
-            try {
-                entry.getValue().rmEvent(event);
-            } catch (Exception e) {
-                markAsDirty(entry.getKey());
-            }
-        }
-        clearListeners();
+        queueEvent(event);
     }
 
     /** 

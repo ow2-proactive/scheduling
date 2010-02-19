@@ -1,5 +1,8 @@
 timeout=args[0];
-print("selectionScript that performs a sleep : " + timeout+ "\n");
-java.lang.Thread.sleep(timeout);
-print("End of timeOut selectionScript\n");
+property=args[1];
+if (property == null || java.lang.System.getProperty(property)!=null ) {
+	print("selection script that sleeps : " + timeout+ "\n");
+	java.lang.Thread.sleep(timeout);
+	print("End of selection script\n");
+}
 selected = true ;

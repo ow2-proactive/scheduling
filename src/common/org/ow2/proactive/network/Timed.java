@@ -44,7 +44,6 @@ public interface Timed<T> extends Runnable {
 
     /**
      * Return the status of the task, terminated or not.
-     * 
      * @return true if the task has been finished, false otherwise.
      */
     public boolean isDone();
