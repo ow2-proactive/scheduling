@@ -75,7 +75,9 @@ public class TestUserEx extends FunctionalTest {
         master = new ProActiveMaster<A, Integer>();
         String[] classpath = new String[] {
                 System.getProperty("pa.scheduler.home") + "/classes/schedulerTests",
-                System.getProperty("pa.scheduler.home") + "/classes/scheduler" };
+                System.getProperty("pa.scheduler.home") + "/classes/scheduler",
+                System.getProperty("pa.scheduler.home") + "/classes/common" };
+
         master.addResources("rmi://localhost:" + PAProperties.PA_RMI_PORT.getValue() + "/", "demo", "demo",
                 classpath);
 
@@ -88,10 +90,10 @@ public class TestUserEx extends FunctionalTest {
             // we don't care of the results
             ids.clear();
         } catch (TaskException e) {
-            assertTrue("Expected exception is the cause",
-                    e.getCause().getCause() instanceof ArithmeticException);
-            System.out.println("Expected exception catched, here it is : ");
+            System.out.println("An exception has been catched, here it is : ");
             e.printStackTrace();
+            assertTrue("Expected exception is the cause", e.getCause() instanceof ArithmeticException);
+
             catched = true;
         }
         assertTrue("Exception caught as excepted", catched);
