@@ -197,11 +197,9 @@
                     </info>
 
                     <para>
-                        The
-                        <emphasis>job</emphasis>
+                        The <emphasis>job</emphasis>
                         tag is the root tag of our descriptor, it must
-                        have a
-                        <emphasis>name</emphasis>
+                        have a <emphasis>name</emphasis>
                         attribute which holds an id of the job. It is
                         generally followed by a
                         <emphasis>description</emphasis>
@@ -211,11 +209,7 @@
                         <emphasis>taskFlow</emphasis>
                         job (a job containing several tasks).
                     </para>
-                    <programlisting language="xml"><![CDATA[<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="urn:proactive:jobdescriptor:dev http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:dev" id="Matlab_job_simplest">
-    <description>A simple Matlab job, which computes the roots of several polynomials</description>
-    <taskFlow>]]></programlisting>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/Matlab_JobDescriptor_1.snip"/></textobject></programlisting>
                 </section>
                 <section xml:id="Scheduler_Matlab_Task_Definition">
                     <info>
@@ -223,8 +217,7 @@
                     </info>
 
                     <para>
-                        The
-                        <emphasis>task</emphasis>
+                        The <emphasis>task</emphasis>
                         tag contains all the information for a single
                         task executed on a single machine. In our
                         example, this task will be the matlab script
@@ -257,13 +250,7 @@
                         installed. The script is retrieved from the URL
                         <link xlink:href="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js" />
                     </para>
-                    <programlisting language="xml"><![CDATA[        <task id="root1" preciousResult="true">
-            <description>Calculates the root of a polynomial</description>
-            <selection>
-                <script>
-                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
-                </script>
-            </selection>]]></programlisting>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/Matlab_JobDescriptor_2.snip"/></textobject></programlisting>
                 </section>
                 <section xml:id="Scheduler_Matlab_Script_Definition">
                     <info>
@@ -274,28 +261,22 @@
                         Now we finally write the script that will be
                         executed on the remote machine. The
                         <emphasis>javaExecutable</emphasis>
-                        tag is a container for our Matlab script, it's a
+                        tag is a container for our Matlab script, it is a
                         java program that will connect to the Matlab
                         engine and launch the given script inside it.
                     </para>
-                    <programlisting language="xml"><![CDATA[<javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
-                <parameters>
-                    <parameter name="input" value="in=[1 0 3 -2 5 1];"/>
-                    <parameter name="script" value="out=roots(in);"/>
-                </parameters>
-            </javaExecutable>]]></programlisting>
+                    <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/Matlab_JobDescriptor_3.snip"/></textobject></programlisting>
                     <para>
                         The javaExecutable tag contains an attribute
                         <emphasis>class</emphasis>
                         which tells which type of Matlab task will be
-                        used, here we'll describe only the task called
-                        <emphasis>SimpleMatlab</emphasis>
-                        . In
-                        <xref linkend="Scheduler_Matlab_AdvancedTasks"/>
-                        , we describe more advanced tasks. The
+                        used, here we will describe only the task called
+                        <emphasis>SimpleMatlab</emphasis> . In
+                        <xref linkend="Scheduler_Matlab_AdvancedTasks"/>,
+                        we describe more advanced tasks. The
                         javaExecutable tag contains a child tag called
-                        <emphasis>parameters</emphasis>
-                        . This tag contains a list of
+                        <emphasis>parameters</emphasis>. 
+						This tag contains a list of
                         <emphasis>parameter</emphasis>
                         tags which define the task parameters. Each
                         parameter tag, has
@@ -370,7 +351,7 @@
                                 Simple Matlab Job descriptor Example
                             </title>
                         </info>
-                        <programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/Job_matlab.xml"/></textobject></programlisting>
+						<programlisting language="xml"><textobject><textdata fileref="automatic_snippets/Matlab_JobDescriptor_0.snip"/></textobject></programlisting>
                     </example>
 				</section>
             </section>
