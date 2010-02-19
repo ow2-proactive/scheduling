@@ -36,12 +36,16 @@
  */
 package org.ow2.proactive.scripting;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
 /**
  * Composition of selection script and its execution result.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
+@PublicAPI
 public class ScriptWithResult {
     /** selection script */
     private SelectionScript script;
