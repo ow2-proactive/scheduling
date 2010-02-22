@@ -66,7 +66,7 @@
 							Resource Manager, thus being able to execute java or native tasks
 							received from the Scheduler.
 						</para>
-						<para>It's is important to note that a JVM process running tasks
+						<para>It is is important to note that a JVM process running tasks
 							can potentially spawn child processes.</para>
 					</listitem>
 					<listitem>
@@ -104,7 +104,17 @@
 				<para>Restarts the spawned JVM process in case of failures
 					with a timeout policy.</para>
 			</listitem>
-		</itemizedlist>
+		</itemizedlist> 
+		<warning>
+			<title>
+				Warning: Do not confuse agent and node deployment! 
+			</title>
+			<para>
+				The role of the agent is to create a node (locally) and to register it to the resource manager (in case of a resource manager connection) 
+				which can be distant. The deployment can be considered as the opposite process: the resource manager creates nodes on remote machine and register them to itself.
+				So <emphasis role="bold">when you use the ProActive Windows Agent, you do not need (and do not have) to use a node deployment</emphasis>.
+			</para>
+		</warning>
 	</section>
 	<section xml:id="PWA_Example">
 		<info>
@@ -129,6 +139,13 @@
 		<para>Once the agent is started, the following java code gets a
 			reference on a remote node and creates an active object on the remote
 			node identified by the url "rmi://192.168.1.62:1099/toto"</para>
+		<note>
+			<para>
+				This piece of code should be executed on a seperate JVM.
+				Moreover, this test is more useful for the RMI Registration connection type since for the Resource Manager one,
+				you can directly see whether the node has been started.
+			</para>
+		</note>
 		<para>
 			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/ProActiveWindowsAgent.snip" /></textobject></programlisting>
 		</para>
@@ -210,7 +227,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 					</listitem>
 					<listitem>
 						<para>Enter the ProActive location. If you want to use only the "Local Registration" connection (see the "Connection" tab description for more information), the path to a ProActive (programming) directory is sufficient but
-							if want to use also the "Resource Manager" connection, you have to specified a path to a
+							if you want to use also the "Resource Manager" connection, you have to specified a path to a
 							ProActive Scheduler directory.</para>
 					</listitem>
 					<listitem>
@@ -224,7 +241,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 				</itemizedlist>
 			</listitem>
 			<listitem>
-				<para>The installer will check whether the selected user account have the log on service right assignment.</para>
+				<para>The installer will check whether the selected user account has the log on service right assignment.</para>
 				<para>If not, follow the following steps to add the log on service right assignment:</para>
 				<itemizedlist>
 					<listitem><para>In the 'Administrative Tools' of the 'Control Panel', open the 'Local Security Policy'.</para></listitem>
@@ -247,7 +264,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 		<para> Launch "Start/Programs/ProActiveAgent/AgentControl" program or
 			click on the notify icon if the "Automatic launch" is activated.
 			Double click on the tray icon to open the ProActive Agent Control
-			window. The dollowing window will appear:</para>
+			window. The following window will appear:</para>
 		<para>
 			<figure xml:id="PWA_agent_control_FIGURE">
 				<info>
@@ -266,9 +283,9 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 			GUI for editing is provided (explained below). Even if it is not
 			recommended, you can edit the configuration file by yourself with
 			your favorite text editor.</para>
-		<note>
+		<warning>
 			<para>Configuration files are not compatible from one major release to another.</para>
-		</note>
+		</warning>
 		<para>
 			Clicking on "GUI Edit", the following windows appears:
 		</para>
@@ -304,7 +321,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 			</listitem>
 			<listitem>
 				<para>The "On Runtime Exit" script. A script executed after a Runtime exits. This can be useful to perform additional cleaning operation.</para>
-				<para>Note that the script receives as parameter the pid of the Runtime.</para>
+				<para>Note that the script receives as parameter the PID of the Runtime.</para>
 			</listitem>
 			<listitem>
 				<para>The user can enable the memory management (disabled by
@@ -359,7 +376,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 					- creates a local ProActive node and registers it in the specified
 					Resource Manager. The mandatory Resource Manager's url must be like 'protocol://host:port/'. The
 					node name and the node source name are optional. Since the Resource Manager requires an
-					authentication the user specify the file that contains the credential or use the default one
+					authentication, the user specifies the file that contains the credential or uses the default one
 					usually located in "%USERPROFILE%\.proactive\security" folder.
 				</para>
 			</listitem>
@@ -423,7 +440,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 		</info>
 		<para>
 			Once you have configured the agent, you can start it clicking on the "Start" button of the ProActive Agent Control window. However, before that, you have to ensure that a resource manager has been started
-			on the address you specified in the agent configuration. You do not need to start a node since it is exactly the job of the agent.
+			on the address you specified in the agent configuration. <emphasis role="bold">You do not need to start a node since it is exactly the job of the agent</emphasis>.
 		</para>
 		<para>
 			Once started, you may face some problems. You can realise that an error occurred by first glancing at the color of the agent tray icon. If everything goes right, it should keep the blue color. If its color changes to yellow, it means that the agent has been stopped.
