@@ -175,12 +175,9 @@ public class AdminController extends UserController {
 
     @Override
     protected void connectJMXClient() {
-        try {
-            final String name = "SchedulerFrontend:name=SchedulerWrapperMBean_admin";
-            model.setJMXInfo(MBeanInfoViewer.create(auth, name, user, credentials));
-        } catch (Exception e) {
-            logger.error("Error while connecting JMX : ", e);
-        }
+        final String name = "SchedulerFrontend:name=SchedulerWrapperMBean_admin";
+        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
+        this.model.setJMXInfo(viewer);
     }
 
     @Override

@@ -298,12 +298,9 @@ public class UserController {
     }
 
     protected void connectJMXClient() {
-        try {
-            final String name = "SchedulerFrontend:name=SchedulerWrapperMBean";
-            model.setJMXInfo(MBeanInfoViewer.create(auth, name, user, credentials));
-        } catch (Exception e) {
-            logger.error("Error while connection JMX : ", e);
-        }
+        final String name = "SchedulerFrontend:name=SchedulerWrapperMBean";
+        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
+        this.model.setJMXInfo(viewer);
     }
 
     private void start() throws Exception {

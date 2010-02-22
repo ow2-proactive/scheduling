@@ -299,12 +299,9 @@ public class AdminController {
     }
 
     protected void connectJMXClient() {
-        try {
-            final String name = "RMFrontend:name=RMBean_admin";
-            model.setJMXInfo(MBeanInfoViewer.create(auth, name, user, credentials));
-        } catch (Exception e) {
-            logger.error("Error while connecting JMX : ", e);
-        }
+        final String name = "RMFrontend:name=RMBean_admin";
+        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
+        this.model.setJMXInfo(viewer);
     }
 
     private void start() throws Exception {
