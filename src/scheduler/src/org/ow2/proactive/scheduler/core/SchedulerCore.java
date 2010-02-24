@@ -54,6 +54,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AsyncAppender;
@@ -131,6 +132,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scripting.ScriptException;
+import org.ow2.proactive.threading.CallableWithTimeoutAction;
 import org.ow2.proactive.threading.ExecutorServiceTasksInvocator;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -168,10 +170,10 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     private static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
 
     /** Maximum blocking time for the do task action */
-    protected static final int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT
+    private static final int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT
             .getValueAsInt();
     /** MAximum number of thread used for the doTask action */
-    protected static final int DOTASK_ACTION_THREADNUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
+    private static final int DOTASK_ACTION_THREADNUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
             .getValueAsInt();
 
     /** Implementation of Resource Manager */
@@ -201,7 +203,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Scheduler current status */
     private SchedulerStatus status;
 
-    protected ExecutorService threadPool;
+    private ExecutorService threadPool;
 
     /** Thread that will ping the running nodes */
     private Thread pinger;
@@ -865,7 +867,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
     }
-    
+
     /**
      * Finalize the start of the task by mark it as started. Also mark the job if it is not already started.
      *
@@ -873,7 +875,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param task the task to be started
      * @param node the node on which the task will be started
      */
-    void finalizeStarting(InternalJob job, InternalTask task, Node node) {
+    private void finalizeStarting(InternalJob job, InternalTask task, Node node) {
         logger.info("Task '" + task.getId() + "' started on " +
             node.getNodeInformation().getVMInformation().getHostName());
         // set the different informations on job
@@ -2280,6 +2282,90 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         public int compare(InternalTask o1, InternalTask o2) {
             return (int) (o1.getFinishedTime() - o2.getFinishedTime());
         }
+    }
+
+    /**
+     * TimedDoTaskAction is used to start the task execution in parallel.
+     *
+     * @author The ProActive Team
+     * @since ProActive Scheduling 2.0
+     */
+    class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
+
+        private AtomicBoolean timeoutCalled = new AtomicBoolean(false);
+        private SchedulerCore schedulerCore;
+        private InternalJob job;
+        private InternalTask task;
+        private TaskLauncher launcher;
+        private Node node;
+        private SchedulerCore coreStub;
+        private ResourceManagerProxy resourceManager;
+        private TaskResult[] parameters;
+
+        /**
+         * Create a new instance of TimedDoTaskAction
+         *
+         * @param job the internal job
+         * @param task the internal task
+         * @param launcher the launcher of the task
+         * @param node the main node on which the task will be started
+         * @param coreStub the stub on SchedulerCore
+         * @param parameters the parameters to be given to the task
+         */
+        public TimedDoTaskAction(SchedulerCore core, InternalJob job, InternalTask task,
+                TaskLauncher launcher, Node node, SchedulerCore coreStub,
+                ResourceManagerProxy resourceManager, TaskResult[] parameters) {
+            this.schedulerCore = core;
+            this.job = job;
+            this.task = task;
+            this.launcher = launcher;
+            this.node = node;
+            this.coreStub = coreStub;
+            this.resourceManager = resourceManager;
+            this.parameters = parameters;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Void call() throws Exception {
+            try {
+                //if a task has been launched
+                if (launcher != null) {
+
+                    TaskResult tr = launcher.doTask(coreStub, task.getExecutableContainer(), parameters);
+
+                    if (timeoutCalled.get()) {
+                        launcher.terminate();
+                        freenodes();
+                    } else {
+                        ((JobResultImpl) job.getJobResult()).storeFuturResult(task.getName(), tr);
+                        //mark the task and job (if needed) as started and send events
+                        schedulerCore.finalizeStarting(job, task, node);
+                    }
+                }
+            } catch (Exception e) {
+                freenodes();
+            }
+            //results is not needed
+            return null;
+        }
+
+        private void freenodes() {
+            try {
+                //launcher node
+                resourceManager.freeNode(node);
+                //multi nodes task
+                resourceManager.freeNodes(task.getExecutableContainer().getNodes());
+            } catch (Throwable ni) {
+                //miam miam
+            }
+        }
+
+        public void timeoutAction() {
+            timeoutCalled.set(true);
+        }
+
     }
 
 }
