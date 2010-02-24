@@ -12,7 +12,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jython.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/script-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/script-js.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ajo.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/axis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/batik-awt-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/batik-dom.jar"/>
@@ -47,7 +46,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jdom.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jh.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/julia-asm.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/julia-mixins.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/julia-runtime.jar"/>
@@ -56,7 +54,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/moduleloader.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/msv.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/njs_client.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/oscar.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/osgi.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ow_deployment_scheduling.jar"/>
@@ -65,9 +62,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/puretls.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/relaxngDatatype.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rngpack-1.1a.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/saxon8.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/saxon8-dom.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/scriptPlugin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servicebinder.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet-api.jar"/>

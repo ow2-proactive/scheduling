@@ -32,22 +32,37 @@
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
 
 	<!-- ************
-		MacroDef Stub generator
+		MacroDef Stub generator and checker
 	-->
 
-    <macrodef name="generate_stub_for_class">
+    <macrodef name="generateorcheck_stub_for_class">
             <attribute name="targetedClasspath"/>
             <attribute name="srcDir"/>
             <attribute name="class"/>
+            <attribute name="mode"/>
             <element name="extra.exclusion.pattern" optional="yes"/>
             <sequential>
-                    <java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
-                            <classpath refid="@{targetedClasspath}" />
-                            <arg value="-srcDir"/>
-                            <arg value="@{srcDir}"/>
-                            <arg value="-class"/>
-                            <arg value="@{class}"/>
-                    </java>
+            	<if>
+            		<bool>
+            		   <equals arg1="@{mode}" arg2="check"/>
+            		</bool>
+        			<java classname="org.objectweb.proactive.ext.util.StubChecker" fork="true">
+	                        <classpath refid="@{targetedClasspath}" />
+	                        <arg value="-class"/>
+	                        <arg value="@{class}"/>
+	                        <arg value="-rootDir"/>
+	                        <arg value="${rootDirV2}"/>
+	                </java>
+            		<else>
+	                    <java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+	                            <classpath refid="@{targetedClasspath}" />
+	                            <arg value="-srcDir"/>
+	                            <arg value="@{srcDir}"/>
+	                            <arg value="-class"/>
+	                            <arg value="@{class}"/>
+	                    </java>
+            		</else>
+            	</if>
             </sequential>
     </macrodef>
 	
@@ -89,8 +104,15 @@
                     <include name="**/*.java"/>
             </javac>
  	
-	 		<generate_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/scripting/ScriptHandler" />
+	 		<common_generateorcheck_stubs mode="generate"/>
       </target>
+	
+	<macrodef name="common_generateorcheck_stubs">
+		<attribute name="mode"/>
+		<sequential>
+			<generateorcheck_stub_for_class targetedClasspath="common.classpath" srcDir="${cl.common.dir}" class="org/ow2/proactive/scripting/ScriptHandler" mode="@{mode}"/>
+		</sequential>
+	</macrodef>
 
 
     <!-- ************
@@ -294,5 +316,13 @@
 			<arg value="${extra.format.dir}"/>
 		<sysproperty key="copyright.update" value="${copyright.update}"/>
 		</java>
+	</target>
+	
+	<target name="check_stubs" description="Check compatibility between current version stubs and an other version (specified using -DrootDirV2=...).">
+		<!-- use -DrootDirV2=... to set the root directory of the other project version to be checked -->
+		<echo>**** Checking compatibility between current version stubs and stubs in ${rootDirV2}</echo>
+		<common_generateorcheck_stubs mode="check"/>
+		<rm_generateorcheck_stubs mode="check"/>
+		<scheduler_generateorcheck_stubs mode="check"/>
 	</target>
 </project>

@@ -41,28 +41,35 @@
 			<include name="**/*.java"/>
 		</javac>
 		
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerFrontend" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/authentication/SchedulerAuthentication" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/examples/Worker" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/filessplitmerge/schedulertools/SchedulerProxyUserInterface" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/masterworker/AOSchedulerWorker" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabWorker" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/embedded/AOMatlabEnvironment" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabSplitter" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabCollector" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/embedded/AOScilabEnvironment" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/AOScilabWorker" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/resourcemanager/ResourceManagerProxy" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/ForkedJavaTaskLauncher" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/JavaTaskLauncher" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/NativeTaskLauncher" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerCore" />
-		<generate_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/filessplitmerge/event/InternalSchedulerEventListener" />
-		<generate_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/MyAO" />
-		<generate_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/SubmitJob" />
-		<generate_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/monitor/MonitorEventReceiver" />
+		<scheduler_generateorcheck_stubs mode="generate"/>
 		
 	</target>
+	
+	<macrodef name="scheduler_generateorcheck_stubs">
+		<attribute name="mode"/>
+		<sequential>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerFrontend" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/authentication/SchedulerAuthentication" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/examples/Worker" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/filessplitmerge/schedulertools/SchedulerProxyUserInterface" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/masterworker/AOSchedulerWorker" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabWorker" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/embedded/AOMatlabEnvironment" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabSplitter" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/matlab/AOMatlabCollector" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/embedded/AOScilabEnvironment" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/scilab/AOScilabWorker" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="all.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/resourcemanager/ResourceManagerProxy" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/ForkedJavaTaskLauncher" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/JavaTaskLauncher" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/NativeTaskLauncher" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerCore" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/filessplitmerge/event/InternalSchedulerEventListener" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/MyAO" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/SubmitJob" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/monitor/MonitorEventReceiver" mode="@{mode}"/>
+		</sequential>
+	</macrodef>
 
     <!-- ************
 		Deploy
@@ -258,9 +265,9 @@
 				<include name="org/ow2/proactive/scheduler/common/task/executable/JavaExecutable.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/CommonAttribute.java" />
 				<include name="org/ow2/proactive/scheduler/common/task/TaskStatus.java" />
+				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/AntFileSelector.java" />
 				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/AntSelector.java" />
 				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/FileSelectInfo.java" />
-				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/AntFileSelector.java" />
 				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/BuildException.java" />
 				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/FileUtils.java" />
 				<include name="org/ow2/proactive/scheduler/task/launcher/dataspace/Os.java" />
