@@ -100,4 +100,13 @@ public abstract class ExecutableContainer implements Serializable {
         this.nodes = nodes;
     }
 
+    /**
+     * Return the nodes set for this executable container
+     *
+     * @return the nodes set for this executable container
+     */
+    public NodeSet getNodes() {
+        return this.nodes;
+    }
+
 }

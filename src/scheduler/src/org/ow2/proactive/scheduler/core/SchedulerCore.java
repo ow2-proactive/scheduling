@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -53,6 +52,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AsyncAppender;
@@ -130,6 +131,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.scripting.ScriptException;
+import org.ow2.proactive.threading.ExecutorServiceTasksInvocator;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -165,6 +167,13 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Number of time to retry an active object creation if it fails to create */
     private static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
 
+    /** Maximum blocking time for the do task action */
+    protected static final int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT
+            .getValueAsInt();
+    /** MAximum number of thread used for the doTask action */
+    protected static final int DOTASK_ACTION_THREADNUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
+            .getValueAsInt();
+
     /** Implementation of Resource Manager */
     private ResourceManagerProxy resourceManager;
 
@@ -191,6 +200,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
     /** Scheduler current status */
     private SchedulerStatus status;
+
+    protected ExecutorService threadPool;
 
     /** Thread that will ping the running nodes */
     private Thread pinger;
@@ -349,6 +360,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             this.jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
             this.jobsToBeLoggedinAFile = new Hashtable<JobId, FileAppender>();
             this.currentlyRunningTasks = new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
+            this.threadPool = Executors.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER);
 
             this.resourceManager = imp;
             this.frontend = frontend;
@@ -805,36 +817,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         logger_dev.info("Starting deployment of task '" + internalTask.getName() +
                             "' for job '" + currentJob.getId() + "'");
 
-                        //TODO if the next task is a native task, it's no need to pass params
-                        ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask.getName(),
-                                launcher.doTask((SchedulerCore) PAActiveObject.getStubOnThis(), internalTask
-                                        .getExecutableContainer(), params));
+                        //enqueue next instruction, and execute whole process in the threadpool controller
+                        TimedDoTaskAction tdta = new TimedDoTaskAction(this, currentJob, internalTask,
+                            launcher, node, (SchedulerCore) PAActiveObject.getStubOnThis(), resourceManager,
+                            params);
+                        ExecutorServiceTasksInvocator.invokeAllWithTimeoutAction(threadPool, Collections
+                                .singletonList(tdta), DOTASK_ACTION_TIMEOUT);
 
                     }
 
-                    //if a task has been launched
-                    if (launcher != null) {
-                        logger.info("Task '" + internalTask.getId() + "' started on " +
-                            node.getNodeInformation().getVMInformation().getHostName());
-
-                        // set the different informations on job
-                        if (currentJob.getStartTime() < 0) {
-                            // if it is the first task of this job
-                            currentJob.start();
-                            pendingJobs.remove(currentJob);
-                            runningJobs.add(currentJob);
-                            //update tasks events list and send it to front-end
-                            updateTaskInfosList(currentJob, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-                            logger.info("Job '" + currentJob.getId() + "' started");
-                        }
-
-                        // set the different informations on task
-                        currentJob.startTask(internalTask);
-                        // send task event to front-end
-                        frontend.taskStateUpdated(currentJob.getOwner(), new NotificationData<TaskInfo>(
-                            SchedulerEvent.TASK_PENDING_TO_RUNNING, internalTask.getTaskInfo()));
-                        //no need to set this status in database
-                    }
                     //if everything were OK (or if the task could not be launched, 
                     //removed this task from the processed task.
                     taskRetrivedFromPolicy.remove(0);
@@ -873,6 +864,34 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         }
 
+    }
+    
+    /**
+     * Finalize the start of the task by mark it as started. Also mark the job if it is not already started.
+     *
+     * @param job the job that owns the task to be started
+     * @param task the task to be started
+     * @param node the node on which the task will be started
+     */
+    void finalizeStarting(InternalJob job, InternalTask task, Node node) {
+        logger.info("Task '" + task.getId() + "' started on " +
+            node.getNodeInformation().getVMInformation().getHostName());
+        // set the different informations on job
+        if (job.getStartTime() < 0) {
+            // if it is the first task of this job
+            job.start();
+            pendingJobs.remove(job);
+            runningJobs.add(job);
+            //update tasks events list and send it to front-end
+            updateTaskInfosList(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
+            logger.info("Job '" + job.getId() + "' started");
+        }
+
+        // set the different informations on task
+        job.startTask(task);
+        // send task event to front-end
+        frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+            SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));
     }
 
     /**

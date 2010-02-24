@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -31,36 +32,28 @@
  *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ * $ACTIVEEON_INITIAL_DEV$
  */
 package org.ow2.proactive.threading;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+
+
 /**
- * Generic TimedRunnable interface can be used to execute a task in the {@link ThreadPoolController} thread pool.
- * This interface provides methods to :<br>
- * <ul>
- * <li>Run the piece of code that should be threaded</li>
- * <li>Retrieve the result at the end of the execution</li>
- * <li>do a particular action when timeout has expired for this execution</li>
- * </ul> 
- * <br>
- * The {@link #isDone()} method must return true as soon as the execution is considered as finished, false otherwise.
+ * Generic CallableWithTimeoutAction interface can be used to execute a task in an {@link ExecutorService} thread pool.
+ * This interface provides method to do a particular action when timeout expires during an execution.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-public interface TimedRunnable extends Runnable {
+public interface CallableWithTimeoutAction<V> extends Callable<V> {
 
     /**
-     * Return the status of the task, terminated or not.
-     * 
-     * @return true if the task is finished, false otherwise.
-     */
-    public boolean isDone();
-
-    /**
-     * Executed if the timeout for this task is expired.
-     * <b>Warning</b> : This method must be non-blocking.
+     * Executed if the timeout for this task expires.
+     * <b>Warning</b> : As this method is not called by threads provided by the {@link ExecutorService},
+     * this method must be non-blocking.<br>
+     * Note that this method should also be called while the {@link CallableWithTimeoutAction#call()} method is being executed.
      */
     public void timeoutAction();
 }
