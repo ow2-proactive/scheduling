@@ -37,6 +37,8 @@ package functionaltests.jmx;
 import java.security.PublicKey;
 import java.util.HashMap;
 
+import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
@@ -49,6 +51,7 @@ import javax.management.remote.JMXServiceURL;
 
 import junit.framework.Assert;
 
+import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.jmx.naming.JMXProperties;
@@ -194,16 +197,46 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
                         e.getCause() instanceof InstanceNotFoundException);
             }
 
-            RMTHelper
-                    .log("Test as user 6 - Check anonymMBean attributes can be called without throwing exceptions");
-            final MBeanInfo info = conn.getMBeanInfo(anonymMBeanName);
-            for (final MBeanAttributeInfo att : info.getAttributes()) {
-                try {
-                    conn.getAttribute(anonymMBeanName, att.getName());
-                } catch (Exception e) {
-                    Assert.fail("The attribute " + att + " of anonymMBean must not throw " + e);
-                }
+            RMTHelper.log("Test as user 6 - Check anonymMBean attributes are correct");
+
+            // Start a new node and add it to the rm
+            final Node node = RMTHelper.createNode("test");
+            final String nodeURL = node.getNodeInformation().getURL();
+            RMTHelper.getAdminInterface().addNode(nodeURL).booleanValue(); // force sync
+
+            // Get all attributes to test
+            AttributeList list = conn.getAttributes(anonymMBeanName, new String[] { "RMStatus",
+                    "AvailableNodesCount", "FreeNodesCount" });
+            // Check RMStatus
+            Attribute att = (Attribute) list.get(0);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", "STARTED", att
+                    .getValue());
+            // Check AvailableNodesCount
+            att = (Attribute) list.get(1);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 1, att.getValue());
+            // Check FreeNodesCount
+            att = (Attribute) list.get(2);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 1, att.getValue());
+
+            RMTHelper.getAdminInterface().removeNode(nodeURL, false);
+
+            while (RMTHelper.getAdminInterface().getTotalAliveNodesNumber().intValue() > 0) {
+                Thread.sleep(1000);
             }
+
+            // Get all attributes to test
+            list = conn.getAttributes(anonymMBeanName,
+                    new String[] { "AvailableNodesCount", "FreeNodesCount" });
+            // Check AvailableNodesCount
+            att = (Attribute) list.get(0);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 0, att.getValue());
+            // Check FreeNodesCount
+            att = (Attribute) list.get(1);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 0, att.getValue());
+
+            // Kill the node
+            RMTHelper.killNode(nodeURL);
+
             jmxConnector.close();
         }
 
@@ -299,5 +332,6 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
             Assert.assertFalse("The helper disconnect() must set the helper as disconnected", client
                     .isConnected());
         }
+
     }
 }
