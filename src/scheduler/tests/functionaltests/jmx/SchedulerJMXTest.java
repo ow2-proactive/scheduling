@@ -37,6 +37,8 @@ package functionaltests.jmx;
 import java.security.PublicKey;
 import java.util.HashMap;
 
+import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
@@ -55,8 +57,12 @@ import org.ow2.proactive.jmx.naming.JMXProperties;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 
 import functionalTests.FunctionalTest;
 import functionaltests.RMTHelper;
@@ -198,16 +204,61 @@ public final class SchedulerJMXTest extends FunctionalTest {
                         e.getCause() instanceof InstanceNotFoundException);
             }
 
-            SchedulerTHelper
-                    .log("Test as user 6 - Check anonymMBean attributes can be called without throwing exceptions");
-            final MBeanInfo info = conn.getMBeanInfo(anonymMBeanName);
-            for (final MBeanAttributeInfo att : info.getAttributes()) {
-                try {
-                    conn.getAttribute(anonymMBeanName, att.getName());
-                } catch (Exception e) {
-                    Assert.fail("The attribute " + att + " of anonymMBean must not throw " + e);
-                }
+            SchedulerTHelper.log("Test as user 6 - Check anonymMBean attributes are correct");
+
+            final String[] attributesToCheck = new String[] { "SchedulerStatus", "TotalNumberOfJobs",
+                    "NumberOfFinishedJobs", "TotalNumberOfTasks", "NumberOfFinishedTasks" };
+
+            // Get all attributes to test BEFORE JOB SUBMISSION
+            AttributeList list = conn.getAttributes(anonymMBeanName, attributesToCheck);
+            Attribute att = (Attribute) list.get(0); // SchedulerStatus
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", "Started", att
+                    .getValue());
+            att = (Attribute) list.get(1); // TotalNumberOfJobs
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 0, att.getValue());
+            att = (Attribute) list.get(2); // NumberOfFinishedJobs
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 0, att.getValue());
+            att = (Attribute) list.get(3); // TotalNumberOfTasks
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 0, att.getValue());
+            att = (Attribute) list.get(4); // NumberOfFinishedTasks
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 0, att.getValue());
+
+            // Create a job then submit it to the scheduler
+            final int taskPerJob = 2;
+            final TaskFlowJob job = new TaskFlowJob();
+            for (int i = 0; i < taskPerJob; i++) {
+                JavaTask task = new JavaTask();
+                task.setName("" + i);
+                task.setExecutableClassName(WaitAndPrint.class.getName());
+                task.addArgument("sleepTime", "1");
+                job.addTask(task);
             }
+
+            // log as admin since its creds are already available
+            final JobId id = SchedulerTHelper.submitJob(job);
+            SchedulerTHelper.waitForEventJobFinished(id);
+
+            // Get all attributes to test AFTER JOB EXECUTION
+            list = conn.getAttributes(anonymMBeanName, attributesToCheck);
+            // Check SchedulerStatus
+            att = (Attribute) list.get(0);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", "Started", att
+                    .getValue());
+            // Check TotalNumberOfJobs
+            att = (Attribute) list.get(1);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 1, att.getValue());
+            // Check NumberOfFinishedJobs
+            att = (Attribute) list.get(2);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 1, att.getValue());
+            // Check TotalNumberOfTasks
+            att = (Attribute) list.get(3);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", taskPerJob, att
+                    .getValue());
+            // Check NumberOfFinishedTasks
+            att = (Attribute) list.get(4);
+            Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", taskPerJob, att
+                    .getValue());
+
             jmxConnector.close();
         }
 
