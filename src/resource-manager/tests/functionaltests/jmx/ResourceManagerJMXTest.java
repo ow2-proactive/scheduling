@@ -234,9 +234,6 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
             att = (Attribute) list.get(1);
             Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 0, att.getValue());
 
-            // Kill the node
-            RMTHelper.killNode(nodeURL);
-
             jmxConnector.close();
         }
 

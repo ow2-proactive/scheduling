@@ -438,7 +438,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
      * @param rmnode
      *            node object to add
      */
-    public void internalAddNodeToCore(RMNode rmnode) {
+    public BooleanWrapper internalAddNodeToCore(RMNode rmnode) {
         this.freeNodes.add(rmnode);
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
         // create the event
@@ -447,6 +447,7 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
             logger.info("New node added, node ID is : " + rmnode.getNodeURL() + ", node Source : " +
                 rmnode.getNodeSourceId());
         }
+        return new BooleanWrapper(true);
     }
 
     /**
