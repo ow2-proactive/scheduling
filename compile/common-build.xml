@@ -36,34 +36,36 @@
 	-->
 
     <macrodef name="generateorcheck_stub_for_class">
-            <attribute name="targetedClasspath"/>
-            <attribute name="srcDir"/>
-            <attribute name="class"/>
-            <attribute name="mode"/>
-            <element name="extra.exclusion.pattern" optional="yes"/>
-            <sequential>
-            	<if>
-            		<bool>
-            		   <equals arg1="@{mode}" arg2="check"/>
-            		</bool>
-        			<java classname="org.objectweb.proactive.ext.util.StubChecker" fork="true">
-	                        <classpath refid="@{targetedClasspath}" />
-	                        <arg value="-class"/>
-	                        <arg value="@{class}"/>
-	                        <arg value="-rootDir"/>
-	                        <arg value="${rootDirV2}"/>
-	                </java>
-            		<else>
-	                    <java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
-	                            <classpath refid="@{targetedClasspath}" />
-	                            <arg value="-srcDir"/>
-	                            <arg value="@{srcDir}"/>
-	                            <arg value="-class"/>
-	                            <arg value="@{class}"/>
-	                    </java>
-            		</else>
-            	</if>
-            </sequential>
+        <attribute name="targetedClasspath"/>
+        <attribute name="srcDir"/>
+        <attribute name="class"/>
+        <attribute name="mode"/>
+        <element name="extra.exclusion.pattern" optional="yes"/>
+        <sequential>
+        	<if>
+        		<bool>
+        		   <equals arg1="@{mode}" arg2="check"/>
+        		</bool>
+        		<java classname="org.objectweb.proactive.ext.util.StubChecker" fork="true">
+                    <classpath path="${proactive.jar}" />
+                    <arg value="-class"/>
+                    <arg value="@{class}"/>
+					<arg value="-rootDirV1"/>
+				    <arg value="${base.dir}"/>
+                    <arg value="-rootDirV2"/>
+                    <arg value="${rootDirV2}"/>
+                </java>
+        		<else>
+                    <java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+                        <classpath refid="@{targetedClasspath}" />
+                        <arg value="-srcDir"/>
+                        <arg value="@{srcDir}"/>
+                        <arg value="-class"/>
+                        <arg value="@{class}"/>
+                    </java>
+        		</else>
+        	</if>
+        </sequential>
     </macrodef>
 	
 	<!-- ************
