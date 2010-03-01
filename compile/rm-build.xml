@@ -19,8 +19,8 @@
 		</copy>
 
 		<copy toDir="${cl.rm.tests.dir}">
-				<fileset dir="${src.rm.tests.dir}" excludes="**/*.java"/>
-				<fileset dir="${cl.rm.tests.dir}" excludes="**/*.java"/>
+			<fileset dir="${src.rm.tests.dir}" excludes="**/*.java"/>
+			<fileset dir="${cl.rm.tests.dir}" excludes="**/*.java"/>
 		</copy>
 
 		<javac
@@ -53,6 +53,7 @@
 	<macrodef name="rm_generateorcheck_stubs">
 		<attribute name="mode"/>
 		<sequential>
+			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthentication" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthenticationImpl" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMAdminImpl" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMUserImpl" mode="@{mode}"/>
@@ -62,6 +63,7 @@
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/examples/windowsagent/Test" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/dataspace/DataSpaceNodeConfigurationAgent" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/core/RMCore" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/common/RMState" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/policy/NodeSourcePolicy" mode="@{mode}"/>
 			<!--<generateorcheck_stub_for_class targetedClasspath="rm.test.classpath" srcDir="${cl.rm.tests.dir}" class="functionaltests/RMLauncherAO" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.test.classpath" srcDir="${cl.rm.tests.dir}" class="functionaltests/monitor/RMMonitorEventReceiver" mode="@{mode}"/>-->
