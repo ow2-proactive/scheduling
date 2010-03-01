@@ -204,13 +204,11 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             try {
                 if (event instanceof RMNodeEvent) {
                     RMNodeEvent nodeEvent = (RMNodeEvent) event;
-                    RMMonitoringImpl.rmStatistics.nodeEvent(nodeEvent);
                     listener.nodeEvent(nodeEvent);
                 } else if (event instanceof RMNodeSourceEvent) {
                     RMNodeSourceEvent sourceEvent = (RMNodeSourceEvent) event;
                     listener.nodeSourceEvent(sourceEvent);
                 } else {
-                    RMMonitoringImpl.rmStatistics.rmEvent(event);
                     listener.rmEvent(event);
                 }
 
@@ -303,6 +301,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeEvent(RMNodeEvent event) {
+        RMMonitoringImpl.rmStatistics.nodeEvent(event);
         queueEvent(event);
     }
 
@@ -317,6 +316,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
     public void rmEvent(RMEvent event) {
+        RMMonitoringImpl.rmStatistics.rmEvent(event);
         queueEvent(event);
     }
 
