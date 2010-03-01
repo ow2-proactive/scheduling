@@ -36,9 +36,20 @@
  */
 package org.ow2.proactive.utils.console;
 
+import java.util.HashMap;
+import java.util.ListIterator;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+
+import org.ow2.proactive.authentication.Authentication;
+import org.ow2.proactive.authentication.crypto.Credentials;
 
 
 /**
@@ -47,42 +58,86 @@ import javax.management.ObjectName;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class MBeanInfoViewer {
-    private MBeanServerConnection connection;
+public final class MBeanInfoViewer {
+    /** The authentication interface */
+    private final Authentication auth;
+    /** The name of MBean */
+    private final String name;
+    /** The connector environment */
+    private final HashMap<String, Object> env;
+    /** The name of the MBean to view */
     private ObjectName mbeanName;
+    /** The connection to the MBeanServer */
+    private MBeanServerConnection connection;
+    /** The names of the attributes of the MBean */
+    private String[] names;
+    /** The padding applied to the output string */
+    private int padding;
 
     /**
-     * Create a new instance of MBeanInfoViewer
-     *
-     * @param connection
-     * @param mbeanName
-     * @param info
+     * Creates a new instance of MBeanInfoViewer.
+     * 
+     * @param auth the authentication interface
+     * @param name a string representation of the object name of the MBean
+     * @param user the user that wants to connect to the JMX infrastructure 
+     * @param creds the credentials of the user
      */
-    public MBeanInfoViewer(MBeanServerConnection connection, ObjectName mbeanName) {
-        super();
-        this.connection = connection;
-        this.mbeanName = mbeanName;
+    public MBeanInfoViewer(final Authentication auth, final String name, final String user,
+            final Credentials creds) {
+        this.auth = auth;
+        this.name = name;
+        this.env = new HashMap<String, Object>(2);
+        // Fill the env with credentials 
+        this.env.put(JMXConnector.CREDENTIALS, new Object[] { creds, user });
     }
 
     /**
-     * Return the informations about the Scheduler MBean as a formatted string
+     * Return the informations about the Scheduler MBean as a formatted string.
+     * The first time this method is called it connects to the JMX connector server.
+     * The default behavior will try to establish a connection using RMI protocol
      *
-     * @return the informations about the Scheduler MBean as a formatted string
+     * @return the informations about the MBean as a formatted string
      */
     public String getInfo() {
-        try {
-            MBeanAttributeInfo[] attrs = connection.getMBeanInfo(mbeanName).getAttributes();
-            int len = 0;
-            for (MBeanAttributeInfo attr : attrs) {
-                if (attr.getName().length() > len) {
-                    len = attr.getName().length();
+        // Lazy initial connection
+        if (this.connection == null) {
+            try {
+                String rawUrl = this.auth.getJMXConnectorURL();
+                if (name.endsWith("admin")) {
+                    rawUrl += "_admin";
                 }
+                final JMXServiceURL jmxUrl = new JMXServiceURL(rawUrl);
+                final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxUrl, env);
+                this.mbeanName = new ObjectName(this.name);
+                this.connection = jmxConnector.getMBeanServerConnection();
+            } catch (Exception e) {
+                throw new RuntimeException("Unable create the MBeanInfoViewer about " + name, e);
             }
-            len += 2;
-            StringBuilder out = new StringBuilder();
-            for (MBeanAttributeInfo attr : attrs) {
-                out.append(String.format("  %1$-" + len + "s" +
-                    connection.getAttribute(mbeanName, attr.getName()) + "\n", attr.getName()));
+        }
+
+        try {
+            // Attribute names can't change so it is asked only once from the MBean
+            if (this.names == null) {
+                final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName)
+                        .getAttributes();
+                this.names = new String[attrs.length];
+                for (int i = 0; i < attrs.length; i++) {
+                    String name = attrs[i].getName();
+                    if (name.length() > this.padding) {
+                        this.padding = name.length();
+                    }
+                    this.names[i] = name;
+                }
+                this.padding += 2;
+            }
+            // Get the list of attributes in a single JMX call  
+            final AttributeList list = this.connection.getAttributes(this.mbeanName, names);
+            final ListIterator<?> it = list.listIterator();
+            final StringBuilder out = new StringBuilder();
+            while (it.hasNext()) {
+                Attribute att = (Attribute) it.next();
+                out.append(String
+                        .format("  %1$-" + this.padding + "s" + att.getValue() + "\n", att.getName()));
             }
             return out.toString();
         } catch (Exception e) {

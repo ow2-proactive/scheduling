@@ -42,8 +42,6 @@ import java.io.InputStreamReader;
 import java.security.KeyException;
 import java.security.PublicKey;
 
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
 import javax.management.remote.JMXProviderException;
 import javax.security.auth.login.LoginException;
 
@@ -63,7 +61,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorClient;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
@@ -302,16 +299,9 @@ public class UserController {
     }
 
     protected void connectJMXClient() throws JMXProviderException {
-        try {
-            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(auth
-                    .getJMXConnectorURL());
-            cli.connect(credentials, user);
-            MBeanServerConnection conn = cli.getConnection();
-            ObjectName on = new ObjectName("SchedulerFrontend:name=SchedulerWrapperMBean");
-            model.setJMXInfo(new MBeanInfoViewer(conn, on));
-        } catch (Exception e) {
-            logger.error("Error while connection JMX : ", e);
-        }
+        final String name = "SchedulerFrontend:name=SchedulerWrapperMBean";
+        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
+        this.model.setJMXInfo(viewer);
     }
 
     private void start() throws Exception {

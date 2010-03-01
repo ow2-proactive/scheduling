@@ -43,8 +43,6 @@ import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
 
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
 import javax.management.remote.JMXProviderException;
 import javax.security.auth.login.LoginException;
 
@@ -65,7 +63,6 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.jmx.connector.PAAuthenticationConnectorClient;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
@@ -303,17 +300,9 @@ public class AdminController {
     }
 
     protected void connectJMXClient() throws JMXProviderException {
-        try {
-            PAAuthenticationConnectorClient cli = new PAAuthenticationConnectorClient(auth
-                    .getJMXConnectorURL() +
-                "_admin");
-            cli.connect(credentials, user);
-            MBeanServerConnection conn = cli.getConnection();
-            ObjectName on = new ObjectName("RMFrontend:name=RMBean_admin");
-            model.setJMXInfo(new MBeanInfoViewer(conn, on));
-        } catch (Exception e) {
-            logger.error("Error while connecting JMX : ", e);
-        }
+        final String name = "RMFrontend:name=RMBean_admin";
+        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
+        this.model.setJMXInfo(viewer);
     }
 
     private void start() throws Exception {
