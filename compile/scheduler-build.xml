@@ -66,9 +66,9 @@
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/task/launcher/NativeTaskLauncher" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/core/SchedulerCore" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.classpath" srcDir="${cl.scheduler.dir}" class="org/ow2/proactive/scheduler/ext/filessplitmerge/event/InternalSchedulerEventListener" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/MyAO" mode="@{mode}"/>
+			<!--<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/MyAO" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/SubmitJob" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/monitor/MonitorEventReceiver" mode="@{mode}"/>
+			<generateorcheck_stub_for_class targetedClasspath="scheduler.test.classpath" srcDir="${cl.scheduler.tests.dir}" class="functionaltests/monitor/MonitorEventReceiver" mode="@{mode}"/>-->
 		</sequential>
 	</macrodef>
 
