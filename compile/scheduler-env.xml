@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="compile">
 	<import file="common-env.xml" />
+	<import file="rm-env.xml" />
 
 	<!-- ================================================================ -->
 	<!--                   		Source paths                              -->
@@ -60,6 +61,11 @@
 	<path id="scheduler.classpath">
 		<path refid="common.classpath"/>
 		<pathelement location="${cl.scheduler.dir}" />
+	</path>
+	
+	<path id="all.classpath">
+		<path refid="scheduler.classpath"/>
+		<pathelement location="${cl.rm.dir}" />
 	</path>
 
 	<path id="scheduler.test.classpath">
