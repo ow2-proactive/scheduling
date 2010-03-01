@@ -640,29 +640,13 @@ public abstract class TaskLauncher implements InitActive {
                     case TransferFromInputSpace:
                         //search in INPUT
                         try {
-                            if (INPUT.getType().hasChildren()) {
-                                AntSelector.findFiles(INPUT, ant, true, results);
-                            } else {
-                                logger_dev_dataspace
-                                        .debug("Cannot list files for this INPUT, switch to non-pattern mode and try again");
-                                for (String incl : is.getInputFiles().getIncludes()) {
-                                    try {
-                                        DataSpacesFileObject dsfo = INPUT.resolveFile(incl);
-                                        if (dsfo.exists()) {
-                                            results.add(dsfo);
-                                        }
-                                    } catch (FileSystemException fse2) {
-                                        logger_dev_dataspace.debug("Cannot read file " + incl, fse2);
-                                        toBeThrown = new FileSystemException("Cannot read file " + incl);
-                                    }
-                                }
-                            }
+                            AntSelector.findFiles(INPUT, ant, true, results);
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact INPUT space. Check that INPUT space is still reachable !");
                         } catch (NullPointerException npe) {
-                            //logger_dev.warn("",npe);
+                            //do nothing
                         }
                         break;
                     case TransferFromOutputSpace:
@@ -673,7 +657,6 @@ public abstract class TaskLauncher implements InitActive {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
                                 "Could not contact OUTPUT space. Check that OUTPUT space is still reachable !");
-                            ;
                         } catch (NullPointerException npe) {
                             //do nothing
                         }
@@ -738,7 +721,6 @@ public abstract class TaskLauncher implements InitActive {
             }
             //check first the OUTPUT and then the INPUT, take care if not set
             if (OUTPUT == null) {
-
                 logger_dev_dataspace.debug("Job OUTPUT space is not defined, cannot copy file.");
                 return;
             }
