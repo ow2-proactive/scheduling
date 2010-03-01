@@ -52,6 +52,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -135,23 +136,31 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         public void run() {
             if (lock.isLocked()) {
-                logger.debug("Communication to the client " + listenerId.shortString() +
-                    " is in progress in one thread of the thread pool. " +
-                    "Either events come too quick or the client is slow. " +
-                    "Do not initiate connection from another thread.");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Communication to the client " + listenerId.shortString() +
+                        " is in progress in one thread of the thread pool. " +
+                        "Either events come too quick or the client is slow. " +
+                        "Do not initiate connection from another thread.");
+                }
                 return;
             }
             lock.lock();
 
             int numberOfEventDelivered = 0;
             long timeStamp = System.currentTimeMillis();
-            logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" +
-                listenerId.shortString() + "'");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" +
+                    listenerId.shortString() + "'");
+            }
 
             LinkedList<RMEvent> events = pendingEvents.get(this);
             while (true) {
                 RMEvent event = null;
                 synchronized (events) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(events.size() + " pending events for the client '" +
+                            listenerId.shortString() + "'");
+                    }
                     if (events.size() > 0) {
                         event = events.removeFirst();
                     }
@@ -166,9 +175,11 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                 }
             }
 
-            logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
-                listenerId.shortString() + "'. " + numberOfEventDelivered + " events were delivered in " +
-                (System.currentTimeMillis() - timeStamp) + " ms");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
+                    listenerId.shortString() + "'. " + numberOfEventDelivered + " events were delivered in " +
+                    (System.currentTimeMillis() - timeStamp) + " ms");
+            }
         }
 
         private void deliverEvent(RMEvent event) {
@@ -185,9 +196,11 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
             //dispatch event
             long timeStamp = System.currentTimeMillis();
-            logger
-                    .debug("Dispatching event '" + event.toString() + "' to client " +
-                        listenerId.shortString());
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Dispatching event '" + event.toString() + "' to client " +
+                    listenerId.shortString());
+            }
             try {
                 if (event instanceof RMNodeEvent) {
                     RMNodeEvent nodeEvent = (RMNodeEvent) event;
@@ -202,8 +215,10 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                 }
 
                 long time = System.currentTimeMillis() - timeStamp;
-                logger.debug("Event '" + event.toString() + "' has been delivered to client " +
-                    listenerId.shortString() + " in " + time + " ms");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Event '" + event.toString() + "' has been delivered to client " +
+                        listenerId.shortString() + " in " + time + " ms");
+                }
 
             } catch (Exception e) {
                 // probably listener was removed or became down
@@ -308,7 +323,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     /** 
      * Stop and remove monitoring active object
      */
-    public void shutdown() {
+    public BooleanWrapper shutdown() {
         //throwing shutdown event
         rmEvent(new RMEvent(RMEventType.SHUTDOWN));
         PAActiveObject.terminateActiveObject(false);
@@ -321,6 +336,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         } catch (InterruptedException e) {
             logger.warn("", e);
         }
+
+        return new BooleanWrapper(true);
     }
 
     public Logger getLogger() {

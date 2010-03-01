@@ -48,6 +48,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -892,8 +893,9 @@ public class RMCore extends RestrictedService implements RMCoreInterface, InitAc
         // finish the shutdown
         this.user.shutdown();
         this.admin.shutdown();
-        this.monitoring.shutdown();
         this.selectionManager.shutdown();
+        // waiting while all events will be dispatched to listeners
+        PAFuture.waitFor(this.monitoring.shutdown());
 
         PAActiveObject.terminateActiveObject(false);
         try {
