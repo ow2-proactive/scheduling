@@ -38,7 +38,6 @@ package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;

@@ -146,6 +146,22 @@ public class AntFileSelector implements FileSelector {
         return included;
     }
 
+    //TODO added for SCHEDULING use
+    public boolean includeFile(org.ow2.proactive.scheduler.task.launcher.dataspace.FileSelectInfo fileInfo) {
+        boolean included = false;
+        String buri = fileInfo.getBaseFolder().getVirtualURI();
+        String furi = fileInfo.getFile().getVirtualURI();
+        String name = furi.replaceFirst(buri + "/?", "");
+
+        if (isIncluded(name)) {
+            if (!isExcluded(name)) {
+                included = true;
+            }
+        }
+
+        return included;
+    }
+
     public boolean traverseDescendents(FileSelectInfo fileInfo) {
         return true;
     }
@@ -246,6 +262,15 @@ public class AntFileSelector implements FileSelector {
 
     /** The patterns for the files to be included. */
     protected String[] includes;
+
+    /**
+     * Get the includes
+     *
+     * @return the includes
+     */
+    public String[] getIncludes() {
+        return includes;
+    }
 
     /** The patterns for the files to be excluded. */
     protected String[] excludes;
@@ -442,33 +467,12 @@ public class AntFileSelector implements FileSelector {
     }
 
     /**
-     * Add to the list of exclude patterns to use. All '/' and '\'
-     * characters are replaced by <code>File.separatorChar</code>, so
-     * the separator used need not match <code>File.separatorChar</code>.
-     * <p>
-     * When a pattern ends with a '/' or '\', "**" is appended.
+     * All '\' characters are replaced by '/', so the separator used need not
+     * match.
      *
-     * @param excludes A list of exclude patterns.
-     *                 May be <code>null</code>, in which case the
-     *                 exclude patterns don't get changed at all.
-     *
+     * <p> When a pattern ends with a '/' or '\', "**" is appended.
      */
-    public synchronized void addExcludes(String[] excludes) {
-        if (excludes != null && excludes.length > 0) {
-            if (this.excludes != null && this.excludes.length > 0) {
-                String[] tmp = new String[excludes.length + this.excludes.length];
-                System.arraycopy(this.excludes, 0, tmp, 0, this.excludes.length);
-                for (int i = 0; i < excludes.length; i++) {
-                    tmp[this.excludes.length + i] = normalizePattern(excludes[i]);
-                }
-                this.excludes = tmp;
-            } else {
-                setExcludes(excludes);
-            }
-        }
-    }
-
-    /**
+    /*
      * All '/' and '\' characters are replaced by
      * <code>File.separatorChar</code>, so the separator used need not
      * match <code>File.separatorChar</code>.
@@ -476,8 +480,8 @@ public class AntFileSelector implements FileSelector {
      * <p> When a pattern ends with a '/' or '\', "**" is appended.
      */
     private static String normalizePattern(String p) {
-        String pattern = p.replace('/', File.separatorChar).replace('\\', File.separatorChar);
-        if (pattern.endsWith(File.separator)) {
+        String pattern = p/*.replace('/', File.separatorChar)*/.replace('\\', '/');
+        if (pattern.endsWith("/")) {
             pattern += "**";
         }
         return pattern;
