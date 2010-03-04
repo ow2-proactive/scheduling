@@ -280,9 +280,7 @@ public class NodeSource implements InitActive, RunActive {
         }
 
         RMNode rmnode = new RMNodeImpl(nodeToAdd, "noVn", (NodeSource) PAActiveObject.getStubOnThis());
-        rmcore.internalAddNodeToCore(rmnode);
-
-        return new BooleanWrapper(true);
+        return rmcore.internalAddNodeToCore(rmnode);
     }
 
     /**
