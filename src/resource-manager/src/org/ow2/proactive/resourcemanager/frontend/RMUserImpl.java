@@ -334,7 +334,7 @@ public class RMUserImpl extends RestrictedService implements RMUser, InitActive 
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMUser#shutdown()
+     * Shutdown RMUserImpl active object and stops the pinger.
      */
     public void shutdown() {
         pinger.stopThread();

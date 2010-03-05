@@ -201,11 +201,6 @@ public interface RMUser {
     public void freeNodes(NodeSet nodes);
 
     /**
-     * Stop and remove the RMUser active object.
-     */
-    public void shutdown();
-
-    /**
      * Return a state containing some informations about RM activity.
      * 
      * @return a state containing some informations about RM activity.
