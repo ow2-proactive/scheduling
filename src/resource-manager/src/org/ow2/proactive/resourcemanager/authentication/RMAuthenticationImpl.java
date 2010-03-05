@@ -47,20 +47,17 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
-import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
+import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.frontend.RMAdminImpl;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
-import org.ow2.proactive.resourcemanager.frontend.RMUserImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -73,7 +70,8 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthentication, InitActive {
 
     private static final String ERROR_ALREADY_CONNECTED = "This active object is already connected to the resource manager. Disconnect first.";
-    private RMCoreInterface rmcore;
+    private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CONNECTION);
+    private RMCore rmcore;
 
     /**
      * ProActive default constructor
@@ -81,7 +79,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     public RMAuthenticationImpl() {
     }
 
-    public RMAuthenticationImpl(RMCoreInterface rmcore) {
+    public RMAuthenticationImpl(RMCore rmcore) {
         super(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_AUTH_JAAS_PATH
                 .getValueAsString()), PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PRIVKEY_PATH.getValueAsString()),
@@ -122,30 +120,30 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      * Performs admin authentication
      */
     public RMAdmin logAsAdmin(Credentials cred) throws LoginException {
-        loginAs("admin", new String[] { "admin" }, cred);
+        Client client = new Client(loginAs("admin", new String[] { "admin" }, cred));
 
-        // login successful
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        RMAdminImpl admin = (RMAdminImpl) rmcore.getAdmin();
-        if (!admin.connect(id)) {
+        if (RMCore.clients.containsKey(client.getID())) {
             throw new LoginException(ERROR_ALREADY_CONNECTED);
         }
-        return admin;
+
+        RMCore.clients.put(client.getID(), client);
+        logger.info(client + " connected");
+        return rmcore;
     }
 
     /**
      * Performs user authentication
      */
     public RMUser logAsUser(Credentials cred) throws LoginException {
-        loginAs("user", new String[] { "user", "admin" }, cred);
+        Client client = new Client(loginAs("user", new String[] { "user", "admin" }, cred));
 
-        // login successful
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        RMUserImpl userImpl = (RMUserImpl) rmcore.getUser();
-        if (!userImpl.connect(id)) {
+        if (RMCore.clients.containsKey(client.getID())) {
             throw new LoginException(ERROR_ALREADY_CONNECTED);
         }
-        return userImpl;
+
+        RMCore.clients.put(client.getID(), client);
+        logger.info(client + " connected");
+        return rmcore;
     }
 
     /**

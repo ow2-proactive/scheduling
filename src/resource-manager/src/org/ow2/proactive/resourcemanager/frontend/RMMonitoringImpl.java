@@ -60,7 +60,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
-import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
@@ -84,7 +83,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.MONITORING);
 
     // Attributes
-    private RMCoreInterface rmcore;
+    private RMCore rmcore;
     private Map<UniqueID, RMEventListener> listeners;
     private HashMap<EventDispatcher, LinkedList<RMEvent>> pendingEvents = new HashMap<EventDispatcher, LinkedList<RMEvent>>();
     private transient ExecutorService eventDispatcherThreadPool;
@@ -103,7 +102,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * Creates the RMMonitoring active object.
      * @param rmcore Stub of the RMCore active object.
      */
-    public RMMonitoringImpl(RMCoreInterface rmcore) {
+    public RMMonitoringImpl(RMCore rmcore) {
         listeners = new HashMap<UniqueID, RMEventListener>();
         this.rmcore = rmcore;
     }

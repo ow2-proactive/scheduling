@@ -40,6 +40,8 @@ import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
 
+import javax.security.auth.login.LoginException;
+
 import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -74,6 +76,8 @@ public class NonBlockingCoreTest extends FunctionalTest {
     private String selectionScriptWithtimeOutPath = SelectionScriptTimeOutTest.class.getResource(
             "selectionScriptWithtimeOut.js").getPath();
 
+    private NodeSet nodes;
+
     /** Actions to be Perform by this test.
      * The method is called automatically by Junit framework.
      * @throws Exception If the test fails.
@@ -98,16 +102,28 @@ public class NonBlockingCoreTest extends FunctionalTest {
         RMTHelper.log("Selecting node with timeout script");
 
         //create the static selection script object
-        SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath),
+        final SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath),
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
         //mandatory to use RMUser AO, otherwise, getAtMostNode we be send in RMAdmin request queue
-        RMAuthentication auth = RMConnection.waitAndJoin(null);
+        final RMAuthentication auth = RMConnection.waitAndJoin(null);
 
-        Credentials cred = Credentials.createCredentials(RMTHelper.username, RMTHelper.password, auth
+        final Credentials cred = Credentials.createCredentials(RMTHelper.username, RMTHelper.password, auth
                 .getPublicKey());
-        RMUser user = auth.logAsUser(cred);
-        NodeSet nodes = user.getAtMostNodes(2, sScript);
+
+        // cannot connect twice from the same active object
+        // so creating another thread
+        Thread t = new Thread() {
+            public void run() {
+                RMUser user;
+                try {
+                    user = auth.logAsUser(cred);
+                    nodes = user.getAtMostNodes(2, sScript);
+                } catch (LoginException e) {
+                }
+            }
+        };
+        t.start();
 
         String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";

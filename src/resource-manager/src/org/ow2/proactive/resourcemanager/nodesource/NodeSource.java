@@ -56,10 +56,10 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
-import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -112,6 +112,7 @@ public class NodeSource implements InitActive, RunActive {
     private static int instanceCount = 0;
     private static ExecutorService networkOperationsThreadPool;
     private NodeSource stub;
+    private Client provider;
 
     /**
      * Creates a new instance of NodeSource.
@@ -187,7 +188,6 @@ public class NodeSource implements InitActive, RunActive {
                 delta = 0;
             }
         }
-
     }
 
     /**
@@ -208,12 +208,13 @@ public class NodeSource implements InitActive, RunActive {
      * Acquires the existing node with specific url. The node have to be up and running.
      *
      * @param nodeUrl the url of the node
+     * @param client
      */
-    public BooleanWrapper acquireNode(String nodeUrl) {
+    public BooleanWrapper acquireNode(String nodeUrl, Client provider) {
 
         if (toShutdown) {
-            throw new AddingNodesException("[" + name +
-                "] addNode request discarded because node source is shutting down");
+            throw new AddingNodesException("[" + name + "] node " + nodeUrl +
+                " adding request discarded because node source is shutting down");
         }
 
         // lookup for a new Node
@@ -279,7 +280,7 @@ public class NodeSource implements InitActive, RunActive {
             throw new AddingNodesException(e);
         }
 
-        RMNode rmnode = new RMNodeImpl(nodeToAdd, "noVn", (NodeSource) PAActiveObject.getStubOnThis());
+        RMNode rmnode = new RMNodeImpl(nodeToAdd, stub, provider);
         return rmcore.internalAddNodeToCore(rmnode);
     }
 
@@ -419,7 +420,7 @@ public class NodeSource implements InitActive, RunActive {
      * Shutdowns the node source and releases all its nodes.
      */
     public void shutdown() {
-        logger.info("[" + name + "] removal request");
+        logger.info("[" + name + "] is shutting down");
         toShutdown = true;
 
         if (nodes.size() == 0) {
@@ -555,7 +556,8 @@ public class NodeSource implements InitActive, RunActive {
      * Gets resource manager core. Used by policies.
      * @return {@link RMCoreInterface}
      */
-    public RMCoreInterface getRMCore() {
+
+    public RMCore getRMCore() {
         return rmcore;
     }
 
@@ -568,7 +570,7 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Instantiates the threadpool controller if it is null.
+     * Instantiates the thread pool if it is null.
      */
     private synchronized static ExecutorService getExecutorService() {
         if (networkOperationsThreadPool == null) {
@@ -597,5 +599,13 @@ public class NodeSource implements InitActive, RunActive {
                 }
             }
         });
+    }
+
+    public void setProvider(Client provider) {
+        this.provider = provider;
+    }
+
+    public Client getProvider() {
+        return provider;
     }
 }

@@ -42,10 +42,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -95,9 +98,6 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** Host name of the node */
     private String hostName;
 
-    /** Java virtual machine name of the node */
-    private String vmName;
-
     /** Script handled, manage scripts launching and results recovering */
     private ScriptHandler handler = null;
 
@@ -113,21 +113,24 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** Time of the last status update */
     private Date stateChangeTime = Calendar.getInstance().getTime();
 
+    private Client provider;
+
+    private Client owner;
+
     /** Create an RMNode Object.
      * A Created node begins to be free.
      * @param node ProActive node deployed.
-     * @param vnodeName {@link VirtualNode} name of the node.
+     * @param nodeSource {@link VirtualNode} name of the node.
      * @param nodeSource {@link NodeSource} Stub of NodeSource that handle the RMNode.
      */
-    public RMNodeImpl(Node node, String vnodeName, NodeSource nodeSource) {
+    public RMNodeImpl(Node node, NodeSource nodeSource, Client provider) {
         this.node = node;
         this.nodeSource = nodeSource;
         this.nodeSourceID = nodeSource.getName();
-        this.vnodeName = vnodeName;
+        this.provider = provider;
         this.nodeName = node.getNodeInformation().getName();
         this.nodeURL = node.getNodeInformation().getURL();
         this.hostName = node.getNodeInformation().getVMInformation().getHostName();
-        this.vmName = node.getNodeInformation().getVMInformation().getName();
         this.scriptStatus = new HashMap<SelectionScript, Integer>();
         this.state = NodeState.FREE;
     }
@@ -179,7 +182,12 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return the java virtual machine name of the RMNode.
      */
     public String getDescriptorVMName() {
-        return this.vmName;
+        try {
+            return RuntimeFactory.getDefaultRuntime().getURL();
+        } catch (ProActiveException e) {
+        }
+
+        return "";
     }
 
     /**
@@ -202,12 +210,13 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Changes the state of this node to {@link NodeState#BUSY}.
      * @throws NodeException if the node is down.
      */
-    public void setBusy() throws NodeException {
+    public void setBusy(Client owner) throws NodeException {
         if (this.isDown()) {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.BUSY;
         this.stateChangeTime = Calendar.getInstance().getTime();
+        this.owner = owner;
     }
 
     /**
@@ -220,6 +229,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         }
         this.state = NodeState.FREE;
         this.stateChangeTime = Calendar.getInstance().getTime();
+        this.owner = null;
     }
 
     /**
@@ -401,5 +411,19 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public Date getStateChangeTime() {
         return this.stateChangeTime;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Client getOwner() {
+        return owner;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Client getProvider() {
+        return provider;
     }
 }

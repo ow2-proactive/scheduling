@@ -42,6 +42,7 @@ import java.util.HashMap;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -164,9 +165,10 @@ public interface RMNode extends Comparable<RMNode> {
 
     /**
      * change the node's status to busy.
+     * @param owner
      * @throws NodeException
      */
-    public void setBusy() throws NodeException;
+    public void setBusy(Client owner) throws NodeException;
 
     /**
      *  * change the node's status to 'to release'.
@@ -211,4 +213,16 @@ public interface RMNode extends Comparable<RMNode> {
      * @return the time when state changed the last time
      */
     public Date getStateChangeTime();
+
+    /**
+     * Gets the provider of the node (who created and deployed it)
+     * @return the node provider
+     */
+    public Client getProvider();
+
+    /**
+     * Gets the owner of the node (who currently running computations on it)
+     * @return the node owner
+     */
+    public Client getOwner();
 }

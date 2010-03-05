@@ -51,7 +51,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
-import org.ow2.proactive.resourcemanager.core.RMCoreInterface;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
@@ -78,7 +77,7 @@ public class RMFactory {
     private static final Logger logger = ProActiveLogger.getLogger(RMLoggers.RMFACTORY);
 
     /** RMCore interface of the created Resource manager */
-    private static RMCoreInterface rmcore = null;
+    private static RMCore rmcore = null;
 
     /**
      * Creates and starts a Resource manager on the local host using the given initializer to configure it.
@@ -104,7 +103,7 @@ public class RMFactory {
             Node nodeRM = NodeFactory.createLocalNode(PAResourceManagerProperties.RM_NODE_NAME
                     .getValueAsString(), false, null, null, null);
             String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
-            rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
+            rmcore = (RMCore) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                     new Object[] { RMCoreName, nodeRM }, nodeRM);
             logger.info("New RM core localy started");
             return RMConnection.waitAndJoin(null);

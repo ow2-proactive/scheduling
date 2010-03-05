@@ -54,6 +54,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -125,7 +126,8 @@ public abstract class SelectionManager {
     public abstract boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
             RMNode rmnode);
 
-    public NodeSet findAppropriateNodes(int nb, List<SelectionScript> selectionScriptList, NodeSet exclusion) {
+    public NodeSet findAppropriateNodes(int nb, List<SelectionScript> selectionScriptList, NodeSet exclusion,
+            Client client) {
 
         ArrayList<RMNode> freeNodes = rmcore.getFreeNodes();
         NodeSet result = new NodeSet();
@@ -173,7 +175,7 @@ public abstract class SelectionManager {
                         }
                         if (node != null) {
                             try {
-                                rmcore.setBusyNode(node.getNodeURL());
+                                rmcore.setBusyNode(node.getNodeURL(), client);
                                 result.add(node.getNode());
                             } catch (NodeException e) {
                                 rmcore.setDownNode(node.getNodeURL());
@@ -192,7 +194,7 @@ public abstract class SelectionManager {
 
         }
 
-        logger.info("Number of found nodes is " + result.size());
+        logger.info(result.size() + "nodes found for " + client);
         return result;
 
     }

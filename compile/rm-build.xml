@@ -56,8 +56,6 @@
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/common/event/RMInitialState" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthentication" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/authentication/RMAuthenticationImpl" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMAdminImpl" mode="@{mode}"/>
-			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMUserImpl" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/frontend/RMMonitoringImpl" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/selection/ProbablisticSelectionManager" mode="@{mode}"/>
 			<generateorcheck_stub_for_class targetedClasspath="rm.classpath" srcDir="${cl.rm.dir}" class="org/ow2/proactive/resourcemanager/nodesource/NodeSource" mode="@{mode}"/>

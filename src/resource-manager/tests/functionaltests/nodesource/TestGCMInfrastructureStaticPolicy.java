@@ -129,7 +129,6 @@ public class TestGCMInfrastructureStaticPolicy extends FunctionalTest {
 
         assertTrue(admin.getTotalNodesNumber().intValue() == defaultDescriptorNodesNb);
         assertTrue(admin.getFreeNodesNumber().intValue() == defaultDescriptorNodesNb);
-
         // releasing some nodes
         NodeSet ns = admin.getAtMostNodes(defaultDescriptorNodesNb, null);
 

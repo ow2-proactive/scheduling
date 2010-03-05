@@ -54,16 +54,6 @@ public interface RMLoggers {
     static final public String CORE = RESOURCEMANAGER + ".core";
 
     /**
-     * RMAdmin logger's name.  
-     */
-    static final public String ADMIN = RESOURCEMANAGER + ".admin";
-
-    /**
-     * RMUser logger's name.
-     */
-    static final public String USER = RESOURCEMANAGER + ".user";
-
-    /**
      * RMMonitoring logger's name. 
      */
     static final public String MONITORING = RESOURCEMANAGER + ".monitoring";
@@ -102,4 +92,6 @@ public interface RMLoggers {
     static final public String CONSOLE = RESOURCEMANAGER + ".consol";
 
     static final public String POLICY = RESOURCEMANAGER + ".policy";
+
+    static final public String PINGER = RESOURCEMANAGER + ".pinger";
 }

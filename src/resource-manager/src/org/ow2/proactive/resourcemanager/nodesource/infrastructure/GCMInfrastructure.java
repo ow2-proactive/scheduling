@@ -266,7 +266,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * @param vnodeName virtual node name of the node.
      */
     public synchronized void receiveDeployedNode(Node node, String vnodeName) {
-        nodeSource.getRMCore().addNode(node.getNodeInformation().getURL(), nodeSource.getName());
+        nodeSource.acquireNode(node.getNodeInformation().getURL(), nodeSource.getProvider());
     }
 
     /**
