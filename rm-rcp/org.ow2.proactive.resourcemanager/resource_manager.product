@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.4"?>
+<?pde version="3.5"?>
 
-<product name="ProActive Resource Manager" id="org.ow2.proactive.resourcemanager.resourcemanager" application="org.ow2.proactive.resourcemanager.application" useFeatures="false">
+<product name="ProActive Resource Manager" id="org.ow2.proactive.resourcemanager.resourcemanager" application="org.ow2.proactive.resourcemanager.application" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.ow2.proactive.resourcemanager/icons/alt_about.gif"/>
@@ -14,6 +14,7 @@
    </configIni>
 
    <launcherArgs>
+      <programArgs>-data @noDefault</programArgs>
       <vmArgs>-Xmx512M -Xms512M
 -Dproactive.net.nolocal=true
 -Dlog4j.configuration=file:proactive-log4j
@@ -43,5 +44,6 @@
       <plugin id="org.ow2.proactive.resourcemanager.gui"/>
       <plugin id="org.ow2.proactive.resourcemanager.lib"/>
    </plugins>
+
 
 </product>
