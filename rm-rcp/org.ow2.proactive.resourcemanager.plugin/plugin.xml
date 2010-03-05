@@ -58,17 +58,6 @@
       </view>
    </extension>
    <extension
-         id="resourcemanager"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="org.ow2.proactive.resourcemanager.application"
-            name="Resource Manager">
-         <property
-               name="aboutText"
-               value="%About.text"/>
-      </product>
-   </extension>
-   <extension
          point="org.eclipse.ui.commands">
       <category
             description="connection category"
@@ -197,6 +186,15 @@
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
+               label="File">
+            <command
+                  commandId="org.eclipse.ui.file.exit"
+                  label="Exit"
+                  mnemonic="E"
+                  style="push">
+            </command>
+         </menu>
+         <menu
                id="connectionMainMenu"
                label="Connection">
             <command
@@ -244,6 +242,14 @@
                   icon="icons/rm_shutdown.gif"
                   label="Shutdown"
                   tooltip="Shutdown connected Resource Manager">
+            </command>
+         </menu>
+         <menu
+               label="Window">
+            <command
+                  commandId="org.eclipse.ui.views.showView"
+                  label="Show View"
+                  style="push">
             </command>
          </menu>
          <menu
