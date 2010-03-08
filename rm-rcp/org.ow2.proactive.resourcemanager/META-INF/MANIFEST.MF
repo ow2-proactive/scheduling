@@ -13,6 +13,5 @@ Require-Bundle: org.eclipse.ui,
  org.ow2.proactive.resourcemanager.gui;bundle-version="11.22.33"
 Bundle-ActivationPolicy: lazy
 Export-Package: org.ow2.proactive.resourcemanager
-Bundle-ClassPath: bin/,
- .
+Bundle-ClassPath: bin/
 Import-Package: org.objectweb.proactive.core.ssh.httpssh

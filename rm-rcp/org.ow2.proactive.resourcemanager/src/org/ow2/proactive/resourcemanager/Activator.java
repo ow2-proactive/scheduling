@@ -40,12 +40,17 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.Permission;
 import java.util.Hashtable;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.ssh.httpssh.Handler;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
@@ -57,14 +62,10 @@ import org.osgi.service.url.URLStreamHandlerSetter;
  */
 public class Activator extends AbstractUIPlugin {
 
-    /**
-     * The plug-in ID
-     */
+    /** The plug-in ID */
     public static final String PLUGIN_ID = "org.ow2.proactive.resourcemanager";
 
-    /**
-     * The shared instance
-     */
+    /** The shared instance */
     private static Activator plugin;
 
     /**
@@ -79,22 +80,57 @@ public class Activator extends AbstractUIPlugin {
      */
     @Override
     public void start(BundleContext context) throws Exception {
-        /* Grant all permission to security manager */
-        System.setSecurityManager(new SecurityManager() {
-            @Override
-            public void checkPermission(Permission perm, Object context) {
-            }
+        // Call the upper class method as required (see AbstractUIPlugin#start javadoc) 
+        super.start(context);
 
-            @Override
-            public void checkPermission(Permission perm) {
+        // Customize the platform instance location 
+        final Location instanceLoc = Platform.getInstanceLocation();
+        URL customLocURL = null;
+        try {
+            customLocURL = new URL("file:" + System.getProperty("user.home") +
+                "/.ProActive_ResourceManager/workspace/");
+            instanceLoc.set(customLocURL, false);
+        } catch (Exception e) {
+            if (e instanceof IllegalStateException) {
+                System.err.println("Unable to set the platform instance location to " + customLocURL);
+                System.err.println("The current location is " + instanceLoc.getURL());
+                System.err.println("Be sure that the program arguments contains -data @noDefault");
             }
-        });
-        /* This code is used to the httpssh, fixes an Eclipse bug */
+            e.printStackTrace();
+        }
+
+        // Get the bundle (this real location of this plugin)
+        final Bundle bundle = context.getBundle();
+        final URL configFolderURL = FileLocator.toFileURL(bundle.getEntry("/config"));
+
+        // Specify the security policy file if it was not specified
+        final String securityPolicyProperty = System.getProperty("java.security.policy");
+        if (securityPolicyProperty == null) {
+            System.setProperty("java.security.policy", configFolderURL.toString() +
+                "resource.manager.java.policy");
+        }
+
+        // Specify default log4j configuration file if it was not specified
+        final String log4jConfProperty = System.getProperty(PAProperties.LOG4J.getKey());
+        if (log4jConfProperty == null) {
+            System.setProperty(PAProperties.LOG4J.getKey(), configFolderURL.toString() + "proactive-log4j");
+        }
+
+        // Specify default ProActive configuration file if it was not specified
+        final String paConfProperty = System.getProperty(PAProperties.PA_CONFIGURATION_FILE.getKey());
+        if (paConfProperty == null) {
+            System.setProperty(PAProperties.PA_CONFIGURATION_FILE.getKey(), configFolderURL.toString() +
+                "ProActiveConfiguration.xml");
+        }
+
+        // Load proactive configuration 
+        ProActiveConfiguration.load();
+
+        // This code is used to the httpssh, fixes an Eclipse bug
         Hashtable<String, String[]> properties = new Hashtable<String, String[]>(1);
         properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] { "httpssh" });
         String serviceClass = URLStreamHandlerService.class.getName();
         context.registerService(serviceClass, new IC2DHandler(), properties);
-        super.start(context);
     }
 
     /**
