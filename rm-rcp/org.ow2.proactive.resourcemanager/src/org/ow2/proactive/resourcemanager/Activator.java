@@ -43,8 +43,11 @@ import java.net.URLConnection;
 import java.util.Hashtable;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -55,12 +58,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.osgi.service.url.URLStreamHandlerSetter;
+import org.ow2.proactive.resourcemanager.gui.Internal;
 
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public final class Activator extends AbstractUIPlugin {
 
     /** The plug-in ID */
     public static final String PLUGIN_ID = "org.ow2.proactive.resourcemanager";
@@ -143,6 +147,34 @@ public class Activator extends AbstractUIPlugin {
     }
 
     /**
+     * Initializes an image registry with images which are frequently used by the plugin. 
+     * @see the registry to initialize
+     */
+    @Override
+    protected void initializeImageRegistry(final ImageRegistry reg) {
+        super.initializeImageRegistry(reg);
+        reg.put(Internal.IMG_ADDNODE, Activator.getImageDescriptor("icons/" + Internal.IMG_ADDNODE));
+        reg.put(Internal.IMG_BUSY, Activator.getImageDescriptor("icons/" + Internal.IMG_BUSY));
+        reg.put(Internal.IMG_COLLAPSEALL, Activator.getImageDescriptor("icons/" + Internal.IMG_COLLAPSEALL));
+        reg.put(Internal.IMG_CONNECT, Activator.getImageDescriptor("icons/" + Internal.IMG_CONNECT));
+        reg
+                .put(Internal.IMG_CREATESOURCE, Activator.getImageDescriptor("icons/" +
+                    Internal.IMG_CREATESOURCE));
+        reg.put(Internal.IMG_DISCONNECT, Activator.getImageDescriptor("icons/" + Internal.IMG_DISCONNECT));
+        reg.put(Internal.IMG_DOWN, Activator.getImageDescriptor("icons/" + Internal.IMG_DOWN));
+        reg.put(Internal.IMG_EXPANDALL, Activator.getImageDescriptor("icons/" + Internal.IMG_EXPANDALL));
+        reg.put(Internal.IMG_FREE, Activator.getImageDescriptor("icons/" + Internal.IMG_FREE));
+        reg.put(Internal.IMG_HOST, Activator.getImageDescriptor("icons/" + Internal.IMG_HOST));
+        reg.put(Internal.IMG_REMOVENODE, Activator.getImageDescriptor("icons/" + Internal.IMG_REMOVENODE));
+        reg
+                .put(Internal.IMG_REMOVESOURCE, Activator.getImageDescriptor("icons/" +
+                    Internal.IMG_REMOVESOURCE));
+        reg.put(Internal.IMG_RMSHUTDOWN, Activator.getImageDescriptor("icons/" + Internal.IMG_RMSHUTDOWN));
+        reg.put(Internal.IMG_SOURCE, Activator.getImageDescriptor("icons/" + Internal.IMG_SOURCE));
+        reg.put(Internal.IMG_TORELEASE, Activator.getImageDescriptor("icons/" + Internal.IMG_TORELEASE));
+    }
+
+    /**
      * Returns the shared instance
      *
      * @return the shared instance
@@ -160,6 +192,17 @@ public class Activator extends AbstractUIPlugin {
      */
     public static ImageDescriptor getImageDescriptor(String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    /**
+     * Logs into the RCP's log file.
+     * @param severity - the severity, see IStatus
+     * @param message
+     * @param t
+     */
+    public static void log(int severity, String message, Throwable t) {
+        IStatus status = new Status(severity, PLUGIN_ID, IStatus.OK, message, t);
+        Activator.getDefault().getLog().log(status);
     }
 
     //
