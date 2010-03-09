@@ -668,23 +668,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         // create a running task table for this job
         this.currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
 
-        //create appender for this job if required 
-        if (job.getLogFile() != null) {
-            logger_dev.info("Create logger for job '" + job.getId() + "'");
-            Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
-            l.setAdditivity(false);
-            if (l.getAppender(Log4JTaskLogs.JOB_APPENDER_NAME + FILEAPPENDER_SUFFIX) == null) {
-                try {
-                    FileAppender fa = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), job.getLogFile(),
-                        false);
-                    fa.setName(Log4JTaskLogs.JOB_APPENDER_NAME + FILEAPPENDER_SUFFIX);
-                    l.addAppender(fa);
-                    this.jobsToBeLoggedinAFile.put(job.getId(), fa);
-                } catch (IOException e) {
-                    logger.warn("Cannot open log file " + job.getLogFile() + " : " + e.getMessage());
-                }
-            }
-        }
+        // create appender for this job if required
+        createFileAppender(job, false);
 
         //unload job environment that potentially contains classpath as byte[]
         DatabaseManager.getInstance().unload(job.getEnvironment());
@@ -1202,6 +1187,30 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         } else {
             l.info(logs.getStdoutLogs(false));
             l.error(logs.getStderrLogs(false));
+        }
+    }
+
+    /**
+     * This method creates an file appender for a job if required, i.e. if logfile property is set.
+     * @param job the job to create the appender for.
+     * @param append whether to append or truncate the job's log file.
+     */
+    private void createFileAppender(InternalJob job, boolean append) {
+        if (job.getLogFile() != null) {
+            logger_dev.info("Create logger for job '" + job.getId() + "'");
+            Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());
+            l.setAdditivity(false);
+            if (l.getAppender(Log4JTaskLogs.JOB_APPENDER_NAME + FILEAPPENDER_SUFFIX) == null) {
+                try {
+                    FileAppender fa = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), job.getLogFile(),
+                        append);
+                    fa.setName(Log4JTaskLogs.JOB_APPENDER_NAME + FILEAPPENDER_SUFFIX);
+                    l.addAppender(fa);
+                    this.jobsToBeLoggedinAFile.put(job.getId(), fa);
+                } catch (IOException e) {
+                    logger.warn("Cannot open log file " + job.getLogFile() + " : " + e.getMessage());
+                }
+            }
         }
     }
 
@@ -1752,6 +1761,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 case PENDING:
                     pendingJobs.add(job);
                     currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
+                    // create appender for this job if required
+                    createFileAppender(job, true);
                     // restart classserver if needed
                     if (job.getEnvironment().getJobClasspath() != null) {
                         try {
@@ -1784,7 +1795,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             job.reStartTask(task);
                         }
                     }
-
+                    // create appender for this job if required
+                    createFileAppender(job, true);
                     // restart classServer if needed
                     if (job.getEnvironment().getJobClasspath() != null) {
                         try {
@@ -1817,6 +1829,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                             job.update(task.getTaskInfo());
                         }
                     }
+                    // create appender for this job if required
+                    createFileAppender(job, true);
                     // restart classserver if needed
                     if (job.getEnvironment().getJobClasspath() != null) {
                         try {
