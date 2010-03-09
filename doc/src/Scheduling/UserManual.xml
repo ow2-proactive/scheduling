@@ -7,9 +7,7 @@
 		<section xml:id="Create_job_xml"><info><title>Job XML descriptor</title></info>
 			<para>
 			The  Job  XML descriptor is created
-			following the
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/schemas/jobdescriptor/dev/schedulerjob.xsd">
-			descriptor XSD schema</link>
+			following the schema given in appendix (<xref linkend="XSDJobSchema" />).
 			</para>
 			<para>
 				Several parameters can be set for a job:
@@ -58,7 +56,7 @@
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>nbMaxOfExecution</emphasis> (optional - 1 by default) - defines how many times tasks are allowed to be restarted.
+							<emphasis>maxNumberOfExecution</emphasis> (optional - 1 by default) - defines how many times tasks are allowed to be restarted.
 							Defining this property will set the nbMaxOfExecution property of each task to this value as the default one
 							(excepted if this property has been set at the task level).
 							The value has to be a non-negative and non-null integer.
@@ -98,7 +96,7 @@
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>JobClasspath</emphasis> (optional) - equivalent to the Java classpath.
+							<emphasis>jobClasspath</emphasis> (optional) - equivalent to the Java classpath.
 							All classes in this path can be loaded by
 							Java tasks contained in this job. The jobClasspath can either contain class directories or jar files.
 						</para>
