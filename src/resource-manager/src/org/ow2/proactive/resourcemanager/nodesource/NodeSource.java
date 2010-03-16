@@ -547,6 +547,10 @@ public class NodeSource implements InitActive, RunActive {
         logger.info("[" + name + "] Detected down node " + nodeUrl);
         Node downNode = nodes.remove(nodeUrl);
         if (downNode != null) {
+            try {
+                infrastructureManager.removeNode(downNode);
+            } catch (RMException e) {
+            }
             downNodes.put(nodeUrl, downNode);
         }
         rmcore.setDownNode(nodeUrl);
