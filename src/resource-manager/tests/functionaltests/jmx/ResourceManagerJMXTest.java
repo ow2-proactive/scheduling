@@ -58,6 +58,7 @@ import org.ow2.proactive.jmx.naming.JMXProperties;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
@@ -204,6 +205,8 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
             final String nodeURL = node.getNodeInformation().getURL();
             RMTHelper.getAdminInterface().addNode(nodeURL).booleanValue(); // force sync
 
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+
             // Get all attributes to test
             AttributeList list = conn.getAttributes(anonymMBeanName, new String[] { "RMStatus",
                     "AvailableNodesCount", "FreeNodesCount" });
@@ -220,9 +223,7 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
 
             RMTHelper.getAdminInterface().removeNode(nodeURL, false);
 
-            while (RMTHelper.getAdminInterface().getTotalAliveNodesNumber().intValue() > 0) {
-                Thread.sleep(1000);
-            }
+            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
             // Get all attributes to test
             list = conn.getAttributes(anonymMBeanName,
