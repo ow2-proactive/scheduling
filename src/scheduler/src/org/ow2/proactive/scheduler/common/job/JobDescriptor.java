@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -52,7 +51,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public interface JobDescriptor extends Serializable, Comparable<JobDescriptor> {
+public interface JobDescriptor extends Comparable<JobDescriptor> {
 
     /**
      * Return true if the task represented by the given taskId has children, false if not.
