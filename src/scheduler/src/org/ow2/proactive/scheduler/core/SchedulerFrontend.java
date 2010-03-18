@@ -50,6 +50,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -1349,8 +1350,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         private static final ExecutorService threadPoolForNetworkCalls = Executors
                 .newFixedThreadPool(THREAD_NUMBER);
 
+        private static AtomicInteger requestLeft = new AtomicInteger();
+
         public static void terminate() {
             try {
+		requestLeft.wait();
                 threadPoolForNetworkCalls.shutdown();
                 threadPoolForNetworkCalls.awaitTermination(12, TimeUnit.SECONDS);
             } catch (Exception e) {
@@ -1392,6 +1396,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         public void addEvent(Method method, Object... args) {
             synchronized (eventCallsToStore) {
                 eventCallsToStore.add(new ReifiedMethodCall(method, args));
+                requestLeft.incrementAndGet();
             }
             tryStartTask();
         }
@@ -1408,6 +1413,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
                 if (eventCallsToStore.size() > 0 && !busy.get()) {
                     LinkedList<ReifiedMethodCall> tasks = (LinkedList<ReifiedMethodCall>) eventCallsToStore
                             .clone();
+                    requestLeft.addAndGet(tasks.size());
                     eventCallsToStore.clear();
                     threadPoolForNetworkCalls.execute(new TaskRunnable(tasks));
                 }
@@ -1441,22 +1447,27 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
              * {@inheritDoc}
              */
             public void run() {
-                busy.set(true);
-                try {
+		try {
+			busy.set(true);
+			//unlock shutdown request
+			if (requestLeft.addAndGet(-eventCallsToSend.size()) == 0) {
+				requestLeft.notify();
+			}
                     //loop on the list and send events
                     while (!eventCallsToSend.isEmpty()) {
                         ReifiedMethodCall methodCall = eventCallsToSend.removeFirst();
                         methodCall.getMethod().invoke(client, methodCall.getArguments());
                     }
+                    busy.set(false);
+                    //try to empty the events list if no event comes from the core
+                    tryStartTask();
                 } catch (Throwable t) {
                     //remove this client from Frontend (client dead or timed out)
                     frontend.markAsDirty(clientId);
                     //do not set busy here, we don't want to wait N times for the network timeout
                     //so when client is dead keep busy to avoid re-execution of this run method by another thread
+                    busy.set(false);
                 }
-                busy.set(false);
-                //try to empty the events list if no event comes from the core
-                tryStartTask();
             }
 
         }
