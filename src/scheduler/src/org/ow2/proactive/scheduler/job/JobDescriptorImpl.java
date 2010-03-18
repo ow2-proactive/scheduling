@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -68,6 +69,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @since ProActive Scheduling 0.9.1
  */
 public class JobDescriptorImpl implements JobDescriptor {
+
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
 
     /** Job id */
@@ -92,10 +94,10 @@ public class JobDescriptorImpl implements JobDescriptor {
     private Set<TaskId> hasChildren = new HashSet<TaskId>();
 
     /** Job tasks to be able to be schedule */
-    private Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new HashMap<TaskId, EligibleTaskDescriptor>();
+    private Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new ConcurrentHashMap<TaskId, EligibleTaskDescriptor>();
 
     /** Job running tasks */
-    private Map<TaskId, TaskDescriptor> runningTasks = new HashMap<TaskId, TaskDescriptor>();
+    private Map<TaskId, TaskDescriptor> runningTasks = new ConcurrentHashMap<TaskId, TaskDescriptor>();
 
     /** Job paused tasks */
     private Map<TaskId, TaskDescriptor> pausedTasks = new HashMap<TaskId, TaskDescriptor>();
@@ -210,17 +212,19 @@ public class JobDescriptorImpl implements JobDescriptor {
         if (type == JobType.TASKSFLOW) {
             TaskDescriptor lt = runningTasks.get(taskId);
 
-            for (TaskDescriptor task : lt.getChildren()) {
-                ((EligibleTaskDescriptorImpl) task)
-                        .setCount(((EligibleTaskDescriptorImpl) task).getCount() - 1);
+            if (lt != null) {
+                for (TaskDescriptor task : lt.getChildren()) {
+                    ((EligibleTaskDescriptorImpl) task).setCount(((EligibleTaskDescriptorImpl) task)
+                            .getCount() - 1);
 
-                if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
-                    eligibleTasks.put(task.getId(), (EligibleTaskDescriptor) task);
+                    if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
+                        eligibleTasks.put(task.getId(), (EligibleTaskDescriptor) task);
+                    }
                 }
-            }
 
-            for (TaskDescriptor task : lt.getParents()) {
-                ((EligibleTaskDescriptorImpl) task).setChildrenCount(task.getChildrenCount() - 1);
+                for (TaskDescriptor task : lt.getParents()) {
+                    ((EligibleTaskDescriptorImpl) task).setChildrenCount(task.getChildrenCount() - 1);
+                }
             }
         }
 
