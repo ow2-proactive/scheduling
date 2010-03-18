@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -85,8 +86,8 @@ public abstract class NodeSourcePolicy implements Serializable {
     /**
      * Shutdown the policy
      */
-    public void shutdown() {
-        nodeSource.finishNodeSourceShutdown();
+    public void shutdown(Client initiator) {
+        nodeSource.finishNodeSourceShutdown(initiator);
         PAActiveObject.terminateActiveObject(false);
     }
 

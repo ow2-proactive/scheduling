@@ -110,7 +110,7 @@ public class RMModel {
             }
 
             newNode = new Node(nodeEvent.getNodeUrl(), nodeEvent.getNodeState(), nodeEvent
-                    .getStateChangeTime());
+                    .getTimeStampFormatted());
             vm.addChild(newNode);
 
             if (parentToRefresh == null) {

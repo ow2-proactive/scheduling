@@ -69,7 +69,7 @@ public class Node extends TreeLeafElement {
      */
     public void setState(RMNodeEvent event) {
         this.state = event.getNodeState();
-        this.stateChangeTime = event.getStateChangeTime();
+        this.stateChangeTime = event.getTimeStampFormatted();
     }
 
     public String getStateChangeTime() {

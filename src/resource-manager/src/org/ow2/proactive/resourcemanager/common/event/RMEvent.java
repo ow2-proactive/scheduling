@@ -37,6 +37,15 @@
 package org.ow2.proactive.resourcemanager.common.event;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -48,11 +57,25 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@MappedSuperclass
+@Entity
+@Table(name = "RMEvent")
 public class RMEvent implements Serializable {
 
+    @Id
+    @GeneratedValue
+    @SuppressWarnings("unused")
+    private long id;
     /** Resource manager URL */
+    @Column(name = "rmurl")
     private String RMUrl = null;
+    @Column(name = "type")
     protected RMEventType type;
+    /** the resource manager client which initiates the event */
+    @Column(name = "initiator")
+    protected String initiator;
+    @Column(name = "timeStamp")
+    protected long timeStamp;
 
     /**
      * ProActive empty constructor
@@ -65,6 +88,7 @@ public class RMEvent implements Serializable {
      */
     public RMEvent(RMEventType type) {
         this.type = type;
+        this.timeStamp = System.currentTimeMillis();
     }
 
     /**
@@ -83,8 +107,28 @@ public class RMEvent implements Serializable {
         this.RMUrl = RMURL;
     }
 
+    /**
+     * Gets the type of event @see RMEventType
+     * @return the type of event
+     */
     public RMEventType getEventType() {
         return type;
+    }
+
+    /**
+     * Gets the time of event creation
+     * @return the event creation time
+     */
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    /**
+     * Gets the formatted time of event creation
+     * @return the formatted event creation time
+     */
+    public String getTimeStampFormatted() {
+        return new SimpleDateFormat().format(new Date(timeStamp));
     }
 
     /**

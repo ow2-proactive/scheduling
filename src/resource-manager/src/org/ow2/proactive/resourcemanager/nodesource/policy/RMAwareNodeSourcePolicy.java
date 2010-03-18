@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.nodesource.policy;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -75,7 +76,7 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
      * {@inheritDoc}
      */
     @Override
-    public void shutdown() {
+    public void shutdown(Client initiator) {
         if (!rmShuttingDown) {
             try {
                 rmMonitoring.removeRMEventListener();
@@ -83,7 +84,7 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
                 e.printStackTrace();
             }
         }
-        super.shutdown();
+        super.shutdown(initiator);
     }
 
     /**

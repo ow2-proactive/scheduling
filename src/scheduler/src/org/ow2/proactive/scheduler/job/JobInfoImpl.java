@@ -51,7 +51,7 @@ import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
-import org.ow2.proactive.scheduler.common.db.annotation.Alterable;
+import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;

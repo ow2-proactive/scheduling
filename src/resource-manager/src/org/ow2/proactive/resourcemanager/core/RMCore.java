@@ -69,6 +69,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
@@ -230,6 +232,15 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMCORE);
 
+            logger.info("Starting Hibernate...");
+            boolean drop = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getValueAsBoolean();
+            logger.info("Drop DB : " + drop);
+            if (drop) {
+                DatabaseManager.getInstance().setProperty("hibernate.hbm2ddl.auto", "create");
+            }
+            DatabaseManager.getInstance().build();
+            logger.info("Hibernate successfully started !");
+
             if (logger.isDebugEnabled()) {
                 logger.debug("active object RMAuthentication");
             }
@@ -339,11 +350,13 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
         final NodeState previousNodeState = rmNode.getState();
         try {
             logger.debug("The node " + rmNode.getNodeURL() + " owned by " + rmNode.getOwner() + " is free");
+            Client owner = rmNode.getOwner();
+            // reseting owner here
             rmNode.setFree();
             this.freeNodes.add(rmNode);
             // create the event
             this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
-                previousNodeState));
+                previousNodeState, owner.getName()));
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
             setDownNode(rmNode.getNodeURL());
@@ -359,7 +372,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
      * @param rmNode
      *            node to set to release.
      */
-    private void internalSetToRelease(final RMNode rmNode) {
+    private void internalSetToRelease(final RMNode rmNode, Client initiator) {
         // If the node is already set to release no need to go further
         if (rmNode.isToRelease()) {
             return;
@@ -376,7 +389,8 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
             logger.debug("", e1);
         }
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState));
+        this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState,
+            initiator.getName()));
     }
 
     /**
@@ -387,12 +401,12 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
      * @param rmnode
      *            the node to release
      */
-    private void internalDoRelease(RMNode rmnode) {
+    private void internalDoRelease(RMNode rmnode, Client initiator) {
         if (logger.isInfoEnabled()) {
             logger.info("Releasing node " + rmnode.getNodeURL());
         }
-        internalRemoveNodeFromCore(rmnode);
-        rmnode.getNodeSource().removeNode(rmnode.getNodeURL());
+        internalRemoveNodeFromCore(rmnode, initiator);
+        rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), initiator);
     }
 
     /**
@@ -403,7 +417,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
      * @param rmnode
      *            the node to remove.
      */
-    private void internalRemoveNodeFromCore(RMNode rmnode) {
+    private void internalRemoveNodeFromCore(RMNode rmnode, Client initiator) {
         logger.debug("Removing node " + rmnode.getNodeURL() + " provided by " + rmnode.getProvider());
         // removing the node from the HM list
         if (rmnode.isFree()) {
@@ -411,7 +425,8 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
         }
         this.allNodes.remove(rmnode.getNodeURL());
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_REMOVED));
+        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_REMOVED, rmnode.getState(),
+            initiator.getName()));
     }
 
     /**
@@ -426,14 +441,15 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
         if (toShutDown) {
             logger.warn("Node " + rmnode.getNodeURL() +
                 " will not be added to the core as the resource manager is shutting down");
-            rmnode.getNodeSource().removeNode(rmnode.getNodeURL());
+            rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), rmnode.getProvider());
             return new BooleanWrapper(false);
         }
 
         this.freeNodes.add(rmnode);
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED));
+        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED, null, rmnode.getProvider()
+                .getName()));
         if (logger.isInfoEnabled()) {
             logger.info("New node " + rmnode.getNodeURL() + " added to the node source " +
                 rmnode.getNodeSourceId() + " by " + rmnode.getProvider());
@@ -508,17 +524,18 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
      */
     public void removeNode(String nodeUrl, boolean preempt) {
 
-        if (checkAccess() == null)
+        Client initiator = checkAccess();
+        if (initiator == null)
             return;
 
         if (this.allNodes.containsKey(nodeUrl)) {
             RMNode rmnode = this.allNodes.get(nodeUrl);
 
             if (rmnode.isDown() || preempt || rmnode.isFree()) {
-                internalRemoveNodeFromCore(rmnode);
-                rmnode.getNodeSource().removeNode(rmnode.getNodeURL());
+                internalRemoveNodeFromCore(rmnode, initiator);
+                rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), initiator);
             } else if (rmnode.isBusy()) {
-                internalSetToRelease(rmnode);
+                internalSetToRelease(rmnode, initiator);
             }
         } else {
             logger.warn("An attempt to remove non existing node " + nodeUrl);
@@ -647,7 +664,8 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
 
         this.nodeSources.put(nodeSourceName, nodeSource);
         // create the event
-        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_CREATED));
+        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_CREATED,
+            client.getName()));
 
         nodeSource.activate();
 
@@ -658,7 +676,8 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
      * Shutdown the resource manager
      */
     public void shutdown(boolean preempt) {
-        if (checkAccess() == null) {
+        Client client = checkAccess();
+        if (client == null) {
             return;
         }
         // this method could be called twice from shutdown hook and user action
@@ -674,7 +693,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
         } else {
             for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
                 removeAllNodes(entry.getKey(), preempt);
-                entry.getValue().shutdown();
+                entry.getValue().shutdown(client);
             }
         }
     }
@@ -759,7 +778,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
                     }
 
                     if (rmnode.isToRelease()) {
-                        internalDoRelease(rmnode);
+                        internalDoRelease(rmnode, client);
                     } else {
                         internalSetFree(rmnode);
                     }
@@ -867,12 +886,12 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
 
         ArrayList<RMNodeEvent> nodesList = new ArrayList<RMNodeEvent>();
         for (RMNode rmnode : this.allNodes.values()) {
-            nodesList.add(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED)); //TODO change event type
+            nodesList.add(new RMNodeEvent(rmnode));
         }
 
         ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<RMNodeSourceEvent>();
         for (NodeSource s : this.nodeSources.values()) {
-            nodeSourcesList.add(new RMNodeSourceEvent(s, RMEventType.NODESOURCE_CREATED)); //TODO change event type
+            nodeSourcesList.add(new RMNodeSourceEvent(s));
         }
 
         return new RMInitialState(nodesList, nodeSourcesList);
@@ -976,7 +995,8 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
         }
         this.freeNodes.remove(rmNode);
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState));
+        this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState,
+            owner.getName()));
     }
 
     /**
@@ -1003,7 +1023,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
             rmNode.setDown();
             // create the event
             this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
-                previousNodeState));
+                previousNodeState, rmNode.getProvider().getName()));
         } else {
             // the nodes has been removed from core asynchronously
             // when pinger of selection manager tried to access it
@@ -1018,12 +1038,13 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
      * @return true if the nodes was successfully removed, false otherwise
      */
     public BooleanWrapper internalRemoveNodeFromCore(String nodeUrl) {
-        if (checkAccess() == null)
+        Client initiator = checkAccess();
+        if (initiator == null)
             throw new RuntimeException("Permission denied");
 
         RMNode rmnode = getNodebyUrl(nodeUrl);
         if (rmnode != null) {
-            internalRemoveNodeFromCore(rmnode);
+            internalRemoveNodeFromCore(rmnode, initiator);
             return new BooleanWrapper(true);
         } else {
             return new BooleanWrapper(false);
@@ -1111,7 +1132,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
             //remove down nodes handled by the source
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
-            nodeSources.get(sourceName).shutdown();
+            nodeSources.get(sourceName).shutdown(client);
         } else {
             throw new RMException("unknown node source : " + sourceName);
         }
@@ -1154,7 +1175,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
             for (RMNode rmnode : allNodes.values()) {
                 if (rmnode.getOwner().equals(client)) {
                     if (rmnode.isToRelease()) {
-                        internalDoRelease(rmnode);
+                        internalDoRelease(rmnode, client);
                     } else if (rmnode.isBusy()) {
                         internalSetFree(rmnode);
                     }

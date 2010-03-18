@@ -54,7 +54,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.task.util.BigString;
+import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 

@@ -49,6 +49,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
@@ -197,11 +198,11 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * Shutdown the policy and clears the timer.
      */
     @Override
-    public void shutdown() {
+    public void shutdown(Client initiator) {
         synchronized (timer) {
             timer.cancel();
         }
-        super.shutdown();
+        super.shutdown(initiator);
     }
 
     /**

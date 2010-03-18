@@ -283,7 +283,7 @@ public class AdminRMModel extends ConsoleModel {
                 list.add(evt.getNodeSource());
                 list.add(evt.getHostName());
                 list.add(evt.getNodeState().toString());
-                list.add(evt.getStateChangeTime().toString());
+                list.add(evt.getTimeStampFormatted());
                 list.add(evt.getNodeUrl());
                 oaf.addLine(list);
             }

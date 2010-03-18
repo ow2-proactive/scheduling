@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,26 +34,49 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.core.db;
+package org.ow2.proactive.db;
 
 /**
- * This class provides a static access to the corresponding data base manager.
+ * DatabaseManagerException is thrown by the DataBaseManager when Hibernate exception occurs.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 1.0
+ * @since ProActive Scheduling 0.9.1
  */
-public class DatabaseManager {
+public class DatabaseManagerException extends RuntimeException {
 
-    private static SchedulerDatabaseManager dbManager;
-
-    public static SchedulerDatabaseManager getInstance() {
-        if (dbManager == null) {
-            if (System.getProperty("scheduler.database.nodb") != null) {
-                dbManager = new SchedulerEmptyDatabaseManager();
-            } else {
-                dbManager = new SchedulerHibernateDatabaseManager();
-            }
-        }
-        return dbManager;
+    /**
+     * Create a new instance of DatabaseManagerException.
+     */
+    public DatabaseManagerException() {
+        super();
     }
+
+    /**
+     * Create a new instance of DatabaseManagerException.
+     *
+     * @param message the message to be display
+     * @param cause the throwable that cause this exception
+     */
+    public DatabaseManagerException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * Create a new instance of DatabaseManagerException.
+     *
+     * @param message the message to be display
+     */
+    public DatabaseManagerException(String message) {
+        super(message);
+    }
+
+    /**
+     * Create a new instance of DatabaseManagerException.
+     *
+     * @param cause the throwable that cause this exception
+     */
+    public DatabaseManagerException(Throwable cause) {
+        super(cause);
+    }
+
 }

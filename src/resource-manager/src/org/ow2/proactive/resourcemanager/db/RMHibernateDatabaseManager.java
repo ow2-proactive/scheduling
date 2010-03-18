@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,49 +34,41 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.core.db;
+package org.ow2.proactive.resourcemanager.db;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.db.HibernateDatabaseManager;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
+
 
 /**
- * DatabaseManagerException is thrown by the DataBaseManager when Hibernate exception occurs.
+ * DatabaseManager is responsible of every database transaction.<br />
+ * Hibernate entities can be managed by this manager. It provides method to register, delete, synchronize
+ * objects in database.
+ * Each method will work on the object and its inheritance.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9.1
+ * @since ProActive Scheduling 1.0
  */
-public class DatabaseManagerException extends RuntimeException {
+public class RMHibernateDatabaseManager extends HibernateDatabaseManager {
 
-    /**
-     * Create a new instance of DatabaseManagerException.
-     */
-    public DatabaseManagerException() {
-        super();
+    public static final Logger logger = ProActiveLogger.getLogger(RMLoggers.DATABASE);
+
+    @Override
+    public String getConfigFile() {
+        return PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG
+                .getValueAsString());
     }
 
-    /**
-     * Create a new instance of DatabaseManagerException.
-     *
-     * @param message the message to be display
-     * @param cause the throwable that cause this exception
-     */
-    public DatabaseManagerException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    public Logger getDevLogger() {
+        return logger;
     }
 
-    /**
-     * Create a new instance of DatabaseManagerException.
-     *
-     * @param message the message to be display
-     */
-    public DatabaseManagerException(String message) {
-        super(message);
+    @Override
+    public Logger getLogger() {
+        return logger;
     }
-
-    /**
-     * Create a new instance of DatabaseManagerException.
-     *
-     * @param cause the throwable that cause this exception
-     */
-    public DatabaseManagerException(Throwable cause) {
-        super(cause);
-    }
-
 }

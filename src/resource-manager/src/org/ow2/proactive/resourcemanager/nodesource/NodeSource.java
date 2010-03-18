@@ -242,7 +242,7 @@ public class NodeSource implements InitActive, RunActive {
                 if (logger.isDebugEnabled())
                     logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
                 // just removing it from down nodes list
-                removeNode(nodeUrl);
+                removeNode(nodeUrl, provider);
             }
         } else if (nodes.containsKey(nodeUrl)) {
             // adding a node which exists in node source
@@ -383,7 +383,7 @@ public class NodeSource implements InitActive, RunActive {
      *
      * @param nodeUrl the url of the node to be released
      */
-    public BooleanWrapper removeNode(String nodeUrl) {
+    public BooleanWrapper removeNode(String nodeUrl, Client initiator) {
 
         //verifying if node is already in the list,
         //node could have fallen between remove request and the confirm
@@ -410,7 +410,7 @@ public class NodeSource implements InitActive, RunActive {
 
         if (toShutdown && nodes.size() == 0) {
             // shutdown all pending nodes
-            shutdownNodeSourceServices();
+            shutdownNodeSourceServices(initiator);
         }
 
         return new BooleanWrapper(true);
@@ -419,12 +419,12 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Shutdowns the node source and releases all its nodes.
      */
-    public void shutdown() {
-        logger.info("[" + name + "] is shutting down");
+    public void shutdown(Client initiator) {
+        logger.info("[" + name + "] is shutting down by " + initiator);
         toShutdown = true;
 
         if (nodes.size() == 0) {
-            shutdownNodeSourceServices();
+            shutdownNodeSourceServices(initiator);
         }
     }
 
@@ -470,20 +470,21 @@ public class NodeSource implements InitActive, RunActive {
 
     /**
      * Initiates node source services shutdown, such as pinger, policy, thread pool.
+     * @param initiator
      */
-    protected void shutdownNodeSourceServices() {
+    protected void shutdownNodeSourceServices(Client initiator) {
         logger.info("[" + name + "] Shutdown finalization");
 
-        nodeSourcePolicy.shutdown();
+        nodeSourcePolicy.shutdown(initiator);
         infrastructureManager.shutDown();
     }
 
     /**
      * Terminates a node source active object when shutdown confirmation is received from the pinger and the policy. 
      */
-    public void finishNodeSourceShutdown() {
+    public void finishNodeSourceShutdown(Client initiator) {
         PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this,
-            RMEventType.NODESOURCE_REMOVED)));
+            RMEventType.NODESOURCE_REMOVED, initiator.getName())));
 
         // got confirmation from pinger and policy
         PAActiveObject.terminateActiveObject(false);

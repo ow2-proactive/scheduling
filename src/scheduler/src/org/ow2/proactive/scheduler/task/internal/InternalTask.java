@@ -69,7 +69,7 @@ import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
+import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.task.TaskId;

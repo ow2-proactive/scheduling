@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
@@ -104,14 +105,14 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown(Client initiator) {
         try {
             userInterface.removeEventListener();
             userInterface.disconnect();
         } catch (Exception e) {
             logger.error("", e);
         }
-        super.shutdown();
+        super.shutdown(initiator);
     }
 
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {

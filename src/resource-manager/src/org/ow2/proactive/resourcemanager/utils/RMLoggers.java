@@ -94,4 +94,6 @@ public interface RMLoggers {
     static final public String POLICY = RESOURCEMANAGER + ".policy";
 
     static final public String PINGER = RESOURCEMANAGER + ".pinger";
+
+    static final public String DATABASE = ".DATABASE";
 }

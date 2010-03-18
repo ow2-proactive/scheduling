@@ -50,7 +50,7 @@ import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.db.annotation.Unloadable;
+import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 
 

@@ -61,6 +61,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -301,6 +302,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeEvent(RMNodeEvent event) {
         RMMonitoringImpl.rmStatistics.nodeEvent(event);
+        DatabaseManager.getInstance().register(event);
         queueEvent(event);
     }
 
@@ -308,6 +310,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public void nodeSourceEvent(RMNodeSourceEvent event) {
+        DatabaseManager.getInstance().register(event);
         queueEvent(event);
     }
 
@@ -316,6 +319,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void rmEvent(RMEvent event) {
         RMMonitoringImpl.rmStatistics.rmEvent(event);
+        DatabaseManager.getInstance().register(event);
         queueEvent(event);
     }
 

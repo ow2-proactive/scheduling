@@ -36,8 +36,9 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -68,34 +69,47 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@Entity
+@Table(name = "RMNodeEvent")
 public final class RMNodeEvent extends RMEvent {
 
     /** URL of the related node */
+    @Column(name = "nodeUrl")
     private final String nodeUrl;
 
     /** {@link NodeSource} name of the node */
+    @Column(name = "nodeSource")
     private final String nodeSource;
 
     /** {@link ProActiveDescriptor} name of the node */
+    @Column(name = "PADName")
     private final String PADName;
 
     /** {@link VirtualNode} name of the node */
+    @Column(name = "VnName")
     private final String VnName;
 
     /** Host name of the node */
+    @Column(name = "hostName")
     private final String hostName;
 
     /** Java virtual machine name of the node */
+    @Column(name = "VMName")
     private final String VMName;
 
     /** The state of the associated node */
+    @Column(name = "nodeState")
     private final NodeState nodeState;
 
     /** The previous state of the associated node */
+    @Column(name = "previousNodeState")
     private final NodeState previousNodeState;
 
-    /** Time of the last status update */
-    private final Date stateChangeTime;
+    @Column(name = "nodeProvider")
+    private final String nodeProvider;
+
+    @Column(name = "nodeOwner")
+    private final String nodeOwner;
 
     /**
      * ProActive empty constructor
@@ -109,16 +123,17 @@ public final class RMNodeEvent extends RMEvent {
         this.VMName = null;
         this.nodeState = null;
         this.previousNodeState = null;
-        this.stateChangeTime = null;
+        this.nodeProvider = null;
+        this.nodeOwner = null;
     }
 
     /**
      * Creates a node event object without previous node state.
+     * Used to represent the resource manager state @see RMInitialState.
      * @param rmNode the node concerned by this event
-     * @param eventType the resource manager event type 
      */
-    public RMNodeEvent(final RMNode rmNode, final RMEventType eventType) {
-        this(rmNode, eventType, null);
+    public RMNodeEvent(final RMNode rmNode) {
+        this(rmNode, null, null, null);
     }
 
     /**
@@ -127,8 +142,11 @@ public final class RMNodeEvent extends RMEvent {
      * @param eventType the resource manager event type
      * @param previousNodeState the previous state of the node concerned by this event
      */
-    public RMNodeEvent(final RMNode rmNode, final RMEventType eventType, final NodeState previousNodeState) {
+    public RMNodeEvent(final RMNode rmNode, final RMEventType eventType, final NodeState previousNodeState,
+            final String initiator) {
         super(eventType);
+
+        this.initiator = initiator;
         this.nodeUrl = rmNode.getNodeURL();
         this.nodeSource = rmNode.getNodeSourceId();
         this.PADName = "";
@@ -137,7 +155,8 @@ public final class RMNodeEvent extends RMEvent {
         this.VMName = rmNode.getDescriptorVMName();
         this.nodeState = rmNode.getState();
         this.previousNodeState = previousNodeState;
-        this.stateChangeTime = rmNode.getStateChangeTime();
+        this.nodeProvider = rmNode.getProvider() == null ? null : rmNode.getProvider().getName();
+        this.nodeOwner = rmNode.getOwner() == null ? null : rmNode.getOwner().getName();
     }
 
     /**
@@ -227,11 +246,19 @@ public final class RMNodeEvent extends RMEvent {
     }
 
     /**
-     * Gets the time when state changed the last time
-     * @return the time when state changed the last time
+     * Gets the provider of the node (who created and deployed it)
+     * @return the node provider name
      */
-    public String getStateChangeTime() {
-        return new SimpleDateFormat().format(this.stateChangeTime.getTime());
+    public String getNodeProvider() {
+        return nodeProvider;
+    }
+
+    /**
+     * Gets the owner of the node (who currently running computations on it)
+     * @return the node owner name
+     */
+    public String getNodeOwner() {
+        return nodeOwner;
     }
 
     /**

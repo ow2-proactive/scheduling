@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,36 +24,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.core.db;
+package org.ow2.proactive.db.annotation;
 
-/**
- * This class provides a static access to the corresponding data base manager.
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 1.0
- */
-public class DatabaseManager {
-
-    private static SchedulerDatabaseManager dbManager;
-
-    public static SchedulerDatabaseManager getInstance() {
-        if (dbManager == null) {
-            if (System.getProperty("scheduler.database.nodb") != null) {
-                dbManager = new SchedulerEmptyDatabaseManager();
-            } else {
-                dbManager = new SchedulerHibernateDatabaseManager();
-            }
-        }
-        return dbManager;
-    }
+@java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
+@java.lang.annotation.Target( { java.lang.annotation.ElementType.FIELD })
+public @interface Unloadable {
 }

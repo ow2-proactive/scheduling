@@ -137,7 +137,17 @@ public enum PAResourceManagerProperties {
     RM_MONITORING_MAX_THREAD_NUMBER("pa.rm.monitoring.maxthreadnumber", PAPropertiesType.INTEGER),
 
     /** Path to the Resource Manager credentials for adding local nodes */
-    RM_CREDS("pa.rm.credentials", PAPropertiesType.STRING);
+    RM_CREDS("pa.rm.credentials", PAPropertiesType.STRING),
+
+    /** Resource Manager hibernate configuration file*/
+    RM_DB_HIBERNATE_CONFIG("pa.rm.db.hibernate.configuration", PAPropertiesType.STRING),
+
+    /**
+     * Drop database before creating a new one
+     * If this value is true, the database will be dropped and then re-created
+     * If this value is false, database will be updated from the existing one.
+     */
+    RM_DB_HIBERNATE_DROPDB("pa.rm.db.hibernate.dropdb", PAPropertiesType.BOOLEAN);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

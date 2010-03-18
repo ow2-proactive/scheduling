@@ -36,7 +36,13 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -61,13 +67,21 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
  *
  */
 @PublicAPI
+@Entity
+@Table(name = "RMNodeSourceEvent")
 public class RMNodeSourceEvent extends RMEvent {
 
     /** name of the source concerned by the event. */
+    @Column(name = "nodeSourceName")
     private String nodeSourceName = null;
 
     /** description of the source concerned by the event. */
-    private String nodeSourceDescription = null;
+    @Column(name = "nodeSourceDescription", length = Integer.MAX_VALUE)
+    @Lob
+    private BigString nodeSourceDescription = null;
+
+    @Column(name = "nodeSourceProvider")
+    private String nodeSourceProvider = null;
 
     /**
      * ProActive Empty constructor.
@@ -77,11 +91,23 @@ public class RMNodeSourceEvent extends RMEvent {
 
     /**
      * Creates an RMNodesourceEvent object.
+     * Used to represent the resource manager state @see RMInitialState.
      */
-    public RMNodeSourceEvent(NodeSource source, RMEventType type) {
+    public RMNodeSourceEvent(NodeSource source) {
         this.nodeSourceName = source.getName();
-        this.nodeSourceDescription = source.getDescription();
-        this.type = type;
+        this.nodeSourceDescription = new BigString(source.getDescription());
+        this.nodeSourceProvider = source.getProvider().getName();
+    }
+
+    /**
+     * Creates an RMNodesourceEvent object.
+     */
+    public RMNodeSourceEvent(NodeSource source, RMEventType type, String initiator) {
+        super(type);
+        this.initiator = initiator;
+        this.nodeSourceName = source.getName();
+        this.nodeSourceDescription = new BigString(source.getDescription());
+        this.nodeSourceProvider = source.getProvider().getName();
     }
 
     /**
@@ -92,8 +118,7 @@ public class RMNodeSourceEvent extends RMEvent {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof RMNodeSourceEvent) {
-            return ((RMNodeSourceEvent) obj).nodeSourceName.equals(this.nodeSourceName) &&
-                ((RMNodeSourceEvent) obj).nodeSourceDescription.equals(this.nodeSourceDescription);
+            return ((RMNodeSourceEvent) obj).nodeSourceName.equals(this.nodeSourceName);
         }
         return false;
     }
@@ -111,7 +136,15 @@ public class RMNodeSourceEvent extends RMEvent {
      * @return node source type of the event.
      */
     public String getSourceDescription() {
-        return this.nodeSourceDescription;
+        return this.nodeSourceDescription.getValue();
+    }
+
+    /**
+     * Returns the name of the node source provider.
+     * @return the node source provider name.
+     */
+    public String getNodeSourceProvider() {
+        return nodeSourceProvider;
     }
 
     /**

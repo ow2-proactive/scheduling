@@ -38,8 +38,6 @@ package org.ow2.proactive.resourcemanager.rmnode;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -109,9 +107,6 @@ public class RMNodeImpl implements RMNode, Serializable {
 
     /** State of the node */
     private NodeState state;
-
-    /** Time of the last status update */
-    private Date stateChangeTime = Calendar.getInstance().getTime();
 
     private Client provider;
 
@@ -215,7 +210,6 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.BUSY;
-        this.stateChangeTime = Calendar.getInstance().getTime();
         this.owner = owner;
     }
 
@@ -228,7 +222,6 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.FREE;
-        this.stateChangeTime = Calendar.getInstance().getTime();
         this.owner = null;
     }
 
@@ -237,7 +230,6 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public void setDown() {
         this.state = NodeState.DOWN;
-        this.stateChangeTime = Calendar.getInstance().getTime();
     }
 
     /**
@@ -249,7 +241,6 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.TO_BE_RELEASED;
-        this.stateChangeTime = Calendar.getInstance().getTime();
     }
 
     /**
@@ -404,13 +395,6 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public NodeState getState() {
         return this.state;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Date getStateChangeTime() {
-        return this.stateChangeTime;
     }
 
     /**

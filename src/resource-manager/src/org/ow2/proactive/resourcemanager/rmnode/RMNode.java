@@ -209,12 +209,6 @@ public interface RMNode extends Comparable<RMNode> {
     public NodeState getState();
 
     /**
-     * Gets the time when state changed the last time
-     * @return the time when state changed the last time
-     */
-    public Date getStateChangeTime();
-
-    /**
      * Gets the provider of the node (who created and deployed it)
      * @return the node provider
      */
