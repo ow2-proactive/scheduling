@@ -818,6 +818,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //get the internal task
         InternalTask descriptor = job.getIHMTasks().get(taskId);
 
+        //as the task is started in its own thread, finalize starts if the task as returned before its finalization
+        if (descriptor.getStatus() != TaskStatus.RUNNING) {
+            ((SchedulerCore) PAActiveObject.getStubOnThis()).terminate(taskId);
+            return;
+        }
+
         // job might have already been removed if job has failed...
         Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
         if (runningTasks != null) {
