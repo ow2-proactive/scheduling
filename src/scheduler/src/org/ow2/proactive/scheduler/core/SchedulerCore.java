@@ -2262,6 +2262,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         }
 
         //------------------------------------------------------------------------
+        //----------------------    Sort each list by id   -----------------------
+        //------------------------------------------------------------------------
+
+        Comparator<InternalJob> jobComparator = new Comparator<InternalJob>() {
+            public int compare(InternalJob o1, InternalJob o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        };
+        Collections.sort(pendingJobs, jobComparator);
+        Collections.sort(runningJobs, jobComparator);
+        Collections.sort(finishedJobs, jobComparator);
+
+        //------------------------------------------------------------------------
         //-----------------    Recover the scheduler front-end   -----------------
         //------------------------------------------------------------------------
         logger.debug("Recover the scheduler front-end");
