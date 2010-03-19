@@ -99,7 +99,7 @@ public final class ExecutorServiceTasksInvocator {
         int i = 0;
         Iterator<? extends CallableWithTimeoutAction<T>> iter = tasks.iterator();
         while (iter.hasNext()) {
-            //results list and iterator element should be in the same order (specified by java)
+            //results list and iterator element should be in the same order (specified by jdk5.0)
             CallableWithTimeoutAction<T> callable = iter.next();
             if (results.get(i++).isCancelled()) {
                 //if task has been canceled, call timeout on it

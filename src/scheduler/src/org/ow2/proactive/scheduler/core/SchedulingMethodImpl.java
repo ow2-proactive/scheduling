@@ -39,9 +39,11 @@ package org.ow2.proactive.scheduler.core;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -63,6 +65,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
@@ -455,11 +458,24 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 logger_dev.info("Starting deployment of task '" + task.getName() + "' for job '" +
                     job.getId() + "'");
 
-                //enqueue next instruction, and execute whole process in the threadpool controller
-                TimedDoTaskAction tdta = new TimedDoTaskAction(this, job, task, launcher, node,
-                    (SchedulerCore) PAActiveObject.getStubOnThis(), core.resourceManager, params);
-                ExecutorServiceTasksInvocator.invokeAllWithTimeoutAction(threadPool, Collections
-                        .singletonList(tdta), DOTASK_ACTION_TIMEOUT);
+                //enqueue next instruction, and execute whole process in the thread-pool controller
+                TimedDoTaskAction tdta = new TimedDoTaskAction(task, launcher, (SchedulerCore) PAActiveObject
+                        .getStubOnThis(), params);
+                List<Future<TaskResult>> futurResults = ExecutorServiceTasksInvocator
+                        .invokeAllWithTimeoutAction(threadPool, Collections.singletonList(tdta),
+                                DOTASK_ACTION_TIMEOUT);
+
+                //wait for only one result
+                Future<TaskResult> future = futurResults.get(0);
+                if (future.isDone()) {
+                    //if task has finished
+                    ((JobResultImpl) job.getJobResult()).storeFuturResult(task.getName(), future.get());
+                    //mark the task and job (if needed) as started and send events
+                    finalizeStarting(job, task, node);
+                } else {
+                    //if there was a problem, free nodeSet for multi-nodes task
+                    core.resourceManager.freeNodes(nodes);
+                }
 
             } catch (Exception t) {
                 try {

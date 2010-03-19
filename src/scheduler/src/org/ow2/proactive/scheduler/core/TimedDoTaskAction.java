@@ -36,11 +36,7 @@ package org.ow2.proactive.scheduler.core;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.job.JobResultImpl;
-import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.threading.CallableWithTimeoutAction;
@@ -52,78 +48,60 @@ import org.ow2.proactive.threading.CallableWithTimeoutAction;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
+public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> {
 
     private AtomicBoolean timeoutCalled = new AtomicBoolean(false);
-    private SchedulingMethodImpl schedulingMethod;
-    private InternalJob job;
     private InternalTask task;
     private TaskLauncher launcher;
-    private Node node;
     private SchedulerCore coreStub;
-    private ResourceManagerProxy resourceManager;
     private TaskResult[] parameters;
 
     /**
      * Create a new instance of TimedDoTaskAction
      *
-     * @param job the internal job
      * @param task the internal task
      * @param launcher the launcher of the task
-     * @param node the main node on which the task will be started
      * @param coreStub the stub on SchedulerCore
      * @param parameters the parameters to be given to the task
      */
-    public TimedDoTaskAction(SchedulingMethodImpl smi, InternalJob job, InternalTask task,
-            TaskLauncher launcher, Node node, SchedulerCore coreStub, ResourceManagerProxy resourceManager,
+    public TimedDoTaskAction(InternalTask task, TaskLauncher launcher, SchedulerCore coreStub,
             TaskResult[] parameters) {
-        this.schedulingMethod = smi;
-        this.job = job;
         this.task = task;
         this.launcher = launcher;
-        this.node = node;
         this.coreStub = coreStub;
-        this.resourceManager = resourceManager;
         this.parameters = parameters;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Void call() throws Exception {
+    public TaskResult call() throws Exception {
         try {
             //if a task has been launched
             if (launcher != null) {
-
+                //try launch the task
                 TaskResult tr = launcher.doTask(coreStub, task.getExecutableContainer(), parameters);
-
+                //check if timeout occurs
                 if (timeoutCalled.get()) {
-                    launcher.terminate();
-                    freenodes();
+                    //return null if timeout occurs (task may have to be restarted later)
+                    return null;
                 } else {
-                    ((JobResultImpl) job.getJobResult()).storeFuturResult(task.getName(), tr);
-                    //mark the task and job (if needed) as started and send events
-                    schedulingMethod.finalizeStarting(job, task, node);
+                    //return task result if everything was OK
+                    return tr;
                 }
+            } else {
+                //return null if launcher was null (should never append)
+                return null;
             }
         } catch (Exception e) {
-            freenodes();
-        }
-        //results is not needed
-        return null;
-    }
-
-    private void freenodes() {
-        try {
-            //launcher node
-            resourceManager.freeNode(node);
-            //multi nodes task
-            resourceManager.freeNodes(task.getExecutableContainer().getNodes());
-        } catch (Throwable ni) {
-            //miam miam
+            //return null if something wrong occurs during task deployment
+            return null;
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void timeoutAction() {
         timeoutCalled.set(true);
     }
