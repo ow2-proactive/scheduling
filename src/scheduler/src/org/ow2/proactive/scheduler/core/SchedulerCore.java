@@ -419,7 +419,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                 runningJobs.size() + ")");
                             pingDeployedNodes();
                         }
-                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
+                        logger_dev.info("", e);
                     }
                 }
             }
@@ -925,8 +926,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             InternalJob job = runningJobs.get(i);
 
             for (InternalTask td : job.getITasks()) {
-                if ((td.getStatus() == TaskStatus.RUNNING) &&
+                if (td != null && (td.getStatus() == TaskStatus.RUNNING) &&
                     !PAActiveObject.pingActiveObject(td.getExecuterInformations().getLauncher())) {
+                    //check if the task has not been terminated while pinging
+                    if (td.getStatus() != TaskStatus.RUNNING) {
+                        continue;
+                    }
                     logger_dev.info("Node failed on job '" + job.getId() + "', task '" + td.getId() + "'");
 
                     try {
@@ -1329,14 +1334,16 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {
                 DatabaseManager.getInstance().unload(res);
             }
-            for (TaskDescriptor td : currentTD.getParents()) {
-                if (td.getChildrenCount() == 0) {
-                    try {
-                        DatabaseManager.getInstance().unload(
-                                job.getJobResult().getResult(td.getId().getReadableName()));
-                    } catch (RuntimeException e) {
-                        //should never append
-                        logger_dev.error("", e);
+            if (currentTD != null) {
+                for (TaskDescriptor td : currentTD.getParents()) {
+                    if (td.getChildrenCount() == 0) {
+                        try {
+                            DatabaseManager.getInstance().unload(
+                                    job.getJobResult().getResult(td.getId().getReadableName()));
+                        } catch (RuntimeException e) {
+                            //should never append
+                            logger_dev.error("", e);
+                        }
                     }
                 }
             }
