@@ -54,14 +54,27 @@ public class Application implements IApplication {
 
     public Object start(IApplicationContext context) throws Exception {
 
-        Display display = PlatformUI.createDisplay();
-        Location location = Platform.getInstanceLocation();
-
-        location.release();
-        location.setURL(new URL("file:" + System.getProperty("user.home") +
-            "/.ProActive_ResourceManager/workspace/"), true);
+        // Customize the platform instance location
+        final Location instanceLoc = Platform.getInstanceLocation();
+        URL customLocURL = null;
         try {
-            int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
+            customLocURL = new URL("file:" + System.getProperty("user.home") +
+                "/.ProActive_ResourceManager/workspace/");
+            instanceLoc.set(customLocURL, false);
+        } catch (Exception e) {
+            if (e instanceof IllegalStateException) {
+                System.err.println("Unable to set the platform instance location to " + customLocURL);
+                System.err.println("The current location is " + instanceLoc.getURL());
+                System.err.println("Be sure that the program arguments contains -data @noDefault");
+            }
+            e.printStackTrace();
+        }
+
+        final Display display = PlatformUI.createDisplay();
+
+        try {
+            final int returnCode = PlatformUI.createAndRunWorkbench(display,
+                    new ApplicationWorkbenchAdvisor());
             if (returnCode == PlatformUI.RETURN_RESTART) {
                 return IApplication.EXIT_RESTART;
             }
