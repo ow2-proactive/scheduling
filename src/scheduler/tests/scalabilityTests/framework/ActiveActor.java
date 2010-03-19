@@ -48,6 +48,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
+
 /**
  * This is an Actor with an active-object-like behaviour.
  *
@@ -55,74 +56,74 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
  *
  */
 @ActiveObject
-public class ActiveActor<T,V> extends Actor<T,V> implements InitActive {
+public class ActiveActor<T, V> extends Actor<T, V> implements InitActive {
 
-	public ActiveActor() {
-		super();
-	}
+    public ActiveActor() {
+        super();
+    }
 
-	public ActiveActor(Action<T,V> action) {
-		super(action);
-	}
+    public ActiveActor(Action<T, V> action) {
+        super(action);
+    }
 
-	public ActiveActor(Action<T,V> action, T parameter) {
-		super(action,parameter);
-	}
+    public ActiveActor(Action<T, V> action, T parameter) {
+        super(action, parameter);
+    }
 
-	@Override
-	public void initActivity(Body arg0) {
-		// log4j (re)configuration
-		rebaseLogFiles();
-	}
+    @Override
+    public void initActivity(Body arg0) {
+        // log4j (re)configuration
+        rebaseLogFiles();
+    }
 
-	/**
-	 * Log4j configuration tweaking
-	 * This method will modify the file name of every FileAppender
-	 * 	by adding the hostname of the machine onto which it executes.
-	 * Because it cannot be done from the log4j-configuration file
-	 * 	we hard-code this configuration issue
-	 * @param logger2
-	 */
-	private void rebaseLogFiles() {
-		Enumeration<Logger> curLoggers = LogManager.getCurrentLoggers();
-		while(curLoggers.hasMoreElements()) {
-			Logger someLogger = curLoggers.nextElement();
-			Enumeration<Appender> appenders = someLogger.getAllAppenders();
-			while(appenders.hasMoreElements()) {
-				Appender app = appenders.nextElement();
-				if(app instanceof FileAppender) {
-					FileAppender fileApp = (FileAppender)app;
-					System.out.println("File appender, output file " + fileApp.getFile());
-					addHostToFilename(fileApp);
-				}
-			}
-		}
-	}
+    /**
+     * Log4j configuration tweaking
+     * This method will modify the file name of every FileAppender
+     * 	by adding the hostname of the machine onto which it executes.
+     * Because it cannot be done from the log4j-configuration file
+     * 	we hard-code this configuration issue
+     * @param logger2
+     */
+    private void rebaseLogFiles() {
+        Enumeration<Logger> curLoggers = LogManager.getCurrentLoggers();
+        while (curLoggers.hasMoreElements()) {
+            Logger someLogger = curLoggers.nextElement();
+            Enumeration<Appender> appenders = someLogger.getAllAppenders();
+            while (appenders.hasMoreElements()) {
+                Appender app = appenders.nextElement();
+                if (app instanceof FileAppender) {
+                    FileAppender fileApp = (FileAppender) app;
+                    System.out.println("File appender, output file " + fileApp.getFile());
+                    addHostToFilename(fileApp);
+                }
+            }
+        }
+    }
 
-	private void addHostToFilename(FileAppender fileApp) {
-		String hostname = ProActiveInet.getInstance().getHostname();
-		String fileName = fileApp.getFile();
-		File filePath = new File(fileName);
-		String hostFileName;
-		String name = filePath.getName();
-		String pathToFile = filePath.getParent();
-		int point = name.indexOf('.');
-		if(point == -1) {
-			hostFileName = fileName + "-" + hostname;
-		} else {
-			String extension = name.substring(point + 1);
-			String nameNoExtension = name.substring(0, point);
-			hostFileName = (pathToFile!=null ? pathToFile : "") + File.separator +
-				nameNoExtension + "-" + hostname + "." + extension;
-		}
-		System.out.println("New output file:" + hostFileName);
-		fileApp.setFile(hostFileName);
-		fileApp.activateOptions();
-	}
+    private void addHostToFilename(FileAppender fileApp) {
+        String hostname = ProActiveInet.getInstance().getHostname();
+        String fileName = fileApp.getFile();
+        File filePath = new File(fileName);
+        String hostFileName;
+        String name = filePath.getName();
+        String pathToFile = filePath.getParent();
+        int point = name.indexOf('.');
+        if (point == -1) {
+            hostFileName = fileName + "-" + hostname;
+        } else {
+            String extension = name.substring(point + 1);
+            String nameNoExtension = name.substring(0, point);
+            hostFileName = (pathToFile != null ? pathToFile : "") + File.separator + nameNoExtension + "-" +
+                hostname + "." + extension;
+        }
+        System.out.println("New output file:" + hostFileName);
+        fileApp.setFile(hostFileName);
+        fileApp.activateOptions();
+    }
 
-	public void cleanup() {
-		// destroy this active object
-		PAActiveObject.terminateActiveObject(true);
-	}
+    public void cleanup() {
+        // destroy this active object
+        PAActiveObject.terminateActiveObject(true);
+    }
 
 }

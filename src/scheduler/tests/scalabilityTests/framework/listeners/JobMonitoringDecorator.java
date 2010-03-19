@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
+
 /**
  * A decorator for {@link SchedulerEventListener}s, which provides
  * 	mechanisms for an outside entity to wait until a job is finished.
@@ -60,105 +61,105 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  *
  */
 @RemoteObject
-public abstract class JobMonitoringDecorator implements SchedulerEventListener{
+public abstract class JobMonitoringDecorator implements SchedulerEventListener {
 
-	private SchedulerEventListener decorated;
-	// monitored jobs
-	protected Map<JobId,ConnectorJobInfo> mapOfJobs = Collections.synchronizedMap(
-			new HashMap<JobId, ConnectorJobInfo>());
+    private SchedulerEventListener decorated;
+    // monitored jobs
+    protected Map<JobId, ConnectorJobInfo> mapOfJobs = Collections
+            .synchronizedMap(new HashMap<JobId, ConnectorJobInfo>());
 
-	private class ConnectorJobInfo {
-		boolean jobFinished;
-		final Object lock;
+    private class ConnectorJobInfo {
+        boolean jobFinished;
+        final Object lock;
 
-		public ConnectorJobInfo() {
-			jobFinished = false;
-			lock = new Object();
-		}
-	}
+        public ConnectorJobInfo() {
+            jobFinished = false;
+            lock = new Object();
+        }
+    }
 
-	public JobMonitoringDecorator() {
-	}
+    public JobMonitoringDecorator() {
+    }
 
-	public JobMonitoringDecorator(SchedulerEventListener listener) {
-		this.decorated = listener;
-	}
+    public JobMonitoringDecorator(SchedulerEventListener listener) {
+        this.decorated = listener;
+    }
 
-	@Override
-	public void jobSubmittedEvent(JobState jobInfo) {
-		this.decorated.jobSubmittedEvent(jobInfo);
-	}
+    @Override
+    public void jobSubmittedEvent(JobState jobInfo) {
+        this.decorated.jobSubmittedEvent(jobInfo);
+    }
 
-	// decorated interface delegation
-	@Override
-	public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
-		this.decorated.schedulerStateUpdatedEvent(eventType);
-	}
+    // decorated interface delegation
+    @Override
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+        this.decorated.schedulerStateUpdatedEvent(eventType);
+    }
 
-	@Override
-	public void taskStateUpdatedEvent(NotificationData<TaskInfo> taskNotification) {
-		this.decorated.taskStateUpdatedEvent(taskNotification);
-	}
+    @Override
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> taskNotification) {
+        this.decorated.taskStateUpdatedEvent(taskNotification);
+    }
 
-	@Override
-	public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
-		this.decorated.usersUpdatedEvent(notification);
-	}
+    @Override
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
+        this.decorated.usersUpdatedEvent(notification);
+    }
 
-	// this is a bit different
-	@Override
-	public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
-		// take care of this first; decorator's impl could do freaky shiet like call system.exit!
-		if(jobNotification.getEventType().equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED)
-				&& this.mapOfJobs.containsKey(jobNotification.getData().getJobId())) {
-			jobRunningToFinishedEvent(jobNotification);
-		}
-		decorated.jobStateUpdatedEvent(jobNotification);
-	}
+    // this is a bit different
+    @Override
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
+        // take care of this first; decorator's impl could do freaky shiet like call system.exit!
+        if (jobNotification.getEventType().equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED) &&
+            this.mapOfJobs.containsKey(jobNotification.getData().getJobId())) {
+            jobRunningToFinishedEvent(jobNotification);
+        }
+        decorated.jobStateUpdatedEvent(jobNotification);
+    }
 
-	protected void jobRunningToFinishedEvent(NotificationData<JobInfo> event) {
-		ConnectorJobInfo job = mapOfJobs.get(event.getData().getJobId());
-		// are we monitoring this job?
-		if( job == null)
-			return;
+    protected void jobRunningToFinishedEvent(NotificationData<JobInfo> event) {
+        ConnectorJobInfo job = mapOfJobs.get(event.getData().getJobId());
+        // are we monitoring this job?
+        if (job == null)
+            return;
 
-		synchronized (job.lock) {
-			job.jobFinished = true;
-			job.lock.notifyAll();
-		}
-	}
+        synchronized (job.lock) {
+            job.jobFinished = true;
+            job.lock.notifyAll();
+        }
+    }
 
-	// the services that this decorator actually provides
-	public void startMonitoring(JobId id) {
-		if(mapOfJobs.containsKey(id))
-			throw new IllegalArgumentException("The listener already monitors the execution of job " + id);
-		mapOfJobs.put(id, new ConnectorJobInfo());
-	}
+    // the services that this decorator actually provides
+    public void startMonitoring(JobId id) {
+        if (mapOfJobs.containsKey(id))
+            throw new IllegalArgumentException("The listener already monitors the execution of job " + id);
+        mapOfJobs.put(id, new ConnectorJobInfo());
+    }
 
-	public void stopMonitoring(JobId id) {
-		mapOfJobs.remove(id);
-	}
+    public void stopMonitoring(JobId id) {
+        mapOfJobs.remove(id);
+    }
 
-	public boolean jobFinished(JobId jobId) {
-		ConnectorJobInfo info = mapOfJobs.get(jobId);
-		if(info == null)
-			throw new IllegalArgumentException("The listener does not monitor the execution of job " + jobId );
-		boolean ret;
-		synchronized (info.lock) {
-			ret = info.jobFinished;
-		}
-		return ret;
-	}
+    public boolean jobFinished(JobId jobId) {
+        ConnectorJobInfo info = mapOfJobs.get(jobId);
+        if (info == null)
+            throw new IllegalArgumentException("The listener does not monitor the execution of job " + jobId);
+        boolean ret;
+        synchronized (info.lock) {
+            ret = info.jobFinished;
+        }
+        return ret;
+    }
 
-	public void waitJobFinished(JobId id) throws InterruptedException {
-		ConnectorJobInfo info = mapOfJobs.get(id);
-		if(info == null)
-			throw new IllegalArgumentException("The listener does not monitor the execution of job " + id );
-		synchronized (info.lock) {
-			while(!info.jobFinished){
-				info.lock.wait();
-			}
-		}
-	}
+    public void waitJobFinished(JobId id) throws InterruptedException {
+        ConnectorJobInfo info = mapOfJobs.get(id);
+        if (info == null)
+            throw new IllegalArgumentException("The listener does not monitor the execution of job " + id);
+        synchronized (info.lock) {
+            while (!info.jobFinished) {
+                info.lock.wait();
+            }
+        }
+    }
 
 }

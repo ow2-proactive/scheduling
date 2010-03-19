@@ -51,6 +51,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
+
 /**
  * This is a (simple) scheduler listener.
  * It listens to all the Scheduler events and just prints them to the logfile.
@@ -59,39 +60,38 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  *
  */
 @RemoteObject
-public class SimpleSchedulerListener implements SchedulerEventListener, Serializable{
+public class SimpleSchedulerListener implements SchedulerEventListener, Serializable {
 
-	protected static final Logger logger = Logger.getLogger(SimpleSchedulerListener.class);
+    protected static final Logger logger = Logger.getLogger(SimpleSchedulerListener.class);
 
-	public SimpleSchedulerListener(){
-	}
+    public SimpleSchedulerListener() {
+    }
 
-	@Override
-	public void jobSubmittedEvent(JobState jobInfo) {
-		logger.info("New job + " + jobInfo.getName() + " + has been started by " + jobInfo.getOwner());
-	}
+    @Override
+    public void jobSubmittedEvent(JobState jobInfo) {
+        logger.info("New job + " + jobInfo.getName() + " + has been started by " + jobInfo.getOwner());
+    }
 
-	@Override
-	public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
-		logger.info("Job " + jobNotification.getData().getJobId() +
-				 " has changed its state to " + jobNotification.getEventType());
-	}
+    @Override
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
+        logger.info("Job " + jobNotification.getData().getJobId() + " has changed its state to " +
+            jobNotification.getEventType());
+    }
 
-	@Override
-	public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
-		logger.info("Scheduler state changed to:" + eventType);
-	}
+    @Override
+    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+        logger.info("Scheduler state changed to:" + eventType);
+    }
 
-	@Override
-	public void taskStateUpdatedEvent(NotificationData<TaskInfo> taskNotification) {
-		logger.info("Task " + taskNotification.getData().getName() +
-				 " has changed its state to " + taskNotification.getEventType());
-	}
+    @Override
+    public void taskStateUpdatedEvent(NotificationData<TaskInfo> taskNotification) {
+        logger.info("Task " + taskNotification.getData().getName() + " has changed its state to " +
+            taskNotification.getEventType());
+    }
 
-	@Override
-	public void usersUpdatedEvent(
-			NotificationData<UserIdentification> notification) {
-		logger.info("User info changed for:" + notification.getData().getUsername());
-	}
+    @Override
+    public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
+        logger.info("User info changed for:" + notification.getData().getUsername());
+    }
 
 }

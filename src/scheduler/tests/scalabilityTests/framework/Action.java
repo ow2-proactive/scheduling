@@ -42,7 +42,7 @@ package scalabilityTests.framework;
  * @author fabratu
  *
  */
-public interface Action<Arg,Res> {
+public interface Action<Arg, Res> {
 
-	public Res execute(Arg arg) throws Exception;
+    public Res execute(Arg arg) throws Exception;
 }

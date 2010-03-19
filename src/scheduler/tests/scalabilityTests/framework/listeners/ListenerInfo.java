@@ -43,28 +43,27 @@ package scalabilityTests.framework.listeners;
  */
 public class ListenerInfo {
 
-	private final String listenerClazzName;
-	private final boolean getInitialState;
-	private final boolean myEventsOnly;
+    private final String listenerClazzName;
+    private final boolean getInitialState;
+    private final boolean myEventsOnly;
 
-	public ListenerInfo(String listenerClazz, boolean getInitialState,
-			boolean myEventsOnly) {
-		super();
-		this.listenerClazzName = listenerClazz;
-		this.getInitialState = getInitialState;
-		this.myEventsOnly = myEventsOnly;
-	}
+    public ListenerInfo(String listenerClazz, boolean getInitialState, boolean myEventsOnly) {
+        super();
+        this.listenerClazzName = listenerClazz;
+        this.getInitialState = getInitialState;
+        this.myEventsOnly = myEventsOnly;
+    }
 
-	public String getListenerClazzName() {
-		return listenerClazzName;
-	}
+    public String getListenerClazzName() {
+        return listenerClazzName;
+    }
 
-	public boolean downloadInitialState() {
-		return getInitialState;
-	}
+    public boolean downloadInitialState() {
+        return getInitialState;
+    }
 
-	public boolean getMyEventsOnly() {
-		return myEventsOnly;
-	}
+    public boolean getMyEventsOnly() {
+        return myEventsOnly;
+    }
 
 }

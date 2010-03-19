@@ -37,6 +37,7 @@ package scalabilityTests.framework;
 
 import org.apache.log4j.Logger;
 
+
 /**
  *
  * An Actor is a participant in the test scenario.
@@ -49,57 +50,57 @@ import org.apache.log4j.Logger;
  * @author fabratu
  *
  */
-public abstract class Actor<T,V> {
+public abstract class Actor<T, V> {
 
-	protected static final Logger logger = Logger.getLogger(ActiveActor.class);
-	protected Action<T,V> defaultAction;
-	protected T defaultParameter;
-	protected V result;
+    protected static final Logger logger = Logger.getLogger(ActiveActor.class);
+    protected Action<T, V> defaultAction;
+    protected T defaultParameter;
+    protected V result;
 
-	public Actor() {
-		this.defaultAction = null;
-		this.defaultParameter = null;
-	}
+    public Actor() {
+        this.defaultAction = null;
+        this.defaultParameter = null;
+    }
 
-	public Actor(Action<T,V> action) {
-		this.defaultAction = action;
-		this.defaultParameter = null;
-	}
+    public Actor(Action<T, V> action) {
+        this.defaultAction = action;
+        this.defaultParameter = null;
+    }
 
-	public Actor(Action<T,V> action, T parameter) {
-		this.defaultAction = action;
-		this.defaultParameter = parameter;
-	}
+    public Actor(Action<T, V> action, T parameter) {
+        this.defaultAction = action;
+        this.defaultParameter = parameter;
+    }
 
-	public void doAction() {
-		if(this.defaultAction == null)
-			throw new IllegalStateException("There is no default action attached to this Actor");
-		if(this.defaultParameter == null)
-			throw new IllegalStateException("There is no default parameter attached to this Actor");
-		doAction(this.defaultAction, this.defaultParameter);
-	}
+    public void doAction() {
+        if (this.defaultAction == null)
+            throw new IllegalStateException("There is no default action attached to this Actor");
+        if (this.defaultParameter == null)
+            throw new IllegalStateException("There is no default parameter attached to this Actor");
+        doAction(this.defaultAction, this.defaultParameter);
+    }
 
-	public void doAction(T parameter) {
-		if(this.defaultAction == null)
-			throw new IllegalStateException("There is no default action attached to this Actor");
-		doAction(this.defaultAction, parameter);
-	}
+    public void doAction(T parameter) {
+        if (this.defaultAction == null)
+            throw new IllegalStateException("There is no default action attached to this Actor");
+        doAction(this.defaultAction, parameter);
+    }
 
-	public void doAction(Action<T,V> action) {
-		if(this.defaultParameter == null)
-			throw new IllegalStateException("There is no default parameter attached to this Actor");
-		doAction(action, this.defaultParameter);
-	}
+    public void doAction(Action<T, V> action) {
+        if (this.defaultParameter == null)
+            throw new IllegalStateException("There is no default parameter attached to this Actor");
+        doAction(action, this.defaultParameter);
+    }
 
-	public void doAction(Action<T,V> action, T parameter) {
-		try {
-			logger.trace("Executing the Action " + action + " on the parameter " + parameter);
-			// store the result for future reference
-			this.result = action.execute(parameter);
-		} catch (Exception e) {
-			logger.warn("Error while executing the action, reason:" + e.getMessage());
-			logger.debug("Stacktrace iz:",e);
-			this.result = null;
-		}
-	}
+    public void doAction(Action<T, V> action, T parameter) {
+        try {
+            logger.trace("Executing the Action " + action + " on the parameter " + parameter);
+            // store the result for future reference
+            this.result = action.execute(parameter);
+        } catch (Exception e) {
+            logger.warn("Error while executing the action, reason:" + e.getMessage());
+            logger.debug("Stacktrace iz:", e);
+            this.result = null;
+        }
+    }
 }

@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 
 import scalabilityTests.framework.AbstractSchedulerUser;
 
+
 /**
  * This decorator also gets the job result for the jobs it monitors
  *
@@ -54,36 +55,36 @@ import scalabilityTests.framework.AbstractSchedulerUser;
 @RemoteObject
 public class JobResultDecorator extends JobMonitoringDecorator {
 
-	private volatile AbstractSchedulerUser<JobId> daddy;
-	protected static final Logger logger = Logger.getLogger(JobResultDecorator.class);
+    private volatile AbstractSchedulerUser<JobId> daddy;
+    protected static final Logger logger = Logger.getLogger(JobResultDecorator.class);
 
-	public JobResultDecorator() {
-	}
+    public JobResultDecorator() {
+    }
 
-	public JobResultDecorator(SchedulerEventListener listener,AbstractSchedulerUser<JobId> daddy) {
-		super(listener);
-		this.daddy = daddy;
-	}
+    public JobResultDecorator(SchedulerEventListener listener, AbstractSchedulerUser<JobId> daddy) {
+        super(listener);
+        this.daddy = daddy;
+    }
 
-	@Override
-	protected void jobRunningToFinishedEvent(NotificationData<JobInfo> event) {
-		super.jobRunningToFinishedEvent(event);
+    @Override
+    protected void jobRunningToFinishedEvent(NotificationData<JobInfo> event) {
+        super.jobRunningToFinishedEvent(event);
 
-		JobId jobId = event.getData().getJobId();
-		if(!this.mapOfJobs.containsKey(jobId)){
-			logger.trace("We are not waiting for the result of job ID " + jobId);
-			return;
-		}
+        JobId jobId = event.getData().getJobId();
+        if (!this.mapOfJobs.containsKey(jobId)) {
+            logger.trace("We are not waiting for the result of job ID " + jobId);
+            return;
+        }
 
-		logger.trace("Trying to get the job result for job " + jobId);
-		try {
-			logger.info( "The result for job with ID " + jobId + " is " + this.daddy.getJobResult(jobId));
-		} catch (SchedulerException e) {
-			logger.error("Cannot get the job result for job with id " + jobId + " from the scheduler", e);
-		}
+        logger.trace("Trying to get the job result for job " + jobId);
+        try {
+            logger.info("The result for job with ID " + jobId + " is " + this.daddy.getJobResult(jobId));
+        } catch (SchedulerException e) {
+            logger.error("Cannot get the job result for job with id " + jobId + " from the scheduler", e);
+        }
 
-		// we have the result => stop monitoring this job
-		this.stopMonitoring(jobId);
-	}
+        // we have the result => stop monitoring this job
+        this.stopMonitoring(jobId);
+    }
 
 }

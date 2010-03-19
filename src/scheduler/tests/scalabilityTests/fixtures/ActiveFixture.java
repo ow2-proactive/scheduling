@@ -53,6 +53,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import scalabilityTests.framework.Action;
 import scalabilityTests.framework.ActiveActor;
 
+
 /**
  * This fixture sets up a GCM infrastructure
  * 	onto which a set of {@link ActiveActor}s
@@ -62,85 +63,89 @@ import scalabilityTests.framework.ActiveActor;
  *
  */
 public class ActiveFixture {
-	/** The GCM descriptor which will be used in order to deploy the Nodes */
-	private final File gcmDeployment;
-	/** The Virtual Node which will supply the nodes used for the scenario execution */
-	private final String virtualNodeName;
-	/** ProActive runtime representations of the deployment entities*/
-	private GCMVirtualNode virtualNode;
-	private GCMApplication gcmad;
-	protected List<Node> nodes = null;
-	/** List of Active Actors which are currently deployed on the infrastructure */
-	protected final List<ActiveActor> knownActors = new LinkedList<ActiveActor>();
+    /** The GCM descriptor which will be used in order to deploy the Nodes */
+    private final File gcmDeployment;
+    /** The Virtual Node which will supply the nodes used for the scenario execution */
+    private final String virtualNodeName;
+    /** ProActive runtime representations of the deployment entities*/
+    private GCMVirtualNode virtualNode;
+    private GCMApplication gcmad;
+    protected List<Node> nodes = null;
+    /** List of Active Actors which are currently deployed on the infrastructure */
+    protected final List<ActiveActor> knownActors = new LinkedList<ActiveActor>();
 
-	private static final Logger logger = Logger.getLogger(ActiveFixture.class);
+    private static final Logger logger = Logger.getLogger(ActiveFixture.class);
 
-	public ActiveFixture(String gcmDeploymentPath, String vnName) throws IllegalArgumentException {
-		File gcmDeployment = new File(gcmDeploymentPath);
+    public ActiveFixture(String gcmDeploymentPath, String vnName) throws IllegalArgumentException {
+        File gcmDeployment = new File(gcmDeploymentPath);
 
-		// routine checks of the path
-		if(!gcmDeployment.exists())
-			throw new IllegalArgumentException("File " + gcmDeploymentPath + " does not exist");
-		if(!gcmDeployment.isFile())
-			throw new IllegalArgumentException("The path " + gcmDeploymentPath + " does not point to a file");
-		if(!gcmDeployment.canRead())
-			throw new IllegalArgumentException("The file " + gcmDeploymentPath + " cannot be read - maybe check your permissions?");
+        // routine checks of the path
+        if (!gcmDeployment.exists())
+            throw new IllegalArgumentException("File " + gcmDeploymentPath + " does not exist");
+        if (!gcmDeployment.isFile())
+            throw new IllegalArgumentException("The path " + gcmDeploymentPath + " does not point to a file");
+        if (!gcmDeployment.canRead())
+            throw new IllegalArgumentException("The file " + gcmDeploymentPath +
+                " cannot be read - maybe check your permissions?");
 
-		this.gcmDeployment = gcmDeployment;
-		this.virtualNodeName = vnName;
-	}
+        this.gcmDeployment = gcmDeployment;
+        this.virtualNodeName = vnName;
+    }
 
-
-	public List<Node> loadInfrastructure() throws ProActiveException {
-		logger.trace("Deploying the GCM infrastructure...");
-		this.gcmad = PAGCMDeployment.loadApplicationDescriptor(this.gcmDeployment);
-		this.gcmad.startDeployment();
-		this.virtualNode = gcmad.getVirtualNode(this.virtualNodeName);
-		if (this.virtualNode == null)
+    public List<Node> loadInfrastructure() throws ProActiveException {
+        logger.trace("Deploying the GCM infrastructure...");
+        this.gcmad = PAGCMDeployment.loadApplicationDescriptor(this.gcmDeployment);
+        this.gcmad.startDeployment();
+        this.virtualNode = gcmad.getVirtualNode(this.virtualNodeName);
+        if (this.virtualNode == null)
             throw new ProActiveException("Failed to acquire " + this.virtualNodeName + " virtual node");
-		logger.trace("Waiting for the nodes of the virtual node " + this.virtualNodeName + " to become ready");
-		this.virtualNode.waitReady();
-		this.nodes = this.virtualNode.getCurrentNodes();
-		logger.trace("Done!");
-		return this.nodes;
-	}
+        logger
+                .trace("Waiting for the nodes of the virtual node " + this.virtualNodeName +
+                    " to become ready");
+        this.virtualNode.waitReady();
+        this.nodes = this.virtualNode.getCurrentNodes();
+        logger.trace("Done!");
+        return this.nodes;
+    }
 
-	/**
-	 * This method will execute the same given action
-	 * on all the nodes previously loaded
-	 * @throws NodeException
-	 * @throws ActiveObjectCreationException
-	 */
-	public <T,V> void executeSameActionSameParameter(Action<T,V> action, T parameter) throws ActiveObjectCreationException, NodeException {
-		if(this.nodes == null)
-			throw new IllegalStateException("Invalid usage of this object; loadInfrastructure() needs to be called first");
-		logger.trace("# of available nodes: " + this.nodes.size());
-		logger.trace("Deploying the actors...");
-		List<ActiveActor<T,V>> actors = new LinkedList<ActiveActor<T,V>>();
-		for(Node node : nodes) {
-			// TODO templated active objects? how?
-			ActiveActor<T,V> actor = PAActiveObject.newActive(ActiveActor.class,
-					new Object[] {action, parameter} , node);
-			actors.add(actor);
-		}
-		this.knownActors.addAll(actors);
+    /**
+     * This method will execute the same given action
+     * on all the nodes previously loaded
+     * @throws NodeException
+     * @throws ActiveObjectCreationException
+     */
+    public <T, V> void executeSameActionSameParameter(Action<T, V> action, T parameter)
+            throws ActiveObjectCreationException, NodeException {
+        if (this.nodes == null)
+            throw new IllegalStateException(
+                "Invalid usage of this object; loadInfrastructure() needs to be called first");
+        logger.trace("# of available nodes: " + this.nodes.size());
+        logger.trace("Deploying the actors...");
+        List<ActiveActor<T, V>> actors = new LinkedList<ActiveActor<T, V>>();
+        for (Node node : nodes) {
+            // TODO templated active objects? how?
+            ActiveActor<T, V> actor = PAActiveObject.newActive(ActiveActor.class, new Object[] { action,
+                    parameter }, node);
+            actors.add(actor);
+        }
+        this.knownActors.addAll(actors);
 
-		logger.trace("Executing the same action " + action + " on the same parameter " + parameter);
-		for(ActiveActor<T,V> actor : actors) {
-			actor.doAction();
-		}
-		logger.trace("Done!");
-	}
+        logger.trace("Executing the same action " + action + " on the same parameter " + parameter);
+        for (ActiveActor<T, V> actor : actors) {
+            actor.doAction();
+        }
+        logger.trace("Done!");
+    }
 
-	public void cleanup() {
-		// kill all the known Actors
-		for(ActiveActor actor : this.knownActors) {
-			actor.cleanup();
-		}
-		// "undeploy" the infrastructure
-		this.gcmad.kill();
-		this.nodes = null;
-		PALifeCycle.exitSuccess();
-	}
+    public void cleanup() {
+        // kill all the known Actors
+        for (ActiveActor actor : this.knownActors) {
+            actor.cleanup();
+        }
+        // "undeploy" the infrastructure
+        this.gcmad.kill();
+        this.nodes = null;
+        PALifeCycle.exitSuccess();
+    }
 
 }

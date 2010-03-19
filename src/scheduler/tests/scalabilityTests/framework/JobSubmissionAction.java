@@ -44,6 +44,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 
+
 /**
  *
  * The Action of submitting a job to the Scheduler
@@ -51,39 +52,40 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
  * @author fabratu
  *
  */
-public class JobSubmissionAction implements Action<UserSchedulerInterface,JobId>,Serializable{
+public class JobSubmissionAction implements Action<UserSchedulerInterface, JobId>, Serializable {
 
-	private final Job job;
+    private final Job job;
 
-	public JobSubmissionAction(String jobDescriptorPath) {
-		File jobDescriptor = new File(jobDescriptorPath);
+    public JobSubmissionAction(String jobDescriptorPath) {
+        File jobDescriptor = new File(jobDescriptorPath);
 
-		// routine checks of the path
-		if(!jobDescriptor.exists())
-			throw new IllegalArgumentException("File " + jobDescriptorPath + " does not exist");
-		if(!jobDescriptor.isFile())
-			throw new IllegalArgumentException("The path " + jobDescriptorPath + " does not point to a file");
-		if(!jobDescriptor.canRead())
-			throw new IllegalArgumentException("The file " + jobDescriptorPath + " cannot be read - maybe check your permissions?");
+        // routine checks of the path
+        if (!jobDescriptor.exists())
+            throw new IllegalArgumentException("File " + jobDescriptorPath + " does not exist");
+        if (!jobDescriptor.isFile())
+            throw new IllegalArgumentException("The path " + jobDescriptorPath + " does not point to a file");
+        if (!jobDescriptor.canRead())
+            throw new IllegalArgumentException("The file " + jobDescriptorPath +
+                " cannot be read - maybe check your permissions?");
 
-		// ok, it is valid. Try to create a Job from the xml descriptor
-		try {
-			this.job = JobFactory.getFactory().createJob(jobDescriptorPath);
-		} catch (JobCreationException e) {
-			throw new IllegalArgumentException("Cannot create a Scheduler Job from the xml descriptor " + jobDescriptorPath
-					+ " because " + e.getMessage());
-		}
-	}
+        // ok, it is valid. Try to create a Job from the xml descriptor
+        try {
+            this.job = JobFactory.getFactory().createJob(jobDescriptorPath);
+        } catch (JobCreationException e) {
+            throw new IllegalArgumentException("Cannot create a Scheduler Job from the xml descriptor " +
+                jobDescriptorPath + " because " + e.getMessage());
+        }
+    }
 
-	@Override
-	public JobId execute(UserSchedulerInterface usi) throws Exception {
-		// simple submit, don't care for the result yet
-		return usi.submit(this.job);
-	}
+    @Override
+    public JobId execute(UserSchedulerInterface usi) throws Exception {
+        // simple submit, don't care for the result yet
+        return usi.submit(this.job);
+    }
 
-	@Override
-	public String toString() {
-		return "Scheduler job submission action";
-	}
+    @Override
+    public String toString() {
+        return "Scheduler job submission action";
+    }
 
 }

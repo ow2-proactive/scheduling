@@ -40,28 +40,29 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
+
 /**
  * Test(hello world) action.
  * @author fabratu
  *
  */
-public class HelloWorldAction implements Action<String,Void>, Serializable {
+public class HelloWorldAction implements Action<String, Void>, Serializable {
 
-	private static final long serialVersionUID = 100L;
-	private final static Logger logger = Logger.getLogger(HelloWorldAction.class);
+    private static final long serialVersionUID = 100L;
+    private final static Logger logger = Logger.getLogger(HelloWorldAction.class);
 
-	public HelloWorldAction() {
-	}
+    public HelloWorldAction() {
+    }
 
-	@Override
-	public Void execute(String message) {
-		logger.info(message + " from " + ProActiveInet.getInstance().getHostname());
-		return null;
-	}
+    @Override
+    public Void execute(String message) {
+        logger.info(message + " from " + ProActiveInet.getInstance().getHostname());
+        return null;
+    }
 
-	@Override
-	public String toString() {
-		return "Trivial Action";
-	}
+    @Override
+    public String toString() {
+        return "Trivial Action";
+    }
 
 }
