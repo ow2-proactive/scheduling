@@ -54,7 +54,6 @@ public class HelloWorldAction implements Action<String, Void>, Serializable {
     public HelloWorldAction() {
     }
 
-    @Override
     public Void execute(String message) {
         logger.info(message + " from " + ProActiveInet.getInstance().getHostname());
         return null;
