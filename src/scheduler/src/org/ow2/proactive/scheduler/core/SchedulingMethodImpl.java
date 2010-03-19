@@ -469,9 +469,14 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 Future<TaskResult> future = futurResults.get(0);
                 if (future.isDone()) {
                     //if task has finished
-                    ((JobResultImpl) job.getJobResult()).storeFuturResult(task.getName(), future.get());
-                    //mark the task and job (if needed) as started and send events
-                    finalizeStarting(job, task, node);
+                    if (future.get() != null) {
+                        //and result is not null
+                        ((JobResultImpl) job.getJobResult()).storeFuturResult(task.getName(), future.get());
+                        //mark the task and job (if needed) as started and send events
+                        finalizeStarting(job, task, node);
+                    } else {
+                        core.resourceManager.freeNodes(nodes);
+                    }
                 } else {
                     //if there was a problem, free nodeSet for multi-nodes task
                     core.resourceManager.freeNodes(nodes);
