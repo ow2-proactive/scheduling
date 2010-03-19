@@ -54,6 +54,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Appender;
@@ -819,12 +820,30 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         logger_dev.info("Starting deployment of task '" + internalTask.getName() +
                             "' for job '" + currentJob.getId() + "'");
 
-                        //enqueue next instruction, and execute whole process in the threadpool controller
-                        TimedDoTaskAction tdta = new TimedDoTaskAction(this, currentJob, internalTask,
-                            launcher, node, (SchedulerCore) PAActiveObject.getStubOnThis(), resourceManager,
-                            params);
-                        ExecutorServiceTasksInvocator.invokeAllWithTimeoutAction(threadPool, Collections
-                                .singletonList(tdta), DOTASK_ACTION_TIMEOUT);
+                        //enqueue next instruction, and execute whole process in the thread-pool controller
+                        TimedDoTaskAction tdta = new TimedDoTaskAction(internalTask, launcher,
+                            (SchedulerCore) PAActiveObject.getStubOnThis(), params);
+                        List<Future<TaskResult>> futurResults = ExecutorServiceTasksInvocator
+                                .invokeAllWithTimeoutAction(threadPool, Collections.singletonList(tdta),
+                                        DOTASK_ACTION_TIMEOUT);
+
+                        //wait for only one result
+                        Future<TaskResult> future = futurResults.get(0);
+                        if (future.isDone()) {
+                            //if task has finished
+                            if (future.get() != null) {
+                                //and result is not null
+                                ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask
+                                        .getName(), future.get());
+                                //mark the task and job (if needed) as started and send events
+                                finalizeStarting(currentJob, internalTask, node);
+                            } else {
+                                resourceManager.freeNodes(nodes);
+                            }
+                        } else {
+                            //if there was a problem, free nodeSet for multi-nodes task
+                            resourceManager.freeNodes(nodes);
+                        }
 
                     }
 
@@ -2290,78 +2309,60 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @author The ProActive Team
      * @since ProActive Scheduling 2.0
      */
-    class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
+    class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> {
 
         private AtomicBoolean timeoutCalled = new AtomicBoolean(false);
-        private SchedulerCore schedulerCore;
-        private InternalJob job;
         private InternalTask task;
         private TaskLauncher launcher;
-        private Node node;
         private SchedulerCore coreStub;
-        private ResourceManagerProxy resourceManager;
         private TaskResult[] parameters;
 
         /**
          * Create a new instance of TimedDoTaskAction
          *
-         * @param job the internal job
          * @param task the internal task
          * @param launcher the launcher of the task
-         * @param node the main node on which the task will be started
          * @param coreStub the stub on SchedulerCore
          * @param parameters the parameters to be given to the task
          */
-        public TimedDoTaskAction(SchedulerCore core, InternalJob job, InternalTask task,
-                TaskLauncher launcher, Node node, SchedulerCore coreStub,
-                ResourceManagerProxy resourceManager, TaskResult[] parameters) {
-            this.schedulerCore = core;
-            this.job = job;
+        public TimedDoTaskAction(InternalTask task, TaskLauncher launcher, SchedulerCore coreStub,
+                TaskResult[] parameters) {
             this.task = task;
             this.launcher = launcher;
-            this.node = node;
             this.coreStub = coreStub;
-            this.resourceManager = resourceManager;
             this.parameters = parameters;
         }
 
         /**
          * {@inheritDoc}
          */
-        public Void call() throws Exception {
+        public TaskResult call() throws Exception {
             try {
                 //if a task has been launched
                 if (launcher != null) {
-
+                    //try launch the task
                     TaskResult tr = launcher.doTask(coreStub, task.getExecutableContainer(), parameters);
-
+                    //check if timeout occurs
                     if (timeoutCalled.get()) {
-                        launcher.terminate();
-                        freenodes();
+                        //return null if timeout occurs (task may have to be restarted later)
+                        return null;
                     } else {
-                        ((JobResultImpl) job.getJobResult()).storeFuturResult(task.getName(), tr);
-                        //mark the task and job (if needed) as started and send events
-                        schedulerCore.finalizeStarting(job, task, node);
+                        //return task result if everything was OK
+                        return tr;
                     }
+                } else {
+                    //return null if launcher was null (should never append)
+                    return null;
                 }
             } catch (Exception e) {
-                freenodes();
-            }
-            //results is not needed
-            return null;
-        }
-
-        private void freenodes() {
-            try {
-                //launcher node
-                resourceManager.freeNode(node);
-                //multi nodes task
-                resourceManager.freeNodes(task.getExecutableContainer().getNodes());
-            } catch (Throwable ni) {
-                //miam miam
+                //return null if something wrong occurs during task deployment
+                return null;
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void timeoutAction() {
             timeoutCalled.set(true);
         }

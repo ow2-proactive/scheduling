@@ -1354,7 +1354,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
 
         public static void terminate() {
             try {
-		requestLeft.wait();
+                requestLeft.wait();
                 threadPoolForNetworkCalls.shutdown();
                 threadPoolForNetworkCalls.awaitTermination(12, TimeUnit.SECONDS);
             } catch (Exception e) {
@@ -1447,12 +1447,12 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
              * {@inheritDoc}
              */
             public void run() {
-		try {
-			busy.set(true);
-			//unlock shutdown request
-			if (requestLeft.addAndGet(-eventCallsToSend.size()) == 0) {
-				requestLeft.notify();
-			}
+                try {
+                    busy.set(true);
+                    //unlock shutdown request
+                    if (requestLeft.addAndGet(-eventCallsToSend.size()) == 0) {
+                        requestLeft.notify();
+                    }
                     //loop on the list and send events
                     while (!eventCallsToSend.isEmpty()) {
                         ReifiedMethodCall methodCall = eventCallsToSend.removeFirst();
