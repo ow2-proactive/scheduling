@@ -77,7 +77,6 @@ public class JobSubmissionAction implements Action<UserSchedulerInterface, JobId
         }
     }
 
-    @Override
     public JobId execute(UserSchedulerInterface usi) throws Exception {
         // simple submit, don't care for the result yet
         return usi.submit(this.job);

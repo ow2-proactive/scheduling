@@ -67,29 +67,24 @@ public class SimpleSchedulerListener implements SchedulerEventListener, Serializ
     public SimpleSchedulerListener() {
     }
 
-    @Override
     public void jobSubmittedEvent(JobState jobInfo) {
         logger.info("New job + " + jobInfo.getName() + " + has been started by " + jobInfo.getOwner());
     }
 
-    @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
         logger.info("Job " + jobNotification.getData().getJobId() + " has changed its state to " +
             jobNotification.getEventType());
     }
 
-    @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
         logger.info("Scheduler state changed to:" + eventType);
     }
 
-    @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> taskNotification) {
         logger.info("Task " + taskNotification.getData().getName() + " has changed its state to " +
             taskNotification.getEventType());
     }
 
-    @Override
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         logger.info("User info changed for:" + notification.getData().getUsername());
     }

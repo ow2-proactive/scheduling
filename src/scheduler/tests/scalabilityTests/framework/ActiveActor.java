@@ -70,7 +70,6 @@ public class ActiveActor<T, V> extends Actor<T, V> implements InitActive {
         super(action, parameter);
     }
 
-    @Override
     public void initActivity(Body arg0) {
         // log4j (re)configuration
         rebaseLogFiles();

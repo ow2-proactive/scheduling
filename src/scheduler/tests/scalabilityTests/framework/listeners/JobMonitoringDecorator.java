@@ -85,29 +85,24 @@ public abstract class JobMonitoringDecorator implements SchedulerEventListener {
         this.decorated = listener;
     }
 
-    @Override
     public void jobSubmittedEvent(JobState jobInfo) {
         this.decorated.jobSubmittedEvent(jobInfo);
     }
 
     // decorated interface delegation
-    @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
         this.decorated.schedulerStateUpdatedEvent(eventType);
     }
 
-    @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> taskNotification) {
         this.decorated.taskStateUpdatedEvent(taskNotification);
     }
 
-    @Override
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         this.decorated.usersUpdatedEvent(notification);
     }
 
     // this is a bit different
-    @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
         // take care of this first; decorator's impl could do freaky shiet like call system.exit!
         if (jobNotification.getEventType().equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED) &&
