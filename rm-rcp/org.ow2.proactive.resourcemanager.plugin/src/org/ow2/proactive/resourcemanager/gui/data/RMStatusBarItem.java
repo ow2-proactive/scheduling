@@ -36,7 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.data;
 
-import org.eclipse.ui.texteditor.StatusLineContributionItem;
+import org.eclipse.jface.action.StatusLineContributionItem;
 
 
 public class RMStatusBarItem extends StatusLineContributionItem {
@@ -44,7 +44,7 @@ public class RMStatusBarItem extends StatusLineContributionItem {
     private static RMStatusBarItem instance;
 
     public RMStatusBarItem(String id) {
-        super(id, true, 20);
+        super(id);
     }
 
     public static RMStatusBarItem getInstance() {
