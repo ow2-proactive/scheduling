@@ -54,6 +54,7 @@ import scalabilityTests.framework.AbstractSchedulerUser;
 import scalabilityTests.framework.JobSubmissionAction;
 import scalabilityTests.framework.listeners.ListenerInfo;
 
+
 /**
  * This fixture offers methods for:
  * 	- deploying {@link AbstractSchedulerUser}s on the GCM infrastructure
@@ -65,129 +66,127 @@ import scalabilityTests.framework.listeners.ListenerInfo;
  */
 public class SchedulerFixture extends ActiveFixture {
 
-	private static final Logger logger = Logger.getLogger(SchedulerFixture.class);
+    private static final Logger logger = Logger.getLogger(SchedulerFixture.class);
 
-	private final ListenerInfo listenerInfo;
+    private final ListenerInfo listenerInfo;
 
-	public SchedulerFixture(String gcmDeploymentPath, String vnName)
-			throws IllegalArgumentException	{
-		this(gcmDeploymentPath,vnName,null);
-	}
+    public SchedulerFixture(String gcmDeploymentPath, String vnName) throws IllegalArgumentException {
+        this(gcmDeploymentPath, vnName, null);
+    }
 
-	public SchedulerFixture(String gcmDeploymentPath, String vnName,
-			ListenerInfo listenerInfo) throws IllegalArgumentException {
-		super(gcmDeploymentPath, vnName);
-		this.listenerInfo = listenerInfo;
-	}
+    public SchedulerFixture(String gcmDeploymentPath, String vnName, ListenerInfo listenerInfo)
+            throws IllegalArgumentException {
+        super(gcmDeploymentPath, vnName);
+        this.listenerInfo = listenerInfo;
+    }
 
-	/**
-	 * One-shot method for:
-	 *  - deploying {@link AbstractSchedulerUser}s
-	 *  - connecting them to the Scheduler, using the same Credentials for login
-	 *  
-	 * Here we take advantage of the fact(not a bug, but a feature? :P)
-	 *  that we can login using the same Credentials from different machines
-	 * @throws NodeException ProActive deployment exception
-	 * @throws ActiveObjectCreationException ProActive deployment exception 
-	 * @throws SchedulerException Scheduler user login exception
-	 * @throws LoginException Scheduler user login exception
-	 * @throws CannotRegisterListenerException 
-	 */
-	public <V> List<AbstractSchedulerUser<V>> deployConnectedUsers(Class<? extends AbstractSchedulerUser<V>> schedulerUserClass,
-			String schedulerUrl, Credentials userCreds)
-	throws ActiveObjectCreationException, NodeException, LoginException, 
-			SchedulerException, CannotRegisterListenerException {
-		// we cheat. 
-		return deployConnectedUsers(schedulerUserClass, schedulerUrl, new Credentials[] {userCreds});
-	}
+    /**
+     * One-shot method for:
+     *  - deploying {@link AbstractSchedulerUser}s
+     *  - connecting them to the Scheduler, using the same Credentials for login
+     *  
+     * Here we take advantage of the fact(not a bug, but a feature? :P)
+     *  that we can login using the same Credentials from different machines
+     * @throws NodeException ProActive deployment exception
+     * @throws ActiveObjectCreationException ProActive deployment exception 
+     * @throws SchedulerException Scheduler user login exception
+     * @throws LoginException Scheduler user login exception
+     * @throws CannotRegisterListenerException 
+     */
+    public <V> List<AbstractSchedulerUser<V>> deployConnectedUsers(
+            Class<? extends AbstractSchedulerUser<V>> schedulerUserClass, String schedulerUrl,
+            Credentials userCreds) throws ActiveObjectCreationException, NodeException, LoginException,
+            SchedulerException, CannotRegisterListenerException {
+        // we cheat. 
+        return deployConnectedUsers(schedulerUserClass, schedulerUrl, new Credentials[] { userCreds });
+    }
 
+    /**
+     * Same as previous method; the difference is that 
+     * now we will login using different Credentials for each Actor.
+     * 
+     * The number of the user credentials does not necessarily have to be equal to
+     * 	the number of available Nodes. If the number is less, only the first Credentials will be used.
+     *  If the number is greater, then the Credentials will be used in cycle for login
+     *
+     * @param schedulerUserClass - the Class of the deployed Scheduler users
+     * @param schedulerUrl the URL of the Scheduler to login to
+     * @param userCreds an array containing the Credentials to be used to login to the Scheduler
+     * @throws CannotRegisterListenerException 
+     */
+    public <V> List<AbstractSchedulerUser<V>> deployConnectedUsers(
+            Class<? extends AbstractSchedulerUser<V>> schedulerUserClass, String schedulerUrl,
+            Credentials[] userCreds) throws LoginException, SchedulerException,
+            ActiveObjectCreationException, NodeException, CannotRegisterListenerException {
 
-	/**
-	 * Same as previous method; the difference is that 
-	 * now we will login using different Credentials for each Actor.
-	 * 
-	 * The number of the user credentials does not necessarily have to be equal to
-	 * 	the number of available Nodes. If the number is less, only the first Credentials will be used.
-	 *  If the number is greater, then the Credentials will be used in cycle for login
-	 *
-	 * @param schedulerUserClass - the Class of the deployed Scheduler users
-	 * @param schedulerUrl the URL of the Scheduler to login to
-	 * @param userCreds an array containing the Credentials to be used to login to the Scheduler
-	 * @throws CannotRegisterListenerException 
-	 */
-	public <V> List<AbstractSchedulerUser<V>> deployConnectedUsers(Class<? extends AbstractSchedulerUser<V>> schedulerUserClass,
-			String schedulerUrl, Credentials[] userCreds) 
-	throws LoginException, SchedulerException, ActiveObjectCreationException, 
-			NodeException, CannotRegisterListenerException {
+        if (this.nodes == null)
+            throw new IllegalStateException(
+                "Invalid usage of this object; loadInfrastructure() needs to be called first");
 
-		if(this.nodes == null)
-			throw new IllegalStateException("Invalid usage of this object; loadInfrastructure() needs to be called first");
+        logger.trace("# of available nodes: " + this.nodes.size());
+        logger.trace("Deploying the scheduler users...");
+        List<AbstractSchedulerUser<V>> connectedUsers = new LinkedList<AbstractSchedulerUser<V>>();
+        int userCredsIndex = 0;
+        for (Node node : nodes) {
+            AbstractSchedulerUser<V> schedulerUser = PAActiveObject.newActive(schedulerUserClass,
+                    new Object[] { schedulerUrl, userCreds[userCredsIndex] }, node);
+            connectedUsers.add(schedulerUser);
+            userCredsIndex++;
+            if (userCredsIndex == userCreds.length)
+                userCredsIndex = 0;
+        }
+        this.knownActors.addAll(connectedUsers);
+        logger.trace("Done.");
 
-		logger.trace("# of available nodes: " + this.nodes.size());
-		logger.trace("Deploying the scheduler users...");
-		List<AbstractSchedulerUser<V>> connectedUsers = new LinkedList<AbstractSchedulerUser<V>>();
-		int userCredsIndex = 0;
-		for(Node node : nodes) {
-			AbstractSchedulerUser<V> schedulerUser = PAActiveObject.newActive(schedulerUserClass, 
-					new Object[] {schedulerUrl, userCreds[userCredsIndex]} , node);
-			connectedUsers.add(schedulerUser);
-			userCredsIndex++;
-			if(userCredsIndex == userCreds.length)
-				userCredsIndex = 0;
-		}
-		this.knownActors.addAll(connectedUsers);
-		logger.trace("Done.");
+        // now it is time to connect
+        logger.trace("Connecting the users to the Scheduler...");
+        if (this.listenerInfo != null) {
+            logger.trace("Scheduler listeners will also be registered for each user.");
+        }
+        for (AbstractSchedulerUser<V> schedulerUser : connectedUsers) {
+            schedulerUser.connectToScheduler();
+            if (this.listenerInfo != null) {
+                try {
+                    schedulerUser.registerListener(listenerInfo.downloadInitialState(), listenerInfo
+                            .getMyEventsOnly(), listenerInfo.getListenerClazzName());
+                } catch (ProActiveException e) {
+                    throw new CannotRegisterListenerException(e);
+                } catch (SchedulerException e) {
+                    throw new CannotRegisterListenerException(e);
+                } catch (IllegalArgumentException e) {
+                    throw new CannotRegisterListenerException(e);
+                }
+            }
+        }
 
-		// now it is time to connect
-		logger.trace("Connecting the users to the Scheduler...");
-		if(this.listenerInfo != null){
-			logger.trace("Scheduler listeners will also be registered for each user.");
-		}
-		for( AbstractSchedulerUser<V> schedulerUser : connectedUsers ){
-			schedulerUser.connectToScheduler();
-			if(this.listenerInfo!=null) {
-				try {
-					schedulerUser.registerListener(listenerInfo.downloadInitialState(), 
-							listenerInfo.getMyEventsOnly(), 
-							listenerInfo.getListenerClazzName());
-				} catch (ProActiveException e) {
-					throw new CannotRegisterListenerException(e);
-				} catch(SchedulerException e){
-					throw new CannotRegisterListenerException(e);
-				} catch(IllegalArgumentException e) {
-					throw new CannotRegisterListenerException(e);
-				}
-			}
-		}
+        return connectedUsers;
+    }
 
-		return connectedUsers;
-	}
+    public class CannotRegisterListenerException extends Exception {
 
-	public class CannotRegisterListenerException extends Exception {
+        public CannotRegisterListenerException(String msg) {
+            super(msg);
+        }
 
-		public CannotRegisterListenerException(String msg) {
-			super(msg);
-		}
+        public CannotRegisterListenerException() {
+            super();
+        }
 
-		public CannotRegisterListenerException() {
-			super();
-		}
+        public CannotRegisterListenerException(String msg, Throwable cause) {
+            super(msg, cause);
+        }
 
-		public CannotRegisterListenerException(String msg, Throwable cause) {
-			super(msg, cause);
-		}
+        public CannotRegisterListenerException(Throwable cause) {
+            super(cause);
+        }
+    }
 
-		public CannotRegisterListenerException(Throwable cause) {
-			super(cause);
-		}
-	}
-
-	public void launchSameJob(List<AbstractSchedulerUser<JobId>> schedulerUsers, JobSubmissionAction action) {
-		logger.trace("Submitting the same Job...");
-		for(AbstractSchedulerUser<JobId> schedulerUser : schedulerUsers) {
-			schedulerUser.doAction(action);
-		}
-		logger.trace("Done!");
-	}
+    public void launchSameJob(List<AbstractSchedulerUser<JobId>> schedulerUsers, JobSubmissionAction action) {
+        logger.trace("Submitting the same Job...");
+        for (AbstractSchedulerUser<JobId> schedulerUser : schedulerUsers) {
+            schedulerUser.doAction(action);
+        }
+        logger.trace("Done!");
+    }
 
 }

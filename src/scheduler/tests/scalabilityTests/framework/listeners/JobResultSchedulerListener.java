@@ -57,41 +57,40 @@ import scalabilityTests.framework.AbstractSchedulerUser;
  */
 @RemoteObject
 public class JobResultSchedulerListener extends SimpleSchedulerListener {
-	
-	private volatile AbstractSchedulerUser<JobId> daddy;
-	
-	protected static final Logger logger = Logger.getLogger(JobResultSchedulerListener.class);
-	
-	public JobResultSchedulerListener() {
-		this.daddy = null;
-	}
-	
-	public JobResultSchedulerListener(AbstractSchedulerUser<JobId> daddy) {
-		this.daddy = daddy;
-	}
-	
-	public void setResultFetcher(AbstractSchedulerUser<JobId> daddy){
-		if(!(daddy instanceof StubObject))
-			throw new IllegalArgumentException("Must be the stub of a Remote Object!");
-		this.daddy = daddy;
-	}
 
-	@Override
-	public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
-		super.jobStateUpdatedEvent(jobNotification);
-		if(jobNotification.getEventType().equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED)) {
-			jobRunningToFinishedEvent(jobNotification);
-		}
-	}
+    private volatile AbstractSchedulerUser<JobId> daddy;
 
-	private void jobRunningToFinishedEvent(
-			NotificationData<JobInfo> jobNotification) {
-		JobId jobId = jobNotification.getData().getJobId();
-		logger.trace("Trying to get the job result for job " + jobId);
-		try {
-			logger.info( "The result for job with ID " + jobId + " is " + this.daddy.getJobResult(jobId));
-		} catch (SchedulerException e) {
-			logger.error("Cannot get the job result for job with id " + jobId + " from the scheduler", e);
-		}
-	}
+    protected static final Logger logger = Logger.getLogger(JobResultSchedulerListener.class);
+
+    public JobResultSchedulerListener() {
+        this.daddy = null;
+    }
+
+    public JobResultSchedulerListener(AbstractSchedulerUser<JobId> daddy) {
+        this.daddy = daddy;
+    }
+
+    public void setResultFetcher(AbstractSchedulerUser<JobId> daddy) {
+        if (!(daddy instanceof StubObject))
+            throw new IllegalArgumentException("Must be the stub of a Remote Object!");
+        this.daddy = daddy;
+    }
+
+    @Override
+    public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
+        super.jobStateUpdatedEvent(jobNotification);
+        if (jobNotification.getEventType().equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED)) {
+            jobRunningToFinishedEvent(jobNotification);
+        }
+    }
+
+    private void jobRunningToFinishedEvent(NotificationData<JobInfo> jobNotification) {
+        JobId jobId = jobNotification.getData().getJobId();
+        logger.trace("Trying to get the job result for job " + jobId);
+        try {
+            logger.info("The result for job with ID " + jobId + " is " + this.daddy.getJobResult(jobId));
+        } catch (SchedulerException e) {
+            logger.error("Cannot get the job result for job with id " + jobId + " from the scheduler", e);
+        }
+    }
 }

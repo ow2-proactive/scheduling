@@ -44,6 +44,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 
 import scalabilityTests.framework.listeners.JobResultDecorator;
 
+
 /**
  * A {@link AbstractSchedulerUser} who is interested in 
  *   the results of the jobs she submits
@@ -53,42 +54,42 @@ import scalabilityTests.framework.listeners.JobResultDecorator;
  */
 @ActiveObject
 public class SchedulerJobSubmitter extends AbstractSchedulerUser<JobId> {
-	
-	private JobResultDecorator jrListener = null;
 
-	// job id is in this.result
-	public SchedulerJobSubmitter() {
-		super();
-	}
-	
-	public SchedulerJobSubmitter(String schedulerURL, Credentials userCreds) {
-		super(schedulerURL,userCreds);
-	}
-	
-	@Override
-	public void doAction(Action<UserSchedulerInterface, JobId> action) {
-		// listener is needed in this case
-		if(this.slExposer == null)
-			throw new IllegalStateException("No listeners were registered to the Scheduler. A listener is needed to know when the job finishes. " +
-				"Consider calling the registerListeners() method first");
-		super.doAction(action);
-		logger.trace("Submitted job with ID " + this.result);
-		// register job ID
-		this.jrListener.startMonitoring(this.result);
-	}
-	
-	@Override
-	protected SchedulerEventListener createEventListener(
-			String listenerClazzName) throws ClassNotFoundException,
-			InstantiationException, IllegalAccessException {
-		logger.trace("Trying to load the listener class " + listenerClazzName);
-		Class listenerClazz = Class.forName(listenerClazzName);
-		logger.trace("Trying to instantiate a listener of type " + listenerClazzName);
-		SchedulerEventListener schedulerListener = (SchedulerEventListener) listenerClazz.newInstance();
-		logger.trace("Decorating the event listener with " + JobResultDecorator.class.getName());
-		this.jrListener = new JobResultDecorator(
-				schedulerListener, (AbstractSchedulerUser<JobId>)PAActiveObject.getStubOnThis());
-		return this.jrListener;
-	}
-	
+    private JobResultDecorator jrListener = null;
+
+    // job id is in this.result
+    public SchedulerJobSubmitter() {
+        super();
+    }
+
+    public SchedulerJobSubmitter(String schedulerURL, Credentials userCreds) {
+        super(schedulerURL, userCreds);
+    }
+
+    @Override
+    public void doAction(Action<UserSchedulerInterface, JobId> action) {
+        // listener is needed in this case
+        if (this.slExposer == null)
+            throw new IllegalStateException(
+                "No listeners were registered to the Scheduler. A listener is needed to know when the job finishes. "
+                    + "Consider calling the registerListeners() method first");
+        super.doAction(action);
+        logger.trace("Submitted job with ID " + this.result);
+        // register job ID
+        this.jrListener.startMonitoring(this.result);
+    }
+
+    @Override
+    protected SchedulerEventListener createEventListener(String listenerClazzName)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        logger.trace("Trying to load the listener class " + listenerClazzName);
+        Class listenerClazz = Class.forName(listenerClazzName);
+        logger.trace("Trying to instantiate a listener of type " + listenerClazzName);
+        SchedulerEventListener schedulerListener = (SchedulerEventListener) listenerClazz.newInstance();
+        logger.trace("Decorating the event listener with " + JobResultDecorator.class.getName());
+        this.jrListener = new JobResultDecorator(schedulerListener,
+            (AbstractSchedulerUser<JobId>) PAActiveObject.getStubOnThis());
+        return this.jrListener;
+    }
+
 }

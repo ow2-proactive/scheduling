@@ -44,6 +44,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 
 import scalabilityTests.framework.listeners.JobResultSchedulerListener;
 
+
 /**
  * 
  * In this implementation, listeners are not decorated
@@ -53,32 +54,32 @@ import scalabilityTests.framework.listeners.JobResultSchedulerListener;
  */
 @ActiveObject
 public class SchedulerUser<V> extends AbstractSchedulerUser<V> {
-	
-	public SchedulerUser() {
-		super();
-	}
-	
-	public SchedulerUser(String schedulerURL, Credentials userCreds) {
-		super(schedulerURL,userCreds);
-	}
-	
-	public SchedulerUser(Action<UserSchedulerInterface,V> defaultAction,
-			String schedulerURL, Credentials userCreds) {
-		super(defaultAction,schedulerURL,userCreds);
-	}
 
-	@Override
-	protected SchedulerEventListener createEventListener(
-			String listenerClazzName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		logger.trace("Trying to load the listener class " + listenerClazzName);
-		Class listenerClazz = Class.forName(listenerClazzName);
-		logger.trace("Trying to instantiate a listener of type " + listenerClazzName);
-		SchedulerEventListener ret = (SchedulerEventListener) listenerClazz.newInstance();
-		// ugly but necessary; getJobResult MUST be called from the SchedulerUser AO !!
-		if(ret instanceof JobResultSchedulerListener) 
-			((JobResultSchedulerListener)ret).setResultFetcher(
-					(SchedulerUser<JobId>)PAActiveObject.getStubOnThis());
-		return ret;
-	}
+    public SchedulerUser() {
+        super();
+    }
+
+    public SchedulerUser(String schedulerURL, Credentials userCreds) {
+        super(schedulerURL, userCreds);
+    }
+
+    public SchedulerUser(Action<UserSchedulerInterface, V> defaultAction, String schedulerURL,
+            Credentials userCreds) {
+        super(defaultAction, schedulerURL, userCreds);
+    }
+
+    @Override
+    protected SchedulerEventListener createEventListener(String listenerClazzName)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        logger.trace("Trying to load the listener class " + listenerClazzName);
+        Class listenerClazz = Class.forName(listenerClazzName);
+        logger.trace("Trying to instantiate a listener of type " + listenerClazzName);
+        SchedulerEventListener ret = (SchedulerEventListener) listenerClazz.newInstance();
+        // ugly but necessary; getJobResult MUST be called from the SchedulerUser AO !!
+        if (ret instanceof JobResultSchedulerListener)
+            ((JobResultSchedulerListener) ret).setResultFetcher((SchedulerUser<JobId>) PAActiveObject
+                    .getStubOnThis());
+        return ret;
+    }
 
 }

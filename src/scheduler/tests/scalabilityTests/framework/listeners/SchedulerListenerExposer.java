@@ -53,26 +53,25 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
  *
  */
 public class SchedulerListenerExposer {
-	
-	private static final Logger logger = Logger.getLogger(SchedulerListenerExposer.class);
-	private final SchedulerEventListener schedulerListener;
-	
-	private RemoteObjectExposer<SchedulerEventListener> roe = null;
-	private URI uri = null;
-	
-	public SchedulerListenerExposer(SchedulerEventListener listener) {
-		this.schedulerListener = listener;
-	}
 
-	public SchedulerEventListener createRemoteReference() throws ProActiveException {
-		roe = PARemoteObject.newRemoteObject(
-				schedulerListener.getClass().getName(), schedulerListener);
-		uri = RemoteObjectHelper.generateUrl(SimpleSchedulerListener.class.getSimpleName());
-		return PARemoteObject.bind(roe, uri);
-	}
-	
-	public void destroyRemoteReference() throws ProActiveException {
-		roe.unexport(uri);
-	}	
+    private static final Logger logger = Logger.getLogger(SchedulerListenerExposer.class);
+    private final SchedulerEventListener schedulerListener;
+
+    private RemoteObjectExposer<SchedulerEventListener> roe = null;
+    private URI uri = null;
+
+    public SchedulerListenerExposer(SchedulerEventListener listener) {
+        this.schedulerListener = listener;
+    }
+
+    public SchedulerEventListener createRemoteReference() throws ProActiveException {
+        roe = PARemoteObject.newRemoteObject(schedulerListener.getClass().getName(), schedulerListener);
+        uri = RemoteObjectHelper.generateUrl(SimpleSchedulerListener.class.getSimpleName());
+        return PARemoteObject.bind(roe, uri);
+    }
+
+    public void destroyRemoteReference() throws ProActiveException {
+        roe.unexport(uri);
+    }
 
 }
