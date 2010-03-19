@@ -1,0 +1,40 @@
+log4j.rootLogger=INFO,NULL
+
+# test logs
+log4j.additivity.tests.scalabilityTests=false
+log4j.logger.tests.scalabilityTests=TRACE,CONSOLE
+
+# proactive logs go to a separate file
+log4j.additivity.proactive=false
+log4j.logger.proactive=DEBUG,FILE
+
+################ Appenders ####################
+#
+# Appender output can be configured by using a pattern layout
+# See: http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/PatternLayout.html
+#
+#   - %c the category of the logging event
+#   - %d the date
+#   - %m he application supplied message
+#   - %n the platform dependent line separator character or characters
+#   - %p the priority of the logging event
+#   - %t the name of the thread that generated the logging event
+#   - %X{hostname}         the hostname
+#   - %X{id@hostname}      the VMID and the hostname
+#   - %X{shortid@hostname} the short VMID and the hostname (a collision can occur between two shortids, you should use id@hostname)
+#   - %X{runtime}          the ProActive runtime url (does not work very well since a different MDC is associated to each thread)
+
+
+# CONSOLE appender is used by default
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=[%p %20.20c{2}] %m%n
+
+log4j.appender.FILE=org.apache.log4j.FileAppender
+log4j.appender.FILE.File=${pa.scheduler.home}/.logs/proactive_scalabilityTests.log
+log4j.appender.FILE.Append=false
+log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.FILE.layout.ConversionPattern=[%-1p %d{ISO8601}] [%C{1}.%M] %m%n
+
+# NULL appender
+log4j.appender.NULL=org.apache.log4j.varia.NullAppender

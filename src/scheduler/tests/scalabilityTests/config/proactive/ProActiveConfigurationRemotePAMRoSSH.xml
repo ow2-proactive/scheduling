@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveUserProperties>
+    <properties>
+		<!-- PAMRoSSH -->
+		<prop key="proactive.communication.protocol" value="pamr"/>
+        <prop key="proactive.net.router.address" value="TODO"/>
+        <prop key="proactive.net.router.port" value="TODO"/>
+
+		<prop key="proactive.communication.pamr.socketfactory" value="ssh"/>
+		<prop key="proactive.communication.pamrssh.key_directory" value="TODO"/>
+		<prop key="proactive.communication.pamrssh.username" value="TODO"/>
+		<prop key="proactive.communication.pamrssh.port" value="22"/>
+    </properties>
+    <javaProperties>
+    </javaProperties>
+</ProActiveUserProperties>
