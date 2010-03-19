@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveUserProperties>
+    <properties>
+
+        <prop key="proactive.communication.protocol" value="rmi"/>
+        <prop key="proactive.rmi.port" value="6355" />
+
+    </properties>
+    <javaProperties>
+    </javaProperties>
+</ProActiveUserProperties>

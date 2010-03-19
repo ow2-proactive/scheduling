@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment xmlns="urn:gcm:deployment:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd">
+	<environment>
+		<descriptorVariable name="HOST" value="eon[10-20]" />
+		<javaPropertyDescriptorDefault name="os" value="unix" />
+		<javaPropertyDescriptorDefault name="hostCapacity" value="7" /> 
+		<javaPropertyDescriptorDefault name="vmCapacity" value="1" />
+		<!-- user for the worker nodes -->
+		<javaPropertyDescriptorDefault name="userName" value="TODO"/>
+		<javaPropertyDescriptorDefault name="userHomeDir" value="TODO" />
+	</environment>
+	<resources>
+		<group refid="remoteThroughSSH">
+			<host refid="host" />
+		</group>
+	</resources>
+	<infrastructure>
+		<hosts>
+			<host id="host" os="${os}" hostCapacity="${hostCapacity}" vmCapacity="${vmCapacity}">
+				<homeDirectory base="root" relpath="${userHomeDir}" />
+				<tool id="java" path="${userHomeDir}/tools/jdk/bin/java"/>
+				<tool id="proactive" path="${userHomeDir}/tools/Scheduler"/>
+			</host>
+		</hosts>
+		<groups>
+			<sshGroup id="remoteThroughSSH" hostList="${HOST}" username="${userName}"/>
+		</groups>
+	</infrastructure>
+</GCMDeployment>

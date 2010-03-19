@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment xmlns="urn:gcm:deployment:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd">
+
+	<environment>
+		<javaPropertyVariable name="user.home" />
+		<descriptorVariable name="HOST" value="node[33-47]" />
+
+		<javaPropertyDescriptorDefault name="os" value="unix" />
+		<javaPropertyDescriptorDefault name="hostCapacity" value="7" /> 
+		<javaPropertyDescriptorDefault name="vmCapacity" value="1" />
+		<!-- user for the worker nodes -->
+		<javaPropertyDescriptorDefault name="userName" value="TODO"/>
+		<javaPropertyDescriptorDefault name="userHomeDir" value="TODO" />		
+	</environment>
+
+	<resources>
+		<group refid="sgCloud">
+			<host refid="CloudNode" />
+		</group>
+	</resources>
+
+	<infrastructure>
+		<hosts>
+			<host id="CloudNode" os="${os}" hostCapacity="${hostCapacity}" vmCapacity="${vmCapacity}" username="${userName}">
+				<homeDirectory base="root" relpath="${userHomeDir}" />
+				<tool id="java" path="${userHomeDir}/tools/jdk/bin/java"/>
+				<tool id="proactive" path="${userHomeDir}/tools/Scheduler"/>
+			</host>
+		</hosts>
+		
+		<groups>
+			<sshGroup id="sgCloud" hostList="${HOST}" username="${userName}"/>
+		</groups>
+	</infrastructure>
+</GCMDeployment>
