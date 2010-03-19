@@ -70,7 +70,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
 
     private static int detachedProcNumber = 4;
 
-    private final static int wait_time = 1000;
+    private final static int wait_time = 2000;
 
     /**
      * Tests start here.
@@ -100,7 +100,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         job2.setDescription("a command that launches detached commands");
 
         NativeTask task2 = new NativeTask();
-        String task2Name = "TestPTK1";
+        String task2Name = "TestPTK2";
         task2.setName(task2Name);
         task2.setCommandLine(new String[] { nativeLinuxExecLauncher });
         job2.addTask(task2);
@@ -117,7 +117,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
 
         int runningDetachedProcNumber = getProcessNumber(unixPTKProcessName);
 
-        //we should have 2 times number of detached processes
+        //we should have 2 times (2 jobs) number of detached processes
         SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
         Assert.assertEquals(detachedProcNumber * 2, runningDetachedProcNumber);
 
