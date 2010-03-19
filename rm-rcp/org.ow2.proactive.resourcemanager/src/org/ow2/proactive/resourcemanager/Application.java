@@ -36,12 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager;
 
-import java.net.URL;
-
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -53,23 +49,6 @@ import org.eclipse.ui.PlatformUI;
 public class Application implements IApplication {
 
     public Object start(IApplicationContext context) throws Exception {
-
-        // Customize the platform instance location
-        final Location instanceLoc = Platform.getInstanceLocation();
-        URL customLocURL = null;
-        try {
-            customLocURL = new URL("file:" + System.getProperty("user.home") +
-                "/.ProActive_ResourceManager/workspace/");
-            instanceLoc.set(customLocURL, false);
-        } catch (Exception e) {
-            if (e instanceof IllegalStateException) {
-                System.err.println("Unable to set the platform instance location to " + customLocURL);
-                System.err.println("The current location is " + instanceLoc.getURL());
-                System.err.println("Be sure that the program arguments contains -data @noDefault");
-            }
-            e.printStackTrace();
-        }
-
         final Display display = PlatformUI.createDisplay();
 
         try {

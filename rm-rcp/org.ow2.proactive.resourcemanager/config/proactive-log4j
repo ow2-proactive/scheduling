@@ -120,4 +120,3 @@ log4j.appender.FILE.File=proactive.log
 log4j.appender.FILE.Append=true
 log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
 log4j.appender.FILE.layout.ConversionPattern=%d %5p [%t]: %m%n
-

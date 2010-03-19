@@ -16,9 +16,7 @@
    <launcherArgs>
       <programArgs>-data @noDefault</programArgs>
       <vmArgs>-Xmx512M -Xms512M
--Dproactive.net.nolocal=true
--Dlog4j.configuration=file:proactive-log4j
--Dproactive.configuration=file:ProActiveConfiguration.xml</vmArgs>
+-Dproactive.net.nolocal=true</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.ow2.proactive.resourcemanager/icons/alt_window_16.gif" i32="/org.ow2.proactive.resourcemanager/icons/alt_window_32.gif"/>
@@ -34,6 +32,7 @@
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
