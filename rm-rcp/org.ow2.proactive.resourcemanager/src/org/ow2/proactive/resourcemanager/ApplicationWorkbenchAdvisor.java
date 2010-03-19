@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager;
 
-import org.eclipse.ui.IWorkbenchPreferenceConstants;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
@@ -66,14 +64,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     public void initialize(IWorkbenchConfigurer configurer) {
         // To restore window preferences
         configurer.setSaveAndRestore(true);
-
-        // Sets the look of the tabs like Eclipse 3.x
-        PlatformUI.getPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
-                false);
-        PlatformUI.getPreferenceStore()
-                .setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
-        PlatformUI.getPreferenceStore().setValue(IWorkbenchPreferenceConstants.DOCK_PERSPECTIVE_BAR,
-                IWorkbenchPreferenceConstants.TOP_RIGHT);
     }
 
     /**
