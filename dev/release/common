@@ -92,6 +92,7 @@ function build_and_clean() {
 
 	# Remove database directory if exist
 	find . -type d -name "SCHEDULER_DB" -exec rm -rf {} \;
+	find . -type d -name "RM_DB" -exec rm -rf {} \;
 	# Remove logs directory
 	rm -rf ${SCHEDULER_DIR}/.logs
 

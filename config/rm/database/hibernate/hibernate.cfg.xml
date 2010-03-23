@@ -21,7 +21,7 @@
         <!-- MYSQL -->
 		<!--
         <property name="connection.driver_class">org.gjt.mm.mysql.Driver</property>
-        <property name="connection.url">jdbc:mysql://localhost:3306/SCHEDULER_DB</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/RM_DB</property>
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 		-->
 
