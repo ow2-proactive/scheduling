@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.db;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -119,11 +120,8 @@ public class EmptyDatabaseManager implements DatabaseManager {
     }
 
     /**
-     * If egClass is JobResultImpl, return the jobResult corresponding to the given JobId in the given condition,
-     * If egClass is TaskresultImpl, return the taskResult corresponding to the given TaskId in the given condition,
-     * Otherwise, return an empty list
+     * Not implemented (Throws a runtimeException)
      */
-    @SuppressWarnings("unchecked")
     public <T> List<T> recover(Class<T> egClass, Condition... conditions) {
         throw new RuntimeException("Not implemented");
     }
@@ -144,6 +142,14 @@ public class EmptyDatabaseManager implements DatabaseManager {
      * Do nothing
      */
     public void unload(Object o) {
+    }
+
+    /**
+     * Do nothing and returns an enpty list
+     */
+    @SuppressWarnings("rawtypes")
+    public List sqlQuery(String nativeQuery) {
+        return new ArrayList<Object>();
     }
 
 }

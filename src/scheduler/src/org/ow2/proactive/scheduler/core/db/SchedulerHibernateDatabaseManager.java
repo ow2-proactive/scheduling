@@ -94,7 +94,7 @@ public class SchedulerHibernateDatabaseManager extends HibernateDatabaseManager 
      * 			then it will call the jobRecovered method each time a job is recovered.
      * @return The list of unloaded job entities.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( { "unchecked", "serial" })
     public List<InternalJob> recoverAllJobs(RecoverCallback callback) {
         if (callback == null) {
             callback = new RecoverCallback() {

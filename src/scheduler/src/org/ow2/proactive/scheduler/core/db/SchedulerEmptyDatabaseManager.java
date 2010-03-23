@@ -82,14 +82,6 @@ public class SchedulerEmptyDatabaseManager extends EmptyDatabaseManager implemen
     }
 
     /**
-     * Return an empty list
-     */
-    @Override
-    public <T> List<T> recover(Class<T> egClass) {
-        return recover(egClass, new Condition[] {});
-    }
-
-    /**
      * If egClass is JobResultImpl, return the jobResult corresponding to the given JobId in the given condition,
      * If egClass is TaskresultImpl, return the taskResult corresponding to the given TaskId in the given condition,
      * Otherwise, return an empty list

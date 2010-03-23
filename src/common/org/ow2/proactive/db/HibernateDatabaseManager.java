@@ -577,6 +577,18 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("rawtypes")
+    public List sqlQuery(String nativeQuery) {
+        if (!nativeQuery.startsWith("SELECT")) {
+            throw new IllegalArgumentException(
+                "Native Query string must be a read request, ie:start with 'SELECT'");
+        }
+        return getSessionFactory().openStatelessSession().createSQLQuery(nativeQuery).list();
+    }
+
+    /**
      * Get every fields contained in the given class and in the inheritance if needed.
      *
      * @param clazz the class where to find the fields.

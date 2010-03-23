@@ -36,16 +36,9 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.ow2.proactive.db.DatabaseManager;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.RecoverCallback;
 import org.ow2.proactive.scheduler.job.InternalJob;
 

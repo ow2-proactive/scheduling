@@ -163,4 +163,13 @@ public interface DatabaseManager {
      * @param o the object to unload.
      */
     public void unload(Object o);
+
+    /**
+     * Execute a native "SELECT" SQL query and return the result as a list. (see hibernate SQLQurey.list() for more details)
+     * 
+     * @param nativeQuery the query to be executed, "must be a SELECT query"
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public List sqlQuery(String nativeQuery);
 }
