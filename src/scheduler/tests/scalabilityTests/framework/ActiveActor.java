@@ -45,6 +45,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
@@ -100,7 +101,8 @@ public class ActiveActor<T, V> extends Actor<T, V> implements InitActive {
     }
 
     private void addHostToFilename(FileAppender fileApp) {
-        String hostname = ProActiveInet.getInstance().getHostname();
+        String hostID = Math.abs(UniqueID.getCurrentVMID().hashCode() % 100000) + "-" +
+            ProActiveInet.getInstance().getHostname();
         String fileName = fileApp.getFile();
         File filePath = new File(fileName);
         String hostFileName;
@@ -108,12 +110,12 @@ public class ActiveActor<T, V> extends Actor<T, V> implements InitActive {
         String pathToFile = filePath.getParent();
         int point = name.indexOf('.');
         if (point == -1) {
-            hostFileName = fileName + "-" + hostname;
+            hostFileName = fileName + "-" + hostID;
         } else {
             String extension = name.substring(point + 1);
             String nameNoExtension = name.substring(0, point);
             hostFileName = (pathToFile != null ? pathToFile : "") + File.separator + nameNoExtension + "-" +
-                hostname + "." + extension;
+                hostID + "." + extension;
         }
         System.out.println("New output file:" + hostFileName);
         fileApp.setFile(hostFileName);
