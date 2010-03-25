@@ -79,9 +79,9 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
     //ObjectID field name for HQL request
     private static final String OBJECTID_REQUEST_FIELD = "objectId";
     //locks
-    private static Object sessionlock = new Object();
+    private Object sessionlock = new Object();
     //Memory for id field name by class
-    private static Map<Class<?>, Field> idFields = new HashMap<Class<?>, Field>();
+    private Map<Class<?>, Field> idFields = new HashMap<Class<?>, Field>();
     //Hibernate Session factory
     private SessionFactory sessionFactory;
     //Hibernate configuration
