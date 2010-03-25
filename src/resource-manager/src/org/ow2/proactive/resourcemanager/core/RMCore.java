@@ -418,7 +418,8 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
      *            the node to remove.
      */
     private void internalRemoveNodeFromCore(RMNode rmnode, Client initiator) {
-        logger.debug("Removing node " + rmnode.getNodeURL() + " provided by " + rmnode.getProvider());
+        logger.debug("Removing node " + rmnode.getNodeURL() + ", provider: " + rmnode.getProvider() +
+            ", initiator: " + initiator);
         // removing the node from the HM list
         if (rmnode.isFree()) {
             freeNodes.remove(rmnode);
@@ -531,12 +532,19 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
         if (this.allNodes.containsKey(nodeUrl)) {
             RMNode rmnode = this.allNodes.get(nodeUrl);
 
-            if (rmnode.isDown() || preempt || rmnode.isFree()) {
-                internalRemoveNodeFromCore(rmnode, initiator);
-                rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), initiator);
-            } else if (rmnode.isBusy()) {
-                internalSetToRelease(rmnode, initiator);
+            if (initiator.getRole() == Client.Role.ADMIN || initiator.equals(rmnode.getProvider())) {
+                if (rmnode.isDown() || preempt || rmnode.isFree()) {
+                    internalRemoveNodeFromCore(rmnode, initiator);
+                    rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), initiator);
+                } else if (rmnode.isBusy()) {
+                    internalSetToRelease(rmnode, initiator);
+                }
+            } else {
+                logger.warn("Client " + initiator + " tried to remove the node " + rmnode.getNodeURL() +
+                    " of " + rmnode.getProvider());
+                return;
             }
+
         } else {
             logger.warn("An attempt to remove non existing node " + nodeUrl);
         }
@@ -770,17 +778,16 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
                 // verify that scheduler don't try to render a node detected
                 // down
                 if (!rmnode.isDown()) {
-
-                    if (!rmnode.getOwner().equals(client)) {
+                    if (client.getRole() == Client.Role.ADMIN || rmnode.getOwner().equals(client)) {
+                        if (rmnode.isToRelease()) {
+                            internalDoRelease(rmnode, client);
+                        } else {
+                            internalSetFree(rmnode);
+                        }
+                    } else {
                         logger.warn("An attempt to free a node by another user (won't be performed) " +
                             node.getNodeInformation().getURL());
                         return;
-                    }
-
-                    if (rmnode.isToRelease()) {
-                        internalDoRelease(rmnode, client);
-                    } else {
-                        internalSetFree(rmnode);
                     }
                 }
             }
@@ -1173,7 +1180,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
         if (client != null) {
             // expensive but relatively rare operation
             for (RMNode rmnode : allNodes.values()) {
-                if (rmnode.getOwner().equals(client)) {
+                if (client.equals(rmnode.getOwner())) {
                     if (rmnode.isToRelease()) {
                         internalDoRelease(rmnode, client);
                     } else if (rmnode.isBusy()) {

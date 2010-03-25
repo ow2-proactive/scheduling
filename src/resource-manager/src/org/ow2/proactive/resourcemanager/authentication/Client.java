@@ -63,14 +63,19 @@ import org.objectweb.proactive.core.mop.StubObject;
  */
 public class Client implements Serializable {
 
+    public enum Role {
+        USER, PROVIDER, ADMIN
+    };
+
     private static final Heartbeat hb = new Heartbeat();
     /** client's name */
     private String name;
-
     /** Unique id of the client */
     private UniqueID id;
     /** Body of the sender of request */
     private transient UniversalBody body;
+    /** client role **/
+    private Role role = Role.USER;
 
     public Client() {
     }
@@ -105,8 +110,12 @@ public class Client implements Serializable {
      * Redefined equals method based on client id
      */
     public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
         Client client = (Client) o;
-        return id.equals(client.getID());
+        return name.equals(client.getName());
     }
 
     public String toString() {
@@ -152,5 +161,13 @@ public class Client implements Serializable {
         }
 
         return null;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

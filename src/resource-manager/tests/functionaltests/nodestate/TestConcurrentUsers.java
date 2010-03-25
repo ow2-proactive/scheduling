@@ -48,6 +48,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -104,11 +105,11 @@ public class TestConcurrentUsers extends FunctionalTest {
             public void run() {
                 try {
                     RMAuthentication auth = RMConnection.join(null);
-                    Credentials cred = Credentials.createCredentials(RMTHelper.username, RMTHelper.password,
-                            auth.getPublicKey());
-                    RMAdmin admin = auth.logAsAdmin(cred);
-                    admin.freeNode(ns.get(0));
+                    Credentials cred = Credentials.createCredentials("user1", "pwd1", auth.getPublicKey());
+                    RMUser user = auth.logAsUser(cred);
+                    user.freeNode(ns.get(0));
                 } catch (Exception e) {
+                    Assert.assertTrue(false);
                 }
             }
         };
