@@ -38,10 +38,14 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
@@ -50,18 +54,21 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
 
 
 /**
- * This interface defines administrator operations for the resource manager.
- * <p>
- * It includes all operations from {@link RMUser} and {@link RMProvider} interfaces,
- * adding abilities to create sources of nodes, control some of their parameters
- * (ping frequencies) and trigger the shutdown of the resource manager.
+ * An interface Front-End for the {@link RMAdminImpl} active object.
+ * this Resource Manager object is designed to receive and perform
+ * administrator commands :<BR>
+ * -initiate creation and removal of {@link org.ow2.proactive.resourcemanager.nodesource.frontend#NodeSource} active objects.<BR>
+ * -add nodes to a static node source ({@link org.ow2.proactive.resourcemanager.nodesource.deprecated.GCMNodeSource}), by
+ * a ProActive descriptor.<BR>
+ * -remove nodes from the RM.<BR>
+ * -shutdown the RM.<BR>
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  *
  */
 @PublicAPI
-public interface RMAdmin extends RMProvider, Serializable {
+public interface RMAdmin extends RMUser, Serializable {
 
     /**
      * Set the ping frequency to the default node source
@@ -109,6 +116,30 @@ public interface RMAdmin extends RMProvider, Serializable {
             throws RMException;
 
     /**
+     * Add an already deployed node to the default static nodes source of the RM
+     * @param nodeUrl URL of the node to add.
+     * @return true if new node is added successfully, false otherwise
+     */
+    public BooleanWrapper addNode(String nodeUrl);
+
+    /**
+     * Add nodes to a StaticNodeSource represented by sourceName.
+     * SourceName must exist and must be a static source
+     * @param nodeUrl URL of the node to add.
+     * @param sourceName name of the static node source that will handle the node
+     * @return true if new node is added successfully, false otherwise
+     */
+    public BooleanWrapper addNode(String nodeUrl, String sourceName);
+
+    /**
+     * Removes a node from the RM.
+     *
+     * @param nodeUrl URL of the node to remove.
+     * @param preempt if true remove the node immediately without waiting while it will be freed.
+     */
+    public void removeNode(String nodeUrl, boolean preempt);
+
+    /**
      * Remove a node source from the RM.
      * All nodes handled by the node source are removed.
      *
@@ -125,6 +156,23 @@ public interface RMAdmin extends RMProvider, Serializable {
      *
      */
     public void shutdown(boolean preempt) throws ProActiveException;
+
+    /**
+     * Gets a list of nodes handled by Resource Manager
+     * @return a list of RMNodeEvent objects representing the nodes 
+     */
+    public List<RMNodeEvent> getNodesList();
+
+    /**
+     * Get list of nodes sources on Resource Manager
+     * @return a list of RMNodeSourceEvent objects representing the nodes sources
+     */
+    public List<RMNodeSourceEvent> getNodeSourcesList();
+
+    /**
+     * Disconnects from resource manager.
+     */
+    public void disconnect();
 
     /**
      * Gets a list of supported node source infrastructures descriptors

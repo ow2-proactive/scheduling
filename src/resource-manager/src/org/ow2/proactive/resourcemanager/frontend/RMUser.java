@@ -42,21 +42,28 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
 
 /**
- * This interface defines user operations for the resource manager.
- * <p>
- * The user of the resource manager is the one who requests nodes for
- * distributed computations providing set of criteria (@see SelectionScript).
- * After computations are completed user frees nodes so that they are available for
- * others.
+ * An interface Front-End for the Resource Manager's User active object.
+ * Provides a way to perform user operations in Resource manager (RM).
+ * We consider the ProActive scheduler as an 'user' of RM.
+ * So the user (scheduler) launch tasks on nodes, it asks node to the RM.
+ * and give back nodes at the end of the tasks. That the two operations
+ * of an user :<BR>
+ * - ask nodes (get nodes).<BR>
+ * - give back nodes (free nodes).<BR><BR>
  *
- * User can also see the internal state of the resource manager, list its nodes and node sources.
+ * Scheduler can ask nodes that verify criteria. selections criteria are
+ * defined in a test script which provides kind of boolean result :
+ * node suitable or not suitable.<BR>
+ * This script is executed in the node before selecting it,
+ * If the node match criteria, it is selected, otherwise RM tries the selection script
+ * on other nodes.
+ *
+ *  @see org.ow2.proactive.scripting.SelectionScript
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -89,25 +96,6 @@ public interface RMUser {
      * @return total number of nodes
      */
     public IntWrapper getTotalNodesNumber();
-
-    /**
-     * Gets a list of nodes handled by Resource Manager
-     * @return a list of RMNodeEvent objects representing the nodes
-     */
-    public List<RMNodeEvent> getNodesList();
-
-    /**
-     * Get list of nodes sources on Resource Manager
-     * @return a list of RMNodeSourceEvent objects representing the nodes sources
-     */
-    public List<RMNodeSourceEvent> getNodeSourcesList();
-
-    /**
-     * Return a state containing some informations about RM activity.
-     *
-     * @return a state containing some informations about RM activity.
-     */
-    public RMState getRMState();
 
     /**
      * Provides nbNodes nodes verifying a selection script.
@@ -211,6 +199,13 @@ public interface RMUser {
      * @param nodes : a table of nodes to release.
      */
     public void freeNodes(NodeSet nodes);
+
+    /**
+     * Return a state containing some informations about RM activity.
+     * 
+     * @return a state containing some informations about RM activity.
+     */
+    public RMState getRMState();
 
     /**
      * Disconnects from resource manager.

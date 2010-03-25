@@ -41,7 +41,6 @@ import static junit.framework.Assert.assertTrue;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.frontend.RMProvider;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 
 import functionalTests.FunctionalTest;
@@ -63,9 +62,6 @@ public class AuthenticationTest extends FunctionalTest {
     private String userName = "user1";
     private String userPwd = "pwd1";
 
-    private String providerName = "provider";
-    private String providerPwd = "provider";
-
     /**
      * test function
      *
@@ -76,8 +72,8 @@ public class AuthenticationTest extends FunctionalTest {
 
         RMAuthentication auth = RMTHelper.getRMAuth();
 
-        RMTHelper.log("Test 1 - admin");
-        RMTHelper.log("Trying to authorized as admin with correct name and password");
+        RMTHelper.log("Test 1");
+        RMTHelper.log("Trying to authorized as an admin with correct user name and password");
 
         try {
             Credentials cred = Credentials.createCredentials(adminName, adminPwd, auth.getPublicKey());
@@ -90,76 +86,8 @@ public class AuthenticationTest extends FunctionalTest {
             RMTHelper.log("Failed: unexpected error " + e.getMessage());
         }
 
-        RMTHelper.log("Test 2 - admin");
-        RMTHelper.log("Trying to authorized as user with correct administrator name and password");
-
-        try {
-            Credentials cred = Credentials.createCredentials(adminName, adminPwd, auth.getPublicKey());
-            RMUser user = auth.logAsUser(cred);
-            user.disconnect();
-            RMTHelper.log("Passed: successful authentication");
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(false);
-            RMTHelper.log("Failed: unexpected error " + e.getMessage());
-        }
-
-        RMTHelper.log("Test 3 - admin");
-        RMTHelper.log("Trying to authorized as provider with correct administrator name and password");
-
-        try {
-            Credentials cred = Credentials.createCredentials(adminName, adminPwd, auth.getPublicKey());
-            RMProvider provider = auth.logAsProvider(cred);
-            provider.disconnect();
-            RMTHelper.log("Passed: successful authentication");
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(false);
-            RMTHelper.log("Failed: unexpected error " + e.getMessage());
-        }
-
-        RMTHelper.log("Test 4 - provider");
-        RMTHelper.log("Trying to authorized as provider with correct name and password");
-
-        try {
-            Credentials cred = Credentials.createCredentials(providerName, providerPwd, auth.getPublicKey());
-            RMProvider provider = auth.logAsProvider(cred);
-            provider.disconnect();
-            RMTHelper.log("Passed: successful authentication");
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(false);
-            RMTHelper.log("Failed: unexpected error " + e.getMessage());
-        }
-
-        RMTHelper.log("Test 5 - provider");
-        RMTHelper.log("Trying to authorized as user with correct provider name and password");
-
-        try {
-            Credentials cred = Credentials.createCredentials(providerName, providerPwd, auth.getPublicKey());
-            RMUser user = auth.logAsUser(cred);
-            user.disconnect();
-            RMTHelper.log("Passed: successful authentication");
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(false);
-            RMTHelper.log("Failed: unexpected error " + e.getMessage());
-        }
-
-        RMTHelper.log("Test 6 - provider");
-        RMTHelper.log("Trying to authorized as an admin with correct provider name and password");
-
-        try {
-            Credentials cred = Credentials.createCredentials(providerName, providerPwd, auth.getPublicKey());
-            auth.logAsAdmin(cred);
-            RMTHelper.log("Error: successful authentication");
-            assertTrue(false);
-        } catch (Exception e) {
-            RMTHelper.log("Passed: expected error " + e.getMessage());
-        }
-
-        RMTHelper.log("Test 7 - user");
-        RMTHelper.log("Trying to authorized as user with correct name and password");
+        RMTHelper.log("Test 2");
+        RMTHelper.log("Trying to authorized as a user with correct user name and password");
 
         try {
             Credentials cred = Credentials.createCredentials(userName, userPwd, auth.getPublicKey());
@@ -172,8 +100,22 @@ public class AuthenticationTest extends FunctionalTest {
             RMTHelper.log("Failed: unexpected error " + e.getMessage());
         }
 
+        RMTHelper.log("Test 3");
+        RMTHelper.log("Trying to authorized as a user with correct administrator name and password");
+
+        try {
+            Credentials cred = Credentials.createCredentials(adminName, adminPwd, auth.getPublicKey());
+            RMUser user = auth.logAsUser(cred);
+            user.disconnect();
+            RMTHelper.log("Passed: successful authentication");
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+            RMTHelper.log("Failed: unexpected error " + e.getMessage());
+        }
+
         // negative
-        RMTHelper.log("Test 8 - user");
+        RMTHelper.log("Test 4");
         RMTHelper.log("Trying to authorized as an admin with incorrect user name and password");
 
         try {
@@ -185,7 +127,7 @@ public class AuthenticationTest extends FunctionalTest {
             RMTHelper.log("Passed: expected error " + e.getMessage());
         }
 
-        RMTHelper.log("Test 8 - user");
+        RMTHelper.log("Test 5");
         RMTHelper.log("Trying to authorized as a user with incorrect user name and password");
 
         try {
@@ -197,7 +139,7 @@ public class AuthenticationTest extends FunctionalTest {
             RMTHelper.log("Passed: expected error " + e.getMessage());
         }
 
-        RMTHelper.log("Test 9 - user");
+        RMTHelper.log("Test 6");
         RMTHelper.log("Trying to authorized as an admin with correct user name and password");
 
         try {
@@ -209,19 +151,7 @@ public class AuthenticationTest extends FunctionalTest {
             RMTHelper.log("Passed: expected error " + e.getMessage());
         }
 
-        RMTHelper.log("Test 10 - user");
-        RMTHelper.log("Trying to authorized as an provider with correct user name and password");
-
-        try {
-            Credentials cred = Credentials.createCredentials(userName, userPwd, auth.getPublicKey());
-            auth.logAsProvider(cred);
-            RMTHelper.log("Error: successful authentication");
-            assertTrue(false);
-        } catch (Exception e) {
-            RMTHelper.log("Passed: expected error " + e.getMessage());
-        }
-
-        RMTHelper.log("Test 11");
+        RMTHelper.log("Test 6");
         RMTHelper.log("Trying to connect twice from one active object");
 
         try {
@@ -233,5 +163,6 @@ public class AuthenticationTest extends FunctionalTest {
         } catch (Exception e) {
             RMTHelper.log("Passed: expected error " + e.getMessage());
         }
+
     }
 }

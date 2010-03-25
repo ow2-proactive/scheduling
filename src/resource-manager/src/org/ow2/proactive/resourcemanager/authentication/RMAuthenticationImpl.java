@@ -57,7 +57,6 @@ import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMProvider;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
@@ -127,23 +126,6 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
             throw new LoginException(ERROR_ALREADY_CONNECTED);
         }
 
-        client.setRole(Client.Role.ADMIN);
-        RMCore.clients.put(client.getID(), client);
-        logger.info(client + " connected");
-        return rmcore;
-    }
-
-    /**
-     * Performs provider authentication
-     */
-    public RMProvider logAsProvider(Credentials cred) throws LoginException {
-        Client client = new Client(loginAs("provider", new String[] { "provider", "admin" }, cred));
-
-        if (RMCore.clients.containsKey(client.getID())) {
-            throw new LoginException(ERROR_ALREADY_CONNECTED);
-        }
-
-        client.setRole(Client.Role.PROVIDER);
         RMCore.clients.put(client.getID(), client);
         logger.info(client + " connected");
         return rmcore;
@@ -153,13 +135,12 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      * Performs user authentication
      */
     public RMUser logAsUser(Credentials cred) throws LoginException {
-        Client client = new Client(loginAs("user", new String[] { "user", "provider", "admin" }, cred));
+        Client client = new Client(loginAs("user", new String[] { "user", "admin" }, cred));
 
         if (RMCore.clients.containsKey(client.getID())) {
             throw new LoginException(ERROR_ALREADY_CONNECTED);
         }
 
-        client.setRole(Client.Role.USER);
         RMCore.clients.put(client.getID(), client);
         logger.info(client + " connected");
         return rmcore;
@@ -234,5 +215,4 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
             return uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + "/";
         }
     }
-
 }

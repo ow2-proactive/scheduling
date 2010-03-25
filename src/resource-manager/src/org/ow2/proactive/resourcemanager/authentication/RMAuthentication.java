@@ -42,7 +42,6 @@ import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMProvider;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
 
 
@@ -69,11 +68,6 @@ public interface RMAuthentication extends Authentication {
      * Performs user authentication
      */
     public RMUser logAsUser(Credentials cred) throws LoginException;
-
-    /**
-     * Performs provider authentication
-     */
-    public RMProvider logAsProvider(Credentials cred) throws LoginException;
 
     /**
      * Performs admin authentication
