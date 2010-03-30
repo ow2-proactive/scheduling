@@ -839,11 +839,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                 //mark the task and job (if needed) as started and send events
                                 finalizeStarting(currentJob, internalTask, node);
                             } else {
-                                resourceManager.freeNodes(nodes);
+                                //if there was a problem, free nodeSet for multi-nodes task (1)
+                                throw new RuntimeException("Free nodes 1");
                             }
                         } else {
-                            //if there was a problem, free nodeSet for multi-nodes task
-                            resourceManager.freeNodes(nodes);
+                            //if there was a problem, free nodeSet for multi-nodes task (2)
+                            throw new RuntimeException("Free nodes 2");
                         }
 
                     }
@@ -875,9 +876,11 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             } catch (Exception e1) {
                 //if we are here, it is that something append while launching the current task.
+                //exception can also come from (1) or (2)
                 logger.warn("", e1);
                 //so try to get back every remaining nodes to the resource manager
                 try {
+                    nodeSet.add(node);
                     resourceManager.freeNodes(nodeSet);
                 } catch (Exception e2) {
                     logger_dev.info("Unable to get back the nodeSet to the RM", e2);
