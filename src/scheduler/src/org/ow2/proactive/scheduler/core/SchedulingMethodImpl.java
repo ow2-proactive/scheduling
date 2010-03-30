@@ -475,16 +475,19 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                         //mark the task and job (if needed) as started and send events
                         finalizeStarting(job, task, node);
                     } else {
-                        core.resourceManager.freeNodes(nodes);
+                        //if there was a problem, free nodeSet for multi-nodes task (1)
+                        throw new RuntimeException("Free nodes 1");
                     }
                 } else {
-                    //if there was a problem, free nodeSet for multi-nodes task
-                    core.resourceManager.freeNodes(nodes);
+                    //if there was a problem, free nodeSet for multi-nodes task (2)
+                    throw new RuntimeException("Free nodes 2");
                 }
 
             } catch (Exception t) {
                 try {
                     //if there was a problem, free nodeSet for multi-nodes task
+                    //exception can also come from (1) or (2)
+                    nodes.add(node);
                     core.resourceManager.freeNodes(nodes);
                 } catch (Throwable ni) {
                     //miam miam
