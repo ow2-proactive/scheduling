@@ -110,7 +110,8 @@ public class NodeSource implements InitActive, RunActive {
     private HashMap<String, Node> downNodes = new HashMap<String, Node>();
 
     private static int instanceCount = 0;
-    private static ExecutorService networkOperationsThreadPool;
+    private static ExecutorService internalThreadPool;
+    private static ExecutorService externalThreadPool;
     private NodeSource stub;
     private Client provider;
 
@@ -150,7 +151,7 @@ public class NodeSource implements InitActive, RunActive {
 
         try {
             // executor service initialization
-            getExecutorService();
+            initExecutorService();
 
             // description could be requested when the policy does not exist anymore
             // so initializing it here
@@ -343,7 +344,7 @@ public class NodeSource implements InitActive, RunActive {
         if (logger.isDebugEnabled())
             logger.debug("Looking up for the node " + nodeUrl + " with " + timeout + " ms timeout");
 
-        Future<Node> futureNode = getExecutorService().submit(new NodeLocator(nodeUrl));
+        Future<Node> futureNode = internalThreadPool.submit(new NodeLocator(nodeUrl));
         try {
             return futureNode.get(timeout, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
@@ -493,14 +494,17 @@ public class NodeSource implements InitActive, RunActive {
 
         if (instanceCount == 0) {
             // terminating thread pool
-            networkOperationsThreadPool.shutdown();
+            internalThreadPool.shutdown();
+            externalThreadPool.shutdown();
             try {
                 // waiting until all nodes will be removed
-                networkOperationsThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                internalThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                externalThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 logger.warn("", e);
             }
-            networkOperationsThreadPool = null;
+            internalThreadPool = null;
+            externalThreadPool = null;
         }
     }
 
@@ -571,20 +575,21 @@ public class NodeSource implements InitActive, RunActive {
      * @param command to execute
      */
     public void executeInParallel(Runnable command) {
-        getExecutorService().execute(command);
+        externalThreadPool.execute(command);
     }
 
     /**
      * Instantiates the thread pool if it is null.
      */
-    private synchronized static ExecutorService getExecutorService() {
-        if (networkOperationsThreadPool == null) {
-            networkOperationsThreadPool = Executors
-                    .newFixedThreadPool(PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER
-                            .getValueAsInt());
+    private synchronized static void initExecutorService() {
+        if (internalThreadPool == null) {
+            int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
+            if (maxThreads < 2) {
+                maxThreads = 2;
+            }
+            internalThreadPool = Executors.newFixedThreadPool(maxThreads / 2);
+            externalThreadPool = Executors.newFixedThreadPool(maxThreads / 2);
         }
-
-        return networkOperationsThreadPool;
     }
 
     /**
