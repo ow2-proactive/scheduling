@@ -203,7 +203,7 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
             }
 
             try {
-                if (nodeSource.getRMCore().addNode(nodeUrl, nodeSource.getName()).booleanValue()) {
+                if (nodeSource.acquireNode(nodeUrl, nodeSource.getProvider()).booleanValue()) {
                     try {
                         // don't destroy the process if launched on localhost without SSH;
                         // it would kill it

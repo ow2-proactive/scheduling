@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 
 
@@ -106,7 +107,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
     /**
      * Asynchronous request of all nodes acquisition.
-     * Nodes should register themselves by calling {@link RMCore#addNode(String, String)}
+     * Proactive node should register itself by calling {@link NodeSource#acquireNode(String, org.ow2.proactive.resourcemanager.authentication.Client)}
      */
     @Override
     public void acquireAllNodes() {
@@ -129,7 +130,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
     /**
      * Asynchronous node acquisition request.
-     * Proactive node should register itself by calling {@link RMCore#addNode(String, String)}
+     * Proactive node should register itself by calling {@link NodeSource#acquireNode(String, org.ow2.proactive.resourcemanager.authentication.Client)}
      */
     @Override
     public void acquireNode() {

@@ -52,6 +52,7 @@ import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -156,7 +157,7 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
 
     /**
      * Asynchronous request of all nodes acquisition.
-     * Nodes should register themselves by calling {@link RMCore#addNode(String, String)}
+     * Proactive node should register itself by calling {@link NodeSource#acquireNode(String, org.ow2.proactive.resourcemanager.authentication.Client)}
      */
     @Override
     public void acquireAllNodes() {
