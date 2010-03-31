@@ -144,7 +144,6 @@ public class NodeSource implements InitActive, RunActive {
      */
     public void initActivity(Body body) {
 
-        instanceCount++;
         stub = (NodeSource) PAActiveObject.getStubOnThis();
         infrastructureManager.setNodeSource(this);
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
@@ -490,21 +489,23 @@ public class NodeSource implements InitActive, RunActive {
         // got confirmation from pinger and policy
         PAActiveObject.terminateActiveObject(false);
 
-        instanceCount--;
+        synchronized (NodeSource.class) {
+            instanceCount--;
 
-        if (instanceCount == 0) {
-            // terminating thread pool
-            internalThreadPool.shutdown();
-            externalThreadPool.shutdown();
-            try {
-                // waiting until all nodes will be removed
-                internalThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-                externalThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                logger.warn("", e);
+            if (instanceCount == 0) {
+                // terminating thread pool
+                internalThreadPool.shutdown();
+                externalThreadPool.shutdown();
+                try {
+                    // waiting until all nodes will be removed
+                    internalThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                    externalThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    logger.warn("", e);
+                }
+                internalThreadPool = null;
+                externalThreadPool = null;
             }
-            internalThreadPool = null;
-            externalThreadPool = null;
         }
     }
 
@@ -582,6 +583,8 @@ public class NodeSource implements InitActive, RunActive {
      * Instantiates the thread pool if it is null.
      */
     private synchronized static void initExecutorService() {
+        instanceCount++;
+
         if (internalThreadPool == null) {
             int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
             if (maxThreads < 2) {
