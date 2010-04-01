@@ -1173,7 +1173,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
         if (client != null) {
             // expensive but relatively rare operation
             for (RMNode rmnode : allNodes.values()) {
-                if (rmnode.getOwner().equals(client)) {
+                if (client.equals(rmnode.getOwner())) {
                     if (rmnode.isToRelease()) {
                         internalDoRelease(rmnode, client);
                     } else if (rmnode.isBusy()) {

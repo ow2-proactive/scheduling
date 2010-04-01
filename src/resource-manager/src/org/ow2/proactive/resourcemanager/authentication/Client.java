@@ -105,8 +105,11 @@ public class Client implements Serializable {
      * Redefined equals method based on client id
      */
     public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
         Client client = (Client) o;
-        return id.equals(client.getID());
+        return name.equals(client.getName());
     }
 
     public String toString() {
