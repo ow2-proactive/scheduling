@@ -103,9 +103,9 @@ public class TestConcurrentUsers extends FunctionalTest {
             @Override
             public void run() {
                 try {
+                    // login as another client
                     RMAuthentication auth = RMConnection.join(null);
-                    Credentials cred = Credentials.createCredentials(RMTHelper.username, RMTHelper.password,
-                            auth.getPublicKey());
+                    Credentials cred = Credentials.createCredentials("admin", "admin", auth.getPublicKey());
                     RMAdmin admin = auth.logAsAdmin(cred);
                     admin.freeNode(ns.get(0));
                 } catch (Exception e) {
@@ -115,7 +115,6 @@ public class TestConcurrentUsers extends FunctionalTest {
         t.start();
         t.join();
 
-        // to make sure everything has been processed
         Thread.sleep(1000);
 
         assertTrue(admin.getTotalNodesNumber().intValue() == 1);
