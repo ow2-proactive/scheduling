@@ -517,6 +517,8 @@ public class JobFactory_stax extends JobFactory {
             int eventType = cursorVariables.next();
             if (eventType == XMLEvent.CHARACTERS) {
                 description = replace(cursorVariables.getText());
+            } else if (eventType == XMLEvent.END_ELEMENT) {
+                return description;
             }
             //go to the description END_ELEMENT
             while (cursorVariables.next() != XMLEvent.END_ELEMENT)
