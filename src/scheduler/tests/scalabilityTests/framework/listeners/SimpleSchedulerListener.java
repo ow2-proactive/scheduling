@@ -31,21 +31,12 @@
 package scalabilityTests.framework.listeners;
 
 import java.io.Serializable;
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PARemoteObject;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.extensions.annotation.RemoteObject;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -81,7 +72,7 @@ public class SimpleSchedulerListener implements SchedulerEventListener, Serializ
     }
 
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> taskNotification) {
-        logger.info("Task " + taskNotification.getData().getName() + " has changed its state to " +
+        logger.info("Task " + taskNotification.getData().getTaskId() + " has changed its state to " +
             taskNotification.getEventType());
     }
 
