@@ -173,9 +173,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /** Maximum blocking time for the do task action */
     private static final int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT
             .getValueAsInt();
+
     /** MAximum number of thread used for the doTask action */
     private static final int DOTASK_ACTION_THREADNUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
             .getValueAsInt();
+
+    /** Delay to wait for a job is terminated and removing it */
+    private static final long SCHEDULER_AUTO_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY
+            .getValueAsInt() * 1000;
 
     /** Implementation of Resource Manager */
     private ResourceManagerProxy resourceManager;
@@ -319,8 +324,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /**
      * Terminate some job handling at the end of a job
      */
-    private void terminateJobHandling(JobId jid) {
+    private void terminateJobHandling(final JobId jid) {
         try {
+            final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
             //remove loggers
             logger_dev.info("Cleaning loggers for Job '" + jid + "'");
             Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jid);
@@ -332,6 +338,21 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             // Other tasks' logs should remain available...
             this.currentlyRunningTasks.remove(jid);
             removeTaskClassServer(jid);
+            //auto remove
+            if (SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
+                try {
+                    //remove job after the given delay
+                    TimerTask tt = new TimerTask() {
+                        @Override
+                        public void run() {
+                            schedulerStub.remove(jid);
+                        }
+                    };
+                    removeJobTimer.schedule(tt, SCHEDULER_AUTO_REMOVED_JOB_DELAY);
+                } catch (Exception e) {
+                    logger_dev.error("", e);
+                }
+            }
         } catch (Throwable t) {
             logger_dev.warn("", t);
         }
@@ -1689,6 +1710,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //send event to front-end
             frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                 SchedulerEvent.JOB_REMOVE_FINISHED, job.getJobInfo()));
+        } else {
+            logger_dev.info("Job '" + jobId + "' has already been removed or is not finished !");
         }
     }
 
@@ -2245,21 +2268,29 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         while (iterJob.hasNext()) {
             final InternalJob job = iterJob.next();
             //re-set job removed delay (if job result has been sent to user)
-            if (job.isToBeRemoved()) {
-                if (SCHEDULER_REMOVED_JOB_DELAY > 0) {
-                    try {
-                        //remove job after the given delay
-                        TimerTask tt = new TimerTask() {
-                            @Override
-                            public void run() {
-                                schedulerStub.remove(job.getId());
-                            }
-                        };
-                        removeJobTimer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
-                        logger.debug("Job " + job.getId() + " will be removed in " +
-                            (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
-                    } catch (Exception e) {
+            if (SCHEDULER_REMOVED_JOB_DELAY > 0 || SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
+                try {
+                    //remove job after the given delay
+                    TimerTask tt = new TimerTask() {
+                        @Override
+                        public void run() {
+                            schedulerStub.remove(job.getId());
+                        }
+                    };
+                    long toWait = 0;
+                    if (job.isToBeRemoved()) {
+                        toWait = SCHEDULER_REMOVED_JOB_DELAY * SCHEDULER_AUTO_REMOVED_JOB_DELAY == 0 ? SCHEDULER_REMOVED_JOB_DELAY +
+                            SCHEDULER_AUTO_REMOVED_JOB_DELAY
+                                : Math.min(SCHEDULER_REMOVED_JOB_DELAY, SCHEDULER_AUTO_REMOVED_JOB_DELAY);
+                    } else {
+                        toWait = SCHEDULER_AUTO_REMOVED_JOB_DELAY;
                     }
+                    if (toWait > 0) {
+                        removeJobTimer.schedule(tt, toWait);
+                    }
+                    logger.debug("Job " + job.getId() + " will be removed in " +
+                        (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+                } catch (Exception e) {
                 }
             }
         }

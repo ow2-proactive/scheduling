@@ -74,9 +74,6 @@ public enum PASchedulerProperties {
     /** Scheduler node ping frequency in s. */
     SCHEDULER_NODE_PING_FREQUENCY("pa.scheduler.core.nodepingfrequency", PAPropertiesType.INTEGER),
 
-    /** Delay to wait between getting a job result and removing the job concerned */
-    SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PAPropertiesType.INTEGER),
-
     /** Name of the JMX MBean for the scheduler */
     SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PAPropertiesType.STRING),
 
@@ -146,6 +143,13 @@ public enum PASchedulerProperties {
 
     /** Multiplicative factor for job id (taskId will be : this_factor*jobID+taskID) */
     JOB_FACTOR("pa.scheduler.job.factor", PAPropertiesType.INTEGER),
+
+    /** Delay to wait between getting a job result and removing the job concerned (0 = infinite) */
+    SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PAPropertiesType.INTEGER),
+
+    /** Delay to wait between a job is terminated and removing the it from Scheduler (0 = infinite) */
+    SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY("pa.scheduler.core.automaticremovejobdelay",
+            PAPropertiesType.INTEGER),
 
     /** Remove job in dataBase when removing it from scheduler. */
     JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PAPropertiesType.BOOLEAN),
