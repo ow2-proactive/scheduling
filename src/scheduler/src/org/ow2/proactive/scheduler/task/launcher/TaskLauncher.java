@@ -361,7 +361,7 @@ public abstract class TaskLauncher implements InitActive {
         // get all names of propagated vars
         String allVars = System.getProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
         if (allVars != null) {
-            logger_dev.info("Propagated properties for task " + this.taskId + " are : " + allVars);
+            logger_dev.debug("Propagated properties for task " + this.taskId + " are : " + allVars);
             StringTokenizer parser = new StringTokenizer(allVars, PropertyUtils.VARS_VAR_SEPARATOR);
             Map<String, BigString> exportedVars = new Hashtable<String, BigString>();
             while (parser.hasMoreTokens()) {
@@ -378,7 +378,7 @@ public abstract class TaskLauncher implements InitActive {
             System.clearProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
             return exportedVars;
         } else {
-            logger_dev.info("No Propagated properties for task " + this.taskId);
+            logger_dev.debug("No Propagated properties for task " + this.taskId);
             return null;
         }
     }
