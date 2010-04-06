@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -187,6 +188,7 @@ public class TaskResultImpl implements TaskResult {
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
      * @param propagatedProperties the map of all properties that has been propagated through Exporter.propagateProperty
+     * @throws IOException
      */
     public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration,
             Map<String, BigString> propagatedProperties) {
@@ -195,9 +197,27 @@ public class TaskResultImpl implements TaskResult {
         this.value = value;
         this.propagatedProperties = propagatedProperties;
         try {
+            //try to serialize user result
             this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
-        } catch (IOException e) {
-            logger_dev.error("", e);
+        } catch (IOException ioe1) {
+            //error while serializing
+            logger_dev.error("", ioe1);
+            try {
+                //try to serialize the cause as an exception
+                this.serializedException = ObjectToByteConverter.ObjectStream.convert(ioe1);
+            } catch (IOException ioe2) {
+                //cannot serialize the cause
+                logger_dev.error("", ioe2);
+                try {
+                    //serialize a NotSerializableException with the cause message
+                    this.serializedException = ObjectToByteConverter.ObjectStream
+                            .convert(new NotSerializableException(ioe2.getMessage()));
+                } catch (IOException ioe3) {
+                    //this should not append as the NotSerializableException is serializable and
+                    //the given argument is a string (also serializable)
+                    logger_dev.error("", ioe3);
+                }
+            }
         }
     }
 
@@ -217,9 +237,20 @@ public class TaskResultImpl implements TaskResult {
         this.exception = exception;
         this.propagatedProperties = propagatedProperties;
         try {
+            //try to serialize the user exception
             this.serializedException = ObjectToByteConverter.ObjectStream.convert(exception);
-        } catch (IOException e) {
-            logger_dev.error("", e);
+        } catch (IOException ioe2) {
+            //cannot serialize the exception
+            logger_dev.error("", ioe2);
+            try {
+                //serialize a NotSerializableException with the cause message
+                this.serializedException = ObjectToByteConverter.ObjectStream
+                        .convert(new NotSerializableException(ioe2.getMessage()));
+            } catch (IOException ioe3) {
+                //this should not append as the NotSerializableException is serializable and
+                //the given argument is a string (also serializable)
+                logger_dev.error("", ioe3);
+            }
         }
     }
 
