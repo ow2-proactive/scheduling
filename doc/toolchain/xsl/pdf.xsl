@@ -1246,20 +1246,7 @@
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="@role='bold' or @role='' or @role='strong'">
-				<xsl:choose>
-					<!--  BOLD WITHIN PROGRAMLISTING -->
-					<xsl:when test="parent::programlisting">
-						<fo:inline background-color="#eaf91f">
-							<xsl:call-template name="inline.boldseq">
-							</xsl:call-template>
-						</fo:inline>
-					</xsl:when>
-					<!-- NORMAL BOLD  -->
-					<xsl:otherwise>
-						<xsl:call-template name="inline.boldseq">
-						</xsl:call-template>
-					</xsl:otherwise>
-				</xsl:choose>
+				<xsl:call-template name="inline.boldseq"/>
 			</xsl:when>
 			<!--  ITALICS -->
 			<xsl:when test="@role='italics'">
@@ -2136,10 +2123,10 @@
 			</xsl:otherwise>
 		</xsl:choose>
 
-
+		
 	</xsl:template>
 
-	<xsl:template name="isFollowedBySameElement">
+	<xsl:template name="isFollowedBySameElement"> 
 		<xsl:variable name="myName" select="name()"/>
 		<xsl:variable name="result">
 			<xsl:apply-templates mode="mode1" select="following-sibling::node()[1]">
@@ -2148,7 +2135,7 @@
 		</xsl:variable>
 		<xsl:choose>
 			<!-- This condition is true when $result is a zero-length string -->
-			<!--
+			<!-- 
 				 It is in particular the case when there does not exist
 				 following siblings: templates are not called and so result
 				 is not set.
@@ -2183,7 +2170,7 @@
 		</xsl:choose>
 	</xsl:template>
 </xsl:stylesheet>
-<!--
+<!-- 
 	<xsl:message>
 	<xsl:text> OK, question.toc </xsl:text> <xsl:copy-of select="$id" /> 
 	</xsl:message>

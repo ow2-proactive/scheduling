@@ -570,22 +570,12 @@
 	<xsl:template match="newline">
 		<br />
 	</xsl:template>
-
+	
 
 	<xsl:template match="emphasis">
 		<xsl:choose>
 			<xsl:when test="@role='bold' or @role='' or @role='strong'">
-				<xsl:choose>
-					<!--  BOLD WITHIN PROGRAMLISTING -->
-					<xsl:when test="parent::programlisting">
-						<xsl:attribute name="color">#eaf91f</xsl:attribute>
-						<xsl:call-template name="inline.boldseq" />
-					</xsl:when>
-					<!-- NORMAL BOLD  -->
-					<xsl:otherwise>
-						<xsl:call-template name="inline.boldseq" />
-					</xsl:otherwise>
-				</xsl:choose>
+				<xsl:call-template name="inline.boldseq" />
 			</xsl:when>
 			<!--  ITALICS -->
 			<xsl:when test="@role='italics'">

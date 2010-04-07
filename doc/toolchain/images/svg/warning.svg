@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="91.470001"
+   height="99.940002"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   sodipodi:docbase="/user/vjuresch/home/workspace/ProActive/doc-src/images"
+   sodipodi:docname="warning.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0"
+   inkscape:export-filename="/user/vjuresch/home/workspace/ProActive/doc-src/images/warning.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3175">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop3177" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3179" />
+    </linearGradient>
+    <filter
+       inkscape:collect="always"
+       id="filter6488">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.87703144"
+         id="feGaussianBlur6490" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter6504">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.27463333"
+         id="feGaussianBlur6506" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="229.34459"
+     inkscape:cy="10.919892"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="1672"
+     inkscape:window-height="994"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     height="99.94px"
+     width="91.47px" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-186.02299,-354.54075)">
+    <path
+       style="opacity:0.25;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#080808;stroke-width:8.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter6488)"
+       d="M 190.9821,446.5912 C 186.41138,440.54386 218.63308,367.30548 228.21161,367.30548 C 236.78114,367.30548 271.69638,440.51976 264.55352,446.41262 C 258.00953,451.81141 195.44639,452.48406 190.9821,446.5912 z "
+       id="path5473"
+       sodipodi:nodetypes="cccc" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot2160"
+       transform="translate(-55.918938,60.548406)"><flowRegion
+         id="flowRegion2162"><rect
+           id="rect2164"
+           width="240"
+           height="234.28572"
+           x="280"
+           y="320.93362" /></flowRegion><flowPara
+         id="flowPara2166"
+         style="font-size:56px;font-family:Drugulin CLM">!</flowPara></flowRoot>    <path
+       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#d41111;stroke-width:8.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 194.71429,442.07647 C 190.14357,436.02913 222.36527,362.79075 231.9438,362.79075 C 240.51333,362.79075 275.42857,436.00503 268.28571,441.89789 C 261.74172,447.29668 199.17858,447.96933 194.71429,442.07647 z "
+       id="path2170"
+       sodipodi:nodetypes="cccc" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6492"
+       transform="translate(-57.18666,62.01275)"
+       style="opacity:0.25520833;filter:url(#filter6504)"><flowRegion
+         id="flowRegion6494"><rect
+           id="rect6496"
+           width="240"
+           height="234.28572"
+           x="280"
+           y="320.93362" /></flowRegion><flowPara
+         id="flowPara6498"
+         style="font-size:56px;font-family:Drugulin CLM">!</flowPara></flowRoot>  </g>
+</svg>

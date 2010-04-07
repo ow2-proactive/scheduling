@@ -95,6 +95,11 @@ h5 {
 	font-weight:bold;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 }
+h6 {
+	font-size:11px;
+	font-style:italic;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
 
 
 .tab_menu {

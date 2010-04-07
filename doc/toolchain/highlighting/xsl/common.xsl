@@ -26,7 +26,7 @@
 	<!-- You can override this template to do more complex mapping of
 		 language attribute to highlighter language ID (see xslthl-config.xml) -->
 	<xsl:template name="language.to.xslthl">
-		<xsl:param name="context"/>
+		<xsl:param name="context"/> 
 
 		<xsl:choose>
 			<xsl:when test="$context/@language != ''">
