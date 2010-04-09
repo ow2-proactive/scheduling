@@ -50,9 +50,9 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.resourcemanager.ResourceManagerProxy;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -110,8 +110,8 @@ public class MyAO implements Serializable {
         ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
             PAProperties.PA_RMI_PORT.getValue() + "/"));
 
-        AdminScheduler
-                .createScheduler(rmp, PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
+        SchedulerFactory.createScheduler(rmp, PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
+                .getValueAsString());
 
         schedulerAuth = SchedulerConnection.waitAndJoin(schedulerDefaultURL);
         if (GCMDPath != null && GCMDPath.length() > 0) {

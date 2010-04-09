@@ -99,7 +99,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 
 /**
  * Scheduler Front-end. This is the API to talk to when you want to managed a scheduler core.
- * Creating this class can only be done by using <code>AdminScheduler</code>.
+ * Creating this class can only be done by using <code>SchedulerFactory</code>.
  * You can join this front-end by using the <code>join()</code> method
  * in {@link SchedulerConnection}.
  *

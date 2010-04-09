@@ -54,9 +54,7 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
-import org.ow2.proactive.scheduler.core.AdminScheduler;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
-import org.ow2.proactive.scheduler.core.UserScheduler;
 import org.ow2.proactive.scheduler.core.jmx.JMXMonitoringHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
@@ -161,8 +159,6 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         String user = loginAs("user", new String[] { "user", "admin" }, cred);
 
         logger_dev.info("user : " + user);
-        UserScheduler us = new UserScheduler();
-        us.schedulerFrontend = this.frontend;
         // add this user to the scheduler front-end
         UserIdentificationImpl ident = new UserIdentificationImpl(user);
         ident.setHostName(getSenderHostName());
@@ -174,7 +170,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         }
 
         // return the created interface
-        return us;
+        return this.frontend;
     }
 
     /**
@@ -185,8 +181,6 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         String user = loginAs("admin", new String[] { "admin" }, cred);
 
         logger_dev.info("user : " + user);
-        AdminScheduler as = new AdminScheduler();
-        as.schedulerFrontend = this.frontend;
         // add this user to the scheduler front-end
         UserIdentificationImpl ident = new UserIdentificationImpl(user, true);
         ident.setHostName(getSenderHostName());
@@ -198,7 +192,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         }
 
         // return the created interface
-        return as;
+        return this.frontend;
     }
 
     /**

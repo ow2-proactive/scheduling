@@ -603,7 +603,7 @@ System.out.println("Scheduler successfully started at : " + sAuth.getHostURL());
 					Another way is to start the ProActive Scheduler AND connect an administrator at the same time:
 				</para>
 				<programlisting language="java">
-AdminScheduler.createScheduler(
+SchedulerFactory.createScheduler(
 	"login",
 	"password",
 	rmp,
