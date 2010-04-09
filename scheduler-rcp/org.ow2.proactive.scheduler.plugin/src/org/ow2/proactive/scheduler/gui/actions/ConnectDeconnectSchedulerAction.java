@@ -40,9 +40,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -80,70 +81,116 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
     }
 
     private void connection() {
-        SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(parent.getShell());
+        final SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(parent.getShell());
 
         if (dialogResult != null) {
             try {
                 int res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
 
                 if (res == SchedulerProxy.CONNECTED) {
-                    isConnected = true;
-                    ActionsManager.getInstance().setConnected(true);
 
-                    // connection successful, so record "valid" url and login
-                    SelectSchedulerDialog.saveInformations();
-                    this.setText("Disconnect");
-                    this.setToolTipText("Disconnect from the ProActive Scheduler");
-                    this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
-                            Internal.IMG_DISCONNECT));
+                    final ConnectDeconnectSchedulerAction btnConnect = this;
                     waitShell = new Shell(parent.getShell(), SWT.PRIMARY_MODAL);
-                    FormLayout layout = new FormLayout();
-                    layout.marginHeight = 20;
-                    layout.marginWidth = 20;
+                    waitShell.setText("Download scheduler state, please wait...");
+                    GridLayout layout = new GridLayout();
+                    int marginWidth = 50;
+                    layout.marginHeight = 30;
+                    layout.marginWidth = marginWidth;
                     waitShell.setLayout(layout);
                     Label jobNameLabel = new Label(waitShell, SWT.NONE);
                     jobNameLabel.setText("Download scheduler state, please wait...");
+
+                    // Progress bar showing to the user that the application still running
+                    final ProgressBar bar = new ProgressBar(waitShell, SWT.INDETERMINATE);
+                    Label connectionCancel = new Label(waitShell, SWT.NONE);
+                    connectionCancel.setText("Press Escape to cancel");
                     waitShell.pack();
                     Rectangle parentBounds = parent.getShell().getBounds();
                     int x = parentBounds.x + parentBounds.width / 2;
                     int y = parentBounds.y + parentBounds.height / 2;
                     waitShell.setLocation(x - waitShell.getSize().x / 2, y - waitShell.getSize().y / 2);
-                    waitShell.pack();
+                    bar.setSize((waitShell.getSize().x) - marginWidth * 2, 20);
                     waitShell.open();
 
-                    // wait result for synchronous call
-                    boolean futurRes = JobsController.getActiveView().init();
+                    // Using thread because graphical thread is blocked by waitShell
+                    new Thread(null, null, "ThreadConnection") {
+                        public void run() {
 
-                    //synchronous call ; wait futur
-                    if (futurRes) {
-                        waitShell.close();
-                    }
+                            // wait result for synchronous call
+                            final boolean futurRes = JobsController.getActiveView().init();
 
-                    // the call "JobsController.getActiveView().init();"
-                    // must be terminated here, before starting other call.
-                    SeparatedJobView.getPendingJobComposite().initTable();
-                    SeparatedJobView.getRunningJobComposite().initTable();
-                    SeparatedJobView.getFinishedJobComposite().initTable();
+                            // If the escape key was pressed, terminate thread
+                            if (waitShell.isDisposed()) {
+                                return;
+                            }
 
-                    // start log server
-                    Activator.startLoggerServer();
+                            // Get graphical thread for the progress bar
+                            parent.getDisplay().syncExec(new Runnable() {
 
-                    ActionsManager.getInstance().update();
+                                public void run() {
 
-                    SeparatedJobView.setVisible(true);
+                                    //synchronous call ; wait futur
+                                    if (futurRes) {
+                                        bar.dispose();
+                                        waitShell.close();
+
+                                    }
+
+                                    // the call "JobsController.getActiveView().init();"
+                                    // must be terminated here, before starting other call.
+                                    SeparatedJobView.getPendingJobComposite().initTable();
+                                    SeparatedJobView.getRunningJobComposite().initTable();
+                                    SeparatedJobView.getFinishedJobComposite().initTable();
+
+                                    isConnected = true;
+                                    ActionsManager.getInstance().setConnected(true);
+                                    SelectSchedulerDialog.saveInformations();
+
+                                    try {
+
+                                        // start log server
+                                        Activator.startLoggerServer();
+
+                                        ActionsManager.getInstance().update();
+
+                                        SeparatedJobView.setVisible(true);
+
+                                        btnConnect.setText("Disconnect");
+                                        btnConnect.setToolTipText("Disconnect from the ProActive Scheduler");
+                                        btnConnect.setImageDescriptor(Activator.getDefault()
+                                                .getImageRegistry().getDescriptor(Internal.IMG_DISCONNECT));
+
+                                    } catch (LogForwardingException e) {
+                                        errorConnect(e, dialogResult);
+                                    }
+
+                                }
+
+                            });
+                        }
+
+                    }.start();
+
                 } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
                     MessageDialog.openError(parent.getShell(), "Could not connect",
                             "Incorrect username or password !");
                 }
+
             } catch (Throwable t) {
-                t.printStackTrace();
-                Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" +
-                    dialogResult.getUrl(), t);
-                MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                        "Could not connect to the scheduler based on : " + dialogResult.getUrl() +
-                            "\n\nCause\n : " + t.getMessage());
+                errorConnect(t, dialogResult);
             }
+
         }
+
+    }
+
+    private void errorConnect(Throwable e, SelectSchedulerDialogResult dialogResult) {
+        e.printStackTrace();
+        Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + dialogResult.getUrl(),
+                e);
+        MessageDialog.openError(parent.getShell(), "Couldn't connect",
+                "Could not connect to the scheduler based on : " + dialogResult.getUrl() + "\n\nCause\n : " +
+                    e.getMessage());
     }
 
     private void disconnection() {
