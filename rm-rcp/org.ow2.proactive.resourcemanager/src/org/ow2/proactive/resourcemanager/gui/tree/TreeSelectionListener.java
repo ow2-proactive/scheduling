@@ -55,19 +55,25 @@ public class TreeSelectionListener implements ISelectionChangedListener {
         ArrayList<Node> selectionList = new ArrayList<Node>();
         if (event != null && event.getSelectionProvider() != null) {
             Object selection = event.getSelectionProvider().getSelection();
+
             if (selection != null) {
                 for (Object leaf : ((IStructuredSelection) selection).toList()) {
                     getSubTreeNodesList((TreeLeafElement) leaf, selectionList);
                 }
+
             }
         }
         //normally RM is connected if I can select something...
         if (RMStore.isConnected()) {
             RemoveNodesHandler.getInstance().setSelectedNodes(selectionList);
         }
+
     }
 
     private void getSubTreeNodesList(TreeLeafElement leaf, ArrayList<Node> selectList) {
+        // Find the source of the selected item for the removing source and add node combo
+        RMStore.getInstance().getModel().findSelectedSource(leaf);
+
         if (leaf.getType().equals(TreeElementType.NODE)) {
             if (!selectList.contains(leaf.getName()))
                 selectList.add((Node) leaf);

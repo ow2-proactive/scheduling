@@ -74,7 +74,9 @@ public class LabelMouseListener implements MouseListener {
      */
     public void mouseUp(MouseEvent e) {
         if (e.button == 3) {
-            // right button click
+            // Needed to activate selection of the item in the compact view (when right click)
+            selectionManager.deselectAll();
+            selectionManager.invertSelection(view);
             // updating selection handler and show menu
             selectionManager.updateSelectionHandler();
             view.getLabel().getParent().getMenu().setVisible(true);

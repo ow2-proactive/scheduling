@@ -109,10 +109,21 @@ public class AddNodeByURLDialog extends Dialog {
         nsFormData.width = 320;
         sourceNameCombo.setLayoutData(nsFormData);
         sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(true));
-        if ((source != null) && (!source.equals("")))
+
+        if ((source != null) && (!source.equals(""))){
             sourceNameCombo.setText(source);
-        else
+        } else {
             sourceNameCombo.setText(NodeSource.DEFAULT);
+        }
+        int i = sourceNameCombo.getItemCount() - 1;
+        // Search the index of the source for the item selected in the tree or compact view 
+        // (index=0 if nothing is selected then blank line in combo is used)
+        while (i > 0 &&
+            !sourceNameCombo.getItem(i).matches(RMStore.getInstance().getModel().getSourceToRemoveSelected())) {
+            i--;
+        }
+        sourceNameCombo.select(i);
+        RMStore.getInstance().getModel().setSourceToRemoveSelected("");
 
         // label sourceName
         urlLabel.setText("Node url :");
