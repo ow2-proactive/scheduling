@@ -110,7 +110,7 @@ public class AddNodeByURLDialog extends Dialog {
         sourceNameCombo.setLayoutData(nsFormData);
         sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(true));
 
-        if ((source != null) && (!source.equals(""))){
+        if ((source != null) && (!source.equals(""))) {
             sourceNameCombo.setText(source);
         } else {
             sourceNameCombo.setText(NodeSource.DEFAULT);

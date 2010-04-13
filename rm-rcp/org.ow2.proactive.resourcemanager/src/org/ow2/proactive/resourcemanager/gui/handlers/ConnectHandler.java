@@ -78,12 +78,12 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
         return !RMStore.isConnected();
     }
 
-    public Object execute(ExecutionEvent event) throws ExecutionException {
+    public synchronized Object execute(ExecutionEvent event) throws ExecutionException {
         return execute(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell());
     }
 
-    public Object execute(Shell parent) {
-        if (this.isDialogOpen) {
+    public synchronized Object execute(Shell parent) {
+        if (this.isDialogOpen || RMStore.isConnected()) {
             return null;
         }
         this.isDialogOpen = true;
