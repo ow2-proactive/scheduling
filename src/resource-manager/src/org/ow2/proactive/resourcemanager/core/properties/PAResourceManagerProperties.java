@@ -147,7 +147,12 @@ public enum PAResourceManagerProperties {
      * If this value is true, the database will be dropped and then re-created
      * If this value is false, database will be updated from the existing one.
      */
-    RM_DB_HIBERNATE_DROPDB("pa.rm.db.hibernate.dropdb", PAPropertiesType.BOOLEAN);
+    RM_DB_HIBERNATE_DROPDB("pa.rm.db.hibernate.dropdb", PAPropertiesType.BOOLEAN),
+
+    /**
+     * The period of sending "alive" event to resource manager's listeners.
+     */
+    RM_ALIVE_EVENT_FREQUENCY("pa.rm.aliveevent.frequency", PAPropertiesType.INTEGER);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

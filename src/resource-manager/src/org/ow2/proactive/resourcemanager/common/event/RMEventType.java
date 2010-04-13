@@ -84,5 +84,10 @@ public enum RMEventType {
     /**
      * A node has been removed from Resource manager
      */
-    NODE_REMOVED;
+    NODE_REMOVED,
+
+    /**
+     * The resource manager is alive
+     */
+    ALIVE;
 }

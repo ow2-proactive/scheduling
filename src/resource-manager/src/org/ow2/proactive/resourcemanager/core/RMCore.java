@@ -49,6 +49,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -137,7 +139,7 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class RMCore implements RMAdmin, RMUser, InitActive {
+public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
 
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
@@ -318,6 +320,31 @@ public class RMCore implements RMAdmin, RMUser, InitActive {
         }
         if (logger.isDebugEnabled()) {
             logger.debug("RMCore end : initActivity");
+        }
+    }
+
+    /**
+     * RunActivity periodically send "alive" event to listeners
+     */
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+
+        int aliveEventFrequency = PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt();
+        long timeStamp = System.currentTimeMillis();
+        long delta = 0;
+
+        // recalculating nodes number only once per policy period
+        while (body.isActive()) {
+
+            service.blockingServeOldest(aliveEventFrequency);
+
+            delta += System.currentTimeMillis() - timeStamp;
+            timeStamp = System.currentTimeMillis();
+
+            if (delta > aliveEventFrequency) {
+                monitoring.rmEvent(new RMEvent(RMEventType.ALIVE));
+                delta = 0;
+            }
         }
     }
 
