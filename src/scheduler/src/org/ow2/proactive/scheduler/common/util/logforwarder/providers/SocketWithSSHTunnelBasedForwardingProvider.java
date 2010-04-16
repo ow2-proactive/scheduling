@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.log4j.Appender;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.SocketAppenderWithSSHTunneling;
@@ -59,9 +59,9 @@ public class SocketWithSSHTunnelBasedForwardingProvider extends SocketBasedForwa
     @Override
     public AppenderProvider createAppenderProvider(URI serverURI) {
         // use ProActive defined ssh port if any
-        if (PAProperties.PA_RMISSH_REMOTE_PORT.isSet()) {
+        if (CentralPAPropertyRepository.PA_RMISSH_REMOTE_PORT.isSet()) {
             return new SocketSSHAppenderProvider(serverURI.getHost(), serverURI.getPort(),
-                PAProperties.PA_RMISSH_REMOTE_PORT.getValueAsInt());
+                CentralPAPropertyRepository.PA_RMISSH_REMOTE_PORT.getValue());
         } else {
             return new SocketSSHAppenderProvider(serverURI.getHost(), serverURI.getPort(), 22);
         }
@@ -90,7 +90,7 @@ public class SocketWithSSHTunnelBasedForwardingProvider extends SocketBasedForwa
          */
         public Appender getAppender() throws LogForwardingException {
             // resolve username locally: use ProActive defined username, or current username if any
-            String sshUserName = PAProperties.PA_RMISSH_REMOTE_USERNAME.getValue();
+            String sshUserName = CentralPAPropertyRepository.PA_RMISSH_REMOTE_USERNAME.getValue();
             if ((sshUserName == null) || sshUserName.equals("")) {
                 sshUserName = System.getProperty("user.name");
             }

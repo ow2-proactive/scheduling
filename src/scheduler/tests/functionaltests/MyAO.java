@@ -40,7 +40,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -108,7 +108,7 @@ public class MyAO implements Serializable {
         RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
 
         ResourceManagerProxy rmp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
-            PAProperties.PA_RMI_PORT.getValue() + "/"));
+            CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/"));
 
         SchedulerFactory.createScheduler(rmp, PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
                 .getValueAsString());

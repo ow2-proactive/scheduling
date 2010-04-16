@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
 
 
 /**
@@ -63,38 +62,38 @@ public enum PASchedulerProperties {
     /* ***************************************************************** */
 
     /** Scheduler default policy full name.  */
-    SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PAPropertiesType.STRING),
+    SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PropertyType.STRING),
 
     /** Forked java task default policy path */
-    SCHEDULER_DEFAULT_FJT_SECURITY_POLICY("pa.scheduler.forkedtask.security.policy", PAPropertiesType.STRING),
+    SCHEDULER_DEFAULT_FJT_SECURITY_POLICY("pa.scheduler.forkedtask.security.policy", PropertyType.STRING),
 
     /** Scheduler main loop time out */
-    SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PAPropertiesType.INTEGER),
+    SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PropertyType.INTEGER),
 
     /** Scheduler node ping frequency in s. */
-    SCHEDULER_NODE_PING_FREQUENCY("pa.scheduler.core.nodepingfrequency", PAPropertiesType.INTEGER),
+    SCHEDULER_NODE_PING_FREQUENCY("pa.scheduler.core.nodepingfrequency", PropertyType.INTEGER),
 
     /** Name of the JMX MBean for the scheduler */
-    SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PAPropertiesType.STRING),
+    SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PropertyType.STRING),
 
     /** Port of the JMX service. Random if not set */
-    SCHEDULER_JMX_PORT("pa.scheduler.core.jmx.port", PAPropertiesType.INTEGER),
+    SCHEDULER_JMX_PORT("pa.scheduler.core.jmx.port", PropertyType.INTEGER),
 
     /** User session time (user is automatically disconnect after this time if no request is made to the scheduler)
     	negative number indicates that session is infinite (value specified in second) */
-    SCHEDULER_USER_SESSION_TIME("pa.scheduler.core.usersessiontime", PAPropertiesType.INTEGER),
+    SCHEDULER_USER_SESSION_TIME("pa.scheduler.core.usersessiontime", PropertyType.INTEGER),
 
     /** Timeout for the start task action. Time during which the scheduling could be waiting (in millis) */
-    SCHEDULER_STARTTASK_TIMEOUT("pa.scheduler.core.starttask.timeout", PAPropertiesType.INTEGER),
+    SCHEDULER_STARTTASK_TIMEOUT("pa.scheduler.core.starttask.timeout", PropertyType.INTEGER),
 
     /** Maximum number of threads used for the start task action. This property defines the number of blocking resources
      * until the scheduling loop will block as well.*/
-    SCHEDULER_STARTTASK_THREADNUMBER("pa.scheduler.core.starttask.threadnumber", PAPropertiesType.INTEGER),
+    SCHEDULER_STARTTASK_THREADNUMBER("pa.scheduler.core.starttask.threadnumber", PropertyType.INTEGER),
 
     /** Maximum number of threads used to send events to clients. This property defines the number of clients
      * than can block at the same time. If this number is reached, every clients won't receive events until
      * a thread unlock. */
-    SCHEDULER_LISTENERS_THREADNUMBER("pa.scheduler.core.listener.threadnumber", PAPropertiesType.INTEGER),
+    SCHEDULER_LISTENERS_THREADNUMBER("pa.scheduler.core.listener.threadnumber", PropertyType.INTEGER),
 
     /* ***************************************************************** */
     /* ********************** AUTHENTICATION PROPERTIES **************** */
@@ -102,13 +101,13 @@ public enum PASchedulerProperties {
 
     /** path to the Jaas configuration file which defines what modules are available for
      * internal authentication */
-    SCHEDULER_AUTH_JAAS_PATH("pa.scheduler.auth.jaas.path", PAPropertiesType.STRING),
+    SCHEDULER_AUTH_JAAS_PATH("pa.scheduler.auth.jaas.path", PropertyType.STRING),
 
     /** path to the private key file which is used to decrypt credentials passed to the jaas module */
-    SCHEDULER_AUTH_PRIVKEY_PATH("pa.scheduler.auth.privkey.path", PAPropertiesType.STRING),
+    SCHEDULER_AUTH_PRIVKEY_PATH("pa.scheduler.auth.privkey.path", PropertyType.STRING),
 
     /** path to the public key file which is used to encrypt credentials for authentication */
-    SCHEDULER_AUTH_PUBKEY_PATH("pa.scheduler.auth.pubkey.path", PAPropertiesType.STRING),
+    SCHEDULER_AUTH_PUBKEY_PATH("pa.scheduler.auth.pubkey.path", PropertyType.STRING),
 
     /** 
      * LDAP Authentication configuration file path, used to set LDAP configuration properties
@@ -116,114 +115,112 @@ public enum PASchedulerProperties {
      * with the variable defined below : pa.scheduler.home.
      * else, the path is absolute, so the path is directly interpreted
      */
-    SCHEDULER_LDAP_CONFIG_FILE_PATH("pa.scheduler.ldap.config.path", PAPropertiesType.STRING),
+    SCHEDULER_LDAP_CONFIG_FILE_PATH("pa.scheduler.ldap.config.path", PropertyType.STRING),
 
     /** Login default file name */
-    SCHEDULER_LOGIN_FILENAME("pa.scheduler.core.defaultloginfilename", PAPropertiesType.STRING),
+    SCHEDULER_LOGIN_FILENAME("pa.scheduler.core.defaultloginfilename", PropertyType.STRING),
 
     /** Group default filename */
-    SCHEDULER_GROUP_FILENAME("pa.scheduler.core.defaultgroupfilename", PAPropertiesType.STRING),
+    SCHEDULER_GROUP_FILENAME("pa.scheduler.core.defaultgroupfilename", PropertyType.STRING),
 
     /** Property that define the method that have to be used for logging users to the Scheduler */
-    SCHEDULER_LOGIN_METHOD("pa.scheduler.core.authentication.loginMethod", PAPropertiesType.STRING),
+    SCHEDULER_LOGIN_METHOD("pa.scheduler.core.authentication.loginMethod", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ******************** CLASSLOADING PROPERTIES ******************** */
     /* ***************************************************************** */
 
     /** Cache classes definition in task class servers  */
-    SCHEDULER_CLASSSERVER_USECACHE("pa.scheduler.classserver.usecache", PAPropertiesType.BOOLEAN),
+    SCHEDULER_CLASSSERVER_USECACHE("pa.scheduler.classserver.usecache", PropertyType.BOOLEAN),
 
     /** Temporary directory for jobclasspathes  */
-    SCHEDULER_CLASSSERVER_TMPDIR("pa.scheduler.classserver.tmpdir", PAPropertiesType.STRING),
+    SCHEDULER_CLASSSERVER_TMPDIR("pa.scheduler.classserver.tmpdir", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
 
     /** Multiplicative factor for job id (taskId will be : this_factor*jobID+taskID) */
-    JOB_FACTOR("pa.scheduler.job.factor", PAPropertiesType.INTEGER),
+    JOB_FACTOR("pa.scheduler.job.factor", PropertyType.INTEGER),
 
     /** Delay to wait between getting a job result and removing the job concerned (0 = infinite) */
-    SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PAPropertiesType.INTEGER),
+    SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PropertyType.INTEGER),
 
     /** Delay to wait between a job is terminated and removing the it from Scheduler (0 = infinite) */
-    SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY("pa.scheduler.core.automaticremovejobdelay",
-            PAPropertiesType.INTEGER),
+    SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY("pa.scheduler.core.automaticremovejobdelay", PropertyType.INTEGER),
 
     /** Remove job in dataBase when removing it from scheduler. */
-    JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PAPropertiesType.BOOLEAN),
+    JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PropertyType.BOOLEAN),
 
     /* ***************************************************************** */
     /* ************************ TASKS PROPERTIES *********************** */
     /* ***************************************************************** */
 
     /** Initial time to wait before the re-execution of a task. */
-    REEXECUTION_INITIAL_WAITING_TIME("pa.scheduler.task.initialwaitingtime", PAPropertiesType.INTEGER),
+    REEXECUTION_INITIAL_WAITING_TIME("pa.scheduler.task.initialwaitingtime", PropertyType.INTEGER),
 
     /** Maximum number of execution for a task in case of failure (node down) */
-    NUMBER_OF_EXECUTION_ON_FAILURE("pa.scheduler.task.numberofexecutiononfailure", PAPropertiesType.INTEGER),
+    NUMBER_OF_EXECUTION_ON_FAILURE("pa.scheduler.task.numberofexecutiononfailure", PropertyType.INTEGER),
 
     /* ***************************************************************** */
     /* ********************** DATASPACES PROPERTIES ******************** */
     /* ***************************************************************** */
 
     /** Default INPUT space URL. Used to define INPUT space of each job that does not define an INPUT space. */
-    DATASPACE_DEFAULTINPUTURL("pa.scheduler.dataspace.defaultinputurl", PAPropertiesType.STRING),
+    DATASPACE_DEFAULTINPUTURL("pa.scheduler.dataspace.defaultinputurl", PropertyType.STRING),
 
     /** Default INPUT space path. Used to define the same INPUT space but with a local (faster) access (if possible). */
     DATASPACE_DEFAULTINPUTURL_LOCALPATH("pa.scheduler.dataspace.defaultinputurl.localpath",
-            PAPropertiesType.STRING),
+            PropertyType.STRING),
 
     /** Host name from which the localpath is accessible */
-    DATASPACE_DEFAULTINPUTURL_HOSTNAME("pa.scheduler.dataspace.defaultinputurl.hostname",
-            PAPropertiesType.STRING),
+    DATASPACE_DEFAULTINPUTURL_HOSTNAME("pa.scheduler.dataspace.defaultinputurl.hostname", PropertyType.STRING),
 
     /** The same for the OUPUT */
-    DATASPACE_DEFAULTOUTPUTURL("pa.scheduler.dataspace.defaultoutputurl", PAPropertiesType.STRING),
+    DATASPACE_DEFAULTOUTPUTURL("pa.scheduler.dataspace.defaultoutputurl", PropertyType.STRING),
     /** */
     DATASPACE_DEFAULTOUTPUTURL_LOCALPATH("pa.scheduler.dataspace.defaultoutputurl.localpath",
-            PAPropertiesType.STRING),
+            PropertyType.STRING),
     /** */
     DATASPACE_DEFAULTOUTPUTURL_HOSTNAME("pa.scheduler.dataspace.defaultoutputurl.hostname",
-            PAPropertiesType.STRING),
+            PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************* LOGS PROPERTIES *********************** */
     /* ***************************************************************** */
 
     /** Log forwarder provider */
-    LOGS_FORWARDING_PROVIDER("pa.scheduler.logs.provider", PAPropertiesType.STRING),
+    LOGS_FORWARDING_PROVIDER("pa.scheduler.logs.provider", PropertyType.STRING),
 
     //    /** Log max size (in lines per tasks) */
-    //    LOGS_MAX_SIZE("pa.scheduler.logs.maxsize", PAPropertiesType.INTEGER),
+    //    LOGS_MAX_SIZE("pa.scheduler.logs.maxsize", PropertyType.INTEGER),
 
     /* ***************************************************************** */
     /* ************************ OTHER PROPERTIES *********************** */
     /* ***************************************************************** */
 
     /** Scheduler home directory */
-    SCHEDULER_HOME("pa.scheduler.home", PAPropertiesType.STRING),
+    SCHEDULER_HOME("pa.scheduler.home", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************** RM PROPERTIES ************************ */
     /* ***************************************************************** */
 
     /** Path to the Scheduler credentials file for RM authentication */
-    RESOURCE_MANAGER_CREDS("pa.scheduler.resourcemanager.authentication.credentials", PAPropertiesType.STRING),
+    RESOURCE_MANAGER_CREDS("pa.scheduler.resourcemanager.authentication.credentials", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ********************** HIBERNATE PROPERTIES ********************* */
     /* ***************************************************************** */
     /** Hibernate configuration file (relative to home directory) */
-    SCHEDULER_DB_HIBERNATE_CONFIG("pa.scheduler.db.hibernate.configuration", PAPropertiesType.STRING),
+    SCHEDULER_DB_HIBERNATE_CONFIG("pa.scheduler.db.hibernate.configuration", PropertyType.STRING),
 
     /**
      * Drop database before creating a new one
      * If this value is true, the database will be dropped and then re-created
      * If this value is false, database will be updated from the existing one.
      */
-    SCHEDULER_DB_HIBERNATE_DROPDB("pa.scheduler.db.hibernate.dropdb", PAPropertiesType.BOOLEAN);
+    SCHEDULER_DB_HIBERNATE_DROPDB("pa.scheduler.db.hibernate.dropdb", PropertyType.BOOLEAN);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -238,7 +235,7 @@ public enum PASchedulerProperties {
     /** Key of the specific instance. */
     private String key;
     /** value of the specific instance. */
-    private PAPropertiesType type;
+    private PropertyType type;
 
     /**
      * Create a new instance of PASchedulerProperties
@@ -246,7 +243,7 @@ public enum PASchedulerProperties {
      * @param str the key of the instance.
      * @param type the real java type of this instance.
      */
-    PASchedulerProperties(String str, PAPropertiesType type) {
+    PASchedulerProperties(String str, PropertyType type) {
         this.key = str;
         this.type = type;
     }
@@ -461,7 +458,7 @@ public enum PASchedulerProperties {
      *
      * @return the type of the given properties.
      */
-    public PAPropertiesType getType() {
+    public PropertyType getType() {
         return type;
     }
 
@@ -489,4 +486,10 @@ public enum PASchedulerProperties {
         }
     }
 
+    /**
+     * Supported types for PASchedulerProperties
+     */
+    public enum PropertyType {
+        STRING, BOOLEAN, INTEGER;
+    }
 }

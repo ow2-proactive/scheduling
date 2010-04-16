@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -210,10 +210,10 @@ public class PBSInfrastructure extends AbstractSSHInfrastructure {
         cmd += " -Dproactive.communication.protocol=" + this.protocol + " ";
         if (this.protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
             this.protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
-            cmd += PAProperties.PA_RMI_PORT.getCmdLine() + this.port + " ";
+            cmd += CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + this.port + " ";
         } else if (this.protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER) ||
             this.protocol.equals(Constants.HTTPSSH_PROTOCOL_IDENTIFIER)) {
-            cmd += PAProperties.PA_RMI_PORT.getCmdLine() + this.port + " ";
+            cmd += CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + this.port + " ";
         }
         cmd += " -Dproactive.useIPaddress=true ";
         cmd += this.javaOptions + " ";

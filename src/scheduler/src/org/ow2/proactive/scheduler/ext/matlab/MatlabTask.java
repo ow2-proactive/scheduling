@@ -39,7 +39,7 @@ package org.ow2.proactive.scheduler.ext.matlab;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
@@ -475,7 +475,7 @@ public class MatlabTask extends JavaExecutable implements NotificationListener {
         // we set as well the java.library.path property (precaution), we forward as well the RMI port in use
 
         javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
-            " -Dproactive.rmi.port=" + Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()));
+            " -Dproactive.rmi.port=" + CentralPAPropertyRepository.PA_RMI_PORT.getValue());
 
         if (debug) {
             System.out.println("Starting Process:");

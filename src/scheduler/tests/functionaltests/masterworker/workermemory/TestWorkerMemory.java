@@ -41,7 +41,7 @@ import functionaltests.*;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.ConstantMemoryFactory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
@@ -79,8 +79,8 @@ public class TestWorkerMemory extends FunctionalTest {
         String[] classpath = new String[] {
                 System.getProperty("pa.scheduler.home") + "/classes/schedulerTests",
                 System.getProperty("pa.scheduler.home") + "/classes/scheduler" };
-        master.addResources("rmi://localhost:" + PAProperties.PA_RMI_PORT.getValue() + "/", "demo", "demo",
-                classpath);
+        master.addResources("rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/",
+                "demo", "demo", classpath);
 
         master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
 

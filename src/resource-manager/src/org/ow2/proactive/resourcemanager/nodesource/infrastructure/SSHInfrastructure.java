@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -151,7 +151,7 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
         paJar += schedulingPath + "/dist/lib/commons-logging-1.0.4.jar";
 
         String cmd = this.javaPath + " -cp " + paJar;
-        cmd += " " + PAProperties.JAVA_SECURITY_POLICY.getCmdLine();
+        cmd += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
         cmd += schedulingPath + "/config/security.java.policy";
         cmd += " -Dproactive.communication.protocol=" + this.protocol;
         cmd += " -Dproactive.useIPaddress=true ";

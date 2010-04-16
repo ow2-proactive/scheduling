@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.config.PAProperties.PAPropertiesType;
 
 
 /**
@@ -63,96 +62,96 @@ public enum PAResourceManagerProperties {
     /* ***************************************************************** */
 
     /** name of the ProActive Node containing RM's active objects */
-    RM_NODE_NAME("pa.rm.node.name", PAPropertiesType.STRING),
+    RM_NODE_NAME("pa.rm.node.name", PropertyType.STRING),
 
     /** ping frequency in ms used by node source for keeping a watch on handled nodes */
-    RM_NODE_SOURCE_PING_FREQUENCY("pa.rm.node.source.ping.frequency", PAPropertiesType.INTEGER),
+    RM_NODE_SOURCE_PING_FREQUENCY("pa.rm.node.source.ping.frequency", PropertyType.INTEGER),
 
     /** ping frequency used by resource manager to ping connected clients (in ms) */
-    RM_CLIENT_PING_FREQUENCY("pa.rm.client.ping.frequency", PAPropertiesType.INTEGER),
+    RM_CLIENT_PING_FREQUENCY("pa.rm.client.ping.frequency", PropertyType.INTEGER),
 
     /**  Timeout in ms for selection script execution */
-    RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PAPropertiesType.INTEGER),
+    RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PropertyType.INTEGER),
 
     /**  Timeout in ms for node lookup */
-    RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PAPropertiesType.INTEGER),
+    RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PropertyType.INTEGER),
 
     /** GCM application template file path, used to perform GCM deployments */
-    RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PAPropertiesType.STRING),
+    RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PropertyType.STRING),
 
     /**
      * name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
      * as a place of a GCM deployment file.
      */
-    RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PAPropertiesType.STRING),
+    RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PropertyType.STRING),
 
     /** path to the Amazon EC2 account credentials properties file,
      *  mandatory when using the EC2 Infrastructure */
-    RM_EC2_PATH_PROPERTY_NAME("pa.rm.ec2.properties", PAPropertiesType.STRING),
+    RM_EC2_PATH_PROPERTY_NAME("pa.rm.ec2.properties", PropertyType.STRING),
 
     /** Resource Manager home directory */
-    RM_HOME("pa.rm.home", PAPropertiesType.STRING),
+    RM_HOME("pa.rm.home", PropertyType.STRING),
 
     /** path to the Jaas configuration file which defines what modules are available for
      * internal authentication */
-    RM_AUTH_JAAS_PATH("pa.rm.auth.jaas.path", PAPropertiesType.STRING),
+    RM_AUTH_JAAS_PATH("pa.rm.auth.jaas.path", PropertyType.STRING),
 
     /** path to the private key file which is used to decrypt credentials passed to the jaas module */
-    RM_AUTH_PRIVKEY_PATH("pa.rm.auth.privkey.path", PAPropertiesType.STRING),
+    RM_AUTH_PRIVKEY_PATH("pa.rm.auth.privkey.path", PropertyType.STRING),
 
     /** path to the public key file which is used to encrypt credentials for authentication */
-    RM_AUTH_PUBKEY_PATH("pa.rm.auth.pubkey.path", PAPropertiesType.STRING),
+    RM_AUTH_PUBKEY_PATH("pa.rm.auth.pubkey.path", PropertyType.STRING),
 
     /** Resource Manager authentication method */
-    RM_LOGIN_METHOD("pa.rm.authentication.loginMethod", PAPropertiesType.STRING),
+    RM_LOGIN_METHOD("pa.rm.authentication.loginMethod", PropertyType.STRING),
 
     /** Resource Manager ldap configuration file */
-    RM_LDAP_CONFIG("pa.rm.ldap.config.path", PAPropertiesType.STRING),
+    RM_LDAP_CONFIG("pa.rm.ldap.config.path", PropertyType.STRING),
 
     /** Resource Manager login file name */
-    RM_LOGIN_FILE("pa.rm.defaultloginfilename", PAPropertiesType.STRING),
+    RM_LOGIN_FILE("pa.rm.defaultloginfilename", PropertyType.STRING),
 
     /** Resource Manager group file name */
-    RM_GROUP_FILE("pa.rm.defaultgroupfilename", PAPropertiesType.STRING),
+    RM_GROUP_FILE("pa.rm.defaultgroupfilename", PropertyType.STRING),
 
     /** Name of the JMX MBean for the RM */
-    RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PAPropertiesType.STRING),
+    RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PropertyType.STRING),
 
     /** Port of the JMX service. Random if not set */
-    RM_JMX_PORT("pa.rm.jmx.port", PAPropertiesType.INTEGER),
+    RM_JMX_PORT("pa.rm.jmx.port", PropertyType.INTEGER),
 
     /** Resource Manager node source infrastructures file*/
-    RM_NODESOURCE_INFRASTRUCTURE_FILE("pa.rm.nodesource.infrastructures", PAPropertiesType.STRING),
+    RM_NODESOURCE_INFRASTRUCTURE_FILE("pa.rm.nodesource.infrastructures", PropertyType.STRING),
 
     /** Resource Manager node source policies file*/
-    RM_NODESOURCE_POLICY_FILE("pa.rm.nodesource.policies", PAPropertiesType.STRING),
+    RM_NODESOURCE_POLICY_FILE("pa.rm.nodesource.policies", PropertyType.STRING),
 
     /** Max number of threads in node source for parallel task execution */
-    RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PAPropertiesType.INTEGER),
+    RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PropertyType.INTEGER),
 
     /** Max number of threads in node source for parallel task execution */
-    RM_SELECTION_MAX_THREAD_NUMBER("pa.rm.selection.maxthreadnumber", PAPropertiesType.INTEGER),
+    RM_SELECTION_MAX_THREAD_NUMBER("pa.rm.selection.maxthreadnumber", PropertyType.INTEGER),
 
     /** Max number of threads in node source for parallel task execution */
-    RM_MONITORING_MAX_THREAD_NUMBER("pa.rm.monitoring.maxthreadnumber", PAPropertiesType.INTEGER),
+    RM_MONITORING_MAX_THREAD_NUMBER("pa.rm.monitoring.maxthreadnumber", PropertyType.INTEGER),
 
     /** Path to the Resource Manager credentials for adding local nodes */
-    RM_CREDS("pa.rm.credentials", PAPropertiesType.STRING),
+    RM_CREDS("pa.rm.credentials", PropertyType.STRING),
 
     /** Resource Manager hibernate configuration file*/
-    RM_DB_HIBERNATE_CONFIG("pa.rm.db.hibernate.configuration", PAPropertiesType.STRING),
+    RM_DB_HIBERNATE_CONFIG("pa.rm.db.hibernate.configuration", PropertyType.STRING),
 
     /**
      * Drop database before creating a new one
      * If this value is true, the database will be dropped and then re-created
      * If this value is false, database will be updated from the existing one.
      */
-    RM_DB_HIBERNATE_DROPDB("pa.rm.db.hibernate.dropdb", PAPropertiesType.BOOLEAN),
+    RM_DB_HIBERNATE_DROPDB("pa.rm.db.hibernate.dropdb", PropertyType.BOOLEAN),
 
     /**
      * The period of sending "alive" event to resource manager's listeners.
      */
-    RM_ALIVE_EVENT_FREQUENCY("pa.rm.aliveevent.frequency", PAPropertiesType.INTEGER);
+    RM_ALIVE_EVENT_FREQUENCY("pa.rm.aliveevent.frequency", PropertyType.INTEGER);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -167,7 +166,7 @@ public enum PAResourceManagerProperties {
     /** Key of the specific instance. */
     private String key;
     /** value of the specific instance. */
-    private PAPropertiesType type;
+    private PropertyType type;
 
     /**
      * Create a new instance of PAResourceManagerProperties
@@ -175,7 +174,7 @@ public enum PAResourceManagerProperties {
      * @param str the key of the instance.
      * @param type the real java type of this instance.
      */
-    PAResourceManagerProperties(String str, PAPropertiesType type) {
+    PAResourceManagerProperties(String str, PropertyType type) {
         this.key = str;
         this.type = type;
     }
@@ -390,7 +389,7 @@ public enum PAResourceManagerProperties {
      *
      * @return the type of the given properties.
      */
-    public PAPropertiesType getType() {
+    public PropertyType getType() {
         return type;
     }
 
@@ -416,6 +415,13 @@ public enum PAResourceManagerProperties {
         } else {
             return PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + userPath;
         }
+    }
+
+    /**
+     * Supported types for PAResourceManagerProperties
+     */
+    public enum PropertyType {
+        STRING, BOOLEAN, INTEGER;
     }
 
 }

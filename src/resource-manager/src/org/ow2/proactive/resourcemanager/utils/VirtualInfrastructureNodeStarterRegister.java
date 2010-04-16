@@ -39,7 +39,7 @@ package org.ow2.proactive.resourcemanager.utils;
 import java.security.KeyException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -90,8 +90,8 @@ public final class VirtualInfrastructureNodeStarterRegister {
         final String nodeSource = args[2];
         final String vmname = args[3];
         final int processID = Integer.parseInt(args[4]);
-        int currentPort = PAProperties.PA_RMI_PORT.getValueAsInt();
-        PAProperties.PA_RMI_PORT.setValue(currentPort + processID - 1);//processID starts from 1...
+        int currentPort = CentralPAPropertyRepository.PA_RMI_PORT.getValue();
+        CentralPAPropertyRepository.PA_RMI_PORT.setValue(currentPort + processID - 1);//processID starts from 1...
         // Use given args
         final VirtualInfrastructureNodeStarterRegister starter = new VirtualInfrastructureNodeStarterRegister();
 

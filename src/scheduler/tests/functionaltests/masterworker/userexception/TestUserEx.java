@@ -41,7 +41,7 @@ import functionalTests.FunctionalTest;
 import functionaltests.masterworker.A;
 import static junit.framework.Assert.assertTrue;
 
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
@@ -78,8 +78,8 @@ public class TestUserEx extends FunctionalTest {
                 System.getProperty("pa.scheduler.home") + "/classes/scheduler",
                 System.getProperty("pa.scheduler.home") + "/classes/common" };
 
-        master.addResources("rmi://localhost:" + PAProperties.PA_RMI_PORT.getValue() + "/", "demo", "demo",
-                classpath);
+        master.addResources("rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/",
+                "demo", "demo", classpath);
 
         //middle
         boolean catched = false;

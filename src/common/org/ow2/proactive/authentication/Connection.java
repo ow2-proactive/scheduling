@@ -41,7 +41,7 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -198,7 +198,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      */
     public static String normalize(String url) {
         if (url == null || url.trim().equals("")) {
-            if (PAProperties.PA_NET_NOLOOPBACK.isTrue()) {
+            if (CentralPAPropertyRepository.PA_NET_NOLOOPBACK.isTrue()) {
                 try {
                     RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
                     //url = "//" + URIBuilder.fromLocalhostToHostname(null) + "/";

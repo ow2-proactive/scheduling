@@ -44,7 +44,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.OperatingSystem;
@@ -779,10 +779,12 @@ public class SchedulerTHelper {
         vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
                 VariableContractType.DescriptorDefaultVariable);
         StringBuilder properties = new StringBuilder("-Djava.security.manager");
-        properties.append(" " + PAProperties.PA_HOME.getCmdLine() + PAProperties.PA_HOME.getValue());
-        properties.append(" " + PAProperties.JAVA_SECURITY_POLICY.getCmdLine() +
-            PAProperties.JAVA_SECURITY_POLICY.getValue());
-        properties.append(" " + PAProperties.LOG4J.getCmdLine() + PAProperties.LOG4J.getValue());
+        properties.append(" " + CentralPAPropertyRepository.PA_HOME.getCmdLine() +
+            CentralPAPropertyRepository.PA_HOME.getValue());
+        properties.append(" " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
+            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
+        properties.append(" " + CentralPAPropertyRepository.LOG4J.getCmdLine() +
+            CentralPAPropertyRepository.LOG4J.getValue());
         properties.append(" " + PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
             PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
         properties.append(" " + PAResourceManagerProperties.RM_HOME.getCmdLine() +

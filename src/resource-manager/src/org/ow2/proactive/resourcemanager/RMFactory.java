@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -131,7 +131,7 @@ public class RMFactory {
         //pa conf
         s = initializer.getProActiveConfiguration();
         if (s != null) {
-            System.setProperty(PAProperties.PA_CONFIGURATION_FILE.getKey(), s);
+            System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), s);
         }
         //RM home
         s = initializer.getRMHomePath();

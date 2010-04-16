@@ -47,7 +47,7 @@ import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ActivityStateE
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.EndpointReferenceType;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.GetActivityStatusResponseType;
 import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ReferenceParametersType;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -293,7 +293,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         }
 
         command = this.javaPath + " -cp " + classpath;
-        command += " " + PAProperties.JAVA_SECURITY_POLICY.getCmdLine();
+        command += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
         command += rmPath + "/config/security.java.policy";
         command += " -Dproactive.useIPaddress=true ";
         command += " " + this.javaOptions + " ";

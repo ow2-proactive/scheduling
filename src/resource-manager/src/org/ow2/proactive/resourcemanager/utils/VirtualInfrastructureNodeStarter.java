@@ -40,7 +40,7 @@ import java.net.Socket;
 import java.util.Formatter;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -76,8 +76,8 @@ public final class VirtualInfrastructureNodeStarter {
         final int serverSocketPort = Integer.parseInt(args[0]);
         Socket clientSocket = new Socket("127.0.0.1", serverSocketPort);
         Formatter output = new Formatter(clientSocket.getOutputStream());
-        int currentRMIPort = PAProperties.PA_RMI_PORT.getValueAsInt();
-        PAProperties.PA_RMI_PORT.setValue(currentRMIPort + processID - 1);//processID starts from 1
+        int currentRMIPort = CentralPAPropertyRepository.PA_RMI_PORT.getValue();
+        CentralPAPropertyRepository.PA_RMI_PORT.setValue(currentRMIPort + processID - 1);//processID starts from 1
         startLocalNode(vmname, processID, output);
     }
 

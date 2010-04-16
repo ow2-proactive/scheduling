@@ -46,7 +46,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -147,7 +147,7 @@ public class SchedulerFactory {
         //pa conf
         s = initializer.getProActiveConfiguration();
         if (s != null) {
-            System.setProperty(PAProperties.PA_CONFIGURATION_FILE.getKey(), s);
+            System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), s);
         }
         //Scheduler home
         s = initializer.getSchedulerHomePath();

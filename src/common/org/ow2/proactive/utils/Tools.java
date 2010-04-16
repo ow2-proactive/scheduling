@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 
 /**
@@ -182,7 +182,7 @@ public class Tools {
         URI uri = URI.create(url);
         String scheme = (uri.getScheme() == null) ? "rmi" : uri.getScheme();
         String host = (uri.getHost() == null) ? "localhost" : uri.getHost();
-        int port = (uri.getPort() == -1) ? PAProperties.PA_RMI_PORT.getValueAsInt() : uri.getPort();
+        int port = (uri.getPort() == -1) ? CentralPAPropertyRepository.PA_RMI_PORT.getValue() : uri.getPort();
         return scheme + "://" + host + ":" + port + "/";
     }
 

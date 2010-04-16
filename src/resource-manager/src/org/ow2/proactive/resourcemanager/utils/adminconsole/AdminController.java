@@ -58,7 +58,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -504,7 +504,7 @@ public class AdminController {
         URI uri = URI.create(url);
         String scheme = (uri.getScheme() == null) ? "rmi" : uri.getScheme();
         String host = (uri.getHost() == null) ? "localhost" : uri.getHost();
-        int port = (uri.getPort() == -1) ? PAProperties.PA_RMI_PORT.getValueAsInt() : uri.getPort();
+        int port = (uri.getPort() == -1) ? CentralPAPropertyRepository.PA_RMI_PORT.getValue() : uri.getPort();
         return scheme + "://" + host + ":" + port + "/";
     }
 

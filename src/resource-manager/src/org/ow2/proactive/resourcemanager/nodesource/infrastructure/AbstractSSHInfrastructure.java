@@ -41,7 +41,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -161,7 +161,8 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
             String[] cmdArray = null;
             switch (OperatingSystem.getOperatingSystem()) {
                 case unix:
-                    cmdArray = new String[] { PAProperties.PA_GCMD_UNIX_SHELL.getValue(), "-c", sshCmd };
+                    cmdArray = new String[] { CentralPAPropertyRepository.PA_GCMD_UNIX_SHELL.getValue(),
+                            "-c", sshCmd };
                     break;
                 case windows:
                     sshCmd.replaceAll("/", "\\");

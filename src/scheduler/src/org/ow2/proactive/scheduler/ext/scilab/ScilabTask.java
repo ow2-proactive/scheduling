@@ -38,7 +38,7 @@ package org.ow2.proactive.scheduler.ext.scilab;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
@@ -403,7 +403,7 @@ public class ScilabTask extends JavaExecutable implements NotificationListener {
         //     "/bin/java");
         // we set as well the java.library.path property (precaution)
         javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
-            " -Dproactive.rmi.port=" + Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()));
+            " -Dproactive.rmi.port=" + CentralPAPropertyRepository.PA_RMI_PORT.getValue());
 
         pb.command(javaCommandBuilder.getJavaCommand());
 
