@@ -50,7 +50,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.ssh.httpssh.Handler;
 import org.osgi.framework.Bundle;
@@ -115,15 +115,18 @@ public final class Activator extends AbstractUIPlugin {
         }
 
         // Specify default log4j configuration file if it was not specified
-        final String log4jConfProperty = System.getProperty(PAProperties.LOG4J.getKey());
+        final String log4jConfProperty = System.getProperty(CentralPAPropertyRepository.LOG4J.getName());
         if (log4jConfProperty == null) {
-            System.setProperty(PAProperties.LOG4J.getKey(), configFolderURL.toString() + "proactive-log4j");
+            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), configFolderURL.toString() +
+                "proactive-log4j");
         }
 
         // Specify default ProActive configuration file if it was not specified
-        final String paConfProperty = System.getProperty(PAProperties.PA_CONFIGURATION_FILE.getKey());
+        final String paConfProperty = System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
+                .getName());
         if (paConfProperty == null) {
-            System.setProperty(PAProperties.PA_CONFIGURATION_FILE.getKey(), configFolderURL.toString() +
+            System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), configFolderURL
+                    .toString() +
                 "ProActiveConfiguration.xml");
         }
 
