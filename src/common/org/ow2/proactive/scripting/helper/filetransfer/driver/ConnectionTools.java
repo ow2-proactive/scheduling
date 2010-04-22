@@ -58,8 +58,7 @@ public class ConnectionTools {
         Connection connection = null;
         // get keys through ProActive's ssh config
         SshConfig config = new SshConfig();
-
-        for (String key : config.getPrivateKeys(hostname)) {
+        for (String key : config.getPrivateKeyPath(hostname)) {
             connection = new Connection(hostname, port);
             connection.connect();
 
@@ -98,7 +97,7 @@ public class ConnectionTools {
             if (logger.isInfoEnabled()) {
                 logger.info("Authentication failed for " + username + "@" + hostname + ":" + port);
                 logger.info("Keys were:");
-                for (String key : config.getPrivateKeys(hostname)) {
+                for (String key : config.getPrivateKeyPath(hostname)) {
                     logger.info("\t" + key);
                 }
             }

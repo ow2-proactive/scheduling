@@ -87,7 +87,7 @@ public class SocketAppenderWithSSHTunneling extends SocketAppender {
         InetAddress localhost = InetAddress.getLocalHost();
         SshConfig config = new SshConfig();
         sshConnection = new SshConnection(username, remoteHost, remoteSSHPort, config
-                .getPrivateKeys(remoteHost));
+                .getPrivateKeyPath(remoteHost));
         tunnel = sshConnection.getSSHTunnel(remoteHost, remoteSSHPort);
         this.setRemoteHost(localhost.getHostAddress());
         this.setPort(tunnel.getPort());
