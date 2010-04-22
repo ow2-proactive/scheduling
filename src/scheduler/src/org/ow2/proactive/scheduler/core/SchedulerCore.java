@@ -61,6 +61,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.api.PAFuture;
@@ -472,17 +473,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         if (status != SchedulerStatus.KILLED) {
 
-            //listen log as immediate Service.
-            //PAActiveObject.setImmediateService("listenLog");
             Service service = new Service(body);
-
-            //used to read the enumerate schedulerStatus in order to know when submit is possible.
-            //have to be immediate service
-            body.setImmediateService("isSubmitPossible", false);
-            //Fix SCHEDULING-337, it could remains a better solution to avoid race condition in DB
-            //body.setImmediateService("getTaskResult");
-            body.setImmediateService("getJobResult", false);
-            body.setImmediateService("getJobState", false);
+            // immediate services are set with @ImmediateService annotation
             logger_dev.debug("Core immediate services : isSubmitPossible, getJobResult, getJobState");
 
             //set the filter for serveAll method (user action are privileged)
@@ -653,6 +645,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * 
      * @return true if a submit is possible, false if not.
      */
+    @ImmediateService
     public boolean isSubmitPossible() {
         return !((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.STOPPED));
     }
@@ -1244,6 +1237,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
      */
+    @ImmediateService
     public JobResult getJobResult(JobId jobId) throws SchedulerException {
         final InternalJob job = jobs.get(jobId);
         final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
@@ -1668,6 +1662,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /**
      * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobState(org.ow2.proactive.scheduler.common.job.JobId)
      */
+    @ImmediateService
     public JobState getJobState(JobId jobId) throws SchedulerException {
         logger_dev.info("Request sent to get the State of job '" + jobId + "'");
         return jobs.get(jobId);
