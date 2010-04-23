@@ -86,7 +86,8 @@ public class SelectResourceManagerDialog extends Dialog {
 
     /** Name of the file which store the good login */
     public static final String LOGIN_FILE = ".proActive_rm_logins";
-    public static final String LOGIN_FILE_PATH = USER_DIR + File.separator + RM_CONFIG_DIR + File.separator + LOGIN_FILE;
+    public static final String LOGIN_FILE_PATH = USER_DIR + File.separator + RM_CONFIG_DIR + File.separator +
+        LOGIN_FILE;
     private static final String SERVER_URL_PROPERTY_NAME = "pa.rm.serverURL";
 
     private static List<String> urls = null;
