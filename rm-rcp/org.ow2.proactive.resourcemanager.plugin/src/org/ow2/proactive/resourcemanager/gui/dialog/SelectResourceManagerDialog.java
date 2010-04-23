@@ -86,11 +86,13 @@ public class SelectResourceManagerDialog extends Dialog {
 
     /** Name of the file which store the good login */
     public static final String LOGIN_FILE = ".proActive_rm_logins";
-    public static final String LOGIN_FILE_PATH = USER_DIR + File.separator + RM_CONFIG_DIR + File.separator +
-        LOGIN_FILE;
+    public static final String LOGIN_FILE_PATH = USER_DIR + File.separator + RM_CONFIG_DIR + File.separator + LOGIN_FILE;
+    private static final String SERVER_URL_PROPERTY_NAME = "pa.rm.serverURL";
+
     private static List<String> urls = null;
     private static List<String> logins = null;
     private static String url = null;
+    private static String serverURLProperty = null;
     private static String login = null;
     private static String pwd = null;
     private static Boolean logAsAdmin = null;
@@ -147,7 +149,14 @@ public class SelectResourceManagerDialog extends Dialog {
         urlFormData.right = new FormAttachment(100, -5);
         urlFormData.width = 320;
         urlCombo.setLayoutData(urlFormData);
-        loadUrls();
+
+        serverURLProperty = System.getProperty(SERVER_URL_PROPERTY_NAME);
+        if (serverURLProperty == null) {
+            loadUrls();
+        } else {
+            urlCombo.setText(serverURLProperty);
+            urlCombo.setEnabled(false);
+        }
 
         // label login
         loginLabel.setText("login :");
@@ -310,7 +319,6 @@ public class SelectResourceManagerDialog extends Dialog {
         try {
             bw = new BufferedWriter(new FileWriter(URL_FILE_PATH));
             pw = new PrintWriter(bw, true);
-
             // Record urls
             if (urls != null) {
                 for (String s : urls) {
@@ -448,6 +456,8 @@ public class SelectResourceManagerDialog extends Dialog {
      */
     public static void saveInformations() {
         recordLogins();
-        recordUrls();
+        if (serverURLProperty == null) {
+            recordUrls();
+        }
     }
 }
