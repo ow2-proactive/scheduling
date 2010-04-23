@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodeSourceHandler;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -66,6 +67,9 @@ public class RMModel {
     private int freeNodesNumber;
     private int busyNodesNumber;
     private int downNodesNumber;
+
+    // For the removing source and add node combo
+    private String sourceToRemoveName = "";
 
     public RMModel() {
         this.root = new Root();
@@ -344,6 +348,8 @@ public class RMModel {
     public String[] getSourcesNames(boolean defaultToo) {
         TreeLeafElement[] children = root.getChildren();
         List<String> res = new ArrayList<String>();
+        res.add(""); // The first blank line use in the combo if no source is selected before trying remove one
+
         for (TreeLeafElement leaf : children) {
             Source src = (Source) leaf;
             if (src.isTheDefault()) {
@@ -359,6 +365,41 @@ public class RMModel {
         Arrays.sort(tmp);
         return tmp;
     }
+
+    // Methods use for the source removing and the add node combo     
+    public void setSourceToRemoveSelected(String sourceName) {
+        this.sourceToRemoveName = sourceName;
+    }
+
+    public String getSourceToRemoveSelected() {
+        return this.sourceToRemoveName;
+    }
+
+    public void findSelectedSource(TreeLeafElement leaf) {
+        String selectedSource = "";
+        try {
+            switch (leaf.getType()) {
+                case SOURCE:
+                    selectedSource = leaf.getName();
+                    break;
+                case HOST:
+                    selectedSource = leaf.getParent().getName();
+                    break;
+                case VIRTUAL_MACHINE:
+                    selectedSource = leaf.getParent().getParent().getName();
+                    break;
+                case NODE:
+                    selectedSource = leaf.getParent().getParent().getParent().getName();
+                    break;
+            }
+        } catch (Exception e) {
+        	//if exception : default empty string argument
+        } finally {
+        	setSourceToRemoveSelected(selectedSource);
+        }
+    }
+
+    // End of removing/add combo methods
 
     public int getFreeNodesNumber() {
         return freeNodesNumber;

@@ -106,7 +106,14 @@ public class RemoveSourceDialog extends Dialog {
         urlFormData.width = 320;
         sourceNameCombo.setLayoutData(urlFormData);
         sourceNameCombo.setItems(RMStore.getInstance().getModel().getSourcesNames(false));
-        sourceNameCombo.select(0);
+        int i = sourceNameCombo.getItemCount() - 1;
+        // Search for the index of the source selected in the tree (index=0 if nothing is selected then blank line in combo is used)
+        while (i > 0 &&
+            !sourceNameCombo.getItem(i).matches(RMStore.getInstance().getModel().getSourceToRemoveSelected())) {
+            i--;
+        }
+        sourceNameCombo.select(i);
+        RMStore.getInstance().getModel().setSourceToRemoveSelected("");
 
         // preempt check
         preemptCheck.setText("wait tasks end on busy nodes");

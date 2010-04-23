@@ -38,7 +38,6 @@ package org.ow2.proactive.resourcemanager.gui.compact;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.ow2.proactive.resourcemanager.gui.compact.view.NodeView;
 import org.ow2.proactive.resourcemanager.gui.compact.view.View;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
@@ -146,6 +145,9 @@ public class SelectionManager {
             ArrayList<Node> selectedNodes = new ArrayList<Node>();
 
             for (View view : selected) {
+                // Find the source of the selected item for the removing source and add node combo in compact view
+                RMStore.getInstance().getModel().findSelectedSource(view.getElement());
+
                 if (view instanceof NodeView) {
                     selectedNodes.add((Node) view.getElement());
                 }
