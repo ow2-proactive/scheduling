@@ -84,10 +84,13 @@ public class SelectSchedulerDialog extends Dialog {
     /** Name of the file which store good logins */
     // proactive/scheduler/
     public static final String LOGIN_FILE = "logins";
+    private static final String SERVER_URL_PROPERTY_NAME = "pa.scheduler.serverURL";
+
     private static List<String> urls = null;
     private static List<String> logins = null;
     private static boolean validate = false;
     private static String url = null;
+    private static String defaultUrl = null;
     private static String login = null;
     private static String pwd = null;
     private static Boolean logAsAdmin = null;
@@ -145,7 +148,14 @@ public class SelectSchedulerDialog extends Dialog {
         urlFormData.right = new FormAttachment(100, -5);
         urlFormData.width = 320;
         urlCombo.setLayoutData(urlFormData);
-        loadUrls();
+
+        defaultUrl = System.getProperty("pa.scheduler.serverURL");
+        if (defaultUrl == null) {
+            loadUrls();
+        } else {
+            urlCombo.setText(defaultUrl);
+            urlCombo.setEnabled(false);
+        }
 
         // label login
         loginLabel.setText("login :");
@@ -457,6 +467,8 @@ public class SelectSchedulerDialog extends Dialog {
      */
     public static void saveInformations() {
         recordLogins();
-        recordUrls();
+        if (defaultUrl == null) {
+		recordUrls();
+        }
     }
 }
