@@ -468,7 +468,7 @@ public class SelectSchedulerDialog extends Dialog {
     public static void saveInformations() {
         recordLogins();
         if (defaultUrl == null) {
-		recordUrls();
+            recordUrls();
         }
     }
 }
