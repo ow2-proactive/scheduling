@@ -36,7 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.gui.dialog.nodesources;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -173,6 +177,7 @@ public class ConfigurablePanel extends Group {
     private Combo combo;
     private List<Property> properties = new LinkedList<Property>();
     private Button loadFromFile = null;
+    private Button saveToFile = null;
     private Label description;
     private PluginDescriptor selectedDescriptor = null;
     private HashMap<String, PluginDescriptor> comboStates = new HashMap<String, PluginDescriptor>();
@@ -223,7 +228,10 @@ public class ConfigurablePanel extends Group {
                     loadFromFile.dispose();
                     loadFromFile = null;
                 }
-
+                if (saveToFile != null) {
+                    saveToFile.dispose();
+                    saveToFile = null;
+                }
                 properties.clear();
                 parent.pack();
 
@@ -260,6 +268,9 @@ public class ConfigurablePanel extends Group {
             // adding 'load properties from file' button
             loadFromFile = new Button(this, SWT.NONE);
             loadFromFile.setText("Load from file");
+            // adding 'save properties to file' button
+            saveToFile = new Button(this, SWT.NONE);
+            saveToFile.setText("Save to file");
 
             loadFromFile.addListener(SWT.Selection, new Listener() {
                 public void handleEvent(Event event) {
@@ -283,12 +294,38 @@ public class ConfigurablePanel extends Group {
                             }
 
                         } catch (Exception e) {
-                            Activator.log(IStatus.ERROR, "Cannot read file " + fileName, e);
-                            MessageDialog.openError(Display.getDefault().getActiveShell(),
-                                    "Cannot read file", "Cannot read file " + fileName + "\n\n" +
-                                        e.getMessage());
+                            manageException(e, fileName);
                         }
 
+                    }
+                }
+            });
+            saveToFile.addListener(SWT.Selection, new Listener() {
+                public void handleEvent(Event event) {
+                    FileDialog fileDialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.SAVE);
+                    String fileName = fileDialog.open();
+                    if (fileName != null) {
+                        Properties saveProperties = new Properties();
+                        try {
+
+                            FileOutputStream fos = new FileOutputStream(fileName);
+
+                            for (Property prop : properties) {
+                                String propName = prop.getPropertyName();
+                                if (propName == null) {
+                                    propName = PluginDescriptor.beautifyName(prop.getPropertyName());
+                                }
+                                String value = prop.getValue().toString();
+                                if (propName != null) {
+                                    saveProperties.setProperty(propName, value);
+
+                                }
+                            }
+                            saveProperties.store(fos, null);
+                            fos.close();
+                        } catch (Exception e) {
+                            manageException(e, fileName);
+                        }
                     }
                 }
             });
@@ -296,6 +333,12 @@ public class ConfigurablePanel extends Group {
             FormData fd = new FormData();
             fd.top = new FormAttachment(properties.get(properties.size() - 1), 10);
             loadFromFile.setLayoutData(fd);
+
+            fd = new FormData();
+            System.getProperty("pa.scheduler.serverURL");
+            fd.left = new FormAttachment(loadFromFile, 0);
+            fd.top = new FormAttachment(properties.get(properties.size() - 1), 10);
+            saveToFile.setLayoutData(fd);
         }
 
         if (descriptor.getPluginDescription() != null) {
@@ -325,4 +368,11 @@ public class ConfigurablePanel extends Group {
     public PluginDescriptor getSelectedPlugin() {
         return selectedDescriptor;
     }
+
+    private void manageException(Exception e, String fileName) {
+        Activator.log(IStatus.ERROR, "Cannot read file " + fileName, e);
+        MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot read file",
+                "Cannot read file " + fileName + "\n\n" + e.getMessage());
+    }
+
 }
