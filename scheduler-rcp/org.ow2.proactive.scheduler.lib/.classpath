@@ -35,7 +35,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jna.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsch-0.1.31.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsch-0.1.38.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jta-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/neethi-2.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.apache.servicemix.bundles.wsdl4j-1.6.1_1.jar"/>
