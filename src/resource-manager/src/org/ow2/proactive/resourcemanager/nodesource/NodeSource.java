@@ -224,9 +224,9 @@ public class NodeSource implements InitActive, RunActive {
             throw new AddingNodesException(e);
         }
 
-        // cannot lookup node
+        // node should be not null at this point...
         if (nodeToAdd == null) {
-            throw new AddingNodesException("Cannot lookup node " + nodeUrl);
+            throw new AddingNodesException("Cannot lookup node for unknown reason : " + nodeUrl);
         }
 
         // the node with specified url was successfully looked up
@@ -343,11 +343,7 @@ public class NodeSource implements InitActive, RunActive {
             logger.debug("Looking up for the node " + nodeUrl + " with " + timeout + " ms timeout");
 
         Future<Node> futureNode = internalThreadPool.submit(new NodeLocator(nodeUrl));
-        try {
-            return futureNode.get(timeout, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            return null;
-        }
+        return futureNode.get(timeout, TimeUnit.MILLISECONDS);
     }
 
     /**
