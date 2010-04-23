@@ -442,17 +442,24 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             logAsAdmin = dialogResult.isLogAsAdmin();
             schedulerURL = dialogResult.getUrl();
             sai = SchedulerConnection.join(schedulerURL);
+
             final Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
                     .getPublicKey());
-            if (logAsAdmin) {
-                scheduler = sai.logAsAdmin(creds);
-            } else {
-                scheduler = sai.logAsUser(creds);
+
+            if (scheduler == null || !scheduler.isConnected().booleanValue()) { // If escape key was pressed during the init of the scheduler
+                if (logAsAdmin) {
+                    scheduler = sai.logAsAdmin(creds);
+                } else {
+                    scheduler = sai.logAsUser(creds);
+                }
             }
+
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
+
             startPinger();
             connected = true;
             ControllerView.getInstance().connectedEvent(logAsAdmin);
+
             JMXChartItAction.getInstance().initJMXClient(sai,
                     new Object[] { creds, dialogResult.getLogin() }, logAsAdmin);
             return CONNECTED;
