@@ -393,9 +393,9 @@ public class RMModel {
                     break;
             }
         } catch (Exception e) {
-        	//if exception : default empty string argument
+            //if exception : default empty string argument
         } finally {
-        	setSourceToRemoveSelected(selectedSource);
+            setSourceToRemoveSelected(selectedSource);
         }
     }
 
