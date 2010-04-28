@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
  */
 public class HelloWorldAction implements Action<String, Void>, Serializable {
 
-    private static final long serialVersionUID = 100L;
+    private static final long serialVersionUID = 200;
     private final static Logger logger = Logger.getLogger(HelloWorldAction.class);
 
     public HelloWorldAction() {
