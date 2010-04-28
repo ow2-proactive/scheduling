@@ -87,6 +87,11 @@ do
 		SUFFIX=win32
 		cp $LOG4J $i/$PRODUCT_NAME/proactive-log4j
 	fi
+	if [ "$FILENAME" = "win32.win32.x86_64" ]
+	then
+		SUFFIX=win32-64
+		cp $LOG4J $i/$PRODUCT_NAME/proactive-log4j
+	fi
 	if [ "$FILENAME" = "macosx.carbon.x86" ]
 	then
 		SUFFIX=macx86
@@ -103,7 +108,7 @@ do
 	# COPY DIRECTORY CONTAINING RCP LAUNCHER TO RCP ROOT DIRECTORY
 	cp -r $i/$PRODUCT_NAME ${RCPs_DIRECTORY}/$NEWFILE
 
-	if [ "$FILENAME" = "win32.win32.x86" ]
+	if [ "$FILENAME" = "win32.win32.x86" ] || [ "$FILENAME" = "win32.win32.x86_64" ]
 	then
 		# ZIP CREATED DIRECTORY
 		cd ${RCPs_DIRECTORY}
