@@ -40,13 +40,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.gui.Activator;
 import org.ow2.proactive.scheduler.gui.Internal;
@@ -66,7 +65,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
     private Composite parent = null;
     private boolean isConnected = false;
     private Shell waitShell = null;
-    private int res;
+    private int res = 0;
     private boolean errorOnConnection = false;
 
     public ConnectDeconnectSchedulerAction(Composite parent) {
@@ -124,7 +123,29 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
                         errorConnect(t, dialogResult);
                     }
 
-                    if (res == SchedulerProxy.CONNECTED) {
+                    if (res == 0/*init val*/) {
+                        parent.getDisplay().syncExec(new Runnable() {
+                            public void run() {
+                                if (!waitShell.isDisposed()) {
+                                    bar.dispose();
+                                    waitShell.dispose();
+                                }
+                            }
+                        });
+                        return;
+                    } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
+                        parent.getDisplay().syncExec(new Runnable() {
+                            public void run() {
+                                if (!waitShell.isDisposed()) {
+                                    bar.dispose();
+                                    waitShell.dispose();
+                                }
+                                MessageDialog.openError(parent.getShell(), "Could not connect",
+                                        "Incorrect username or password !");
+                            }
+                        });
+                        return;
+                    } else if (res == SchedulerProxy.CONNECTED) {
                         // wait result for synchronous call
                         final boolean futurRes = JobsController.getActiveView().init();
 
@@ -191,13 +212,17 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
         }
     }
 
-    private void errorConnect(Throwable e, SelectSchedulerDialogResult dialogResult) {
+    private void errorConnect(final Throwable e, final SelectSchedulerDialogResult dialogResult) {
         e.printStackTrace();
         Activator.log(IStatus.ERROR, "Could not connect to the scheduler based on:" + dialogResult.getUrl(),
                 e);
-        MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                "Could not connect to the scheduler based on : " + dialogResult.getUrl() + "\n\nCause\n : " +
-                    e.getMessage());
+        parent.getDisplay().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openError(parent.getShell(), "Couldn't connect",
+                        "Could not connect to the scheduler based on : " + dialogResult.getUrl() +
+                            "\n\nCause\n : " + e.getMessage());
+            }
+        });
     }
 
     private void disconnection() {
