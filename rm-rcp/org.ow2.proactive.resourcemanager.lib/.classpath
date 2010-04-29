@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_utils.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualbox-wsdl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-libvirt.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-virtualbox.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-vmware-vi.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-vmware-vix.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/virtualization-xenserver.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/WinHPCWebserviceStubs.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager-client.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_SRM-common-client.jar"/>
