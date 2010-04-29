@@ -1,19 +1,20 @@
 #!/bin/sh
 
 # cmd example
-# ./makeRCP_arch.sh ../Public/RCP 1.0.2 ../Workspace/ProActiveScheduling.git/rm-rcp/org.ow2.proactive.resourcemanager/proactive-log4j ../Public/RCP
+# ./makeRCP_arch.sh . ../Public/RCP 1.0.2 ../Workspace/ProActiveScheduling.git/rm-rcp/org.ow2.proactive.resourcemanager/proactive-log4j ../Public/RCP
 
-if [ $# -ne 4 ]
+if [ $# -ne 5 ]
 then
         echo usage : $0 RCPs_directory version proactive-log4j destination
 	echo
+	echo "    root_directory   : Root directory of the Scheduling project : must contains license files"
 	echo "    RCPs_directory   : Directory containing the different built RCPs for both products (must contain the \'scheduler\' and \'rm\' directories)"
 	echo "    version          : Version number to release"
 	echo "    proactive-log4j  : Path to the proactive-log4j FILE to copy into the RCPs"
 	echo "    destination      : Destination path for the final generated archive"
 	echo
 	echo "    Example :"
-	echo "    ./makeRCP_arch.sh ../Public/RCP 1.0.2 ../Workspace/ProActiveScheduling.git/scheduler_rcp/org.ow2.proactive.scheduler/proactive-log4j ../Public/RCP"
+	echo "    ./makeRCP_arch.sh . ../Public/RCP 1.0.2 ../Workspace/ProActiveScheduling.git/scheduler_rcp/org.ow2.proactive.scheduler/proactive-log4j ../Public/RCP"
 	echo "    "
 	echo "    To export plugins (via Eclipse) Root directory must be :"
 	echo "       'ResourceManager'    for RM"
@@ -26,10 +27,18 @@ fi
 
 function generate
 {
-RCPs_DIRECTORY=$1/$PRODUCT
-VERSION=$2
-LOG4J=$3
-DESTINATION=$4
+ROOT_DIRECTORY=$1
+RCPs_DIRECTORY=$2/$PRODUCT
+VERSION=$3
+LOG4J=$4
+DESTINATION=$5
+
+# CHECK ROOT DIRECTORY ARGUMENT
+if [ ! -d "$ROOT_DIRECTORY" ]
+then
+	echo \'$ROOT_DIRECTORY\' is not a valid directory
+	exit
+fi
 
 # CHECK PRODUCT NAME ARGUMENT
 if [ "$PRODUCT" = "scheduler" ]
@@ -87,6 +96,11 @@ do
 		SUFFIX=win32
 		cp $LOG4J $i/$PRODUCT_NAME/proactive-log4j
 	fi
+	if [ "$FILENAME" = "win32.win32.x86_64" ]
+	then
+		SUFFIX=win32-64
+		cp $LOG4J $i/$PRODUCT_NAME/proactive-log4j
+	fi
 	if [ "$FILENAME" = "macosx.carbon.x86" ]
 	then
 		SUFFIX=macx86
@@ -97,13 +111,17 @@ do
 		SUFFIX=maccarbon
 		cp $LOG4J $i/$PRODUCT_NAME/$PRODUCT_NAME.app/Contents/MacOS/proactive-log4j
 	fi
+	
+	#COPY LICENSE FILES
+	cp $ROOT_DIRECTORY/LICENSE.txt $i/$PRODUCT_NAME/
+	cp $ROOT_DIRECTORY/LICENSE_EXCEPTION.txt $i/$PRODUCT_NAME/
 
 	# GENERATE NEW DIRECTORY NAME
 	NEWFILE=${PREFIX}${VERSION}_RCP-client-${SUFFIX}
 	# COPY DIRECTORY CONTAINING RCP LAUNCHER TO RCP ROOT DIRECTORY
 	cp -r $i/$PRODUCT_NAME ${RCPs_DIRECTORY}/$NEWFILE
 
-	if [ "$FILENAME" = "win32.win32.x86" ]
+	if [ "$FILENAME" = "win32.win32.x86" ] || [ "$FILENAME" = "win32.win32.x86_64" ]
 	then
 		# ZIP CREATED DIRECTORY
 		cd ${RCPs_DIRECTORY}
@@ -127,7 +145,7 @@ done
 for p in {"scheduler","rm"}
 do
 	PRODUCT=$p
-	generate $1 $2 $3 $4
+	generate $1 $2 $3 $4 $5
 done
 
 
