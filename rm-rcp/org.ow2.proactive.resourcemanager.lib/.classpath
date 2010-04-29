@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_utils.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/virtualbox-wsdl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/virtualization-core.jar"/>
