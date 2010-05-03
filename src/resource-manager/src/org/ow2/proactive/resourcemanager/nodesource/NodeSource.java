@@ -130,11 +130,13 @@ public class NodeSource implements InitActive, RunActive {
      * @param policy nodes acquisition policy
      * @param rmcore resource manager core
      */
-    public NodeSource(String name, InfrastructureManager im, NodeSourcePolicy policy, RMCore rmcore) {
+    public NodeSource(String name, InfrastructureManager im, NodeSourcePolicy policy, RMCore rmcore,
+            Client provider) {
         this.name = name;
-        infrastructureManager = im;
-        nodeSourcePolicy = policy;
+        this.infrastructureManager = im;
+        this.nodeSourcePolicy = policy;
         this.rmcore = rmcore;
+        this.provider = provider;
     }
 
     /**
@@ -161,6 +163,7 @@ public class NodeSource implements InitActive, RunActive {
             PAActiveObject.setImmediateService("getName");
             PAActiveObject.setImmediateService("executeInParallel");
             PAActiveObject.setImmediateService("getDescription");
+            PAActiveObject.setImmediateService("getProvider");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -610,10 +613,12 @@ public class NodeSource implements InitActive, RunActive {
         });
     }
 
-    public void setProvider(Client provider) {
-        this.provider = provider;
-    }
-
+    /**
+     * The provider of the node source is the resource manager client initiated
+     * the node source creation.
+     *
+     * @return the node source provider
+     */
     public Client getProvider() {
         return provider;
     }

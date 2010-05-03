@@ -672,12 +672,11 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
         NodeSource nodeSource;
         try {
             nodeSource = (NodeSource) PAActiveObject.newActive(NodeSource.class.getName(), new Object[] {
-                    nodeSourceName, im, policy, PAActiveObject.getStubOnThis() }, nodeRM);
+                    nodeSourceName, im, policy, PAActiveObject.getStubOnThis(), client }, nodeRM);
         } catch (Exception e) {
             throw new RMException(e);
         }
 
-        nodeSource.setProvider(client);
         // adding node source as client to the core
         UniqueID nsId = Client.getId(nodeSource);
         UniqueID policyId = Client.getId(policy);
