@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.PropertyType;
 
 
 /**
