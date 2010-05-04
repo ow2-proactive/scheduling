@@ -692,6 +692,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
                 infrastructureParameters);
         NodeSourcePolicy policy = NodeSourcePolicyFactory.create(policyType, infrastructureType,
                 policyParameters);
+
         NodeSource nodeSource;
         try {
             nodeSource = (NodeSource) PAActiveObject.newActive(NodeSource.class.getName(), new Object[] {

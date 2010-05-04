@@ -50,6 +50,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -99,12 +100,12 @@ public class NodeSource implements InitActive, RunActive {
     public static final String DEFAULT = "Default";
 
     /** unique name of the source */
-    private String name;
+    private final String name;
 
-    private InfrastructureManager infrastructureManager;
-    private NodeSourcePolicy nodeSourcePolicy;
-    private String description;
-    private RMCore rmcore;
+    private final InfrastructureManager infrastructureManager;
+    private final NodeSourcePolicy nodeSourcePolicy;
+    private final String description;
+    private final RMCore rmcore;
     private boolean toShutdown = false;
 
     // all nodes except down
@@ -115,16 +116,24 @@ public class NodeSource implements InitActive, RunActive {
     private static ExecutorService internalThreadPool;
     private static ExecutorService externalThreadPool;
     private NodeSource stub;
-    private Client provider;
+    private final Client provider;
 
-    private PrincipalPermission adminPermission;
-    private PrincipalPermission userPermission;
+    private final PrincipalPermission adminPermission;
+    private final PrincipalPermission userPermission;
 
     /**
      * Creates a new instance of NodeSource.
      * This constructor is used by Proactive as one of requirements for active objects.
      */
     public NodeSource() {
+        name = null;
+        infrastructureManager = null;
+        nodeSourcePolicy = null;
+        description = null;
+        rmcore = null;
+        provider = null;
+        adminPermission = null;
+        userPermission = null;
     }
 
     /**
@@ -142,7 +151,13 @@ public class NodeSource implements InitActive, RunActive {
         this.infrastructureManager = im;
         this.nodeSourcePolicy = policy;
         this.rmcore = rmcore;
-        this.provider = provider;
+        this.description = "Infrastructure:" + im + ", Policy: " + policy;
+
+        // creating node source admin and user permissions
+        this.userPermission = new PrincipalPermission(name, provider.getSubject().getPrincipals(
+                nodeSourcePolicy.getUserPrincipalType()));
+        this.adminPermission = new PrincipalPermission(name, provider.getSubject().getPrincipals(
+                nodeSourcePolicy.getAdminPrincipalType()));
     }
 
     /**
@@ -156,26 +171,9 @@ public class NodeSource implements InitActive, RunActive {
         infrastructureManager.setNodeSource(this);
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
-        // creating node source admin and user permissions
-        userPermission = new PrincipalPermission(name, provider.getSubject().getPrincipals(
-                nodeSourcePolicy.getUserPrincipalType()));
-        adminPermission = new PrincipalPermission(name, provider.getSubject().getPrincipals(
-                nodeSourcePolicy.getAdminPrincipalType()));
-
         try {
             // executor service initialization
             initExecutorService();
-
-            // description could be requested when the policy does not exist anymore
-            // so initializing it here
-            description = "Infrastructure:" + infrastructureManager + ", Policy: " + nodeSourcePolicy;
-
-            // these methods are called from the rm core
-            // mark them as immediate services in order to prevent the block of the core
-            PAActiveObject.setImmediateService("getName");
-            PAActiveObject.setImmediateService("executeInParallel");
-            PAActiveObject.setImmediateService("getDescription");
-            PAActiveObject.setImmediateService("getProvider");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -459,6 +457,7 @@ public class NodeSource implements InitActive, RunActive {
      * Creates a node source string representation
      * @return string representation of the node source
      */
+    @ImmediateService
     public String getDescription() {
         return description;
     }
@@ -467,6 +466,7 @@ public class NodeSource implements InitActive, RunActive {
      * Gets name of the node source
      * @return name of the node source
      */
+    @ImmediateService
     public String getName() {
         return name;
     }
@@ -577,7 +577,7 @@ public class NodeSource implements InitActive, RunActive {
      * Gets resource manager core. Used by policies.
      * @return {@link RMCoreInterface}
      */
-
+    @ImmediateService
     public RMCore getRMCore() {
         return rmcore;
     }
@@ -586,6 +586,7 @@ public class NodeSource implements InitActive, RunActive {
      * Executed command in parallel using thread pool
      * @param command to execute
      */
+    @ImmediateService
     public void executeInParallel(Runnable command) {
         externalThreadPool.execute(command);
     }
@@ -631,6 +632,7 @@ public class NodeSource implements InitActive, RunActive {
      *
      * @return the node source provider
      */
+    @ImmediateService
     public Client getProvider() {
         return provider;
     }
@@ -645,6 +647,7 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Returns the permission required to administrate the node source
      */
+    @ImmediateService
     public Permission getAdminPermission() {
         return adminPermission;
     }
@@ -652,6 +655,7 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Returns the permission required to use the node source
      */
+    @ImmediateService
     public Permission getUserPermission() {
         return userPermission;
     }
