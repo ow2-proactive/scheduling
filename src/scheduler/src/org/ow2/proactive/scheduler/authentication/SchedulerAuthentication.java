@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.common.backwardcompatibility.SchedulerAdminAd
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
-import org.ow2.proactive.scheduler.core.jmx.JMXMonitoringHelper;
+import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -282,7 +282,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
      */
     public String getJMXConnectorURL() {
         try {
-            return JMXMonitoringHelper.getInstance().getAddress(JMXTransportProtocol.RMI).toString();
+            return SchedulerJMXHelper.getInstance().getAddress(JMXTransportProtocol.RMI).toString();
         } catch (JMException e) {
             return null; // TODO: FORWARD THE JMException
         }
@@ -296,7 +296,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
      * @throws JMException in case of boot sequence failure
      */
     public String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException {
-        return JMXMonitoringHelper.getInstance().getAddress(protocol).toString();
+        return SchedulerJMXHelper.getInstance().getAddress(protocol).toString();
     }
 
     /**

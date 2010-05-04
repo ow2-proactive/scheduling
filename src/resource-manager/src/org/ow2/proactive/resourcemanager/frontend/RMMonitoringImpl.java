@@ -300,7 +300,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeEvent(RMNodeEvent event) {
         RMMonitoringImpl.rmStatistics.nodeEvent(event);
-        DatabaseManager.getInstance().register(event);
+        //DatabaseManager.getInstance().register(event);
         queueEvent(event);
     }
 

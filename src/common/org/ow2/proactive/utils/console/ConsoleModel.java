@@ -204,6 +204,7 @@ public abstract class ConsoleModel {
             }
         } catch (ScriptException e) {
             error("*SYNTAX ERROR* - " + format(e.getMessage()));
+            e.printStackTrace();
         } catch (Exception e) {
             handleExceptionDisplay("Error while evaluating command", e);
         }

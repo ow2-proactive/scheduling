@@ -44,16 +44,16 @@ import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 
 
 /**
- * This class implements {@link RMMBean} to allow the management of the Resource
+ * This class implements {@link RuntimeDataMBean} to expose the runtime data of the Resource
  * Manager following the JMX standard for management. It provides a consistent view of
  * the Resource Manager statistics.
  *
  * @author The ProActive Team
- * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMMBean
+ * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean
  * @since ProActive Scheduling 1.1
  */
 @PublicAPI
-public class RMMBeanImpl extends StandardMBean implements RMMBean {
+public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMBean {
 
     /**
      * The reference on the statistics holder.
@@ -64,112 +64,97 @@ public class RMMBeanImpl extends StandardMBean implements RMMBean {
      * Creates a new instance of this class.
      *
      * @param rmStatisticsHolder The instance of the statistics holder
-     * @throws NotCompliantMBeanException if the {@link RMMBean} interface does not follow
+     * @throws NotCompliantMBeanException if the {@link RuntimeDataMBean} interface does not follow
      * JMX design patterns for Management Interfaces, or if <var>this</var> does not
      * implement the specified interface.
      */
-    public RMMBeanImpl(final AtomicRMStatisticsHolder rmStatisticsHolder) throws NotCompliantMBeanException {
-        this(RMMBean.class, rmStatisticsHolder);
-    }
-
-    /**
-     * Creates a new instance of this class. Only for sub-classes.
-     *
-     * @param mbeanInterface The interface of the mbean
-     * @param rmStatisticsHolder The instance of the statistics holder
-     * @throws NotCompliantMBeanException if the {@link RMMBean} interface does not follow
-     * JMX design patterns for Management Interfaces, or if <var>this</var> does not
-     * implement the specified interface.
-     */
-    protected RMMBeanImpl(final Class<?> mbeanInterface, final AtomicRMStatisticsHolder rmStatisticsHolder)
+    public RuntimeDataMBeanImpl(final AtomicRMStatisticsHolder rmStatisticsHolder)
             throws NotCompliantMBeanException {
-        super(mbeanInterface);
+        super(RuntimeDataMBean.class);
         this.rmStatisticsHolder = rmStatisticsHolder;
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMMBean#getRMStatus()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getStatus()
      */
-    public String getRMStatus() {
+    public String getStatus() {
         return this.rmStatisticsHolder.getStatistics().getRMStatus();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMMBean#getAvailableNodesCount()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getAvailableNodesCount()
      */
     public int getAvailableNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getAvailableNodesCount();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMMBean#getFreeNodesCount()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getFreeNodesCount()
      */
     public int getFreeNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getFreeNodesCount();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMMBean#getBusyNodesCount()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getBusyNodesCount()
      */
     public int getBusyNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getBusyNodesCount();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMMBean#getToBeReleasedNodesCount()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getToBeReleasedNodesCount()
      */
-    @Deprecated
     public int getToBeReleasedNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getToBeRemovedNodesCount();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMMBean#getDownNodesCount()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getDownNodesCount()
      */
     public int getDownNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getDownNodesCount();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxFreeNodes()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxFreeNodes()
      */
     public int getMaxFreeNodes() {
-        return rmStatisticsHolder.getStatistics().getMaxFreeNodes();
+        return this.rmStatisticsHolder.getStatistics().getMaxFreeNodes();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxBusyNodes()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxBusyNodes()
      */
     public int getMaxBusyNodes() {
-        return rmStatisticsHolder.getStatistics().getMaxBusyNodes();
+        return this.rmStatisticsHolder.getStatistics().getMaxBusyNodes();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxToBeReleasedNodes()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxToBeReleasedNodes()
      */
     public int getMaxToBeReleasedNodes() {
-        return rmStatisticsHolder.getStatistics().getToBeRemovedNodesCount();
+        return this.rmStatisticsHolder.getStatistics().getToBeRemovedNodesCount();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getMaxDownNodes()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxDownNodes()
      */
     public int getMaxDownNodes() {
-        return rmStatisticsHolder.getStatistics().getMaxDownNodes();
+        return this.rmStatisticsHolder.getStatistics().getMaxDownNodes();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getAverageActivity()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getAverageActivity()
      */
     public double getAverageActivity() {
-        return rmStatisticsHolder.getStatistics().getActivityTimePercentage();
+        return this.rmStatisticsHolder.getStatistics().getActivityTimePercentage();
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean#getAverageInactivity()
+     * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getAverageInactivity()
      */
     public double getAverageInactivity() {
-        return rmStatisticsHolder.getStatistics().getInactivityTimePercentage();
+        return this.rmStatisticsHolder.getStatistics().getInactivityTimePercentage();
     }
-
 }

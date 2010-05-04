@@ -111,6 +111,14 @@ public final class RMNodeEvent extends RMEvent {
     @Column(name = "nodeOwner")
     private final String nodeOwner;
 
+    /** The id of the previous event */
+    @Column(name = "previousEventId")
+    private long previousEventId;
+
+    /** The id of the add event */
+    @Column(name = "addEventId")
+    private long addEventId;
+
     /**
      * ProActive empty constructor
      */
@@ -125,6 +133,8 @@ public final class RMNodeEvent extends RMEvent {
         this.previousNodeState = null;
         this.nodeProvider = null;
         this.nodeOwner = null;
+        this.previousEventId = 0l;
+        this.addEventId = 0l;
     }
 
     /**
@@ -141,6 +151,7 @@ public final class RMNodeEvent extends RMEvent {
      * @param rmNode the node concerned by this event
      * @param eventType the resource manager event type
      * @param previousNodeState the previous state of the node concerned by this event
+     * @param initiator the client which initiates the event
      */
     public RMNodeEvent(final RMNode rmNode, final RMEventType eventType, final NodeState previousNodeState,
             final String initiator) {
@@ -157,6 +168,27 @@ public final class RMNodeEvent extends RMEvent {
         this.previousNodeState = previousNodeState;
         this.nodeProvider = rmNode.getProvider() == null ? null : rmNode.getProvider().getName();
         this.nodeOwner = rmNode.getOwner() == null ? null : rmNode.getOwner().getName();
+        // The rm node always keeps track on its last event, this is needed for rm node events logic
+        if (eventType == null) {
+            this.previousEventId = 0l;
+            this.addEventId = 0l;
+        } else {
+            try {
+                switch (eventType) {
+                    case NODE_ADDED:
+                        rmNode.setAddEvent(this);
+                        this.previousEventId = 0l;
+                        this.addEventId = 0l;
+                        break;
+                    default:
+                        this.previousEventId = rmNode.getLastEvent() == null ? 0l : rmNode.getLastEvent().id;
+                        this.addEventId = rmNode.getAddEvent() == null ? 0l : rmNode.getAddEvent().id;
+                }
+                rmNode.setLastEvent(this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

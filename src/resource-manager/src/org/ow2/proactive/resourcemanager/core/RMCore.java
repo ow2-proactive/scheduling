@@ -79,7 +79,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
+import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
+import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
@@ -192,6 +193,10 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
     /** Client pinger */
     private ClientPinger clientPinger;
 
+    private transient RMAccountsManager accountsManager;
+
+    private transient RMJMXHelper jmxHelper;
+
     /**
      * ProActive Empty constructor
      */
@@ -218,6 +223,9 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         nodeSources = new HashMap<String, NodeSource>();
         allNodes = new HashMap<String, RMNode>();
         freeNodes = new ArrayList<RMNode>();
+
+        this.accountsManager = new RMAccountsManager();
+        this.jmxHelper = new RMJMXHelper(this.accountsManager);
     }
 
     /**
@@ -266,8 +274,12 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             if (logger.isDebugEnabled()) {
                 logger.debug("active object RMMonitoring");
             }
-            // Boot the JMX monitoring infrastructure            
-            JMXMonitoringHelper.getInstance().boot(authentication);
+
+            // Boot the JMX infrastructure
+            this.jmxHelper.boot(authentication);
+
+            // Start the accounts refresher
+            this.accountsManager.startAccountsRefresher();
 
             monitoring = (RMMonitoringImpl) PAActiveObject.newActive(RMMonitoringImpl.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
@@ -409,7 +421,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             rmNode.setFree();
             this.freeNodes.add(rmNode);
             // create the event
-            this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
+            this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
                 previousNodeState, owner.getName()));
         } catch (NodeException e) {
             // Exception on the node, we assume the node is down
@@ -436,13 +448,13 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         final NodeState previousNodeState = rmNode.getState();
         try {
             rmNode.setToRemove();
+            // create the event
+            this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
+                previousNodeState, initiator.getName()));
         } catch (NodeException e1) {
             // A down node shouldn't be busied...
             logger.debug("", e1);
         }
-        // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState,
-            initiator.getName()));
     }
 
     /**
@@ -477,7 +489,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         }
         this.allNodes.remove(rmnode.getNodeURL());
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_REMOVED, rmnode.getState(),
+        this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_REMOVED, rmnode.getState(),
             initiator.getName()));
     }
 
@@ -500,8 +512,8 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         this.freeNodes.add(rmnode);
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED, null, rmnode.getProvider()
-                .getName()));
+        this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED, null, rmnode
+                .getProvider().getName()));
         if (logger.isInfoEnabled()) {
             logger.info("New node " + rmnode.getNodeURL() + " added to the node source " +
                 rmnode.getNodeSourceName() + " by " + rmnode.getProvider());
@@ -997,8 +1009,8 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         }
         this.freeNodes.remove(rmNode);
         // create the event
-        this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED, previousNodeState,
-            owner.getName()));
+        this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
+            previousNodeState, owner.getName()));
     }
 
     /**
@@ -1021,13 +1033,18 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             }
             rmNode.setDown();
             // create the event
-            this.monitoring.nodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
+            this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
                 previousNodeState, rmNode.getProvider().getName()));
         } else {
             // the nodes has been removed from core asynchronously
             // when pinger of selection manager tried to access it
             // do nothing in this case
         }
+    }
+
+    private void registerAndEmitNodeEvent(final RMNodeEvent event) {
+        DatabaseManager.getInstance().register(event);
+        this.monitoring.nodeEvent(event);
     }
 
     /**

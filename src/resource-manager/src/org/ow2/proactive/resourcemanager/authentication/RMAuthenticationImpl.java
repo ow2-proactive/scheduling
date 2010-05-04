@@ -55,7 +55,7 @@ import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
-import org.ow2.proactive.resourcemanager.core.jmx.JMXMonitoringHelper;
+import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -213,7 +213,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      * {@inheritDoc}
      */
     public String getJMXConnectorURL() throws JMException {
-        return JMXMonitoringHelper.getInstance().getAddress(JMXTransportProtocol.RMI).toString();
+        return RMJMXHelper.getInstance().getAddress(JMXTransportProtocol.RMI).toString();
     }
 
     /**
@@ -224,7 +224,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      * @throws JMException in case of boot sequence failure
      */
     public String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException {
-        return JMXMonitoringHelper.getInstance().getAddress(protocol).toString();
+        return RMJMXHelper.getInstance().getAddress(protocol).toString();
     }
 
     /**

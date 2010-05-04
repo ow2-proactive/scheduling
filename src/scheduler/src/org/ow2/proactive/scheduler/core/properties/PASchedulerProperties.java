@@ -79,6 +79,9 @@ public enum PASchedulerProperties {
     /** Port of the JMX service. Random if not set */
     SCHEDULER_JMX_PORT("pa.scheduler.core.jmx.port", PropertyType.INTEGER),
 
+    /** Accounting refresh rate from the database in seconds */
+    SCHEDULER_ACCOUNTING_REFRESH_RATE("pa.scheduler.accounting.refreshrate", PropertyType.INTEGER),
+
     /** User session time (user is automatically disconnect after this time if no request is made to the scheduler)
     	negative number indicates that session is infinite (value specified in second) */
     SCHEDULER_USER_SESSION_TIME("pa.scheduler.core.usersessiontime", PropertyType.INTEGER),

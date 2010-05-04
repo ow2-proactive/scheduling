@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
-import java.util.Date;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.node.Node;
@@ -44,6 +43,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -86,8 +86,19 @@ public interface RMNode extends Comparable<RMNode> {
      */
     public HashMap<SelectionScript, Integer> getScriptStatus();
 
-    // ----------------------------------------------------------------------//
+    /**
+     * Cleaning method : remove all active objects on this node.
+     */
+    public void clean() throws NodeException;
+
+    /**
+     * @return a string describing the RMNode (status, vnode, host, pad, ...)
+     */
+    public String toString();
+
+    // ---------------------------------------------------------------------//
     // GET
+    //----------------------------------------------------------------------//
 
     /**
      * @return the name of the node
@@ -137,6 +148,45 @@ public interface RMNode extends Comparable<RMNode> {
      */
     public String getNodeURL();
 
+    /** Get the node source object that handle the node
+     * @return the stub of the node source active object
+     */
+    public NodeSource getNodeSource();
+
+    /**
+     * Returns the node state
+     * @return the node state
+     */
+    public NodeState getState();
+
+    /**
+     * Gets the provider of the node (who created and deployed it)
+     * @return the node provider
+     */
+    public Client getProvider();
+
+    /**
+     * Gets the owner of the node (who currently running computations on it)
+     * @return the node owner
+     */
+    public Client getOwner();
+
+    /**
+     * Returns the id of the add event {@link RMNodeEvent}.
+     * @return the id of the add event
+     */
+    public RMNodeEvent getAddEvent();
+
+    /**
+     * Returns the id of the last event {@link RMNodeEvent}.
+     * @return the id of the last event
+     */
+    public RMNodeEvent getLastEvent();
+
+    // ---------------------------------------------------------------------//
+    // IS
+    //----------------------------------------------------------------------//
+
     /**
      * @return true if the node is free, false otherwise.
      */
@@ -156,6 +206,10 @@ public interface RMNode extends Comparable<RMNode> {
      * @return true if the node is busy, false otherwise.
      */
     public boolean isBusy();
+
+    // ---------------------------------------------------------------------//
+    // SET
+    //----------------------------------------------------------------------//
 
     /**
      * change the node's status to free
@@ -182,41 +236,12 @@ public interface RMNode extends Comparable<RMNode> {
     public void setDown();
 
     /**
-     * @return a string describing the RMNode (status, vnode, host, pad, ...)
-     */
-    public String toString();
-
-    /**
-     * Cleaning method : remove all active objects on this node.
-     */
-    public void clean() throws NodeException;
-
-    /** Get the node source object that handle the node
-     * @return the stub of the node source active object
-     */
-    public NodeSource getNodeSource();
-
-    /**
      * Change the {@link NodeSource} from where the node is.
      * @param nodeSource
      */
     public void setNodeSource(NodeSource nodeSource);
 
-    /**
-     * Returns the node state
-     * @return the node state
-     */
-    public NodeState getState();
+    public void setAddEvent(final RMNodeEvent addEvent);
 
-    /**
-     * Gets the provider of the node (who created and deployed it)
-     * @return the node provider
-     */
-    public Client getProvider();
-
-    /**
-     * Gets the owner of the node (who currently running computations on it)
-     * @return the node owner
-     */
-    public Client getOwner();
+    public void setLastEvent(final RMNodeEvent lastEvent);
 }

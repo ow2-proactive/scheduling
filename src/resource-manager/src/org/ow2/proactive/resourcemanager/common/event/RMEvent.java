@@ -65,7 +65,7 @@ public class RMEvent implements Serializable {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused")
-    private long id;
+    protected long id;
     /** Resource manager URL */
     @Column(name = "rmurl")
     private String RMUrl = null;

@@ -59,25 +59,28 @@ import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 
 /**
  * This helper class represents the common JMX monitoring infrastructure.
+ * Two levels of JMX monitoring are possible using two separate MBeans, one for
+ * anonymous users and one for administrators.
  * <p>
  * Sub-classes must register these MBeans into the MBean server then provide an {@link ObjectName} for each MBean.
  * <p>
- * This helper exposes two connector servers, one over RMI and one over RO (Remote Objects).
+ * This helper exposes two connector servers, one over RMI and one over RO (Remote Objects). Each
+ * connector server exposes the anonymous MBean for anonymous users and same for admin users.
  * <p>
- * The service url of the connector server over RMI is built like
+ * The service url of the connector server over RMI for anonymous access is built like
  * <code>service:jmx:rmi:///jndi/rmi://HOSTNAME_OR_IP:PORT/NAME</code> where
  * <ul>
  * <li><code>HOSTNAME_OR_IP</code> is specified by the ProActive network configuration.
  * <li><code>PORT</code> is provided by sub-classes by the {@link #getJMXRMIConnectorServerPort()} method.
- * <li><code>NAME</code> is provided by sub-classes by the {@link #getConnectorServerName()} method. 
- * </ul> 
+ * <li><code>NAME</code> is provided by sub-classes by the {@link #getConnectorServerName()} method.
+ * </ul>
  * <p>
  * Once booted with {@link #boot(AuthenticationImpl)} infrastructure can be shutdown with the {@link #shutdown()} method.
- * 
+ *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public abstract class AbstractJMXMonitoringHelper {
+public abstract class AbstractJMXHelper {
     /** The logger provided by sub-classes */
     private final Logger logger;
     /** The standard JMX over RMI connector server */
@@ -90,12 +93,12 @@ public abstract class AbstractJMXMonitoringHelper {
     private String jmxRoFailureReason;
 
     /** Can be called only by sub-classes */
-    protected AbstractJMXMonitoringHelper() {
-        this.logger = Logger.getLogger(AbstractJMXMonitoringHelper.class);
+    protected AbstractJMXHelper() {
+        this.logger = Logger.getLogger(AbstractJMXHelper.class);
     }
 
     /** Can be called only by sub-classes */
-    protected AbstractJMXMonitoringHelper(final Logger logger) {
+    protected AbstractJMXHelper(final Logger logger) {
         this.logger = logger;
     }
 
@@ -104,7 +107,7 @@ public abstract class AbstractJMXMonitoringHelper {
      * <p>
      * <ul>
      * <li>Creates a new RMI registry or reuses an existing one needed for the JMX RMI connector server.
-     * <li>Create a a single MBean server for users.
+     * <li>Create a a single MBean server for both administrator users and for anonymous users.
      * <li>Registers the MBeans into the MBean server.
      * <li>Creates and starts the connector servers, one over RMI and one over RO.
      * </ul>
@@ -122,14 +125,11 @@ public abstract class AbstractJMXMonitoringHelper {
                     e);
             return false;
         }
-        // Sub-classes must register an MBean in the server
-        final ObjectName beanName = this.registerMBean(mbs);
-        if (beanName == null) {
-            this.jmxRmiFailureReason = this.jmxRoFailureReason = "Unable to register MBean";
-            return false;
-        }
         // Create an authenticator that will be used by the connectors
         final JMXAuthenticator authenticator = new JMXAuthenticatorImpl(auth);
+
+        // Let sub-classes create a the MBean server forwarder
+        this.registerMBeans(mbs);
 
         // Sub-classes provides the name of the connector server and the port
         final String serverName = this.getConnectorServerName();
@@ -138,8 +138,6 @@ public abstract class AbstractJMXMonitoringHelper {
         // Boot the JMX RMI connector server
         final boolean isJMXRMIbooted = this.createJMXRMIConnectorServer(mbs, serverName, port, authenticator);
         if (isJMXRMIbooted) {
-            // Add a forwarder to intercept calls to the MBeanServer and start the connector
-            //this.rmiCs.setMBeanServerForwarder(mbsf);
             try {
                 this.rmiCs.start();
                 if (logger.isInfoEnabled()) {
@@ -152,8 +150,6 @@ public abstract class AbstractJMXMonitoringHelper {
         // Boot the JMX RO connector server
         final boolean isJMXRObooted = this.createJMXROConnectorServer(mbs, serverName, authenticator);
         if (isJMXRObooted) {
-            // Add a forwarder to intercept calls to the MBeanServer and start the connector
-            //this.roCs.setMBeanServerForwarder(mbsf);
             try {
                 this.roCs.start();
                 if (logger.isInfoEnabled()) {
@@ -167,15 +163,15 @@ public abstract class AbstractJMXMonitoringHelper {
     }
 
     /**
-     * Sub-class must register the MBean into the MBean server and return its object name.
+     * Sub-class must register the MBeans into the MBean server.
+     *
      * @param mbs the MBean server
-     * @return the object name of the registered MBean
      */
-    public abstract ObjectName registerMBean(final MBeanServer mbs);
+    public abstract void registerMBeans(final MBeanServer mbs);
 
     /**
-     * Sub-classes must provide the name of the connector server. 
-     * 
+     * Sub-classes must provide the name of the connector server.
+     *
      * @return the name of the connector server
      */
     public abstract String getConnectorServerName();
@@ -183,7 +179,7 @@ public abstract class AbstractJMXMonitoringHelper {
     /**
      * Sub-classes must provide the port to be used by the JMX RMI connector server.
      * with correct values.
-     * 
+     *
      * @return the JMX RMI connector server port
      */
     public abstract int getJMXRMIConnectorServerPort();
@@ -207,7 +203,7 @@ public abstract class AbstractJMXMonitoringHelper {
         }
         // Use the same hostname as ProActive (follows properties defined by ProActive configuration)
         final String hostname = ProActiveInet.getInstance().getHostname();
-        // The asked address of the new connector server. The actual address can be different due to 
+        // The asked address of the new connector server. The actual address can be different due to
         // JMX specification. See {@link JMXConnectorServerFactory} documentation.
         final String jmxConnectorServerURL = "service:jmx:rmi:///jndi/rmi://" + hostname + ":" + port + "/" +
             connectorServerName;
@@ -242,7 +238,7 @@ public abstract class AbstractJMXMonitoringHelper {
             logger.error(jmxRoFailureReason = "Unable to get the base uri", e);
             return false;
         }
-        // The asked address of the new connector server. The actual address can be different due to 
+        // The asked address of the new connector server. The actual address can be different due to
         // JMX specification. See {@link JMXConnectorServerFactory} documentation.
         final String jmxConnectorServerURL = "service:jmx:" + JMXProviderUtils.RO_PROTOCOL + ":///jndi/" +
             baseURI + connectorServerName;
@@ -295,7 +291,7 @@ public abstract class AbstractJMXMonitoringHelper {
 
     /**
      * Returns the address of the JMX connector server depending on the specified protocol.
-     * 
+     *
      * @param protocol the JMX transport protocol
      * @return the address of the connector server
      * @throws JMException in case of boot sequence failure
@@ -331,5 +327,4 @@ public abstract class AbstractJMXMonitoringHelper {
                 throw new JMException("Uknown JMX transport protocol: " + protocol);
         }
     }
-
 }

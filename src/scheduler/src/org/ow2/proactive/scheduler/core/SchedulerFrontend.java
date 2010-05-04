@@ -90,7 +90,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.core.jmx.JMXMonitoringHelper;
+import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
+import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -165,8 +166,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /** Session timer */
     private Timer sessionTimer;
 
+    /** Users Statistics Manager */
+    private SchedulerAccountsManager accountsManager;
+
     /** JMX Helper reference */
-    private JMXMonitoringHelper jmxHelper;
+    private SchedulerJMXHelper jmxHelper;
+
+    /** Current scheduler status */
+    protected SchedulerStatus status;
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -196,7 +203,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         this.dirtyList = new HashSet<UniqueID>();
         this.currentJobToSubmit = new InternalJobWrapper();
         this.schedulerListeners = new ConcurrentHashMap<UniqueID, ClientRequestHandler>();
-        this.jmxHelper = JMXMonitoringHelper.getInstance();
+        this.accountsManager = new SchedulerAccountsManager(this.connectedUsers);
+        this.jmxHelper = new SchedulerJMXHelper(this.accountsManager);
+        this.status = SchedulerStatus.STOPPED;
 
         logger_dev.info("Creating scheduler Front-end...");
         resourceManager = imp;
@@ -299,7 +308,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             logger_dev.info("job list empty");
         }
         // rebuild JMX object
-        jmxHelper.recover(jobStates);
+        this.jmxHelper.getSchedulerRuntimeMBean().recover(jobStates);
+        // Start the stats refresher
+        this.accountsManager.startAccountsRefresher();
         //once recovered, activate scheduler communication
         authentication.setActivated(true);
     }
@@ -525,7 +536,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         //checking permissions
         checkPermission("getStatus", "You do not have permission to get the status !");
 
-        return jmxHelper.getSchedulerStatus_();
+        return this.status;
     }
 
     /**
@@ -1138,7 +1149,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         } catch (SecurityException e) {
             logger_dev.error(e);
         }
-        jmxHelper.usersUpdatedEvent(notification);
+        this.jmxHelper.getSchedulerRuntimeMBean().usersUpdatedEvent(notification);
     }
 
     //--------------------------------------------------------------------------------------------
@@ -1149,18 +1160,34 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public void schedulerStateUpdated(SchedulerEvent eventType) {
         switch (eventType) {
             case STARTED:
+                this.status = SchedulerStatus.STARTED;
+                break;
             case STOPPED:
+                this.status = SchedulerStatus.STOPPED;
+                break;
             case PAUSED:
+                this.status = SchedulerStatus.PAUSED;
+                break;
             case FROZEN:
+                this.status = SchedulerStatus.FROZEN;
+                break;
             case RESUMED:
+                this.status = SchedulerStatus.STARTED;
+                break;
             case SHUTTING_DOWN:
+                this.status = SchedulerStatus.SHUTTING_DOWN;
+                break;
             case SHUTDOWN:
+                this.status = SchedulerStatus.STOPPED;
+                break;
             case KILLED:
+                this.status = SchedulerStatus.KILLED;
+                break;
             case RM_DOWN:
             case RM_UP:
             case POLICY_CHANGED:
                 dispatchSchedulerStateUpdated(eventType);
-                jmxHelper.schedulerStateUpdatedEvent(eventType);
+                this.jmxHelper.getSchedulerRuntimeMBean().schedulerStateUpdatedEvent(eventType);
                 break;
             default:
                 logger_dev.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
@@ -1173,7 +1200,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public void jobSubmitted(JobState job) {
         dispatchJobSubmitted(job);
-        jmxHelper.jobSubmittedEvent(job);
+        this.jmxHelper.getSchedulerRuntimeMBean().jobSubmittedEvent(job);
     }
 
     /**
@@ -1186,19 +1213,19 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             case JOB_PENDING_TO_RUNNING:
             case JOB_CHANGE_PRIORITY:
                 dispatchJobStateUpdated(owner, notification);
-                jmxHelper.jobStateUpdatedEvent(notification);
+                this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             case JOB_RUNNING_TO_FINISHED:
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 dispatchJobStateUpdated(owner, notification);
-                jmxHelper.jobStateUpdatedEvent(notification);
+                this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             case JOB_REMOVE_FINISHED:
                 //removing jobs from the global list : this job is no more managed
                 jobs.remove(notification.getData().getJobId());
                 dispatchJobStateUpdated(owner, notification);
-                jmxHelper.jobStateUpdatedEvent(notification);
+                this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             default:
                 logger_dev.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
@@ -1215,7 +1242,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
                 dispatchTaskStateUpdated(owner, notification);
-                jmxHelper.taskStateUpdatedEvent(notification);
+                this.jmxHelper.getSchedulerRuntimeMBean().taskStateUpdatedEvent(notification);
                 break;
             default:
                 logger_dev.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
@@ -1236,5 +1263,4 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                     notification.getEventType());
         }
     }
-
 }

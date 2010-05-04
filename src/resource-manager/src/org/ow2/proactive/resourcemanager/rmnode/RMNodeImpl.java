@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -112,6 +113,12 @@ public class RMNodeImpl implements RMNode, Serializable {
 
     private Client owner;
 
+    /** The add event */
+    private RMNodeEvent addEvent;
+
+    /** The last event */
+    private RMNodeEvent lastEvent;
+
     /** Create an RMNode Object.
      * A Created node begins to be free.
      * @param node ProActive node deployed.
@@ -128,6 +135,8 @@ public class RMNodeImpl implements RMNode, Serializable {
         this.hostName = node.getNodeInformation().getVMInformation().getHostName();
         this.scriptStatus = new HashMap<SelectionScript, Integer>();
         this.state = NodeState.FREE;
+        this.addEvent = null;
+        this.lastEvent = null;
     }
 
     /**
@@ -272,7 +281,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * @return a String shwowing informations about the node.
+     * @return a String showing informations about the node.
      */
     @Override
     public String toString() {
@@ -409,5 +418,33 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public Client getProvider() {
         return provider;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public RMNodeEvent getAddEvent() {
+        return this.addEvent;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public RMNodeEvent getLastEvent() {
+        return this.lastEvent;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setLastEvent(final RMNodeEvent lastEvent) {
+        this.lastEvent = lastEvent;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setAddEvent(final RMNodeEvent addEvent) {
+        this.addEvent = addEvent;
     }
 }
