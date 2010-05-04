@@ -172,7 +172,7 @@ public class ClientsPolicy extends Policy {
                 return (Permission) instance;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.debug(ex.getMessage(), ex);
         }
         return null;
     }
