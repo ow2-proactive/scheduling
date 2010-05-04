@@ -75,7 +75,7 @@ public abstract class AbstractAccountsManager<E extends Account> {
     protected AbstractAccountsManager(final Map<String, E> accountsMap, final String refreshThreadName,
             final Logger logger) {
         this.accountsMap = accountsMap;
-        this.refreshDelayInSeconds = this.getDefaultRefreshDelayInSeconds();
+        this.refreshDelayInSeconds = this.getDefaultRefreshRateInSeconds();
         // Create the single thread executor that creates min priority daemon
         // thread
         this.executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
@@ -217,7 +217,7 @@ public abstract class AbstractAccountsManager<E extends Account> {
      *
      * @return the default value of the refresh delay in seconds
      */
-    public abstract int getDefaultRefreshDelayInSeconds();
+    public abstract int getDefaultRefreshRateInSeconds();
 
     /**
      * Returns the duration of the last refresh performed by the account refresher.

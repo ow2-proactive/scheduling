@@ -160,8 +160,8 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
      * {@inheritDoc}
      */
     @Override
-    public int getDefaultRefreshDelayInSeconds() {
-        return PASchedulerProperties.SCHEDULER_ACCOUNTING_REFRESH_RATE.getValueAsInt();
+    public int getDefaultRefreshRateInSeconds() {
+        return PASchedulerProperties.SCHEDULER_ACCOUNT_REFRESH_RATE.getValueAsInt();
     }
 
     // For the two requests, it does not take into account the following

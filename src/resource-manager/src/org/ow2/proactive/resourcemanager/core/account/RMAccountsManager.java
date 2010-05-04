@@ -42,6 +42,7 @@ import java.util.Map;
 
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.account.AbstractAccountsManager;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
@@ -80,8 +81,8 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
      * {@inheritDoc}
      */
     @Override
-    public int getDefaultRefreshDelayInSeconds() {
-        return 10;
+    public int getDefaultRefreshRateInSeconds() {
+        return PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE.getValueAsInt();
     }
 
     /**

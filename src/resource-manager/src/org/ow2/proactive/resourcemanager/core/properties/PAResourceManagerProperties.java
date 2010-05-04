@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.PropertyType;
 
 
 /**
@@ -151,7 +152,10 @@ public enum PAResourceManagerProperties {
     /**
      * The period of sending "alive" event to resource manager's listeners.
      */
-    RM_ALIVE_EVENT_FREQUENCY("pa.rm.aliveevent.frequency", PropertyType.INTEGER);
+    RM_ALIVE_EVENT_FREQUENCY("pa.rm.aliveevent.frequency", PropertyType.INTEGER),
+
+    /** Accounting refresh rate from the database in seconds */
+    RM_ACCOUNT_REFRESH_RATE("pa.rm.account.refreshrate", PropertyType.INTEGER);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

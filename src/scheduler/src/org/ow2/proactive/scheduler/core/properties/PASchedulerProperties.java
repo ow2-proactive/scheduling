@@ -80,7 +80,7 @@ public enum PASchedulerProperties {
     SCHEDULER_JMX_PORT("pa.scheduler.core.jmx.port", PropertyType.INTEGER),
 
     /** Accounting refresh rate from the database in seconds */
-    SCHEDULER_ACCOUNTING_REFRESH_RATE("pa.scheduler.accounting.refreshrate", PropertyType.INTEGER),
+    SCHEDULER_ACCOUNT_REFRESH_RATE("pa.scheduler.account.refreshrate", PropertyType.INTEGER),
 
     /** User session time (user is automatically disconnect after this time if no request is made to the scheduler)
     	negative number indicates that session is infinite (value specified in second) */
