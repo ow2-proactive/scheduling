@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -36,49 +36,48 @@
  */
 package org.ow2.proactive.scheduler.common.exception;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-
-
 /**
- * Exception generated when trying to get task result and the task result does not exist.
+ * Exception generated when trying to connect the scheduler without being authenticate.<br>
+ *
+ * Try to authenticate before using the Scheduler.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-@PublicAPI
-public class UnknowTaskResultException extends SchedulerException {
+public class NotConnectedException extends SchedulerException {
 
     /**
-     * Create a new instance of UnknowTaskResultException
-     * 
-     * @param msg the message to attach.
+     * Create a new instance of NotConnectedException
+     *
+     * @param msg the message to attach
      */
-    public UnknowTaskResultException(String msg) {
+    public NotConnectedException(String msg) {
         super(msg);
     }
 
     /**
-     * Create a new instance of UnknowTaskResultException
+     * Create a new instance of NotConnectedException
+     *
      */
-    public UnknowTaskResultException() {
+    public NotConnectedException() {
     }
 
     /**
-     * Create a new instance of UnknowTaskResultException
-     * 
-     * @param msg the message to attach.
+     * Create a new instance of NotConnectedException
+     *
+     * @param msg the message to attach
      * @param cause the cause of the exception.
      */
-    public UnknowTaskResultException(String msg, Throwable cause) {
+    public NotConnectedException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
     /**
-     * Create a new instance of UnknowTaskResultException
-     * 
+     * Create a new instance of NotConnectedException
+     *
      * @param cause the cause of the exception.
      */
-    public UnknowTaskResultException(Throwable cause) {
+    public NotConnectedException(Throwable cause) {
         super(cause);
     }
 

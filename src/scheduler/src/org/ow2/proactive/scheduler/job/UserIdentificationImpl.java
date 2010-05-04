@@ -45,7 +45,7 @@ import javax.security.auth.Subject;
 
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.exception.AccessRightException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 
 
@@ -266,7 +266,7 @@ public class UserIdentificationImpl extends UserIdentification {
      * @return true if it has, throw {@link SecurityException} otherwise with specified error message
      */
     public boolean checkPermission(final Permission permission, String errorMessage)
-            throws AccessRightException {
+            throws PermissionException {
         try {
             Subject.doAsPrivileged(subject, new PrivilegedAction<Object>() {
                 public Object run() {
@@ -278,7 +278,7 @@ public class UserIdentificationImpl extends UserIdentification {
                 }
             }, null);
         } catch (SecurityException ex) {
-            throw new AccessRightException(errorMessage);
+            throw new PermissionException(errorMessage);
         }
 
         return true;

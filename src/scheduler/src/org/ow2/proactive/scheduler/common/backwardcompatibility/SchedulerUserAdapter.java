@@ -146,11 +146,7 @@ public class SchedulerUserAdapter implements UserSchedulerInterface {
      * {@inheritDoc}
      */
     public BooleanWrapper isConnected() {
-        try {
-            return new BooleanWrapper(frontend.isConnected());
-        } catch (SchedulerException e) {
-            return new BooleanWrapper(false);
-        }
+        return new BooleanWrapper(frontend.isConnected());
     }
 
     /**

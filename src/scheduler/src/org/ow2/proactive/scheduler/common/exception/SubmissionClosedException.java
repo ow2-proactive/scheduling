@@ -47,40 +47,40 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public class UnsuitableActionException extends SchedulerException {
+public class SubmissionClosedException extends SchedulerException {
 
     /**
-     * Create a new instance of UnsuitableActionException with the given message.
+     * Create a new instance of SubmissionClosedException with the given message.
      *
      * @param msg the message to attach.
      */
-    public UnsuitableActionException(String msg) {
+    public SubmissionClosedException(String msg) {
         super(msg);
     }
 
     /**
-     * Create a new instance of UnsuitableActionException.
+     * Create a new instance of SubmissionClosedException.
      */
-    public UnsuitableActionException() {
+    public SubmissionClosedException() {
         super();
     }
 
     /**
-     * Create a new instance of UnsuitableActionException with the given message and cause
+     * Create a new instance of SubmissionClosedException with the given message and cause
      *
      * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public UnsuitableActionException(String msg, Throwable cause) {
+    public SubmissionClosedException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
     /**
-     * Create a new instance of UnsuitableActionException with the given cause.
+     * Create a new instance of SubmissionClosedException with the given cause.
      *
      * @param cause the cause of the exception.
      */
-    public UnsuitableActionException(Throwable cause) {
+    public SubmissionClosedException(Throwable cause) {
         super(cause);
     }
 }

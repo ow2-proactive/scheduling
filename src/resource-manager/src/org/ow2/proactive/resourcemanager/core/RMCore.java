@@ -355,14 +355,14 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         while (body.isActive()) {
 
             Request request = service.blockingRemoveOldest(aliveEventFrequency);
-            if (request!=null) {
-	            try {
-	                caller = checkMethodCallPermission(request.getMethodName(), request.getSourceBodyID());
-	                service.serve(request);
-	            } catch (SecurityException ex) {
-	                logger.warn("Cannot serve request: " + request, ex);
-	                service.serve(new ThrowExceptionRequest(request, ex));
-	            }
+            if (request != null) {
+                try {
+                    caller = checkMethodCallPermission(request.getMethodName(), request.getSourceBodyID());
+                    service.serve(request);
+                } catch (SecurityException ex) {
+                    logger.warn("Cannot serve request: " + request, ex);
+                    service.serve(new ThrowExceptionRequest(request, ex));
+                }
             }
 
             delta += System.currentTimeMillis() - timeStamp;

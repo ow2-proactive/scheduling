@@ -41,10 +41,10 @@ import java.io.Serializable;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.exception.AccessRightException;
-import org.ow2.proactive.scheduler.common.exception.AuthenticationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.UnknowJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknowTaskResultException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -81,8 +81,8 @@ public interface UserSchedulerInterface_ extends Serializable {
      * @return a job Result containing information about the result.
      * 		If the job result is not yet available (job not finished), null is returned.
      * @throws SchedulerException if an exception occurs while serving the request.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
     public JobResult getJobResult(JobId jobId) throws SchedulerException;
@@ -99,9 +99,9 @@ public interface UserSchedulerInterface_ extends Serializable {
      * @return a job Result containing information about the result.
      * 		If the task result is not yet available, null is returned.
      * @throws SchedulerException if an exception occurs while serving the request.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws UnknowTaskResultException if this task result does not exist or is unknown.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws UnknownTaskException if this task result does not exist or is unknown.
      * @throws AccessRightException if you can't access to this particular job.
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException;
@@ -111,8 +111,8 @@ public interface UserSchedulerInterface_ extends Serializable {
      *
      * @param jobId the job to be removed.
      * @throws SchedulerException if an exception occurs while serving the request.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
     public void remove(JobId jobId) throws SchedulerException;
@@ -124,8 +124,8 @@ public interface UserSchedulerInterface_ extends Serializable {
      * @param jobId the id of the job to listen to.
      * @param appenderProvider a provider for an appender that must be connected on a log server on the caller side (see {@link LogForwardingService})
      * @throws SchedulerException if an exception occurs while serving the request, specially if the appender cannot be created.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
     public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException;
@@ -137,8 +137,8 @@ public interface UserSchedulerInterface_ extends Serializable {
      *
      * @param jobId the job to kill.
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
     public BooleanWrapper kill(JobId jobId) throws SchedulerException;
@@ -150,8 +150,8 @@ public interface UserSchedulerInterface_ extends Serializable {
      *
      * @param jobId the job to pause.
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
     public BooleanWrapper pause(JobId jobId) throws SchedulerException;
@@ -162,8 +162,8 @@ public interface UserSchedulerInterface_ extends Serializable {
      *
      * @param jobId the job to resume.
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
     public BooleanWrapper resume(JobId jobId) throws SchedulerException;
@@ -175,8 +175,8 @@ public interface UserSchedulerInterface_ extends Serializable {
      * @param jobId the job on which to change the priority.
      * @param priority The new priority to apply to the job.
      * @throws SchedulerException if the job is already finished.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
     public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException;
@@ -189,8 +189,8 @@ public interface UserSchedulerInterface_ extends Serializable {
      *
      * @param jobId the job on which to get the state.
      * @return the current state of the given job
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
      * @throws AccessRightException if you can't access to this particular job.
      */
     public JobState getJobState(JobId jobId) throws SchedulerException;

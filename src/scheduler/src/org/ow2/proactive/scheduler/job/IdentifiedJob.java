@@ -41,7 +41,7 @@ import java.security.Permission;
 
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
-import org.ow2.proactive.scheduler.common.exception.AccessRightException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
 
@@ -107,7 +107,7 @@ public class IdentifiedJob implements Serializable {
             userIdentification.getSubject().getPrincipals(UserNamePrincipal.class));
         try {
             userId.checkPermission(jobPermission, "");
-        } catch (AccessRightException ex) {
+        } catch (PermissionException ex) {
             return false;
         }
 

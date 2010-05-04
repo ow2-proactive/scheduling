@@ -84,8 +84,8 @@ import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ClassServerException;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.UnknowJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknowTaskResultException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -654,10 +654,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * Submit a new job to the scheduler.
      * This method will prepare the new job and get it ready for scheduling.<br>
      * It is not possible to submit the job if the Scheduler is stopped
-     *
-     * @throws SchedulerException if problem occurs during job preparation
+     * This method must be synchronous !
      */
-    public void submit() {
+    public boolean submit() {
         InternalJob job = currentJobToSubmit.getJob();
         logger_dev.info("Trying to submit new Job '" + job.getId() + "'");
         // TODO cdelbe : create classserver only when job is running ?
@@ -702,6 +701,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         }
         logger_dev.info("JobEnvironment and internalTask unloaded for job '" + job.getId() + "'");
         frontend.jobSubmitted(job);
+        return true;
     }
 
     /**
@@ -1121,7 +1121,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
-    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknowJobException {
+    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
         logger_dev.info("listen logs of job '" + jobId + "'");
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
 
@@ -1139,7 +1139,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         InternalJob target = this.jobs.get(jobId);
 
         if (target == null) {
-            throw new UnknowJobException("The job " + jobId + " does not exist !");
+            throw new UnknownJobException("The job " + jobId + " does not exist !");
         }
 
         // get or create appender for the targeted job
@@ -1246,12 +1246,12 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
-    public JobResult getJobResult(JobId jobId) throws UnknowJobException {
+    public JobResult getJobResult(JobId jobId) throws UnknownJobException {
         final InternalJob job = jobs.get(jobId);
         final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
 
         if (job == null) {
-            throw new UnknowJobException("The job " + jobId + " does not exist !");
+            throw new UnknownJobException("The job " + jobId + " does not exist !");
         }
 
         logger_dev.info("Trying to get JobResult of job '" + jobId + "'");
@@ -1300,14 +1300,14 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws UnknowJobException,
-            UnknowTaskResultException {
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws UnknownJobException,
+            UnknownTaskException {
         logger_dev.info("Trying to get TaskResult of task '" + taskName + "' for job '" + jobId + "'");
         InternalJob job = jobs.get(jobId);
 
         if (job == null) {
             logger_dev.info("Job '" + jobId + "' does not exist");
-            throw new UnknowJobException("The job does not exist !");
+            throw new UnknownJobException("The job does not exist !");
         }
 
         //extract taskResult reference from memory (weak instance)
@@ -1316,7 +1316,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         if (result == null) {
             //the task is unknown
             logger_dev.info("Result of task " + taskName + " does not exist !");
-            throw new UnknowTaskResultException("Result of task " + taskName + " does not exist !");
+            throw new UnknownTaskException("Result of task " + taskName + " does not exist !");
         }
         if (PAFuture.isAwaited(result)) {
             //the result is not yet available

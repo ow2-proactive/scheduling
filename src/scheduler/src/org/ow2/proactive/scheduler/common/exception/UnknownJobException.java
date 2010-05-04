@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -36,48 +36,50 @@
  */
 package org.ow2.proactive.scheduler.common.exception;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
 /**
- * Exception generated when trying to connect the scheduler without being authenticate.<br>
- * 
- * Try to authenticate before using the Scheduler.
+ * Exception generated when trying to get information about a job that does not exist.<br>
+ * This exception is thrown each time the scheduler cannot perform a user request due to an unknown job.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class AuthenticationException extends SchedulerException {
+@PublicAPI
+public class UnknownJobException extends SchedulerException {
 
     /**
-     * Create a new instance of AuthenticationException
-     * 
-     * @param msg the message to attach
+     * Create a new instance of UnknownJobException
+     *
+     * @param msg the message to attach.
      */
-    public AuthenticationException(String msg) {
+    public UnknownJobException(String msg) {
         super(msg);
     }
 
     /**
-     * Create a new instance of AuthenticationException
-     * 
+     * Create a new instance of UnknownJobException
      */
-    public AuthenticationException() {
+    public UnknownJobException() {
     }
 
     /**
-     * Create a new instance of AuthenticationException
-     * 
-     * @param msg the message to attach
+     * Create a new instance of UnknownJobException
+     *
+     * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public AuthenticationException(String msg, Throwable cause) {
+    public UnknownJobException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
     /**
-     * Create a new instance of AuthenticationException
-     * 
+     * Create a new instance of UnknownJobException
+     *
      * @param cause the cause of the exception.
      */
-    public AuthenticationException(Throwable cause) {
+    public UnknownJobException(Throwable cause) {
         super(cause);
     }
 

@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -36,50 +36,48 @@
  */
 package org.ow2.proactive.scheduler.common.exception;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-
-
 /**
- * Exception generated when trying to get information about a job that does not exist.<br>
- * This exception is thrown each time the scheduler cannot perform a user request due to an unknown job.
+ * Exception generated when trying to perform an action not allowed by a client.<br>
+ *
+ * It could be an administrator method or simply an access to a job that you do not own.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-@PublicAPI
-public class UnknowJobException extends SchedulerException {
+public class PermissionException extends SchedulerException {
 
     /**
-     * Create a new instance of UnknowJobException
-     * 
+     * Create a new instance of PermissionException
+     *
      * @param msg the message to attach.
      */
-    public UnknowJobException(String msg) {
+    public PermissionException(String msg) {
         super(msg);
     }
 
     /**
-     * Create a new instance of UnknowJobException
+     * Create a new instance of PermissionException
+     *
      */
-    public UnknowJobException() {
+    public PermissionException() {
     }
 
     /**
-     * Create a new instance of UnknowJobException
-     * 
+     * Create a new instance of PermissionException
+     *
      * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public UnknowJobException(String msg, Throwable cause) {
+    public PermissionException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
     /**
-     * Create a new instance of UnknowJobException
-     * 
+     * Create a new instance of PermissionException
+     *
      * @param cause the cause of the exception.
      */
-    public UnknowJobException(Throwable cause) {
+    public PermissionException(Throwable cause) {
         super(cause);
     }
 

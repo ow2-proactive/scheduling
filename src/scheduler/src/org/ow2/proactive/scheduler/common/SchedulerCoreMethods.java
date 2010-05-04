@@ -37,12 +37,12 @@
 package org.ow2.proactive.scheduler.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.exception.AccessRightException;
-import org.ow2.proactive.scheduler.common.exception.AuthenticationException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.UnknowJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknowTaskResultException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -77,12 +77,12 @@ public interface SchedulerCoreMethods {
      * @param jobId the job on which the result will be send
      * @return a job Result containing information about the result.
      * 		If the job result is not yet available (job not finished), null is returned.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws AccessRightException if you can't access to this particular job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
      */
-    public JobResult getJobResult(JobId jobId) throws AuthenticationException, AccessRightException,
-            UnknowJobException;
+    public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException,
+            UnknownJobException;
 
     /**
      * Get the result for the given task name in the given jobId.
@@ -95,24 +95,23 @@ public interface SchedulerCoreMethods {
      * @param taskName the name of the task in which the result is.
      * @return a job Result containing information about the result.
      * 		If the task result is not yet available, null is returned.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws UnknowTaskResultException if this task result does not exist or is unknown.
-     * @throws AccessRightException if you can't access to this particular job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws UnknownTaskException if this task result does not exist or is unknown.
+     * @throws PermissionException if you can't access to this particular job.
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws AuthenticationException,
-            UnknowJobException, UnknowTaskResultException, AccessRightException;
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException;
 
     /**
      * Remove the job from the scheduler.
      *
      * @param jobId the job to be removed.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws AccessRightException if you can't access to this particular job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
      */
-    public void removeJob(JobId jobId) throws AuthenticationException, UnknowJobException,
-            AccessRightException;
+    public void removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
      * Listen for the tasks user logs.<br>
@@ -120,12 +119,12 @@ public interface SchedulerCoreMethods {
      *
      * @param jobId the id of the job to listen to.
      * @param appenderProvider a provider for an appender that must be connected on a log server on the caller side (see {@link LogForwardingService})
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws AccessRightException if you can't access to this particular job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
      */
-    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws AuthenticationException,
-            UnknowJobException, AccessRightException;
+    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws NotConnectedException,
+            UnknownJobException, PermissionException;
 
     /**
      * Kill the job represented by jobId.<br>
@@ -134,12 +133,12 @@ public interface SchedulerCoreMethods {
      *
      * @param jobId the job to kill.
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws AccessRightException if you can't access to this particular job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
      */
-    public boolean killJob(JobId jobId) throws AuthenticationException, UnknowJobException,
-            AccessRightException;
+    public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException;
 
     /**
      * Pause the job represented by jobId.<br>
@@ -148,12 +147,12 @@ public interface SchedulerCoreMethods {
      *
      * @param jobId the job to pause.
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws AccessRightException if you can't access to this particular job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
      */
-    public boolean pauseJob(JobId jobId) throws AuthenticationException, UnknowJobException,
-            AccessRightException;
+    public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException;
 
     /**
      * Resume the job represented by jobId.<br>
@@ -161,12 +160,12 @@ public interface SchedulerCoreMethods {
      *
      * @param jobId the job to resume.
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws AccessRightException if you can't access to this particular job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
      */
-    public boolean resumeJob(JobId jobId) throws AuthenticationException, UnknowJobException,
-            AccessRightException;
+    public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException;
 
     /**
      * Change the priority of the job represented by jobId.<br>
@@ -174,13 +173,13 @@ public interface SchedulerCoreMethods {
      *
      * @param jobId the job on which to change the priority.
      * @param priority The new priority to apply to the job.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws AccessRightException if you can't access to this particular job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
      * @throws JobAlreadyFinishedException if you want to change the priority on a finished job.
      */
-    public void changeJobPriority(JobId jobId, JobPriority priority) throws AuthenticationException,
-            UnknowJobException, AccessRightException, JobAlreadyFinishedException;
+    public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
+            UnknownJobException, PermissionException, JobAlreadyFinishedException;
 
     /**
      * Return the state of the given job.<br>
@@ -190,22 +189,22 @@ public interface SchedulerCoreMethods {
      *
      * @param jobId the job on which to get the state.
      * @return the current state of the given job
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws UnknowJobException if the job does not exist.
-     * @throws AccessRightException if you can't access to this particular job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
      */
-    public JobState getJobState(JobId jobId) throws AuthenticationException, UnknowJobException,
-            AccessRightException;
+    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException;
 
     /**
      * Get the list of job states that describe every jobs in the Scheduler.
      * The SchedulerState contains 3 list of jobs, pending, running, and finished
      *
      * @return the list of every jobs in the Scheduler
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you can't access to this particular method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to this particular method.
      */
-    public SchedulerState getState() throws AuthenticationException, AccessRightException;
+    public SchedulerState getState() throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Change the policy of the scheduler.<br>
@@ -214,20 +213,20 @@ public interface SchedulerCoreMethods {
      * @param newPolicyFile the new policy file as a class.
      * @return true if the policy has been correctly change, false if not.
      * @throws SchedulerException if an exception occurs while serving the request.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you have not enough permission to access this method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean changePolicy(Class<? extends Policy> newPolicyFile) throws AuthenticationException,
-            AccessRightException;
+    public boolean changePolicy(Class<? extends Policy> newPolicyFile) throws NotConnectedException,
+            PermissionException;
 
     /**
      * For administrator only, Start the scheduler.
      *
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you have not enough permission to access this method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean start() throws AuthenticationException, AccessRightException;
+    public boolean start() throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Stop the scheduler.<br>
@@ -235,37 +234,37 @@ public interface SchedulerCoreMethods {
      * Every running jobs will be terminated.
      *
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you have not enough permission to access this method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean stop() throws AuthenticationException, AccessRightException;
+    public boolean stop() throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Pause the scheduler by terminating running jobs.
      *
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you have not enough permission to access this method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean pause() throws AuthenticationException, AccessRightException;
+    public boolean pause() throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Freeze the scheduler by terminating running tasks.
      *
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you have not enough permission to access this method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean freeze() throws AuthenticationException, AccessRightException;
+    public boolean freeze() throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Resume the scheduler.
      *
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you have not enough permission to access this method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean resume() throws AuthenticationException, AccessRightException;
+    public boolean resume() throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Shutdown the scheduler.<br>
@@ -273,20 +272,20 @@ public interface SchedulerCoreMethods {
      * Use {@link #kill()} if you want to stop the scheduling and exit the scheduler.
      *
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you have not enough permission to access this method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean shutdown() throws AuthenticationException, AccessRightException;
+    public boolean shutdown() throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Kill the scheduler.<br>
      * Will stop the scheduling, and shutdown the scheduler.
      *
      * @return true if success, false if not.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you have not enough permission to access this method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean kill() throws AuthenticationException, AccessRightException;
+    public boolean kill() throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Reconnect a new Resource Manager to the scheduler.<br>
@@ -295,9 +294,9 @@ public interface SchedulerCoreMethods {
      * @param rmURL the URL of the new Resource Manager to link to the scheduler.<br>
      * 		Example : //host/RM_node_name
      * @return true if success, false otherwise.
-     * @throws AuthenticationException if you are not authenticated.
-     * @throws AccessRightException if you have not enough permission to access this method.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
      */
-    public boolean linkResourceManager(String rmURL) throws AuthenticationException, AccessRightException;
+    public boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException;
 
 }
