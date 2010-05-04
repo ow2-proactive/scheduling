@@ -44,8 +44,6 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
@@ -78,8 +76,7 @@ import org.ow2.proactive.utils.Tools;
  * @since ProActive Scheduling 0.9
  *
  */
-public class SchedulerAuthentication extends AuthenticationImpl implements InitActive,
-        SchedulerAuthenticationInterface {
+public class SchedulerAuthentication extends AuthenticationImpl implements SchedulerAuthenticationInterface {
 
     /** Scheduler logger */
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CONNECTION);
@@ -111,13 +108,6 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         this.frontend = frontend;
         //TODO to be removed in 3.X.X
         this.useradminAdapter = new SchedulerAdminAdapter(frontend);
-    }
-
-    /**
-     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
-     */
-    public void initActivity(Body body) {
-        this.frontend.connect();
     }
 
     /**

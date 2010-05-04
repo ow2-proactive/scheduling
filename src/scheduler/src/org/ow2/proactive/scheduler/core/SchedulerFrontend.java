@@ -47,14 +47,12 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.policy.ClientsPolicy;
@@ -68,16 +66,16 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.MaxJobIdReachedException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -193,11 +191,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * @param imp a resource manager which
      *                                 be able to managed the resource used by scheduler.
      * @param policyFullClassName the full class name of the policy to use.
-     * @throws NodeException
-     * @throws ActiveObjectCreationException
      */
-    public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName)
-            throws ActiveObjectCreationException, NodeException {
+    public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName) {
         this.identifications = new HashMap<UniqueID, UserIdentificationImpl>();
         this.connectedUsers = new SchedulerUsers();
         this.dirtyList = new HashSet<UniqueID>();
@@ -242,8 +237,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger_dev.info("Creating scheduler authentication interface...");
-            SchedulerAuthentication schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(
-                    SchedulerAuthentication.class.getName(), new Object[] { PAActiveObject.getStubOnThis() });
+            authentication = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class
+                    .getName(), new Object[] { PAActiveObject.getStubOnThis() });
             //creating scheduler core
             logger_dev.info("Creating scheduler core...");
             SchedulerCore scheduler_local = new SchedulerCore(resourceManager,
@@ -251,11 +246,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             scheduler = (SchedulerCore) PAActiveObject.turnActive(scheduler_local);
 
             logger_dev.info("Registering scheduler...");
-            PAActiveObject.registerByName(schedulerAuth, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
+            PAActiveObject.registerByName(authentication, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
 
             // Boot the JMX helper
             logger_dev.info("Booting jmx...");
-            this.jmxHelper.boot(schedulerAuth);
+            this.jmxHelper.boot(authentication);
 
             // run !!
         } catch (Exception e) {
@@ -269,14 +264,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /* ################################### SCHEDULING MANAGEMENT ################################# */
     /*                                                                                             */
     /* ########################################################################################### */
-
-    /**
-     * Connect the scheduler front-end to the scheduler authentication.
-     */
-    public void connect() {
-        logger_dev.info(" ");//just trace method name
-        authentication = (SchedulerAuthentication) PAActiveObject.getContext().getStubOnCaller();
-    }
 
     /**
      * Called by the scheduler core to recover the front-end.

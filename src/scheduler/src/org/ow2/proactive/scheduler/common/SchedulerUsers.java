@@ -37,12 +37,10 @@
 package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -59,8 +57,10 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 @PublicAPI
 public class SchedulerUsers implements Serializable {
 
-    /** List of connected user. */
-    private Set<UserIdentification> users = new HashSet<UserIdentification>();
+    /** List of connected user.
+     * Will be sorted by default as defined in the {@link UserIdentification#compareTo(UserIdentification)} method !
+     */
+    private Set<UserIdentification> users = new TreeSet<UserIdentification>();
 
     /**
      * Return a sorted collection of all connected users.
@@ -68,13 +68,7 @@ public class SchedulerUsers implements Serializable {
      * @return a sorted collection of all connected users
      */
     public Collection<UserIdentification> getUsers() {
-        ArrayList<UserIdentification> c = new ArrayList<UserIdentification>();
-        Iterator<UserIdentification> iter = users.iterator();
-        while (iter.hasNext()) {
-            c.add(iter.next());
-        }
-        Collections.sort(c);
-        return c;
+        return users;
     }
 
     /**
@@ -96,7 +90,7 @@ public class SchedulerUsers implements Serializable {
                 iter.remove();
             }
         }
-        //add or re-inject the user if it was not to remove
+        //add or re-inject the user if it was not to be removed
         if (!user.isToRemove()) {
             users.add(user);
         }
