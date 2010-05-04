@@ -165,7 +165,7 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
                             "-c", sshCmd };
                     break;
                 case windows:
-                    sshCmd.replaceAll("/", "\\");
+                    sshCmd.replaceAll("/", "\\\\");
                     cmdArray = new String[] { sshCmd };
                     break;
             }
