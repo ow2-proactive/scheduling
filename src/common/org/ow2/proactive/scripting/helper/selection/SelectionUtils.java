@@ -172,7 +172,7 @@ public class SelectionUtils {
      */
     public static boolean checkHostName(String hostName) {
         if (hostName == null) {
-            System.err.println("Given OS name was NULL");
+            System.err.println("Given HOST name was NULL");
             return false;
         }
         try {

@@ -46,9 +46,8 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
-import org.ow2.proactive.scheduler.common.util.userconsole.UserSchedulerModel;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
-import org.ow2.proactive.scheduler.util.adminconsole.AdminSchedulerModel;
+import org.ow2.proactive.scheduler.util.console.SchedulerModel;
 import org.ow2.proactive.utils.console.VisualConsole;
 
 
@@ -103,21 +102,14 @@ public class ControllerView extends ViewPart {
 
             scheduler = SchedulerProxy.getInstance();
 
-            UserSchedulerModel model;
-            if (SchedulerProxy.getInstance().isAnAdmin()) {
-                model = AdminSchedulerModel.getModel(false);
-            } else {
-                model = UserSchedulerModel.getModel(false);
-            }
-
-            startConsole(model);
+            startConsole(SchedulerModel.getModel(false));
 
             scrollableContainer = new JScrollPane(console.getJContentPane());
             container.add(scrollableContainer);
         }
     }
 
-    private void startConsole(final UserSchedulerModel model) {
+    private void startConsole(final SchedulerModel model) {
         model.connectConsole(console);
         model.connectScheduler(scheduler);
         try {
@@ -139,14 +131,7 @@ public class ControllerView extends ViewPart {
     public void connectedEvent(boolean isAdmin) {
         scheduler = SchedulerProxy.getInstance();
 
-        UserSchedulerModel model;
-        if (isAdmin) {
-            model = AdminSchedulerModel.getNewModel(false);
-        } else {
-            model = UserSchedulerModel.getNewModel(false);
-        }
-
-        startConsole(model);
+        startConsole(SchedulerModel.getNewModel(false));
 
         if (container != null) {
             scrollableContainer = new JScrollPane(console.getJContentPane());

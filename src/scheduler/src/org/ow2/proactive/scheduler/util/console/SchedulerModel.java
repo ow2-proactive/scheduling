@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ActiveEon Team
@@ -34,13 +34,14 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.util.userconsole;
+package org.ow2.proactive.scheduler.util.console;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,6 +50,8 @@ import java.util.Map.Entry;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -56,6 +59,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -67,19 +71,28 @@ import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
 
 /**
- * UserSchedulerModel is the class that drives the Scheduler console in the user view.
+ * SchedulerModel is the class that drives the Scheduler console in the client view.
  * To use this class, get the model, connect a Scheduler and a console, and just start this model.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 1.0
+ * @since ProActive Scheduling 2.0
  */
-public class UserSchedulerModel extends ConsoleModel {
+public class SchedulerModel extends ConsoleModel {
 
-    private static final String JS_INIT_FILE = "UserActions.js";
+    private static final String JS_INIT_FILE = "Actions.js";
+    private static final String YES = "yes";
+    private static final String NO = "no";
+    private static final String YES_NO = "(" + YES + "/" + NO + ")";
     protected static final int cmdHelpMaxCharLength = 24;
-    protected Scheduler scheduler;
-    private ArrayList<Command> commands;
 
+    private static int logsNbLines = 20;
+    private static String logsDirectory = System.getProperty("pa.scheduler.home") + File.separator + ".logs";
+
+    private static final String schedulerLogFile = "Scheduler.log";
+    private static final String schedulerDevLogFile = "SchedulerDev.log";
+
+    private ArrayList<Command> commands;
+    protected Scheduler scheduler;
     protected MBeanInfoViewer jmxInfoViewer = null;
 
     static {
@@ -95,11 +108,11 @@ public class UserSchedulerModel extends ConsoleModel {
      * @param allowExitCommand true if the exit command is part of the commands, false if exit command does not exist.
      * @return the current model associated to this class.
      */
-    public static UserSchedulerModel getModel(boolean allowExitCommand) {
+    public static SchedulerModel getModel(boolean allowExitCommand) {
         if (model == null) {
-            model = new UserSchedulerModel(allowExitCommand);
+            model = new SchedulerModel(allowExitCommand);
         }
-        return (UserSchedulerModel) model;
+        return (SchedulerModel) model;
     }
 
     /**
@@ -109,16 +122,16 @@ public class UserSchedulerModel extends ConsoleModel {
      * @param allowExitCommand true if the exit command is part of the commands, false if exit command does not exist.
      * @return a brand new model associated to this class.
      */
-    public static UserSchedulerModel getNewModel(boolean allowExitCommand) {
-        model = new UserSchedulerModel(allowExitCommand);
-        return (UserSchedulerModel) model;
+    public static SchedulerModel getNewModel(boolean allowExitCommand) {
+        model = new SchedulerModel(allowExitCommand);
+        return (SchedulerModel) model;
     }
 
-    private static UserSchedulerModel getModel() {
-        return (UserSchedulerModel) model;
+    private static SchedulerModel getModel() {
+        return (SchedulerModel) model;
     }
 
-    protected UserSchedulerModel(boolean allowExitCommand) {
+    protected SchedulerModel(boolean allowExitCommand) {
         this.allowExitCommand = allowExitCommand;
         commands = new ArrayList<Command>();
         commands
@@ -164,9 +177,40 @@ public class UserSchedulerModel extends ConsoleModel {
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
+        commands.add(new Command("start()", "Start Scheduler"));
+        commands.add(new Command("stop()", "Stop Scheduler"));
+        commands
+                .add(new Command("pause()", "Pause Scheduler, causes every jobs but running one to be paused"));
+        commands.add(new Command("freeze()",
+            "Freeze Scheduler, causes all jobs to be paused (every non-running tasks are paused)"));
+        commands.add(new Command("resume()", "Resume Scheduler, causes all jobs to be resumed"));
+        commands.add(new Command("shutdown()", "Wait for running jobs to finish and shutdown Scheduler"));
+        commands.add(new Command("kill()", "Kill every tasks and jobs and shutdown Scheduler"));
+        commands.add(new Command("linkrm(rmURL)",
+            "Reconnect a Resource Manager (parameter is a string representing the new rmURL)"));
+        commands.add(new Command("changePolicy(fullName)",
+            "Change the current scheduling policy, (argument is the new policy full name)"));
+        commands.add(new Command("setLogsDir(logsDir)",
+            "Set the directory where the log are located, (default is SCHEDULER_HOME/.logs"));
+        commands.add(new Command("viewlogs(nbLines)",
+            "View the last nbLines lines of the admin logs file, (default nbLines is 20)"));
+        commands.add(new Command("viewDevlogs(nbLines)",
+            "View the last nbLines lines of the dev logs file, (default nbLines is 20)"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exit Scheduler controller"));
         }
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.util.userconsole.UserSchedulerModel#initialize()
+     */
+    @Override
+    protected void initialize() throws IOException {
+        super.initialize();
+        //read and launch Action.js
+        BufferedReader br = new BufferedReader(new InputStreamReader(Controller.class
+                .getResourceAsStream(JS_INIT_FILE)));
+        eval(readFileContent(br));
     }
 
     /**
@@ -178,18 +222,6 @@ public class UserSchedulerModel extends ConsoleModel {
         if (scheduler == null) {
             throw new RuntimeException("Scheduler is not set, it must be set before starting the model");
         }
-    }
-
-    /**
-     * @see org.ow2.proactive.utils.console.ConsoleModel#initialize()
-     */
-    @Override
-    protected void initialize() throws IOException {
-        super.initialize();
-        //read and launch Action.js
-        BufferedReader br = new BufferedReader(new InputStreamReader(UserController.class
-                .getResourceAsStream(JS_INIT_FILE)));
-        eval(readFileContent(br));
     }
 
     /**
@@ -222,6 +254,20 @@ public class UserSchedulerModel extends ConsoleModel {
             }
         }
         console.stop();
+    }
+
+    @Override
+    public void handleExceptionDisplay(String msg, Throwable t) {
+        if (t instanceof PermissionException) {
+            String tmp = msg + " : " + (t.getMessage() == null ? t : t.getMessage());
+            if (!displayOnStdStream) {
+                console.error(tmp);
+            } else {
+                System.err.printf(tmp);
+            }
+        } else {
+            super.handleExceptionDisplay(msg, t);
+        }
     }
 
     //***************** COMMAND LISTENER *******************
@@ -675,6 +721,290 @@ public class UserSchedulerModel extends ConsoleModel {
         return scheduler;
     }
 
+    public static boolean start() {
+        return getModel().start_();
+    }
+
+    private boolean start_() {
+        boolean success = false;
+        try {
+            success = scheduler.start();
+        } catch (Exception e) {
+            handleExceptionDisplay("Start Scheduler is not possible", e);
+            return false;
+        }
+        if (success) {
+            print("Scheduler started.");
+        } else {
+            print("Scheduler cannot be started in its current state.");
+        }
+        return success;
+    }
+
+    public static boolean stop() {
+        return getModel().stop_();
+    }
+
+    private boolean stop_() {
+        boolean success = false;
+        try {
+            success = scheduler.stop();
+        } catch (Exception e) {
+            handleExceptionDisplay("Stop Scheduler is not possible", e);
+            return false;
+        }
+        if (success) {
+            print("Scheduler stopped.");
+        } else {
+            print("Scheduler cannot be stopped in its current state.");
+        }
+        return success;
+    }
+
+    public static boolean pause() {
+        return getModel().pause_();
+    }
+
+    private boolean pause_() {
+        boolean success = false;
+        try {
+            success = scheduler.pause();
+        } catch (Exception e) {
+            handleExceptionDisplay("Pause Scheduler is not possible", e);
+            return false;
+        }
+        if (success) {
+            print("Scheduler paused.");
+        } else {
+            print("Scheduler cannot be paused in its current state.");
+        }
+        return success;
+    }
+
+    public static boolean freeze() {
+        return getModel().freeze_();
+    }
+
+    private boolean freeze_() {
+        boolean success = false;
+        try {
+            success = scheduler.freeze();
+        } catch (Exception e) {
+            handleExceptionDisplay("Freeze Scheduler is not possible", e);
+            return false;
+        }
+        if (success) {
+            print("Scheduler frozen.");
+        } else {
+            print("Scheduler cannot be frozen in its current state.");
+        }
+        return success;
+    }
+
+    public static boolean resume() {
+        return getModel().resume_();
+    }
+
+    private boolean resume_() {
+        boolean success = false;
+        try {
+            success = scheduler.resume();
+        } catch (Exception e) {
+            handleExceptionDisplay("Resume Scheduler is not possible", e);
+            return false;
+        }
+        if (success) {
+            print("Scheduler resumed.");
+        } else {
+            print("Scheduler cannot be resumed in its current state.");
+        }
+        return success;
+    }
+
+    public static boolean shutdown() {
+        return getModel().shutdown_();
+    }
+
+    private boolean shutdown_() {
+        boolean success = false;
+        try {
+            if (!displayOnStdStream) {
+                String s = console.readStatement("Are you sure you want to shutdown the Scheduler ? " +
+                    YES_NO + " > ");
+                success = s.equalsIgnoreCase(YES);
+            }
+            if (success || displayOnStdStream) {
+                try {
+                    success = scheduler.shutdown();
+                } catch (SchedulerException e) {
+                    error("Shutdown Scheduler is not possible : " + e.getMessage());
+                    return false;
+                }
+                if (success) {
+                    print("Shutdown sequence initialized, it might take a while to finish all executions, shell will exit.");
+                    terminated = true;
+                } else {
+                    print("Scheduler cannot be shutdown in its current state.");
+                }
+            } else {
+                print("Shutdown aborted !");
+            }
+        } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
+        return success;
+    }
+
+    public static boolean kill() {
+        return getModel().kill_();
+    }
+
+    private boolean kill_() {
+        boolean success = false;
+        try {
+            if (!displayOnStdStream) {
+                String s = console.readStatement("Are you sure you want to kill the Scheduler ? " + YES_NO +
+                    " > ");
+                success = s.equalsIgnoreCase(YES);
+            }
+            if (success || displayOnStdStream) {
+                try {
+                    success = scheduler.kill();
+                } catch (SchedulerException e) {
+                    error("Kill Scheduler is not possible : " + e.getMessage());
+                    return false;
+                }
+                if (success) {
+                    print("Sheduler has just been killed, shell will exit.");
+                    terminated = true;
+                } else {
+                    print("Scheduler cannot be killed in its current state.");
+                }
+            } else {
+                print("Kill aborted !");
+            }
+        } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
+        return success;
+    }
+
+    public static boolean linkRM(String rmURL) {
+        return getModel().linkRM_(rmURL);
+    }
+
+    private boolean linkRM_(String rmURL) {
+        boolean success = false;
+        try {
+            success = scheduler.linkResourceManager(rmURL.trim());
+            if (success) {
+                print("The new Resource Manager at " + rmURL + " has been rebound to the scheduler.");
+            } else {
+                error("Reconnect a Resource Manager is only possible when RM is dead !");
+            }
+        } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
+        return success;
+    }
+
+    public static void setLogsDir(String logsDir) {
+        if (logsDir == null || "".equals(logsDir)) {
+            getModel().error("Given logs directory is null or empty !");
+            return;
+        }
+        File dir = new File(logsDir);
+        if (!dir.exists()) {
+            getModel().error("Given logs directory does not exist !");
+            return;
+        }
+        if (!dir.isDirectory()) {
+            getModel().error("Given logsDir is not a directory !");
+            return;
+        }
+        dir = new File(logsDir + File.separator + schedulerLogFile);
+        if (!dir.exists()) {
+            getModel().error("Given logs directory does not contains Scheduler logs files !");
+            return;
+        }
+        getModel().print("Logs Directory set to '" + logsDir + "' !");
+        logsDirectory = logsDir;
+    }
+
+    public static void viewlogs(String nbLines) {
+        if (!"".equals(nbLines)) {
+            try {
+                logsNbLines = Integer.parseInt(nbLines);
+            } catch (NumberFormatException nfe) {
+                //logsNbLines not set
+            }
+        }
+        getModel().print(readLastNLines(schedulerLogFile));
+    }
+
+    public static void viewDevlogs(String nbLines) {
+        if (!"".equals(nbLines)) {
+            try {
+                logsNbLines = Integer.parseInt(nbLines);
+            } catch (NumberFormatException nfe) {
+                //logsNbLines not set
+            }
+        }
+        getModel().print(readLastNLines(schedulerDevLogFile));
+    }
+
+    /**
+     * Return the logsNbLines last lines of the given file.
+     *
+     * @param fileName the file to be displayed
+     * @return the N last lines of the given file
+     */
+    private static String readLastNLines(String fileName) {
+        StringBuilder toret = new StringBuilder();
+        File f = new File(logsDirectory + File.separator + fileName);
+        try {
+            RandomAccessFile raf = new RandomAccessFile(f, "r");
+            long cursor = raf.length() - 2;
+            int nbLines = logsNbLines;
+            byte b;
+            raf.seek(cursor);
+            while (nbLines > 0) {
+                if ((b = raf.readByte()) == '\n') {
+                    nbLines--;
+                }
+                cursor--;
+                raf.seek(cursor);
+                if (nbLines > 0) {
+                    toret.insert(0, (char) b);
+                }
+            }
+        } catch (Exception e) {
+        }
+        return toret.toString();
+    }
+
+    public static void changePolicy(String newPolicyFullName) {
+        getModel().changePolicy_(newPolicyFullName);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void changePolicy_(String newPolicyFullName) {
+        try {
+            Class<? extends Policy> klass = (Class<? extends Policy>) Class.forName(newPolicyFullName);
+            scheduler.changePolicy(klass);
+        } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
+    }
+
+    public static Scheduler getSchedulerInterface() {
+        return getModel().getSchedulerInterface_();
+    }
+
+    private Scheduler getSchedulerInterface_() {
+        return scheduler;
+    }
+
     //****************** HELP SCREEN ********************
 
     @Override
@@ -717,7 +1047,7 @@ public class UserSchedulerModel extends ConsoleModel {
 
     /**
      * Set the JMX information : it is not a mandatory option, if set, it will show informations, if not nothing will be displayed.
-     * 
+     *
      * @param info the jmx information about the current connection
      */
     public void setJMXInfo(MBeanInfoViewer info) {

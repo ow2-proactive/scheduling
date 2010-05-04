@@ -4,7 +4,7 @@ CLASSPATH=.
 workingDir=`dirname $0`
 . $workingDir/env log4j-client
 
-eval $JAVACMD org.ow2.proactive.scheduler.util.adminconsole.AdminController $@
+eval $JAVACMD org.ow2.proactive.scheduler.util.console.Controller $@
 
 
 echo

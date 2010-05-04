@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ActiveEon Team
@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.util.userconsole;
+package org.ow2.proactive.scheduler.util.console;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -77,20 +77,20 @@ import org.ow2.proactive.utils.console.VisualConsole;
 
 
 /**
- * UserController will help you to interact with the scheduler.<br>
+ * Controller will help you to manage and interact with the scheduler.<br>
  * Use this class to submit jobs, get results, pause job, etc...
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 1.0
+ * @since ProActive Scheduling 2.0
  */
-public class UserController {
+public class Controller {
 
     protected static final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
 
     protected static final String control = "<ctl> ";
     protected static final String newline = System.getProperty("line.separator");
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
-    protected static UserController shell;
+    protected static Controller shell;
 
     protected CommandLine cmd = null;
     protected String user = null;
@@ -98,7 +98,7 @@ public class UserController {
     protected Credentials credentials = null;
 
     protected SchedulerAuthenticationInterface auth = null;
-    protected UserSchedulerModel model;
+    protected SchedulerModel model;
 
     /**
      * Start the Scheduler controller
@@ -107,23 +107,23 @@ public class UserController {
      */
     public static void main(String[] args) {
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
-        shell = new UserController(null);
+        shell = new Controller(null);
         shell.load(args);
     }
 
     /**
-     * Create a new instance of UserController
+     * Create a new instance of Controller
      */
-    protected UserController() {
+    protected Controller() {
     }
 
     /**
-     * Create a new instance of UserController
+     * Create a new instance of Controller
      *
      * Convenience constructor to let the default one do nothing
      */
-    protected UserController(Object o) {
-        model = UserSchedulerModel.getModel(true);
+    protected Controller(Object o) {
+        model = SchedulerModel.getModel(true);
     }
 
     public void load(String[] args) {
@@ -285,22 +285,11 @@ public class UserController {
         System.exit(0);
     }
 
-    protected String getCommandName() {
-        return "scheduler-user";
-    }
-
     protected void connect() throws LoginException {
-        Scheduler scheduler;
-        scheduler = auth.login(this.credentials);
+        Scheduler scheduler = auth.login(credentials);
         model.connectScheduler(scheduler);
         String userStr = (user != null) ? "'" + user + "' " : "";
-        logger.info("\t-> User " + userStr + "successfully connected" + newline);
-    }
-
-    protected void connectJMXClient() {
-        final String name = "SchedulerFrontend:name=SchedulerWrapperMBean";
-        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
-        this.model.setJMXInfo(viewer);
+        logger.info("\t-> Admin " + userStr + "successfully connected" + newline);
     }
 
     private void start() throws Exception {
@@ -442,6 +431,50 @@ public class UserController {
 
         options.addOptionGroup(actionGroup);
 
+        opt = new Option("start", false, control + "Start the Scheduler");
+        opt.setRequired(false);
+        actionGroup.addOption(opt);
+
+        opt = new Option("stop", false, control + "Stop the Scheduler");
+        opt.setRequired(false);
+        actionGroup.addOption(opt);
+
+        opt = new Option("pause", false, control +
+            "Pause the Scheduler (cause all non-running jobs to be paused)");
+        opt.setRequired(false);
+        actionGroup.addOption(opt);
+
+        opt = new Option("freeze", false, control +
+            "Freeze the Scheduler (cause all non-running tasks to be paused)");
+        opt.setRequired(false);
+        actionGroup.addOption(opt);
+
+        opt = new Option("resume", false, control + "Resume the Scheduler");
+        opt.setRequired(false);
+        actionGroup.addOption(opt);
+
+        opt = new Option("shutdown", false, control + "Shutdown the Scheduler");
+        opt.setRequired(false);
+        actionGroup.addOption(opt);
+
+        opt = new Option("kill", false, control + "Kill the Scheduler");
+        opt.setRequired(false);
+        actionGroup.addOption(opt);
+
+        opt = new Option("linkrm", true, control + "Reconnect a RM to the scheduler");
+        opt.setArgName("rmURL");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        actionGroup.addOption(opt);
+
+        opt = new Option("policy", true, control + "Change the current scheduling policy");
+        opt.setArgName("fullName");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        actionGroup.addOption(opt);
+
+        options.addOptionGroup(actionGroup);
+
         return actionGroup;
     }
 
@@ -459,58 +492,86 @@ public class UserController {
     protected boolean startCommandLine(CommandLine cmd) {
         model.setDisplayOnStdStream(true);
         if (cmd.hasOption("pausejob")) {
-            UserSchedulerModel.pause(cmd.getOptionValue("pausejob"));
+            SchedulerModel.pause(cmd.getOptionValue("pausejob"));
         } else if (cmd.hasOption("resumejob")) {
-            UserSchedulerModel.resume(cmd.getOptionValue("resumejob"));
+            SchedulerModel.resume(cmd.getOptionValue("resumejob"));
         } else if (cmd.hasOption("killjob")) {
-            UserSchedulerModel.kill(cmd.getOptionValue("killjob"));
+            SchedulerModel.kill(cmd.getOptionValue("killjob"));
         } else if (cmd.hasOption("removejob")) {
-            UserSchedulerModel.remove(cmd.getOptionValue("removejob"));
+            SchedulerModel.remove(cmd.getOptionValue("removejob"));
         } else if (cmd.hasOption("submit")) {
             if (cmd.hasOption("cmd") || cmd.hasOption("cmdf")) {
                 submitCMD();
             } else {
-                UserSchedulerModel.submit(cmd.getOptionValue("submit"));
+                SchedulerModel.submit(cmd.getOptionValue("submit"));
             }
         } else if (cmd.hasOption("result")) {
-            UserSchedulerModel.result(cmd.getOptionValue("result"));
+            SchedulerModel.result(cmd.getOptionValue("result"));
         } else if (cmd.hasOption("tresult")) {
             String[] optionValues = cmd.getOptionValues("tresult");
             if (optionValues == null || optionValues.length != 2) {
                 model.error("tresult must have two arguments. Start with --help for more informations");
             }
-            UserSchedulerModel.tresult(optionValues[0], optionValues[1]);
+            SchedulerModel.tresult(optionValues[0], optionValues[1]);
         } else if (cmd.hasOption("output")) {
-            UserSchedulerModel.output(cmd.getOptionValue("output"));
+            SchedulerModel.output(cmd.getOptionValue("output"));
         } else if (cmd.hasOption("toutput")) {
             String[] optionValues = cmd.getOptionValues("toutput");
             if (optionValues == null || optionValues.length != 2) {
                 model.error("toutput must have two arguments. Start with --help for more informations");
             }
-            UserSchedulerModel.toutput(optionValues[0], optionValues[1]);
+            SchedulerModel.toutput(optionValues[0], optionValues[1]);
         } else if (cmd.hasOption("priority")) {
             try {
-                UserSchedulerModel.priority(cmd.getOptionValues("priority")[0], cmd
-                        .getOptionValues("priority")[1]);
+                SchedulerModel.priority(cmd.getOptionValues("priority")[0],
+                        cmd.getOptionValues("priority")[1]);
             } catch (ArrayIndexOutOfBoundsException e) {
                 model.print("Missing arguments for job priority. Arguments must be <jobId> <newPriority>" +
                     newline + "\t" + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
         } else if (cmd.hasOption("jobstate")) {
-            UserSchedulerModel.jobState(cmd.getOptionValue("jobstate"));
+            SchedulerModel.jobState(cmd.getOptionValue("jobstate"));
         } else if (cmd.hasOption("listjobs")) {
-            UserSchedulerModel.schedulerState();
+            SchedulerModel.schedulerState();
         } else if (cmd.hasOption("jmxinfo")) {
-            UserSchedulerModel.JMXinfo();
+            SchedulerModel.JMXinfo();
         } else if (cmd.hasOption("script")) {
-            UserSchedulerModel.exec(cmd.getOptionValue("script"));
+            SchedulerModel.exec(cmd.getOptionValue("script"));
         } else if (cmd.hasOption("test")) {
-            UserSchedulerModel.test();
+            SchedulerModel.test();
+        } else if (cmd.hasOption("start")) {
+            SchedulerModel.start();
+        } else if (cmd.hasOption("stop")) {
+            SchedulerModel.stop();
+        } else if (cmd.hasOption("pause")) {
+            SchedulerModel.pause();
+        } else if (cmd.hasOption("freeze")) {
+            SchedulerModel.freeze();
+        } else if (cmd.hasOption("resume")) {
+            SchedulerModel.resume();
+        } else if (cmd.hasOption("shutdown")) {
+            SchedulerModel.shutdown();
+        } else if (cmd.hasOption("kill")) {
+            SchedulerModel.kill();
+        } else if (cmd.hasOption("linkrm")) {
+            SchedulerModel.linkRM(cmd.getOptionValue("linkrm"));
+        } else if (cmd.hasOption("policy")) {
+            SchedulerModel.changePolicy(cmd.getOptionValue("policy"));
         } else {
             model.setDisplayOnStdStream(false);
             return true;
         }
         return false;
+    }
+
+    protected void connectJMXClient() {
+        final String name = "SchedulerFrontend:name=SchedulerWrapperMBean";
+        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
+        this.model.setJMXInfo(viewer);
+    }
+
+    protected String getCommandName() {
+        return "scheduler-client";
     }
 
     private String submitCMD() {
@@ -553,5 +614,4 @@ public class UserController {
         }
         return "";
     }
-
 }
