@@ -363,11 +363,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             SubmissionClosedException, JobCreationException {
         logger_dev.info("New job submission requested : " + userJob.getName());
 
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id);
-        //renew session for this user
-        renewUserSession(id, ident);
+        UserIdentificationImpl ident = checkPermission("submit",
+                "You do not have permission to submit a job !");
 
         //check if the scheduler is stopped
         if (!scheduler.isSubmitPossible()) {
@@ -442,26 +439,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
+
         //checking permissions
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id);
-        //renew session for this user
-        renewUserSession(id, ident);
-
-        IdentifiedJob ij = jobs.get(jobId);
-
-        if (ij == null) {
-            String msg = "The job represented by this ID is unknow !";
-            logger_dev.info(msg);
-            throw new UnknownJobException(msg);
-        }
-
-        if (!ij.hasRight(ident)) {
-            String msg = "You do not have permission to access this job !";
-            logger_dev.info(msg);
-            throw new PermissionException(msg);
-        }
+        IdentifiedJob ij = checkJobOwner("getJobResult", jobId,
+                "You do not have permission to get the result of this job !");
 
         if (!ij.isFinished()) {
             logger_dev.info("Job '" + jobId + "' is not finished");
@@ -487,26 +468,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
+
         //checking permissions
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id);
-        //renew session for this user
-        renewUserSession(id, ident);
-
-        IdentifiedJob ij = jobs.get(jobId);
-
-        if (ij == null) {
-            String msg = "The job represented by this ID is unknow !";
-            logger_dev.info(msg);
-            throw new UnknownJobException(msg);
-        }
-
-        if (!ij.hasRight(ident)) {
-            String msg = "You do not have permission to access this job !";
-            logger_dev.info(msg);
-            throw new PermissionException(msg);
-        }
+        checkJobOwner("getTaskResult", jobId,
+                "You do not have permission to get the task result of this job !");
 
         //asking the scheduler for the result
         TaskResult result = scheduler.getTaskResult(jobId, taskName);
@@ -526,26 +491,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public void removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+
         //checking permissions
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id);
-        //renew session for this user
-        renewUserSession(id, ident);
-
-        IdentifiedJob ij = jobs.get(jobId);
-
-        if (ij == null) {
-            String msg = "The job represented by this ID is unknow !";
-            logger_dev.info(msg);
-            throw new UnknownJobException(msg);
-        }
-
-        if (!ij.hasRight(ident)) {
-            String msg = "You do not have permission to remove this job !";
-            logger_dev.info(msg);
-            throw new PermissionException(msg);
-        }
+        checkJobOwner("removeJob", jobId, "You do not have permission to remove this job !");
 
         //asking the scheduler for the result
         scheduler.removeJob(jobId);
@@ -556,25 +504,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws NotConnectedException,
             UnknownJobException, PermissionException {
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id);
-        //renew session for this user
-        renewUserSession(id, ident);
-
-        IdentifiedJob ij = jobs.get(jobId);
-
-        if (ij == null) {
-            String msg = "The job represented by this ID is unknow !";
-            logger_dev.info(msg);
-            throw new UnknownJobException(msg);
-        }
-
-        if (!ij.hasRight(ident)) {
-            String msg = "You do not have permission to listen the log of this job !";
-            logger_dev.info(msg);
-            throw new PermissionException(msg);
-        }
+        //checking permissions
+        checkJobOwner("listenJobLogs", jobId, "You do not have permission to listen the log of this job !");
 
         scheduler.listenJobLogs(jobId, appenderProvider);
     }
@@ -591,10 +522,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
-        UniqueID id = checkAccess();
-
-        //renew session for this user
-        renewUserSession(id, identifications.get(id));
+        //checking permissions
+        checkPermission("getStatus", "You do not have permission to get the status !");
 
         return jmxHelper.getSchedulerStatus_();
     }
@@ -603,7 +532,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public SchedulerState getState() throws NotConnectedException, PermissionException {
-        checkAccess();
+        //checking permissions
+        checkPermission("getState", "You do not have permission to get the state !");
+
         //get the scheduler State
         SchedulerStateImpl initState = null;
         initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler.getState()));
@@ -627,9 +558,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
             boolean getCurrentState, SchedulerEvent... events) throws NotConnectedException,
             PermissionException {
-        UniqueID id = checkAccess();
+        //checking permissions
+        UserIdentificationImpl uIdent = checkPermission("addEventListener",
+                "You do not have permission to add a listener !");
 
-        UserIdentificationImpl uIdent = identifications.get(id);
         // check if listener is not null
         if (sel == null) {
             String msg = "Scheduler listener must be not null";
@@ -647,6 +579,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         //set if the user wants to get its events only or every events
         uIdent.setMyEventsOnly(myEventsOnly);
         //add the listener to the list of listener for this user.
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
         schedulerListeners.put(id, new ClientRequestHandler(this, id, sel));
         //cancel timer for this user : session is now managed by events
         uIdent.getSession().cancel();
@@ -696,11 +629,12 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * Check permission and rights
      *
      * @param permissionMsg the message to log if an error occurs.
+     * @return the user identification found for this client
      * @throws NotConnectedException if the caller is not authenticated.
      * @throws PermissionException if the user has not the permission to access this method.
      */
-    private void checkPermission(String methodName, String permissionMsg) throws NotConnectedException,
-            PermissionException {
+    private UserIdentificationImpl checkPermission(String methodName, String permissionMsg)
+            throws NotConnectedException, PermissionException {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl ident = identifications.get(id);
@@ -716,6 +650,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             logger_dev.warn(permissionMsg);
             throw ex;
         }
+        return ident;
     }
 
     /**
@@ -818,26 +753,19 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     }
 
     /**
-     * Factoring of exception management for the 4 next jobs order.
+     * Factoring of exception management for the 5 next jobs order.
      *
+     * @param methodName the name of the method to be checked
      * @param jobId the jobId concerned by the order.
      * @param permissionMsg the message to send the user if he has no right.
+     * @return the job identified object in case it can be useful
      * @throws NotConnectedException if user is not authenticated.
      * @throws UnknownJobException if the job does not exist.
      * @throws PermissionException if user can't access to this particular job.
      */
-    private void prkcp(JobId jobId, String permissionMsg) throws NotConnectedException, UnknownJobException,
-            PermissionException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-
-        if (!identifications.containsKey(id)) {
-            logger_dev.info(ACCESS_DENIED);
-            throw new NotConnectedException(ACCESS_DENIED);
-        }
-
-        UserIdentificationImpl ident = identifications.get(id);
-        //renew session for this user
-        renewUserSession(id, ident);
+    private IdentifiedJob checkJobOwner(String methodName, JobId jobId, String permissionMsg)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        UserIdentificationImpl ident = checkPermission(methodName, permissionMsg);
 
         IdentifiedJob ij = jobs.get(jobId);
 
@@ -851,6 +779,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             logger_dev.info(permissionMsg);
             throw new PermissionException(permissionMsg);
         }
+
+        return ij;
     }
 
     /**
@@ -858,7 +788,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
-        prkcp(jobId, "You do not have permission to pause this job !");
+        checkJobOwner("pauseJob", jobId, "You do not have permission to pause this job !");
 
         return scheduler.pauseJob(jobId);
     }
@@ -868,7 +798,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
-        prkcp(jobId, "You do not have permission to resume this job !");
+        checkJobOwner("resumeJob", jobId, "You do not have permission to resume this job !");
 
         return scheduler.resumeJob(jobId);
     }
@@ -878,7 +808,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
-        prkcp(jobId, "You do not have permission to kill this job !");
+        checkJobOwner("killJob", jobId, "You do not have permission to kill this job !");
 
         return scheduler.killJob(jobId);
     }
@@ -888,7 +818,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
             UnknownJobException, PermissionException, JobAlreadyFinishedException {
-        prkcp(jobId, "You do not have permission to change the priority of this job !");
+        checkJobOwner("changeJobPriority", jobId,
+                "You do not have permission to change the priority of this job !");
 
         UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
                 .getSourceBodyID());
@@ -915,7 +846,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
-        prkcp(jobId, "You do not have permission to get the state of this job !");
+        checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this job !");
         return scheduler.getJobState(jobId);
     }
 
