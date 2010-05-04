@@ -46,7 +46,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.InternalException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
@@ -81,9 +82,9 @@ public class InternalJobFactory {
      *
      * @param job the user job that will be used to create the internal job.
      * @return the created internal job.
-     * @throws SchedulerException an exception if the factory cannot create the given job.
+     * @throws JobCreationException an exception if the factory cannot create the given job.
      */
-    public static InternalJob createJob(Job job) throws SchedulerException {
+    public static InternalJob createJob(Job job) throws JobCreationException {
         InternalJob iJob = null;
 
         logger_dev.info("Create job '" + job.getName() + "' - " + job.getClass().getName());
@@ -91,13 +92,13 @@ public class InternalJobFactory {
         switch (job.getType()) {
             case PARAMETER_SWEEPING:
                 logger_dev.error("The type of the given job is not yet implemented !");
-                throw new SchedulerException("The type of the given job is not yet implemented !");
+                throw new JobCreationException("The type of the given job is not yet implemented !");
             case TASKSFLOW:
                 iJob = createJob((TaskFlowJob) job);
                 break;
             default:
                 logger_dev.error("The type of the given job is unknown !");
-                throw new SchedulerException("The type of the given job is unknown !");
+                throw new JobCreationException("The type of the given job is unknown !");
         }
 
         try {
@@ -106,7 +107,7 @@ public class InternalJobFactory {
             return iJob;
         } catch (Exception e) {
             logger_dev.error("", e);
-            throw new SchedulerException("Error while creating the internalJob !", e);
+            throw new InternalException("Error while creating the internalJob !", e);
         }
     }
 
@@ -148,19 +149,19 @@ public class InternalJobFactory {
      *
      * @param job the user job that will be used to create the internal job.
      * @return the created internal job.
-     * @throws SchedulerException an exception if the factory cannot create the given job. 
+     * @throws JobCreationException an exception if the factory cannot create the given job.
      */
-    private static InternalJob createJob(TaskFlowJob userJob) throws SchedulerException {
+    private static InternalJob createJob(TaskFlowJob userJob) throws JobCreationException {
         if (userJob.getTasks().size() == 0) {
             logger_dev.info("Job '" + userJob.getName() + "' must contain tasks !");
-            throw new SchedulerException("This job must contains tasks !");
+            throw new JobCreationException("This job must contains tasks !");
         }
 
         //check tasks flow
         if (!isConsistent(userJob)) {
             String msg = "One or more tasks in this job cannot be reached !";
             logger_dev.info(msg);
-            throw new SchedulerException(msg);
+            throw new JobCreationException(msg);
         }
 
         InternalJob job = new InternalTaskFlowJob();
@@ -191,7 +192,7 @@ public class InternalJobFactory {
         return job;
     }
 
-    private static InternalTask createTask(Job userJob, Task task) throws SchedulerException {
+    private static InternalTask createTask(Job userJob, Task task) throws JobCreationException {
         if (task instanceof NativeTask) {
             return createTask(userJob, (NativeTask) task);
         } else if (task instanceof JavaTask) {
@@ -199,7 +200,7 @@ public class InternalJobFactory {
         } else {
             String msg = "The task you intend to add is unknown ! (type : " + task.getClass().getName() + ")";
             logger_dev.info(msg);
-            throw new SchedulerException(msg);
+            throw new JobCreationException(msg);
         }
     }
 
@@ -208,10 +209,10 @@ public class InternalJobFactory {
      *
      * @param task the user java task that will be used to create the internal java task.
      * @return the created internal task.
-     * @throws SchedulerException an exception if the factory cannot create the given task.
+     * @throws JobCreationException an exception if the factory cannot create the given task.
      */
     @SuppressWarnings("unchecked")
-    private static InternalTask createTask(Job userJob, JavaTask task) throws SchedulerException {
+    private static InternalTask createTask(Job userJob, JavaTask task) throws JobCreationException {
         InternalJavaTask javaTask;
 
         if (task.getExecutableClassName() != null) {
@@ -239,14 +240,14 @@ public class InternalJobFactory {
         } else {
             String msg = "You must specify your own executable task class to be launched (in every task) !";
             logger_dev.info(msg);
-            throw new SchedulerException(msg);
+            throw new JobCreationException(msg);
         }
 
         //set task common properties
         try {
             setTaskCommonProperties(userJob, task, javaTask);
         } catch (Exception e) {
-            throw new SchedulerException(e);
+            throw new JobCreationException(e);
         }
         return javaTask;
     }
@@ -256,14 +257,14 @@ public class InternalJobFactory {
      *
      * @param task the user native task that will be used to create the internal native task.
      * @return the created internal task.
-     * @throws SchedulerException an exception if the factory cannot create the given task.
+     * @throws JobCreationException an exception if the factory cannot create the given task.
      */
-    private static InternalTask createTask(Job userJob, NativeTask task) throws SchedulerException {
+    private static InternalTask createTask(Job userJob, NativeTask task) throws JobCreationException {
         if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0)) &&
             (task.getGenerationScript() == null)) {
             String msg = "The command line is null or empty and not generated !";
             logger_dev.info(msg);
-            throw new SchedulerException(msg);
+            throw new JobCreationException(msg);
         }
         InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
                 .getCommandLine(), task.getGenerationScript(), task.getWorkingDir()));
@@ -271,7 +272,7 @@ public class InternalJobFactory {
         try {
             setTaskCommonProperties(userJob, task, nativeTask);
         } catch (Exception e) {
-            throw new SchedulerException(e);
+            throw new JobCreationException(e);
         }
         return nativeTask;
     }

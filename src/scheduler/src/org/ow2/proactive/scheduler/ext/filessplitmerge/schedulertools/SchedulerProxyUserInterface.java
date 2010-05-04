@@ -23,8 +23,9 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.SchedulerStatus; //import org.ow2.proactive.scheduler.common.Stats;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -81,7 +82,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
             Credentials cred = Credentials.createCredentials(user, pwd, pubKey);
             this.uischeduler = auth.logAsUser(cred);
         } catch (KeyException e) {
-            throw new SchedulerException(e);
+            throw new InternalSchedulerException(e);
         }
 
         //LoggerManager.getInstane().info("Connection to the scheduler successfully established. ");
@@ -96,7 +97,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
             SchedulerEvent... events) throws SchedulerException {
 
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         //return uischeduler.addSchedulerEventListener(arg0, onlyMyEvents, arg1);
         return uischeduler.addEventListener(sel, myEventsOnly, true, events);
@@ -105,7 +106,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public void disconnect() throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         uischeduler.disconnect();
 
@@ -138,7 +139,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public void removeSchedulerEventListener() throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         //uischeduler.removeSchedulerEventListener();
         uischeduler.removeEventListener();
@@ -148,7 +149,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public JobId submit(Job arg0) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         return uischeduler.submit(arg0);
     }
@@ -156,7 +157,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public void changePriority(JobId arg0, JobPriority arg1) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         uischeduler.changePriority(arg0, arg1);
 
@@ -165,7 +166,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public JobResult getJobResult(String arg0) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         return uischeduler.getJobResult(arg0);
     }
@@ -173,7 +174,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public JobResult getJobResult(JobId arg0) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         return uischeduler.getJobResult(arg0);
     }
@@ -181,7 +182,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public TaskResult getTaskResult(JobId jobId, String arg1) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         return uischeduler.getTaskResult(jobId, arg1);
     }
@@ -189,7 +190,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public TaskResult getTaskResult(String jobId, String arg1) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         return uischeduler.getTaskResult(jobId, arg1);
     }
@@ -197,7 +198,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public BooleanWrapper kill(JobId arg0) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         return uischeduler.kill(arg0);
     }
@@ -205,7 +206,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public void listenLog(JobId arg0, AppenderProvider arg1) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         uischeduler.listenLog(arg0, arg1);
 
@@ -214,7 +215,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public BooleanWrapper pause(JobId arg0) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         return uischeduler.pause(arg0);
 
@@ -223,7 +224,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public void remove(JobId arg0) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         uischeduler.remove(arg0);
 
@@ -232,7 +233,7 @@ public class SchedulerProxyUserInterface implements UserSchedulerInterface {
     //@Override
     public BooleanWrapper resume(JobId arg0) throws SchedulerException {
         if (uischeduler == null)
-            throw new SchedulerException("Not connected to the schecduler.");
+            throw new InternalSchedulerException("Not connected to the schecduler.");
 
         return uischeduler.resume(arg0);
     }

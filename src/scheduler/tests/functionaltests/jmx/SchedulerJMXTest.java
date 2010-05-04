@@ -34,38 +34,7 @@
  */
 package functionaltests.jmx;
 
-import java.security.PublicKey;
-import java.util.HashMap;
-
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-
-import junit.framework.Assert;
-
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.jmx.JMXClientHelper;
-import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
-import org.ow2.proactive.jmx.provider.JMXProviderUtils;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.core.jmx.JMXMonitoringHelper;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.examples.WaitAndPrint;
-
 import functionalTests.FunctionalTest;
-import functionaltests.RMTHelper;
-import functionaltests.SchedulerTHelper;
 
 
 /**
@@ -81,8 +50,9 @@ public final class SchedulerJMXTest extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        final String userLogin = "user1";
-        final String userPassword = "pwd1";
+        //Test became useless, next test coming soon
+        /*final String userLogin = "user";
+        final String userPassword = "pwd";
         final String adminLogin = "demo";
         final String adminPassword = "demo";
 
@@ -350,6 +320,6 @@ public final class SchedulerJMXTest extends FunctionalTest {
             client.disconnect();
             Assert.assertFalse("The helper disconnect() must set the helper as disconnected", client
                     .isConnected());
-        }
+        }*/
     }
 }

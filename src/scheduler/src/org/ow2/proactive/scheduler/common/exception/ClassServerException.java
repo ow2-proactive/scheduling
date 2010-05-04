@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -36,42 +36,47 @@
  */
 package org.ow2.proactive.scheduler.common.exception;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-
-
 /**
- * Exceptions Generated if a problem occurred while creating a job.
+ * Exception generated when trying to create a classServer for java task.<br>
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 2.1.0
  */
-@PublicAPI
-public class JobCreationException extends SchedulerException {
+public class ClassServerException extends SchedulerException {
 
     /**
-     * Create a new instance of JobCreationException with the given message and cause
+     * Create a new instance of ClassServerException
      *
-     * @param msg the message to attach.
-     * @param cause the cause of the exception.
+     * @param msg the message to attach
      */
-    public JobCreationException(String msg, Exception cause) {
-        super(msg, cause);
-    }
-
-    /**
-     * Create a new instance of JobCreationException with the given message.
-     * @param msg message to attach.
-     */
-    public JobCreationException(String msg) {
+    public ClassServerException(String msg) {
         super(msg);
     }
 
     /**
-     * Create a new instance of JobCreationException with the given cause
+     * Create a new instance of ClassServerException
+     *
+     */
+    public ClassServerException() {
+    }
+
+    /**
+     * Create a new instance of ClassServerException
+     *
+     * @param msg the message to attach
+     * @param cause the cause of the exception.
+     */
+    public ClassServerException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    /**
+     * Create a new instance of ClassServerException
      *
      * @param cause the cause of the exception.
      */
-    public JobCreationException(Exception cause) {
+    public ClassServerException(Throwable cause) {
         super(cause);
     }
+
 }

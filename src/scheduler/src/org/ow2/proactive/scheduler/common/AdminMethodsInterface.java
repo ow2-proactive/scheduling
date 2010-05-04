@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.policy.Policy;
  * $Id$
  */
 @PublicAPI
+@Deprecated
 public interface AdminMethodsInterface {
     /**
      * For administrator only, Change the policy of the scheduler.<br>

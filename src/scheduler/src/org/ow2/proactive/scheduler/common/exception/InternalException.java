@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,54 +24,60 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $ACTIVEEON_INITIAL_DEV$
  */
 package org.ow2.proactive.scheduler.common.exception;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-
-
 /**
- * Exceptions Generated if a problem occurred while creating a job.
+ * InternalException...
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 2.0
  */
-@PublicAPI
-public class JobCreationException extends SchedulerException {
+public class InternalException extends RuntimeException {
 
     /**
-     * Create a new instance of JobCreationException with the given message and cause
+     * Create a new instance of InternalException
      *
-     * @param msg the message to attach.
-     * @param cause the cause of the exception.
      */
-    public JobCreationException(String msg, Exception cause) {
-        super(msg, cause);
+    public InternalException() {
+        super();
     }
 
     /**
-     * Create a new instance of JobCreationException with the given message.
-     * @param msg message to attach.
+     * Create a new instance of InternalException
+     *
+     * @param message
+     * @param cause
      */
-    public JobCreationException(String msg) {
-        super(msg);
+    public InternalException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     /**
-     * Create a new instance of JobCreationException with the given cause
+     * Create a new instance of InternalException
      *
-     * @param cause the cause of the exception.
+     * @param message
      */
-    public JobCreationException(Exception cause) {
+    public InternalException(String message) {
+        super(message);
+    }
+
+    /**
+     * Create a new instance of InternalException
+     *
+     * @param cause
+     */
+    public InternalException(Throwable cause) {
         super(cause);
     }
+
 }

@@ -48,7 +48,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 1.0
  */
 @PublicAPI
-public class MaxJobIdReachedException extends SchedulerException {
+public class MaxJobIdReachedException extends InternalException {
     /**
      * Create a new instance of MaxJobIdReachedException with the given message.
      *

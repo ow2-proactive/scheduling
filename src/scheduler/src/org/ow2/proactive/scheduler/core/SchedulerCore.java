@@ -73,16 +73,16 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
-import org.ow2.proactive.scheduler.common.AdminMethodsInterface;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerCoreMethods;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface_;
+import org.ow2.proactive.scheduler.common.exception.ClassServerException;
+import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UnknowJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknowTaskResultException;
@@ -134,8 +134,7 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInterface,
-        TaskTerminateNotification, RunActive {
+public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotification, RunActive {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
@@ -230,11 +229,12 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param jid the job id
      * @param userClasspathJarFile the contents of the classpath as a serialized jar file
      * @param deflateJar if true, the jar file is deflated in the tmpJarFilesDir
+     * @throws ClassServerException if something goes wrong during task class server creation
      */
     private static void addTaskClassServer(JobId jid, byte[] userClasspathJarFile, boolean deflateJar)
-            throws SchedulerException {
+            throws ClassServerException {
         if (getTaskClassServer(jid) != null) {
-            throw new SchedulerException("ClassServer already exists for job " + jid);
+            throw new ClassServerException("ClassServer already exists for job " + jid);
         }
         try {
             // create remote task classserver 
@@ -252,19 +252,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             remoteClassServers.put(jid, remoteExposer);// stored to be unregistered later
         } catch (FileNotFoundException e) {
             logger_dev.error("", e);
-            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
+            throw new ClassServerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         } catch (IOException e) {
             logger_dev.error("", e);
-            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
+            throw new ClassServerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         } catch (UnknownProtocolException e) {
             logger_dev.error("", e);
-            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
+            throw new ClassServerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         } catch (ProActiveException e) {
             logger_dev.error("", e);
-            throw new SchedulerException("Unable to create class server for job " + jid + " because " +
+            throw new ClassServerException("Unable to create class server for job " + jid + " because " +
                 e.getMessage());
         }
     }
@@ -319,7 +319,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     TimerTask tt = new TimerTask() {
                         @Override
                         public void run() {
-                            schedulerStub.remove(jid);
+                            schedulerStub.removeJob(jid);
                         }
                     };
                     removeJobTimer.schedule(tt, SCHEDULER_AUTO_REMOVED_JOB_DELAY);
@@ -485,8 +485,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //create scheduling method
             schedulingMethod = new SchedulingMethodImpl(this);
 
-            //default scheduler status is started
-            ((SchedulerCore) PAActiveObject.getStubOnThis()).start();
+            //default scheduler status will be started
+            start();
 
             do {
                 service.blockingServeOldest();
@@ -657,15 +657,20 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      *
      * @throws SchedulerException if problem occurs during job preparation
      */
-    public void submit() throws SchedulerException {
+    public void submit() {
         InternalJob job = currentJobToSubmit.getJob();
         logger_dev.info("Trying to submit new Job '" + job.getId() + "'");
         // TODO cdelbe : create classserver only when job is running ?
         // create taskClassLoader for this job
         if (job.getEnvironment().getJobClasspath() != null) {
-            SchedulerCore.addTaskClassServer(job.getId(), job.getEnvironment().getJobClasspathContent(), job
-                    .getEnvironment().containsJarFile());
-            // if the classserver creation fails, the submit is aborted
+            try {
+                SchedulerCore.addTaskClassServer(job.getId(), job.getEnvironment().getJobClasspathContent(),
+                        job.getEnvironment().containsJarFile());
+                // if the classserver creation fails, the submit is aborted
+            } catch (ClassServerException cse) {
+                logger_dev.info("", cse);
+                throw new InternalException(cse);
+            }
         }
 
         job.submitAction();
@@ -1096,7 +1101,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     /**
      * {@inheritDoc}
      */
-    public SchedulerState getSchedulerState() {
+    public SchedulerState getState() {
         SchedulerStateImpl sState = new SchedulerStateImpl();
         sState.setPendingJobs(convert(pendingJobs));
         sState.setRunningJobs(convert(runningJobs));
@@ -1114,9 +1119,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String, int)
+     * {@inheritDoc}
      */
-    public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException {
+    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknowJobException {
         logger_dev.info("listen logs of job '" + jobId + "'");
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
 
@@ -1127,11 +1132,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         } catch (LogForwardingException e1) {
             logger.error("Cannot create an appender for job " + jobId, e1);
             logger_dev.error("", e1);
-            throw new SchedulerException("Cannot create an appender for job " + jobId, e1);
+            throw new InternalException("Cannot create an appender for job " + jobId, e1);
         }
 
         // targeted job
         InternalJob target = this.jobs.get(jobId);
+
+        if (target == null) {
+            throw new UnknowJobException("The job " + jobId + " does not exist !");
+        }
 
         // get or create appender for the targeted job
         AsyncAppender jobAppender = this.jobsToBeLogged.get(jobId);
@@ -1146,7 +1155,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         jobAppender.addAppender(appender);
 
         // handle finished jobs
-        if ((target != null) && this.finishedJobs.contains(target)) {
+        if (this.finishedJobs.contains(target)) {
             logger_dev.info("listen logs of job '" + jobId + "' : job is already finished");
             // for finished tasks, add logs events "manually"
             Collection<TaskResult> allRes = target.getJobResult().getAllResults().values();
@@ -1159,7 +1168,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             this.jobsToBeLogged.remove(jobId);
 
             // job is not finished, tasks are running
-        } else if ((target != null) && !this.pendingJobs.contains(target)) {
+        } else if (!this.pendingJobs.contains(target)) {
             // this jobs contains running and finished tasks
 
             // for finished tasks, add logs events "manually"
@@ -1235,10 +1244,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    @ImmediateService
-    public JobResult getJobResult(JobId jobId) throws SchedulerException {
+    public JobResult getJobResult(JobId jobId) throws UnknowJobException {
         final InternalJob job = jobs.get(jobId);
         final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
 
@@ -1253,7 +1261,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             result = DatabaseManager.getInstance().recover(job.getJobResult().getClass(),
                     new Condition("id", ConditionComparator.EQUALS_TO, job.getJobResult().getJobId())).get(0);
         } catch (IndexOutOfBoundsException e) {
-            throw new SchedulerException("Cannot retrieve the result of job '" + jobId + "' !", e);
+            throw new InternalException("Cannot retrieve the result of job '" + jobId + "' !", e);
         }
 
         try {
@@ -1268,7 +1276,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     TimerTask tt = new TimerTask() {
                         @Override
                         public void run() {
-                            schedulerStub.remove(job.getId());
+                            schedulerStub.removeJob(job.getId());
                         }
                     };
                     removeJobTimer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
@@ -1285,14 +1293,15 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             return result;
         } catch (Throwable t) {
             logger.warn("Thrown to user", t);
-            throw new SchedulerException(t);
+            throw new InternalException(t);
         }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
+     * {@inheritDoc}
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException {
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws UnknowJobException,
+            UnknowTaskResultException {
         logger_dev.info("Trying to get TaskResult of task '" + taskName + "' for job '" + jobId + "'");
         InternalJob job = jobs.get(jobId);
 
@@ -1331,9 +1340,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#remove(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public void remove(JobId jobId) {
+    public void removeJob(JobId jobId) {
         InternalJob job = jobs.get(jobId);
 
         logger_dev.info("Request to remove job '" + jobId + "'");
@@ -1369,138 +1378,138 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#start()
+     * {@inheritDoc}
      */
-    public BooleanWrapper start() {
+    public boolean start() {
         if (status == SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if (status != SchedulerStatus.STOPPED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         status = SchedulerStatus.STARTED;
         logger.info("Scheduler has just been started !");
         frontend.schedulerStateUpdated(SchedulerEvent.STARTED);
 
-        return new BooleanWrapper(true);
+        return true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#stop()
+     * {@inheritDoc}
      */
-    public BooleanWrapper stop() {
+    public boolean stop() {
         if (status == SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status == SchedulerStatus.STOPPED) || (status == SchedulerStatus.SHUTTING_DOWN) ||
             (status == SchedulerStatus.KILLED)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         status = SchedulerStatus.STOPPED;
         logger.info("Scheduler has just been stopped, no tasks will be launched until start.");
         frontend.schedulerStateUpdated(SchedulerEvent.STOPPED);
 
-        return new BooleanWrapper(true);
+        return true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#pause()
+     * {@inheritDoc}
      */
-    public BooleanWrapper pause() {
+    public boolean pause() {
         if (status == SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status != SchedulerStatus.FROZEN) && (status != SchedulerStatus.STARTED)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         status = SchedulerStatus.PAUSED;
         logger.info("Scheduler has just been paused !");
         frontend.schedulerStateUpdated(SchedulerEvent.PAUSED);
 
-        return new BooleanWrapper(true);
+        return true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#freeze()
+     * {@inheritDoc}
      */
-    public BooleanWrapper freeze() {
+    public boolean freeze() {
         if (status == SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status != SchedulerStatus.PAUSED) && (status != SchedulerStatus.STARTED)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         status = SchedulerStatus.FROZEN;
         logger.info("Scheduler has just been frozen !");
         frontend.schedulerStateUpdated(SchedulerEvent.FROZEN);
 
-        return new BooleanWrapper(true);
+        return true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#resume()
+     * {@inheritDoc}
      */
-    public BooleanWrapper resume() {
+    public boolean resume() {
         if (status == SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status != SchedulerStatus.PAUSED) && (status != SchedulerStatus.FROZEN)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         status = SchedulerStatus.STARTED;
         logger.info("Scheduler has just been resumed !");
         frontend.schedulerStateUpdated(SchedulerEvent.RESUMED);
 
-        return new BooleanWrapper(true);
+        return true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#shutdown()
+     * {@inheritDoc}
      */
-    public BooleanWrapper shutdown() {
+    public boolean shutdown() {
         if (status == SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status == SchedulerStatus.KILLED) || (status == SchedulerStatus.SHUTTING_DOWN)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         status = SchedulerStatus.SHUTTING_DOWN;
         logger.info("Scheduler is shutting down, this make take time to finish every jobs !");
         frontend.schedulerStateUpdated(SchedulerEvent.SHUTTING_DOWN);
 
-        return new BooleanWrapper(true);
+        return true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#kill()
+     * {@inheritDoc}
      */
-    public synchronized BooleanWrapper kill() {
+    public synchronized boolean kill() {
         if (status == SchedulerStatus.KILLED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         logger_dev.info("Killing all running task processes...");
@@ -1558,25 +1567,25 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         logger.info("Scheduler has just been killed !");
         frontend.schedulerStateUpdated(SchedulerEvent.KILLED);
 
-        return new BooleanWrapper(true);
+        return true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#pause(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public BooleanWrapper pause(JobId jobId) {
+    public boolean pauseJob(JobId jobId) {
         if (status == SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         InternalJob job = jobs.get(jobId);
 
         if (finishedJobs.contains(job)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         boolean change = job.setPaused();
@@ -1588,25 +1597,25 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //update tasks events list and send it to front-end
         updateTaskInfosList(job, SchedulerEvent.JOB_PAUSED);
 
-        return new BooleanWrapper(change);
+        return change;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public BooleanWrapper resume(JobId jobId) {
+    public boolean resumeJob(JobId jobId) {
         if (status == SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if ((status == SchedulerStatus.SHUTTING_DOWN) || (status == SchedulerStatus.KILLED)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         InternalJob job = jobs.get(jobId);
 
         if (finishedJobs.contains(job)) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         boolean change = job.setUnPause();
@@ -1618,19 +1627,19 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         //update tasks events list and send it to front-end
         updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
 
-        return new BooleanWrapper(change);
+        return change;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public synchronized BooleanWrapper kill(JobId jobId) {
+    public synchronized boolean killJob(JobId jobId) {
         if (status == SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         if (status == SchedulerStatus.KILLED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         logger_dev.info("Request sent to kill job '" + jobId + "'");
@@ -1638,18 +1647,18 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         InternalJob job = jobs.get(jobId);
 
         if (job == null || job.getStatus() == JobStatus.KILLED) {
-            return new BooleanWrapper(false);
+            return false;
         }
 
         endJob(job, null, "", JobStatus.KILLED);
 
-        return new BooleanWrapper(true);
+        return true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
+     * {@inheritDoc}
      */
-    public void changePriority(JobId jobId, JobPriority priority) {
+    public void changeJobPriority(JobId jobId, JobPriority priority) {
         logger_dev
                 .info("Request sent to change priority on job '" + jobId + "' - new priority : " + priority);
         InternalJob job = jobs.get(jobId);
@@ -1660,45 +1669,39 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobState(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    @ImmediateService
-    public JobState getJobState(JobId jobId) throws SchedulerException {
+    public JobState getJobState(JobId jobId) {
         logger_dev.info("Request sent to get the State of job '" + jobId + "'");
         return jobs.get(jobId);
     }
 
     /**
-     * Change the policy of the scheduler.<br>
-     * This method will immediately change the policy and so the whole scheduling process.
-     *
-     * @param newPolicyFile the new policy file as a string.
-     * @return true if the policy has been correctly change, false if not.
-     * @throws SchedulerException (can be due to insufficient permission)
+     * {@inheritDoc}
      */
-    public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
+    public boolean changePolicy(Class<? extends Policy> newPolicyFile) {
         try {
             policy = newPolicyFile.newInstance();
             frontend.schedulerStateUpdated(SchedulerEvent.POLICY_CHANGED);
-            logger_dev.info("New policy changed ! new policy name : " + newPolicyFile.getName());
+            logger_dev.info("Policy changed ! new policy name : " + newPolicyFile.getName());
         } catch (InstantiationException e) {
             logger_dev.error("", e);
-            throw new SchedulerException("Exception occurs while instanciating the policy !");
+            throw new InternalException("Exception occurs while instanciating the policy !");
         } catch (IllegalAccessException e) {
             logger_dev.error("", e);
-            throw new SchedulerException("Exception occurs while accessing the policy !");
+            throw new InternalException("Exception occurs while accessing the policy !");
         }
 
-        return new BooleanWrapper(true);
+        return true;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#linkResourceManager(java.lang.String)
+     * {@inheritDoc}
      */
-    public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
+    public boolean linkResourceManager(String rmURL) {
         //only if unlink
         if (status != SchedulerStatus.UNLINKED) {
-            return new BooleanWrapper(false);
+            return false;
         }
         try {
             ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL.trim()));
@@ -1710,9 +1713,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
             //restart the scheduler
             status = SchedulerStatus.STARTED;
             frontend.schedulerStateUpdated(SchedulerEvent.STARTED);
-            return new BooleanWrapper(true);
+            return true;
         } catch (Exception e) {
-            throw new SchedulerException("Error while connecting the new Resource Manager !", e);
+            throw new InternalException("Error while connecting the new Resource Manager !", e);
         }
     }
 
@@ -1792,7 +1795,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         try {
                             SchedulerCore.addTaskClassServer(job.getId(), job.getEnvironment()
                                     .getJobClasspathContent(), job.getEnvironment().containsJarFile());
-                        } catch (SchedulerException e) {
+                        } catch (ClassServerException e) {
                             // TODO cdelbe : exception handling ?
                             logger_dev.error("", e);
                         }
@@ -1928,7 +1931,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                     TimerTask tt = new TimerTask() {
                         @Override
                         public void run() {
-                            schedulerStub.remove(job.getId());
+                            schedulerStub.removeJob(job.getId());
                         }
                     };
                     long toWait = 0;

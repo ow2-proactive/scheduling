@@ -36,6 +36,17 @@
  */
 package org.ow2.proactive.scheduler.ext.masterworker;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+
+import javax.security.auth.login.LoginException;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -48,19 +59,27 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Resul
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-
-import javax.security.auth.login.LoginException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.KeyException;
-import java.util.*;
 
 
 public class AOSchedulerWorker extends AOWorker implements SchedulerEventListener {
@@ -146,8 +165,6 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             this.scheduler = auth.logAsUser(creds);
         } catch (LoginException e) {
             throw new ProActiveRuntimeException(e);
-        } catch (SchedulerException e1) {
-            throw new ProActiveRuntimeException(e1);
         }
 
         this.processing = new HashMap<JobId, Collection<TaskIntern<Serializable>>>();
@@ -271,8 +288,8 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             case KILLED:
             case SHUTTING_DOWN:
                 for (JobId jobId : processing.keySet()) {
-                    jobDidNotSucceed(jobId, new TaskException(new SchedulerException("Scheduler was " +
-                        eventType)));
+                    jobDidNotSucceed(jobId, new TaskException(new InternalSchedulerException(
+                        "Scheduler was " + eventType)));
                 }
                 break;
         }
@@ -291,8 +308,8 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                         return;
                     }
 
-                    jobDidNotSucceed(info.getJobId(), new TaskException(new SchedulerException("Job id=" +
-                        info.getJobId() + " was killed")));
+                    jobDidNotSucceed(info.getJobId(), new TaskException(new InternalSchedulerException(
+                        "Job id=" + info.getJobId() + " was killed")));
                 } else {
 
                     if (debug) {
@@ -338,7 +355,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                         TaskResult result = allTaskResults.get("MasterWorker" + task.getId());
 
                         if (result == null) {
-                            intres.setException(new SchedulerException("Task id=" + task.getId() +
+                            intres.setException(new InternalSchedulerException("Task id=" + task.getId() +
                                 " was not returned by the scheduler"));
                             if (debug) {
                                 logger.debug("Task result not found in job result: " +

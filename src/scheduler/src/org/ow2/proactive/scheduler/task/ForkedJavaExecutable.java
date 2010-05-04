@@ -65,6 +65,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -200,7 +201,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
             } else {
                 logger_dev.debug("Task has been killed");
                 FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
-                throw new SchedulerException("Walltime exceeded");
+                throw new InternalSchedulerException("Walltime exceeded");
             }
             return result;
         } finally {
@@ -315,13 +316,13 @@ public class ForkedJavaExecutable extends JavaExecutable {
             try {
                 process.exitValue();
                 // process terminated abnormally:
-                throw new SchedulerException("Unable to create a separate java process");
+                throw new InternalSchedulerException("Unable to create a separate java process");
             } catch (IllegalThreadStateException e) {
             }
         }
         if (numberOfTrials == RETRY_ACQUIRE) {
-            throw new SchedulerException("Unable to create a separate java process after " + RETRY_ACQUIRE +
-                " tries");
+            throw new InternalSchedulerException("Unable to create a separate java process after " +
+                RETRY_ACQUIRE + " tries");
         }
 
     }

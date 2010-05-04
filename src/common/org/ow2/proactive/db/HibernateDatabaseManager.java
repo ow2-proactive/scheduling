@@ -288,7 +288,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
         checkIsEntity(o);
         Session session = beginTransaction();
         try {
-            getDevLogger().info("Registering new Object : " + o.getClass().getName());
+            getDevLogger().debug("Registering new Object : " + o.getClass().getName());
             session.save(o);
             commitTransaction(session);
         } catch (Exception e) {

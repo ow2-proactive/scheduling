@@ -54,14 +54,14 @@ public class SchedulerException extends Exception {
      *
      * @param msg the message to attach.
      */
-    public SchedulerException(String msg) {
+    protected SchedulerException(String msg) {
         super(msg);
     }
 
     /**
      * Create a new instance of SchedulerException.
      */
-    public SchedulerException() {
+    protected SchedulerException() {
         super();
     }
 
@@ -71,7 +71,7 @@ public class SchedulerException extends Exception {
      * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public SchedulerException(String msg, Throwable cause) {
+    protected SchedulerException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
@@ -80,7 +80,7 @@ public class SchedulerException extends Exception {
      *
      * @param cause the cause of the exception.
      */
-    public SchedulerException(Throwable cause) {
+    protected SchedulerException(Throwable cause) {
         super(cause);
     }
 }

@@ -74,7 +74,7 @@ import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.db.types.BigString;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.ResultPreview;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
@@ -274,11 +274,11 @@ public class TaskResultImpl implements TaskResult {
             try {
                 thrown = this.instanciateException(this.getTaskClassLoader());
             } catch (IOException e) {
-                throw new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
-                    " : " + e.getMessage());
+                throw new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
+                    this.id + " : " + e.getMessage());
             } catch (ClassNotFoundException e) {
-                throw new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
-                    " : " + e.getMessage());
+                throw new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
+                    this.id + " : " + e.getMessage());
             }
             throw thrown;
         } else {
@@ -286,12 +286,12 @@ public class TaskResultImpl implements TaskResult {
                 return this.instanciateValue(this.getTaskClassLoader());
             } catch (IOException e) {
                 logger_dev.error("", e);
-                throw new SchedulerException("Cannot instanciate result of the task " + this.id + " : " +
-                    e.getMessage());
+                throw new InternalSchedulerException("Cannot instanciate result of the task " + this.id +
+                    " : " + e.getMessage());
             } catch (ClassNotFoundException e) {
                 logger_dev.error("", e);
-                throw new SchedulerException("Cannot instanciate result of the task " + this.id + " : " +
-                    e.getMessage());
+                throw new InternalSchedulerException("Cannot instanciate result of the task " + this.id +
+                    " : " + e.getMessage());
             }
         }
     }
@@ -304,11 +304,11 @@ public class TaskResultImpl implements TaskResult {
             try {
                 return this.instanciateException(this.getTaskClassLoader());
             } catch (IOException e) {
-                return new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
-                    " : " + e.getMessage());
+                return new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
+                    this.id + " : " + e.getMessage());
             } catch (ClassNotFoundException e) {
-                return new SchedulerException("Cannot instanciate exception thrown by the task " + this.id +
-                    " : " + e.getMessage());
+                return new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
+                    this.id + " : " + e.getMessage());
             }
         } else {
             return null;

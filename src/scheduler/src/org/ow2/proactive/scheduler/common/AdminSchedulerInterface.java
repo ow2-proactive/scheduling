@@ -47,5 +47,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@Deprecated
 public interface AdminSchedulerInterface extends UserSchedulerInterface, AdminMethodsInterface {
 }

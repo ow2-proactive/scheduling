@@ -143,8 +143,6 @@ public class SchedulerTester {
                     }
                 }
             }
-        } catch (SchedulerException e) {
-            logger.error("", e);
         } finally {
             if (bu != null) {
                 try {

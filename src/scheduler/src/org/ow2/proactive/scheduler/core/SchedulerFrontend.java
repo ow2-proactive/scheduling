@@ -56,12 +56,11 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
-import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -71,9 +70,14 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.exception.AccessRightException;
 import org.ow2.proactive.scheduler.common.exception.AuthenticationException;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.MaxJobIdReachedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UnknowJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknowTaskResultException;
+import org.ow2.proactive.scheduler.common.exception.UnsuitableActionException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -111,7 +115,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, AdminSchedulerInterface {
+public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Scheduler {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
@@ -138,7 +142,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     private Set<UniqueID> dirtyList;
 
     /** Implementation of Resource Manager */
-    private transient ResourceManagerProxy resourceManager;
+    private ResourceManagerProxy resourceManager;
 
     /** Authentication Interface */
     private SchedulerAuthentication authentication;
@@ -147,7 +151,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     private String policyFullName;
 
     /** Implementation of scheduler main structure */
-    private transient SchedulerCore scheduler;
+    private SchedulerCore scheduler;
 
     /** Direct link to the current job to submit. */
     private InternalJobWrapper currentJobToSubmit;
@@ -312,7 +316,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throws SchedulerException {
         if (identifications.containsKey(sourceBodyID)) {
             logger.warn("Active object already connected for this user :" + identification.getUsername());
-            throw new SchedulerException("This active object is already connected to the scheduler !");
+            throw new InternalSchedulerException("This active object is already connected to the scheduler !");
         }
         logger.info(identification.getUsername() + " successfully connected !");
         identifications.put(sourceBodyID, identification);
@@ -353,9 +357,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#submit(org.ow2.proactive.scheduler.common.job.Job)
+     * {@inheritDoc}
      */
-    public JobId submit(Job userJob) throws SchedulerException {
+    public JobId submit(Job userJob) throws AuthenticationException, AccessRightException,
+            UnsuitableActionException, JobCreationException {
         logger_dev.info("New job submission requested : " + userJob.getName());
 
         UniqueID id = checkAccess();
@@ -368,7 +373,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (!scheduler.isSubmitPossible()) {
             String msg = "Scheduler is stopped, cannot submit job";
             logger_dev.info(msg);
-            throw new SchedulerException(msg);
+            throw new UnsuitableActionException(msg);
         }
         //get the internal job.
         InternalJob job = InternalJobFactory.createJob(userJob);
@@ -376,7 +381,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (job.getTasks().size() == 0) {
             String msg = "This job does not contain Tasks !! Insert tasks before submitting job";
             logger_dev.info(msg);
-            throw new SchedulerException(msg);
+            throw new UnsuitableActionException(msg);
         }
 
         //verifying that the user has right to set the given priority to his job.
@@ -433,9 +438,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public JobResult getJobResult(JobId jobId) throws SchedulerException {
+    public JobResult getJobResult(JobId jobId) throws AuthenticationException, AccessRightException,
+            UnknowJobException {
         //checking permissions
         UniqueID id = checkAccess();
 
@@ -444,7 +450,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         renewUserSession(id, ident);
 
         IdentifiedJob ij = jobs.get(jobId);
-        UserIdentificationImpl owner = ij.getUserIdentification();
 
         if (ij == null) {
             String msg = "The job represented by this ID is unknow !";
@@ -470,16 +475,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobResult(java.lang.String)
+     * {@inheritDoc}
      */
-    public JobResult getJobResult(String jobId) throws SchedulerException {
+    public JobResult getJobResult(String jobId) throws AuthenticationException, AccessRightException,
+            UnknowJobException {
         return this.getJobResult(JobIdImpl.makeJobId(jobId));
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
+     * {@inheritDoc}
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException {
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws AuthenticationException,
+            UnknowJobException, UnknowTaskResultException, AccessRightException {
         //checking permissions
         UniqueID id = checkAccess();
 
@@ -508,16 +515,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getTaskResult(java.lang.String, java.lang.String)
+     * {@inheritDoc}
      */
-    public TaskResult getTaskResult(String jobId, String taskName) throws SchedulerException {
+    public TaskResult getTaskResult(String jobId, String taskName) throws AuthenticationException,
+            UnknowJobException, UnknowTaskResultException, AccessRightException {
         return this.getTaskResult(JobIdImpl.makeJobId(jobId), taskName);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#remove(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public void remove(JobId jobId) throws SchedulerException {
+    public void removeJob(JobId jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
         //checking permissions
         UniqueID id = checkAccess();
 
@@ -540,13 +549,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         }
 
         //asking the scheduler for the result
-        scheduler.remove(jobId);
+        scheduler.removeJob(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
+     * {@inheritDoc}
      */
-    public void listenLog(JobId jobId, AppenderProvider appenderProvider) throws SchedulerException {
+    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws AuthenticationException,
+            UnknowJobException, AccessRightException {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl ident = identifications.get(id);
@@ -567,21 +577,21 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
             throw new AccessRightException(msg);
         }
 
-        scheduler.listenLog(jobId, appenderProvider);
+        scheduler.listenJobLogs(jobId, appenderProvider);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#listenLog(java.lang.String, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
+     * {@inheritDoc}
      */
-    public void listenLog(String jobId, AppenderProvider appenderProvider) throws SchedulerException {
-        this.listenLog(JobIdImpl.makeJobId(jobId), appenderProvider);
+    public void listenJobLogs(String jobId, AppenderProvider appenderProvider)
+            throws AuthenticationException, UnknowJobException, AccessRightException {
+        this.listenJobLogs(JobIdImpl.makeJobId(jobId), appenderProvider);
     }
 
     /**
-     * @deprecated {@link SchedulerFrontend#getSchedulerStatus()}
+     * {@inheritDoc}
      */
-    @Deprecated
-    public SchedulerStatus getStatus() throws SchedulerException {
+    public SchedulerStatus getStatus() throws AuthenticationException, AccessRightException {
         UniqueID id = checkAccess();
 
         //renew session for this user
@@ -591,25 +601,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerStatus()
+     * {@inheritDoc}
      */
-    public SchedulerStatus getSchedulerStatus() throws SchedulerException {
-        UniqueID id = checkAccess();
-
-        //renew session for this user
-        renewUserSession(id, identifications.get(id));
-
-        return jmxHelper.getSchedulerStatus_();
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerState()
-     */
-    public SchedulerState getSchedulerState() throws SchedulerException {
+    public SchedulerState getState() throws AuthenticationException, AccessRightException {
         checkAccess();
         //get the scheduler State
         SchedulerStateImpl initState = null;
-        initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler.getSchedulerState()));
+        initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler.getState()));
         //and update the connected users list.
         initState.setUsers(connectedUsers);
         //return to the user
@@ -617,71 +615,19 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @deprecated {@link SchedulerFrontend#addEventListener(SchedulerEventListener, boolean, SchedulerEvent...)}
-     */
-    @Deprecated
-    public SchedulerState addSchedulerEventListener(SchedulerEventListener sel, boolean myEventsOnly,
-            SchedulerEvent... events) throws SchedulerException {
-
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl uIdent = identifications.get(id);
-
-        // check if listener is not null
-        if (sel == null) {
-            String msg = "Scheduler listener must not be null !";
-            logger_dev.info(msg);
-            throw new SchedulerException(msg);
-        }
-        // check if the listener is a reified remote object
-        if (!MOP.isReifiedObject(sel)) {
-            String msg = "Scheduler listener must be a remote object !";
-            logger_dev.info(msg);
-            throw new SchedulerException(msg);
-        }
-
-        uIdent.setUserEvents(events);
-        //set if the user wants to get its events only or every events
-        uIdent.setMyEventsOnly(myEventsOnly);
-        //add the listener to the list of listener for this user.
-        schedulerListeners.put(id, new ClientRequestHandler(this, id, sel));
-        //cancel timer for this user : session is now managed by events
-        uIdent.getSession().cancel();
-        //get the scheduler State
-        SchedulerStateImpl initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler
-                .getSchedulerState()));
-        //and update the connected users list.
-        initState.setUsers(connectedUsers);
-        //return to the user
-        return initState;
-    }
-
-    /**
-     * @deprecated {@link SchedulerFrontend#removeEventListener()}
-     */
-    @Deprecated
-    public void removeSchedulerEventListener() throws SchedulerException {
-        //Remove the listener on that user designated by its given UniqueID,
-        //then renew its user session as it is no more managed by the listener.
-        UniqueID id = checkAccess();
-        schedulerListeners.remove(id);
-        //recreate the session for this user which is no more managed by listener
-        renewUserSession(id, identifications.get(id));
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     * {@inheritDoc}
      */
     public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
-            throws SchedulerException {
+            throws AuthenticationException, AccessRightException, UnsuitableActionException {
         addEventListener(sel, myEventsOnly, false, events);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     * {@inheritDoc}
      */
     public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
-            boolean getInitialState, SchedulerEvent... events) throws SchedulerException {
+            boolean getCurrentState, SchedulerEvent... events) throws AuthenticationException,
+            AccessRightException, UnsuitableActionException {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl uIdent = identifications.get(id);
@@ -689,13 +635,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (sel == null) {
             String msg = "Scheduler listener must not be null !";
             logger_dev.info(msg);
-            throw new SchedulerException(msg);
+            throw new UnsuitableActionException(msg);
         }
         // check if the listener is a reified remote object
         if (!MOP.isReifiedObject(sel)) {
             String msg = "Scheduler listener must be a remote object !";
             logger_dev.info(msg);
-            throw new SchedulerException(msg);
+            throw new UnsuitableActionException(msg);
         }
 
         uIdent.setUserEvents(events);
@@ -706,18 +652,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         //cancel timer for this user : session is now managed by events
         uIdent.getSession().cancel();
         //get the scheduler State
-        SchedulerState initState = null;
-        if (getInitialState) {
-            initState = getSchedulerState();
+        SchedulerState currentState = null;
+        if (getCurrentState) {
+            currentState = getState();
         }
         //return to the user
-        return initState;
+        return currentState;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeEventListener()
+     * {@inheritDoc}
      */
-    public void removeEventListener() throws SchedulerException {
+    public void removeEventListener() throws AuthenticationException, AccessRightException {
         //Remove the listener on that user designated by its given UniqueID,
         //then renew its user session as it is no more managed by the listener.
         UniqueID id = checkAccess();
@@ -754,7 +700,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @throws AuthenticationException if the caller is not authenticated.
      * @throws AccessRightException if the user has not the permission to access this method.
      */
-    private void ssprsc(String methodName, String permissionMsg) throws SchedulerException {
+    private void ssprsc(String methodName, String permissionMsg) throws AuthenticationException,
+            AccessRightException {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl ident = identifications.get(id);
@@ -773,65 +720,65 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#start()
+     * {@inheritDoc}
      */
-    public BooleanWrapper start() throws SchedulerException {
+    public boolean start() throws AuthenticationException, AccessRightException {
         ssprsc("start", "You do not have permission to start the scheduler !");
         return scheduler.start();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#stop()
+     * {@inheritDoc}
      */
-    public BooleanWrapper stop() throws SchedulerException {
+    public boolean stop() throws AuthenticationException, AccessRightException {
         ssprsc("stop", "You do not have permission to stop the scheduler !");
         return scheduler.stop();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#pause()
+     * {@inheritDoc}
      */
-    public BooleanWrapper pause() throws SchedulerException {
+    public boolean pause() throws AuthenticationException, AccessRightException {
         ssprsc("pause", "You do not have permission to pause the scheduler !");
         return scheduler.pause();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#freeze()
+     * {@inheritDoc}
      */
-    public BooleanWrapper freeze() throws SchedulerException {
+    public boolean freeze() throws AuthenticationException, AccessRightException {
         ssprsc("freeze", "You do not have permission to pause the scheduler !");
         return scheduler.freeze();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#resume()
+     * {@inheritDoc}
      */
-    public BooleanWrapper resume() throws SchedulerException {
+    public boolean resume() throws AuthenticationException, AccessRightException {
         ssprsc("resume", "You do not have permission to resume the scheduler !");
         return scheduler.resume();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#shutdown()
+     * {@inheritDoc}
      */
-    public BooleanWrapper shutdown() throws SchedulerException {
+    public boolean shutdown() throws AuthenticationException, AccessRightException {
         ssprsc("shutdown", "You do not have permission to shutdown the scheduler !");
         return scheduler.shutdown();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#kill()
+     * {@inheritDoc}
      */
-    public BooleanWrapper kill() throws SchedulerException {
+    public boolean kill() throws AuthenticationException, AccessRightException {
         ssprsc("kill", "You do not have permission to kill the scheduler !");
         return scheduler.kill();
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#disconnect()
+     * {@inheritDoc}
      */
-    public void disconnect() throws SchedulerException {
+    public void disconnect() throws AuthenticationException, AccessRightException {
         UniqueID id = checkAccess();
         disconnect(id);
     }
@@ -860,11 +807,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#isConnected()
+     * {@inheritDoc}
      */
-    public BooleanWrapper isConnected() {
+    public boolean isConnected() throws AuthenticationException, AccessRightException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        return new BooleanWrapper(identifications.containsKey(id));
+        return identifications.containsKey(id);
     }
 
     /**
@@ -876,7 +823,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
      * @throws UnknowJobException if the job does not exist.
      * @throws AccessRightException if user can't access to this particular job.
      */
-    private void prkcp(JobId jobId, String permissionMsg) throws SchedulerException {
+    private void prkcp(JobId jobId, String permissionMsg) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
@@ -903,36 +851,40 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#pause(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public BooleanWrapper pause(JobId jobId) throws SchedulerException {
+    public boolean pauseJob(JobId jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
         prkcp(jobId, "You do not have permission to pause this job !");
 
-        return scheduler.pause(jobId);
+        return scheduler.pauseJob(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public BooleanWrapper resume(JobId jobId) throws SchedulerException {
+    public boolean resumeJob(JobId jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
         prkcp(jobId, "You do not have permission to resume this job !");
 
-        return scheduler.resume(jobId);
+        return scheduler.resumeJob(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public BooleanWrapper kill(JobId jobId) throws SchedulerException {
+    public boolean killJob(JobId jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
         prkcp(jobId, "You do not have permission to kill this job !");
 
-        return scheduler.kill(jobId);
+        return scheduler.killJob(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
+     * {@inheritDoc}
      */
-    public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
+    public void changeJobPriority(JobId jobId, JobPriority priority) throws AuthenticationException,
+            UnknowJobException, AccessRightException, JobAlreadyFinishedException {
         prkcp(jobId, "You do not have permission to change the priority of this job !");
 
         UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
@@ -949,66 +901,74 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
         if (jobs.get(jobId).isFinished()) {
             String msg = "Job '" + jobId + "' is already finished";
             logger_dev.info(msg);
-            throw new SchedulerException(msg);
+            throw new JobAlreadyFinishedException(msg);
         }
 
-        scheduler.changePriority(jobId, priority);
+        scheduler.changeJobPriority(jobId, priority);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobState(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public JobState getJobState(JobId jobId) throws SchedulerException {
+    public JobState getJobState(JobId jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
         prkcp(jobId, "You do not have permission to get the state of this job !");
         return scheduler.getJobState(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#kill(java.lang.String)
+     * {@inheritDoc}
      */
-    public BooleanWrapper kill(String jobId) throws SchedulerException {
-        return this.kill(JobIdImpl.makeJobId(jobId));
+    public boolean killJob(String jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
+        return this.killJob(JobIdImpl.makeJobId(jobId));
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#pause(java.lang.String)
+     * {@inheritDoc}
      */
-    public BooleanWrapper pause(String jobId) throws SchedulerException {
-        return this.pause(JobIdImpl.makeJobId(jobId));
+    public boolean pauseJob(String jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
+        return this.pauseJob(JobIdImpl.makeJobId(jobId));
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#remove(java.lang.String)
+     * {@inheritDoc}
      */
-    public void remove(String jobId) throws SchedulerException {
-        this.remove(JobIdImpl.makeJobId(jobId));
+    public void removeJob(String jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
+        this.removeJob(JobIdImpl.makeJobId(jobId));
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#resume(java.lang.String)
+     * {@inheritDoc}
      */
-    public BooleanWrapper resume(String jobId) throws SchedulerException {
-        return this.resume(JobIdImpl.makeJobId(jobId));
+    public boolean resumeJob(String jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
+        return this.resumeJob(JobIdImpl.makeJobId(jobId));
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#changePriority(java.lang.String, org.ow2.proactive.scheduler.common.job.JobPriority)
+     * {@inheritDoc}
      */
-    public void changePriority(String jobId, JobPriority priority) throws SchedulerException {
-        this.changePriority(JobIdImpl.makeJobId(jobId), priority);
+    public void changeJobPriority(String jobId, JobPriority priority) throws AuthenticationException,
+            UnknowJobException, AccessRightException, JobAlreadyFinishedException {
+        this.changeJobPriority(JobIdImpl.makeJobId(jobId), priority);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobState(java.lang.String)
+     * {@inheritDoc}
      */
-    public JobState getJobState(String jobId) throws SchedulerException {
+    public JobState getJobState(String jobId) throws AuthenticationException, UnknowJobException,
+            AccessRightException {
         return this.getJobState(JobIdImpl.makeJobId(jobId));
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#changePolicy(java.lang.Class)
+     * {@inheritDoc}
      */
-    public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
+    public boolean changePolicy(Class<? extends Policy> newPolicyFile) throws AuthenticationException,
+            AccessRightException {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl ident = identifications.get(id);
@@ -1027,9 +987,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#linkResourceManager(java.lang.String)
+     * {@inheritDoc}
      */
-    public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
+    public boolean linkResourceManager(String rmURL) throws AuthenticationException, AccessRightException {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl ident = identifications.get(id);
@@ -1250,7 +1210,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     //--------------------------------------------------------------------------------------------
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#schedulerStateUpdated(org.ow2.proactive.scheduler.common.SchedulerEvent)
+     * {@inheritDoc}
      */
     public void schedulerStateUpdated(SchedulerEvent eventType) {
         switch (eventType) {
@@ -1275,7 +1235,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobSubmitted(org.ow2.proactive.scheduler.common.job.JobState)
+     * {@inheritDoc}
      */
     public void jobSubmitted(JobState job) {
         dispatchJobSubmitted(job);
@@ -1283,7 +1243,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#jobStateUpdated(java.lang.String, org.ow2.proactive.scheduler.common.NotificationData)
+     * {@inheritDoc}
      */
     public void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
@@ -1313,7 +1273,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#taskStateUpdated(java.lang.String, org.ow2.proactive.scheduler.common.NotificationData)
+     * {@inheritDoc}
      */
     public void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         switch (notification.getEventType()) {
@@ -1330,7 +1290,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Admi
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.core.SchedulerStateUpdate#usersUpdated(org.ow2.proactive.scheduler.common.NotificationData)
+     * {@inheritDoc}
      */
     public void usersUpdated(NotificationData<UserIdentification> notification) {
         switch (notification.getEventType()) {

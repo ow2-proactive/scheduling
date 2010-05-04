@@ -54,8 +54,10 @@ import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.backwardcompatibility.SchedulerAdminAdapter;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
@@ -85,6 +87,9 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
     /** The scheduler front-end connected to this authentication interface */
     private SchedulerFrontend frontend;
 
+    /** TODO Adapter for backward compatibility : to be removed in 3.X.X */
+    private AdminSchedulerInterface useradminAdapter;
+
     /**
      * ProActive empty constructor.
      */
@@ -104,6 +109,8 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
                 PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH
                         .getValueAsString()));
         this.frontend = frontend;
+        //TODO to be removed in 3.X.X
+        this.useradminAdapter = new SchedulerAdminAdapter(frontend);
     }
 
     /**
@@ -185,7 +192,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         }
 
         // return the created interface
-        return this.frontend;
+        return this.useradminAdapter;
     }
 
     /**
@@ -201,6 +208,30 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
         if (!userOrAdmin) {
             throw new LoginException("User does not belong to \"admins\" group");
         }
+
+        UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
+        String user = unPrincipal.getName();
+
+        logger_dev.info("user : " + user);
+        // add this user to the scheduler front-end
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
+        ident.setHostName(getSenderHostName());
+        try {
+            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
+        } catch (SchedulerException e) {
+            logger_dev.error("", e);
+            throw new LoginException(e.getMessage());
+        }
+
+        // return the created interface
+        return this.useradminAdapter;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Scheduler login(Credentials cred) throws LoginException {
+        Subject subject = authenticate(cred);
 
         UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
         String user = unPrincipal.getName();

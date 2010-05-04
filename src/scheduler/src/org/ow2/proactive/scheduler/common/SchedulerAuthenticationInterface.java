@@ -106,6 +106,7 @@ public interface SchedulerAuthenticationInterface extends Authentication {
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
+    @Deprecated
     public UserSchedulerInterface logAsUser(Credentials cred) throws LoginException;
 
     /**
@@ -125,5 +126,21 @@ public interface SchedulerAuthenticationInterface extends Authentication {
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
+    @Deprecated
     public AdminSchedulerInterface logAsAdmin(Credentials cred) throws LoginException;
+
+    /**
+     * Try to login a client to the scheduler sending login and password in an encrypted state.<br>
+     * If the login or/and password do not match an allowed one, it will throw an LoginException.<br>
+     * If the authentication succeed, it will return a new scheduler API.<br>
+     * This authentication just requires the client to be known by the System.<br>
+     * Note that you can use the provided
+     * {@link SchedulerAuthenticationGUIHelper} class to display a graphical
+     * interface that will ask the URL, login and password.
+     *
+     * @param cred Object encapsulating encrypted credentials, and information on how to decrypt them
+     * @return The {@link Scheduler} interface if this client is allowed to access the scheduler.
+     * @throws LoginException thrown if this user/password does not match any entries.
+     */
+    public Scheduler login(Credentials cred) throws LoginException;
 }

@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.Connection;
+import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
@@ -93,15 +94,12 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      *
      * @param url the URL of the scheduler to join.
      * @return the scheduler authentication at the specified URL.
-     * @throws SchedulerException
-     *             thrown if the connection to the scheduler cannot be
-     *             established.
      */
-    public static SchedulerAuthenticationInterface join(String url) throws SchedulerException {
+    public static SchedulerAuthenticationInterface join(String url) {
         try {
             return getInstance().connect(normalizeScheduler(url));
         } catch (Exception e) {
-            throw new SchedulerException(e.getMessage());
+            throw new InternalException(e.getMessage());
         }
     }
 
@@ -126,12 +124,11 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      *
      * @return the interface to be authenticate by the Scheduler
      */
-    public static SchedulerAuthenticationInterface waitAndJoin(String url, long timeout)
-            throws SchedulerException {
+    public static SchedulerAuthenticationInterface waitAndJoin(String url, long timeout) {
         try {
             return getInstance().waitAndConnect(normalizeScheduler(url), timeout);
         } catch (Exception e) {
-            throw new SchedulerException(e);
+            throw new InternalException(e);
         }
     }
 

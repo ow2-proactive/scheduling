@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -40,38 +40,46 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Exceptions Generated if a problem occurred while creating a job.
+ * Exception generated when trying to get or set information on a finished job that must be done on a running one.<br>
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * @since ProActive Scheduling 2.0
  */
 @PublicAPI
-public class JobCreationException extends SchedulerException {
+public class JobAlreadyFinishedException extends SchedulerException {
 
     /**
-     * Create a new instance of JobCreationException with the given message and cause
+     * Create a new instance of JobAlreadyFinishedException
      *
      * @param msg the message to attach.
-     * @param cause the cause of the exception.
      */
-    public JobCreationException(String msg, Exception cause) {
-        super(msg, cause);
-    }
-
-    /**
-     * Create a new instance of JobCreationException with the given message.
-     * @param msg message to attach.
-     */
-    public JobCreationException(String msg) {
+    public JobAlreadyFinishedException(String msg) {
         super(msg);
     }
 
     /**
-     * Create a new instance of JobCreationException with the given cause
+     * Create a new instance of JobAlreadyFinishedException
+     */
+    public JobAlreadyFinishedException() {
+    }
+
+    /**
+     * Create a new instance of JobAlreadyFinishedException
+     *
+     * @param msg the message to attach.
+     * @param cause the cause of the exception.
+     */
+    public JobAlreadyFinishedException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    /**
+     * Create a new instance of JobAlreadyFinishedException
      *
      * @param cause the cause of the exception.
      */
-    public JobCreationException(Exception cause) {
+    public JobAlreadyFinishedException(Throwable cause) {
         super(cause);
     }
+
 }

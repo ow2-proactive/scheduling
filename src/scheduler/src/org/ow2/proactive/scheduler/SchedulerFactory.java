@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
@@ -99,7 +100,7 @@ public class SchedulerFactory {
      * @throws ActiveObjectCreationException If Scheduler cannot be created
      */
     public static SchedulerAuthenticationInterface startLocal(String rmURL, SchedulerInitializer initializer)
-            throws Exception {
+            throws InternalSchedulerException {
         if (imp == null) {
             if (!allowNullInit) {
                 if (initializer != null) {
@@ -112,13 +113,17 @@ public class SchedulerFactory {
             if (rmURL == null || rmURL.length() == 0) {
                 throw new IllegalArgumentException("RM url is null or empty !");
             }
-            ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL));
-            String policy = initializer.getPolicyFullClassName();
-            //start scheduler
-            createScheduler(imp, policy);
-            return SchedulerConnection.waitAndJoin(null);
+            try {
+                ResourceManagerProxy imp = ResourceManagerProxy.getProxy(new URI(rmURL));
+                String policy = initializer.getPolicyFullClassName();
+                //start scheduler
+                createScheduler(imp, policy);
+                return SchedulerConnection.waitAndJoin(null);
+            } catch (Exception e) {
+                throw new InternalSchedulerException(e);
+            }
         } else {
-            throw new SchedulerException("Scheduler already localy running");
+            throw new InternalSchedulerException("Scheduler already localy running");
         }
     }
 
