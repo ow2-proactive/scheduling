@@ -299,7 +299,7 @@ public class ResourceManagerController {
     }
 
     protected void connectJMXClient() {
-        final String name = "RMFrontend:name=RMBean";
+        final String name = "ProActiveResourceManager:name=RuntimeData";
         final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
         this.model.setJMXInfo(viewer);
     }

@@ -192,6 +192,7 @@ public final class JMXClientHelper {
             final String url = auth.getJMXConnectorURL(JMXTransportProtocol.RMI);
             jmxRmiServiceURL = new JMXServiceURL(url);
         } catch (Exception e) {
+            e.printStackTrace();
             // At this point the JMX-RMI infrastructure was not started, try JMX over RO
             return tryJMXoverRO(auth, env);
         }
@@ -199,6 +200,7 @@ public final class JMXClientHelper {
         try {
             return JMXConnectorFactory.connect(jmxRmiServiceURL, env);
         } catch (IOException e) {
+            e.printStackTrace();
             // At this point there was a communication problem, try to connect over RO
             return tryJMXoverRO(auth, env);
         }

@@ -565,7 +565,7 @@ public class Controller {
     }
 
     protected void connectJMXClient() {
-        final String name = "SchedulerFrontend:name=SchedulerWrapperMBean";
+        final String name = "ProActiveScheduler:name=RuntimeData";
         final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
         this.model.setJMXInfo(viewer);
     }

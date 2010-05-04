@@ -62,7 +62,7 @@ public abstract class AbstractAccountsManager<E extends Account> {
     /** A variable to know if the accounts are being refreshed from the database */
     private volatile boolean isAlive;
     /** Refresh delay changeable by the user */
-    private volatile int refreshDelayInSeconds;
+    private volatile int refreshRateInSeconds;
     /** Last refresh duration */
     private volatile long lastRefreshDurationInMilliseconds;
     /** The single thread executor */
@@ -75,7 +75,7 @@ public abstract class AbstractAccountsManager<E extends Account> {
     protected AbstractAccountsManager(final Map<String, E> accountsMap, final String refreshThreadName,
             final Logger logger) {
         this.accountsMap = accountsMap;
-        this.refreshDelayInSeconds = this.getDefaultRefreshRateInSeconds();
+        this.refreshRateInSeconds = this.getDefaultRefreshRateInSeconds();
         // Create the single thread executor that creates min priority daemon
         // thread
         this.executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
@@ -161,14 +161,14 @@ public abstract class AbstractAccountsManager<E extends Account> {
     }
 
     private void internalSchedule(final boolean immediate) {
-        long delay = this.refreshDelayInSeconds;
+        long refreshRate = this.refreshRateInSeconds;
         if (immediate) {
             if (this.refreshFuture != null) {
                 this.refreshFuture.cancel(true);
             }
-            delay = 0;
+            refreshRate = 0;
         }
-        this.refreshFuture = this.executor.schedule(this.accountsRefresher, delay, TimeUnit.SECONDS);
+        this.refreshFuture = this.executor.schedule(this.accountsRefresher, refreshRate, TimeUnit.SECONDS);
     }
 
     /**
@@ -195,27 +195,27 @@ public abstract class AbstractAccountsManager<E extends Account> {
     }
 
     /**
-     * Sets the refresh delay of the accounts refresher.
+     * Sets the refresh rate of the accounts refresher.
      *
-     * @param refreshDelayInSeconds the refresh delay
+     * @param refreshRateInSeconds the refresh rate
      */
-    public void setRefreshRateInSeconds(final int refreshDelayInSeconds) {
-        this.refreshDelayInSeconds = refreshDelayInSeconds;
+    public void setRefreshRateInSeconds(final int refreshRateInSeconds) {
+        this.refreshRateInSeconds = refreshRateInSeconds;
     }
 
     /**
-     * Returns the refresh delay of the accounts refresher.
+     * Returns the refresh rate of the accounts refresher.
      *
-     * @return the current value of the refresh delay in seconds
+     * @return the current value of the refresh rate in seconds
      */
-    public int getRefreshDelayInSeconds() {
-        return this.refreshDelayInSeconds;
+    public int getRefreshRateInSeconds() {
+        return this.refreshRateInSeconds;
     }
 
     /**
      * Returns the default value of the accounts refresher.
      *
-     * @return the default value of the refresh delay in seconds
+     * @return the default value of the refresh rate in seconds
      */
     public abstract int getDefaultRefreshRateInSeconds();
 

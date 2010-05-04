@@ -83,6 +83,7 @@ public final class RMJMXHelper extends AbstractJMXHelper {
     public RMJMXHelper(final RMAccountsManager accountsManager) {
         super(RMJMXHelper.LOGGER);
         this.accountsManager = accountsManager;
+        RMJMXHelper.instance = this;
     }
 
     /**

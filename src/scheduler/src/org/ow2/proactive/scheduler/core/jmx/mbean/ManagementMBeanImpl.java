@@ -59,11 +59,11 @@ public final class ManagementMBeanImpl extends StandardMBean implements Manageme
     }
 
     public int getAccountingRefreshRateInSeconds() {
-        return this.accountsManager.getRefreshDelayInSeconds();
+        return this.accountsManager.getRefreshRateInSeconds();
     }
 
-    public void setAccountingRefreshRateInSeconds(int refreshDelayInSeconds) {
-        this.accountsManager.setRefreshRateInSeconds(refreshDelayInSeconds);
+    public void setAccountingRefreshRateInSeconds(int refreshRateInSeconds) {
+        this.accountsManager.setRefreshRateInSeconds(refreshRateInSeconds);
     }
 
     public void setDefaultAccountingRefreshRateInSeconds() {
