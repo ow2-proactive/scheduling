@@ -42,7 +42,7 @@ import java.net.InetAddress;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -69,7 +69,8 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
                 .join(SchedulerTHelper.schedulerDefaultURL);
         Credentials creds = Credentials.createCredentials(SchedulerTHelper.username,
                 SchedulerTHelper.password, auth.getPublicKey());
-        return new Object[] { SchedulerTHelper.schedulerDefaultURL, creds.getBase64(), "false", "2000",// policy period
+        return new Object[] { "USER", "ALL", SchedulerTHelper.schedulerDefaultURL, creds.getBase64(),
+                "false", "2000",// policy period
                 "0", // min modes
                 "1", // max modes
                 "1", // nodes per task
@@ -88,7 +89,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
 
         byte[] hosts = InetAddress.getLocalHost().getHostName().getBytes();
         // creating node source
-        RMTHelper.getAdminInterface().createNodesource(sourceName,
+        RMTHelper.getResourceManager().createNodeSource(sourceName,
                 GCMCustomisedInfrastructure.class.getName(), new Object[] { GCMDeploymentData, hosts },
                 SchedulerLoadingPolicy.class.getName(), getPolicyParams());
 
@@ -101,14 +102,14 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
 
         init();
 
-        RMAdmin admin = RMTHelper.getAdminInterface();
+        ResourceManager resourceManager = RMTHelper.getResourceManager();
 
         String source1 = "Node source 1";
 
         SchedulerTHelper.log("Test 1");
         createDefaultNodeSource(source1);
-        assertTrue(admin.getTotalNodesNumber().intValue() == 0);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 0);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         JobId jobId = SchedulerTHelper.testJobSubmission(jobDescriptor);
 
@@ -123,9 +124,9 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         SchedulerTHelper.log("Test 2");
         try {
             // incorrect infrastructure for the policy
-            admin.createNodesource(source1, GCMInfrastructure.class.getName(),
+            resourceManager.createNodeSource(source1, GCMInfrastructure.class.getName(),
                     new Object[] { GCMDeploymentData }, SchedulerLoadingPolicy.class.getName(),
-                    getPolicyParams());
+                    getPolicyParams()).booleanValue();
             assertTrue(false);
         } catch (Exception e) {
         }

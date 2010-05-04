@@ -146,8 +146,8 @@ public class AddNodeByURLDialog extends Dialog {
                     MessageDialog.openError(shell, "Error", "You didn't enter an url");
                 else {
                     try {
-                        BooleanWrapper result = RMStore.getInstance().getRMAdmin().addNode(urlText.getText(),
-                                sourceNameCombo.getText());
+                        BooleanWrapper result = RMStore.getInstance().getResourceManager().addNode(
+                                urlText.getText(), sourceNameCombo.getText());
                         if (result.booleanValue()) {
                             shell.close();
                         }

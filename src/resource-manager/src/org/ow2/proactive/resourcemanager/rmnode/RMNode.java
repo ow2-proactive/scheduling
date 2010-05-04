@@ -130,7 +130,7 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      * @return the {@link NodeSource} name of the source that handle the node
      */
-    public String getNodeSourceId();
+    public String getNodeSourceName();
 
     /**
      * @return the URL of the node.
@@ -150,7 +150,7 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      * @return true if the node has to be released, false otherwise.
      */
-    public boolean isToRelease();
+    public boolean isToRemove();
 
     /**
      * @return true if the node is busy, false otherwise.
@@ -174,7 +174,7 @@ public interface RMNode extends Comparable<RMNode> {
      *  * change the node's status to 'to release'.
      * @throws NodeException if the node is down
      */
-    public void setToRelease() throws NodeException;
+    public void setToRemove() throws NodeException;
 
     /**
      * change the node's status to down.

@@ -49,6 +49,7 @@ import java.util.Random;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -283,7 +284,7 @@ public class PBSInfrastructure extends AbstractSSHInfrastructure {
     }
 
     @Override
-    public void configure(Object... parameters) throws RMException {
+    public BooleanWrapper configure(Object... parameters) {
         super.configure(parameters);
 
         if (parameters != null && parameters.length >= 10) {
@@ -295,17 +296,19 @@ public class PBSInfrastructure extends AbstractSSHInfrastructure {
             this.PBSServer = parameters[6].toString();
             this.RMUrl = parameters[7].toString();
             if (parameters[8] == null) {
-                throw new RMException("Credentials must be specified");
+                throw new IllegalArgumentException("Credentials must be specified");
             }
             try {
                 this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[8]);
             } catch (KeyException e) {
-                throw new RMException("Could not retrieve base64 credentials", e);
+                throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
             this.qsubOptions = parameters[9].toString().replaceAll("\"", "\\\"");
         } else {
-            throw new RMException("Invalid parameters for IM creation");
+            throw new IllegalArgumentException("Invalid parameters for IM creation");
         }
+
+        return new BooleanWrapper(true);
     }
 
     @Override

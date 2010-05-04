@@ -37,8 +37,10 @@
 package org.ow2.proactive.scheduler.authentication;
 
 import java.security.KeyException;
+import java.util.Set;
 
 import javax.management.JMException;
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -48,6 +50,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -154,13 +158,24 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public UserSchedulerInterface logAsUser(Credentials cred) throws LoginException {
 
-        String user = loginAs("user", new String[] { "user", "admin" }, cred);
+        Subject subject = authenticate(cred);
+
+        Set<GroupNamePrincipal> groupPrincipals = subject.getPrincipals(GroupNamePrincipal.class);
+        boolean userOrAdmin = groupPrincipals.contains(new GroupNamePrincipal("user")) ||
+            groupPrincipals.contains(new GroupNamePrincipal("admin"));
+        if (!userOrAdmin) {
+            throw new LoginException("User does not belong to either \"users\" or \"admins\" group");
+        }
+
+        UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
+        String user = unPrincipal.getName();
 
         logger_dev.info("user : " + user);
         // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user);
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
         ident.setHostName(getSenderHostName());
         try {
             this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
@@ -176,13 +191,23 @@ public class SchedulerAuthentication extends AuthenticationImpl implements InitA
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public AdminSchedulerInterface logAsAdmin(Credentials cred) throws LoginException {
 
-        String user = loginAs("admin", new String[] { "admin" }, cred);
+        Subject subject = authenticate(cred);
+
+        Set<GroupNamePrincipal> groupPrincipals = subject.getPrincipals(GroupNamePrincipal.class);
+        boolean userOrAdmin = groupPrincipals.contains(new GroupNamePrincipal("admin"));
+        if (!userOrAdmin) {
+            throw new LoginException("User does not belong to \"admins\" group");
+        }
+
+        UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
+        String user = unPrincipal.getName();
 
         logger_dev.info("user : " + user);
         // add this user to the scheduler front-end
-        UserIdentificationImpl ident = new UserIdentificationImpl(user, true);
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
         ident.setHostName(getSenderHostName());
         try {
             this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);

@@ -44,7 +44,6 @@ public class SelectResourceManagerDialogResult {
     private String url = null;
     private String login = null;
     private String password = null;
-    private Boolean logAsAdmin = false;
     private Boolean canceled = false;
 
     public SelectResourceManagerDialogResult(Boolean isCanceled, String url, String login, String password,
@@ -54,7 +53,6 @@ public class SelectResourceManagerDialogResult {
             this.url = url;
             this.login = login;
             this.password = password;
-            this.logAsAdmin = logAsAdmin;
         }
     }
 
@@ -68,10 +66,6 @@ public class SelectResourceManagerDialogResult {
 
     public String getPassword() {
         return password;
-    }
-
-    public Boolean isLogAsAdmin() {
-        return logAsAdmin;
     }
 
     public Boolean isCanceled() {

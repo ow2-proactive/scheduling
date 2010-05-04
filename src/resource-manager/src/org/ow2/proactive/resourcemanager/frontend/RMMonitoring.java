@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.frontend;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -60,6 +61,7 @@ public interface RMMonitoring {
      *
      * @return true if the RM is still alive
      */
+    @Deprecated
     public boolean isAlive();
 
     /** Register a new Resource manager listener.
@@ -76,4 +78,15 @@ public interface RMMonitoring {
      * Removes a listener from RMMonitoring. Only listener itself must call this method
      */
     public void removeRMEventListener() throws RMException;
+
+    /**
+     * Gets the current snapshot of the resource manager state providing
+     * detailed nodes and node source information.
+     *
+     * To obtain summary of the resource manager state use {@link ResourceManager}.getState()
+     *
+     * @return the current state of the resource manager
+     */
+    public RMInitialState getState();
+
 }

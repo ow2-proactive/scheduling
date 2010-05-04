@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.data.model.Node;
 
@@ -119,17 +118,24 @@ public class RemoveNodeDialog extends Dialog {
         okButton.setText("OK");
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
-                try {
-                    boolean removeDownNodes = downCheck.getSelection();
-                    boolean preemptive = !preemptCheck.getSelection();
-                    for (Node node : nodes) {
-                        if (removeDownNodes && node.getState() != NodeState.DOWN) {
-                            continue;
-                        }
-                        RMStore.getInstance().getRMAdmin().removeNode(node.getName(), preemptive);
+                boolean removeDownNodes = downCheck.getSelection();
+                boolean preemptive = !preemptCheck.getSelection();
+                for (Node node : nodes) {
+                    if (removeDownNodes && node.getState() != NodeState.DOWN) {
+                        continue;
                     }
-                } catch (RMException e) {
-                    MessageDialog.openError(parent, "Access denied", e.getMessage());
+                    try {
+                        RMStore.getInstance().getResourceManager().removeNode(node.getName(), preemptive)
+                                .booleanValue();
+                    } catch (RuntimeException e) {
+                        e.printStackTrace();
+                        String message = e.getMessage();
+                        if (e.getCause() != null) {
+                            message = e.getCause().getMessage();
+                        }
+                        MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot remove node",
+                                message);
+                    }
                 }
                 shell.close();
             }

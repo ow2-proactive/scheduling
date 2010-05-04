@@ -52,7 +52,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.Activator;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
@@ -132,9 +131,10 @@ public class RemoveSourceDialog extends Dialog {
                     MessageDialog.openError(shell, "Error", "You didn't choose a source to remove");
                 else {
                     try {
-                        RMStore.getInstance().getRMAdmin().removeSource(src, !preemptCheck.getSelection());
+                        RMStore.getInstance().getResourceManager().removeNodeSource(src,
+                                !preemptCheck.getSelection());
                         shell.close();
-                    } catch (RMException e) {
+                    } catch (RuntimeException e) {
                         e.printStackTrace();
                         Activator.log(IStatus.ERROR, "Error in node source removal: " + src, e);
                         MessageDialog.openError(shell, "Error", "Error in node source removal :\n" +

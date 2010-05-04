@@ -37,14 +37,19 @@
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.IdentityPrincipal;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
@@ -70,12 +75,33 @@ public abstract class NodeSourcePolicy implements Serializable {
     /** Node source of the policy */
     protected NodeSource nodeSource;
 
+    private static String[] security = new String[] { "USER", "GROUP", "ALL" };
+
+    @Configurable(description = "USER|GROUP|ALL")
+    private String nodesAvailableTo = "ALL";
+
+    @Configurable(description = "USER|GROUP|ALL")
+    private String administrator = "USER";
+
     /**
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
-     * @throws RMException if parameters are incorrect
+     * @throws IllegalArgumentException if parameters are incorrect
      */
-    public abstract void configure(Object... policyParameters) throws RMException;
+    public BooleanWrapper configure(Object... policyParameters) {
+        if (policyParameters != null && policyParameters.length >= 2) {
+            if (!Arrays.asList(security).contains(policyParameters[0])) {
+                throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[0]);
+            }
+            if (!Arrays.asList(security).contains(policyParameters[1])) {
+                throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[1]);
+            }
+            nodesAvailableTo = policyParameters[0].toString();
+            administrator = policyParameters[1].toString();
+        }
+        // else using default values
+        return new BooleanWrapper(true);
+    }
 
     /**
      * Activates the policy.
@@ -164,5 +190,49 @@ public abstract class NodeSourcePolicy implements Serializable {
      */
     protected void debug(String message) {
         logger.debug("[" + nodeSource.getName() + "] " + message);
+    }
+
+    /**
+     * Returns the type of principal of the node source administrator.
+     * Based on this type the appropriate PrincipalPermission is created
+     * in the node source which will control the administrator access to it.
+     * <p>
+     * The PrincipalPermission which will be created could be represented by
+     * the following pseudo code: PrincipalPermission(nodeSourceOwner.getPrincipals(type))
+     */
+    public Class<? extends IdentityPrincipal> getAdminPrincipalType() {
+        if (administrator.equals(security[0])) {
+            // USER
+            return UserNamePrincipal.class;
+        } else if (administrator.equals(security[1])) {
+            // GROP
+            return GroupNamePrincipal.class;
+        }
+        // creating fake anonymous class to filter out all meaningful principals
+        // in node source and create permission like PrincipalPermission(empty)
+        return new IdentityPrincipal("") {
+        }.getClass();
+    }
+
+    /**
+     * Returns the type of principal of the node source user.
+     * Based on this type the appropriate PrincipalPermission is created
+     * in the node source which will control the user access to it.
+     * <p>
+     * The PrincipalPermission which will be created could be represented by
+     * the following pseudo code: PrincipalPermission(nodeSourceOwner.getPrincipals(type))
+     */
+    public Class<? extends IdentityPrincipal> getUserPrincipalType() {
+        if (nodesAvailableTo.equals(security[0])) {
+            // USER
+            return UserNamePrincipal.class;
+        } else if (nodesAvailableTo.equals(security[1])) {
+            // GROP
+            return GroupNamePrincipal.class;
+        }
+        // creating fake anonymous class to filter out all meaningful principals
+        // in node source and create permission like PrincipalPermission(empty)
+        return new IdentityPrincipal("") {
+        }.getClass();
     }
 }

@@ -550,13 +550,13 @@ public class EC2Deployer implements java.io.Serializable {
      * 64bit AMI need to be run on xlarge instances
      *
      * @param it The type of hardware on which nodes will be deployed
-     * @throws RMException when the provided String does not match any
+     * @throws IllegalArgumentException when the provided String does not match any
      * existing instance type
      */
-    public void setInstanceType(String it) throws RMException {
+    public void setInstanceType(String it) {
         this.instanceType = InstanceType.getTypeFromString(it);
         if (instanceType == null) {
-            throw new RMException("Invalid instance type: " + it);
+            throw new IllegalArgumentException("Invalid instance type: " + it);
         }
     }
 

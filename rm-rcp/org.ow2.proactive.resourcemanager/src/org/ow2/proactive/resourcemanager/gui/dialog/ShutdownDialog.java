@@ -49,9 +49,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.objectweb.proactive.core.ProActiveException;
 import org.ow2.proactive.resourcemanager.Activator;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 
 
@@ -96,12 +94,12 @@ public class ShutdownDialog extends Dialog {
         okButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 try {
-                    RMStore.getInstance().getRMAdmin().shutdown(!preemptCheck.getSelection());
-                } catch (ProActiveException e) {
+                    RMStore.getInstance().getResourceManager().shutdown(!preemptCheck.getSelection())
+                            .booleanValue();
+                } catch (RuntimeException e) {
+                    MessageDialog.openError(parent, "Cannot shutdown the resource manager", e.getMessage());
                     Activator.log(IStatus.ERROR, "Error when shutting down. ", e);
                     e.printStackTrace();
-                } catch (RMException e) {
-                    MessageDialog.openError(parent, "Access denied", e.getMessage());
                 }
                 shell.close();
             }

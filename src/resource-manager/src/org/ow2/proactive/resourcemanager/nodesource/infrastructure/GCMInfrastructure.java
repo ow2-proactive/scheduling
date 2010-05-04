@@ -45,6 +45,7 @@ import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -52,7 +53,6 @@ import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -129,21 +129,23 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * policy.
      */
     @Override
-    public void configure(Object... parameters) throws RMException {
+    public BooleanWrapper configure(Object... parameters) {
         if (parameters == null) {
             // nothing to add
-            return;
+            throw new IllegalArgumentException("No parameters were specified");
         }
 
         if (parameters.length != 1) {
-            throw new RMException("Incorrect parameters for nodes acqusition");
+            throw new IllegalArgumentException("Incorrect parameters for nodes acqusition");
         }
 
         if (parameters[0] == null) {
             // gcmd descriptor was not specified
-            throw new RMException("GCMD file must be specified");
+            throw new IllegalArgumentException("GCMD file must be specified");
         }
         deploymentData.data = (byte[]) parameters[0];
+
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -267,7 +269,9 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
      * @param vnodeName virtual node name of the node.
      */
     public synchronized void receiveDeployedNode(Node node, String vnodeName) {
-        nodeSource.acquireNode(node.getNodeInformation().getURL(), nodeSource.getProvider());
+        // make the call to node source through the stub in order to
+        // correctly control the security access in the core
+        nodeSource.getStub().acquireNode(node.getNodeInformation().getURL(), nodeSource.getProvider());
     }
 
     /**

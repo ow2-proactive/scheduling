@@ -34,19 +34,13 @@
  */
 package org.ow2.proactive.jmx;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.ExportException;
-import java.security.AccessController;
 import java.util.HashMap;
-import java.util.Set;
 
-import javax.management.InstanceNotFoundException;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -55,28 +49,22 @@ import javax.management.remote.JMXAuthenticator;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
-import javax.management.remote.MBeanServerForwarder;
-import javax.security.auth.Subject;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.authentication.AuthenticationImpl;
-import org.ow2.proactive.jmx.naming.JMXProperties;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 
 
 /**
  * This helper class represents the common JMX monitoring infrastructure.
- * Two levels of JMX monitoring are possible using two separate MBeans, one for
- * anonymous users and one for administrators.
  * <p>
  * Sub-classes must register these MBeans into the MBean server then provide an {@link ObjectName} for each MBean.
  * <p>
- * This helper exposes two connector servers, one over RMI and one over RO (Remote Objects). Each
- * connector server exposes the anonymous MBean for anonymous users and same for admin users.  
+ * This helper exposes two connector servers, one over RMI and one over RO (Remote Objects).
  * <p>
- * The service url of the connector server over RMI for anonymous access is built like
+ * The service url of the connector server over RMI is built like
  * <code>service:jmx:rmi:///jndi/rmi://HOSTNAME_OR_IP:PORT/NAME</code> where
  * <ul>
  * <li><code>HOSTNAME_OR_IP</code> is specified by the ProActive network configuration.
@@ -116,7 +104,7 @@ public abstract class AbstractJMXMonitoringHelper {
      * <p>
      * <ul>
      * <li>Creates a new RMI registry or reuses an existing one needed for the JMX RMI connector server.
-     * <li>Create a a single MBean server for both administrator users and for anonymous users.
+     * <li>Create a a single MBean server for users.
      * <li>Registers the MBeans into the MBean server.
      * <li>Creates and starts the connector servers, one over RMI and one over RO.
      * </ul>
@@ -134,23 +122,14 @@ public abstract class AbstractJMXMonitoringHelper {
                     e);
             return false;
         }
-        // Sub-classes must register an anonym MBean in the server
-        final ObjectName anonymMBeanName = this.registerAnonymMBean(mbs);
-        if (anonymMBeanName == null) {
-            this.jmxRmiFailureReason = this.jmxRoFailureReason = "Unable to register anonym MBean";
-            return false;
-        }
-        // Sub-classes must register an admin MBean in the server
-        final ObjectName adminMBeanName = this.registerAdminMBean(mbs);
-        if (adminMBeanName == null) {
-            this.jmxRmiFailureReason = this.jmxRoFailureReason = "Unable to register admin MBean";
+        // Sub-classes must register an MBean in the server
+        final ObjectName beanName = this.registerMBean(mbs);
+        if (beanName == null) {
+            this.jmxRmiFailureReason = this.jmxRoFailureReason = "Unable to register MBean";
             return false;
         }
         // Create an authenticator that will be used by the connectors
         final JMXAuthenticator authenticator = new JMXAuthenticatorImpl(auth);
-        // Create a proxy to the server forwarder
-        final MBeanServerForwarder mbsf = new MBSFInvocationHandler(mbs, anonymMBeanName, adminMBeanName)
-                .getProxy();
 
         // Sub-classes provides the name of the connector server and the port
         final String serverName = this.getConnectorServerName();
@@ -160,7 +139,7 @@ public abstract class AbstractJMXMonitoringHelper {
         final boolean isJMXRMIbooted = this.createJMXRMIConnectorServer(mbs, serverName, port, authenticator);
         if (isJMXRMIbooted) {
             // Add a forwarder to intercept calls to the MBeanServer and start the connector
-            this.rmiCs.setMBeanServerForwarder(mbsf);
+            //this.rmiCs.setMBeanServerForwarder(mbsf);
             try {
                 this.rmiCs.start();
                 if (logger.isInfoEnabled()) {
@@ -174,7 +153,7 @@ public abstract class AbstractJMXMonitoringHelper {
         final boolean isJMXRObooted = this.createJMXROConnectorServer(mbs, serverName, authenticator);
         if (isJMXRObooted) {
             // Add a forwarder to intercept calls to the MBeanServer and start the connector
-            this.roCs.setMBeanServerForwarder(mbsf);
+            //this.roCs.setMBeanServerForwarder(mbsf);
             try {
                 this.roCs.start();
                 if (logger.isInfoEnabled()) {
@@ -188,18 +167,11 @@ public abstract class AbstractJMXMonitoringHelper {
     }
 
     /**
-     * Sub-class must register the anonymous MBean into the MBean server and return its object name.
+     * Sub-class must register the MBean into the MBean server and return its object name.
      * @param mbs the MBean server
      * @return the object name of the registered MBean
      */
-    public abstract ObjectName registerAnonymMBean(final MBeanServer mbs);
-
-    /**
-     * Sub-class must register the admin MBean into the MBean server and return its object name.
-     * @param mbs the MBean server
-     * @return the object name of the registered MBean
-     */
-    public abstract ObjectName registerAdminMBean(final MBeanServer mbs);
+    public abstract ObjectName registerMBean(final MBeanServer mbs);
 
     /**
      * Sub-classes must provide the name of the connector server. 
@@ -360,89 +332,4 @@ public abstract class AbstractJMXMonitoringHelper {
         }
     }
 
-    /**
-     * The server forwarder to filter incoming requests to the MBean server. 
-     */
-    private final class MBSFInvocationHandler implements InvocationHandler {
-        private final MBeanServer mbs;
-        private final ObjectName anonymMBeanName;
-        private final ObjectName adminMBeanName;
-
-        MBSFInvocationHandler(final MBeanServer mbs, final ObjectName anonymMBeanName,
-                final ObjectName adminMBeanName) {
-            this.mbs = mbs;
-            this.anonymMBeanName = anonymMBeanName;
-            this.adminMBeanName = adminMBeanName;
-        }
-
-        /**
-         * @see java.lang.reflect.InvocationHandler#invoke(Object, Method, Object[])
-         */
-        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-            final String methodName = method.getName();
-
-            // Intercept the "setMBeanServer" method
-            if ("setMBeanServer".equals(methodName)) {
-                return null;
-            }
-
-            // Restrict access to creational and destructive methods to any user
-            if ("createMBean".equals(methodName) || "registerMBean".equals(methodName) ||
-                "instantiate".equals(methodName) || "unregisterMBean".equals(methodName)) {
-                throw new SecurityException("Access denied");
-            }
-
-            // Get the current subject from the context
-            final Subject subject = Subject.getSubject(AccessController.getContext());
-            // Allow operations performed locally on behalf of the connector server itself
-            if (subject == null) {
-                return method.invoke(this.mbs, args);
-            }
-
-            // String username = subject.getPrincipals().iterator().next().getName();
-            final String role = subject.getPublicCredentials().iterator().next().toString();
-
-            // The admin role can access the adminMBean and have no restrictions
-            if (JMXProperties.JMX_ADMIN.equals(role)) {
-                // Filter names query
-                if ("queryNames".equals(methodName)) {
-                    final Set<?> res = (Set<?>) method.invoke(this.mbs, args);
-                    res.remove(this.anonymMBeanName);
-                    return res;
-                }
-                return method.invoke(mbs, args);
-            }
-            // The user role cannot access the adminMBean 
-            if (JMXProperties.JMX_USER.equals(role)) {
-                // Filter names query 
-                if ("queryNames".equals(methodName)) {
-                    final Set<?> res = (Set<?>) method.invoke(this.mbs, args);
-                    res.remove(this.adminMBeanName);
-                    return res;
-                }
-                // Filter instances query
-                if ("queryMBeans".equals(methodName)) {
-                    final Set<?> res = (Set<?>) method.invoke(this.mbs, args);
-                    res.remove(this.mbs.getObjectInstance(this.adminMBeanName));
-                    return res;
-                }
-                // Filter arguments
-                if (args != null) {
-                    for (final Object arg : args) {
-                        if (this.adminMBeanName.equals(arg)) {
-                            throw new InstanceNotFoundException("No instance of " + adminMBeanName);
-                        }
-                    }
-                }
-                return method.invoke(this.mbs, args);
-            }
-            throw new SecurityException("Access denied");
-        }
-
-        public MBeanServerForwarder getProxy() {
-            final Object proxy = Proxy.newProxyInstance(MBeanServerForwarder.class.getClassLoader(),
-                    new Class[] { MBeanServerForwarder.class }, this);
-            return MBeanServerForwarder.class.cast(proxy);
-        }
-    }
 }

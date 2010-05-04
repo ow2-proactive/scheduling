@@ -36,9 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -135,6 +137,7 @@ public abstract class SelectionManager {
         Collection<RMNode> candidatesNodes = arrangeNodesForScriptExecution(selectionScriptList, freeNodes,
                 exclusion);
 
+        HashMap<String, Permission> nsPermissions = new HashMap<String, Permission>();
         // here we will contact the node either for script execution and cleaning or just
         // for cleaning.
         // So parallelizing this action and delegate execution to the thread pool
@@ -144,8 +147,26 @@ public abstract class SelectionManager {
             int numberOfNodesNeeded = nb - result.size();
 
             ArrayList<Callable<RMNode>> scriptExecutors = new ArrayList<Callable<RMNode>>();
-            for (int i = 0; i < numberOfNodesNeeded && nodesIterator.hasNext(); i++) {
+            for (int i = 0; i < numberOfNodesNeeded && nodesIterator.hasNext();) {
                 RMNode rmnode = nodesIterator.next();
+
+                Permission userPermission = nsPermissions.get(rmnode.getNodeSourceName());
+                if (userPermission == null) {
+                    userPermission = rmnode.getNodeSource().getUserPermission();
+                    nsPermissions.put(rmnode.getNodeSourceName(), userPermission);
+                }
+                // checking the permission
+                try {
+                    client.checkPermission(userPermission, client + " is not authorized to get the node " +
+                        rmnode.getNodeURL() + " from " + rmnode.getNodeSource());
+                } catch (SecurityException e) {
+                    // client does not have an access to this node
+                    logger.debug(e.getMessage());
+                    continue;
+                }
+
+                i++;
+
                 if (inProgress.contains(rmnode.getNodeURL())) {
                     if (logger.isDebugEnabled())
                         logger.debug("Script execution is in progress on node " + rmnode.getNodeURL() +
@@ -194,7 +215,7 @@ public abstract class SelectionManager {
 
         }
 
-        logger.info(result.size() + "nodes found for " + client);
+        logger.info(result.size() + " nodes found for " + client);
         return result;
 
     }

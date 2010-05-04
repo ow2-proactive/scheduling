@@ -41,6 +41,7 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
@@ -77,14 +78,14 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      * policy.
      */
     @Override
-    public void configure(Object... parameters) throws RMException {
+    public BooleanWrapper configure(Object... parameters) {
         if (parameters == null) {
             // nothing to do
-            return;
+            throw new IllegalArgumentException("No parameters were specified");
         }
         if (parameters.length == 2) {
             if (parameters[1] == null) {
-                throw new RMException("Host list file must be specified");
+                throw new IllegalArgumentException("Host list file must be specified");
             }
 
             String hosts = new String((byte[]) parameters[1]);
@@ -94,7 +95,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
             for (String host : hostsList) {
                 if (parameters[0] == null) {
-                    throw new RMException("GCMD template file must be specified");
+                    throw new IllegalArgumentException("GCMD template file must be specified");
                 }
 
                 DeploymentData dd = new DeploymentData();
@@ -103,6 +104,8 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
                 this.hosts.put(host, dd);
             }
         }
+
+        return new BooleanWrapper(true);
     }
 
     /**

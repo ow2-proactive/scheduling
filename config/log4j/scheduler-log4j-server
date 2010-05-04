@@ -38,6 +38,8 @@ log4j.logger.proactive.scheduler.dev.admin.consol=INFO,CONSOLE
 #log4j.logger.proactive.scheduler.dev.admin.matlab=DEBUG
 #log4j.logger.proactive.scheduler.dev.scilab=DEBUG
 #log4j.logger.proactive.scheduler.dev.admin.scilab=DEBUG
+#log4j.logger.proactive.security=DEBUG,SchedulerDevFileAppender
+
 
 # avoid displaying additivity of the inherit loggers
 #log4j.additivity.proactive.resourceManager=false

@@ -51,6 +51,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -177,17 +178,15 @@ public class EC2Infrastructure extends InfrastructureManager {
      *            parameters[1]: Fully qualified URL of the Resource Manager (proto://IP:port)
      *            parameters[2]: RM credentials
      *            parameters[3]: HTTP node port
-     * @throws RMException
-     *             when the configuration could not be set
      */
     @Override
-    public void configure(Object... parameters) throws RMException {
+    public BooleanWrapper configure(Object... parameters) {
 
         /** parameters look fine */
         if (parameters != null && parameters.length == 4) {
 
             if (parameters[0] == null) {
-                throw new RMException("EC2 config file must be specified");
+                throw new IllegalArgumentException("EC2 config file must be specified");
             }
 
             try {
@@ -204,7 +203,7 @@ public class EC2Infrastructure extends InfrastructureManager {
             }
             String rmu = parameters[1].toString();
             if (parameters[2] == null) {
-                throw new RMException("Credentials must be specified");
+                throw new IllegalArgumentException("Credentials must be specified");
             }
             String creds64 = new String((byte[]) parameters[2]);
             String nodep = parameters[3].toString();
@@ -215,7 +214,7 @@ public class EC2Infrastructure extends InfrastructureManager {
                     throw new Exception("Out of range");
                 }
             } catch (Exception e) {
-                throw new RMException("Invalid value for parameter Node Port", e);
+                throw new IllegalArgumentException("Invalid value for parameter Node Port", e);
             }
 
             this.ec2d.setUserData(rmu, creds64, nodep);
@@ -225,8 +224,10 @@ public class EC2Infrastructure extends InfrastructureManager {
          * missing or absent parameters, aborting
          */
         else {
-            throw new RMException("Invalid parameters for EC2Infrastructure creation");
+            throw new IllegalArgumentException("Invalid parameters for EC2Infrastructure creation");
         }
+
+        return new BooleanWrapper(false);
     }
 
     /**
@@ -295,13 +296,13 @@ public class EC2Infrastructure extends InfrastructureManager {
      * @throws RMException
      *             incorrect file or missing properties in file
      */
-    private void readConf(String path) throws RMException {
+    private void readConf(String path) {
         File fp = new File(path);
 
         if (!fp.isAbsolute()) {
             fp = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + path);
             if (!fp.exists()) {
-                throw new RMException("Could not find configuration file: " + path);
+                throw new IllegalArgumentException("Could not find configuration file: " + path);
             }
         }
 
@@ -311,22 +312,22 @@ public class EC2Infrastructure extends InfrastructureManager {
             in = new FileInputStream(fp);
             props.load(in);
         } catch (Exception e) {
-            throw new RMException("Error while reading EC2 properties: " + e.getMessage());
+            throw new IllegalArgumentException("Error while reading EC2 properties: " + e.getMessage());
         }
 
         /** check all mandatory fields are present */
         if (!props.containsKey("AWS_AKEY"))
-            throw new RMException("Missing property AWS_AKEY in: " + path);
+            throw new IllegalArgumentException("Missing property AWS_AKEY in: " + path);
         if (!props.containsKey("AWS_SKEY"))
-            throw new RMException("Missing property AWS_SKEY in: " + path);
+            throw new IllegalArgumentException("Missing property AWS_SKEY in: " + path);
         if (!props.containsKey("AWS_USER"))
-            throw new RMException("Missing property AWS_USER in: " + path);
+            throw new IllegalArgumentException("Missing property AWS_USER in: " + path);
         if (!props.containsKey("AMI"))
-            throw new RMException("Missing property AMI in: " + path);
+            throw new IllegalArgumentException("Missing property AMI in: " + path);
         if (!props.containsKey("INSTANCE_TYPE"))
-            throw new RMException("Missing property INSTANCE_TYPE: " + path);
+            throw new IllegalArgumentException("Missing property INSTANCE_TYPE: " + path);
         if (!props.containsKey("MAX_INST"))
-            throw new RMException("Missing property MAX_INST in: " + path);
+            throw new IllegalArgumentException("Missing property MAX_INST in: " + path);
 
         this.ec2d = new EC2Deployer(props.getProperty("AWS_AKEY"), props.getProperty("AWS_SKEY"), props
                 .getProperty("AWS_USER"));
@@ -345,7 +346,7 @@ public class EC2Infrastructure extends InfrastructureManager {
         try {
             in.close();
         } catch (IOException e) {
-            throw new RMException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 

@@ -47,7 +47,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public enum JobPriority implements java.io.Serializable {
-    /** Lowest priority : administrator only */
+    /** Lowest priority*/
     IDLE("Idle", 0),
     /** Lowest priority */
     LOWEST("Lowest", 1),
@@ -55,9 +55,9 @@ public enum JobPriority implements java.io.Serializable {
     LOW("Low", 2),
     /** Normal Priority */
     NORMAL("Normal", 3),
-    /** High priority : administrator only */
+    /** High priority*/
     HIGH("High", 4),
-    /** Highest priority : administrator only */
+    /** Highest priority*/
     HIGHEST("Highest", 5);
     /** Name of the priority */
     private String name;

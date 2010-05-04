@@ -42,11 +42,8 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.jmx.AbstractJMXMonitoringHelper;
-import org.ow2.proactive.jmx.naming.JMXProperties;
-import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBean;
-import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAdminMBeanImpl;
-import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAnonymMBean;
-import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMAnonymMBeanImpl;
+import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMMBean;
+import org.ow2.proactive.resourcemanager.core.jmx.mbean.RMMBeanImpl;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
@@ -85,34 +82,16 @@ public final class JMXMonitoringHelper extends AbstractJMXMonitoringHelper {
      * {@inheritDoc}
      */
     @Override
-    public ObjectName registerAnonymMBean(final MBeanServer mbs) {
+    public ObjectName registerMBean(final MBeanServer mbs) {
         // Register the anonym MBean into the MBean server      
         try {
-            final RMAnonymMBean anonymMBean = new RMAnonymMBeanImpl(RMMonitoringImpl.rmStatistics);
+            final RMMBean mBean = new RMMBeanImpl(RMMonitoringImpl.rmStatistics);
             // Uniquely identify the MBean and register it to the MBeanServer
             final ObjectName anonymMBeanName = new ObjectName(RM_BEAN_NAME);
-            mbs.registerMBean(anonymMBean, anonymMBeanName);
+            mbs.registerMBean(mBean, anonymMBeanName);
             return anonymMBeanName;
         } catch (Exception e) {
             LOGGER.error("Unable to register the RMAnonymMBean", e);
-            return null;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ObjectName registerAdminMBean(final MBeanServer mbs) {
-        // Register the anonym MBean into the MBean server
-        try {
-            final RMAdminMBean adminMBean = new RMAdminMBeanImpl(RMMonitoringImpl.rmStatistics);
-            // Uniquely identify the MBean and register it to the MBeanServer
-            final ObjectName adminMBeanName = new ObjectName(RM_BEAN_NAME + "_" + JMXProperties.JMX_ADMIN);
-            mbs.registerMBean(adminMBean, adminMBeanName);
-            return adminMBeanName;
-        } catch (Exception e) {
-            LOGGER.error("Unable to register the RMAdminMBean", e);
             return null;
         }
     }

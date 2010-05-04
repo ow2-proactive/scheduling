@@ -45,10 +45,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
-import org.ow2.proactive.resourcemanager.utils.adminconsole.AdminRMModel;
+import org.ow2.proactive.resourcemanager.utils.console.ResourceManagerModel;
 import org.ow2.proactive.utils.console.VisualConsole;
 
 
@@ -67,7 +66,7 @@ public class ControllerView extends ViewPart {
     private Frame container;
     private VisualConsole console;
     private JScrollPane scrollableContainer;
-    private RMAdmin rm;
+    private ResourceManager rm;
 
     public ControllerView() {
         instance = this;
@@ -101,22 +100,17 @@ public class ControllerView extends ViewPart {
         if (RMStore.isConnected()) {
             //rm is connected
 
-            try {
-                rm = RMStore.getInstance().getRMAdmin();
-                AdminRMModel model = AdminRMModel.getModel(false);
+            rm = RMStore.getInstance().getResourceManager();
+            ResourceManagerModel model = ResourceManagerModel.getModel(false);
 
-                startConsole(model);
+            startConsole(model);
 
-                scrollableContainer = new JScrollPane(console.getJContentPane());
-                container.add(scrollableContainer);
-            } catch (RMException e) {
-                e.printStackTrace();
-            }
-
+            scrollableContainer = new JScrollPane(console.getJContentPane());
+            container.add(scrollableContainer);
         }
     }
 
-    private void startConsole(final AdminRMModel model) {
+    private void startConsole(final ResourceManagerModel model) {
         model.connectConsole(console);
         model.connectRM(rm);
         try {
@@ -135,23 +129,17 @@ public class ControllerView extends ViewPart {
         }
     }
 
-    public void connectedEvent(boolean isAdmin) {
-        if (isAdmin) {
-            try {
-                rm = RMStore.getInstance().getRMAdmin();
-                AdminRMModel model = AdminRMModel.getModel(false);
+    public void connectedEvent() {
+        rm = RMStore.getInstance().getResourceManager();
+        ResourceManagerModel model = ResourceManagerModel.getModel(false);
 
-                startConsole(model);
+        startConsole(model);
 
-                if (container != null) {
-                    scrollableContainer = new JScrollPane(console.getJContentPane());
-                    container.add(scrollableContainer);
-                    container.repaint();
-                    container.pack();
-                }
-            } catch (RMException e) {
-                e.printStackTrace();
-            }
+        if (container != null) {
+            scrollableContainer = new JScrollPane(console.getJContentPane());
+            container.add(scrollableContainer);
+            container.repaint();
+            container.pack();
         }
     }
 

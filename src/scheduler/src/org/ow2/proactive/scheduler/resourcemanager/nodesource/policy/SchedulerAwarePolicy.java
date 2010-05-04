@@ -75,21 +75,24 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     protected UserSchedulerInterface userInterface;
 
     @Override
-    public void configure(Object... params) throws RMException {
+    public BooleanWrapper configure(Object... params) {
+        super.configure(params);
         SchedulerAuthenticationInterface authentication;
 
-        if (params[1] == null) {
-            throw new RMException("Credentials must be specified");
+        if (params[3] == null) {
+            throw new IllegalArgumentException("Credentials must be specified");
         }
 
         try {
-            authentication = SchedulerConnection.join(params[0].toString());
-            Credentials creds = Credentials.getCredentialsBase64((byte[]) params[1]);
+            authentication = SchedulerConnection.join(params[2].toString());
+            Credentials creds = Credentials.getCredentialsBase64((byte[]) params[3]);
             userInterface = authentication.logAsUser(creds);
-            preemptive = Boolean.parseBoolean(params[2].toString());
+            preemptive = Boolean.parseBoolean(params[4].toString());
         } catch (Throwable t) {
-            throw new RMException(t);
+            throw new IllegalArgumentException(t);
         }
+
+        return new BooleanWrapper(true);
     }
 
     @Override

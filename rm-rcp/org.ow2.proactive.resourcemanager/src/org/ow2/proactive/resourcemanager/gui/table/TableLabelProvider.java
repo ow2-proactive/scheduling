@@ -120,7 +120,7 @@ public class TableLabelProvider extends ColumnLabelProvider {
                     return "Node is ready to perform tasks";
                 case BUSY:
                     return "Node is currently performing a task";
-                case TO_BE_RELEASED:
+                case TO_BE_REMOVED:
                     return "Node is busy and will be removed at task's end";
             }
         }

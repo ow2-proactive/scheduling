@@ -56,8 +56,6 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     /** Value for  */
     public static final int SORT_BY_NAME = 1;
     /**  */
-    public static final int SORT_BY_ADMIN = 2;
-    /**  */
     public static final int SORT_BY_SUBMIT = 3;
     /**  */
     public static final int SORT_BY_HOST = 4;
@@ -79,13 +77,6 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
      * @return the user name
      */
     public abstract String getUsername();
-
-    /**
-     * To know if this user is an administrator or a user.
-     *
-     * @return true if this user is admin, false if not.
-     */
-    public abstract Boolean isAdmin();
 
     /**
      * Get the number of submit for this user.
@@ -160,9 +151,6 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
      */
     public int compareTo(UserIdentification user) {
         switch (currentSort) {
-            case SORT_BY_ADMIN:
-                return (currentOrder == ASC_ORDER) ? isAdmin().compareTo(user.isAdmin()) : user.isAdmin()
-                        .compareTo(isAdmin());
             case SORT_BY_SUBMIT:
                 return (currentOrder == ASC_ORDER) ? getSubmitNumber() - user.getSubmitNumber() : user
                         .getSubmitNumber() -

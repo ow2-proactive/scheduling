@@ -61,7 +61,7 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -86,7 +86,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.RMPROXY);
     private static Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.RMPROXY);
     private static final long VERIF_TIMEOUT = 10000;
-    private RMUser user;
+    private ResourceManager resourceManager;
     private HashMap<Node, ScriptResult<?>> nodes;
     private boolean running = true;
 
@@ -125,7 +125,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     }
 
     public boolean isAlive() {
-        return user.isAlive();
+        return resourceManager.isActive().booleanValue();
     }
 
     // FREE NODES *********************************************
@@ -138,7 +138,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     public void freeNode(Node node) {
         logger_dev.info("Node freed : " + node.getNodeInformation().getURL());
 
-        user.freeNode(node);
+        resourceManager.releaseNode(node);
     }
 
     /**
@@ -182,7 +182,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     public void freeNodes(NodeSet nodes) {
         logger_dev.info("Nodes freed : " + nodes.size() + " nodes");
 
-        user.freeNodes(nodes);
+        resourceManager.releaseNodes(nodes);
     }
 
     /**
@@ -227,7 +227,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @return A node set that contains between 0 and nbNodes nodes matching the given script.
      */
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript) {
-        return user.getAtMostNodes(nbNodes, selectionScript);
+        return resourceManager.getAtMostNodes(nbNodes, selectionScript);
     }
 
     /**
@@ -240,7 +240,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @return A node set that contains between 0 and nbNodes nodes matching the given script.
      */
     public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript, NodeSet exclusion) {
-        return user.getAtMostNodes(nbNodes, selectionScript, exclusion);
+        return resourceManager.getAtMostNodes(nbNodes, selectionScript, exclusion);
     }
 
     /**
@@ -254,7 +254,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @return an array list of nodes.
      */
     public NodeSet getAtMostNodes(int nbNodes, List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
-        return user.getAtMostNodes(nbNodes, selectionScriptsList, exclusion);
+        return resourceManager.getAtMostNodes(nbNodes, selectionScriptsList, exclusion);
     }
 
     /**
@@ -266,7 +266,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @return the exact number of nodes demanded matching the selection script
      */
     public NodeSet getExactlyNodes(int nbNodes, SelectionScript selectionScript) {
-        return user.getExactlyNodes(nbNodes, selectionScript);
+        throw new RuntimeException("Unsupported method call getExactlyNodes");
     }
 
     // PROXY SPECIFIC METHODS ********************************
@@ -275,16 +275,14 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      */
     public void shutdownProxy() {
         if (running) {
-            NodeSet ns = new NodeSet();
-            ns.addAll(nodes.keySet());
-            user.freeNodes(ns);
             running = false;
 
             if (logger.isInfoEnabled()) {
                 logger.info("Infrastructure Manager Proxy Stopped");
             }
 
-            user.disconnect();
+            // all the nodes will be released in disconnect
+            resourceManager.disconnect();
         }
     }
 
@@ -296,7 +294,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
             try {
                 Credentials creds = Credentials.getCredentials(PASchedulerProperties
                         .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
-                user = auth.logAsUser(creds);
+                resourceManager = auth.login(creds);
             } catch (LoginException e) {
                 throw new RuntimeException(e);
             } catch (KeyException e) {
@@ -349,7 +347,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
         }
 
         if (ns.size() > 0) {
-            user.freeNodes(ns);
+            resourceManager.releaseNodes(ns);
         }
     }
 
@@ -359,6 +357,6 @@ public class ResourceManagerProxy implements InitActive, RunActive {
      * @return a state containing some informations about RM activity.
      */
     public RMState getRMState() {
-        return user.getRMState();
+        return resourceManager.getState();
     }
 }

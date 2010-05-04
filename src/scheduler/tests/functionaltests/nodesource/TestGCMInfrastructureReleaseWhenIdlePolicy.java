@@ -43,7 +43,7 @@ import java.io.File;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -75,7 +75,8 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
                 .join(SchedulerTHelper.schedulerDefaultURL);
         Credentials creds = Credentials.createCredentials(SchedulerTHelper.username,
                 SchedulerTHelper.password, auth.getPublicKey());
-        return new Object[] { SchedulerTHelper.schedulerDefaultURL, creds.getBase64(), "true", "30000" };
+        return new Object[] { "USER", "ALL", SchedulerTHelper.schedulerDefaultURL, creds.getBase64(), "true",
+                "30000" };
     }
 
     protected String getDescriptor() {
@@ -85,7 +86,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
-        RMTHelper.getAdminInterface().createNodesource(sourceName, GCMInfrastructure.class.getName(),
+        RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
                 new Object[] { GCMDeploymentData }, ReleaseResourcesWhenSchedulerIdle.class.getName(),
                 getPolicyParams());
 
@@ -94,7 +95,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
 
     protected void removeNodeSource(String sourceName) throws Exception {
         // removing node source
-        RMTHelper.getAdminInterface().removeSource(sourceName, true);
+        RMTHelper.getResourceManager().removeNodeSource(sourceName, true);
 
         //wait for the event of the node source removal
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
@@ -119,11 +120,11 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
         String source1 = "Node source 1";
         SchedulerTHelper.log("Test 1");
 
-        RMAdmin admin = RMTHelper.getAdminInterface();
+        ResourceManager resourceManager = RMTHelper.getResourceManager();
 
         createDefaultNodeSource(source1);
-        assertTrue(admin.getTotalNodesNumber().intValue() == 0);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 0);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         System.out.println("TestGCMInfrastructureReleaseWhenIdlePolicy.action() Submit job ");
         JobId jobId = SchedulerTHelper.submitJob(jobDescriptor);

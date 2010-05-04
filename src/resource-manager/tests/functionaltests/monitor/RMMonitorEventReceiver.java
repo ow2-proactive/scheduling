@@ -37,6 +37,7 @@
 package functionaltests.monitor;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
@@ -44,6 +45,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
+
+import functionaltests.RMTHelper;
 
 
 public class RMMonitorEventReceiver implements RMEventListener {
@@ -79,8 +82,10 @@ public class RMMonitorEventReceiver implements RMEventListener {
         monitorsHandler.handleSchedulerStateEvent(event.getEventType());
     }
 
-    public RMInitialState init(RMAuthentication auth) {
-        RMMonitoring monitor = auth.logAsMonitor();
+    public RMInitialState init(RMAuthentication auth) throws Exception {
+        Credentials cred = Credentials.createCredentials(RMTHelper.username, RMTHelper.password, auth
+                .getPublicKey());
+        RMMonitoring monitor = auth.login(cred).getMonitoring();
         return monitor.addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
     }
 }

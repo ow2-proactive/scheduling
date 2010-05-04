@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,16 +34,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.jmx.naming;
+package org.ow2.proactive.authentication.principals;
 
-/**
- * Class to keep the references to the JMX properties 
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 1.0 
- */
-public class JMXProperties {
-    /** The default JMX group hierarchy */
-    public static final String JMX_ADMIN = "admin";
-    public static final String JMX_USER = "user";
+public class UserNamePrincipal extends IdentityPrincipal {
+
+    public UserNamePrincipal(String name) {
+        super(name);
+    }
 }

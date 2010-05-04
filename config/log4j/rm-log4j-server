@@ -9,7 +9,8 @@ log4j.rootLogger=INFO,RMDevFileAppender
 # avoid displaying additivity of the inherit loggers
 log4j.additivity.proactive.resourceManager=false
 # define RESOURCE MANAGER loggers
-log4j.logger.proactive.resourceManager=INFO,RMDevFileAppender
+log4j.logger.proactive.resourceManager=WARN,RMDevFileAppender
+log4j.logger.proactive.security=INFO,RMDevFileAppender
 #log4j.logger.proactive.resourceManager.core=INFO
 #log4j.logger.proactive.resourceManager.user=INFO
 #log4j.logger.proactive.resourceManager.monitoring=INFO

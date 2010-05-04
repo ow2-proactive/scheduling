@@ -40,8 +40,11 @@ import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -69,6 +72,7 @@ import org.ow2.proactive.utils.NodeSet;
  * @since ProActive Scheduling 0.9
  *
  */
+@Deprecated
 @PublicAPI
 public interface RMUser {
 
@@ -96,6 +100,23 @@ public interface RMUser {
      * @return total number of nodes
      */
     public IntWrapper getTotalNodesNumber();
+
+    /**
+     * Gets a list of nodes handled by Resource Manager
+     * @return a list of RMNodeEvent objects representing the nodes
+     */
+    public List<RMNodeEvent> getNodesList();
+
+    /**
+     * Get list of nodes sources on Resource Manager
+     * @return a list of RMNodeSourceEvent objects representing the nodes sources
+     */
+    public List<RMNodeSourceEvent> getNodeSourcesList();
+
+    /**
+     * Get monitoring interface to manager listeners of the resource manager
+     */
+    public RMMonitoring getMonitoring();
 
     /**
      * Provides nbNodes nodes verifying a selection script.
@@ -209,6 +230,7 @@ public interface RMUser {
 
     /**
      * Disconnects from resource manager.
+     * @return the request status
      */
-    public void disconnect();
+    public BooleanWrapper disconnect();
 }

@@ -62,7 +62,7 @@ public final class RMStatistics {
     /** The count of nodes in {@link NodeState#BUSY} state */
     private int busyNodesCount;
     /** The count of nodes in {@link NodeState#TO_BE_RELEASED} state */
-    private int toBeReleasedNodesCount;
+    private int toBeRemovedNodesCount;
     /** The count of nodes in {@link NodeState#DOWN} state */
     private int downNodesCount;
     /** The maximum free nodes count */
@@ -70,7 +70,7 @@ public final class RMStatistics {
     /** The maximum busy nodes count */
     private int maxBusyNodes;
     /** The maximum to be released nodes count */
-    private int maxToBeReleasedNodes;
+    private int maxToBeRemovedNodes;
     /** The maximum down nodes count */
     private int maxDownNodes;
     /** The cumulative activity time */
@@ -91,11 +91,11 @@ public final class RMStatistics {
         this.availableNodesCount = 0;
         this.freeNodesCount = 0;
         this.busyNodesCount = 0;
-        this.toBeReleasedNodesCount = 0;
+        this.toBeRemovedNodesCount = 0;
         this.downNodesCount = 0;
         this.maxFreeNodes = 0;
         this.maxBusyNodes = 0;
-        this.maxToBeReleasedNodes = 0;
+        this.maxToBeRemovedNodes = 0;
         this.maxDownNodes = 0;
 
         // Initialize all cumulative times
@@ -123,11 +123,11 @@ public final class RMStatistics {
         this.availableNodesCount = rmStatistics.availableNodesCount;
         this.freeNodesCount = rmStatistics.freeNodesCount;
         this.busyNodesCount = rmStatistics.busyNodesCount;
-        this.toBeReleasedNodesCount = rmStatistics.toBeReleasedNodesCount;
+        this.toBeRemovedNodesCount = rmStatistics.toBeRemovedNodesCount;
         this.downNodesCount = rmStatistics.downNodesCount;
         this.maxFreeNodes = rmStatistics.maxFreeNodes;
         this.maxBusyNodes = rmStatistics.maxBusyNodes;
-        this.maxToBeReleasedNodes = rmStatistics.toBeReleasedNodesCount;
+        this.maxToBeRemovedNodes = rmStatistics.toBeRemovedNodesCount;
         this.maxDownNodes = rmStatistics.maxDownNodes;
         this.cumulativeInactivityTime = rmStatistics.cumulativeInactivityTime;
         this.cumulativeActivityTime = rmStatistics.cumulativeActivityTime;
@@ -167,7 +167,7 @@ public final class RMStatistics {
                         this.decrementBusyNodesCount();
                         break;
                     case TO_BE_RELEASED:
-                        this.decrementToBeReleasedNodesCount();
+                        this.decrementToBeRemovedNodesCount();
                         break;
                     case DOWN:
                         this.decrementDownNodesCount();
@@ -189,7 +189,7 @@ public final class RMStatistics {
                             this.decrementBusyNodesCount();
                             break;
                         case TO_BE_RELEASED:
-                            this.decrementToBeReleasedNodesCount();
+                            this.decrementToBeRemovedNodesCount();
                             break;
                         case DOWN:
                             this.decrementDownNodesCount();
@@ -208,7 +208,7 @@ public final class RMStatistics {
                         this.incrementBusyNodesCount();
                         break;
                     case TO_BE_RELEASED:
-                        this.incrementToBeReleasedNodesCount();
+                        this.incrementToBeRemovedNodesCount();
                         break;
                     case DOWN:
                         this.incrementDownNodesCount();
@@ -247,10 +247,10 @@ public final class RMStatistics {
         }
     }
 
-    private void incrementToBeReleasedNodesCount() {
+    private void incrementToBeRemovedNodesCount() {
         // Increment and update toBeReleased nodes max value		
-        if (++this.toBeReleasedNodesCount > this.maxToBeReleasedNodes) {
-            this.maxToBeReleasedNodes = this.toBeReleasedNodesCount;
+        if (++this.toBeRemovedNodesCount > this.maxToBeRemovedNodes) {
+            this.maxToBeRemovedNodes = this.toBeRemovedNodesCount;
         }
     }
 
@@ -282,10 +282,10 @@ public final class RMStatistics {
         }
     }
 
-    private void decrementToBeReleasedNodesCount() {
+    private void decrementToBeRemovedNodesCount() {
         // Decrement toBeReleased nodes count (keep always >= 0)
-        if (this.toBeReleasedNodesCount > 0) {
-            this.toBeReleasedNodesCount--;
+        if (this.toBeRemovedNodesCount > 0) {
+            this.toBeRemovedNodesCount--;
         }
     }
 
@@ -336,8 +336,8 @@ public final class RMStatistics {
      * Returns the current number of nodes in {@link NodeState#TO_BE_RELEASED} state.
      * @return the current number of busy nodes
      */
-    public int getToBeReleasedNodesCount() {
-        return this.toBeReleasedNodesCount;
+    public int getToBeRemovedNodesCount() {
+        return this.toBeRemovedNodesCount;
     }
 
     /**

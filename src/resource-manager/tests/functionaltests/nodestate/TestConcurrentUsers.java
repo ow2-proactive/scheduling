@@ -41,15 +41,12 @@ import junit.framework.Assert;
 
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -71,69 +68,65 @@ public class TestConcurrentUsers extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
 
-        RMAdmin admin = RMTHelper.getAdminInterface();
+        ResourceManager resourceManager = RMTHelper.connect(RMTHelper.username, RMTHelper.username);
 
         String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";
         String node1URL = "//" + hostName + "/" + node1Name;
         RMTHelper.createNode(node1Name);
-        admin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(), null,
-                StaticPolicy.class.getName(), null);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
-        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
+        resourceManager.createNodeSource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(),
+                null, StaticPolicy.class.getName(), null);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        resourceManager.addNode(node1URL, NodeSource.DEFAULT);
 
         // waiting for node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
 
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
         RMTHelper.log("Test 1 - releasing of the foreign node");
         // acquiring a node
-        final NodeSet ns = admin.getAtMostNodes(1, null);
+        final NodeSet ns = resourceManager.getAtMostNodes(1, null);
 
         // waiting for node busy event
         RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         assertTrue(ns.size() == 1);
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
-                    // login as another client
-                    RMAuthentication auth = RMConnection.join(null);
-                    Credentials cred = Credentials.createCredentials("admin", "admin", auth.getPublicKey());
-                    RMAdmin admin = auth.logAsAdmin(cred);
-                    admin.freeNode(ns.get(0));
+                    ResourceManager rm2 = RMTHelper.connect("user", "pwd");
+                    rm2.releaseNode(ns.get(0)).booleanValue();
                 } catch (Exception e) {
+                    System.out.println(e.getMessage());
                 }
             }
         };
         t.start();
         t.join();
 
-        Thread.sleep(1000);
+        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
-
-        admin.freeNodes(ns);
+        resourceManager.releaseNodes(ns);
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
         RMTHelper.log("Test 2 - releasing node twice");
-        admin.freeNodes(ns);
+        resourceManager.releaseNodes(ns);
 
         // to make sure everything has been processed
         Thread.sleep(1000);
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
         RMTHelper.log("Test 3 - client crash detection");
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
@@ -144,8 +137,8 @@ public class TestConcurrentUsers extends FunctionalTest {
         // node busy event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         // client does not exist anymore
         RMTHelper.log("Client does not exist anymore. Waiting for client crash detection.");
@@ -153,8 +146,8 @@ public class TestConcurrentUsers extends FunctionalTest {
         // waiting for node free event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
     }
 }

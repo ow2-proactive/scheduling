@@ -48,7 +48,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
@@ -91,7 +91,7 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
 
-        RMAdmin admin = RMTHelper.getAdminInterface();
+        ResourceManager resourceManager = RMTHelper.getResourceManager();
 
         RMTHelper.log("Deployment");
         RMTHelper.createGCMLocalNodeSource();
@@ -112,7 +112,7 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         vmProp1.put(this.vmPropKey1, this.vmPropValue1);
 
         String node1URL = RMTHelper.createNode(node1Name, vmProp1).getNodeInformation().getURL();
-        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node1URL, NodeSource.GCM_LOCAL);
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
@@ -126,7 +126,7 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         vmTwoProperties.put(this.vmPropKey2, this.vmPropValue2);
 
         String node2URL = RMTHelper.createNode(node2Name, vmTwoProperties).getNodeInformation().getURL();
-        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node2URL, NodeSource.GCM_LOCAL);
 
         //wait node adding event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
@@ -146,7 +146,7 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         scriptsList.add(sScript1);
         scriptsList.add(sScript2);
 
-        NodeSet nodes = admin.getAtMostNodes(1, scriptsList, null);
+        NodeSet nodes = resourceManager.getAtMostNodes(1, scriptsList, null);
 
         //wait node selection
         PAFuture.waitFor(nodes);
@@ -157,14 +157,14 @@ public class SelectionWithSeveralScriptsTest2 extends FunctionalTest {
         //wait for node busy event
         RMNodeEvent evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 1);
 
-        admin.freeNodes(nodes);
+        resourceManager.releaseNodes(nodes);
         //wait for node free event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 2);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);
 
     }
 }

@@ -39,6 +39,7 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 import java.io.Serializable;
 
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
@@ -67,8 +68,10 @@ public abstract class InfrastructureManager implements Serializable {
      * Adds information required to deploy nodes in the future.
      * Do not initiate a real nodes deployment/acquisition as it's up to the
      * policy.
+     *
+     * @return true if configuration is successful, RuntimeException otherwise
      */
-    public abstract void configure(Object... parameters) throws RMException;
+    public abstract BooleanWrapper configure(Object... parameters);
 
     /**
      * Asynchronous node acquisition request.
@@ -83,7 +86,7 @@ public abstract class InfrastructureManager implements Serializable {
     public abstract void acquireAllNodes();
 
     /**
-     * Releases the node.
+     * Removes the node from the resource manager.
      * @param node node to release
      * @throws RMException if any problems occurred
      */

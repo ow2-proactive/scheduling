@@ -90,10 +90,10 @@ public class SimpleHelloWorld {
             //you can also log on as admin if your username is in admin group. (it provides you more power ;) )
             //your need to create encrypted credentials so that it cannot be intercepted by network sniffers;
             //the scheduler will offer the public key required for encryption
-            Credentials cred = Credentials.createCredentials("user1", "pwd1", auth.getPublicKey());
+            Credentials cred = Credentials.createCredentials("user", "pwd", auth.getPublicKey());
             UserSchedulerInterface scheduler = auth.logAsUser(cred);
 
-            //if this point is reached, that's we are connected to the scheduler under "user1".
+            //if this point is reached, that's we are connected to the scheduler under "user".
             //@snippet-start taskflow_params
             //******************** CREATE A NEW JOB ***********************
             //params are respectively : name, priority,cancelOnError, description.

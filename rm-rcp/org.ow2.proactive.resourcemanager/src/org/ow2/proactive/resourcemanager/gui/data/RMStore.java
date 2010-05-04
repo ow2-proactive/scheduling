@@ -51,10 +51,9 @@ import org.ow2.proactive.resourcemanager.Activator;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.gui.actions.JMXChartItAction;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
@@ -75,8 +74,7 @@ public class RMStore {
 
     /*    public static StatusLineContributionItem statusItem =
      new StatusLineContributionItem("LoggedInStatus");*/
-    private RMUser loggerUser = null;
-    private boolean isAdmin = false;
+    private ResourceManager resourceManager = null;
 
     private RMMonitoring rmMonitoring = null;
     private EventsReceiver receiver = null;
@@ -87,10 +85,9 @@ public class RMStore {
      statusItem.setText("diconnected");
      }*/
 
-    private RMStore(String url, String login, String password, Boolean isAdmin) throws RMException {
+    private RMStore(String url, String login, String password) throws RMException, SecurityException {
         try {
             baseURL = url;
-            this.isAdmin = isAdmin.booleanValue();
 
             if (url != null && !url.endsWith("/"))
                 url += "/";
@@ -112,17 +109,16 @@ public class RMStore {
                 } catch (KeyException e) {
                     throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
                 }
-                if (isAdmin) {
-                    loggerUser = auth.logAsAdmin(creds);
-                } else {
-                    loggerUser = auth.logAsUser(creds);
-                }
+                resourceManager = auth.login(creds);
             } catch (LoginException e) {
                 Activator.log(IStatus.INFO, "Login exception for user " + login, e);
                 throw new RMException(e.getMessage());
             }
 
-            rmMonitoring = auth.logAsMonitor();
+            rmMonitoring = resourceManager.getMonitoring();
+            // checking if there were no exception
+            rmMonitoring.toString();
+
             RMStore.instance = this;
             model = new RMModel();
             receiver = (EventsReceiver) PAActiveObject.newActive(EventsReceiver.class.getName(),
@@ -133,7 +129,7 @@ public class RMStore {
             RMStatusBarItem.getInstance().setText("connected");
 
             // Initialize the JMX chartit action
-            JMXChartItAction.getInstance().initJMXClient(auth, new Object[] { login, creds }, isAdmin);
+            JMXChartItAction.getInstance().initJMXClient(auth, new Object[] { login, creds });
 
         } catch (ActiveObjectCreationException e) {
             RMStatusBarItem.getInstance().setText("disconnected");
@@ -148,9 +144,9 @@ public class RMStore {
         }
     }
 
-    public static void newInstance(String url, String login, String password, Boolean logAsAdmin)
-            throws RMException {
-        instance = new RMStore(url, login, password, logAsAdmin);
+    public static void newInstance(String url, String login, String password) throws RMException,
+            SecurityException {
+        instance = new RMStore(url, login, password);
     }
 
     public static RMStore getInstance() {
@@ -170,20 +166,8 @@ public class RMStore {
      * @return the rmAdmin
      * @throws RMException
      */
-    public RMAdmin getRMAdmin() throws RMException {
-        if (isAdmin && loggerUser != null) {
-            return (RMAdmin) loggerUser;
-        } else {
-            throw new RMException("Only administrators can perform this action");
-        }
-    }
-
-    public RMUser getRMUser() throws RMException {
-        if (loggerUser != null) {
-            return loggerUser;
-        } else {
-            throw new RMException("You are not authenticated");
-        }
+    public ResourceManager getResourceManager() {
+        return resourceManager;
     }
 
     /**
@@ -242,10 +226,10 @@ public class RMStore {
         try {
             //disconnect user if user has not failed
             //protect it by a try catch
-            loggerUser.disconnect();
+            resourceManager.disconnect();
         } catch (Exception e) {
         }
-        loggerUser = null;
+        resourceManager = null;
         rmMonitoring = null;
         model = null;
         baseURL = null;

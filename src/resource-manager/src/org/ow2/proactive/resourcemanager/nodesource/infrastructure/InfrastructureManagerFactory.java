@@ -66,8 +66,7 @@ public class InfrastructureManagerFactory {
      * @return new infrastructure manager
      * @throws RMException if any problems occurred
      */
-    public static InfrastructureManager create(String infrastructureType, Object[] infrastructureParameters)
-            throws RMException {
+    public static InfrastructureManager create(String infrastructureType, Object[] infrastructureParameters) {
 
         InfrastructureManager im = null;
         try {
@@ -80,18 +79,14 @@ public class InfrastructureManagerFactory {
                 }
             }
             if (!supported) {
-                throw new RMException(infrastructureType + " is not supported");
+                throw new IllegalArgumentException(infrastructureType + " is not supported");
             }
 
             Class<?> imClass = Class.forName(infrastructureType);
             im = (InfrastructureManager) imClass.newInstance();
             im.configure(infrastructureParameters);
-        } catch (ClassNotFoundException e) {
-            throw new RMException(e);
-        } catch (InstantiationException e) {
-            throw new RMException(e);
-        } catch (IllegalAccessException e) {
-            throw new RMException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return im;
     }

@@ -63,6 +63,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -266,13 +267,13 @@ public class VirtualInfrastructure extends InfrastructureManager {
      * 		  parameters[9] is the path to a credentials file
      */
     @Override
-    public void configure(Object... parameters) throws RMException {
+    public BooleanWrapper configure(Object... parameters) {
         logger.info("Configuration read from user input");
         int index = 0;
         infrastructure = parameters[index++].toString();
         InfrastructureType it = InfrastructureType.getInfrastructureType(infrastructure);
         if (it == null) {
-            throw new RMException("A bad virtual infrastructure type was supplied");
+            throw new IllegalArgumentException("A bad virtual infrastructure type was supplied");
         }
         VMMUrl = parameters[index++].toString();
         VMMUser = parameters[index++].toString();
@@ -292,6 +293,7 @@ public class VirtualInfrastructure extends InfrastructureManager {
         } else {
             logger.info("Credentials not supplied, will register nodes locally.");
         }
+        return new BooleanWrapper(true);
     }
 
     @Override

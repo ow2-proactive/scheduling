@@ -67,14 +67,11 @@ public class LDAPProperties {
     /** path in the LDAP tree users containing*/
     public static final String LDAP_USERS_SUBTREE = "pa.ldap.userssubtree";
 
-    /** attribute in user entries that represent user's login */
-    public static final String LDAP_USER_LOGIN_ATTR = "pa.ldap.user.login.attr";
+    /** object class of users in LDAP server configuration */
+    public static final String LDAP_USER_OBJECT_CLASS = "pa.ldap.user.objectclass";
 
-    /** DN of a group of unique Members containing users with 'users' permissions */
-    public static final String LDAP_USERS_GROUP_DN = "pa.ldap.users.group.dn";
-
-    /** DN of a group of unique Members containing users with 'administrator' permissions */
-    public static final String LDAP_ADMINS_GROUP_DN = "pa.ldap.admins.group.dn";
+    /** object class of groups in LDAP server configuration */
+    public static final String LDAP_GROUP_OBJECT_CLASS = "pa.ldap.group.objectclass";
 
     /** authentication method used to connect to LDAP : none, simple or a SASL method */
     public static final String LDAP_AUTHENTICATION_METHOD = "pa.ldap.authentication.method";

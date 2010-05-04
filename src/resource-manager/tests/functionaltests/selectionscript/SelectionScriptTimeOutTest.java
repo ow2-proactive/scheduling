@@ -43,7 +43,7 @@ import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
@@ -79,7 +79,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
 
         RMTHelper.log("Deployment");
 
-        RMAdmin admin = RMTHelper.getAdminInterface();
+        ResourceManager resourceManager = RMTHelper.getResourceManager();
         RMTHelper.createGCMLocalNodeSource();
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
 
@@ -95,7 +95,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         SelectionScript script = new SelectionScript(new File(selectionScriptWithtimeOutPath),
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
-        NodeSet nodes = admin.getAtMostNodes(2, script);
+        NodeSet nodes = resourceManager.getAtMostNodes(2, script);
 
         //wait node selection
         try {
@@ -106,7 +106,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
             Assert.assertTrue(false);
         }
 
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, admin.getFreeNodesNumber().intValue());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 2 - selecting nodes with script which is timed out only on some hosts");
         String nodeName = "timeoutNode";
@@ -115,7 +115,7 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
         vmProperties.put(nodeName, "dummy");
 
         String nodeURL = RMTHelper.createNode(nodeName, vmProperties).getNodeInformation().getURL();
-        admin.addNode(nodeURL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(nodeURL, NodeSource.GCM_LOCAL);
         RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         // now we have RMTHelper.defaultNodesNumber + 1 nodes
@@ -123,25 +123,27 @@ public class SelectionScriptTimeOutTest extends FunctionalTest {
                 Integer.toString(scriptSleepingTime), nodeName }, false);
 
         // selecting all nodes
-        nodes = admin.getAtMostNodes(RMTHelper.defaultNodesNumber + 1, script);
+        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber + 1, script);
         // have to get RMTHelper.defaultNodesNumber due to the script timeout on one node
         Assert.assertEquals(RMTHelper.defaultNodesNumber, nodes.size());
-        Assert.assertEquals(1, admin.getFreeNodesNumber().intValue());
+        Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         // waiting until selection manager finishes script execution for node "timeout"
         // as we don't know how long should we wait roughly estimate it as scriptSleepingTime/2  
         Thread.sleep(scriptSleepingTime / 2);
 
-        NodeSet nodes2 = admin.getAtMostNodes(1, null);
+        NodeSet nodes2 = resourceManager.getAtMostNodes(1, null);
         Assert.assertEquals(1, nodes2.size());
-        Assert.assertEquals(0, admin.getFreeNodesNumber().intValue());
+        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
-        admin.freeNodes(nodes);
-        admin.freeNodes(nodes2);
+        resourceManager.releaseNodes(nodes);
+        resourceManager.releaseNodes(nodes2);
 
-        nodes = admin.getAtMostNodes(2, script);
+        nodes = resourceManager.getAtMostNodes(2, script);
         Assert.assertEquals(2, nodes.size());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber - 1, admin.getFreeNodesNumber().intValue());
-        admin.freeNodes(nodes);
+        Assert
+                .assertEquals(RMTHelper.defaultNodesNumber - 1, resourceManager.getState()
+                        .getFreeNodesNumber());
+        resourceManager.releaseNodes(nodes);
     }
 }

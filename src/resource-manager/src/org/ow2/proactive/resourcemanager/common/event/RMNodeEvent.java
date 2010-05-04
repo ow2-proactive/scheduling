@@ -148,7 +148,7 @@ public final class RMNodeEvent extends RMEvent {
 
         this.initiator = initiator;
         this.nodeUrl = rmNode.getNodeURL();
-        this.nodeSource = rmNode.getNodeSourceId();
+        this.nodeSource = rmNode.getNodeSourceName();
         this.PADName = "";
         this.VnName = rmNode.getVNodeName();
         this.hostName = rmNode.getHostName();

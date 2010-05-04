@@ -272,9 +272,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         }
     }
 
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.RMMonitoring#isAlive()
-     */
+    @Deprecated
     public boolean isAlive() {
         return true;
     }
@@ -345,5 +343,17 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     public Logger getLogger() {
         return logger;
+    }
+
+    /**
+     * Gets the current snapshot of the resource manager state providing
+     * detailed nodes and node source information.
+     *
+     * To obtain summary of the resource manager state use {@link ResourceManager}.getState()
+     *
+     * @return the current state of the resource manager
+     */
+    public RMInitialState getState() {
+        return rmcore.getRMInitialState();
     }
 }

@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import java.security.Permission;
+import java.security.Policy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +45,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -55,11 +58,17 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.authentication.principals.IdentityPrincipal;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.permissions.MethodCallPermission;
+import org.ow2.proactive.permissions.PrincipalPermission;
+import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -79,6 +88,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
@@ -98,7 +108,7 @@ import org.ow2.proactive.utils.NodeSet;
 
 /**
  * The main active object of the Resource Manager (RM), the RMCore has to
- * provide nodes to a scheduler.
+ * provide nodes to clients.
  * 
  * The RMCore functions are :<BR>
  * - Create Resource Manager's active objects at its initialization ;
@@ -117,7 +127,7 @@ import org.ow2.proactive.utils.NodeSet;
  * has to manage different states of nodes : -free : node is ready to perform a
  * task.<BR>
  * -busy : node is executing a task.<BR>
- * -to be released : node is busy and have to be removed at the end of the its
+ * -to be removed : node is busy and have to be removed at the end of the its
  * current task.<BR>
  * -down : node is broken, and not anymore able to perform tasks.<BR>
  * <BR>
@@ -133,13 +143,10 @@ import org.ow2.proactive.utils.NodeSet;
  * - all method calls to other active objects should be either asynchronous or non-blocking immediate services <BR>
  * - methods which have to return something depending on another active objects should use an automatic continuation <BR>
  *
- * @see RMCoreInterface
- * @see RMCoreSourceInterface
- * 
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
+public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, RunActive {
 
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(RMLoggers.CORE);
@@ -171,6 +178,8 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     private boolean toShutDown = false;
 
     private boolean shutedDown = false;
+
+    private Client caller = null;
 
     /**
      * Map of connected clients.
@@ -231,6 +240,10 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
             logger.debug("RMCore start : initActivity");
         }
         try {
+            // setting up the policy
+            logger.info("Setting up resource manager security policy");
+            ClientsPolicy.init();
+
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMCORE);
 
@@ -275,6 +288,10 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
                 public boolean isAlive() {
                     return true;
                 }
+
+                public String toString() {
+                    return "RM service";
+                }
             };
 
             // adding shutdown hook
@@ -307,6 +324,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
             clients.put(Client.getId(authentication), internalClient);
             clients.put(Client.getId(monitoring), internalClient);
             clients.put(Client.getId(selectionManager), internalClient);
+            clients.put(Client.getId(clientPinger), internalClient);
 
             authentication.setActivated(true);
             clientPinger.ping();
@@ -336,7 +354,16 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
         // recalculating nodes number only once per policy period
         while (body.isActive()) {
 
-            service.blockingServeOldest(aliveEventFrequency);
+            Request request = service.blockingRemoveOldest(aliveEventFrequency);
+            if (request!=null) {
+	            try {
+	                caller = checkMethodCallPermission(request.getMethodName(), request.getSourceBodyID());
+	                service.serve(request);
+	            } catch (SecurityException ex) {
+	                logger.warn("Cannot serve request: " + request, ex);
+	                service.serve(new ThrowExceptionRequest(request, ex));
+	            }
+            }
 
             delta += System.currentTimeMillis() - timeStamp;
             timeStamp = System.currentTimeMillis();
@@ -392,25 +419,23 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     }
 
     /**
-     * Set a node state to 'to be released'. mark the node toRelease, and move
-     * the node to the internal 'to be released' nodes list. An event informing
-     * the node state's change is thrown to RMMonitoring.
+     * Mark node to be removed after releasing.
      * 
      * @param rmNode
-     *            node to set to release.
+     *            node to be removed after node is released.
      */
-    private void internalSetToRelease(final RMNode rmNode, Client initiator) {
-        // If the node is already set to release no need to go further
-        if (rmNode.isToRelease()) {
+    private void internalSetToRemove(final RMNode rmNode, Client initiator) {
+        // If the node is already marked to be removed, so no need to go further
+        if (rmNode.isToRemove()) {
             return;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("Prepare to release node " + rmNode.getNodeURL());
+            logger.debug("Prepare to removing the node " + rmNode.getNodeURL());
         }
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
         try {
-            rmNode.setToRelease();
+            rmNode.setToRemove();
         } catch (NodeException e1) {
             // A down node shouldn't be busied...
             logger.debug("", e1);
@@ -428,11 +453,11 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      * @param rmnode
      *            the node to release
      */
-    private void internalDoRelease(RMNode rmnode, Client initiator) {
+    private void removeNodeFromCoreAndSource(RMNode rmnode, Client initiator) {
         if (logger.isInfoEnabled()) {
-            logger.info("Releasing node " + rmnode.getNodeURL());
+            logger.info("Removing node " + rmnode.getNodeURL());
         }
-        internalRemoveNodeFromCore(rmnode, initiator);
+        removeNodeFromCore(rmnode, initiator);
         rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), initiator);
     }
 
@@ -444,7 +469,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      * @param rmnode
      *            the node to remove.
      */
-    private void internalRemoveNodeFromCore(RMNode rmnode, Client initiator) {
+    private void removeNodeFromCore(RMNode rmnode, Client initiator) {
         logger.debug("Removing node " + rmnode.getNodeURL() + " provided by " + rmnode.getProvider());
         // removing the node from the HM list
         if (rmnode.isFree()) {
@@ -479,7 +504,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
                 .getName()));
         if (logger.isInfoEnabled()) {
             logger.info("New node " + rmnode.getNodeURL() + " added to the node source " +
-                rmnode.getNodeSourceId() + " by " + rmnode.getProvider());
+                rmnode.getNodeSourceName() + " by " + rmnode.getProvider());
         }
         return new BooleanWrapper(true);
     }
@@ -512,32 +537,28 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
 
         if (!existingNodeSource && sourceName.equals(NodeSource.DEFAULT)) {
             // creating the default node source
-            try {
-                createNodesource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(), null,
-                        StaticPolicy.class.getName(), null);
-            } catch (RMException e) {
-                logger.error("Cannot create the default node source", e);
-            }
+            createNodeSource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(), null,
+                    StaticPolicy.class.getName(), null).booleanValue();
         }
 
         if (nodeSources.containsKey(sourceName)) {
             NodeSource nodeSource = this.nodeSources.get(sourceName);
 
-            Client client = checkAccess();
-            if (client == null)
-                client = nodeSource.getProvider();
+            // checking that client has a right to change this node source
+            caller.checkPermission(nodeSource.getAdminPermission(), caller +
+                " is not authorized to add node " + nodeUrl + " to " + sourceName);
 
             // Known URL, so do some cleanup before replacing it
             if (allNodes.containsKey(nodeUrl)) {
 
-                if (!allNodes.get(nodeUrl).getNodeSourceId().equals(sourceName)) {
+                if (!allNodes.get(nodeUrl).getNodeSourceName().equals(sourceName)) {
                     // trying to already registered node to another node source
                     // do nothing in this case
                     throw new AddingNodesException("An attempt to add a node " + nodeUrl +
                         " registered in one node source to another one");
                 }
             }
-            return nodeSource.acquireNode(nodeUrl, client);
+            return nodeSource.acquireNode(nodeUrl, caller);
         } else {
             throw new AddingNodesException("Unknown node source " + sourceName);
         }
@@ -549,24 +570,26 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      * @param nodeUrl URL of the node to remove.
      * @param preempt if true remove the node immediately without waiting while it will be freed.
      */
-    public void removeNode(String nodeUrl, boolean preempt) {
-
-        Client initiator = checkAccess();
-        if (initiator == null)
-            return;
+    public BooleanWrapper removeNode(String nodeUrl, boolean preempt) {
 
         if (this.allNodes.containsKey(nodeUrl)) {
             RMNode rmnode = this.allNodes.get(nodeUrl);
 
+            NodeSource nodeSource = rmnode.getNodeSource();
+            // checking that client has the permission to change this node source
+            caller.checkPermission(nodeSource.getAdminPermission(), caller +
+                " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
+                rmnode.getNodeSourceName());
+
             if (rmnode.isDown() || preempt || rmnode.isFree()) {
-                internalRemoveNodeFromCore(rmnode, initiator);
-                rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), initiator);
+                removeNodeFromCoreAndSource(rmnode, caller);
             } else if (rmnode.isBusy()) {
-                internalSetToRelease(rmnode, initiator);
+                internalSetToRemove(rmnode, caller);
             }
         } else {
-            logger.warn("An attempt to remove non existing node " + nodeUrl);
+            throw new IllegalArgumentException("An attempt to remove non existing node " + nodeUrl);
         }
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -577,9 +600,6 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      * @param preemptive if true remove nodes immediately without waiting while they will be freed
      */
     public void removeNodes(int number, String nodeSourceName, boolean preemptive) {
-
-        if (checkAccess() == null)
-            return;
         int numberOfRemovedNodes = 0;
 
         // temporary list to avoid concurrent modification
@@ -629,8 +649,6 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      */
     public void removeAllNodes(String nodeSourceName, boolean preemptive) {
 
-        if (checkAccess() == null)
-            return;
         for (Node node : nodeSources.get(nodeSourceName).getAliveNodes()) {
             removeNode(node.getNodeInformation().getURL(), preemptive);
         }
@@ -648,18 +666,12 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      * @param infrastructureParameters parameters for infrastructure creation
      * @param policyType name of the policy type. It passed as a string due to pluggable approach {@link NodeSourcePolicyFactory}
      * @param policyParameters parameters for policy creation
-     * @throws RMException if any problems occurred
      */
-    public void createNodesource(String nodeSourceName, String infrastructureType,
-            Object[] infrastructureParameters, String policyType, Object[] policyParameters)
-            throws RMException {
-
-        Client client = checkAccess();
-        if (client == null)
-            return;
+    public BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType,
+            Object[] infrastructureParameters, String policyType, Object[] policyParameters) {
 
         if (this.nodeSources.containsKey(nodeSourceName)) {
-            throw new RMException("Node Source name " + nodeSourceName + " is already exist");
+            throw new IllegalArgumentException("Node Source name " + nodeSourceName + " already exist");
         }
 
         logger.info("Creating a node source : " + nodeSourceName);
@@ -668,47 +680,43 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
                 infrastructureParameters);
         NodeSourcePolicy policy = NodeSourcePolicyFactory.create(policyType, infrastructureType,
                 policyParameters);
-
         NodeSource nodeSource;
         try {
             nodeSource = (NodeSource) PAActiveObject.newActive(NodeSource.class.getName(), new Object[] {
-                    nodeSourceName, im, policy, PAActiveObject.getStubOnThis(), client }, nodeRM);
+                    nodeSourceName, caller, im, policy, PAActiveObject.getStubOnThis() }, nodeRM);
         } catch (Exception e) {
-            throw new RMException(e);
+            throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
         }
-
         // adding node source as client to the core
         UniqueID nsId = Client.getId(nodeSource);
         UniqueID policyId = Client.getId(policy);
         if (nsId == null || policyId == null) {
-            throw new RMException("Cannot register the node source");
+            throw new IllegalStateException("Cannot register the node source");
         }
 
         // adding access to the core for node source and policy
-        RMCore.clients.put(nsId, client);
-        RMCore.clients.put(policyId, client);
+        RMCore.clients.put(nsId, caller);
+        RMCore.clients.put(policyId, caller);
 
         this.nodeSources.put(nodeSourceName, nodeSource);
         // create the event
         this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_CREATED,
-            client.getName()));
+            caller.getName()));
 
         nodeSource.activate();
 
-        logger.info("Node source : " + nodeSourceName + " has been successfully created by " + client);
+        logger.info("Node source : " + nodeSourceName + " has been successfully created by " + caller);
+
+        return new BooleanWrapper(true);
     }
 
     /**
      * Shutdown the resource manager
      */
-    public void shutdown(boolean preempt) {
-        Client client = checkAccess();
-        if (client == null) {
-            return;
-        }
+    public BooleanWrapper shutdown(boolean preempt) {
         // this method could be called twice from shutdown hook and user action
         if (toShutDown)
-            return;
+            return new BooleanWrapper(false);
 
         logger.info("RMCore shutdown request");
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
@@ -719,9 +727,10 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
         } else {
             for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
                 removeAllNodes(entry.getKey(), preempt);
-                entry.getValue().shutdown(client);
+                entry.getValue().shutdown(caller);
             }
         }
+        return new BooleanWrapper(true);
     }
 
     // ----------------------------------------------------------------------
@@ -729,23 +738,11 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     // ----------------------------------------------------------------------
 
     /**
-     * Return number of free nodes available for scheduling
-     * @return number of free nodes
-     */
-    public IntWrapper getFreeNodesNumber() {
-        if (checkAccess() == null)
-            throw new RuntimeException("Permission denied");
-        return new IntWrapper(this.freeNodes.size());
-    }
-
-    /**
      * Gives total number of alive nodes handled by RM
      * @return total number of alive nodes
      */
+    @Deprecated
     public IntWrapper getTotalAliveNodesNumber() {
-        if (checkAccess() == null)
-            throw new RuntimeException("Permission denied");
-
         // TODO get the number of alive nodes in a more effective way
         int count = 0;
         for (RMNode node : allNodes.values()) {
@@ -756,32 +753,17 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     }
 
     /**
-     * Gives total number of nodes handled by RM (including dead nodes)
-     * @return total number of nodes
+     * {@inheritDoc}
      */
-    public IntWrapper getTotalNodesNumber() {
-        if (checkAccess() == null)
-            throw new RuntimeException("Permission denied");
-        return new IntWrapper(this.allNodes.size());
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#freeNode(org.objectweb.proactive.core.node.Node)
-     */
-    public void freeNode(Node node) {
-        Client client = checkAccess();
-        if (client == null)
-            return;
-
+    public BooleanWrapper releaseNode(Node node) {
         String nodeURL = null;
         try {
             nodeURL = node.getNodeInformation().getURL();
         } catch (RuntimeException e) {
-            logger.debug("A Runtime exception occured " + "while obtaining information on the node,"
+            logger.debug("A Runtime exception occured while obtaining information on the node,"
                 + "the node must be down (it will be detected later)", e);
-            // node is down,
-            // will be detected later
-            return;
+            // node is down, will be detected by pinger
+            throw new IllegalStateException(e.getMessage(), e);
         }
 
         // verify whether the node has not been removed from the RM
@@ -791,36 +773,40 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
             // prevent Scheduler Error : Scheduler try to render anode already
             // free
             if (rmnode.isFree()) {
-                logger.warn("[RMCORE] scheduler tried to free a node already free ! Node URL : " + nodeURL);
+                logger.warn("Client " + caller + " tries to release the already free node " + nodeURL);
             } else {
                 // verify that scheduler don't try to render a node detected
                 // down
                 if (!rmnode.isDown()) {
+                    Set<? extends IdentityPrincipal> userPrincipal = rmnode.getOwner().getSubject()
+                            .getPrincipals(UserNamePrincipal.class);
+                    Permission ownerPermission = new PrincipalPermission(rmnode.getOwner().getName(),
+                        userPrincipal);
+                    caller.checkPermission(ownerPermission, caller + " is not authorized to free node " +
+                        node.getNodeInformation().getURL());
 
-                    if (!rmnode.getOwner().equals(client)) {
-                        logger.warn("An attempt to free a node by another user (won't be performed) " +
-                            node.getNodeInformation().getURL());
-                        return;
-                    }
-
-                    if (rmnode.isToRelease()) {
-                        internalDoRelease(rmnode, client);
+                    if (rmnode.isToRemove()) {
+                        removeNodeFromCoreAndSource(rmnode, caller);
                     } else {
                         internalSetFree(rmnode);
                     }
                 }
             }
         } else {
-            logger.warn("[RMCORE] scheduler asked to free an unknown node ! Node URL : " + nodeURL);
+            logger.warn("Cannot release unknown node " + nodeURL);
+            throw new IllegalArgumentException("Cannot release unknown node " + nodeURL);
         }
+        return new BooleanWrapper(true);
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreInterface#freeNodes(org.ow2.proactive.utils.NodeSet)
+     * {@inheritDoc}
      */
-    public void freeNodes(NodeSet nodes) {
-        for (Node node : nodes)
-            freeNode(node);
+    public BooleanWrapper releaseNodes(NodeSet nodes) {
+        for (Node node : nodes) {
+            releaseNode(node);
+        }
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -877,12 +863,8 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
             return new NodeSet();
         } else {
 
-            Client client = checkAccess();
-            if (client == null)
-                throw new RuntimeException("Permission denied");
-
-            logger.info(client + " requested " + nb + " nodes");
-            return selectionManager.findAppropriateNodes(nb, selectionScriptList, exclusion, client);
+            logger.info(caller + " requested " + nb + " nodes");
+            return selectionManager.findAppropriateNodes(nb, selectionScriptList, exclusion, caller);
         }
     }
 
@@ -926,7 +908,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     /**
      * Gets RM monitoring stub
      */
-    public RMMonitoringImpl getMonitoring() {
+    public RMMonitoring getMonitoring() {
         return this.monitoring;
     }
 
@@ -935,9 +917,6 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      *      org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public BooleanWrapper nodeSourceUnregister(String sourceId, RMNodeSourceEvent evt) {
-        if (checkAccess() == null)
-            throw new RuntimeException("Permission denied");
-
         NodeSource nodeSource = this.nodeSources.remove(sourceId);
 
         if (nodeSource == null) {
@@ -997,9 +976,6 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      * @throws NodeException if the node can't be set busy
      */
     public void setBusyNode(final String nodeUrl, Client owner) throws NodeException {
-        if (checkAccess() == null)
-            return;
-
         final RMNode rmNode = this.allNodes.get(nodeUrl);
         if (rmNode == null) {
             logger.error("Unknown node " + nodeUrl);
@@ -1030,9 +1006,6 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      * accordingly. Sends an event indicating that the node is down.
      */
     public void setDownNode(String nodeUrl) {
-        if (checkAccess() == null)
-            return;
-
         RMNode rmNode = getNodebyUrl(nodeUrl);
         if (rmNode != null) {
             // If the node is already down no need to go further
@@ -1063,14 +1036,10 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
      * @param nodeUrl down node to be removed
      * @return true if the nodes was successfully removed, false otherwise
      */
-    public BooleanWrapper internalRemoveNodeFromCore(String nodeUrl) {
-        Client initiator = checkAccess();
-        if (initiator == null)
-            throw new RuntimeException("Permission denied");
-
+    public BooleanWrapper removeNodeFromCore(String nodeUrl) {
         RMNode rmnode = getNodebyUrl(nodeUrl);
         if (rmnode != null) {
-            internalRemoveNodeFromCore(rmnode, initiator);
+            removeNodeFromCore(rmnode, caller);
             return new BooleanWrapper(true);
         } else {
             return new BooleanWrapper(false);
@@ -1084,49 +1053,24 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
-    public IntWrapper getNodeSourcePingFrequency(String sourceName) throws RMException {
-        if (checkAccess() == null)
-            throw new RuntimeException("Permission denied");
-
+    public IntWrapper getNodeSourcePingFrequency(String sourceName) {
         if (this.nodeSources.containsKey(sourceName)) {
             return this.nodeSources.get(sourceName).getPingFrequency();
         } else {
-            throw new RMException("unknown node source : " + sourceName);
+            throw new IllegalArgumentException("Unknown node source " + sourceName);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void setNodeSourcePingFrequency(int frequency, String sourceName) throws RMException {
-        if (checkAccess() == null)
-            return;
-
+    public BooleanWrapper setNodeSourcePingFrequency(int frequency, String sourceName) {
         if (this.nodeSources.containsKey(sourceName)) {
             this.nodeSources.get(sourceName).setPingFrequency(frequency);
         } else {
-            throw new RMException("unknown node source : " + sourceName);
+            throw new IllegalArgumentException("Unknown node source " + sourceName);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setAllNodeSourcesPingFrequency(int frequency) {
-        if (checkAccess() == null)
-            return;
-        for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
-            entry.getValue().setPingFrequency(frequency);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultNodeSourcePingFrequency(int frequency) throws RMException {
-        if (checkAccess() == null)
-            return;
-        setNodeSourcePingFrequency(frequency, NodeSource.DEFAULT);
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -1146,40 +1090,37 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
-    public void removeSource(String sourceName, boolean preempt) throws RMException {
-
+    public BooleanWrapper removeNodeSource(String sourceName, boolean preempt) {
         if (nodeSources.containsKey(sourceName)) {
+            NodeSource nodeSource = nodeSources.get(sourceName);
+            caller.checkPermission(nodeSource.getAdminPermission(), caller + " is not authorized to remove " +
+                sourceName);
 
-            Client client = checkAccess();
-            if (client == null)
-                return;
-            logger.info(client + " requested removal of the " + sourceName + " node source");
+            logger.info(caller + " requested removal of the " + sourceName + " node source");
 
             //remove down nodes handled by the source
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
-            nodeSources.get(sourceName).shutdown(client);
+            nodeSource.shutdown(caller);
+
+            return new BooleanWrapper(true);
         } else {
-            throw new RMException("unknown node source : " + sourceName);
+            throw new IllegalArgumentException("Unknown node source " + sourceName);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public RMState getRMState() {
-        if (checkAccess() == null)
-            throw new RuntimeException("Permission denied");
-
-        RMState state = new RMState();
-        state.setNumberOfFreeResources(getFreeNodesNumber());
-        state.setNumberOfAllResources(getTotalNodesNumber());
+    public RMState getState() {
+        RMState state = new RMState(freeNodes.size(), getTotalAliveNodesNumber().intValue(), allNodes.size());
         return state;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public boolean isAlive() {
         return !toShutDown;
     }
@@ -1187,8 +1128,16 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
-    public void disconnect() {
+    public BooleanWrapper isActive() {
+        return new BooleanWrapper(!toShutDown);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BooleanWrapper disconnect() {
         disconnect(PAActiveObject.getContext().getCurrentRequest().getSender().getID());
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -1200,8 +1149,8 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
             // expensive but relatively rare operation
             for (RMNode rmnode : allNodes.values()) {
                 if (client.equals(rmnode.getOwner())) {
-                    if (rmnode.isToRelease()) {
-                        internalDoRelease(rmnode, client);
+                    if (rmnode.isToRemove()) {
+                        removeNodeFromCoreAndSource(rmnode, client);
                     } else if (rmnode.isBusy()) {
                         internalSetFree(rmnode);
                     }
@@ -1226,9 +1175,7 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     }
 
     private Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
-
         Collection<PluginDescriptor> descriptors = new ArrayList<PluginDescriptor>();
-
         for (Class<?> cls : plugins) {
             descriptors.add(new PluginDescriptor(cls));
         }
@@ -1236,19 +1183,120 @@ public class RMCore implements RMAdmin, RMUser, InitActive, RunActive {
     }
 
     /**
-     * Checks if the caller thread has an access to the core
+     * Checks if the caller thread has permissions to call particular method name
      * @return client object corresponding to the caller thread
      */
-    private Client checkAccess() {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        Client client = RMCore.clients.get(id);
-        if (client != null) {
-            return client;
-        }
-        logger.warn("Access denied for client " +
-            PAActiveObject.getContext().getCurrentRequest().getSourceBodyID() + "\n", new Exception(
-            "Access denied"));
+    private Client checkMethodCallPermission(final String methodName, UniqueID clientId) {
+        Client client = RMCore.clients.get(clientId);
 
-        return null;
+        if (client == null) {
+            throw new SecurityException("Unknown client " + clientId);
+        }
+
+        final String fullMethodName = RMCore.class.getName() + "." + methodName;
+        final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
+
+        client.checkPermission(methodCallPermission, client + " is not authorized to call " + fullMethodName);
+        return client;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BooleanWrapper reloadPermissions() {
+        Policy.getPolicy().refresh();
+        return new BooleanWrapper(true);
+    }
+
+    // Deprecated methods
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void createNodesource(String nodeSourceName, String infrastructureType,
+            Object[] infrastructureParameters, String policyType, Object[] policyParameters)
+            throws RMException {
+        try {
+            createNodeSource(nodeSourceName, infrastructureType, infrastructureParameters, policyType,
+                    policyParameters);
+        } catch (RuntimeException e) {
+            throw new RMException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void removeSource(String sourceName, boolean preempt) throws RMException {
+        try {
+            removeNodeSource(sourceName, preempt);
+        } catch (RuntimeException e) {
+            throw new RMException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void setAllNodeSourcesPingFrequency(int frequency) {
+        List<RMNodeSourceEvent> nodeSources = getNodeSourcesList();
+        for (RMNodeSourceEvent ns : nodeSources) {
+            setNodeSourcePingFrequency(frequency, ns.getSourceName());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void setDefaultNodeSourcePingFrequency(int frequency) throws RMException {
+        try {
+            setNodeSourcePingFrequency(frequency, NodeSource.DEFAULT);
+        } catch (RuntimeException e) {
+            throw new RMException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public IntWrapper getFreeNodesNumber() {
+        return getState().getNumberOfFreeResources();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public RMState getRMState() {
+        return getState();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public IntWrapper getTotalNodesNumber() {
+        return getState().getNumberOfAllResources();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void freeNode(Node node) {
+        releaseNode(node);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void freeNodes(NodeSet nodes) {
+        releaseNodes(nodes);
+    }
+
 }

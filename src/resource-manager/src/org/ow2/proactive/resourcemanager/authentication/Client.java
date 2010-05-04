@@ -37,7 +37,12 @@
 package org.ow2.proactive.resourcemanager.authentication;
 
 import java.io.Serializable;
+import java.security.Permission;
+import java.security.PrivilegedAction;
 
+import javax.security.auth.Subject;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -45,6 +50,9 @@ import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
@@ -67,8 +75,11 @@ public class Client implements Serializable {
     /** client's name */
     private String name;
 
+    private Subject subject;
+
     /** Unique id of the client */
     private UniqueID id;
+
     /** Body of the sender of request */
     private transient UniversalBody body;
 
@@ -79,8 +90,10 @@ public class Client implements Serializable {
      * Constructs the client object from given client name.
      * @param clientName the name of the client authenticated in the resource manager
      */
-    public Client(String name) {
-        this.name = name;
+    public Client(Subject subject) {
+        this.subject = subject;
+        UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
+        this.name = unPrincipal.getName();
         this.id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
         this.body = PAActiveObject.getContext().getCurrentRequest().getSender();
     }
@@ -155,5 +168,32 @@ public class Client implements Serializable {
         }
 
         return null;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    /**
+     * Checks that client has the specified permission.
+     *
+     * @return true if it has, throw {@link SecurityException} otherwise with specified error message
+     */
+    public boolean checkPermission(final Permission permission, String errorMessage) {
+        try {
+            Subject.doAsPrivileged(subject, new PrivilegedAction<Object>() {
+                public Object run() {
+                    SecurityManager sm = System.getSecurityManager();
+                    if (sm != null) {
+                        sm.checkPermission(permission);
+                    }
+                    return null;
+                }
+            }, null);
+        } catch (SecurityException ex) {
+            throw new SecurityException(errorMessage);
+        }
+
+        return true;
     }
 }

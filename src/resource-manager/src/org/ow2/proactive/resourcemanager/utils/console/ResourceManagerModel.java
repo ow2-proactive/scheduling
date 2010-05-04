@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ActiveEon Team
@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.utils.adminconsole;
+package org.ow2.proactive.resourcemanager.utils.console;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,7 +50,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -62,17 +62,17 @@ import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
 
 /**
- * AdminRMModel is the class that drives the RM console in the admin view.
- * To use this class, get the model, connect a RM and a console, and just start this model.
+ * Class represents underlying model of the resource manager when accessing from
+ * the command line.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class AdminRMModel extends ConsoleModel {
+public class ResourceManagerModel extends ConsoleModel {
 
-    private static final String JS_INIT_FILE = "AdminActions.js";
+    private static final String JS_INIT_FILE = "ResourceManagerActions.js";
     protected static final int cmdHelpMaxCharLength = 28;
-    protected RMAdmin rm;
+    protected ResourceManager rm;
     private ArrayList<Command> commands;
 
     private static int logsNbLines = 20;
@@ -88,18 +88,18 @@ public class AdminRMModel extends ConsoleModel {
      * @param allowExitCommand true if the exit command is part of the commands, false if exit command does not exist.
      * @return the current model associated to this class.
      */
-    public static AdminRMModel getModel(boolean allowExitCommand) {
+    public static ResourceManagerModel getModel(boolean allowExitCommand) {
         if (model == null) {
-            model = new AdminRMModel(allowExitCommand);
+            model = new ResourceManagerModel(allowExitCommand);
         }
-        return (AdminRMModel) model;
+        return (ResourceManagerModel) model;
     }
 
-    private static AdminRMModel getModel() {
-        return (AdminRMModel) model;
+    private static ResourceManagerModel getModel() {
+        return (ResourceManagerModel) model;
     }
 
-    protected AdminRMModel(boolean allowExitCommand) {
+    protected ResourceManagerModel(boolean allowExitCommand) {
         this.allowExitCommand = allowExitCommand;
         commands = new ArrayList<Command>();
         commands
@@ -133,6 +133,7 @@ public class AdminRMModel extends ConsoleModel {
             "Set the directory where the log are located, (default is RM_HOME/.logs"));
         commands.add(new Command("viewlogs(nbLines)",
             "View the last nbLines lines of the logs file, (default nbLines is 20)"));
+        commands.add(new Command("refreshPermissions()", "Reload permissions policy file"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exits RM controller"));
         }
@@ -157,7 +158,7 @@ public class AdminRMModel extends ConsoleModel {
     protected void initialize() throws IOException {
         super.initialize();
         //read and launch Action.js
-        BufferedReader br = new BufferedReader(new InputStreamReader(AdminController.class
+        BufferedReader br = new BufferedReader(new InputStreamReader(ResourceManagerController.class
                 .getResourceAsStream(JS_INIT_FILE)));
         eval(readFileContent(br));
     }
@@ -218,7 +219,7 @@ public class AdminRMModel extends ConsoleModel {
 
     private void removens_(String nodeSourceName, boolean preempt) {
         try {
-            rm.removeSource(nodeSourceName, preempt);
+            rm.removeNodeSource(nodeSourceName, preempt);
             print("Node source '" + nodeSourceName + "' removal request sent to Resource Manager");
         } catch (Exception e) {
             handleExceptionDisplay("Error while removing node source '" + nodeSourceName, e);
@@ -232,7 +233,7 @@ public class AdminRMModel extends ConsoleModel {
 
     private void listns_() {
         List<String> list;
-        List<RMNodeSourceEvent> listns = rm.getNodeSourcesList();
+        List<RMNodeSourceEvent> listns = rm.getMonitoring().getState().getNodeSource();
         ObjectArrayFormatter oaf = new ObjectArrayFormatter();
         oaf.setMaxColumnLength(70);
         //space between column
@@ -259,7 +260,7 @@ public class AdminRMModel extends ConsoleModel {
     }
 
     private void listnodes_() {
-        List<RMNodeEvent> listne = rm.getNodesList();
+        List<RMNodeEvent> listne = rm.getMonitoring().getState().getNodesEvents();
         if (listne.size() == 0) {
             print("No nodes handled by Resource Manager");
         } else {
@@ -304,7 +305,7 @@ public class AdminRMModel extends ConsoleModel {
             Object[] shiftedParams = new Object[params.length - 1];
             System.arraycopy(params, 1, shiftedParams, 0, params.length - 1);
 
-            //TODO if we want to run rm-admin remotely this part has to be rewritten
+            //TODO if we want to run the command line remotely this part has to be rewritten
             Class<?> cls = Class.forName(name);
             PluginDescriptor pd = new PluginDescriptor(cls);
             // packing parameters (reading files on client side, processing login information, etc)
@@ -335,7 +336,7 @@ public class AdminRMModel extends ConsoleModel {
             Object[] imPackedParams = packPluginParameters(imInputParams);
             Object[] policyPackedParams = packPluginParameters(policyInputParams);
 
-            rm.createNodesource(nodeSourceName, imName, imPackedParams, policyName, policyPackedParams);
+            rm.createNodeSource(nodeSourceName, imName, imPackedParams, policyName, policyPackedParams);
             print("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
         } catch (Exception e) {
             handleExceptionDisplay("Error while creating node source '" + nodeSourceName, e);
@@ -487,12 +488,12 @@ public class AdminRMModel extends ConsoleModel {
         }
     }
 
-    public static RMAdmin getAdminRM() {
+    public static ResourceManager getResourceManager() {
         getModel().checkIsReady();
-        return getModel().getAdminRM_();
+        return getModel().getResourceManager_();
     }
 
-    private RMAdmin getAdminRM_() {
+    private ResourceManager getResourceManager_() {
         return rm;
     }
 
@@ -521,7 +522,7 @@ public class AdminRMModel extends ConsoleModel {
      *
      * @param rm the Resource manager to connect
      */
-    public void connectRM(RMAdmin rm) {
+    public void connectRM(ResourceManager rm) {
         if (rm == null) {
             throw new NullPointerException("Given Resource Manager is null");
         }
@@ -530,7 +531,7 @@ public class AdminRMModel extends ConsoleModel {
 
     /**
      * Set the JMX information : it is not a mandatory option, if set, it will show informations, if not nothing will be displayed.
-     * 
+     *
      * @param info the jmx information about the current connection
      */
     public void setJMXInfo(MBeanInfoViewer info) {
@@ -551,5 +552,10 @@ public class AdminRMModel extends ConsoleModel {
         for (PluginDescriptor plugin : getModel().rm.getSupportedNodeSourcePolicies()) {
             getModel().print(plugin.toString());
         }
+    }
+
+    public static void reloadPermissions() {
+        getModel().checkIsReady();
+        getModel().rm.reloadPermissions();
     }
 }

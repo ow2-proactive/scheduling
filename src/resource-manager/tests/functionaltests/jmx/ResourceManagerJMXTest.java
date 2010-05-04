@@ -54,7 +54,6 @@ import junit.framework.Assert;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
-import org.ow2.proactive.jmx.naming.JMXProperties;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -93,9 +92,7 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
                 .getJMXConnectorURL(JMXTransportProtocol.RMI));
         final JMXServiceURL jmxRoServiceURL = new JMXServiceURL(auth
                 .getJMXConnectorURL(JMXTransportProtocol.RO));
-        final ObjectName anonymMBeanName = new ObjectName(JMXMonitoringHelper.RM_BEAN_NAME);
-        final ObjectName adminMBeanName = new ObjectName(JMXMonitoringHelper.RM_BEAN_NAME + "_" +
-            JMXProperties.JMX_ADMIN);
+        final ObjectName beanName = new ObjectName(JMXMonitoringHelper.RM_BEAN_NAME);
         final String suffix = "/" + PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME.getValueAsString();
 
         {
@@ -175,24 +172,24 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
             Assert.assertNotNull("Unable to obtain the MBean server connection over RMI", conn);
 
             RMTHelper.log("Test as user 2 - Check anonymMBean is registered in the MBean server");
-            Assert.assertTrue("AnonymMBean is not registered", conn.isRegistered(anonymMBeanName));
+            Assert.assertTrue("AnonymMBean is not registered", conn.isRegistered(beanName));
 
             RMTHelper.log("Test as user 3 - Check adminMBean not accessible by queryNames()");
             for (final Object o : conn.queryNames(null, null)) {
                 Assert.assertFalse("AdminMBean must not be accessible from user connection", ((ObjectName) o)
-                        .equals(adminMBeanName));
+                        .equals(beanName));
             }
 
             RMTHelper.log("Test as user 4 - Check adminMBean not accessible by queryMBeans()");
             for (final Object o : conn.queryMBeans(null, null)) {
                 Assert.assertFalse("AdminMBean must not be accessible from user connection",
-                        ((ObjectInstance) o).getObjectName().equals(adminMBeanName));
+                        ((ObjectInstance) o).getObjectName().equals(beanName));
             }
 
             RMTHelper
                     .log("Test as user 5 - Check adminMBean name injection (expecting an InstanceNotFoundException)");
             try {
-                conn.isRegistered(adminMBeanName);
+                conn.isRegistered(beanName);
             } catch (Exception e) {
                 Assert.assertTrue("AdminMBean injection must throw InstanceNotFoundException",
                         e.getCause() instanceof InstanceNotFoundException);
@@ -203,12 +200,12 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
             // Start a new node and add it to the rm
             final Node node = RMTHelper.createNode("test");
             final String nodeURL = node.getNodeInformation().getURL();
-            RMTHelper.getAdminInterface().addNode(nodeURL).booleanValue(); // force sync
+            RMTHelper.getResourceManager().addNode(nodeURL).booleanValue(); // force sync
 
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
             // Get all attributes to test
-            AttributeList list = conn.getAttributes(anonymMBeanName, new String[] { "RMStatus",
+            AttributeList list = conn.getAttributes(beanName, new String[] { "RMStatus",
                     "AvailableNodesCount", "FreeNodesCount" });
             // Check RMStatus
             Attribute att = (Attribute) list.get(0);
@@ -221,13 +218,12 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
             att = (Attribute) list.get(2);
             Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 1, att.getValue());
 
-            RMTHelper.getAdminInterface().removeNode(nodeURL, false);
+            RMTHelper.getResourceManager().removeNode(nodeURL, false);
 
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
             // Get all attributes to test
-            list = conn.getAttributes(anonymMBeanName,
-                    new String[] { "AvailableNodesCount", "FreeNodesCount" });
+            list = conn.getAttributes(beanName, new String[] { "AvailableNodesCount", "FreeNodesCount" });
             // Check AvailableNodesCount
             att = (Attribute) list.get(0);
             Assert.assertEquals("Incorrect value of " + att.getName() + " attribute", 0, att.getValue());
@@ -252,21 +248,21 @@ public final class ResourceManagerJMXTest extends FunctionalTest {
             Assert.assertNotNull("Unable to obtain the MBean server connection over RO", conn);
 
             RMTHelper.log("Test as admin 2 - Check adminMBean is registered in the MBean server");
-            Assert.assertTrue("AdminMBean is not registered", conn.isRegistered(adminMBeanName));
+            Assert.assertTrue("AdminMBean is not registered", conn.isRegistered(beanName));
 
             RMTHelper.log("Test as admin 3 - Check anonymMBean not accessible by queryNames()");
             for (final Object o : conn.queryNames(null, null)) {
                 Assert.assertFalse(
                         "AnonymMBean must not be accessible by queryName() from an admin connection",
-                        ((ObjectName) o).equals(anonymMBeanName));
+                        ((ObjectName) o).equals(beanName));
             }
 
             RMTHelper
                     .log("Test as admin 4 - Check adminMBean attributes can be called without throwing exceptions");
-            final MBeanInfo info = conn.getMBeanInfo(adminMBeanName);
+            final MBeanInfo info = conn.getMBeanInfo(beanName);
             for (final MBeanAttributeInfo att : info.getAttributes()) {
                 try {
-                    conn.getAttribute(adminMBeanName, att.getName());
+                    conn.getAttribute(beanName, att.getName());
                 } catch (Exception e) {
                     Assert.fail("The attribute " + att + " of adminMBean must not throw " + e);
                 }

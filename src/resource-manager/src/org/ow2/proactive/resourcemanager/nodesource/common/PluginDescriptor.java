@@ -46,6 +46,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -57,6 +58,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * without having a direct link to the service.
  *
  */
+@PublicAPI
 public class PluginDescriptor implements Serializable {
 
     private String pluginName;

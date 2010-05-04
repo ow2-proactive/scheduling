@@ -36,10 +36,16 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.security.Permission;
+import java.security.PrivilegedAction;
 import java.util.HashSet;
 import java.util.TimerTask;
 
+import javax.security.auth.Subject;
+
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.exception.AccessRightException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 
 
@@ -54,8 +60,8 @@ public class UserIdentificationImpl extends UserIdentification {
     /** user name */
     private String username;
 
-    /** is this user an admin */
-    private Boolean admin = false;
+    /** user subject */
+    private Subject subject;
 
     /** Number of submit for this user */
     private int submitNumber = 0;
@@ -87,17 +93,19 @@ public class UserIdentificationImpl extends UserIdentification {
     public UserIdentificationImpl(String username) {
         this.username = username;
         this.connectionTime = System.currentTimeMillis();
+        this.subject = new Subject();
+        this.subject.getPrincipals().add(new UserNamePrincipal(username));
     }
 
     /**
      * Constructor of user identification using user name and admin property.
      *
      * @param username the user name.
-     * @param admin true if the user is an administrator, false if not.
+     * @param subject contains all user's principals and permissions
      */
-    public UserIdentificationImpl(String username, boolean admin) {
+    public UserIdentificationImpl(String username, Subject subject) {
         this.username = username;
-        this.admin = admin;
+        this.subject = subject;
         this.connectionTime = System.currentTimeMillis();
     }
 
@@ -114,14 +122,6 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public String getUsername() {
         return username;
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.job.UserIdentification#isAdmin()
-     */
-    @Override
-    public Boolean isAdmin() {
-        return admin;
     }
 
     /**
@@ -246,7 +246,6 @@ public class UserIdentificationImpl extends UserIdentification {
             UserIdentificationImpl id = (UserIdentificationImpl) object;
             toReturn = toReturn && getUsername().equals(id.getUsername());
             toReturn = toReturn && getHostName().equals(id.getHostName());
-            toReturn = toReturn && isAdmin().equals(id.isAdmin());
             toReturn = toReturn && (getConnectionTime() == id.getConnectionTime());
             return toReturn;
         }
@@ -258,8 +257,38 @@ public class UserIdentificationImpl extends UserIdentification {
      */
     @Override
     public String toString() {
-        String a = admin ? "(admin)" : "";
-        return getClass().getName() + "[" + username + a + "]";
+        return getClass().getName() + "[" + username + "]";
     }
 
+    /**
+     * Checks if user has the specified permission.
+     *
+     * @return true if it has, throw {@link SecurityException} otherwise with specified error message
+     */
+    public boolean checkPermission(final Permission permission, String errorMessage)
+            throws AccessRightException {
+        try {
+            Subject.doAsPrivileged(subject, new PrivilegedAction<Object>() {
+                public Object run() {
+                    SecurityManager sm = System.getSecurityManager();
+                    if (sm != null) {
+                        sm.checkPermission(permission);
+                    }
+                    return null;
+                }
+            }, null);
+        } catch (SecurityException ex) {
+            throw new AccessRightException(errorMessage);
+        }
+
+        return true;
+    }
+
+    /**
+     * Gets user's subject retrieved from JAAS authentication
+     * @return user's subject
+     */
+    public Subject getSubject() {
+        return subject;
+    }
 }

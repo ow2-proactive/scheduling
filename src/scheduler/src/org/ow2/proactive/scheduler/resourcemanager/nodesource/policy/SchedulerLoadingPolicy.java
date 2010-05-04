@@ -108,19 +108,20 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
      * @param policyParameters parameters defined by user
      */
     @Override
-    public void configure(Object... policyParameters) throws RMException {
+    public BooleanWrapper configure(Object... policyParameters) {
         super.configure(policyParameters);
 
         try {
-            int index = 3;
+            int index = 5;
             policyPeriod = Integer.parseInt(policyParameters[index++].toString());
             minNodes = Integer.parseInt(policyParameters[index++].toString());
             maxNodes = Integer.parseInt(policyParameters[index++].toString());
             loadingFactor = Integer.parseInt(policyParameters[index++].toString());
             releasePeriod = Integer.parseInt(policyParameters[index++].toString());
         } catch (RuntimeException e) {
-            throw new RMException(e);
+            throw new IllegalArgumentException(e);
         }
+        return new BooleanWrapper(true);
     }
 
     public void initActivity(Body body) {

@@ -42,7 +42,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
+import javax.security.auth.login.LoginException;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -66,10 +67,9 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -116,8 +116,7 @@ public class RMTHelper {
 
     protected static RMMonitorEventReceiver eventReceiver;
 
-    protected static RMAdmin admin;
-    protected static RMUser user;
+    protected static ResourceManager resourceManager;
 
     protected static RMMonitoring monitor;
     protected static RMAuthentication auth;
@@ -157,8 +156,8 @@ public class RMTHelper {
     public static void createGCMLocalNodeSource() throws Exception {
         RMFactory.setOsJavaProperty();
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(defaultDescriptor)));
-        RMAdmin admin = getAdminInterface();
-        admin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
+        ResourceManager rm = getResourceManager();
+        rm.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
                 new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
     }
 
@@ -282,42 +281,6 @@ public class RMTHelper {
     }
 
     /**
-     * Return RM's user interface. Start RM if needed,
-     * connect as user if needed (if not yet connected as user).
-     *
-     * WARNING : if there was a previous connection as Administrator, this connection is shut down.
-     * And so some event can be missed by event receiver, between disconnection and reconnection
-     * (only one connection to RM per body is possible).
-     *
-     * @return RMUser
-     * @throws Exception if an error occurs.
-     */
-    public static RMUser getUserInterface() throws Exception {
-        if (user == null) {
-            connectAsUser();
-        }
-        return user;
-    }
-
-    /**
-     * Return RM's admin interface. Start RM if needed,
-     * connect as user if needed (if not yet connected as user).
-     *
-     * WARNING : if there was a previous connection as user, this connection is shut down.
-     * And so some event can be missed by event receiver, between disconnection and reconnection
-     * (only one connection to RM per body is possible).
-     *
-     * @return RMUser
-     * @throws Exception if an error occurs.
-     */
-    public static RMAdmin getAdminInterface() throws Exception {
-        if (admin == null) {
-            connectAsAdmin();
-        }
-        return admin;
-    }
-
-    /**
      * Stop the Resource Manager if exists.
      * @throws Exception
      * @throws ProActiveException
@@ -327,9 +290,8 @@ public class RMTHelper {
             gcmad.kill();
         }
         auth = null;
-        admin = null;
-        user = null;
         monitor = null;
+        resourceManager = null;
     }
 
     /**
@@ -492,8 +454,7 @@ public class RMTHelper {
         gcmad.startDeployment();
     }
 
-    private static void initEventReceiver(RMAuthentication auth) throws NodeException,
-            ActiveObjectCreationException {
+    private static void initEventReceiver(RMAuthentication auth) throws Exception {
         RMMonitorsHandler mHandler = getMonitorsHandler();
         if (eventReceiver == null) {
             /** create event receiver then turnActive to avoid deepCopy of MonitorsHandler object
@@ -504,35 +465,43 @@ public class RMTHelper {
         }
         PAFuture.waitFor(eventReceiver.init(auth));
 
-        System.out.println("RMTHelper.connectAsAdmin() Connected ");
+        System.out.println("RMTHelper is connected");
     }
 
     /**
-     * Init connection as admin
-     * @throws Exception
+     * Connects to the resource manager
      */
-    private static void connectAsAdmin() throws Exception {
+    public static ResourceManager connect(String name, String pass) throws Exception {
         RMAuthentication authInt = getRMAuth();
-        if (user != null) {
-            user.disconnect();
-            user = null;
-        }
-        Credentials cred = Credentials.createCredentials(username, password, authInt.getPublicKey());
-        admin = authInt.logAsAdmin(cred);
+        Credentials cred = Credentials.createCredentials(name, pass, authInt.getPublicKey());
+
+        return authInt.login(cred);
     }
 
     /**
-    * Init connection as admin
-    * @throws Exception
-    */
-    private static void connectAsUser() throws Exception {
+     * Joins to the resource manager.
+     */
+    public static ResourceManager join(String name, String pass) throws Exception {
         RMAuthentication authInt = getRMAuth();
-        if (admin != null) {
-            admin.disconnect();
-            admin = null;
+        Credentials cred = Credentials.createCredentials(name, pass, authInt.getPublicKey());
+
+        while (true) {
+            try {
+                return authInt.login(cred);
+            } catch (LoginException e) {
+                Thread.sleep(100);
+            }
         }
-        Credentials cred = Credentials.createCredentials(username, password, authInt.getPublicKey());
-        user = authInt.logAsUser(cred);
+    }
+
+    /**
+     * Gets the connected ResourceManager interface.
+     */
+    public static ResourceManager getResourceManager() throws Exception {
+        if (resourceManager == null) {
+            resourceManager = connect(username, password);
+        }
+        return resourceManager;
     }
 
     private static RMMonitorsHandler getMonitorsHandler() {

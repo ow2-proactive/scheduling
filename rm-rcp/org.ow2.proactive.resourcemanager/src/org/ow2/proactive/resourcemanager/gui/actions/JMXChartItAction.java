@@ -122,15 +122,10 @@ public final class JMXChartItAction extends Action {
      * not sets as tool tip a message.
      * @param auth the resource manager authentication interface
      * @param creds the credentials required for authentication 
-     * @param isAdmin used to distinguish the admin user from anonymous user
      */
-    public void initJMXClient(final RMAuthentication auth, final Object[] creds, final boolean isAdmin) {
+    public void initJMXClient(final RMAuthentication auth, final Object[] creds) {
         String name = "RMFrontend:name=RMBean";
         String path = "config/rm_chartit_conf";
-        if (isAdmin) {
-            name += "_admin";
-            path += "_admin";
-        }
 
         try {
             this.mBeanName = new ObjectName(name);

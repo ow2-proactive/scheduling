@@ -48,9 +48,9 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -89,49 +89,49 @@ public class TestAdminAddingNodes extends FunctionalTest {
         String hostName = ProActiveInet.getInstance().getHostname();
 
         int pingFrequency = 5000;
-        RMAdmin admin = RMTHelper.getAdminInterface();
+        ResourceManager resourceManager = RMTHelper.getResourceManager();
 
-        admin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(), null,
-                StaticPolicy.class.getName(), null);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
+        resourceManager.createNodeSource(NodeSource.DEFAULT, DefaultInfrastructureManager.class.getName(),
+                null, StaticPolicy.class.getName(), null);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
 
-        admin.setNodeSourcePingFrequency(pingFrequency, NodeSource.GCM_LOCAL);
+        resourceManager.setNodeSourcePingFrequency(pingFrequency, NodeSource.DEFAULT);
 
         RMTHelper.log("Test 1");
         String node1Name = "node1";
         String node1URL = "//" + hostName + "/" + node1Name;
         RMTHelper.createNode(node1Name);
 
-        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node1URL, NodeSource.DEFAULT);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getTotalAliveNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getTotalAliveNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
         RMTHelper.log("Test 2");
 
         //preemptive removal is useless for this case, because node is free
-        admin.removeNode(node1URL, false);
+        resourceManager.removeNode(node1URL, false);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
 
-        assertTrue(admin.getTotalNodesNumber().intValue() == 0);
-        assertTrue(admin.getTotalAliveNodesNumber().intValue() == 0);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 0);
+        assertTrue(resourceManager.getState().getTotalAliveNodesNumber() == 0);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         RMTHelper.log("Test 3");
         String node2Name = "node2";
         String node2URL = "//" + hostName + "/" + node2Name;
         RMTHelper.createNode(node2Name);
 
-        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node2URL, NodeSource.DEFAULT);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait the node added event
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
-        assertTrue(admin.getTotalAliveNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getTotalAliveNodesNumber() == 1);
 
         //kill the node
         RMTHelper.killNode(node2URL);
@@ -140,13 +140,13 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
         //wait the node down event
-        Assert.assertEquals(admin.getTotalNodesNumber().intValue(), 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
-        assertTrue(admin.getTotalAliveNodesNumber().intValue() == 0);
+        Assert.assertEquals(resourceManager.getState().getTotalNodesNumber(), 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
+        assertTrue(resourceManager.getState().getTotalAliveNodesNumber() == 0);
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
-        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node2URL, NodeSource.DEFAULT);
 
         //wait for removal of the previous down node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
@@ -154,14 +154,14 @@ public class TestAdminAddingNodes extends FunctionalTest {
         //wait the node added event
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
 
-        Assert.assertEquals(admin.getTotalNodesNumber().intValue(), 1);
-        Assert.assertEquals(admin.getFreeNodesNumber().intValue(), 1);
-        Assert.assertEquals(admin.getTotalAliveNodesNumber().intValue(), 1);
+        Assert.assertEquals(resourceManager.getState().getTotalNodesNumber(), 1);
+        Assert.assertEquals(resourceManager.getState().getFreeNodesNumber(), 1);
+        Assert.assertEquals(resourceManager.getState().getTotalAliveNodesNumber(), 1);
 
         RMTHelper.log("Test 4");
 
         //put a large ping frequency in order to avoid down nodes detection
-        admin.setNodeSourcePingFrequency(Integer.MAX_VALUE, NodeSource.GCM_LOCAL);
+        resourceManager.setNodeSourcePingFrequency(Integer.MAX_VALUE, NodeSource.DEFAULT);
 
         //wait the end of last ping sequence
         Thread.sleep(PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt() + 500);
@@ -171,7 +171,7 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
-        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node2URL, NodeSource.DEFAULT);
 
         //wait for removal of the previous free node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
@@ -183,28 +183,28 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //wait the node added event, node added is free
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
-        Assert.assertEquals(admin.getTotalNodesNumber().intValue(), 1);
-        Assert.assertEquals(admin.getFreeNodesNumber().intValue(), 1);
+        Assert.assertEquals(resourceManager.getState().getTotalNodesNumber(), 1);
+        Assert.assertEquals(resourceManager.getState().getFreeNodesNumber(), 1);
 
         RMTHelper.log("Test 5");
 
         //put the the node to busy state
-        NodeSet nodes = admin.getAtMostNodes(1, null);
+        NodeSet nodes = resourceManager.getAtMostNodes(1, null);
         PAFuture.waitFor(nodes);
 
         //wait the node busy event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
-        Assert.assertEquals(admin.getTotalNodesNumber().intValue(), 1);
-        Assert.assertEquals(admin.getFreeNodesNumber().intValue(), 0);
+        Assert.assertEquals(resourceManager.getState().getTotalNodesNumber(), 1);
+        Assert.assertEquals(resourceManager.getState().getFreeNodesNumber(), 0);
 
         //node2 is busy, kill the node
         RMTHelper.killNode(node2URL);
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
-        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node2URL, NodeSource.DEFAULT);
 
         //wait for removal of the previous free node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
@@ -216,38 +216,38 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //wait the node added event, node added is free
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
         RMTHelper.log("Test 6");
 
         //put the the node to busy state
-        nodes = admin.getAtMostNodes(1, null);
+        nodes = resourceManager.getAtMostNodes(1, null);
         PAFuture.waitFor(nodes);
 
         //wait the node busy event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         //put the node in to Release state
-        admin.removeNode(node2URL, false);
+        resourceManager.removeNode(node2URL, false);
 
         //wait the node to release event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_RELEASED);
 
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 0);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
         //node2 is to release, kill the node
         RMTHelper.killNode(node2URL);
 
         //create another node with the same URL, and add it to Resource manager
         RMTHelper.createNode(node2Name);
-        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node2URL, NodeSource.DEFAULT);
 
         //wait for removal of the previous down node with the same URL
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
@@ -259,14 +259,14 @@ public class TestAdminAddingNodes extends FunctionalTest {
 
         //wait the node added event, node added is free
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
-        assertTrue(admin.getTotalNodesNumber().intValue() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
         RMTHelper.log("Test 7");
 
         //add the same node twice and check that RM will not kill the node. If it does
         //second attempt will fail
-        BooleanWrapper result = admin.addNode(node2URL, NodeSource.GCM_LOCAL);
+        BooleanWrapper result = resourceManager.addNode(node2URL, NodeSource.DEFAULT);
         if (result.booleanValue()) {
             assertTrue("Successfully added the same node twice - incorrect", false);
         }

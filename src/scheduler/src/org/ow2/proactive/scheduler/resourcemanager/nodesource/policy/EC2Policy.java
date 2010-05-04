@@ -149,20 +149,21 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
      *            <li>params[4]: loadFactor: number of tasks per node at best, for the whole RM
      *            <li>params[5]: releaseCycle: number of seconds before a node can be released
      *            </ul>
-     * @throws RMException
+     * @throws IllegalArgumentException
      *             invalid parameters, policy creation fails
      */
     @Override
-    public void configure(Object... params) throws RMException {
+    public BooleanWrapper configure(Object... params) {
         super.configure(params);
         try {
-            int index = 3;
+            int index = 5;
             refreshTime = Integer.parseInt(params[index++].toString());
             loadFactor = Integer.parseInt(params[index++].toString());
             releaseCycle = Integer.parseInt(params[index++].toString());
         } catch (RuntimeException e) {
-            throw new RMException("Unable to parse parameters", e);
+            throw new IllegalArgumentException("Unable to parse parameters", e);
         }
+        return new BooleanWrapper(true);
     }
 
     /**

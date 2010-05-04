@@ -50,6 +50,7 @@ import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ReferenceParam
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -240,12 +241,12 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     }
 
     @Override
-    public void configure(Object... parameters) throws RMException {
+    public BooleanWrapper configure(Object... parameters) {
 
         try {
             maxNodes = Integer.parseInt(parameters[0].toString());
         } catch (NumberFormatException e) {
-            throw new RMException("Max Nodes value has to be integer");
+            throw new IllegalArgumentException("Max Nodes value has to be integer");
         }
         serviceUrl = parameters[1].toString();
         userName = parameters[2].toString();
@@ -261,7 +262,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             FileToBytesConverter.convertByteArrayToFile((byte[]) parameters[4], file);
             trustStorePath = file.getAbsolutePath();
         } catch (Exception e) {
-            throw new RMException("Cannot save trust store file", e);
+            throw new IllegalArgumentException("Cannot save trust store file", e);
         }
 
         trustStorePassword = parameters[5].toString();
@@ -273,7 +274,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         try {
             this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[9]);
         } catch (KeyException e) {
-            throw new RMException("Could not retrieve base64 credentials", e);
+            throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
         }
 
         javaOptions = parameters[10].toString();
@@ -304,9 +305,10 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         try {
             command += " -v " + new String(this.credentials.getBase64()) + " ";
         } catch (KeyException e1) {
-            throw new RMException("Could not get base64 credentials", e1);
+            throw new IllegalArgumentException("Could not get base64 credentials", e1);
         }
 
+        return new BooleanWrapper(true);
     }
 
     protected String randomString() {

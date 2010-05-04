@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
+import java.security.Policy;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -50,10 +51,12 @@ import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -68,7 +71,6 @@ import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
  * @since ProActive Scheduling 0.9
  */
 public class RMStarter {
-
     /**
      * Log4j logger name.
      */
@@ -158,8 +160,9 @@ public class RMStarter {
             logger.info("Resource Manager successfully created on " + auth.getHostURL());
 
             if (deploymentDescriptors.size() > 0) {
-                RMAdmin admin = auth.logAsAdmin(Credentials.getCredentials(PAResourceManagerProperties
-                        .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+                ResourceManager resourceManager = auth.login(Credentials
+                        .getCredentials(PAResourceManagerProperties
+                                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
                 String nodeSourceName = NodeSource.GCM_LOCAL;
                 int counter = 2;
 
@@ -167,7 +170,7 @@ public class RMStarter {
                     byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
                         deploymentDescriptor));
 
-                    admin.createNodesource(nodeSourceName, GCMInfrastructure.class.getName(),
+                    resourceManager.createNodeSource(nodeSourceName, GCMInfrastructure.class.getName(),
                             new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
                     nodeSourceName = NodeSource.GCM_LOCAL + counter;

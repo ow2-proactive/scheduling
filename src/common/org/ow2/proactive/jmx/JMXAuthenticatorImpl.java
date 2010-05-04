@@ -35,16 +35,12 @@
  */
 package org.ow2.proactive.jmx;
 
-import java.util.Collections;
-
 import javax.management.remote.JMXAuthenticator;
-import javax.management.remote.JMXPrincipal;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.jmx.naming.JMXProperties;
 
 
 /**
@@ -103,23 +99,10 @@ public final class JMXAuthenticatorImpl implements JMXAuthenticator {
         } else {
             throw new SecurityException("Invalid credentials");
         }
-        String role = null;
-        // First try to authenticate as admin
         try {
-            role = JMXProperties.JMX_ADMIN;
-            this.authentication.loginAs(role, new String[] { role }, internalCredentials);
-        } catch (LoginException le1) {
-            // If failed try to authenticate as user (an admin can authenticate as a user)
-            try {
-                role = JMXProperties.JMX_USER;
-                this.authentication.loginAs(role, new String[] { JMXProperties.JMX_ADMIN, role },
-                        internalCredentials);
-            } catch (LoginException le2) {
-                throw new SecurityException("Unable to log as " + role);
-            }
+            return this.authentication.authenticate(internalCredentials);
+        } catch (LoginException e) {
+            throw new SecurityException("Unable to authenticate " + username);
         }
-        // Return a subject that contains the username and the role 
-        return new Subject(true, Collections.singleton(new JMXPrincipal(username)), Collections
-                .singleton(role), Collections.EMPTY_SET);
     }
 }

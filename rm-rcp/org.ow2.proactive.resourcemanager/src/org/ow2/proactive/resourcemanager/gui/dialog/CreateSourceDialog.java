@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.ConfigurablePanel;
 import org.ow2.proactive.resourcemanager.gui.dialog.nodesources.NodeSourceName;
@@ -100,11 +100,12 @@ public class CreateSourceDialog extends Dialog {
                     try {
                         validateForm();
 
-                        RMAdmin admin = RMStore.getInstance().getRMAdmin();
+                        ResourceManager rm = RMStore.getInstance().getResourceManager();
                         Object[] policyParams = policy.getParameters();
-                        admin.createNodesource(name.getNodeSourceName(), infrastructure.getSelectedPlugin()
-                                .getPluginName(), infrastructure.getParameters(), policy.getSelectedPlugin()
-                                .getPluginName(), policyParams);
+                        rm.createNodeSource(name.getNodeSourceName(),
+                                infrastructure.getSelectedPlugin().getPluginName(),
+                                infrastructure.getParameters(), policy.getSelectedPlugin().getPluginName(),
+                                policyParams).booleanValue();
 
                         shell.close();
                     } catch (Exception e) {
@@ -162,8 +163,8 @@ public class CreateSourceDialog extends Dialog {
         infrastructure = new ConfigurablePanel(shell, "Node source infrastructure");
         policy = new ConfigurablePanel(shell, "Node source policy");
 
-        RMAdmin admin = RMStore.getInstance().getRMAdmin();
-        Collection<PluginDescriptor> infrastructures = admin.getSupportedNodeSourceInfrastructures();
+        ResourceManager rm = RMStore.getInstance().getResourceManager();
+        Collection<PluginDescriptor> infrastructures = rm.getSupportedNodeSourceInfrastructures();
 
         for (PluginDescriptor descriptor : infrastructures) {
             try {
@@ -173,7 +174,7 @@ public class CreateSourceDialog extends Dialog {
             }
         }
 
-        Collection<PluginDescriptor> policies = admin.getSupportedNodeSourcePolicies();
+        Collection<PluginDescriptor> policies = rm.getSupportedNodeSourcePolicies();
 
         for (PluginDescriptor descriptor : policies) {
             policy.addComboValue(descriptor);

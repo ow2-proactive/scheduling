@@ -1,4 +1,4 @@
-importClass(org.ow2.proactive.resourcemanager.utils.adminconsole.AdminRMModel);
+importClass(org.ow2.proactive.resourcemanager.utils.console.ResourceManagerModel);
 
 function exMode(displayStack, displayOnDemand){
 	if (displayStack == undefined){
@@ -7,7 +7,7 @@ function exMode(displayStack, displayOnDemand){
 	if (displayOnDemand == undefined){
 		displayOnDemand = true;
 	}
-	AdminRMModel.setExceptionMode(displayStack, displayOnDemand);
+	ResourceManagerModel.setExceptionMode(displayStack, displayOnDemand);
 }
 
 function addnode(nodeURL, nodeSourceName){
@@ -15,7 +15,7 @@ function addnode(nodeURL, nodeSourceName){
 		nodeSourceName = null;
 		println("Node Source will be the default one as it is not set");
 	}
-	return AdminRMModel.addnode(nodeURL, nodeSourceName);
+	return ResourceManagerModel.addnode(nodeURL, nodeSourceName);
 }
 
 function removenode(nodeURL,preemptively){
@@ -23,11 +23,11 @@ function removenode(nodeURL,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-    return AdminRMModel.removenode(nodeURL,preemptively);
+    return ResourceManagerModel.removenode(nodeURL,preemptively);
 }
 
 function createns(nsName,infrastructure,policy){
-	return AdminRMModel.createns(nsName,infrastructure,policy);
+	return ResourceManagerModel.createns(nsName,infrastructure,policy);
 }
 
 function removens(nodeSourceName,preemptively){
@@ -35,23 +35,23 @@ function removens(nodeSourceName,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return AdminRMModel.removens(nodeSourceName,preemptively);
+	return ResourceManagerModel.removens(nodeSourceName,preemptively);
 }
 
 function listnodes(){
-    return AdminRMModel.listnodes();
+    return ResourceManagerModel.listnodes();
 }
 
 function listns(){
-    return AdminRMModel.listns();
+    return ResourceManagerModel.listns();
 }
 
 function listInfrastructures(){
-	return AdminRMModel.listInfrastructures();
+	return ResourceManagerModel.listInfrastructures();
 }
 
 function listPolicies(){
-	return AdminRMModel.listPolicies();
+	return ResourceManagerModel.listPolicies();
 }
 
 function shutdown(preemptively){
@@ -59,34 +59,38 @@ function shutdown(preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return AdminRMModel.shutdown(preemptively);
+	return ResourceManagerModel.shutdown(preemptively);
 }
 
 function jmxinfo(){
-	AdminRMModel.JMXinfo();
+	ResourceManagerModel.JMXinfo();
 }
 
 function exec(commandFilePath){
-	return AdminRMModel.exec(commandFilePath);
+	return ResourceManagerModel.exec(commandFilePath);
 }
 
 function setLogsDir(logsDir){
 	if (logsDir == undefined){
 		logsDir = "";
 	}
-	AdminRMModel.setLogsDir(""+logsDir);
+	ResourceManagerModel.setLogsDir(""+logsDir);
 }
 
 function viewlogs(nbLines){
-	AdminRMModel.viewlogs(""+nbLines);
+	ResourceManagerModel.viewlogs(""+nbLines);
+}
+
+function reloadpermissions(){
+	ResourceManagerModel.reloadpermissions();
 }
 
 function exit(){
-	return AdminRMModel.exit();
+	return ResourceManagerModel.exit();
 }
 
 function help(){
-	AdminRMModel.help();
+	ResourceManagerModel.help();
 }
 
-var rm = AdminRMModel.getAdminRM();
+var rm = ResourceManagerModel.getResourceManager();

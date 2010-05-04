@@ -40,7 +40,6 @@ import java.io.File;
 
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -58,11 +57,12 @@ import functionaltests.RMTHelper;
  */
 public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
 
+    protected byte[] emptyGCMD;
     protected byte[] GCMDeploymentData;
     protected int descriptorNodeNumber = 1;
 
     protected Object[] getPolicyParams() {
-        return new Object[] { TimeSlotPolicy.dateFormat.format(System.currentTimeMillis()),
+        return new Object[] { "USER", "ALL", TimeSlotPolicy.dateFormat.format(System.currentTimeMillis()),
                 TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + 15000), "0", "true" };
     }
 
@@ -70,18 +70,21 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
         String oneNodeescriptor = TestGCMInfrastructureTimeSlotPolicy.class.getResource(
                 "/functionaltests/nodesource/1node.xml").getPath();
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
+        String emptyNodeDescriptor = TestGCMInfrastructureTimeSlotPolicy.class.getResource(
+                "/functionaltests/nodesource/empty_gcmd.xml").getPath();
+        emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
     }
 
     protected void createEmptyNodeSource(String sourceName) throws Exception {
-        RMTHelper.getAdminInterface().createNodesource(sourceName, GCMInfrastructure.class.getName(), null,
-                StaticPolicy.class.getName(), null);
+        RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
+                new Object[] { emptyGCMD }, TimeSlotPolicy.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
-        RMTHelper.getAdminInterface().createNodesource(sourceName, GCMInfrastructure.class.getName(),
+        RMTHelper.getResourceManager().createNodeSource(sourceName, GCMInfrastructure.class.getName(),
                 new Object[] { GCMDeploymentData }, TimeSlotPolicy.class.getName(), getPolicyParams());
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
 
@@ -89,7 +92,7 @@ public class TestGCMInfrastructureTimeSlotPolicy extends FunctionalTest {
 
     protected void removeNodeSource(String sourceName) throws Exception {
         // removing node source
-        RMTHelper.getAdminInterface().removeSource(sourceName, true);
+        RMTHelper.getResourceManager().removeNodeSource(sourceName, true);
 
         //wait for the event of the node source removal
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);

@@ -47,7 +47,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -115,8 +114,7 @@ public class EventsReceiver implements InitActive, RMEventListener {
                     try {
                         try {
                             //try to ping RM server
-                            RMUser userAO = RMStore.getInstance().getRMUser();
-                            if (!PAActiveObject.pingActiveObject(userAO)) {
+                            if (!PAActiveObject.pingActiveObject(RMStore.getInstance().getResourceManager())) {
                                 throw new RMException("RM seems to be down");
                             }
                         } catch (RMException e) {
@@ -152,7 +150,7 @@ public class EventsReceiver implements InitActive, RMEventListener {
                 switch (event.getNodeState()) {
                     case BUSY:
                     case DOWN:
-                    case TO_BE_RELEASED:
+                    case TO_BE_REMOVED:
                     case FREE:
                         model.changeNodeState(event);
                         break;

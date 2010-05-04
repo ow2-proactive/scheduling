@@ -48,6 +48,7 @@ import java.util.Random;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -203,7 +204,7 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
             }
 
             try {
-                if (nodeSource.acquireNode(nodeUrl, nodeSource.getProvider()).booleanValue()) {
+                if (nodeSource.getStub().acquireNode(nodeUrl, nodeSource.getProvider()).booleanValue()) {
                     try {
                         // don't destroy the process if launched on localhost without SSH;
                         // it would kill it
@@ -232,15 +233,15 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
      * @param parameters
      *            parameters[0;1] : super
      *            parameters[2]   : path to the scheduling installation on the hosts from the list
-     * @throws RMException configuration failed
+     * @throws IllegalArgumentException configuration failed
      */
     @Override
-    public void configure(Object... parameters) throws RMException {
+    public BooleanWrapper configure(Object... parameters) {
         super.configure(parameters);
 
         if (parameters != null && parameters.length >= 6) {
             if (parameters[5] == null) {
-                throw new RMException("Host file must be specified");
+                throw new IllegalArgumentException("Host file must be specified");
             }
             try {
                 byte[] hosts = (byte[]) parameters[5];
@@ -249,11 +250,12 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
                 readHosts(f);
                 f.delete();
             } catch (Exception e) {
-                throw new RMException("Could not read hosts file", e);
+                throw new IllegalArgumentException("Could not read hosts file", e);
             }
         } else {
-            throw new RMException("Invalid parameters for infrastructure creation");
+            throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
         }
+        return new BooleanWrapper(true);
     }
 
     /**

@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ActiveEon Team
@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.utils.adminconsole;
+package org.ow2.proactive.resourcemanager.utils.console;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -64,8 +64,8 @@ import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
@@ -83,16 +83,16 @@ import org.ow2.proactive.utils.console.VisualConsole;
  * @since ProActive Scheduling 1.0
  *
  */
-public class AdminController {
+public class ResourceManagerController {
 
     private static final String RM_DEFAULT_URL = getHostURL("//localhost/");
 
     protected static final String control = "<ctl> ";
     protected static final String newline = System.getProperty("line.separator");
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.RMLAUNCHER);
-    protected static AdminController shell;
+    protected static ResourceManagerController shell;
 
-    private String commandName = "rm-admin";
+    private String commandName = "rm-client";
 
     protected CommandLine cmd = null;
     protected String user = null;
@@ -100,7 +100,7 @@ public class AdminController {
     protected Credentials credentials = null;
 
     protected RMAuthentication auth = null;
-    protected AdminRMModel model;
+    protected ResourceManagerModel model;
 
     /**
      * Start the RM controller
@@ -109,23 +109,23 @@ public class AdminController {
      */
     public static void main(String[] args) {
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
-        shell = new AdminController(null);
+        shell = new ResourceManagerController(null);
         shell.load(args);
     }
 
     /**
-     * Create a new instance of AdminController
+     * Create a new instance of ResourceManagerController
      */
-    protected AdminController() {
+    protected ResourceManagerController() {
     }
 
     /**
-     * Create a new instance of AdminController
+     * Create a new instance of ResourceManagerController
      *
      * Convenience constructor to let the default one do nothing
      */
-    protected AdminController(Object o) {
-        model = AdminRMModel.getModel(true);
+    protected ResourceManagerController(Object o) {
+        model = ResourceManagerModel.getModel(true);
     }
 
     public void load(String[] args) {
@@ -177,7 +177,7 @@ public class AdminController {
                 auth = RMConnection.join(url);
                 logger.info("\t-> Connection established on " + url);
 
-                logger.info(newline + "Connecting admin to the RM");
+                logger.info(newline + "Connecting to the RM");
 
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
@@ -292,14 +292,14 @@ public class AdminController {
     }
 
     protected void connect() throws LoginException {
-        RMAdmin rm = auth.logAsAdmin(credentials);
+        ResourceManager rm = auth.login(credentials);
         model.connectRM(rm);
         String userStr = (user != null) ? "'" + user + "' " : "";
-        logger.info("\t-> Admin " + userStr + " successfully connected" + newline);
+        logger.info("\t-> Client " + userStr + " successfully connected" + newline);
     }
 
     protected void connectJMXClient() {
-        final String name = "RMFrontend:name=RMBean_admin";
+        final String name = "RMFrontend:name=RMBean";
         final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
         this.model.setJMXInfo(viewer);
     }
@@ -362,6 +362,11 @@ public class AdminController {
         removeNSOpt.setRequired(false);
         removeNSOpt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(removeNSOpt);
+
+        Option permissionsOpt = new Option("reloadpermissions", false, control +
+            "Reload resource manager permissions");
+        permissionsOpt.setRequired(false);
+        actionGroup.addOption(permissionsOpt);
 
         Option shutdownOpt = new Option("s", "shutdown", false, control + "Shutdown Resource Manager");
         shutdownOpt.setRequired(false);
@@ -427,18 +432,18 @@ public class AdminController {
             if (cmd.hasOption("ns")) {
                 String nsName = cmd.getOptionValue("ns");
                 for (String nUrl : nodesURls) {
-                    AdminRMModel.addnode(nUrl, nsName);
+                    ResourceManagerModel.addnode(nUrl, nsName);
                 }
             } else {
                 for (String nUrl : nodesURls) {
-                    AdminRMModel.addnode(nUrl, null);
+                    ResourceManagerModel.addnode(nUrl, null);
                 }
             }
         } else if (cmd.hasOption("removenodes")) {
             String[] nodesURls = cmd.getOptionValues("removenodes");
             boolean preempt = cmd.hasOption("f");
             for (String nUrl : nodesURls) {
-                AdminRMModel.removenode(nUrl, preempt);
+                ResourceManagerModel.removenode(nUrl, preempt);
             }
         } else if (cmd.hasOption("createns")) {
 
@@ -450,7 +455,7 @@ public class AdminController {
                 imParams = cmd.getOptionValues("infrastructure");
                 if (imParams == null) {
                     // list available infrastructures
-                    AdminRMModel.listInfrastructures();
+                    ResourceManagerModel.listInfrastructures();
                     return false;
                 }
             }
@@ -460,33 +465,35 @@ public class AdminController {
                 policyParams = cmd.getOptionValues("policy");
                 if (policyParams == null) {
                     // list available policies
-                    AdminRMModel.listPolicies();
+                    ResourceManagerModel.listPolicies();
                     return false;
                 }
             }
 
             for (String nsName : nsNames) {
                 // if imParams is null or policyParams is null use default
-                if (!AdminRMModel.createns(nsName, imParams, policyParams)) {
+                if (!ResourceManagerModel.createns(nsName, imParams, policyParams)) {
                     break;
                 }
             }
         } else if (cmd.hasOption("listnodes")) {
-            AdminRMModel.listnodes();
+            ResourceManagerModel.listnodes();
         } else if (cmd.hasOption("listns")) {
-            AdminRMModel.listns();
+            ResourceManagerModel.listns();
         } else if (cmd.hasOption("removens")) {
             String[] nsNames = cmd.getOptionValues("removens");
             boolean preempt = cmd.hasOption("f");
             for (String nsName : nsNames) {
-                AdminRMModel.removens(nsName, preempt);
+                ResourceManagerModel.removens(nsName, preempt);
             }
+        } else if (cmd.hasOption("reloadpermissions")) {
+            ResourceManagerModel.reloadPermissions();
         } else if (cmd.hasOption("shutdown")) {
-            AdminRMModel.shutdown(cmd.hasOption("f"));
+            ResourceManagerModel.shutdown(cmd.hasOption("f"));
         } else if (cmd.hasOption("jmxinfo")) {
-            AdminRMModel.JMXinfo();
+            ResourceManagerModel.JMXinfo();
         } else if (cmd.hasOption("script")) {
-            AdminRMModel.exec(cmd.getOptionValue("script"));
+            ResourceManagerModel.exec(cmd.getOptionValue("script"));
         } else {
             model.setDisplayOnStdStream(false);
             return true;

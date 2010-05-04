@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
@@ -103,7 +103,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
         RMTHelper.log("Deployment");
 
-        RMAdmin admin = RMTHelper.getAdminInterface();
+        ResourceManager resourceManager = RMTHelper.getResourceManager();
         RMTHelper.createGCMLocalNodeSource();
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.GCM_LOCAL);
 
@@ -113,29 +113,29 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
 
         RMTHelper.log("Test 1");
 
-        NodeSet nodeSetWithNodeToExclude = admin.getAtMostNodes(1, null);
+        NodeSet nodeSetWithNodeToExclude = resourceManager.getAtMostNodes(1, null);
 
         //wait for node selection
         PAFuture.waitFor(nodeSetWithNodeToExclude);
 
         assertTrue(nodeSetWithNodeToExclude.size() == 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber - 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber - 1);
 
         //wait for node busy event
         RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
-        admin.freeNodes(nodeSetWithNodeToExclude);
+        resourceManager.releaseNodes(nodeSetWithNodeToExclude);
 
         //wait for node free event
         evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         //get nodes with the previous node excluded
-        NodeSet nodes = admin.getAtMostNodes(RMTHelper.defaultNodesNumber, new ArrayList<SelectionScript>(),
-                nodeSetWithNodeToExclude);
+        NodeSet nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber,
+                new ArrayList<SelectionScript>(), nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
@@ -148,9 +148,9 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == RMTHelper.defaultNodesNumber - 1);
         //excluded node stays in free state
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
-        admin.freeNodes(nodes);
+        resourceManager.releaseNodes(nodes);
 
         //wait for nodes freed event
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
@@ -158,7 +158,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         RMTHelper.log("Test 2");
 
@@ -167,7 +167,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
             new String[] {}, true);
 
         //get nodes with the previous node excluded
-        nodes = admin.getAtMostNodes(RMTHelper.defaultNodesNumber, dummyDynamicScript,
+        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, dummyDynamicScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -182,9 +182,9 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == RMTHelper.defaultNodesNumber - 1);
         //excluded node stays in free state
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
-        admin.freeNodes(nodes);
+        resourceManager.releaseNodes(nodes);
 
         //wait for nodes freed event
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
@@ -192,7 +192,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         RMTHelper.log("Test 3");
 
@@ -201,7 +201,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
             new String[] {}, false);
 
         //get nodes with the previous node excluded
-        nodes = admin.getAtMostNodes(RMTHelper.defaultNodesNumber, dummyStaticScript,
+        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, dummyStaticScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -216,9 +216,9 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == RMTHelper.defaultNodesNumber - 1);
         //excluded node stays in free state
-        assertTrue(admin.getFreeNodesNumber().intValue() == 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
-        admin.freeNodes(nodes);
+        resourceManager.releaseNodes(nodes);
 
         //wait for node free event
         for (int i = 0; i < RMTHelper.defaultNodesNumber - 1; i++) {
@@ -226,7 +226,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         RMTHelper.log("Test 4");
 
@@ -237,17 +237,17 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         vmProperties.put(this.vmPropKey, this.vmPropValue);
 
         String node1URL = RMTHelper.createNode(node1Name, vmProperties).getNodeInformation().getURL();
-        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node1URL, NodeSource.GCM_LOCAL);
 
         String node2URL = RMTHelper.createNode(node2Name, vmProperties).getNodeInformation().getURL();
-        admin.addNode(node2URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node2URL, NodeSource.GCM_LOCAL);
 
         Thread.sleep(5000);
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
 
         //wait for nodes added events
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 2);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);
 
         //create the dynamic selection script object
         SelectionScript checkPropDynamicSScript = new SelectionScript(new File(vmPropSelectionScriptpath),
@@ -258,7 +258,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         nodeSetWithNodeToExclude.add(node1ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = admin.getAtMostNodes(RMTHelper.defaultNodesNumber, checkPropDynamicSScript,
+        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, checkPropDynamicSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -271,17 +271,17 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == 1);
         //excluded node stays in free state
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 1);
 
         //unique node got is node2
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node2URL));
 
-        admin.freeNodes(nodes);
+        resourceManager.releaseNodes(nodes);
         //wait for node free event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 2);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);
 
         RMTHelper.log("Test 5");
 
@@ -295,7 +295,7 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         nodeSetWithNodeToExclude.add(node2ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = admin.getAtMostNodes(RMTHelper.defaultNodesNumber, checkPropStaticSScript,
+        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, checkPropStaticSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
@@ -308,30 +308,30 @@ public class SelectionWithNodesExclusionTest extends FunctionalTest {
         // booked all nodes minus the node to exclude
         assertTrue(nodes.size() == 1);
         //excluded node stays in free state
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 1);
 
         //unique node got is node2
         assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
 
-        admin.freeNodes(nodes);
+        resourceManager.releaseNodes(nodes);
 
         //wait for node free event
         evt = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
 
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 2);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);
 
         RMTHelper.log("Test 6");
 
         nodeSetWithNodeToExclude.add(node1ToExclude);
 
         //get nodes with the previous node1 excluded        
-        nodes = admin.getAtMostNodes(RMTHelper.defaultNodesNumber, checkPropStaticSScript,
+        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, checkPropStaticSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 2);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 2);
     }
 }

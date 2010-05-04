@@ -44,13 +44,11 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.jmx.AbstractJMXMonitoringHelper;
-import org.ow2.proactive.jmx.naming.JMXProperties;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.jmx.mbean.SchedulerWrapperAdmin;
-import org.ow2.proactive.scheduler.common.jmx.mbean.SchedulerWrapperAnonym;
+import org.ow2.proactive.scheduler.common.jmx.mbean.SchedulerWrapperMBeanImpl;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -74,8 +72,7 @@ public class JMXMonitoringHelper extends AbstractJMXMonitoringHelper implements 
     public static final String SCHEDULER_BEAN_NAME = "SchedulerFrontend:name=SchedulerWrapperMBean";
 
     /** Scheduler's MBean */
-    private SchedulerWrapperAnonym schedulerBeanAnonym;
-    private SchedulerWrapperAdmin schedulerBeanAdmin;
+    private SchedulerWrapperMBeanImpl schedulerMBean;
 
     private JMXMonitoringHelper() {
         super(LOGGER);
@@ -94,36 +91,18 @@ public class JMXMonitoringHelper extends AbstractJMXMonitoringHelper implements 
      * {@inheritDoc}
      */
     @Override
-    public ObjectName registerAnonymMBean(final MBeanServer mbs) {
-        ObjectName mBeanNameAnonym = null;
+    public ObjectName registerMBean(final MBeanServer mbs) {
+        ObjectName beanName = null;
         try {
-            this.schedulerBeanAnonym = new SchedulerWrapperAnonym();
+            this.schedulerMBean = new SchedulerWrapperMBeanImpl();
             // Create the Object Names
-            mBeanNameAnonym = new ObjectName(SCHEDULER_BEAN_NAME);
+            beanName = new ObjectName(SCHEDULER_BEAN_NAME);
             // Register the MBean Views in the related MBeanServer
-            mbs.registerMBean(this.schedulerBeanAnonym, mBeanNameAnonym);
+            mbs.registerMBean(this.schedulerMBean, beanName);
         } catch (Exception e) {
             LOGGER.error("", e);
         }
-        return mBeanNameAnonym;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ObjectName registerAdminMBean(final MBeanServer mbs) {
-        ObjectName mBeanNameAdmin = null;
-        try {
-            this.schedulerBeanAdmin = new SchedulerWrapperAdmin();
-            // Create the Object Names            
-            mBeanNameAdmin = new ObjectName(SCHEDULER_BEAN_NAME + "_" + JMXProperties.JMX_ADMIN);
-            // Register the MBean Views in the related MBeanServer            
-            mbs.registerMBean(this.schedulerBeanAdmin, mBeanNameAdmin);
-        } catch (Exception e) {
-            LOGGER.error("", e);
-        }
-        return mBeanNameAdmin;
+        return beanName;
     }
 
     /**
@@ -146,7 +125,7 @@ public class JMXMonitoringHelper extends AbstractJMXMonitoringHelper implements 
      * Method to get the status of the Scheduler from the MBean
      */
     public SchedulerStatus getSchedulerStatus_() {
-        return schedulerBeanAnonym.getSchedulerStatus_();
+        return schedulerMBean.getSchedulerStatus_();
     }
 
     /**
@@ -155,8 +134,7 @@ public class JMXMonitoringHelper extends AbstractJMXMonitoringHelper implements 
      * @param jobList the list of job to be recovered
      */
     public void recover(Set<JobState> jobList) {
-        schedulerBeanAnonym.recover(jobList);
-        schedulerBeanAdmin.recover(jobList);
+        schedulerMBean.recover(jobList);
     }
 
     // ----------------- Event Management --------------------
@@ -165,39 +143,34 @@ public class JMXMonitoringHelper extends AbstractJMXMonitoringHelper implements 
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
-        schedulerBeanAnonym.jobStateUpdatedEvent(notification);
-        schedulerBeanAdmin.jobStateUpdatedEvent(notification);
+        schedulerMBean.jobStateUpdatedEvent(notification);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
      */
     public void jobSubmittedEvent(JobState job) {
-        schedulerBeanAnonym.jobSubmittedEvent(job);
-        schedulerBeanAdmin.jobSubmittedEvent(job);
+        schedulerMBean.jobSubmittedEvent(job);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
      */
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
-        schedulerBeanAnonym.schedulerStateUpdatedEvent(eventType);
-        schedulerBeanAdmin.schedulerStateUpdatedEvent(eventType);
+        schedulerMBean.schedulerStateUpdatedEvent(eventType);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
-        schedulerBeanAnonym.taskStateUpdatedEvent(notification);
-        schedulerBeanAdmin.taskStateUpdatedEvent(notification);
+        schedulerMBean.taskStateUpdatedEvent(notification);
     }
 
     /**
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
-        schedulerBeanAnonym.usersUpdatedEvent(notification);
-        schedulerBeanAdmin.usersUpdatedEvent(notification);
+        schedulerMBean.usersUpdatedEvent(notification);
     }
 }

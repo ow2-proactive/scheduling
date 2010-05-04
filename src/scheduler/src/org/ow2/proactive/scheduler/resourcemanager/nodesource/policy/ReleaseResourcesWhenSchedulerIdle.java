@@ -72,13 +72,14 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
      * @param policyParameters parameters defined by user
      */
     @Override
-    public void configure(Object... policyParameters) throws RMException {
+    public BooleanWrapper configure(Object... policyParameters) {
         super.configure(policyParameters);
         try {
-            idleTime = Long.parseLong(policyParameters[3].toString());
+            idleTime = Long.parseLong(policyParameters[5].toString());
         } catch (RuntimeException e) {
-            throw new RMException(e);
+            throw new IllegalArgumentException(e);
         }
+        return new BooleanWrapper(true);
     }
 
     public void initActivity(Body body) {

@@ -70,7 +70,7 @@ public class NodeSourcePolicyFactory {
      * @throws RMException if any problems occurred
      */
     public static NodeSourcePolicy create(String policyClassName, String infrastructureType,
-            Object[] policyParameters) throws RMException {
+            Object[] policyParameters) {
 
         NodeSourcePolicy policy;
         try {
@@ -82,7 +82,7 @@ public class NodeSourcePolicyFactory {
                 }
             }
             if (!supported) {
-                throw new RMException(policyClassName + " is not supported");
+                throw new IllegalArgumentException(policyClassName + " is not supported");
             }
 
             Class<?> policyClass = Class.forName(policyClassName);
@@ -102,10 +102,8 @@ public class NodeSourcePolicyFactory {
                 }
             }
             policy = (NodeSourcePolicy) policyClass.newInstance();
-        } catch (RMException e) {
-            throw e;
         } catch (Exception e) {
-            throw new RMException(e);
+            throw new RuntimeException(e);
         }
 
         // activating the policy
@@ -113,10 +111,8 @@ public class NodeSourcePolicyFactory {
         try {
             stub = (NodeSourcePolicy) PAActiveObject.turnActive(policy);
             stub.configure(policyParameters);
-        } catch (RMException e) {
-            throw e;
         } catch (Exception e) {
-            throw new RMException(e);
+            throw new RuntimeException(e);
         }
         return stub;
     }

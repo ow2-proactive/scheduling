@@ -190,8 +190,8 @@
 					<path refid="@{testclasspath}" />
 				</classpath>
 
-				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
 				<jvmarg value="@{log4jconfig}"/>
+				<jvmarg value="-Djava.security.policy=${base.dir}/config/security.java.policy" />
 				<jvmarg value="-Dproactive.http.jetty.xml=${base.dir}/config/rm/deployment/jetty.xml"/>
 				<jvmargs />
 

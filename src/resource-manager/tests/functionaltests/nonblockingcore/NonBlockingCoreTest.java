@@ -49,9 +49,8 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.frontend.RMUser;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -85,7 +84,7 @@ public class NonBlockingCoreTest extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
 
-        RMAdmin admin = RMTHelper.getAdminInterface();
+        ResourceManager resourceManager = RMTHelper.getResourceManager();
 
         RMTHelper.log("Deployment");
 
@@ -115,10 +114,10 @@ public class NonBlockingCoreTest extends FunctionalTest {
         // so creating another thread
         Thread t = new Thread() {
             public void run() {
-                RMUser user;
+                ResourceManager rm2;
                 try {
-                    user = auth.logAsUser(cred);
-                    nodes = user.getAtMostNodes(2, sScript);
+                    rm2 = auth.login(cred);
+                    nodes = rm2.getAtMostNodes(2, sScript);
                 } catch (LoginException e) {
                 }
             }
@@ -131,28 +130,28 @@ public class NonBlockingCoreTest extends FunctionalTest {
         RMTHelper.createNode(node1Name);
 
         RMTHelper.log("Adding node " + node1URL);
-        admin.addNode(node1URL, NodeSource.GCM_LOCAL);
+        resourceManager.addNode(node1URL, NodeSource.GCM_LOCAL);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
 
-        assertTrue(admin.getTotalNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 1);
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber + 1);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber + 1);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber + 1);
 
         //preemptive removal is useless for this case, because node is free
         RMTHelper.log("Removing node " + node1URL);
-        admin.removeNode(node1URL, false);
+        resourceManager.removeNode(node1URL, false);
 
         RMTHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
 
-        assertTrue(admin.getTotalNodesNumber().intValue() == RMTHelper.defaultNodesNumber);
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         String nsName = "myNS";
         RMTHelper.log("Creating GCM node source " + nsName);
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(
             RMTHelper.defaultDescriptor)));
-        admin.createNodesource(nsName, GCMInfrastructure.class.getName(), new Object[] { GCMDeploymentData },
-                StaticPolicy.class.getName(), null);
+        resourceManager.createNodeSource(nsName, GCMInfrastructure.class.getName(),
+                new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
         //wait for creation of GCM Node Source event, and deployment of its nodes
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
@@ -160,11 +159,11 @@ public class NonBlockingCoreTest extends FunctionalTest {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         }
 
-        assertTrue(admin.getTotalNodesNumber().intValue() == RMTHelper.defaultNodesNumber * 2);
-        assertTrue(admin.getFreeNodesNumber().intValue() == RMTHelper.defaultNodesNumber * 2);
+        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber * 2);
+        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber * 2);
 
         RMTHelper.log("Removing node source " + nsName);
-        admin.removeSource(nsName, true);
+        resourceManager.removeNodeSource(nsName, true);
 
         boolean selectionInProgress = PAFuture.isAwaited(nodes);
 

@@ -102,8 +102,8 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** {@link NodeSource} Stub of NodeSource that handle the RMNode */
     private NodeSource nodeSource;
 
-    /** {@link NodeSource} NodeSource ID that handle the RMNode */
-    private String nodeSourceID;
+    /** {@link NodeSource} NodeSource that handle the RMNode */
+    private String nodeSourceName;
 
     /** State of the node */
     private NodeState state;
@@ -121,7 +121,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     public RMNodeImpl(Node node, NodeSource nodeSource, Client provider) {
         this.node = node;
         this.nodeSource = nodeSource;
-        this.nodeSourceID = nodeSource.getName();
+        this.nodeSourceName = nodeSource.getName();
         this.provider = provider;
         this.nodeName = node.getNodeInformation().getName();
         this.nodeURL = node.getNodeInformation().getURL();
@@ -189,8 +189,8 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Returns the NodeSource name of the RMNode.
      * @return {@link NodeSource} name of the RMNode.
      */
-    public String getNodeSourceId() {
-        return this.nodeSourceID;
+    public String getNodeSourceName() {
+        return this.nodeSourceName;
     }
 
     /**
@@ -236,7 +236,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Changes the state of this node to {@link NodeState#TO_BE_RELEASED}.
      * @throws NodeException if the node is down.
      */
-    public void setToRelease() throws NodeException {
+    public void setToRemove() throws NodeException {
         if (this.isDown()) {
             throw new NodeException("The node is down");
         }
@@ -267,7 +267,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @return true if the node is 'to be released', false otherwise.
      */
-    public boolean isToRelease() {
+    public boolean isToRemove() {
         return this.state == NodeState.TO_BE_RELEASED;
     }
 

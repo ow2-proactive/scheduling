@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
+import java.security.Permission;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.Callable;
@@ -56,6 +57,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -115,6 +117,9 @@ public class NodeSource implements InitActive, RunActive {
     private NodeSource stub;
     private Client provider;
 
+    private PrincipalPermission adminPermission;
+    private PrincipalPermission userPermission;
+
     /**
      * Creates a new instance of NodeSource.
      * This constructor is used by Proactive as one of requirements for active objects.
@@ -130,9 +135,10 @@ public class NodeSource implements InitActive, RunActive {
      * @param policy nodes acquisition policy
      * @param rmcore resource manager core
      */
-    public NodeSource(String name, InfrastructureManager im, NodeSourcePolicy policy, RMCore rmcore,
-            Client provider) {
+    public NodeSource(String name, Client provider, InfrastructureManager im, NodeSourcePolicy policy,
+            RMCore rmcore) {
         this.name = name;
+        this.provider = provider;
         this.infrastructureManager = im;
         this.nodeSourcePolicy = policy;
         this.rmcore = rmcore;
@@ -149,6 +155,12 @@ public class NodeSource implements InitActive, RunActive {
         stub = (NodeSource) PAActiveObject.getStubOnThis();
         infrastructureManager.setNodeSource(this);
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
+
+        // creating node source admin and user permissions
+        userPermission = new PrincipalPermission(name, provider.getSubject().getPrincipals(
+                nodeSourcePolicy.getUserPrincipalType()));
+        adminPermission = new PrincipalPermission(name, provider.getSubject().getPrincipals(
+                nodeSourcePolicy.getAdminPrincipalType()));
 
         try {
             // executor service initialization
@@ -240,7 +252,7 @@ public class NodeSource implements InitActive, RunActive {
             // so basically the node was restarted.
             // adding a new node and removing old one from the down list
             logger.debug("Removing existing node from down nodes list");
-            BooleanWrapper result = rmcore.internalRemoveNodeFromCore(nodeUrl);
+            BooleanWrapper result = rmcore.removeNodeFromCore(nodeUrl);
             if (result.booleanValue()) {
                 if (logger.isDebugEnabled())
                     logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
@@ -263,7 +275,7 @@ public class NodeSource implements InitActive, RunActive {
                 // replacing the old node by the new one
                 logger
                         .debug("Removing existing node from the RM without request propagation to the infrastructure manager");
-                BooleanWrapper result = rmcore.internalRemoveNodeFromCore(nodeUrl);
+                BooleanWrapper result = rmcore.removeNodeFromCore(nodeUrl);
                 if (result.booleanValue()) {
                     if (logger.isDebugEnabled())
                         logger
@@ -621,5 +633,26 @@ public class NodeSource implements InitActive, RunActive {
      */
     public Client getProvider() {
         return provider;
+    }
+
+    /**
+     * Returns the the node source stub
+     */
+    public NodeSource getStub() {
+        return stub;
+    }
+
+    /**
+     * Returns the permission required to administrate the node source
+     */
+    public Permission getAdminPermission() {
+        return adminPermission;
+    }
+
+    /**
+     * Returns the permission required to use the node source
+     */
+    public Permission getUserPermission() {
+        return userPermission;
     }
 }

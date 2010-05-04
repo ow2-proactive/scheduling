@@ -36,14 +36,13 @@
  */
 package org.ow2.proactive.authentication;
 
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
@@ -56,6 +55,8 @@ import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 
 
 /**
@@ -104,16 +105,13 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     /** LDAP Subtree wherein users entries are searched*/
     private final String USER_DN = ldapProperties.getProperty(LDAPProperties.LDAP_USERS_SUBTREE);
 
-    /** attribute name in a LDAP user entry that corresponds to user login name*/
-    private final String USER_LOGIN_ATTR_NAME = ldapProperties
-            .getProperty(LDAPProperties.LDAP_USER_LOGIN_ATTR);
+    /** object class of users in LDAP server configuration */
+    private final String USER_OBJECT_CLASS = ldapProperties
+            .getProperty(LDAPProperties.LDAP_USER_OBJECT_CLASS);
 
-    /** DN of an entry of type groupOfUniqueNames, that contains users DN that have user permissions */
-    private final String USERS_GROUP_DN = ldapProperties.getProperty(LDAPProperties.LDAP_USERS_GROUP_DN);
-
-    /** DN of an entry of type groupOfUniqueNames, that contains users DN that have admin permissions */
-    private final String ADMINS_GROUP_DN = ldapProperties.getProperty(LDAPProperties.LDAP_ADMINS_GROUP_DN);
-
+    /** object class of groups in LDAP server configuration */
+    private final String GROUP_OBJECT_CLASS = ldapProperties
+            .getProperty(LDAPProperties.LDAP_GROUP_OBJECT_CLASS);
     /**
      * Authentication method used to bind to LDAP : none, simple, 
      * or one of the SASL authentication methods
@@ -137,9 +135,6 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
 
     /** authentication status */
     private boolean succeeded = false;
-
-    /** map defining  a group name and its relative DN in LDAP */
-    private Map<String, String> groupDNMap;
 
     /**
      * Creates a new instance of LDAPLoginModule
@@ -215,11 +210,8 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
+        this.subject = subject;
         this.callbackHandler = callbackHandler;
-
-        groupDNMap = new HashMap<String, String>(2);
-        groupDNMap.put("admin", ADMINS_GROUP_DN);
-        groupDNMap.put("user", USERS_GROUP_DN);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Using LDAP : " + LDAP_URL);
@@ -260,9 +252,6 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             Map<String, Object> params = ((NoCallback) callbacks[0]).get();
             String username = (String) params.get("username");
             String password = (String) params.get("pw");
-            String reqGroup = (String) params.get("group");
-            String[] hierarchyArray = (String[]) params.get("groupsHierarchy");
-            GroupHierarchy groupsHierarchy = new GroupHierarchy(hierarchyArray);
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
@@ -272,32 +261,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 throw new FailedLoginException("No username has been specified for authentication");
             }
 
-            if (hierarchyArray == null) {
-                logger.info("No group hierarchy has been specified for authentication");
-                throw new FailedLoginException("No group hierarchy has been specified for authentication");
-            }
-
-            if (hierarchyArray.length == 0) {
-                logger.info("No group hierarchy has been specified for authentication");
-                throw new FailedLoginException("No group hierarchy has been specified for authentication");
-            }
-
-            if (reqGroup == null) {
-                logger.info("No group has been specified for authentication");
-                throw new FailedLoginException("No group has been specified for authentication");
-            }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("LDAP authentication requested for user : " + username);
-                String hierarchyRepresentation = "";
-                for (String s : hierarchyArray) {
-                    hierarchyRepresentation += (s + " ");
-                }
-                logger.debug("requested group : " + reqGroup + ", group hierarchy : " +
-                    hierarchyRepresentation);
-            }
-
-            succeeded = logUser(username, password, reqGroup, groupsHierarchy);
+            succeeded = logUser(username, password);
             return succeeded;
 
         } catch (java.io.IOException ioe) {
@@ -327,8 +291,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @throws LoginException if authentication and group membership fails.
      */
     @Override
-    protected boolean logUser(String username, String password, String reqGroup,
-            GroupHierarchy groupsHierarchy) throws LoginException {
+    protected boolean logUser(String username, String password) throws LoginException {
 
         // check the user name, get the RDN of the user
         // (null = not found)
@@ -345,7 +308,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             logger.info("user entry not found in subtree " + USER_DN + " for user " + username);
             if (fallbackUserAuth) {
                 logger.info("fall back to file authentication for user : " + username);
-                return super.logUser(username, password, reqGroup, groupsHierarchy);
+                return super.logUser(username, password);
             } else
                 throw new FailedLoginException("User name doesn't exists");
         } else {
@@ -363,21 +326,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             throw new FailedLoginException("Password Incorrect");
         }
 
-        boolean groupOk = checkLDAPGroupMemberShip(userDN, reqGroup, groupsHierarchy);
-
-        if (!groupOk) {
-            logger.info("LDAP group membership verification failed for user " + username);
-            if (this.fallbackGroupMembership) {
-                logger.info("fall back to file group membership checking for user : " + username +
-                    ", requested group : " + reqGroup);
-                String group = super.checkGroupMemberShip(username, reqGroup, groupsHierarchy);
-                logger.info("authentication succeeded for user '" + username + "' in group '" + group + "'");
-                return true;
-            } else
-                throw new FailedLoginException("User doesn't belong to a group");
-        } else {
-            return true;
-        }
+        return true;
     }
 
     /**
@@ -507,15 +456,34 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             ctx = this.connectAndGetContext();
             SearchControls sControl = new SearchControls();
             sControl.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            String filter = "(&(objectclass=*)(" + USER_LOGIN_ATTR_NAME + "=" + username + "))";
+            String filter = "(&(objectclass=" + USER_OBJECT_CLASS + ")(cn=" + username + "))";
 
+            // looking for the user dn (distinguish name)
             NamingEnumeration<SearchResult> answer = ctx.search(USER_DN, filter, sControl);
             if (answer.hasMoreElements()) {
                 SearchResult result = (SearchResult) answer.next();
                 userDN = result.getNameInNamespace();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("User DN found : " + userDN);
+                    logger.debug("User " + username + " has LDAP entry " + userDN);
                 }
+                subject.getPrincipals().add(new UserNamePrincipal(username));
+
+                // looking for the user groups
+                String groupFilter = "(&(objectclass=" + GROUP_OBJECT_CLASS + ")(uniqueMember=" + userDN +
+                    "))";
+                NamingEnumeration<SearchResult> groupResults = ctx.search(USER_DN, groupFilter, sControl);
+                while (groupResults.hasMoreElements()) {
+                    SearchResult res = (SearchResult) groupResults.next();
+                    Attribute attr = res.getAttributes().get("cn");
+                    if (attr != null) {
+                        String groupName = attr.get().toString();
+                        subject.getPrincipals().add(new GroupNamePrincipal(groupName));
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("User " + username + " is a member of group " + groupName);
+                        }
+                    }
+                }
+
             } else {
                 if (logger.isDebugEnabled()) {
                     logger.debug("User DN not found");
@@ -536,77 +504,6 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         }
 
         return userDN;
-    }
-
-    /**
-     * Checks is user belongs to the group
-     *
-     * @param userDN user name
-     * @param reqGroup group to check
-     * @param hierarchy group hierarchy
-     *
-     * @return true if user is a member of this group according to hierarchy
-     */
-    private boolean checkLDAPGroupMemberShip(String userDN, String reqGroup, GroupHierarchy hierarchy) {
-        boolean groupMemberShip = false;
-
-        // Create the initial directory context
-        DirContext ctx = null;
-        try {
-            ctx = this.connectAndGetContext();
-            String filter = "(&(objectclass=groupOfUniqueNames)(uniqueMember=" + userDN + "))";
-            SearchControls sControl = new SearchControls();
-            sControl.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-            //try to find group membership in LDAP's defined groups
-            for (Entry<String, String> ldapGroupEntry : this.groupDNMap.entrySet()) {
-                String groupName = ldapGroupEntry.getKey();
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("test Group : " + groupName);
-                }
-
-                //check first if LDAP group to test is above or at same level of requested group
-                //if not, useless to test user membership
-                if (hierarchy.isGroupInHierarchy(groupName) && hierarchy.isAbove(groupName, reqGroup)) {
-                    String groupDN = ldapGroupEntry.getValue();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("checking group : " + groupDN + " membership for user dn : " + userDN);
-                    }
-                    //perform LDAP search on a LDAP's group
-                    NamingEnumeration<SearchResult> answer = ctx.search(groupDN, filter, sControl);
-                    //check if user is member of this group
-                    if (answer.hasMoreElements()) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(userDN + " is member of  group : " + groupDN);
-                        }
-                        //user is member of group and group level is above or equal of requested level
-                        groupMemberShip = true;
-                        break;
-                    } else {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(userDN + " is not member of  group : " + groupDN);
-                        }
-                    }
-                }
-            }
-        } catch (NamingException e) {
-            logger.error("Problem with the search in mode : " + AUTHENTICATION_METHOD + e);
-            return false;
-        } catch (GroupException e) {
-            logger.error("Problem with group hierarchy: " + e.getMessage());
-            return false;
-        } finally {
-            try {
-                if (ctx != null) {
-                    ctx.close();
-                }
-            } catch (NamingException e) {
-                logger.error("", e);
-                logger.error("Problem closing LDAP connection : " + e.getMessage());
-            }
-        }
-        return groupMemberShip;
     }
 
     /**

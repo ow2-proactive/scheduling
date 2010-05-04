@@ -69,9 +69,9 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfras
 
     @Override
     protected void createEmptyNodeSource(String sourceName) throws Exception {
-        RMTHelper.getAdminInterface().createNodesource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(), null, TimeSlotPolicy.class.getName(),
-                getPolicyParams());
+        RMTHelper.getResourceManager().createNodeSource(sourceName,
+                GCMCustomisedInfrastructure.class.getName(), new Object[] { emptyGCMD, hostsListData },
+                TimeSlotPolicy.class.getName(), getPolicyParams());
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
@@ -79,7 +79,7 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestGCMInfras
     @Override
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
-        RMTHelper.getAdminInterface().createNodesource(sourceName,
+        RMTHelper.getResourceManager().createNodeSource(sourceName,
                 GCMCustomisedInfrastructure.class.getName(),
                 new Object[] { GCMDeploymentData, hostsListData }, TimeSlotPolicy.class.getName(),
                 getPolicyParams());

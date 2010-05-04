@@ -69,8 +69,8 @@ public class AuthenticationTest extends FunctionalTest {
     private String adminName = "demo";
     private String adminPwd = "demo";
 
-    private String userName = "user1";
-    private String userPwd = "pwd1";
+    private String userName = "user";
+    private String userPwd = "pwd";
 
     /**
      * Tests start here.

@@ -90,7 +90,8 @@
 				<include name="org/ow2/proactive/resourcemanager/exception/**" />
 				<include name="org/ow2/proactive/resourcemanager/nodesource/common/**" />
 				<include name="org/ow2/proactive/resourcemanager/nodesource/NodeSource.class" />
-				<include name="org/ow2/proactive/resourcemanager/utils/adminconsole/**" />
+				<include name="org/ow2/proactive/resourcemanager/utils/console/**" />
+				<include name="org/ow2/proactive/resourcemanager/frontend/ResourceManager.class" />
 				<include name="org/ow2/proactive/resourcemanager/frontend/RMAdmin.class" />
 				<include name="org/ow2/proactive/resourcemanager/frontend/RMConnection.class" />
 				<include name="org/ow2/proactive/resourcemanager/frontend/RMMonitoring.class" />

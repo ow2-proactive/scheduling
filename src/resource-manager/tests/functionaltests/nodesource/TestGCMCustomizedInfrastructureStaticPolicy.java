@@ -67,12 +67,16 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(oneNodeescriptor)));
         String hostList = RMTHelper.class.getResource("/functionaltests/nodesource/hostslist").getPath();
         hostsListData = FileToBytesConverter.convertFileToByteArray((new File(hostList)));
+        String emptyNodeDescriptor = TestGCMInfrastructureTimeSlotPolicy.class.getResource(
+                "/functionaltests/nodesource/empty_gcmd.xml").getPath();
+        emptyGCMD = FileToBytesConverter.convertFileToByteArray((new File(emptyNodeDescriptor)));
     }
 
     @Override
     protected void createEmptyNodeSource(String sourceName) throws Exception {
-        RMTHelper.getAdminInterface().createNodesource(sourceName,
-                GCMCustomisedInfrastructure.class.getName(), null, StaticPolicy.class.getName(), null);
+        RMTHelper.getResourceManager().createNodeSource(sourceName,
+                GCMCustomisedInfrastructure.class.getName(), new Object[] { emptyGCMD, hostsListData },
+                StaticPolicy.class.getName(), null);
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
@@ -81,7 +85,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestGCMInfrastr
     protected void createNodeSourceWithNodes(String sourceName) throws Exception {
 
         // creating node source
-        RMTHelper.getAdminInterface().createNodesource(sourceName,
+        RMTHelper.getResourceManager().createNodeSource(sourceName,
                 GCMCustomisedInfrastructure.class.getName(),
                 new Object[] { GCMDeploymentData, hostsListData }, StaticPolicy.class.getName(), null);
 

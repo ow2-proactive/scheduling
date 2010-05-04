@@ -72,9 +72,6 @@ public class Users extends ViewPart implements SchedulerUsersListener {
     /** the unique id and the title for the column "Name" */
     public static final String COLUMN_NAME_TITLE = "Name";
 
-    /** the unique id and the title for the column "Admin" */
-    public static final String COLUMN_ADMIN_TITLE = "Admin";
-
     /** the unique id and the title for the column "# Job Submitted" */
     public static final String COLUMN_SUBMITTED_JOBS_TITLE = "# Job submitted";
 
@@ -141,9 +138,7 @@ public class Users extends ViewPart implements SchedulerUsersListener {
 
         for (int i = 0; i < cols.length; i++) {
             String title = cols[i].getText();
-            if (title.equals(COLUMN_ADMIN_TITLE)) {
-                item.setText(i, user.isAdmin() ? "Yes" : "No");
-            } else if (title.equals(COLUMN_CONNECTED_AT_TITLE)) {
+            if (title.equals(COLUMN_CONNECTED_AT_TITLE)) {
                 item.setText(i, Tools.getFormattedDate(user.getConnectionTime()));
             } else if (title.equals(COLUMN_HOSTNAME_TITLE)) {
                 item.setText(i, user.getHostName());
@@ -230,18 +225,16 @@ public class Users extends ViewPart implements SchedulerUsersListener {
 
         // setText
         cols.get(0).setText(COLUMN_NAME_TITLE);
-        cols.get(1).setText(COLUMN_ADMIN_TITLE);
-        cols.get(2).setText(COLUMN_SUBMITTED_JOBS_TITLE);
-        cols.get(3).setText(COLUMN_HOSTNAME_TITLE);
-        cols.get(4).setText(COLUMN_CONNECTED_AT_TITLE);
-        cols.get(5).setText(COLUMN_LAST_SUBMITTED_JOB_TITLE);
+        cols.get(1).setText(COLUMN_SUBMITTED_JOBS_TITLE);
+        cols.get(2).setText(COLUMN_HOSTNAME_TITLE);
+        cols.get(3).setText(COLUMN_CONNECTED_AT_TITLE);
+        cols.get(4).setText(COLUMN_LAST_SUBMITTED_JOB_TITLE);
         // setWidth
         cols.get(0).setWidth(120);
-        cols.get(1).setWidth(55);
-        cols.get(2).setWidth(120);
-        cols.get(3).setWidth(170);
+        cols.get(1).setWidth(120);
+        cols.get(2).setWidth(170);
+        cols.get(3).setWidth(140);
         cols.get(4).setWidth(140);
-        cols.get(5).setWidth(140);
 
         SchedulerUsers users = JobsController.getLocalView().getUsers();
         if (users != null) {
@@ -310,19 +303,14 @@ class UserComparator implements Comparator<UserIdentification> {
     public int compare(UserIdentification o1, UserIdentification o2) {
         switch (type) {
             case 1:
-                boolean b1 = o1.isAdmin();
-                boolean b2 = o2.isAdmin();
-                int ret = (b1 == b2) ? 0 : (b1) ? -1 : 1;
-                return (sortOrder == SWT.UP) ? (ret * -1) : (ret);
-            case 2:
                 int i1 = o1.getSubmitNumber();
                 int i2 = o2.getSubmitNumber();
                 return (sortOrder == SWT.UP) ? (i2 - i1) : (i1 - i2);
-            case 4:
+            case 3:
                 long l1 = o1.getConnectionTime();
                 long l2 = o2.getConnectionTime();
                 return (int) ((sortOrder == SWT.UP) ? (l2 - l1) : (l1 - l2));
-            case 5:
+            case 4:
                 l1 = o1.getLastSubmitTime();
                 l2 = o2.getLastSubmitTime();
                 return (int) ((sortOrder == SWT.UP) ? (l2 - l1) : (l1 - l2));
@@ -330,7 +318,7 @@ class UserComparator implements Comparator<UserIdentification> {
                 String s1 = o1.getUsername();
                 String s2 = o2.getUsername();
                 return (sortOrder == SWT.UP) ? s1.compareTo(s2) : s2.compareTo(s1);
-            case 3:
+            case 2:
                 s1 = o1.getHostName();
                 s2 = o2.getHostName();
                 return (sortOrder == SWT.UP) ? s1.compareTo(s2) : s2.compareTo(s1);

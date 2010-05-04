@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,21 +34,47 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.authentication;
+package org.ow2.proactive.authentication.principals;
 
-/**
- * Group Exception
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 0.9.1
- */
-public class GroupException extends Exception {
+import java.io.Serializable;
+import java.security.Principal;
 
-    /**
-     * Attaches a message to the Exception
-     * @param msg message attached
-     */
-    public GroupException(String msg) {
-        super(msg);
+
+public class IdentityPrincipal implements Principal, Serializable {
+
+    private String name;
+
+    public IdentityPrincipal(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String toString() {
+        return (this.getClass().getSimpleName() + " \"" + name + "\"");
+    }
+
+    public boolean equals(Object o) {
+        if (o == null)
+            return false;
+
+        if (this == o)
+            return true;
+
+        if (!o.getClass().getName().equals(this.getClass().getName()))
+            return false;
+
+        IdentityPrincipal that = (IdentityPrincipal) o;
+
+        if (this.getName().equals(that.getName()))
+            return true;
+
+        return false;
+    }
+
+    public int hashCode() {
+        return name.hashCode();
     }
 }

@@ -42,6 +42,7 @@ import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
@@ -128,7 +129,7 @@ public abstract class AuthenticationImpl implements Authentication {
      * @return the name of the user logged
      * @throws LoginException if username or password is incorrect.
      */
-    public String loginAs(String role, String[] groups, Credentials cred) throws LoginException {
+    public Subject authenticate(Credentials cred) throws LoginException {
 
         if (activated == false) {
             throw new LoginException("Authentication active object is not activated.");
@@ -149,31 +150,27 @@ public abstract class AuthenticationImpl implements Authentication {
 
         try {
             // Verify that this user//password can connect to this existing scheduler
-            getLogger().info(username + " is trying to connect as " + role);
+            getLogger().info(username + " is trying to connect");
 
             Map<String, Object> params = new HashMap<String, Object>(4);
             //user name to check
             params.put("username", username);
             //password to check
             params.put("pw", password);
-            //minimal group membership : user must belong to group user or a group above
-            params.put("group", role);
-            //group hierarchy defined for this authentication/permission ( from lowest,
-            params.put("groupsHierarchy", groups);
 
             //Load LoginContext according to login method defined in jaas.config
             LoginContext lc = new LoginContext(getLoginMethod(), new NoCallbackHandler(params));
 
             lc.login();
-            getLogger().info("Logged successfull as a " + role + " : " + username);
+            getLogger().info("User " + username + " logged successfully");
 
+            return lc.getSubject();
         } catch (LoginException e) {
             getLogger().info(e.getMessage());
             //Nature of exception is hidden for user, we don't want to inform
             //user about the reason of non authentication
             throw new LoginException("Authentication failed");
         }
-        return username;
     }
 
     /**

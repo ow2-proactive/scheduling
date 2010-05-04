@@ -38,14 +38,11 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
@@ -67,6 +64,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
  * @since ProActive Scheduling 0.9
  *
  */
+@Deprecated
 @PublicAPI
 public interface RMAdmin extends RMUser, Serializable {
 
@@ -82,8 +80,9 @@ public interface RMAdmin extends RMUser, Serializable {
      * @param frequency the frequency to set to the node source in ms.
      * @param sourceName name of the node source to set the frequency
      * @throws RMException if the node source doesn't exist
+     * @return true if ping frequency is successfully changed, false or exception otherwise
      */
-    public void setNodeSourcePingFrequency(int frequency, String sourceName) throws RMException;
+    public BooleanWrapper setNodeSourcePingFrequency(int frequency, String sourceName) throws RMException;
 
     /**
      * Set the ping frequency to all nodes sources.
@@ -136,8 +135,9 @@ public interface RMAdmin extends RMUser, Serializable {
      *
      * @param nodeUrl URL of the node to remove.
      * @param preempt if true remove the node immediately without waiting while it will be freed.
+     * @return true if the node is removed successfully, false or exception otherwise
      */
-    public void removeNode(String nodeUrl, boolean preempt);
+    public BooleanWrapper removeNode(String nodeUrl, boolean preempt);
 
     /**
      * Remove a node source from the RM.
@@ -153,26 +153,8 @@ public interface RMAdmin extends RMUser, Serializable {
      * Kills Resource Manager
      * @param preempt if true remove the node immediately without waiting while it will be freed.
      * @exception ProActiveException
-     *
      */
-    public void shutdown(boolean preempt) throws ProActiveException;
-
-    /**
-     * Gets a list of nodes handled by Resource Manager
-     * @return a list of RMNodeEvent objects representing the nodes 
-     */
-    public List<RMNodeEvent> getNodesList();
-
-    /**
-     * Get list of nodes sources on Resource Manager
-     * @return a list of RMNodeSourceEvent objects representing the nodes sources
-     */
-    public List<RMNodeSourceEvent> getNodeSourcesList();
-
-    /**
-     * Disconnects from resource manager.
-     */
-    public void disconnect();
+    public BooleanWrapper shutdown(boolean preempt) throws ProActiveException;
 
     /**
      * Gets a list of supported node source infrastructures descriptors

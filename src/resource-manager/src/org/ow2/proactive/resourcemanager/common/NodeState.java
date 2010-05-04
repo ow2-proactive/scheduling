@@ -43,10 +43,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Enumeration of all states of a RMNode :<BR>
  * -free : node is ready to perform a task.<BR>
  * -busy : node is executing a task.<BR>
- * -to be released : node is busy and have to be removed at the end of its current task.<BR>
+ * -to be removed : node is busy and have to be removed at the end of its current task.<BR>
  * -down : node is broken, and not anymore able to perform tasks.<BR>
- *
- * @see org.ow2.proactive.resourcemanager.rmnode.RMNode
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -67,11 +65,13 @@ public enum NodeState {
      */
     DOWN("Down"),
     /**
-     * a node busy which must be removed from Resource manager, when the RM user
+     * a busy node which must be removed from resource manager when the user
      * will give back the node.
      * 
+     * The constant will be replaced with TO_BE_REMOVED in the future.
      */
-    TO_BE_RELEASED("To be Released");
+    @Deprecated
+    TO_BE_RELEASED("To be removed");
 
     private String desc;
 

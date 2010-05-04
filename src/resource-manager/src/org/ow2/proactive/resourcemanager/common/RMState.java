@@ -53,16 +53,24 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 @PublicAPI
 public class RMState implements Serializable {
 
-    private IntWrapper numberOfAllResources;
-    private IntWrapper numberOfFreeResources;
+    private int freeNodesNumber;
+    private int totalAliveNodesNumber;
+    private int totalNodesNumber;
+
+    public RMState(int freeNodesNumber, int totalAliveNodesNumber, int totalNodesNumber) {
+        this.freeNodesNumber = freeNodesNumber;
+        this.totalAliveNodesNumber = totalAliveNodesNumber;
+        this.totalNodesNumber = totalNodesNumber;
+    }
 
     /**
      * Get the number of all resources.
      * 
      * @return the number of all resources.
      */
+    @Deprecated
     public IntWrapper getNumberOfAllResources() {
-        return numberOfAllResources;
+        return new IntWrapper(totalNodesNumber);
     }
 
     /**
@@ -70,17 +78,9 @@ public class RMState implements Serializable {
      * 
      * @return the number of free resources.
      */
+    @Deprecated
     public IntWrapper getNumberOfFreeResources() {
-        return numberOfFreeResources;
-    }
-
-    /**
-     * Return true if the scheduler has free resources, false if not.
-     * 
-     * @return true if the scheduler has free resources, false if not.
-     */
-    public BooleanWrapper hasFreeResources() {
-        return new BooleanWrapper(numberOfFreeResources.intValue() != 0);
+        return new IntWrapper(freeNodesNumber);
     }
 
     /**
@@ -88,8 +88,9 @@ public class RMState implements Serializable {
      *
      * @param numberOfAllResources the number Of All Resources to set.
      */
+    @Deprecated
     public void setNumberOfAllResources(IntWrapper numberOfAllResources) {
-        this.numberOfAllResources = numberOfAllResources;
+        this.totalNodesNumber = numberOfAllResources.intValue();
     }
 
     /**
@@ -97,8 +98,44 @@ public class RMState implements Serializable {
      *
      * @param numberOfFreeResources the number Of Free Resources to set.
      */
+    @Deprecated
     public void setNumberOfFreeResources(IntWrapper numberOfFreeResources) {
-        this.numberOfFreeResources = numberOfFreeResources;
+        this.freeNodesNumber = numberOfFreeResources.intValue();
     }
 
+    /**
+     * Return true if the scheduler has free resources, false if not.
+     *
+     * @return true if the scheduler has free resources, false if not.
+     */
+    public BooleanWrapper hasFreeResources() {
+        return new BooleanWrapper(freeNodesNumber != 0);
+    }
+
+    /**
+     * Returns free nodes number in the resource manager.
+     *
+     * @return free nodes number in the resource manager
+     */
+    public int getFreeNodesNumber() {
+        return freeNodesNumber;
+    }
+
+    /**
+     * Returns total alive nodes number in the resource manager.
+     *
+     * @return total alive nodes number in the resource manager
+     */
+    public int getTotalAliveNodesNumber() {
+        return totalAliveNodesNumber;
+    }
+
+    /**
+     * Returns total nodes number (including dead nodes) in the resource manager.
+     *
+     * @return total nodes number in the resource manager
+     */
+    public int getTotalNodesNumber() {
+        return totalNodesNumber;
+    }
 }

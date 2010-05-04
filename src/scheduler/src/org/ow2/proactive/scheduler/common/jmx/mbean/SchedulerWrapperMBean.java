@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -46,7 +46,77 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 1.0
  */
 @PublicAPI
-public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean {
+public interface SchedulerWrapperMBean {
+
+    /**
+     * Returns the state of the scheduler.
+     *
+     * @return The state of the scheduler.
+     */
+    public String getSchedulerStatus();
+
+    /**
+     * Returns the number of users connected to the scheduler.
+     *
+     * @return the number of users connected to the scheduler.
+     */
+    public int getNumberOfConnectedUsers();
+
+    /**
+     * Returns the total number of jobs.
+     *
+     * @return the total number of jobs.
+     */
+    public int getTotalNumberOfJobs();
+
+    /**
+     * Returns the number of pending jobs of the scheduler.
+     *
+     * @return The number of pending jobs of the scheduler.
+     */
+    public int getNumberOfPendingJobs();
+
+    /**
+     * Returns the number of running jobs of the scheduler.
+     *
+     * @return The number of running jobs of the scheduler.
+     */
+    public int getNumberOfRunningJobs();
+
+    /**
+     * Returns the number of finished jobs of the scheduler.
+     *
+     * @return The number of finished jobs of the scheduler.
+     */
+    public int getNumberOfFinishedJobs();
+
+    /**
+     * Returns the total number of Tasks.
+     *
+     * @return the total number of Tasks.
+     */
+    public int getTotalNumberOfTasks();
+
+    /**
+     * Returns the number of pending Tasks of the scheduler.
+     *
+     * @return The number of pending Tasks of the scheduler.
+     */
+    public int getNumberOfPendingTasks();
+
+    /**
+     * Returns the number of running Tasks of the scheduler.
+     *
+     * @return The number of running Tasks of the scheduler.
+     */
+    public int getNumberOfRunningTasks();
+
+    /**
+     * Returns the number of finished Tasks of the scheduler.
+     *
+     * @return The number of finished Tasks of the scheduler.
+     */
+    public int getNumberOfFinishedTasks();
 
     /**
      * @return current mean job pending time as integer
@@ -89,7 +159,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * It gives the pending time for a given Job
      *
      * @param jobId the id of the Job to check
-     * @return a representation as long of the duration of the pending time for the given job. 
+     * @return a representation as long of the duration of the pending time for the given job.
      */
     public long getJobPendingTime(String jobId);
 
@@ -97,7 +167,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * This method gives the running time for a given Job.
      *
      * @param jobId the id of the Job to check
-     * @return a representation as long of the duration of the running time for the given job. 
+     * @return a representation as long of the duration of the running time for the given job.
      */
     public long getJobRunningTime(String jobId);
 
@@ -105,7 +175,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * This method gives the mean task pending time for a given Job
      *
      * @param jobId the id of the Job to check
-     * @return a representation as long of the duration of the mean task pending time for the given job. 
+     * @return a representation as long of the duration of the mean task pending time for the given job.
      */
     public long getMeanTaskPendingTime(String jobId);
 
@@ -113,7 +183,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * This method gives the mean task running time for a given Job
      *
      * @param jobId the id of the Job to check
-     * @return a representation as long of the duration of the mean task running time for the given job. 
+     * @return a representation as long of the duration of the mean task running time for the given job.
      */
     public long getMeanTaskRunningTime(String jobId);
 
@@ -121,7 +191,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * This method gives the total number of nodes used by a given Job
      *
      * @param jobId the id of the Job to check
-     * @return the total number of nodes used by the given job. 
+     * @return the total number of nodes used by the given job.
      */
     public int getTotalNumberOfNodesUsed(String jobId);
 
@@ -130,7 +200,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * It gives the pending time for a given Job as String
      *
      * @param jobId the id of the Job to check
-     * @return a representation as long of the duration of the pending time for the given job. 
+     * @return a representation as long of the duration of the pending time for the given job.
      */
     public String getFormattedJobPendingTime(String jobId);
 
@@ -138,7 +208,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * This method gives the running time for a given Job as String
      *
      * @param jobId the id of the Job to check
-     * @return a representation as long of the duration of the running time for the given job. 
+     * @return a representation as long of the duration of the running time for the given job.
      */
     public String getFormattedJobRunningTime(String jobId);
 
@@ -146,7 +216,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * This method gives the mean task pending time for a given Job as String
      *
      * @param jobId the id of the Job to check
-     * @return a representation as long of the duration of the mean task pending time for the given job. 
+     * @return a representation as long of the duration of the mean task pending time for the given job.
      */
     public String getFormattedMeanTaskPendingTime(String jobId);
 
@@ -154,7 +224,7 @@ public interface SchedulerWrapperAdminMBean extends SchedulerWrapperAnonymMBean 
      * This method gives the mean task running time for a given Job as String
      *
      * @param jobId the id of the Job to check
-     * @return a representation as long of the duration of the mean task running time for the given job. 
+     * @return a representation as long of the duration of the mean task running time for the given job.
      */
     public String getFormattedMeanTaskRunningTime(String jobId);
 }

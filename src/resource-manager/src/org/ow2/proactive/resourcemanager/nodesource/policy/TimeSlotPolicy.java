@@ -138,17 +138,20 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * @param policyParameters parameters defined by user
      */
     @Override
-    public void configure(Object... policyParameters) throws RMException {
+    public BooleanWrapper configure(Object... policyParameters) {
+        super.configure(policyParameters);
         try {
+            int index = 2;
+
+            acquireTime = policyParameters[index++].toString();
+            releaseTime = policyParameters[index++].toString();
+
             // validation of date parameters
-            dateFormat.parse(policyParameters[0].toString());
-            dateFormat.parse(policyParameters[1].toString());
+            dateFormat.parse(acquireTime);
+            dateFormat.parse(releaseTime);
 
-            acquireTime = policyParameters[0].toString();
-            releaseTime = policyParameters[1].toString();
-
-            if (policyParameters[2].toString().length() > 0) {
-                period = Long.parseLong(policyParameters[2].toString());
+            if (policyParameters[index++].toString().length() > 0) {
+                period = Long.parseLong(policyParameters[index - 1].toString());
 
                 if (period < 0) {
                     throw new RMException("Period cannot be less than zero");
@@ -158,10 +161,11 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
                 period = new Long(0);
             }
 
-            preemptive = Boolean.parseBoolean(policyParameters[3].toString());
+            preemptive = Boolean.parseBoolean(policyParameters[index++].toString());
         } catch (Throwable t) {
-            throw new RMException(t);
+            throw new IllegalArgumentException(t);
         }
+        return new BooleanWrapper(true);
     }
 
     /**

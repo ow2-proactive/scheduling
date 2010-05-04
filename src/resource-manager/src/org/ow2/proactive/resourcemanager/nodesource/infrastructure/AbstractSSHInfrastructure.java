@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -105,10 +106,9 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
      * @param parameters
      *            parameters[0]: path to the JVM on the remote host 
      *            parameters[1]: path to the Scheduling installation on the remote host
-     * @throws RMException configuration failed
      */
     @Override
-    public void configure(Object... parameters) throws RMException {
+    public BooleanWrapper configure(Object... parameters) {
         if (parameters != null && parameters.length >= 5) {
             this.javaPath = parameters[0].toString();
             if (!new File(this.javaPath).isAbsolute()) {
@@ -119,8 +119,10 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
             this.port = parameters[3].toString();
             this.javaOptions = parameters[4].toString();
         } else {
-            throw new RMException("Invalid parameters for infrastructure creation");
+            throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
         }
+
+        return new BooleanWrapper(true);
     }
 
     /**
