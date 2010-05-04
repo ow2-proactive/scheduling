@@ -46,9 +46,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -77,7 +77,7 @@ public class UserSchedulerModel extends ConsoleModel {
 
     private static final String JS_INIT_FILE = "UserActions.js";
     protected static final int cmdHelpMaxCharLength = 24;
-    protected UserSchedulerInterface scheduler;
+    protected Scheduler scheduler;
     private ArrayList<Command> commands;
 
     protected MBeanInfoViewer jmxInfoViewer = null;
@@ -203,7 +203,7 @@ public class UserSchedulerModel extends ConsoleModel {
         initialize();
         String stmt;
         while (!terminated) {
-            SchedulerStatus status = scheduler.getSchedulerStatus();
+            SchedulerStatus status = scheduler.getStatus();
             String prompt = " ";
             if (status != SchedulerStatus.STARTED) {
                 try {
@@ -261,7 +261,7 @@ public class UserSchedulerModel extends ConsoleModel {
     private boolean pause_(String jobId) {
         boolean success = false;
         try {
-            success = scheduler.pause(jobId).booleanValue();
+            success = scheduler.pauseJob(jobId);
         } catch (Exception e) {
             handleExceptionDisplay("Error while pausing job " + jobId, e);
             return false;
@@ -282,7 +282,7 @@ public class UserSchedulerModel extends ConsoleModel {
     private boolean resume_(String jobId) {
         boolean success = false;
         try {
-            success = scheduler.resume(jobId).booleanValue();
+            success = scheduler.resumeJob(jobId);
         } catch (Exception e) {
             handleExceptionDisplay("Error while resuming job  " + jobId, e);
             return false;
@@ -303,7 +303,7 @@ public class UserSchedulerModel extends ConsoleModel {
     private boolean kill_(String jobId) {
         boolean success = false;
         try {
-            success = scheduler.kill(jobId).booleanValue();
+            success = scheduler.killJob(jobId);
         } catch (Exception e) {
             handleExceptionDisplay("Error while killing job  " + jobId, e);
             return false;
@@ -323,7 +323,7 @@ public class UserSchedulerModel extends ConsoleModel {
 
     private void remove_(String jobId) {
         try {
-            scheduler.remove(jobId);
+            scheduler.removeJob(jobId);
             print("Job " + jobId + " removed.");
         } catch (Exception e) {
             handleExceptionDisplay("Error while removing job  " + jobId, e);
@@ -450,7 +450,7 @@ public class UserSchedulerModel extends ConsoleModel {
     private void priority_(String jobId, String newPriority) {
         try {
             JobPriority prio = JobPriority.findPriority(newPriority);
-            scheduler.changePriority(jobId, prio);
+            scheduler.changeJobPriority(jobId, prio);
             print("Job " + jobId + " priority changed to '" + prio + "' !");
         } catch (Exception e) {
             handleExceptionDisplay("Error on job " + jobId, e);
@@ -530,7 +530,7 @@ public class UserSchedulerModel extends ConsoleModel {
     private void schedulerState_() {
         List<String> list;
         try {
-            SchedulerState state = scheduler.getSchedulerState();
+            SchedulerState state = scheduler.getState();
             if (state.getPendingJobs().size() + state.getRunningJobs().size() +
                 state.getFinishedJobs().size() == 0) {
                 print("\n\tThere is no jobs handled by the Scheduler");
@@ -666,12 +666,12 @@ public class UserSchedulerModel extends ConsoleModel {
         }
     }
 
-    public static UserSchedulerInterface getUserScheduler() {
+    public static Scheduler getUserScheduler() {
         getModel().checkIsReady();
         return getModel().getUserScheduler_();
     }
 
-    private UserSchedulerInterface getUserScheduler_() {
+    private Scheduler getUserScheduler_() {
         return scheduler;
     }
 
@@ -699,7 +699,7 @@ public class UserSchedulerModel extends ConsoleModel {
      *
      * @return the scheduler
      */
-    public UserSchedulerInterface getScheduler() {
+    public Scheduler getScheduler() {
         return scheduler;
     }
 
@@ -708,7 +708,7 @@ public class UserSchedulerModel extends ConsoleModel {
      *
      * @param scheduler the scheduler to connect
      */
-    public void connectScheduler(UserSchedulerInterface scheduler) {
+    public void connectScheduler(Scheduler scheduler) {
         if (scheduler == null) {
             throw new NullPointerException("Given Scheduler is null");
         }

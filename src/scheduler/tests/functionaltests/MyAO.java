@@ -45,8 +45,8 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -115,10 +115,10 @@ public class MyAO implements Serializable {
 
         schedulerAuth = SchedulerConnection.waitAndJoin(schedulerDefaultURL);
         if (GCMDPath != null && GCMDPath.length() > 0) {
-            RMAdmin rmAdmin = rmAuth.logAsAdmin(Credentials.getCredentials(PAResourceManagerProperties
+            ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
             byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(GCMDPath));
-            rmAdmin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
+            rmAdmin.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
                     new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
         }
         System.out.println("Scheduler successfully created !");

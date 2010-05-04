@@ -60,7 +60,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -184,13 +184,13 @@ public class SchedulerStarter {
                                     .info("Trying to connect the local Resource Manager using Scheduler identity");
 
                             //creating default node source
-                            RMAdmin rmAdmin = rmAuth.logAsAdmin(Credentials
+                            ResourceManager rman = rmAuth.login(Credentials
                                     .getCredentials(PAResourceManagerProperties
                                             .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
                                                     .getValueAsString())));
                             byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray(new File(
                                 deploymentFile));
-                            rmAdmin.createNodesource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
+                            rman.createNodeSource(NodeSource.GCM_LOCAL, GCMInfrastructure.class.getName(),
                                     new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), null);
 
                             logger.info("Resource Manager created on " + rmAuth.getHostURL());

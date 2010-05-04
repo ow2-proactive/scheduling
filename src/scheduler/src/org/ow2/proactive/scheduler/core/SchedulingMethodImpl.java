@@ -147,7 +147,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             //get rmState and update it in scheduling policy
             RMState rmState = core.resourceManager.getRMState();
             core.policy.RMState = rmState;
-            int freeResourcesNb = rmState.getNumberOfFreeResources().intValue();
+            int freeResourcesNb = rmState.getFreeNodesNumber();
             logger_dev.info("Number of free resources : " + freeResourcesNb);
             //if there is no free resources, stop it right now
             if (freeResourcesNb == 0) {

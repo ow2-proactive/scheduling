@@ -38,8 +38,8 @@ package scalabilityTests.framework;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
 import scalabilityTests.framework.listeners.JobResultSchedulerListener;
@@ -63,8 +63,7 @@ public class SchedulerUser<V> extends AbstractSchedulerUser<V> {
         super(schedulerURL, userCreds);
     }
 
-    public SchedulerUser(Action<UserSchedulerInterface, V> defaultAction, String schedulerURL,
-            Credentials userCreds) {
+    public SchedulerUser(Action<Scheduler, V> defaultAction, String schedulerURL, Credentials userCreds) {
         super(defaultAction, schedulerURL, userCreds);
     }
 

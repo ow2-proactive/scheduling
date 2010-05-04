@@ -68,11 +68,11 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -108,7 +108,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     /**
      * Connection to the scheduler
      */
-    private UserSchedulerInterface scheduler;
+    private Scheduler scheduler;
 
     /**
      * Id of the current jobs running
@@ -183,7 +183,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             throw new LoginException("Could not retrieve public key, contact the Scheduler admininistrator" +
                 e);
         }
-        this.scheduler = auth.logAsUser(creds);
+        this.scheduler = auth.login(creds);
 
         this.scheduler.addEventListener(stubOnThis, false, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                 SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN, SchedulerEvent.SHUTTING_DOWN);

@@ -51,7 +51,6 @@ import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestExcepti
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.PolicyRestriction;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
@@ -188,7 +187,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     }
 
     protected IntWrapper getTotalNodeNumber() {
-        return nodeSource.getRMCore().getTotalAliveNodesNumber();
+        return new IntWrapper(nodeSource.getRMCore().getState().getFreeNodesNumber());
     }
 
     private void refreshPolicyState() {

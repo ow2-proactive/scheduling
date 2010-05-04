@@ -7,12 +7,13 @@ import java.io.IOException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -23,7 +24,7 @@ public class SchedulerClientEventsLogger implements SchedulerEventListener {
 
     public static String newline = System.getProperty("line.separator");
 
-    private UserSchedulerInterface user;
+    private Scheduler user;
     private FileWriter writer;
 
     /**
@@ -61,7 +62,8 @@ public class SchedulerClientEventsLogger implements SchedulerEventListener {
         //1. get the authentication interface using the SchedulerConnection
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(schedulerURL);
         //2. get the user interface using the retrieved SchedulerAuthenticationInterface
-        user = auth.logAsAdmin("admin", "admin");
+        Credentials cred = Credentials.createCredentials("admin", "admin", auth.getPublicKey());
+        user = auth.login(cred);
 
         //let the client be notified of its own 'job termination' -> job running to finished event
         user.addEventListener((SchedulerClientEventsLogger) PAActiveObject.getStubOnThis(), false);

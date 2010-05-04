@@ -40,11 +40,11 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -57,7 +57,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 public class SubmitJob implements SchedulerEventListener {
 
     private JobId myJobId;
-    private UserSchedulerInterface user;
+    private Scheduler user;
     private int terminated = 0;
 
     public void begin() {
@@ -68,7 +68,7 @@ public class SubmitJob implements SchedulerEventListener {
             SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("rmi://localhost:" +
                 CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/");
             //get the user interface using the retrieved SchedulerAuthenticationInterface
-            user = auth.logAsUser(Credentials.createCredentials(SchedulerTHelper.username,
+            user = auth.login(Credentials.createCredentials(SchedulerTHelper.username,
                     SchedulerTHelper.password, auth.getPublicKey()));
 
             //let the client be notified of its own 'job termination' -> job running to finished event
@@ -95,7 +95,7 @@ public class SubmitJob implements SchedulerEventListener {
                 System.out.println(result.getJobInfo().getFinishedTime() -
                     result.getJobInfo().getStartTime() + "ms");
                 //notify the test that it is terminated
-                user.remove(notification.getData().getJobId());
+                user.removeJob(notification.getData().getJobId());
             } catch (Throwable e) {
                 e.printStackTrace();
             }

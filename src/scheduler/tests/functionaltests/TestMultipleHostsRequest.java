@@ -98,7 +98,7 @@ public class TestMultipleHostsRequest extends FunctionalTest {
         SchedulerTHelper.waitForEventTaskRunning(id, task1Name);
         TaskInfo tInfo = SchedulerTHelper.waitForEventTaskFinished(id, task1Name);
 
-        SchedulerTHelper.log(SchedulerTHelper.getUserInterface().getTaskResult(id, "task1").getOutput()
+        SchedulerTHelper.log(SchedulerTHelper.getSchedulerInterface().getTaskResult(id, "task1").getOutput()
                 .getAllLogs(false));
 
         Assert.assertEquals(TaskStatus.FINISHED, tInfo.getStatus());

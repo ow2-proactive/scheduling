@@ -84,7 +84,7 @@ public final class Internal {
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_FREE);
             case BUSY:
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_BUSY);
-            case TO_BE_REMOVED:
+            case TO_BE_RELEASED:
                 return Activator.getDefault().getImageRegistry().get(Internal.IMG_TORELEASE);
             default:
                 return Activator.getDefault().getImageRegistry().get(ISharedImages.IMG_OBJS_ERROR_TSK);

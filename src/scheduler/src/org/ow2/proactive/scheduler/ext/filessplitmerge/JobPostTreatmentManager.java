@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -37,6 +37,7 @@ import org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions.ExceptionToStr
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.util.FilesTools;
+import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -84,7 +85,7 @@ public abstract class JobPostTreatmentManager implements Observer {
      * This interface will be used in order to gather the results of the
      * finished jobs. It is a reference (stub) to the {@link SchedulerProxyUserInterface} active object
      */
-    protected UserSchedulerInterface uiScheduler;
+    protected Scheduler uiScheduler;
 
     /**
      * Name of the attribute awaited jobs in the status file 
@@ -155,7 +156,7 @@ public abstract class JobPostTreatmentManager implements Observer {
     public void init() {
         connect();
         createStatusFromFile();
-        if (!uiScheduler.isConnected().booleanValue()) {
+        if (!uiScheduler.isConnected()) {
             LoggerManager.getInstane().error("Could not initiate the post treatment process. ");
             return;
         }

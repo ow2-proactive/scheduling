@@ -156,7 +156,7 @@ public class InternalSchedulerEventListener extends Observable implements Schedu
 
         SchedulerState state = null;
 
-        if ((proxyUserInterface == null) || (!proxyUserInterface.isConnected().booleanValue())) {
+        if ((proxyUserInterface == null) || (!proxyUserInterface.isConnected())) {
             LoggerManager.getLogger().warn(
                     "InternalSchedulerEventListener.init()-> userSchedulerInerface not connected.");
             LoggerManager.getInstane().error("Could not initiate Scheduler Event Listener. ");
@@ -167,8 +167,8 @@ public class InternalSchedulerEventListener extends Observable implements Schedu
 
             //TODO: put true for the second argument: listen only to my events
             //... and test 
-            state = proxyUserInterface.addSchedulerEventListener((SchedulerEventListener) PAActiveObject
-                    .getStubOnThis(), false);
+            state = proxyUserInterface.addEventListener((SchedulerEventListener) PAActiveObject
+                    .getStubOnThis(), false, true);
 
             // LoggerManager.getInstane().info("The scheduler current state was
             // gathered: ");

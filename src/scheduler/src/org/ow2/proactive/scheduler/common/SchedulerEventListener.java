@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -54,7 +52,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public interface SchedulerEventListener extends Serializable {
+public interface SchedulerEventListener {
 
     /**
      * Invoked each time a scheduler event occurs.<br />

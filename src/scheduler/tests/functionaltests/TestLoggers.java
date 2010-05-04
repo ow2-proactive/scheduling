@@ -97,8 +97,8 @@ public class TestLoggers extends FunctionalTest {
         l2.addAppender(test2);
         //l3.addAppender(test3);
 
-        SchedulerTHelper.getUserInterface().listenLog(id1, lfsPA.getAppenderProvider());
-        SchedulerTHelper.getUserInterface().listenLog(id2, lfsSocket.getAppenderProvider());
+        SchedulerTHelper.getSchedulerInterface().listenJobLogs(id1, lfsPA.getAppenderProvider());
+        SchedulerTHelper.getSchedulerInterface().listenJobLogs(id2, lfsSocket.getAppenderProvider());
         //SchedulerTHelper.getUserInterface().listenLog(id3, lfsPA.getAppenderProvider());
 
         SchedulerTHelper.waitForEventJobFinished(id1);

@@ -38,7 +38,7 @@ package scalabilityTests.framework;
 import java.io.File;
 import java.io.Serializable;
 
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
  * @author fabratu
  *
  */
-public class JobSubmissionAction implements Action<UserSchedulerInterface, JobId>, Serializable {
+public class JobSubmissionAction implements Action<Scheduler, JobId>, Serializable {
 
     private final Job job;
 
@@ -77,7 +77,7 @@ public class JobSubmissionAction implements Action<UserSchedulerInterface, JobId
         }
     }
 
-    public JobId execute(UserSchedulerInterface usi) throws Exception {
+    public JobId execute(Scheduler usi) throws Exception {
         // simple submit, don't care for the result yet
         return usi.submit(this.job);
     }

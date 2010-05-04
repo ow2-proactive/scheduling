@@ -43,7 +43,7 @@ import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.util.userconsole.UserSchedulerModel;
@@ -146,7 +146,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     private boolean start_() {
         boolean success = false;
         try {
-            success = ((AdminSchedulerInterface) scheduler).start().booleanValue();
+            success = scheduler.start();
         } catch (Exception e) {
             handleExceptionDisplay("Start Scheduler is not possible", e);
             return false;
@@ -166,7 +166,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     private boolean stop_() {
         boolean success = false;
         try {
-            success = ((AdminSchedulerInterface) scheduler).stop().booleanValue();
+            success = scheduler.stop();
         } catch (Exception e) {
             handleExceptionDisplay("Stop Scheduler is not possible", e);
             return false;
@@ -186,7 +186,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     private boolean pause_() {
         boolean success = false;
         try {
-            success = ((AdminSchedulerInterface) scheduler).pause().booleanValue();
+            success = scheduler.pause();
         } catch (Exception e) {
             handleExceptionDisplay("Pause Scheduler is not possible", e);
             return false;
@@ -206,7 +206,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     private boolean freeze_() {
         boolean success = false;
         try {
-            success = ((AdminSchedulerInterface) scheduler).freeze().booleanValue();
+            success = scheduler.freeze();
         } catch (Exception e) {
             handleExceptionDisplay("Freeze Scheduler is not possible", e);
             return false;
@@ -226,7 +226,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     private boolean resume_() {
         boolean success = false;
         try {
-            success = ((AdminSchedulerInterface) scheduler).resume().booleanValue();
+            success = scheduler.resume();
         } catch (Exception e) {
             handleExceptionDisplay("Resume Scheduler is not possible", e);
             return false;
@@ -253,7 +253,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
             }
             if (success || displayOnStdStream) {
                 try {
-                    success = ((AdminSchedulerInterface) scheduler).shutdown().booleanValue();
+                    success = scheduler.shutdown();
                 } catch (SchedulerException e) {
                     error("Shutdown Scheduler is not possible : " + e.getMessage());
                     return false;
@@ -287,7 +287,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
             }
             if (success || displayOnStdStream) {
                 try {
-                    success = ((AdminSchedulerInterface) scheduler).kill().booleanValue();
+                    success = scheduler.kill();
                 } catch (SchedulerException e) {
                     error("Kill Scheduler is not possible : " + e.getMessage());
                     return false;
@@ -314,7 +314,7 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     private boolean linkRM_(String rmURL) {
         boolean success = false;
         try {
-            success = ((AdminSchedulerInterface) scheduler).linkResourceManager(rmURL.trim()).booleanValue();
+            success = scheduler.linkResourceManager(rmURL.trim());
             if (success) {
                 print("The new Resource Manager at " + rmURL + " has been rebound to the scheduler.");
             } else {
@@ -409,18 +409,18 @@ public class AdminSchedulerModel extends UserSchedulerModel {
     private void changePolicy_(String newPolicyFullName) {
         try {
             Class<? extends Policy> klass = (Class<? extends Policy>) Class.forName(newPolicyFullName);
-            ((AdminSchedulerInterface) scheduler).changePolicy(klass);
+            scheduler.changePolicy(klass);
         } catch (Exception e) {
             handleExceptionDisplay("*ERROR*", e);
         }
     }
 
-    public static AdminSchedulerInterface getAdminScheduler() {
-        return getModel().getAdminScheduler_();
+    public static Scheduler getSchedulerInterface() {
+        return getModel().getSchedulerInterface_();
     }
 
-    private AdminSchedulerInterface getAdminScheduler_() {
-        return (AdminSchedulerInterface) scheduler;
+    private Scheduler getSchedulerInterface_() {
+        return scheduler;
     }
 
     //****************** HELP SCREEN ********************

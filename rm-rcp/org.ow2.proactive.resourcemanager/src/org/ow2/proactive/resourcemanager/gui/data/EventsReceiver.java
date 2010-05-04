@@ -150,7 +150,7 @@ public class EventsReceiver implements InitActive, RMEventListener {
                 switch (event.getNodeState()) {
                     case BUSY:
                     case DOWN:
-                    case TO_BE_REMOVED:
+                    case TO_BE_RELEASED:
                     case FREE:
                         model.changeNodeState(event);
                         break;

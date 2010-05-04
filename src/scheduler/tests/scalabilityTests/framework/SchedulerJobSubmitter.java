@@ -38,8 +38,8 @@ package scalabilityTests.framework;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
 import scalabilityTests.framework.listeners.JobResultDecorator;
@@ -67,7 +67,7 @@ public class SchedulerJobSubmitter extends AbstractSchedulerUser<JobId> {
     }
 
     @Override
-    public void doAction(Action<UserSchedulerInterface, JobId> action) {
+    public void doAction(Action<Scheduler, JobId> action) {
         // listener is needed in this case
         if (this.slExposer == null)
             throw new IllegalStateException(

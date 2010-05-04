@@ -131,7 +131,7 @@ public class RMModel {
                 this.downNodesNumber++;
                 break;
             case BUSY:
-            case TO_BE_REMOVED:
+            case TO_BE_RELEASED:
                 this.busyNodesNumber++;
         }
         this.actualizeTreeView(parentToRefresh);
@@ -172,7 +172,7 @@ public class RMModel {
                 this.downNodesNumber--;
                 break;
             case BUSY:
-            case TO_BE_REMOVED:
+            case TO_BE_RELEASED:
                 this.busyNodesNumber--;
         }
 
@@ -201,7 +201,7 @@ public class RMModel {
                 this.downNodesNumber--;
                 break;
             case BUSY:
-            case TO_BE_REMOVED:
+            case TO_BE_RELEASED:
                 this.busyNodesNumber--;
         }
         switch (nodeEvent.getNodeState()) {
@@ -212,7 +212,7 @@ public class RMModel {
                 this.downNodesNumber++;
                 break;
             case BUSY:
-            case TO_BE_REMOVED:
+            case TO_BE_RELEASED:
                 this.busyNodesNumber++;
         }
 

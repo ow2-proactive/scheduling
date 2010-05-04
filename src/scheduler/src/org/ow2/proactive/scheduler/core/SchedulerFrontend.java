@@ -122,7 +122,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.FRONTEND);
     public static final Logger logger_console = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
 
-    /** A repeated  warning message */
+    /** A repeated warning message */
     private static final String ACCESS_DENIED = "Access denied !";
 
     /** Maximum duration of a session for a useless client */
@@ -809,8 +809,12 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public boolean isConnected() {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        return identifications.containsKey(id);
+        try {
+            checkAccess();
+            return true;
+        } catch (NotConnectedException nce) {
+            return false;
+        }
     }
 
     /**

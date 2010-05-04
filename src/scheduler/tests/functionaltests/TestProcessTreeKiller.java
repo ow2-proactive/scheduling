@@ -122,7 +122,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         Assert.assertEquals(detachedProcNumber * 2, runningDetachedProcNumber);
 
         //kill the first job
-        SchedulerTHelper.getUserInterface().kill(id1);
+        SchedulerTHelper.getSchedulerInterface().killJob(id1);
         SchedulerTHelper.waitForEventJobFinished(id1);
 
         //we should have 1 time number of detached processes
@@ -131,7 +131,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
         Assert.assertEquals(detachedProcNumber, runningDetachedProcNumber);
 
         //kill the second job
-        SchedulerTHelper.getUserInterface().kill(id2);
+        SchedulerTHelper.getSchedulerInterface().killJob(id2);
         SchedulerTHelper.waitForEventJobFinished(id2);
 
         //we should have 0 detached processes

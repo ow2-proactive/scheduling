@@ -55,13 +55,12 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -145,9 +144,7 @@ public class SchedulerTHelper {
 
     protected static SchedulerAuthenticationInterface schedulerAuth;
 
-    protected static UserSchedulerInterface userschedInterface;
-
-    protected static AdminSchedulerInterface adminSchedInterface;
+    protected static Scheduler adminSchedInterface;
 
     protected static SchedulerMonitorsHandler monitorsHandler;
 
@@ -218,7 +215,6 @@ public class SchedulerTHelper {
             gcmad.kill();
         }
         schedulerAuth = null;
-        userschedInterface = null;
         adminSchedInterface = null;
     }
 
@@ -273,37 +269,19 @@ public class SchedulerTHelper {
     }
 
     /**
-     * Return Scheduler's user interface. Start Scheduler if needed,
-     * connect as user if needed (if not yet connected as user).
-     *
-     * WARNING : if there was a previous connection as Administrator, this connection is shut down.
-     * And so some event can be missed by event receiver, between disconnection and reconnection
-     * (only one connection to Scheduler per body is possible).
-     *
-     * @return UserSchedulerInterface
-     * @throws Exception if an error occurs.
-     */
-    public static UserSchedulerInterface getUserInterface() throws Exception {
-        if (userschedInterface == null) {
-            connectAsUser();
-        }
-        return userschedInterface;
-    }
-
-    /**
-     * Return Scheduler's administrator interface. Start Scheduler if needed,
+     * Return Scheduler's interface. Start Scheduler if needed,
      * connect as administrator if needed (if not yet connected as user).
      *
      * WARNING : if there was a previous connection as User, this connection is shut down.
      * And so some event can be missed by event receiver, between disconnection and reconnection
      * (only one connection to Scheduler per body is possible).
      *
-     * @return AdminsScheduler interface
+     * @return scheduler interface
      * @throws Exception if an error occurs.
      */
-    public static AdminSchedulerInterface getAdminInterface() throws Exception {
+    public static Scheduler getSchedulerInterface() throws Exception {
         if (adminSchedInterface == null) {
-            connectAsAdmin();
+            connect();
         }
         return adminSchedInterface;
     }
@@ -328,7 +306,7 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job submission.
      */
     public static JobId submitJob(Job jobToSubmit) throws Exception {
-        UserSchedulerInterface userInt = getUserInterface();
+        Scheduler userInt = getSchedulerInterface();
         return userInt.submit(jobToSubmit);
     }
 
@@ -339,8 +317,8 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs at job removal.
      */
     public static void removeJob(JobId id) throws Exception {
-        UserSchedulerInterface userInt = getUserInterface();
-        userInt.remove(id);
+        Scheduler userInt = getSchedulerInterface();
+        userInt.removeJob(id);
     }
 
     /**
@@ -387,7 +365,7 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public static JobId testJobSubmission(Job jobToSubmit) throws Exception {
-        UserSchedulerInterface userInt = getUserInterface();
+        Scheduler userInt = getSchedulerInterface();
 
         JobId id = userInt.submit(jobToSubmit);
 
@@ -437,7 +415,7 @@ public class SchedulerTHelper {
      * @throws Exception if an exception occurs in result retrieval
      */
     public static JobResult getJobResult(JobId id) throws Exception {
-        return getUserInterface().getJobResult(id);
+        return getSchedulerInterface().getJobResult(id);
     }
 
     //---------------------------------------------------------------//
@@ -758,8 +736,8 @@ public class SchedulerTHelper {
     //private methods
     //-------------------------------------------------------------//
 
-    private static void initEventReceiver(UserSchedulerInterface schedInt) throws NodeException,
-            SchedulerException, ActiveObjectCreationException {
+    private static void initEventReceiver(Scheduler schedInt) throws NodeException, SchedulerException,
+            ActiveObjectCreationException {
 
         SchedulerMonitorsHandler mHandler = getMonitorsHandler();
         if (eventReceiver == null) {
@@ -795,31 +773,14 @@ public class SchedulerTHelper {
         gcmad.startDeployment();
     }
 
-    private static void connectAsUser() throws Exception {
-        SchedulerAuthenticationInterface authInt = getSchedulerAuth();
-        if (adminSchedInterface != null) {
-            adminSchedInterface.removeEventListener();
-            adminSchedInterface.disconnect();
-            adminSchedInterface = null;
-        }
-        Credentials cred = Credentials.createCredentials(username, password, authInt.getPublicKey());
-        userschedInterface = authInt.logAsUser(cred);
-        initEventReceiver(userschedInterface);
-    }
-
     /**
      * Init connection as user
      * @throws Exception
      */
-    private static void connectAsAdmin() throws Exception {
+    private static void connect() throws Exception {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
-        if (userschedInterface != null) {
-            userschedInterface.removeEventListener();
-            userschedInterface.disconnect();
-            userschedInterface = null;
-        }
         Credentials cred = Credentials.createCredentials(username, password, authInt.getPublicKey());
-        adminSchedInterface = authInt.logAsAdmin(cred);
+        adminSchedInterface = authInt.login(cred);
         initEventReceiver(adminSchedInterface);
     }
 

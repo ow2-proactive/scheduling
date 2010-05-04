@@ -121,17 +121,16 @@ public class SchedulerAuthenticationGUIHelper {
     }
 
     /**
-     * This method will log a user to the scheduler by requesting his URL, username and password from a
+     * This method will log a client to the scheduler by requesting his URL, username and password from a
      * graphical interface.<br/>
      *
      * @param schedulerURL The default URL of the scheduler to connect
-     * @return The connection to the scheduler as a {@link UserSchedulerInterface} if logging successful.
+     * @return The connection to the scheduler as a {@link Scheduler} if logging successful.
      * 			If the username is empty or if the user cancel the authentication, this method will return null.
      * @throws LoginException If a problem occurs while logging the user.
      * @throws SchedulerException If a problem occurs at scheduler level.
      */
-    public static UserSchedulerInterface logAsUser(String schedulerURL) throws LoginException,
-            SchedulerException {
+    public static Scheduler login(String schedulerURL) throws LoginException, SchedulerException {
         AuthResultContainer auth = connect(schedulerURL);
         if (auth == null) {
             return null;
@@ -147,38 +146,7 @@ public class SchedulerAuthenticationGUIHelper {
             } catch (KeyException e) {
                 throw new LoginException("Could not encrypt credentials " + e);
             }
-            return schedAuth.logAsUser(cred);
-        }
-    }
-
-    /**
-     * This method will log an administrator to the scheduler by requesting his URL, username and password from a
-     * graphical interface.<br/>
-     *
-     * @param schedulerURL The default URL of the scheduler to connect
-     * @return The connection to the scheduler as a {@link AdminSchedulerInterface} if logging successful.
-     * 			If the username is empty or if the user cancel the authentication, this method will return null.
-     * @throws LoginException If a problem occurs while logging the administrator.
-     * @throws SchedulerException If a problem occurs at scheduler level.
-     */
-    public static AdminSchedulerInterface logAsAdmin(String schedulerURL) throws LoginException,
-            SchedulerException {
-        AuthResultContainer auth = connect(schedulerURL);
-        if (auth == null) {
-            return null;
-        } else {
-            SchedulerAuthenticationInterface schedAuth = auth.getAuth();
-            Credentials cred = null;
-            try {
-                cred = Credentials.createCredentials(auth.getUsername(), auth.getPassword(), schedAuth
-                        .getPublicKey());
-            } catch (LoginException e) {
-                throw new LoginException("Could not retrieve public key from Scheduler " + schedulerURL +
-                    ", contact the administrator" + e);
-            } catch (KeyException e) {
-                throw new LoginException("Could not encrypt credentials " + e);
-            }
-            return schedAuth.logAsAdmin(cred);
+            return schedAuth.login(cred);
         }
     }
 

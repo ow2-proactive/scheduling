@@ -43,9 +43,9 @@ import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -57,7 +57,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
-import org.ow2.proactive.scheduler.common.util.logforwarder.util.SimpleLoggerServer;
 
 
 /**
@@ -91,7 +90,7 @@ public class SimpleHelloWorld {
             //your need to create encrypted credentials so that it cannot be intercepted by network sniffers;
             //the scheduler will offer the public key required for encryption
             Credentials cred = Credentials.createCredentials("user", "pwd", auth.getPublicKey());
-            UserSchedulerInterface scheduler = auth.logAsUser(cred);
+            Scheduler scheduler = auth.login(cred);
 
             //if this point is reached, that's we are connected to the scheduler under "user".
             //@snippet-start taskflow_params
@@ -129,7 +128,6 @@ public class SimpleHelloWorld {
             JobId jobId = scheduler.submit(job);
 
             //******************** GET JOB OUTPUT ***********************
-            SimpleLoggerServer simpleLoggerServer;
             System.out.println("Getting job output...");
             try {
                 // it will launch a listener that will listen connection on any free port
@@ -137,7 +135,7 @@ public class SimpleHelloWorld {
                     "org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider");
                 lfs.initialize();
                 // next, this method will forward task output on the previous loggerServer
-                scheduler.listenLog(jobId, lfs.getAppenderProvider());
+                scheduler.listenJobLogs(jobId, lfs.getAppenderProvider());
             } catch (LogForwardingException e) {
                 e.printStackTrace();
             }

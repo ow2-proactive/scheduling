@@ -60,9 +60,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -290,8 +290,8 @@ public class UserController {
     }
 
     protected void connect() throws LoginException {
-        UserSchedulerInterface scheduler;
-        scheduler = auth.logAsUser(this.credentials);
+        Scheduler scheduler;
+        scheduler = auth.login(this.credentials);
         model.connectScheduler(scheduler);
         String userStr = (user != null) ? "'" + user + "' " : "";
         logger.info("\t-> User " + userStr + "successfully connected" + newline);

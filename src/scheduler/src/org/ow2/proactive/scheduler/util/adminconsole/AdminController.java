@@ -42,7 +42,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.util.userconsole.UserController;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
@@ -84,7 +84,7 @@ public class AdminController extends UserController {
 
     @Override
     protected void connect() throws LoginException {
-        UserSchedulerInterface scheduler = auth.logAsAdmin(credentials);
+        Scheduler scheduler = auth.login(credentials);
         model.connectScheduler(scheduler);
         String userStr = (user != null) ? "'" + user + "' " : "";
         logger.info("\t-> Admin " + userStr + "successfully connected" + newline);

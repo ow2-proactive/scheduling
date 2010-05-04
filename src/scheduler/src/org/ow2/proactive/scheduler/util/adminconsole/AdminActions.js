@@ -51,4 +51,4 @@ function changePolicy(newPolicyName){
 	AdminSchedulerModel.changePolicy(""+newPolicyName);
 }
 
-var scheduler = AdminSchedulerModel.getAdminScheduler();
+var scheduler = AdminSchedulerModel.getSchedulerInterface();

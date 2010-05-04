@@ -43,17 +43,16 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -72,7 +71,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     protected boolean preemptive = false;
 
     protected SchedulerState state;
-    protected UserSchedulerInterface userInterface;
+    protected Scheduler userInterface;
 
     @Override
     public BooleanWrapper configure(Object... params) {
@@ -86,7 +85,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         try {
             authentication = SchedulerConnection.join(params[2].toString());
             Credentials creds = Credentials.getCredentialsBase64((byte[]) params[3]);
-            userInterface = authentication.logAsUser(creds);
+            userInterface = authentication.login(creds);
             preemptive = Boolean.parseBoolean(params[4].toString());
         } catch (Throwable t) {
             throw new IllegalArgumentException(t);

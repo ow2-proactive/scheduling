@@ -60,11 +60,11 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskI
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -87,7 +87,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     /**
      * interface to scheduler
      */
-    private UserSchedulerInterface scheduler;
+    private Scheduler scheduler;
 
     /**
      * Current tasks processed by the scheduler
@@ -162,7 +162,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                 throw new LoginException(
                     "Could not retrieve public key, contact the Scheduler admininistrator" + e);
             }
-            this.scheduler = auth.logAsUser(creds);
+            this.scheduler = auth.login(creds);
         } catch (LoginException e) {
             throw new ProActiveRuntimeException(e);
         }
@@ -189,7 +189,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
     public void clear() {
         for (JobId id : processing.keySet()) {
             try {
-                scheduler.kill(id);
+                scheduler.killJob(id);
             } catch (SchedulerException e) {
                 logger.error(e.getMessage());
             }

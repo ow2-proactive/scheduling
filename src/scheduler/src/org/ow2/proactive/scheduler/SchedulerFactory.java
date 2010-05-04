@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
-import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
@@ -231,27 +231,26 @@ public class SchedulerFactory {
 
     /**
      * Create a new scheduler on the local host plugged on the given resource manager.<br>
-     * This constructor also requires the username//password of the admin to connect.<br><br>
+     * This constructor also requires the username//password of the client to connect.<br><br>
      * This will provide a connection interface to allow the access to a restricted number of user.
-     * It will return an admin scheduler able to managed the scheduler.<br><br>
+     * It will return a client scheduler able to managed the scheduler.<br><br>
      * <font color="red">WARNING :</font> this method provides a way to connect to the scheduler after its creation,
      * BUT if the scheduler is restarting after failure, this method will create the scheduler
-     * but will throw a SchedulerException due to the failure of admin connection.<br>
+     * but will throw a SchedulerException due to the failure of client connection.<br>
      * In fact, while the scheduler is restarting after a crash, no one can connect it during the whole restore process.<br><br>
      * The method will block until connection is allowed or error occurred.
      *
-     * @param login the admin login.
-     * @param password the admin password.
+     * @param login the client login.
+     * @param password the client password.
      * @param rm the resource manager to plug on the scheduler.
      * @param policyFullClassName the full policy class name for the scheduler.
-     * @return an admin scheduler interface to manage the scheduler.
+     * @return a scheduler interface to manage the scheduler.
      * @throws SchedulerException if the scheduler cannot be created.
-     * @throws AdminSchedulerException if an admin connection exception occurs.
+     * @throws AdminSchedulerException if a client connection exception occurs.
      * @throws LoginException if a user login/password exception occurs.
      */
-    public static AdminSchedulerInterface createScheduler(String login, String password,
-            ResourceManagerProxy rm, String policyFullClassName) throws AdminSchedulerException,
-            SchedulerException, LoginException {
+    public static Scheduler createScheduler(String login, String password, ResourceManagerProxy rm,
+            String policyFullClassName) throws AdminSchedulerException, SchedulerException, LoginException {
         createScheduler(rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("//localhost/");
@@ -264,7 +263,7 @@ public class SchedulerFactory {
         } catch (KeyException e) {
             throw new LoginException("Could not encrypt credentials");
         }
-        return auth.logAsAdmin(creds);
+        return auth.login(creds);
     }
 
 }

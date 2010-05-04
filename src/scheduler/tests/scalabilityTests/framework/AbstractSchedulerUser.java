@@ -40,12 +40,12 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -71,13 +71,13 @@ import scalabilityTests.framework.listeners.SchedulerListenerExposer;
  *
  */
 @ActiveObject
-public abstract class AbstractSchedulerUser<V> extends ActiveActor<UserSchedulerInterface, V> {
+public abstract class AbstractSchedulerUser<V> extends ActiveActor<Scheduler, V> {
 
     // Scheduler info
     private final String schedulerURL;
     private final Credentials userCreds;
     // Scheduler interaction internal state
-    protected UserSchedulerInterface scheduler = null;
+    protected Scheduler scheduler = null;
     // Scheduler listener
     protected SchedulerListenerExposer slExposer = null;
 
@@ -92,7 +92,7 @@ public abstract class AbstractSchedulerUser<V> extends ActiveActor<UserScheduler
         this.userCreds = userCreds;
     }
 
-    public AbstractSchedulerUser(Action<UserSchedulerInterface, V> defaultAction, String schedulerURL,
+    public AbstractSchedulerUser(Action<Scheduler, V> defaultAction, String schedulerURL,
             Credentials userCreds) {
         super(defaultAction);
         this.schedulerURL = schedulerURL;
@@ -108,7 +108,7 @@ public abstract class AbstractSchedulerUser<V> extends ActiveActor<UserScheduler
     }
 
     @Override
-    public void doAction(Action<UserSchedulerInterface, V> action) {
+    public void doAction(Action<Scheduler, V> action) {
         if (this.scheduler == null)
             throw new IllegalStateException("The user is not connected to the Scheduler yet. "
                 + "Consider calling the connectToScheduler() method first");
@@ -117,7 +117,7 @@ public abstract class AbstractSchedulerUser<V> extends ActiveActor<UserScheduler
 
     public void connectToScheduler() throws SchedulerException, LoginException {
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(this.schedulerURL);
-        this.scheduler = auth.logAsUser(this.userCreds);
+        this.scheduler = auth.login(this.userCreds);
         this.defaultParameter = this.scheduler;
     }
 

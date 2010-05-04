@@ -52,9 +52,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -253,7 +253,7 @@ public class SchedulerTester {
         private String login;
         private String pswd;
         private Vector<String> jobs;
-        private UserSchedulerInterface scheduler;
+        private Scheduler scheduler;
         private boolean isActive;
         private Vector<JobId> results = new Vector<JobId>();
         private boolean submit = true;
@@ -285,7 +285,7 @@ public class SchedulerTester {
             // connect from a different thread (i.e. not in the constructor)
             try {
                 Credentials cred = Credentials.createCredentials(login, pswd, authentication.getPublicKey());
-                this.scheduler = authentication.logAsUser(cred);
+                this.scheduler = authentication.login(cred);
             } catch (Exception e) {
                 logger.error(e);
             }
