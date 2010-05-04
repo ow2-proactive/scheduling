@@ -153,7 +153,7 @@ public abstract class AbstractJMXHelper {
             try {
                 this.roCs.start();
                 if (logger.isInfoEnabled()) {
-                    logger.info("Address JMX RO connector server at " + this.roCs.getAddress());
+                    logger.info("Started JMX RO connector server at " + this.roCs.getAddress());
                 }
             } catch (Exception e) {
                 logger.error(this.jmxRoFailureReason = "Unable to start the JMX RO connector server", e);

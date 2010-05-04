@@ -255,13 +255,8 @@ public class ResourceManagerModel extends ConsoleModel {
     }
 
     public static void listnodes() {
-        System.out.println("AdminRMModel.listnodes()-->");
-        try {
-            getModel().checkIsReady();
-            getModel().listnodes_();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        getModel().checkIsReady();
+        getModel().listnodes_();
     }
 
     private void listnodes_() {

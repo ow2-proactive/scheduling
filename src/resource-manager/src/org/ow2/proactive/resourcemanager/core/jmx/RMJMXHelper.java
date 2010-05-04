@@ -65,7 +65,7 @@ public final class RMJMXHelper extends AbstractJMXHelper {
     private static final Logger LOGGER = ProActiveLogger.getLogger(RMLoggers.MONITORING);
 
     /** The name of the Resource Manager bean */
-    public static final String RUNTIMEDATA_MBEAN_NAME = "ProActiveResourceManager:name=RuntimeDataMBean";
+    public static final String RUNTIMEDATA_MBEAN_NAME = "ProActiveResourceManager:name=RuntimeData";
     public static final String MYACCOUNT_MBEAN_NAME = "ProActiveResourceManager:name=MyAccount";
     public static final String ALLACCOUNTS_MBEAN_NAME = "ProActiveResourceManager:name=AllAccounts";
     public static final String MANAGEMENT_MBEAN_NAME = "ProActiveResourceManager:name=Management";

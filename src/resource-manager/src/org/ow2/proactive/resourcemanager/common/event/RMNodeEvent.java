@@ -173,21 +173,17 @@ public final class RMNodeEvent extends RMEvent {
             this.previousEventId = 0l;
             this.addEventId = 0l;
         } else {
-            try {
-                switch (eventType) {
-                    case NODE_ADDED:
-                        rmNode.setAddEvent(this);
-                        this.previousEventId = 0l;
-                        this.addEventId = 0l;
-                        break;
-                    default:
-                        this.previousEventId = rmNode.getLastEvent() == null ? 0l : rmNode.getLastEvent().id;
-                        this.addEventId = rmNode.getAddEvent() == null ? 0l : rmNode.getAddEvent().id;
-                }
-                rmNode.setLastEvent(this);
-            } catch (Exception e) {
-                e.printStackTrace();
+            switch (eventType) {
+                case NODE_ADDED:
+                    rmNode.setAddEvent(this);
+                    this.previousEventId = 0l;
+                    this.addEventId = 0l;
+                    break;
+                default:
+                    this.previousEventId = rmNode.getLastEvent() == null ? 0l : rmNode.getLastEvent().id;
+                    this.addEventId = rmNode.getAddEvent() == null ? 0l : rmNode.getAddEvent().id;
             }
+            rmNode.setLastEvent(this);
         }
     }
 
