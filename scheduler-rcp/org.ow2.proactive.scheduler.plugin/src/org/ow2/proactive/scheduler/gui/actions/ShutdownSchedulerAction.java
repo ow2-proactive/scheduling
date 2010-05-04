@@ -63,7 +63,7 @@ public class ShutdownSchedulerAction extends SchedulerGUIAction {
     @Override
     public void run() {
         if (MessageDialog.openConfirm(shell, "Confirm please",
-                "Are you sure you want to shutting down the scheduler ?")) {
+                "Are you sure you want to shutdown the scheduler ?")) {
             SchedulerProxy.getInstance().shutdown();
         }
     }

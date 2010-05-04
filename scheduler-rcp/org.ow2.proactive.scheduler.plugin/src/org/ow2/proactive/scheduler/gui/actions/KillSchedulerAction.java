@@ -70,9 +70,10 @@ public class KillSchedulerAction extends SchedulerGUIAction {
     @Override
     public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
-        if (connected && admin && (schedulerStatus != SchedulerStatus.UNLINKED))
+        if (connected && admin && (schedulerStatus != SchedulerStatus.UNLINKED)) {
             setEnabled(true);
-        else
+        } else {
             setEnabled(false);
+        }
     }
 }

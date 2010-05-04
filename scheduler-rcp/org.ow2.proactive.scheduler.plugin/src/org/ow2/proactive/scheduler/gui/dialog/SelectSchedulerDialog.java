@@ -191,6 +191,9 @@ public class SelectSchedulerDialog extends Dialog {
         checkFormData.top = new FormAttachment(loginCombo, 5);
         checkFormData.left = new FormAttachment(50, -45);
         adminCheck.setLayoutData(checkFormData);
+        adminCheck.setSelection(true);
+        adminCheck.setEnabled(false);
+        adminCheck.setVisible(false);
 
         // button "OK"
         okButton.setText("OK");

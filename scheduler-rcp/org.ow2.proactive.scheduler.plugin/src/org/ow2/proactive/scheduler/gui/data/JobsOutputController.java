@@ -138,7 +138,7 @@ public class JobsOutputController {
                 log.removeAllAppenders();
                 log.addAppender(joa);
                 appenders.put(jobId, joa);
-                SchedulerProxy.getInstance().listenLog(jobId, Activator.lfs.getAppenderProvider());
+                SchedulerProxy.getInstance().listenJobLogs(jobId, Activator.lfs.getAppenderProvider());
                 showJobOutput(jobId);
             } catch (LogForwardingException e) {
                 // TODO Auto-generated catch block

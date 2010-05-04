@@ -64,8 +64,9 @@ public class PriorityJobAction extends SchedulerGUIAction {
     @Override
     public void run() {
         List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
-        for (JobId jobId : jobsId)
-            SchedulerProxy.getInstance().changePriority(jobId, priority);
+        for (JobId jobId : jobsId) {
+            SchedulerProxy.getInstance().changeJobPriority(jobId, priority);
+        }
     }
 
     public static PriorityJobAction newInstance(JobPriority priority) {

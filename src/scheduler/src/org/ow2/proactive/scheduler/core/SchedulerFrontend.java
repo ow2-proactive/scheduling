@@ -693,13 +693,13 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /* ########################################################################################### */
 
     /**
-     * Factoring for the next 7 scheduler orders.
+     * Check permission and rights
      *
      * @param permissionMsg the message to log if an error occurs.
      * @throws NotConnectedException if the caller is not authenticated.
      * @throws PermissionException if the user has not the permission to access this method.
      */
-    private void ssprsc(String methodName, String permissionMsg) throws NotConnectedException,
+    private void checkPermission(String methodName, String permissionMsg) throws NotConnectedException,
             PermissionException {
         UniqueID id = checkAccess();
 
@@ -722,7 +722,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public boolean start() throws NotConnectedException, PermissionException {
-        ssprsc("start", "You do not have permission to start the scheduler !");
+        checkPermission("start", "You do not have permission to start the scheduler !");
         return scheduler.start();
     }
 
@@ -730,7 +730,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public boolean stop() throws NotConnectedException, PermissionException {
-        ssprsc("stop", "You do not have permission to stop the scheduler !");
+        checkPermission("stop", "You do not have permission to stop the scheduler !");
         return scheduler.stop();
     }
 
@@ -738,7 +738,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public boolean pause() throws NotConnectedException, PermissionException {
-        ssprsc("pause", "You do not have permission to pause the scheduler !");
+        checkPermission("pause", "You do not have permission to pause the scheduler !");
         return scheduler.pause();
     }
 
@@ -746,7 +746,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public boolean freeze() throws NotConnectedException, PermissionException {
-        ssprsc("freeze", "You do not have permission to pause the scheduler !");
+        checkPermission("freeze", "You do not have permission to pause the scheduler !");
         return scheduler.freeze();
     }
 
@@ -754,7 +754,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public boolean resume() throws NotConnectedException, PermissionException {
-        ssprsc("resume", "You do not have permission to resume the scheduler !");
+        checkPermission("resume", "You do not have permission to resume the scheduler !");
         return scheduler.resume();
     }
 
@@ -762,7 +762,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public boolean shutdown() throws NotConnectedException, PermissionException {
-        ssprsc("shutdown", "You do not have permission to shutdown the scheduler !");
+        checkPermission("shutdown", "You do not have permission to shutdown the scheduler !");
         return scheduler.shutdown();
     }
 
@@ -770,7 +770,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public boolean kill() throws NotConnectedException, PermissionException {
-        ssprsc("kill", "You do not have permission to kill the scheduler !");
+        checkPermission("kill", "You do not have permission to kill the scheduler !");
         return scheduler.kill();
     }
 
@@ -894,8 +894,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 .getSourceBodyID());
 
         try {
-            ui.checkPermission(new ChangePriorityPermission(priority.ordinal()), ui.getUsername() +
-                " does not have rights to set job priority " + priority);
+            ui.checkPermission(new ChangePriorityPermission(priority.getPriority()), ui.getUsername() +
+                " does not have permissions to set job priority to " + priority);
         } catch (PermissionException ex) {
             logger_dev.info(ex.getMessage());
             throw ex;
@@ -980,7 +980,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
 
         try {
             ident.checkPermission(new ChangePolicyPermission(), ident.getUsername() +
-                " does not have rights to change the policy of the scheduler");
+                " does not have permissions to change the policy of the scheduler");
         } catch (PermissionException ex) {
             logger_dev.info(ex.getMessage());
             throw ex;
@@ -1001,7 +1001,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
 
         try {
             ident.checkPermission(new ConnectToResourceManagerPermission(), ident.getUsername() +
-                " does not have rights to change RM in the scheduler");
+                " does not have permissions to change RM in the scheduler");
         } catch (PermissionException ex) {
             logger_dev.info(ex.getMessage());
             throw ex;

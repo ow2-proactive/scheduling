@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 
 
 /**
- * This class will be able to authenticate a user/admin.
+ * This class will be able to authenticate a client.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9

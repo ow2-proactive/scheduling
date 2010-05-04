@@ -72,7 +72,7 @@ public class KillRemoveJobAction extends SchedulerGUIAction {
                     .openConfirm(shell, "Confirm please", "Are you sure you want to Kill this job ?")) {
                 List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
                 for (JobId jobId : jobsId) {
-                    SchedulerProxy.getInstance().kill(jobId);
+                    SchedulerProxy.getInstance().killJob(jobId);
                 }
             }
         } else {
@@ -80,7 +80,7 @@ public class KillRemoveJobAction extends SchedulerGUIAction {
                     "Are you sure you want to Remove this job ?")) {
                 List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
                 for (JobId jobId : jobsId) {
-                    SchedulerProxy.getInstance().remove(jobId);
+                    SchedulerProxy.getInstance().removeJob(jobId);
                 }
             }
         }

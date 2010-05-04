@@ -45,7 +45,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 import org.ow2.proactive.scheduler.util.console.SchedulerModel;
 import org.ow2.proactive.utils.console.VisualConsole;
@@ -66,7 +66,7 @@ public class ControllerView extends ViewPart {
     private Frame container;
     private VisualConsole console;
     private JScrollPane scrollableContainer;
-    private UserSchedulerInterface scheduler;
+    private Scheduler scheduler;
 
     public ControllerView() {
         instance = this;

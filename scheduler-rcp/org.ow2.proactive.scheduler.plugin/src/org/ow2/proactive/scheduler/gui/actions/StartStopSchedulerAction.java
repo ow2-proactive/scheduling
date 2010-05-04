@@ -71,7 +71,7 @@ public class StartStopSchedulerAction extends SchedulerGUIAction {
         // stopped !
 
         this.setText("Start scheduler");
-        this.setToolTipText("Start the scheduler (this will finish start or restart the scheduler)");
+        this.setToolTipText("Start the scheduler (this will start or restart the scheduler)");
         this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
                 Internal.IMG_SCHEDULERSTART));
     }

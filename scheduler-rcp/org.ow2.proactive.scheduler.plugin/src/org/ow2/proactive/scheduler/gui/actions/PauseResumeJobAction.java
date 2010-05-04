@@ -64,12 +64,15 @@ public class PauseResumeJobAction extends SchedulerGUIAction {
 
     @Override
     public void run() {
-        if (resume)
-            for (JobId jobId : jobsId)
-                SchedulerProxy.getInstance().resume(jobId);
-        else
-            for (JobId jobId : jobsId)
-                SchedulerProxy.getInstance().pause(jobId);
+        if (resume) {
+            for (JobId jobId : jobsId) {
+                SchedulerProxy.getInstance().resumeJob(jobId);
+            }
+        } else {
+            for (JobId jobId : jobsId) {
+                SchedulerProxy.getInstance().pauseJob(jobId);
+            }
+        }
     }
 
     private void setPauseMode() {

@@ -47,17 +47,22 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.AdminSchedulerInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -82,14 +87,14 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class SchedulerProxy implements AdminSchedulerInterface {
+public class SchedulerProxy implements Scheduler {
 
     private static final long SCHEDULER_SERVER_PING_FREQUENCY = 5000;
     public static final int CONNECTED = 1;
     public static final int LOGIN_OR_PASSWORD_WRONG = 2;
     private static SchedulerProxy instance = null;
     private SchedulerAuthenticationInterface sai;
-    private UserSchedulerInterface scheduler = null;
+    private Scheduler scheduler = null;
     private String userName = null;
     private Boolean logAsAdmin = false;
     private Thread pinger;
@@ -109,23 +114,27 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         observers = new LinkedList<SchedulerConnectionListener>();
     }
 
+    private void displayError(final String message) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openError(Display.getDefault().getActiveShell(), "Error !", message);
+            }
+        });
+    }
+
     // -------------------------------------------------------------------- //
     // ---------------- implements AdminSchedulerInterface ---------------- //
     // -------------------------------------------------------------------- //
-    @Deprecated
-    public SchedulerState addSchedulerEventListener(SchedulerEventListener listener, boolean myEventsOnly,
-            SchedulerEvent... events) {
-        // Do nothing
-        return null;
-    }
 
-    public void addEventListener(SchedulerEventListener listener, boolean myEventsOnly,
-            SchedulerEvent... events) throws SchedulerException {
+    /**
+     * {@inheritDoc}
+     */
+    public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events) {
         // Do nothing (unused)
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#addEventListener(org.ow2.proactive.scheduler.common.SchedulerEventListener, boolean, boolean, org.ow2.proactive.scheduler.common.SchedulerEvent[])
+     * {@inheritDoc}
      */
     public SchedulerState addEventListener(SchedulerEventListener listener, boolean myEventsOnly,
             boolean getSchedulerState, SchedulerEvent... events) {
@@ -134,25 +143,20 @@ public class SchedulerProxy implements AdminSchedulerInterface {
                     events);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "Error in Scheduler Proxy ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
         return null;
     }
 
-    @Deprecated
-    public void removeSchedulerEventListener() throws SchedulerException {
-        //unused anymore
-    }
-
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#removeEventListener()
+     * {@inheritDoc}
      */
-    public void removeEventListener() throws SchedulerException {
+    public void removeEventListener() {
         //not used for the GUI
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#disconnect()
+     * {@inheritDoc}
      */
     public void disconnect() {
         if (pinger != null) {
@@ -167,6 +171,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             } catch (Exception e) {
                 // Nothing to do
                 Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error in  disconnect action", e);
+                displayError(e.getMessage());
             }
             sendConnectionLostEvent();
         }
@@ -194,241 +199,242 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobResult(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
     public JobResult getJobResult(JobId jobId) {
         try {
             return scheduler.getJobResult(jobId);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when getting job result", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
         return null;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getTaskResult(org.ow2.proactive.scheduler.common.job.JobId, java.lang.String)
+     * {@inheritDoc}
      */
     public TaskResult getTaskResult(JobId jobId, String taskName) {
         try {
             return scheduler.getTaskResult(jobId, taskName);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error when getting task result", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
         return null;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#kill(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public BooleanWrapper kill(JobId jobId) {
+    public boolean killJob(JobId jobId) {
         try {
-            return scheduler.kill(jobId);
+            return scheduler.killJob(jobId);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on kill job ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#listenLog(org.ow2.proactive.scheduler.common.job.JobId, AppenderProvider appenderProvider)
+     * {@inheritDoc}
      */
-    public void listenLog(JobId jobId, AppenderProvider appenderProvider) {
+    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) {
         try {
-            scheduler.listenLog(jobId, appenderProvider);
+            scheduler.listenJobLogs(jobId, appenderProvider);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on listen log", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#pause(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public BooleanWrapper pause(JobId jobId) {
+    public boolean pauseJob(JobId jobId) {
         try {
-            return scheduler.pause(jobId);
+            return scheduler.pauseJob(jobId);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on pause", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#resume(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public BooleanWrapper resume(JobId jobId) {
+    public boolean resumeJob(JobId jobId) {
         try {
-            return scheduler.resume(jobId);
+            return scheduler.resumeJob(jobId);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume action", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#submit(org.ow2.proactive.scheduler.common.job.Job)
+     * {@inheritDoc}
      */
-    public JobId submit(Job job) throws SchedulerException {
+    public JobId submit(Job job) throws NotConnectedException, PermissionException,
+            SubmissionClosedException, JobCreationException {
         return scheduler.submit(job);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#remove(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public void remove(JobId jobId) {
+    public void removeJob(JobId jobId) {
         try {
-            scheduler.remove(jobId);
+            scheduler.removeJob(jobId);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on remove job action ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#kill()
+     * {@inheritDoc}
      */
-    public BooleanWrapper kill() {
+    public boolean kill() {
         if (pinger != null) {
             pinger.interrupt();
         }
         try {
-            return ((AdminSchedulerInterface) scheduler).kill();
+            return scheduler.kill();
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on kill action ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#pause()
+     * {@inheritDoc}
      */
-    public BooleanWrapper pause() {
+    public boolean pause() {
         try {
-            return ((AdminSchedulerInterface) scheduler).pause();
+            return scheduler.pause();
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on pause action ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#freeze()
+     * {@inheritDoc}
      */
-    public BooleanWrapper freeze() {
+    public boolean freeze() {
         try {
-            return ((AdminSchedulerInterface) scheduler).freeze();
+            return scheduler.freeze();
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on freeze action ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#resume()
+     * {@inheritDoc}
      */
-    public BooleanWrapper resume() {
+    public boolean resume() {
         try {
-            return ((AdminSchedulerInterface) scheduler).resume();
+            return scheduler.resume();
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on resume action ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#shutdown()
+     * {@inheritDoc}
      */
-    public BooleanWrapper shutdown() {
+    public boolean shutdown() {
         if (pinger != null) {
             pinger.interrupt();
         }
         try {
-            return ((AdminSchedulerInterface) scheduler).shutdown();
+            return scheduler.shutdown();
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on shut down action ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#start()
+     * {@inheritDoc}
      */
-    public BooleanWrapper start() {
+    public boolean start() {
         try {
-            return ((AdminSchedulerInterface) scheduler).start();
+            return scheduler.start();
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on start action", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#stop()
+     * {@inheritDoc}
      */
-    public BooleanWrapper stop() {
+    public boolean stop() {
         try {
-            return ((AdminSchedulerInterface) scheduler).stop();
+            return scheduler.stop();
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on stop action ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#changePriority(org.ow2.proactive.scheduler.common.job.JobId, org.ow2.proactive.scheduler.common.job.JobPriority)
+     * {@inheritDoc}
      */
-    public void changePriority(JobId jobId, JobPriority priority) {
+    public void changeJobPriority(JobId jobId, JobPriority priority) {
         try {
-            scheduler.changePriority(jobId, priority);
+            scheduler.changeJobPriority(jobId, priority);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on change priority action ", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#changePolicy(java.lang.Class)
+     * {@inheritDoc}
      */
-    public BooleanWrapper changePolicy(Class<? extends Policy> newPolicyFile) throws SchedulerException {
+    public boolean changePolicy(Class<? extends Policy> newPolicyFile) {
         try {
-            return ((AdminSchedulerInterface) scheduler).changePolicy(newPolicyFile);
+            return scheduler.changePolicy(newPolicyFile);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on change Policy action", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.AdminMethodsInterface#linkResourceManager(java.lang.String)
+     * {@inheritDoc}
      */
-    public BooleanWrapper linkResourceManager(String rmURL) throws SchedulerException {
+    public boolean linkResourceManager(String rmURL) {
         try {
-            return ((AdminSchedulerInterface) scheduler).linkResourceManager(rmURL);
+            return scheduler.linkResourceManager(rmURL);
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on link Resource Manager action", e);
-            e.printStackTrace();
+            displayError(e.getMessage());
         }
-        return new BooleanWrapper(false);
+        return false;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#isConnected()
+     * {@inheritDoc}
      */
-    public BooleanWrapper isConnected() {
-        return ((AdminSchedulerInterface) scheduler).isConnected();
+    public boolean isConnected() {
+        return scheduler.isConnected();
     }
 
     // -------------------------------------------------------------------- //
@@ -444,12 +450,10 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             final Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
                     .getPublicKey());
 
-            if (scheduler == null || !scheduler.isConnected().booleanValue()) { // If escape key was pressed during the init of the scheduler
-                if (logAsAdmin) {
-                    scheduler = sai.logAsAdmin(creds);
-                } else {
-                    scheduler = sai.logAsUser(creds);
-                }
+            if (scheduler == null || !scheduler.isConnected()) { // If escape key was pressed during the init of the scheduler
+                //new authentication does not care about admin behavior or not
+                //but RCP kept the admin/user behavior (in the way it hides button or not)
+                scheduler = sai.login(creds);
             }
 
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
@@ -545,7 +549,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         return connected;
     }
 
-    public UserSchedulerInterface getScheduler() {
+    public Scheduler getScheduler() {
         return scheduler;
     }
 
@@ -578,73 +582,75 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobResult(java.lang.String)
+     * {@inheritDoc}
      */
-    public JobResult getJobResult(String jobId) throws SchedulerException {
+    public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException,
+            UnknownJobException {
         return scheduler.getJobResult(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getTaskResult(java.lang.String, java.lang.String)
+     * {@inheritDoc}
      */
-    public TaskResult getTaskResult(String jobId, String taskName) throws SchedulerException {
+    public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
         return scheduler.getTaskResult(jobId, taskName);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#changePriority(java.lang.String, org.ow2.proactive.scheduler.common.job.JobPriority)
+     * {@inheritDoc}
      */
-    public void changePriority(String jobId, JobPriority newPrio) throws SchedulerException {
-        scheduler.changePriority(jobId, newPrio);
+    public void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException,
+            UnknownJobException, PermissionException, JobAlreadyFinishedException {
+        scheduler.changeJobPriority(jobId, priority);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#kill(java.lang.String)
+     * {@inheritDoc}
      */
-    public BooleanWrapper kill(String jobId) throws SchedulerException {
-        return scheduler.kill(jobId);
+    public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
+        return scheduler.killJob(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#pause(java.lang.String)
+     * {@inheritDoc}
      */
-    public BooleanWrapper pause(String jobId) throws SchedulerException {
-        return scheduler.pause(jobId);
+    public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
+        return scheduler.pauseJob(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#remove(java.lang.String)
+     * {@inheritDoc}
      */
-    public void remove(String jobId) throws SchedulerException {
-        scheduler.remove(jobId);
+    public void removeJob(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
+        scheduler.removeJob(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#resume(java.lang.String)
+     * {@inheritDoc}
      */
-    public BooleanWrapper resume(String jobId) throws SchedulerException {
-        return scheduler.resume(jobId);
+    public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
+        return scheduler.resumeJob(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#listenLog(java.lang.String, org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider)
+     * {@inheritDoc}
      */
-    public void listenLog(String jobId, AppenderProvider appender) throws SchedulerException {
-        scheduler.listenLog(jobId, appender);
-    }
-
-    @Deprecated
-    public SchedulerStatus getStatus() {
-        //unused anymore
-        return null;
+    public void listenJobLogs(String jobId, AppenderProvider appender) throws NotConnectedException,
+            UnknownJobException, PermissionException {
+        scheduler.listenJobLogs(jobId, appender);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerStatus()
+     * {@inheritDoc}
      */
-    public SchedulerStatus getSchedulerStatus() throws SchedulerException {
+    public SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
         try {
-            return scheduler.getSchedulerStatus();
+            return scheduler.getStatus();
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error while getting status", e);
             e.printStackTrace();
@@ -653,24 +659,26 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getJobState(java.lang.String)
+     * {@inheritDoc}
      */
-    public JobState getJobState(String id) throws SchedulerException {
-        return scheduler.getJobState(id);
+    public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
+        return scheduler.getJobState(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface_#getJobState(org.ow2.proactive.scheduler.common.job.JobId)
+     * {@inheritDoc}
      */
-    public JobState getJobState(JobId id) throws SchedulerException {
-        return scheduler.getJobState(id);
+    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
+        return scheduler.getJobState(jobId);
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.UserSchedulerInterface#getSchedulerState()
+     * {@inheritDoc}
      */
-    public SchedulerState getSchedulerState() throws SchedulerException {
-        return scheduler.getSchedulerState();
+    public SchedulerState getState() throws NotConnectedException, PermissionException {
+        return scheduler.getState();
     }
 
 }

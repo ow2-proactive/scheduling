@@ -63,9 +63,10 @@ public class PauseSchedulerAction extends SchedulerGUIAction {
     @Override
     public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
             boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
-        if (connected && admin && (schedulerStatus == SchedulerStatus.STARTED))
+        if (connected && admin && (schedulerStatus == SchedulerStatus.STARTED)) {
             setEnabled(true);
-        else
+        } else {
             setEnabled(false);
+        }
     }
 }
