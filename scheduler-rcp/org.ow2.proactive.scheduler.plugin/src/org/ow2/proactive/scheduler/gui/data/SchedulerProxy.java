@@ -490,7 +490,7 @@ public class SchedulerProxy implements Scheduler {
 
             @Override
             public void run() {
-                while (!pinger.isInterrupted()) {
+                while (!isInterrupted()) {
                     try {
                         Thread.sleep(SCHEDULER_SERVER_PING_FREQUENCY);
                         //try to ping Scheduler server
