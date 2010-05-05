@@ -73,7 +73,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.gui.Activator;
-import org.ow2.proactive.scheduler.gui.actions.JMXChartItAction;
+import org.ow2.proactive.scheduler.gui.actions.JMXActionsManager;
 import org.ow2.proactive.scheduler.gui.composite.StatusLabel;
 import org.ow2.proactive.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.ow2.proactive.scheduler.gui.listeners.SchedulerConnectionListener;
@@ -462,8 +462,8 @@ public class SchedulerProxy implements Scheduler {
             connected = true;
             ControllerView.getInstance().connectedEvent(logAsAdmin);
 
-            JMXChartItAction.getInstance().initJMXClient(sai,
-                    new Object[] { dialogResult.getLogin(), creds }, logAsAdmin);
+            JMXActionsManager.getInstance().initJMXClient(sai,
+                    new Object[] { dialogResult.getLogin(), creds });
             return CONNECTED;
         } catch (LoginException e) {
             e.printStackTrace();

@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.gui.actions.ChangePriorityJobAction;
 import org.ow2.proactive.scheduler.gui.actions.ChangeViewModeAction;
 import org.ow2.proactive.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.FreezeSchedulerAction;
-import org.ow2.proactive.scheduler.gui.actions.JMXChartItAction;
+import org.ow2.proactive.scheduler.gui.actions.JMXActionsManager;
 import org.ow2.proactive.scheduler.gui.actions.KillRemoveJobAction;
 import org.ow2.proactive.scheduler.gui.actions.KillSchedulerAction;
 import org.ow2.proactive.scheduler.gui.actions.MaximizeListAction;
@@ -108,8 +108,6 @@ public class SeparatedJobView extends ViewPart {
     private static Action maximizeRunningListAction = null;
     private static Action maximizeFinishedListAction = null;
     private static Action maximizeNoneListAction = null;
-
-    private static Action jmxChartItAction = null;
 
     private static Action obtainJobOutputAction = null;
     private static Action submitJob = null;
@@ -177,7 +175,9 @@ public class SeparatedJobView extends ViewPart {
         subMenu.add(maximizePendingListAction);
         subMenu.add(maximizeRunningListAction);
         subMenu.add(maximizeFinishedListAction);
-        manager.add(jmxChartItAction);
+        for (final Action action : JMXActionsManager.getInstance().getActions()) {
+            manager.add(action);
+        }
 
         manager.add(new Separator());
 
@@ -227,7 +227,9 @@ public class SeparatedJobView extends ViewPart {
         manager.add(connectSchedulerAction);
         manager.add(changeViewModeAction);
         manager.add(changeMaximizeListAction);
-        manager.add(jmxChartItAction);
+        for (final Action action : JMXActionsManager.getInstance().getActions()) {
+            manager.add(action);
+        }
         manager.add(new Separator());
         manager.add(submitJob);
         manager.add(submitFlatJob);
@@ -259,8 +261,6 @@ public class SeparatedJobView extends ViewPart {
                 MaximizeListAction.RUNNING);
         maximizeFinishedListAction = MaximizeListAction.newInstance(finishedJobComposite,
                 MaximizeListAction.FINISHED);
-
-        jmxChartItAction = JMXChartItAction.getInstance();
 
         obtainJobOutputAction = new ObtainJobOutputAction();
         submitJob = new SubmitJobAction(parent);
@@ -378,7 +378,7 @@ public class SeparatedJobView extends ViewPart {
         }
 
         // Disconnect the JMX client of ChartIt
-        JMXChartItAction.getInstance().disconnectJMXClient();
+        JMXActionsManager.getInstance().disconnectJMXClient();
 
         if (sendDisconnectMessage) {
             SchedulerProxy.getInstance().disconnect();
