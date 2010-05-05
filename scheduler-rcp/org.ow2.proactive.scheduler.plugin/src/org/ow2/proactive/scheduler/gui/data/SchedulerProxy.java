@@ -480,18 +480,29 @@ public class SchedulerProxy implements Scheduler {
     }
 
     private void startPinger() {
-        //final SchedulerProxy thisStub = (SchedulerProxy) PAActiveObject.getStubOnThis();
-        pinger = new Thread() {
+
+        class Pinger extends Thread {
+            private SchedulerProxy stubOnSchedulerProxy;
+
+            public Pinger(SchedulerProxy stubOnSchedulerProxy) {
+                this.stubOnSchedulerProxy = stubOnSchedulerProxy;
+            }
+
             @Override
             public void run() {
                 while (!pinger.isInterrupted()) {
                     try {
                         Thread.sleep(SCHEDULER_SERVER_PING_FREQUENCY);
                         //try to ping Scheduler server
-                        if (PAActiveObject.pingActiveObject(sai)) {
-                            //if OK continue
-                            continue;
-                        } else {
+                        try {
+                            boolean ping = this.stubOnSchedulerProxy.isConnected();
+                            if (ping) {
+                                //if OK continue
+                                continue;
+                            } else {
+                                throw new Throwable();
+                            }
+                        } catch (Throwable t) {
                             //if not, shutdown Scheduler
                             try {
                                 serverDown();
@@ -505,7 +516,8 @@ public class SchedulerProxy implements Scheduler {
                     }
                 }
             }
-        };
+        }
+        Pinger pinger = new Pinger((SchedulerProxy) PAActiveObject.getStubOnThis());
         pinger.start();
     }
 
