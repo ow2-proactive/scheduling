@@ -84,6 +84,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
+import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -1208,7 +1209,8 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         Client client = RMCore.clients.get(clientId);
 
         if (client == null) {
-            throw new SecurityException("Unknown client " + clientId);
+            throw new NotConnectedException("Client " + clientId +
+                " is not connected to the resource manager");
         }
 
         final String fullMethodName = RMCore.class.getName() + "." + methodName;
