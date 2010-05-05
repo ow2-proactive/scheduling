@@ -101,6 +101,8 @@ public class SchedulerProxy implements Scheduler {
     private String schedulerURL;
     private boolean connected = false;
 
+    private static String disconnectionReason = "Unknown reason.";
+
     List<SchedulerConnectionListener> observers;
 
     // -------------------------------------------------------------------- //
@@ -181,8 +183,8 @@ public class SchedulerProxy implements Scheduler {
         pinger.interrupt();
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                MessageDialog.openInformation(SeparatedJobView.getSchedulerShell(), "Scheduler server down",
-                        "Scheduler  '" + schedulerURL + "'  seems to be down, now disconnect.");
+                MessageDialog.openInformation(SeparatedJobView.getSchedulerShell(), "Disconnection",
+                        disconnectionReason);
                 StatusLabel.getInstance().disconnect();
                 // stop log server
                 try {
@@ -192,7 +194,7 @@ public class SchedulerProxy implements Scheduler {
                             "- Scheduler Proxy: Error while terminating the logger server", e);
                     e.printStackTrace();
                 }
-                SeparatedJobView.clearOnDisconnection(true);
+                SeparatedJobView.clearOnDisconnection(false);
                 connected = false;
             }
         });
@@ -490,30 +492,30 @@ public class SchedulerProxy implements Scheduler {
 
             @Override
             public void run() {
+                boolean ping = false;
                 while (!isInterrupted()) {
                     try {
                         Thread.sleep(SCHEDULER_SERVER_PING_FREQUENCY);
+                        ping = false;
                         //try to ping Scheduler server
                         try {
-                            boolean ping = this.stubOnSchedulerProxy.isConnected();
-                            if (ping) {
-                                //if OK continue
-                                continue;
-                            } else {
-                                throw new Throwable();
-                            }
+                            ping = this.stubOnSchedulerProxy.isConnected();
                         } catch (Throwable t) {
-                            //if not, shutdown Scheduler
-                            try {
-                                serverDown();
-                            } catch (Exception e) {
-                                //thisStub has already been killed, shutdown, or disconnected
-                                break;
-                            }
+                            SchedulerProxy.disconnectionReason = "Scheduler  '" + schedulerURL +
+                                "'  seems to be down. Now disconnecting.";
+                            break;
+                        }
+                        if (!ping) {
+                            SchedulerProxy.disconnectionReason = "Your connection to the Scheduler '" +
+                                schedulerURL + "' has expired. Now disconnecting.";
+                            break;
                         }
                     } catch (InterruptedException e) {
                         break;
                     }
+                }
+                if (!ping) {
+                    serverDown();
                 }
             }
         }
