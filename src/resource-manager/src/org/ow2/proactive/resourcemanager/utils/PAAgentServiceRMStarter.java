@@ -51,6 +51,7 @@ import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
@@ -292,15 +293,15 @@ public final class PAAgentServiceRMStarter {
             return false;
         }
 
-        RMAdmin admin = null;
+        ResourceManager rm = null;
         // 3 - Log using credential        
         try {
-            admin = auth.logAsAdmin(credentials);
-            if (admin == null) {
-                throw new RuntimeException("The RMAdmin instance is null");
+            rm = auth.login(credentials);
+            if (rm == null) {
+                throw new RuntimeException("The ResourceManager instance is null");
             }
         } catch (Throwable t) {
-            System.out.println("Unable to log as admin into the Resource Manager at " + rmURL);
+            System.out.println("Unable to log into the Resource Manager at " + rmURL);
             t.printStackTrace();
             return false;
         }
@@ -314,11 +315,15 @@ public final class PAAgentServiceRMStarter {
             attempts++;
             try {
                 if (nodeSourceName == null) {
-                    isNodeAdded = admin.addNode(nodeURL).booleanValue();
+                    isNodeAdded = rm.addNode(nodeURL).booleanValue();
                 } else {
-                    isNodeAdded = admin.addNode(nodeURL, nodeSourceName).booleanValue();
+                    isNodeAdded = rm.addNode(nodeURL, nodeSourceName).booleanValue();
                 }
             } catch (AddingNodesException ex) {
+                System.out.println("Unable to add the local node to the Resource Manager at " + rmURL);
+                ex.printStackTrace();
+                isNodeAdded = false;
+            } catch (SecurityException ex) {
                 System.out.println("Unable to add the local node to the Resource Manager at " + rmURL);
                 ex.printStackTrace();
                 isNodeAdded = false;
@@ -344,23 +349,23 @@ public final class PAAgentServiceRMStarter {
         }// if not registered
 
         // 5 - Start a new pinger thread
-        final RMPinger rp = new RMPinger(admin);
+        final RMPinger rp = new RMPinger(rm);
         new Thread(rp).start();
         return true;
     }
 
     private final class RMPinger implements Runnable {
         /** The reference to ping */
-        private final RMAdmin admin;
+        private final ResourceManager rm;
 
-        public RMPinger(final RMAdmin admin) {
-            this.admin = admin;
+        public RMPinger(final ResourceManager rm) {
+            this.rm = rm;
         }
 
         public void run() {
             // ping the rm to see if we are still connected
             // if not connected just exit
-            while (PAActiveObject.pingActiveObject(admin)) {
+            while (PAActiveObject.pingActiveObject(rm)) {
                 try {
                     Thread.sleep(PING_DELAY_IN_MS);
                 } catch (InterruptedException e) {
