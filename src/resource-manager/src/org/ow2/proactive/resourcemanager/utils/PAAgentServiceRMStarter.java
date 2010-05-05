@@ -36,20 +36,25 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Parser;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
@@ -68,6 +73,8 @@ public final class PAAgentServiceRMStarter {
     /** The default name of the node */
     private static final String PAAGENT_DEFAULT_NODE_NAME = "PA-AGENT_NODE";
 
+    /** Prefix for temp files that store nodes URL */
+    private static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
     /**
      * The starter will try to connect to the Resource Manager before killing
      * itself that means that it will try to connect during
@@ -330,7 +337,18 @@ public final class PAAgentServiceRMStarter {
             }
 
             if (isNodeAdded) {
-                System.out.println("Node " + nodeURL + " added");
+                // try to remove previous URL if different...
+                String previousURL = this.getAndDeleteNodeURL(nodeName);
+                if (previousURL != null && !previousURL.equals(nodeURL)) {
+                    System.out
+                            .println("Different previous URL registered by this agent has been found. Remove previous registration.");
+                    rm.removeNode(previousURL, true);
+                }
+                // store the node URL
+                this.storeNodeURL(nodeName, nodeURL);
+                System.out.println("Node " + nodeURL + " added. URL is stored in " +
+                    getNodeURLFilename(nodeName));
+
             } else { // not yet registered
                 System.out.println("Attempt number " + attempts + " out of " + NB_OF_ADD_NODE_ATTEMPTS +
                     " to add the local node to the Resource Manager at " + rmURL + " has failed.");
@@ -352,6 +370,58 @@ public final class PAAgentServiceRMStarter {
         final RMPinger rp = new RMPinger(rm);
         new Thread(rp).start();
         return true;
+    }
+
+    /**
+     * Store in a temp file the current URL of the node started by the agent
+     * @param nodeName the name of the node
+     * @param nodeURL the URL of the node
+     */
+    private void storeNodeURL(String nodeName, String nodeURL) {
+        try {
+            File f = new File(getNodeURLFilename(nodeName));
+            if (f.exists()) {
+                System.out.println("[WARNING] NodeURL file already exists ; delete it.");
+                f.delete();
+            }
+            BufferedWriter out = new BufferedWriter(new FileWriter(f));
+            out.write(nodeURL);
+            out.write(System.getProperty("line.separator"));
+            out.close();
+        } catch (IOException e) {
+            System.out.println("[WARNING] NodeURL cannot be created.");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Return the previous URL of this node
+     * @param nodeName the name of the node started by the Agent
+     * @return the previous URL of this node, null if none can be found
+     */
+    private String getAndDeleteNodeURL(String nodeName) {
+        try {
+            File f = new File(getNodeURLFilename(nodeName));
+            if (f.exists()) {
+                BufferedReader in = new BufferedReader(new FileReader(f));
+                String read = in.readLine();
+                in.close();
+                f.delete();
+                return read;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Create the name of the temp file for storing node URL.
+     */
+    private String getNodeURLFilename(String nodeName) {
+        final String tmpDir = System.getProperty("java.io.tmpdir");
+        final String tmpFile = tmpDir + "_" + URL_TMPFILE_PREFIX + "_" + nodeName;
+        return tmpFile;
     }
 
     private final class RMPinger implements Runnable {
