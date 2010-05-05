@@ -59,10 +59,11 @@ import functionaltests.RMTHelper;
 
 /**
  *  Checks node source admin/user permissions.
- *  We suppose that 3 users exists admin, nsadmin, user
+ *  We suppose that the resource manager is configured in the way that
+ *  3 users exist: admin, nsadmin, user
  *  admin and nsadmin are in the same group ("nsadmins")
  *
- *  Checking all possible combination of permissions
+ *  Checking all possible combination of permissions.
  */
 public class TestNodeSourcesPermissions extends FunctionalTest {
 
@@ -70,39 +71,41 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
     public void action() throws Exception {
 
         String nsName = "ns";
-        ResourceManager resourceManager = RMTHelper.join("admin", "admin");
+        ResourceManager adminRMAccess = RMTHelper.join("admin", "admin");
 
         byte[] GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(
             RMTHelper.defaultDescriptor)));
 
         RMTHelper.log("Test1 - node source admin permission is limited to USER");
-        resourceManager.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
+        adminRMAccess.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "USER" });
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
-        resourceManager.disconnect();
+        adminRMAccess.disconnect();
 
-        // admin and user are in different groups
-        ResourceManager user = RMTHelper.join("radmin", "pwd");
+        // user does not have an access to change the node source
+        ResourceManager userRMAccess = RMTHelper.join("radmin", "pwd");
         try {
-            user.removeNodeSource(nsName, true).booleanValue();
+            userRMAccess.removeNodeSource(nsName, true).booleanValue();
             Assert.assertTrue(false);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        user.disconnect();
+        userRMAccess.disconnect();
 
         // admin and provider are in "nsadmins" group
-        ResourceManager provider = RMTHelper.join("nsadmin", "pwd");
+        ResourceManager providerRMAccess = RMTHelper.join("nsadmin", "pwd");
         try {
-            provider.removeNodeSource(nsName, true).booleanValue();
+            providerRMAccess.removeNodeSource(nsName, true).booleanValue();
             Assert.assertTrue(false);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        provider.disconnect();
+        providerRMAccess.disconnect();
 
-        resourceManager = RMTHelper.join("admin", "admin");
+        adminRMAccess = RMTHelper.join("admin", "admin");
         try {
-            resourceManager.removeNodeSource(nsName, true).booleanValue();
+            adminRMAccess.removeNodeSource(nsName, true).booleanValue();
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
@@ -110,53 +113,54 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test2 - node source admin permission is limited to GROUP");
-        resourceManager.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
+        adminRMAccess.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "GROUP" });
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
-        resourceManager.disconnect();
+        adminRMAccess.disconnect();
 
         // admin and user are in different groups
-        user = RMTHelper.join("radmin", "pwd");
+        userRMAccess = RMTHelper.join("radmin", "pwd");
         try {
-            user.removeNodeSource(nsName, true).booleanValue();
+            userRMAccess.removeNodeSource(nsName, true).booleanValue();
             Assert.assertTrue(false);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        user.disconnect();
+        userRMAccess.disconnect();
 
         // admin and provider are in "nsadmins" group
-        provider = RMTHelper.join("nsadmin", "pwd");
+        providerRMAccess = RMTHelper.join("nsadmin", "pwd");
         try {
             // should be able to remove it
-            provider.removeNodeSource(nsName, true).booleanValue();
+            providerRMAccess.removeNodeSource(nsName, true).booleanValue();
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        provider.disconnect();
+        providerRMAccess.disconnect();
 
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test3 - node source admin permission is not limited");
-        resourceManager = RMTHelper.join("admin", "admin");
-        resourceManager.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
+        adminRMAccess = RMTHelper.join("admin", "admin");
+        adminRMAccess.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
 
-        resourceManager.disconnect();
+        adminRMAccess.disconnect();
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         // admin and user are in different groups
-        user = RMTHelper.join("radmin", "pwd");
+        userRMAccess = RMTHelper.join("radmin", "pwd");
         try {
-            user.removeNodeSource(nsName, true).booleanValue();
+            userRMAccess.removeNodeSource(nsName, true).booleanValue();
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        user.disconnect();
+        userRMAccess.disconnect();
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test4 - node source usage permission is limited to USER");
-        resourceManager = RMTHelper.join("admin", "admin");
-        resourceManager.createNodeSource(nsName, GCMInfrastructure.class.getName(),
+        adminRMAccess = RMTHelper.join("admin", "admin");
+        adminRMAccess.createNodeSource(nsName, GCMInfrastructure.class.getName(),
                 new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), new Object[] { "USER",
                         "ALL" });
 
@@ -167,11 +171,11 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         }
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(adminRMAccess.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(adminRMAccess.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         // geting all nodes
-        NodeSet nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        NodeSet nodes = adminRMAccess.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
@@ -179,33 +183,34 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
         Assert.assertEquals(RMTHelper.defaultNodesNumber, nodes.size());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, adminRMAccess.getState().getFreeNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, adminRMAccess.getState().getTotalNodesNumber());
 
-        resourceManager.releaseNodes(nodes).booleanValue();
+        adminRMAccess.releaseNodes(nodes).booleanValue();
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
-        resourceManager.disconnect();
+        adminRMAccess.disconnect();
 
-        provider = RMTHelper.join("nsadmin", "pwd");
-        nodes = provider.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        providerRMAccess = RMTHelper.join("nsadmin", "pwd");
+        nodes = providerRMAccess.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
         PAFuture.waitFor(nodes);
 
         Assert.assertEquals(0, nodes.size());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, resourceManager.getState().getFreeNodesNumber());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, adminRMAccess.getState().getFreeNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, adminRMAccess.getState().getTotalNodesNumber());
+
+        providerRMAccess.disconnect();
+        adminRMAccess = RMTHelper.join("admin", "admin");
 
         try {
-            // should be able to remove it
-            provider.removeNodeSource(nsName, true).booleanValue();
+            adminRMAccess.removeNodeSource(nsName, true).booleanValue();
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        provider.disconnect();
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
@@ -213,8 +218,7 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test5 - node source usage permission is limited to GROUP");
-        resourceManager = RMTHelper.join("admin", "admin");
-        resourceManager.createNodeSource(nsName, GCMInfrastructure.class.getName(),
+        adminRMAccess.createNodeSource(nsName, GCMInfrastructure.class.getName(),
                 new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(), new Object[] { "GROUP",
                         "ALL" });
 
@@ -225,11 +229,11 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         }
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(adminRMAccess.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(adminRMAccess.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         // geting all nodes
-        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        nodes = adminRMAccess.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
@@ -238,21 +242,21 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
         }
 
         Assert.assertEquals(RMTHelper.defaultNodesNumber, nodes.size());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, adminRMAccess.getState().getFreeNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, adminRMAccess.getState().getTotalNodesNumber());
 
-        resourceManager.releaseNodes(nodes);
+        adminRMAccess.releaseNodes(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
-        resourceManager.disconnect();
+        adminRMAccess.disconnect();
 
         // geting all nodes
-        provider = RMTHelper.join("nsadmin", "pwd");
-        nodes = provider.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        providerRMAccess = RMTHelper.join("nsadmin", "pwd");
+        nodes = providerRMAccess.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
@@ -261,33 +265,34 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
         }
 
         Assert.assertEquals(RMTHelper.defaultNodesNumber, nodes.size());
-        Assert.assertEquals(0, provider.getState().getFreeNodesNumber());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, provider.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, providerRMAccess.getState().getFreeNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, providerRMAccess.getState().getTotalNodesNumber());
 
-        provider.releaseNodes(nodes);
+        providerRMAccess.releaseNodes(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
-        provider.disconnect();
+        providerRMAccess.disconnect();
 
-        user = RMTHelper.join("radmin", "pwd");
-        nodes = user.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        userRMAccess = RMTHelper.join("radmin", "pwd");
+        nodes = userRMAccess.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
         PAFuture.waitFor(nodes);
 
         Assert.assertEquals(0, nodes.size());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, user.getState().getFreeNodesNumber());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, user.getState().getTotalNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, userRMAccess.getState().getFreeNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, userRMAccess.getState().getTotalNodesNumber());
+
+        userRMAccess.disconnect();
+        adminRMAccess = RMTHelper.join("admin", "admin");
 
         try {
-            // should be able to remove it
-            user.removeNodeSource(nsName, true).booleanValue();
+            adminRMAccess.removeNodeSource(nsName, true).booleanValue();
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        user.disconnect();
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
@@ -295,8 +300,7 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test6 - node source usage permission is not limited");
-        resourceManager = RMTHelper.join("admin", "admin");
-        resourceManager.createNodeSource(nsName, GCMInfrastructure.class.getName(),
+        adminRMAccess.createNodeSource(nsName, GCMInfrastructure.class.getName(),
                 new Object[] { GCMDeploymentData }, StaticPolicy.class.getName(),
                 new Object[] { "ALL", "ALL" });
 
@@ -307,11 +311,11 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         }
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(adminRMAccess.getState().getTotalNodesNumber() == RMTHelper.defaultNodesNumber);
+        assertTrue(adminRMAccess.getState().getFreeNodesNumber() == RMTHelper.defaultNodesNumber);
 
         // geting all nodes
-        nodes = resourceManager.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        nodes = adminRMAccess.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
@@ -320,21 +324,21 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
         }
 
         Assert.assertEquals(RMTHelper.defaultNodesNumber, nodes.size());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, adminRMAccess.getState().getFreeNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, adminRMAccess.getState().getTotalNodesNumber());
 
-        resourceManager.releaseNodes(nodes);
+        adminRMAccess.releaseNodes(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
-        resourceManager.disconnect();
+        adminRMAccess.disconnect();
 
         // geting all nodes
-        provider = RMTHelper.join("nsadmin", "pwd");
-        nodes = provider.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        providerRMAccess = RMTHelper.join("nsadmin", "pwd");
+        nodes = providerRMAccess.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
@@ -343,21 +347,21 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
         }
 
         Assert.assertEquals(RMTHelper.defaultNodesNumber, nodes.size());
-        Assert.assertEquals(0, provider.getState().getFreeNodesNumber());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, provider.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, providerRMAccess.getState().getFreeNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, providerRMAccess.getState().getTotalNodesNumber());
 
-        provider.releaseNodes(nodes);
+        providerRMAccess.releaseNodes(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
 
-        provider.disconnect();
+        providerRMAccess.disconnect();
 
         // geting all nodes
-        user = RMTHelper.join("radmin", "pwd");
-        nodes = user.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
+        userRMAccess = RMTHelper.join("radmin", "pwd");
+        nodes = userRMAccess.getAtMostNodes(RMTHelper.defaultNodesNumber, null);
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
@@ -366,23 +370,25 @@ public class TestNodeSourcesPermissions extends FunctionalTest {
         }
 
         Assert.assertEquals(RMTHelper.defaultNodesNumber, nodes.size());
-        Assert.assertEquals(0, user.getState().getFreeNodesNumber());
-        Assert.assertEquals(RMTHelper.defaultNodesNumber, user.getState().getTotalNodesNumber());
+        Assert.assertEquals(0, userRMAccess.getState().getFreeNodesNumber());
+        Assert.assertEquals(RMTHelper.defaultNodesNumber, userRMAccess.getState().getTotalNodesNumber());
 
-        user.releaseNodes(nodes);
+        userRMAccess.releaseNodes(nodes);
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMNodeEvent evt = RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
+
+        userRMAccess.disconnect();
+        adminRMAccess = RMTHelper.join("admin", "admin");
 
         try {
-            // should be able to remove it
-            user.removeNodeSource(nsName, true).booleanValue();
+            adminRMAccess.removeNodeSource(nsName, true).booleanValue();
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
-        user.disconnect();
+        adminRMAccess.disconnect();
 
         for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
             RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);

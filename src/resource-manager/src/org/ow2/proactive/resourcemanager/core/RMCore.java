@@ -594,6 +594,13 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
                 " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
                 rmnode.getNodeSourceName());
 
+            // checking that client has the permission to remove the node
+            // it has to be a user who added the node or the one with AllPermissions
+            PrincipalPermission pp = new PrincipalPermission(nodeUrl, rmnode.getProvider().getSubject()
+                    .getPrincipals(UserNamePrincipal.class));
+            caller.checkPermission(pp, caller + " is not authorized to remove node " + rmnode.getNodeURL() +
+                " from " + rmnode.getNodeSourceName());
+
             if (rmnode.isDown() || preempt || rmnode.isFree()) {
                 removeNodeFromCoreAndSource(rmnode, caller);
             } else if (rmnode.isBusy()) {
@@ -1121,7 +1128,6 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
             nodeSource.shutdown(caller);
-
             return new BooleanWrapper(true);
         } else {
             throw new IllegalArgumentException("Unknown node source " + sourceName);
