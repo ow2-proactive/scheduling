@@ -54,7 +54,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.gui.actions.JMXChartItAction;
+import org.ow2.proactive.resourcemanager.gui.actions.JMXActionsManager;
 import org.ow2.proactive.resourcemanager.gui.data.model.RMModel;
 import org.ow2.proactive.resourcemanager.gui.dialog.SelectResourceManagerDialog;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
@@ -129,7 +129,7 @@ public class RMStore {
             RMStatusBarItem.getInstance().setText("connected");
 
             // Initialize the JMX chartit action
-            JMXChartItAction.getInstance().initJMXClient(auth, new Object[] { login, creds });
+            JMXActionsManager.getInstance().initJMXClient(auth, new Object[] { login, creds });
 
         } catch (ActiveObjectCreationException e) {
             RMStatusBarItem.getInstance().setText("disconnected");
@@ -222,7 +222,7 @@ public class RMStore {
             StatisticsView.getStatsViewer().setInput(null);
         }
         // Disconnect JMX ChartIt action
-        JMXChartItAction.getInstance().disconnectJMXClient();
+        JMXActionsManager.getInstance().disconnectJMXClient();
         try {
             //disconnect user if user has not failed
             //protect it by a try catch
