@@ -517,7 +517,7 @@ public class SchedulerProxy implements Scheduler {
                 }
             }
         }
-        Pinger pinger = new Pinger((SchedulerProxy) PAActiveObject.getStubOnThis());
+        pinger = new Pinger((SchedulerProxy) PAActiveObject.getStubOnThis());
         pinger.start();
     }
 
