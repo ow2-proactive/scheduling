@@ -1148,28 +1148,20 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         switch (eventType) {
             case STARTED:
                 this.status = SchedulerStatus.STARTED;
-                break;
             case STOPPED:
                 this.status = SchedulerStatus.STOPPED;
-                break;
             case PAUSED:
                 this.status = SchedulerStatus.PAUSED;
-                break;
             case FROZEN:
                 this.status = SchedulerStatus.FROZEN;
-                break;
             case RESUMED:
                 this.status = SchedulerStatus.STARTED;
-                break;
             case SHUTTING_DOWN:
                 this.status = SchedulerStatus.SHUTTING_DOWN;
-                break;
             case SHUTDOWN:
                 this.status = SchedulerStatus.STOPPED;
-                break;
             case KILLED:
                 this.status = SchedulerStatus.KILLED;
-                break;
             case RM_DOWN:
             case RM_UP:
             case POLICY_CHANGED:
