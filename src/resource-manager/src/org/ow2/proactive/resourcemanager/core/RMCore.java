@@ -678,6 +678,19 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
     }
 
     /**
+     * Returns true if the node nodeUrl is registered (i.e. known by the RM). Note that
+     * true is returned even if the node is down.
+     *
+     * @param nodeUrl the tested node.
+     * @return true if the node nodeUrl is registered.
+     */
+    public BooleanWrapper nodeIsAvailable(String nodeUrl) {
+        final RMNode checked = this.allNodes.get(nodeUrl);
+        return new BooleanWrapper(checked != null && !checked.isDown());
+
+    }
+
+    /**
      * Creates a new node source with specified name, infrastructure manages {@link InfrastructureManager}
      * and acquisition policy {@link NodeSourcePolicy}.
      *

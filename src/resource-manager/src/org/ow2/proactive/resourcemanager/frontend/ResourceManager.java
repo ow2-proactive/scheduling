@@ -159,6 +159,14 @@ public interface ResourceManager {
     public BooleanWrapper removeNode(String nodeUrl, boolean preempt);
 
     /**
+     * Returns true if the node nodeUrl is registered (i.e. known by the RM) and not down.
+     *
+     * @param nodeUrl the tested node.
+     * @return true if the node nodeUrl is registered and not down.
+     */
+    public BooleanWrapper nodeIsAvailable(String nodeUrl);
+
+    /**
      * Returns true if the resource manager is operational.
      *
      * @return true if the resource manager is operational, false otherwise

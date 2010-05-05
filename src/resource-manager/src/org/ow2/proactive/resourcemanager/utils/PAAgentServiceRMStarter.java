@@ -365,16 +365,25 @@ public final class PAAgentServiceRMStarter {
         public void run() {
             // ping the rm to see if we are still connected
             // if not connected just exit
-            while (PAActiveObject.pingActiveObject(rm)) {
-                try {
-                    Thread.sleep(PING_DELAY_IN_MS);
-                } catch (InterruptedException e) {
-                }
-            }// while connected
+            // isActive throws an exception is not connected
+            try {
+                while (rm.isActive().booleanValue()) {
+                    try {
+                        Thread.sleep(PING_DELAY_IN_MS);
+                    } catch (InterruptedException e) {
+                    }
+                }// while connected
+            } catch (Throwable e) {
+                // no more connected to the RM
+                System.out
+                        .println("The connection to the Resource Manager has been lost. The application will exit.");
+                System.exit(1);
+            }
+
             // if we are here it means we lost the connection. just exit..
-            System.out
-                    .println("The connection to the Resource Manager has been lost. The application will exit. ");
-            System.exit(1);
+            System.out.println("The Resource Manager has been shutdown. The application will exit. ");
+            System.exit(2);
         }
     }
+
 }
