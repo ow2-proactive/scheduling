@@ -233,8 +233,11 @@ public class NodeSource implements InitActive, RunActive {
         // lookup for a new Node
         Node nodeToAdd = null;
         try {
+            logger.info("Looking up the node " + nodeUrl + " with " + NODE_LOOKUP_TIMEOUT + " ms timeout");
             nodeToAdd = lookupNode(nodeUrl, NODE_LOOKUP_TIMEOUT);
+            logger.info("The node " + nodeUrl + " has been successfully looked up");
         } catch (Exception e) {
+            logger.warn("Cannot look up the node " + nodeUrl + " within " + NODE_LOOKUP_TIMEOUT + " ms", e);
             throw new AddingNodesException(e);
         }
 
@@ -353,9 +356,6 @@ public class NodeSource implements InitActive, RunActive {
      * @throws Exception if node was not looked up
      */
     private Node lookupNode(String nodeUrl, long timeout) throws Exception {
-        if (logger.isDebugEnabled())
-            logger.debug("Looking up for the node " + nodeUrl + " with " + timeout + " ms timeout");
-
         Future<Node> futureNode = internalThreadPool.submit(new NodeLocator(nodeUrl));
         return futureNode.get(timeout, TimeUnit.MILLISECONDS);
     }
