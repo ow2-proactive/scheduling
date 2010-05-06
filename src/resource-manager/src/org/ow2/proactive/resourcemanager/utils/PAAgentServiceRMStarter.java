@@ -93,6 +93,17 @@ public final class PAAgentServiceRMStarter {
     /** The delay, in millis, between two attempts to add a node */
     private static int ADD_NODE_ATTEMPTS_DELAY_IN_MS = 5000;
 
+    // The url of the created node
+    private String nodeURL = "Not defined";
+
+    /**
+     * Returns the URL of the node handled by this starter.
+     * @return the URL of the node handled by this starter.
+     */
+    public String getNodeURL() {
+        return this.nodeURL;
+    }
+
     /**
      * Fills the command line options.
      * @param options the options to fill 
@@ -253,35 +264,55 @@ public final class PAAgentServiceRMStarter {
         }
 
         final PAAgentServiceRMStarter starter = new PAAgentServiceRMStarter();
-        boolean registered = starter.registerInRM(credentials, rmURL, nodeName, nodeSourceName);
-        if (registered) {
+        ResourceManager rm = starter.registerInRM(credentials, rmURL, nodeName, nodeSourceName);
+        if (rm != null) {
             System.out.println("Connected to the Resource Manager at " + rmURL + "\n");
+            // start pinging...
+            // ping the rm to see if we are still connected
+            // if not connected just exit
+            // isActive throws an exception is not connected
+            try {
+                while (rm.nodeIsAvailable(starter.getNodeURL()).booleanValue()) {
+                    try {
+                        Thread.sleep(PING_DELAY_IN_MS);
+                    } catch (InterruptedException e) {
+                    }
+                }// while connected
+            } catch (Throwable e) {
+                // no more connected to the RM
+                System.out
+                        .println("The connection to the Resource Manager has been lost. The application will exit.");
+                System.exit(1);
+            }
+
+            // if we are here it means we lost the connection. just exit..
+            System.out.println("The Resource Manager has been shutdown. The application will exit. ");
+            System.exit(2);
         } else {
             // Force system exit to bypass daemon threads
-            System.exit(1);
+            System.exit(3);
         }
     }
 
     /**
      * Creates a local node, tries to join to the Resource Manager with a specified timeout
-     * at the given URL, logs as admin with provided credentials and adds the local node to
+     * at the given URL, logs with provided credentials and adds the local node to
      * the Resource Manager. Handles all errors/exceptions.
      */
-    private boolean registerInRM(final Credentials credentials, final String rmURL, final String nodeName,
-            final String nodeSourceName) {
+    private ResourceManager registerInRM(final Credentials credentials, final String rmURL,
+            final String nodeName, final String nodeSourceName) {
         // 1 - Create the local node that will be registered in RM
         Node localNode = null;
-        String nodeURL = null;
         try {
             localNode = NodeFactory.createLocalNode(nodeName, false, null, null, null);
             if (localNode == null) {
                 throw new RuntimeException("The node returned by the NodeFactory is null");
             }
-            nodeURL = localNode.getNodeInformation().getURL();
+            this.nodeURL = localNode.getNodeInformation().getURL();
         } catch (Throwable t) {
             System.out.println("Unable to create the local node " + nodeName);
             t.printStackTrace();
-            return false;
+            return null;
         }
 
         // Create the full url to contact the Resource Manager
@@ -297,7 +328,7 @@ public final class PAAgentServiceRMStarter {
         } catch (Throwable t) {
             System.out.println("Unable to join the Resource Manager at " + rmURL);
             t.printStackTrace();
-            return false;
+            return null;
         }
 
         ResourceManager rm = null;
@@ -310,7 +341,7 @@ public final class PAAgentServiceRMStarter {
         } catch (Throwable t) {
             System.out.println("Unable to log into the Resource Manager at " + rmURL);
             t.printStackTrace();
-            return false;
+            return null;
         }
 
         // 4 - Add the created node to the Resource Manager with a specified 
@@ -322,9 +353,9 @@ public final class PAAgentServiceRMStarter {
             attempts++;
             try {
                 if (nodeSourceName == null) {
-                    isNodeAdded = rm.addNode(nodeURL).booleanValue();
+                    isNodeAdded = rm.addNode(this.nodeURL).booleanValue();
                 } else {
-                    isNodeAdded = rm.addNode(nodeURL, nodeSourceName).booleanValue();
+                    isNodeAdded = rm.addNode(this.nodeURL, nodeSourceName).booleanValue();
                 }
             } catch (AddingNodesException ex) {
                 System.out.println("Unable to add the local node to the Resource Manager at " + rmURL);
@@ -339,14 +370,14 @@ public final class PAAgentServiceRMStarter {
             if (isNodeAdded) {
                 // try to remove previous URL if different...
                 String previousURL = this.getAndDeleteNodeURL(nodeName);
-                if (previousURL != null && !previousURL.equals(nodeURL)) {
+                if (previousURL != null && !previousURL.equals(this.nodeURL)) {
                     System.out
                             .println("Different previous URL registered by this agent has been found. Remove previous registration.");
                     rm.removeNode(previousURL, true);
                 }
                 // store the node URL
-                this.storeNodeURL(nodeName, nodeURL);
-                System.out.println("Node " + nodeURL + " added. URL is stored in " +
+                this.storeNodeURL(nodeName, this.nodeURL);
+                System.out.println("Node " + this.nodeURL + " added. URL is stored in " +
                     getNodeURLFilename(nodeName));
 
             } else { // not yet registered
@@ -361,15 +392,12 @@ public final class PAAgentServiceRMStarter {
         }// while
 
         if (!isNodeAdded) {
-            System.out.println("The Resource Manager was unable to add the local node " + nodeURL +
+            System.out.println("The Resource Manager was unable to add the local node " + this.nodeURL +
                 " after " + NB_OF_ADD_NODE_ATTEMPTS + " attempts. The application will exit.");
-            return false;
+            return null;
         }// if not registered
 
-        // 5 - Start a new pinger thread
-        final RMPinger rp = new RMPinger(rm);
-        new Thread(rp).start();
-        return true;
+        return rm;
     }
 
     /**
@@ -422,38 +450,6 @@ public final class PAAgentServiceRMStarter {
         final String tmpDir = System.getProperty("java.io.tmpdir");
         final String tmpFile = tmpDir + "_" + URL_TMPFILE_PREFIX + "_" + nodeName;
         return tmpFile;
-    }
-
-    private final class RMPinger implements Runnable {
-        /** The reference to ping */
-        private final ResourceManager rm;
-
-        public RMPinger(final ResourceManager rm) {
-            this.rm = rm;
-        }
-
-        public void run() {
-            // ping the rm to see if we are still connected
-            // if not connected just exit
-            // isActive throws an exception is not connected
-            try {
-                while (rm.isActive().booleanValue()) {
-                    try {
-                        Thread.sleep(PING_DELAY_IN_MS);
-                    } catch (InterruptedException e) {
-                    }
-                }// while connected
-            } catch (Throwable e) {
-                // no more connected to the RM
-                System.out
-                        .println("The connection to the Resource Manager has been lost. The application will exit.");
-                System.exit(1);
-            }
-
-            // if we are here it means we lost the connection. just exit..
-            System.out.println("The Resource Manager has been shutdown. The application will exit. ");
-            System.exit(2);
-        }
     }
 
 }
