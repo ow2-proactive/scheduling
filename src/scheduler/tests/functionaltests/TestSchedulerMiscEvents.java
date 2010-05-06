@@ -40,6 +40,7 @@ import static junit.framework.Assert.assertTrue;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 
 import functionalTests.FunctionalTest;
 
@@ -72,24 +73,29 @@ public class TestSchedulerMiscEvents extends FunctionalTest {
         assertTrue(schedAdminInterface.stop());
         SchedulerTHelper.log("waiting scheduler stopped  event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.STOPPED);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.STOPPED));
 
         assertTrue(!schedAdminInterface.pause());
         assertTrue(!schedAdminInterface.freeze());
         assertTrue(schedAdminInterface.start());
         SchedulerTHelper.log("waiting scheduler started event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.STARTED);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.STARTED));
 
         assertTrue(schedAdminInterface.pause());
         SchedulerTHelper.log("waiting scheduler paused event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.PAUSED);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.PAUSED));
 
         assertTrue(schedAdminInterface.freeze());
         SchedulerTHelper.log("waiting scheduler frozen event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.FROZEN);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.FROZEN));
 
         assertTrue(schedAdminInterface.stop());
         SchedulerTHelper.log("waiting scheduler stopped  event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.STOPPED);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.STOPPED));
 
         assertTrue(!schedAdminInterface.resume());
         //TODO resume from stopped doesn't throw any event ?
@@ -97,10 +103,12 @@ public class TestSchedulerMiscEvents extends FunctionalTest {
         assertTrue(schedAdminInterface.start());
         SchedulerTHelper.log("waiting scheduler started event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.STARTED);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.STARTED));
 
         assertTrue(schedAdminInterface.freeze());
         SchedulerTHelper.log("waiting scheduler frozen event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.FROZEN);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.FROZEN));
 
         assertTrue(schedAdminInterface.resume());
         SchedulerTHelper.log("waiting scheduler resumed  event");
@@ -109,6 +117,7 @@ public class TestSchedulerMiscEvents extends FunctionalTest {
         assertTrue(schedAdminInterface.pause());
         SchedulerTHelper.log("waiting scheduler paused event");
         SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.PAUSED);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.PAUSED));
 
         assertTrue(schedAdminInterface.resume());
         SchedulerTHelper.log("waiting scheduler resumed  event");
