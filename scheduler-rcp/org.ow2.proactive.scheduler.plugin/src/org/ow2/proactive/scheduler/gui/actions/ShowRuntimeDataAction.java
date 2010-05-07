@@ -82,6 +82,7 @@ public final class ShowRuntimeDataAction extends Action {
                     "icons/areacharticon.gif"), null)));
         // This action is disabled by default
         super.setEnabled(false);
+        super.setText("Show " + NAME);
         super.setToolTipText("Show " + NAME);
 
         this.manager = manager;

@@ -87,13 +87,21 @@ public class JMXActionsManager {
     }
 
     private JMXActionsManager() {
-        this.actions = new Action[1];
+        this.actions = new Action[2];
 
         try {
             this.actions[0] = new ShowRuntimeDataAction(this);
         } catch (Exception e) {
             MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
                 ShowRuntimeDataAction.NAME, e.getMessage());
+        }
+
+        try {
+            this.actions[1] = new ShowMyAccountAction(this);
+        } catch (Exception e) {
+            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
+                ShowMyAccountAction.NAME, e.getMessage());
+            e.printStackTrace();
         }
     }
 
