@@ -123,7 +123,7 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
         // The result of the query is sorted by job duration (Descending order)
         final List<?> jobStats = this.dbmanager.sqlQuery(jobStatsQuery);
         for (int i = 0; i < jobStats.size(); i++) {
-            final Object[] tuple = (Object[]) taskStats.get(i);
+            final Object[] tuple = (Object[]) jobStats.get(i);
             final String username = (String) tuple[0];
             SchedulerAccount account = map.get(username);
             // The user may be unknown
