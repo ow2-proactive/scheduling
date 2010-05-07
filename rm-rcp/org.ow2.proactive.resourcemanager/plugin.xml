@@ -159,6 +159,13 @@
             id="org.ow2.proactive.resourcemanager.plugin.removeNodes"
             name="Remove nodes">
       </command>
+      <command
+            categoryId="org.ow2.proactive.resourcemanager.plugin.gui.connectionCategory"
+            defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.ShowRuntimeDataHandler"
+            description="Show Runtime Data"
+            id="org.ow2.proactive.resourcemanager.gui.showRuntimeData"
+            name="Show Runtime Data">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
@@ -329,7 +336,7 @@
                   tooltip="disconnect from a Resource Manager">
             </command>
             <separator
-                  name="separator"
+                  name="separator1"
                   visible="true">
             </separator>
             <command
@@ -414,6 +421,32 @@
             schemeId="org.ow2.proactive.resourcemanager.plugin.scheme"
             sequence="M1+R">
       </key>
-   </extension>   
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.ow2.proactive.resourcemanager.jmxActionSet"
+            label="JMX ChartIt"
+            visible="true">
+         <action
+               class="org.ow2.proactive.resourcemanager.gui.actions.ShowMyAccountActionDelegate"
+               icon="icons/account.gif"
+               id="org.ow2.proactive.resourcemanager.showMyAccount"
+               label="Show My Account"
+               style="push"
+               toolbarPath="toolbar:org.eclipse.ui.main.toolbar"
+               tooltip="Shows accounting information">
+         </action>
+         <action
+               class="org.ow2.proactive.resourcemanager.gui.actions.ShowRuntimeDataActionDelegate"
+               icon="icons/areacharticon.gif"
+               id="org.ow2.proactive.resourcemanager.showRuntimeData"
+               label="Show Runtime Data"
+               style="push"
+               toolbarPath="toolbar:org.eclipse.ui.main.toolbar"
+               tooltip="Shows some runtime information about the Resource Manager">
+         </action>
+      </actionSet>
+   </extension>
 
 </plugin>

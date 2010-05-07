@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.gui.actions;
 
@@ -43,10 +43,12 @@ import javax.management.ObjectName;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.actions.ActionDelegate;
 import org.objectweb.proactive.ic2d.chartit.data.provider.IDataProvider;
 import org.objectweb.proactive.ic2d.chartit.data.resource.IResourceDescriptor;
 import org.objectweb.proactive.ic2d.chartit.editor.ChartItDataEditor;
@@ -54,12 +56,12 @@ import org.ow2.proactive.resourcemanager.Activator;
 
 
 /**
- * This class represents an action that corresponds to a chartable resource from
+ * This class represents an action delegate that corresponds to a chartable resource from
  * the Runtime Data MBean. 
  *  
  * @author The ProActive Team 
  */
-public final class ShowRuntimeDataAction extends Action {
+public class ShowRuntimeDataActionDelegate extends ActionDelegate implements IWorkbenchWindowActionDelegate {
 
     public static final String NAME = "Runtime Data";
 
@@ -72,42 +74,24 @@ public final class ShowRuntimeDataAction extends Action {
     /** The URL of the configuration file */
     private final URL configFileURL;
 
-    /**
-     * Creates a new instance of this class.
-     */
-    ShowRuntimeDataAction(final JMXActionsManager manager) throws Exception {
-        // Set a descriptive icon
-        super.setImageDescriptor(ImageDescriptor.createFromURL(FileLocator.find(
-                org.objectweb.proactive.ic2d.chartit.Activator.getDefault().getBundle(), new Path(
-                    "icons/areacharticon.gif"), null)));
-        // This action is disabled by default
-        super.setEnabled(false);
-        super.setToolTipText("Show " + NAME);
-
-        this.manager = manager;
+    public ShowRuntimeDataActionDelegate() throws Exception {
+        this.manager = JMXActionsManager.getInstance();
         this.mBeanName = new ObjectName("ProActiveResourceManager:name=RuntimeData");
         this.configFileURL = FileLocator.find(Activator.getDefault().getBundle(), new Path(
-            "config/RuntimeDataChartItConf.xml"), null); // TODO RENAME THE CONFIG FILE                                              
+            "config/RuntimeDataChartItConf.xml"), null); // TODO RENAME THE CONFIG FILE        
     }
 
     @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        // Each time the action is disabled close the corresponding chart editor
-        if (!enabled) {
-            try {
-                // activateIfFound method with false to close the editor
-                JMXActionsManager.activateIfFound(NAME, false);
-            } catch (Exception t) {
-                MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to close the " + NAME,
-                        t.getMessage());
-                t.printStackTrace();
-            }
-        }
+    public void init(final IAction action) {
+        action.setEnabled(false);
+        this.manager.addAction(action);
+    }
+
+    public void init(IWorkbenchWindow window) {
     }
 
     @Override
-    public void run() {
+    public void run(IAction action) {
         // Try to connect the JMX client    	
         if (!this.manager.getJMXClientHelper().isConnected()) {
             return;
@@ -128,10 +112,12 @@ public final class ShowRuntimeDataAction extends Action {
                     .getMessage());
             e.printStackTrace();
         }
+
     }
 
-    //////////////////
-
+    /**
+     * Internal definition of a ChartIt Resource Descriptor 
+     */
     private final class RuntimeDataResourceDescriptor implements IResourceDescriptor {
         private final MBeanServerConnection connection;
 
@@ -144,11 +130,11 @@ public final class ShowRuntimeDataAction extends Action {
         }
 
         public URL getConfigFileURL() {
-            return ShowRuntimeDataAction.this.configFileURL;
+            return ShowRuntimeDataActionDelegate.this.configFileURL;
         }
 
         public String getHostUrlServer() {
-            return ShowRuntimeDataAction.this.manager.getJMXClientHelper().getConnector().toString();
+            return ShowRuntimeDataActionDelegate.this.manager.getJMXClientHelper().getConnector().toString();
         }
 
         public MBeanServerConnection getMBeanServerConnection() {
@@ -156,11 +142,11 @@ public final class ShowRuntimeDataAction extends Action {
         }
 
         public String getName() {
-            return ShowRuntimeDataAction.NAME;
+            return ShowRuntimeDataActionDelegate.NAME;
         }
 
         public ObjectName getObjectName() {
-            return ShowRuntimeDataAction.this.mBeanName;
+            return ShowRuntimeDataActionDelegate.this.mBeanName;
         }
     }
 }

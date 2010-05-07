@@ -1,8 +1,9 @@
 package org.ow2.proactive.resourcemanager.gui.actions;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.action.IAction;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -37,7 +38,7 @@ public class JMXActionsManager {
     private JMXClientHelper jmxClient;
 
     /** All managed actions */
-    private Action[] actions;
+    private List<IAction> actions;
 
     /**
      * Returns the single instance of this class
@@ -51,14 +52,15 @@ public class JMXActionsManager {
     }
 
     private JMXActionsManager() {
-        this.actions = new Action[1];
+        this.actions = new ArrayList<IAction>(2);
+    }
 
-        try {
-            this.actions[0] = new ShowRuntimeDataAction(this);
-        } catch (Exception e) {
-            MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to create the action " +
-                ShowRuntimeDataAction.NAME, e.getMessage());
-        }
+    public void addAction(final IAction action) {
+        this.actions.add(action);
+    }
+
+    public void removeAction(final IAction action) {
+        this.actions.remove(action);
     }
 
     /**
@@ -71,11 +73,11 @@ public class JMXActionsManager {
         this.jmxClient = new JMXClientHelper(auth, creds);
         // Connect the JMX client
         if (this.jmxClient.connect()) {
-            for (final Action a : this.actions) {
+            for (final IAction a : this.actions) {
                 a.setEnabled(true);
             }
         } else {
-            for (final Action a : this.actions) {
+            for (final IAction a : this.actions) {
                 // Show a tool tip text in case of connection failure
                 a.setToolTipText("Unable to show the JMX Monitoring due to " +
                     this.jmxClient.getLastException());
@@ -90,17 +92,13 @@ public class JMXActionsManager {
         // Disconnect the jmx Client
         this.jmxClient.disconnect();
         // Disable all actions of this manager
-        for (final Action a : this.actions) {
+        for (final IAction a : this.actions) {
             a.setEnabled(false);
         }
     }
 
     public JMXClientHelper getJMXClientHelper() {
         return this.jmxClient;
-    }
-
-    public Action[] getActions() {
-        return this.actions;
     }
 
     /**
