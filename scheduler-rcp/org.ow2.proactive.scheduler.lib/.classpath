@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/fractal-adl-2.4-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fractal-api-2.0.3-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fractal-gcm-api-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/annogen-0.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.6.jar"/>
@@ -99,8 +102,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/derby.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/derbytools.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dtdparser.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/fractal.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/fractal-adl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/glite-wms-jdlj.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/http.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ibis-1.4.jar"/>
