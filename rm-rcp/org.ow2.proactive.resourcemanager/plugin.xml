@@ -159,13 +159,6 @@
             id="org.ow2.proactive.resourcemanager.plugin.removeNodes"
             name="Remove nodes">
       </command>
-      <command
-            categoryId="org.ow2.proactive.resourcemanager.plugin.gui.connectionCategory"
-            defaultHandler="org.ow2.proactive.resourcemanager.gui.handlers.ShowRuntimeDataHandler"
-            description="Show Runtime Data"
-            id="org.ow2.proactive.resourcemanager.gui.showRuntimeData"
-            name="Show Runtime Data">
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
