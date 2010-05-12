@@ -47,6 +47,7 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.core.ClientRequestHandler;
 
 
 /**
@@ -85,6 +86,10 @@ public class UserIdentificationImpl extends UserIdentification {
     //must be transient because useless on user side and TimerTask is not serializable
     private transient TimerTask session;
 
+    /** Associated listener to client */
+    //must be transient because useless on user side and TimerTask is not serializable
+    private transient ClientRequestHandler listener;
+
     /**
      * Constructor of user identification using user name.
      *
@@ -122,6 +127,43 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    /**
+     * Get the listener associated to this user if any
+     * 
+     * @return the listener if it exists, null otherwise
+     */
+    public ClientRequestHandler getListener() {
+        return listener;
+    }
+
+    /**
+     * Return true if this user is currently having a listener on Scheduler events, false otherwise.
+     * 
+     * @return true if this user is currently having a listener on Scheduler events, false otherwise.
+     */
+    public boolean isListening() {
+        return listener != null;
+    }
+
+    /**
+     * Set the listener associated to this user
+     * 
+     * Listener must not be null !
+     */
+    public void setListener(ClientRequestHandler listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("Listener must not be null !");
+        }
+        this.listener = listener;
+    }
+
+    /**
+     * clear the listener associated to this user
+     */
+    public void clearListener() {
+        this.listener = null;
     }
 
     /**

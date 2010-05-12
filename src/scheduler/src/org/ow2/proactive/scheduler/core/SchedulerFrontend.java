@@ -44,7 +44,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -135,7 +134,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private Map<UniqueID, UserIdentificationImpl> identifications;
 
     /** List of connected user */
-    private SchedulerUsers connectedUsers;
+    private SchedulerUsers users;
 
     /** List used to mark the user that does not respond anymore */
     private Set<UniqueID> dirtyList;
@@ -157,9 +156,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
 
     /** Job identification management */
     private Map<JobId, IdentifiedJob> jobs;
-
-    /** scheduler listeners */
-    private Map<UniqueID, ClientRequestHandler> schedulerListeners;
 
     /** Session timer */
     private Timer sessionTimer;
@@ -194,11 +190,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName) {
         this.identifications = new HashMap<UniqueID, UserIdentificationImpl>();
-        this.connectedUsers = new SchedulerUsers();
+        this.users = new SchedulerUsers();
         this.dirtyList = new HashSet<UniqueID>();
         this.currentJobToSubmit = new InternalJobWrapper();
-        this.schedulerListeners = new ConcurrentHashMap<UniqueID, ClientRequestHandler>();
-        this.accountsManager = new SchedulerAccountsManager(this.connectedUsers);
+        this.accountsManager = new SchedulerAccountsManager(this.users);
         this.jmxHelper = new SchedulerJMXHelper(this.accountsManager);
         this.status = SchedulerStatus.STOPPED;
 
@@ -320,7 +315,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         identifications.put(sourceBodyID, identification);
         renewUserSession(sourceBodyID, identification);
         //add this new user in the list of connected user
-        connectedUsers.update(identification);
+        users.update(identification);
         //send events
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, identification));
     }
@@ -334,7 +329,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * @param identification the user on which to renew the session
      */
     private void renewUserSession(final UniqueID id, UserIdentificationImpl identification) {
-        if (schedulerListeners.containsKey(id)) {
+        if (identifications.get(id).isListening()) {
             //if this id has a listener, do not renew user session
             return;
         }
@@ -537,7 +532,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         SchedulerStateImpl initState = null;
         initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler.getState()));
         //and update the connected users list.
-        initState.setUsers(connectedUsers);
+        initState.setUsers(users);
         //return to the user
         return initState;
     }
@@ -578,7 +573,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         uIdent.setMyEventsOnly(myEventsOnly);
         //add the listener to the list of listener for this user.
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        schedulerListeners.put(id, new ClientRequestHandler(this, id, sel));
+        uIdent.setListener(new ClientRequestHandler(this, id, sel));
         //cancel timer for this user : session is now managed by events
         uIdent.getSession().cancel();
         //get the scheduler State
@@ -597,9 +592,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         //Remove the listener on that user designated by its given UniqueID,
         //then renew its user session as it is no more managed by the listener.
         UniqueID id = checkAccess();
-        schedulerListeners.remove(id);
+        UserIdentificationImpl uIdent = identifications.get(id);
+        uIdent.clearListener();
         //recreate the session for this user which is no more managed by listener
-        renewUserSession(id, identifications.get(id));
+        renewUserSession(id, uIdent);
     }
 
     /**
@@ -722,12 +718,12 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     private void disconnect(UniqueID id) {
         UserIdentificationImpl ident = identifications.remove(id);
-        //remove listeners if needed
-        schedulerListeners.remove(id);
         if (ident != null) {
+            //remove listeners if needed
+            ident.clearListener();
             //remove this user to the list of connected user if it has not already been removed
             ident.setToRemove();
-            connectedUsers.update(ident);
+            users.update(ident);
             //cancel the timer
             ident.getSession().cancel();
             //log and send events
@@ -991,13 +987,14 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + eventType.toString() + "'");
             }
-            for (Entry<UniqueID, ClientRequestHandler> entry : schedulerListeners.entrySet()) {
-                UniqueID id = entry.getKey();
-                UserIdentificationImpl userId = null;
-                userId = identifications.get(id);
-                //if there is no specified event OR if the specified event is allowed
-                if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(eventType)) {
-                    entry.getValue().addEvent(eventMethods.get("schedulerStateUpdatedEvent"), eventType);
+            for (UserIdentificationImpl userId : identifications.values()) {
+                //if this user has a listener
+                if (userId.isListening()) {
+                    //if there is no specified event OR if the specified event is allowed
+                    if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(eventType)) {
+                        userId.getListener().addEvent(eventMethods.get("schedulerStateUpdatedEvent"),
+                                eventType);
+                    }
                 }
             }
             clearListeners();
@@ -1016,23 +1013,23 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "'");
             }
-            for (Entry<UniqueID, ClientRequestHandler> entry : schedulerListeners.entrySet()) {
-                UniqueID id = entry.getKey();
-                UserIdentificationImpl userId = null;
-                try {
-                    userId = identifications.get(id);
-                    //if there is no specified event OR if the specified event is allowed
-                    if ((userId.getUserEvents() == null) ||
-                        userId.getUserEvents().contains(SchedulerEvent.JOB_SUBMITTED)) {
-                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
-                        if (!userId.isMyEventsOnly() ||
-                            (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
-                            entry.getValue().addEvent(eventMethods.get("jobSubmittedEvent"), job);
+            for (UserIdentificationImpl userId : identifications.values()) {
+                //if this user has a listener
+                if (userId.isListening()) {
+                    try {
+                        //if there is no specified event OR if the specified event is allowed
+                        if ((userId.getUserEvents() == null) ||
+                            userId.getUserEvents().contains(SchedulerEvent.JOB_SUBMITTED)) {
+                            //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                            if (!userId.isMyEventsOnly() ||
+                                (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
+                                userId.getListener().addEvent(eventMethods.get("jobSubmittedEvent"), job);
+                            }
                         }
+                    } catch (NullPointerException e) {
+                        //can't do anything
+                        logger_dev.debug("", e);
                     }
-                } catch (NullPointerException e) {
-                    //can't do anything
-                    logger_dev.debug("", e);
                 }
             }
             clearListeners();
@@ -1052,17 +1049,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
-            for (Entry<UniqueID, ClientRequestHandler> entry : schedulerListeners.entrySet()) {
-                UniqueID id = entry.getKey();
-                UserIdentificationImpl userId = null;
-                userId = identifications.get(id);
-                //if there is no specified event OR if the specified event is allowed
-                if ((userId.getUserEvents() == null) ||
-                    userId.getUserEvents().contains(notification.getEventType())) {
-                    //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
-                    if (!userId.isMyEventsOnly() ||
-                        (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                        entry.getValue().addEvent(eventMethods.get("jobStateUpdatedEvent"), notification);
+            for (UserIdentificationImpl userId : identifications.values()) {
+                //if this user has a listener
+                if (userId.isListening()) {
+                    //if there is no specified event OR if the specified event is allowed
+                    if ((userId.getUserEvents() == null) ||
+                        userId.getUserEvents().contains(notification.getEventType())) {
+                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
+                            userId.getListener().addEvent(eventMethods.get("jobStateUpdatedEvent"),
+                                    notification);
+                        }
                     }
                 }
             }
@@ -1083,17 +1081,18 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
-            for (Entry<UniqueID, ClientRequestHandler> entry : schedulerListeners.entrySet()) {
-                UniqueID id = entry.getKey();
-                UserIdentificationImpl userId = null;
-                userId = identifications.get(id);
-                //if there is no specified event OR if the specified event is allowed
-                if ((userId.getUserEvents() == null) ||
-                    userId.getUserEvents().contains(notification.getEventType())) {
-                    //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
-                    if (!userId.isMyEventsOnly() ||
-                        (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                        entry.getValue().addEvent(eventMethods.get("taskStateUpdatedEvent"), notification);
+            for (UserIdentificationImpl userId : identifications.values()) {
+                //if this user has a listener
+                if (userId.isListening()) {
+                    //if there is no specified event OR if the specified event is allowed
+                    if ((userId.getUserEvents() == null) ||
+                        userId.getUserEvents().contains(notification.getEventType())) {
+                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
+                            userId.getListener().addEvent(eventMethods.get("taskStateUpdatedEvent"),
+                                    notification);
+                        }
                     }
                 }
             }
@@ -1114,18 +1113,19 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             if (logger_dev.isDebugEnabled()) {
                 logger_dev.debug("Dispatch event '" + notification.getEventType() + "'");
             }
-            for (Entry<UniqueID, ClientRequestHandler> entry : schedulerListeners.entrySet()) {
-                UniqueID id = entry.getKey();
-                UserIdentificationImpl userId = null;
-                userId = identifications.get(id);
-                //if there is no specified event OR if the specified event is allowed
-                if ((userId.getUserEvents() == null) ||
-                    userId.getUserEvents().contains(notification.getEventType())) {
-                    //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
-                    if (!userId.isMyEventsOnly() ||
-                        (userId.isMyEventsOnly() && userId.getUsername().equals(
-                                notification.getData().getUsername()))) {
-                        entry.getValue().addEvent(eventMethods.get("usersUpdatedEvent"), notification);
+            for (UserIdentificationImpl userId : identifications.values()) {
+                //if this user has a listener
+                if (userId.isListening()) {
+                    //if there is no specified event OR if the specified event is allowed
+                    if ((userId.getUserEvents() == null) ||
+                        userId.getUserEvents().contains(notification.getEventType())) {
+                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() && userId.getUsername().equals(
+                                    notification.getData().getUsername()))) {
+                            userId.getListener()
+                                    .addEvent(eventMethods.get("usersUpdatedEvent"), notification);
+                        }
                     }
                 }
             }

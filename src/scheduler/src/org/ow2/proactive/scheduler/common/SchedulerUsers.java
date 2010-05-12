@@ -37,10 +37,13 @@
 package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -57,10 +60,11 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 @PublicAPI
 public class SchedulerUsers implements Serializable {
 
-    /** List of connected user.
+    /** 
+     * List of connected user.
      * Will be sorted by default as defined in the {@link UserIdentification#compareTo(UserIdentification)} method !
      */
-    private Set<UserIdentification> users = new TreeSet<UserIdentification>();
+    private Set<UserIdentification> users = new HashSet<UserIdentification>();
 
     /**
      * Return a sorted collection of all connected users.
@@ -68,7 +72,13 @@ public class SchedulerUsers implements Serializable {
      * @return a sorted collection of all connected users
      */
     public Collection<UserIdentification> getUsers() {
-        return users;
+        List<UserIdentification> tmp = new ArrayList<UserIdentification>();
+        Iterator<UserIdentification> iter = users.iterator();
+        while (iter.hasNext()) {
+            tmp.add(iter.next());
+        }
+        Collections.sort(tmp);
+        return tmp;
     }
 
     /**
