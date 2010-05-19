@@ -55,6 +55,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -143,6 +144,8 @@ public class SchedulerTester {
                     }
                 }
             }
+        } catch (ConnectionException e) {
+            logger.error("", e);
         } finally {
             if (bu != null) {
                 try {

@@ -40,8 +40,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.Connection;
-import org.ow2.proactive.scheduler.common.exception.InternalException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 
 
@@ -94,12 +93,13 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      *
      * @param url the URL of the scheduler to join.
      * @return the scheduler authentication at the specified URL.
+     * @throws ConnectionException if connection is not possible on the given URL.
      */
-    public static SchedulerAuthenticationInterface join(String url) {
+    public static SchedulerAuthenticationInterface join(String url) throws ConnectionException {
         try {
             return getInstance().connect(normalizeScheduler(url));
         } catch (Exception e) {
-            throw new InternalException(e.getMessage());
+            throw new ConnectionException(e.getMessage());
         }
     }
 
@@ -109,9 +109,11 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      * Note that you can use the provided {@link SchedulerAuthenticationGUIHelper} class to display a
      * graphical interface that will ask the URL, login and password.
      *
+     * @param url the URL of the scheduler to join.
      * @return the interface to be authenticate by the Scheduler
+     * @throws ConnectionException if connection is not possible on the given URL.
      */
-    public static SchedulerAuthenticationInterface waitAndJoin(String url) throws SchedulerException {
+    public static SchedulerAuthenticationInterface waitAndJoin(String url) throws ConnectionException {
         return waitAndJoin(url, 0);
     }
 
@@ -122,13 +124,16 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      * Note that you can use the provided {@link SchedulerAuthenticationGUIHelper} class to display a
      * graphical interface that will ask the URL, login and password.
      *
+     * @param url the URL of the scheduler to join.
+     * @param timeout the amount of time during which it will try to join the Scheduler
      * @return the interface to be authenticate by the Scheduler
      */
-    public static SchedulerAuthenticationInterface waitAndJoin(String url, long timeout) {
+    public static SchedulerAuthenticationInterface waitAndJoin(String url, long timeout)
+            throws ConnectionException {
         try {
             return getInstance().waitAndConnect(normalizeScheduler(url), timeout);
         } catch (Exception e) {
-            throw new InternalException(e);
+            throw new ConnectionException(e);
         }
     }
 

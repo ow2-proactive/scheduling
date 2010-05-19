@@ -163,7 +163,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
                     "Could not retrieve public key, contact the Scheduler admininistrator" + e);
             }
             this.scheduler = auth.login(creds);
-        } catch (LoginException e) {
+        } catch (Exception e) {
             throw new ProActiveRuntimeException(e);
         }
 
