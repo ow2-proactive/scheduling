@@ -292,8 +292,8 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             session.save(o);
             commitTransaction(session);
         } catch (Exception e) {
-            rollbackTransaction(session);
             getDevLogger().error("", e);
+            rollbackTransaction(session);
             throw new DatabaseManagerException("Unable to store the given object !", e);
         }
     }
@@ -312,8 +312,8 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             session.delete(o);
             commitTransaction(session);
         } catch (Exception e) {
-            rollbackTransaction(session);
             getDevLogger().error("", e);
+            rollbackTransaction(session);
             throw new DatabaseManagerException("Unable to delete the given object !", e);
         }
     }
@@ -333,8 +333,8 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             session.update(o);
             commitTransaction(session);
         } catch (Exception e) {
-            rollbackTransaction(session);
             getDevLogger().error("", e);
+            rollbackTransaction(session);
             throw new DatabaseManagerException("Unable to update the given object !", e);
         }
     }
@@ -452,8 +452,8 @@ public abstract class HibernateDatabaseManager implements DatabaseManager {
             commitTransaction(session);
             getDevLogger().debug("Transaction committed");
         } catch (Exception e) {
-            rollbackTransaction(session);
             getDevLogger().error("", e);
+            rollbackTransaction(session);
             throw new DatabaseManagerException("Unable to synchronize this object !", e);
         }
     }
