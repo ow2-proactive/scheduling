@@ -75,6 +75,10 @@ public final class PAAgentServiceRMStarter {
 
     /** Prefix for temp files that store nodes URL */
     private static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
+
+    /** Name of the java property to set the rank */
+    private final static String RANK_PROP_NAME = "pa.agent.rank";
+
     /**
      * The starter will try to connect to the Resource Manager before killing
      * itself that means that it will try to connect during
@@ -95,6 +99,18 @@ public final class PAAgentServiceRMStarter {
 
     // The url of the created node
     private String nodeURL = "Not defined";
+    // the rank of this node
+    private int rank;
+    // if true, previous nodes with different URLs are removed from the RM
+    private boolean removePrevious;
+
+    /**
+     * Returns the rank of this node
+     * @return the rank of this node
+     */
+    public int getRank() {
+        return rank;
+    }
 
     /**
      * Returns the URL of the node handled by this starter.
@@ -301,6 +317,24 @@ public final class PAAgentServiceRMStarter {
      */
     private ResourceManager registerInRM(final Credentials credentials, final String rmURL,
             final String nodeName, final String nodeSourceName) {
+
+        // 0 - read and set the rank
+        String rankAsString = System.getProperty(RANK_PROP_NAME);
+        if (rankAsString == null) {
+            System.out.println("[WARNING] Rank is not set. Previous URLs will not be stored");
+            this.removePrevious = false;
+        } else {
+            try {
+                this.rank = Integer.parseInt(rankAsString);
+                this.removePrevious = true;
+                System.out.println("Rank is " + this.rank);
+            } catch (Throwable e) {
+                System.out.println("[WARNING] Rank cannot be read due to " + e.getMessage() +
+                    ". Previous URLs will not be stored");
+                this.removePrevious = false;
+            }
+        }
+
         // 1 - Create the local node that will be registered in RM
         Node localNode = null;
         try {
@@ -368,18 +402,21 @@ public final class PAAgentServiceRMStarter {
             }
 
             if (isNodeAdded) {
-                // try to remove previous URL if different...
-                String previousURL = this.getAndDeleteNodeURL(nodeName);
-                if (previousURL != null && !previousURL.equals(this.nodeURL)) {
-                    System.out
-                            .println("Different previous URL registered by this agent has been found. Remove previous registration.");
-                    rm.removeNode(previousURL, true);
+                if (removePrevious) {
+                    // try to remove previous URL if different...
+                    String previousURL = this.getAndDeleteNodeURL(nodeName, rank);
+                    if (previousURL != null && !previousURL.equals(this.nodeURL)) {
+                        System.out
+                                .println("Different previous URL registered by this agent has been found. Remove previous registration.");
+                        rm.removeNode(previousURL, true);
+                    }
+                    // store the node URL
+                    this.storeNodeURL(nodeName, rank, this.nodeURL);
+                    System.out.println("Node " + this.nodeURL + " added. URL is stored in " +
+                        getNodeURLFilename(nodeName, rank));
+                } else {
+                    System.out.println("Node " + this.nodeURL + " added.");
                 }
-                // store the node URL
-                this.storeNodeURL(nodeName, this.nodeURL);
-                System.out.println("Node " + this.nodeURL + " added. URL is stored in " +
-                    getNodeURLFilename(nodeName));
-
             } else { // not yet registered
                 System.out.println("Attempt number " + attempts + " out of " + NB_OF_ADD_NODE_ATTEMPTS +
                     " to add the local node to the Resource Manager at " + rmURL + " has failed.");
@@ -403,11 +440,12 @@ public final class PAAgentServiceRMStarter {
     /**
      * Store in a temp file the current URL of the node started by the agent
      * @param nodeName the name of the node
+     * @param rank the rank of the node
      * @param nodeURL the URL of the node
      */
-    private void storeNodeURL(String nodeName, String nodeURL) {
+    private void storeNodeURL(String nodeName, int rank, String nodeURL) {
         try {
-            File f = new File(getNodeURLFilename(nodeName));
+            File f = new File(getNodeURLFilename(nodeName, rank));
             if (f.exists()) {
                 System.out.println("[WARNING] NodeURL file already exists ; delete it.");
                 f.delete();
@@ -425,11 +463,12 @@ public final class PAAgentServiceRMStarter {
     /**
      * Return the previous URL of this node
      * @param nodeName the name of the node started by the Agent
+     * @param rank the rank of the node
      * @return the previous URL of this node, null if none can be found
      */
-    private String getAndDeleteNodeURL(String nodeName) {
+    private String getAndDeleteNodeURL(String nodeName, int rank) {
         try {
-            File f = new File(getNodeURLFilename(nodeName));
+            File f = new File(getNodeURLFilename(nodeName, rank));
             if (f.exists()) {
                 BufferedReader in = new BufferedReader(new FileReader(f));
                 String read = in.readLine();
@@ -446,9 +485,9 @@ public final class PAAgentServiceRMStarter {
     /**
      * Create the name of the temp file for storing node URL.
      */
-    private String getNodeURLFilename(String nodeName) {
+    private String getNodeURLFilename(String nodeName, int rank) {
         final String tmpDir = System.getProperty("java.io.tmpdir");
-        final String tmpFile = tmpDir + "_" + URL_TMPFILE_PREFIX + "_" + nodeName;
+        final String tmpFile = tmpDir + "_" + URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank;
         return tmpFile;
     }
 
