@@ -414,7 +414,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             //create launcher
             launcher = task.createLauncher(job, node);
             activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-            core.currentlyRunningTasks.get(task.getJobId()).put(task.getId(), launcher);
 
             nodeSet.remove(0);
 
@@ -473,7 +472,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                         //and result is not null
                         ((JobResultImpl) job.getJobResult()).storeFuturResult(task.getName(), future.get());
                         //mark the task and job (if needed) as started and send events
-                        finalizeStarting(job, task, node);
+                        finalizeStarting(job, task, node, launcher);
                     } else {
                         //if there was a problem, free nodeSet for multi-nodes task (1)
                         throw new RuntimeException("Free nodes 1");
@@ -486,6 +485,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             } catch (Exception t) {
                 try {
                     //if there was a problem, free nodeSet for multi-nodes task
+                    //exception can come from future.get() -> cancellationException
                     //exception can also come from (1) or (2)
                     nodes.add(node);
                     core.resourceManager.freeNodes(nodes);
@@ -505,8 +505,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @param job the job that owns the task to be started
      * @param task the task to be started
      * @param node the node on which the task will be started
+     * @param launcher the taskLauncher that has just been launched
      */
-    void finalizeStarting(InternalJob job, InternalTask task, Node node) {
+    void finalizeStarting(InternalJob job, InternalTask task, Node node, TaskLauncher launcher) {
         logger.info("Task '" + task.getId() + "' started on " +
             node.getNodeInformation().getVMInformation().getHostName());
         // set the different informations on job
@@ -522,6 +523,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         // set the different informations on task
         job.startTask(task);
+        //set this task as started
+        core.currentlyRunningTasks.get(task.getJobId()).put(task.getId(), launcher);
         // send task event to front-end
         core.frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
             SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));

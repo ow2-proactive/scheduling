@@ -839,7 +839,14 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         // job might have already been removed if job has failed...
         Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
         if (runningTasks != null) {
-            runningTasks.remove(taskId);
+            if (runningTasks.remove(taskId) == null) {
+                //This case is checked to avoid race condition when starting a task.
+                //The doTask(...) action could have been performed while the starter thread has considered it
+                //as timed out. In this particular case, this terminate(taskId) method could have been called anyway.
+                //We must not consider this call !
+                logger_dev.info("This taskId represents a non running task");
+                return;
+            }
         } else {
             logger_dev.error("RunningTasks list was null, This is an abnormal case");
             return;
