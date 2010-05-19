@@ -791,8 +791,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                         //create launcher
                         launcher = internalTask.createLauncher(currentJob, node);
                         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-                        this.currentlyRunningTasks.get(internalTask.getJobId()).put(internalTask.getId(),
-                                launcher);
+
                         nodeSet.remove(0);
                         NodeSet nodes = new NodeSet();
 
@@ -850,7 +849,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                                 ((JobResultImpl) currentJob.getJobResult()).storeFuturResult(internalTask
                                         .getName(), future.get());
                                 //mark the task and job (if needed) as started and send events
-                                finalizeStarting(currentJob, internalTask, node);
+                                finalizeStarting(currentJob, internalTask, node, launcher);
                             } else {
                                 //if there was a problem, free nodeSet for multi-nodes task (1)
                                 throw new RuntimeException("Free nodes 1");
@@ -889,6 +888,7 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
                 }
             } catch (Exception e1) {
                 //if we are here, it is that something append while launching the current task.
+                //exception can come from future.get() -> cancellationException
                 //exception can also come from (1) or (2)
                 logger.warn("", e1);
                 //so try to get back every remaining nodes to the resource manager
@@ -910,8 +910,9 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
      * @param job the job that owns the task to be started
      * @param task the task to be started
      * @param node the node on which the task will be started
+     * @param launcher the taskLauncher that has just been launched
      */
-    private void finalizeStarting(InternalJob job, InternalTask task, Node node) {
+    private void finalizeStarting(InternalJob job, InternalTask task, Node node, TaskLauncher launcher) {
         logger.info("Task '" + task.getId() + "' started on " +
             node.getNodeInformation().getVMInformation().getHostName());
         // set the different informations on job
@@ -927,6 +928,8 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
 
         // set the different informations on task
         job.startTask(task);
+        //set this task as started
+        this.currentlyRunningTasks.get(job.getId()).put(task.getId(), launcher);
         // send task event to front-end
         frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
             SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));
@@ -1175,7 +1178,14 @@ public class SchedulerCore implements UserSchedulerInterface_, AdminMethodsInter
         // job might have already been removed if job has failed...
         Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
         if (runningTasks != null) {
-            runningTasks.remove(taskId);
+            if (runningTasks.remove(taskId) == null) {
+                //This case is checked to avoid race condition when starting a task.
+                //The doTask(...) action could have been performed while the starter thread has considered it
+                //as timed out. In this particular case, this terminate(taskId) method could have been called anyway.
+                //We must not consider this call !
+                logger_dev.info("This taskId represents a non running task");
+                return;
+            }
         } else {
             logger_dev.error("RunningTasks list was null, This is an abnormal case");
             return;
