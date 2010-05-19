@@ -670,7 +670,7 @@ JobId myJobId = scheduler.submit(job);
 				<para>
 					The admin Scheduler controller is an interface which allows to administer the ProActive Scheduler without the
 					java API. It is also possible to see exceptions coming from the scheduler to know what happened.
-					To start a admin controller, run the <emphasis>scheduler-admin[.bat]</emphasis>
+					To start a admin controller, run the <emphasis>scheduler-client[.bat]</emphasis>
 					script in 'bin/[os]/' directory. It works in the same manner as the user controller (<xref linkend="scheduler_controller"/>)
 					but some administration functions have been added. Note that the admin controller uses administrator rights to allow
 					the connection to the scheduler.
@@ -680,7 +680,7 @@ JobId myJobId = scheduler.submit(job);
 				To understand how to use it, please refers to the <xref linkend="scheduler_controller"/> section.
 			</para>
 			<para>
-				Here is the displayed help when using <emphasis>scheduler-admin[.bat] -h</emphasis> command:
+				Here is the displayed help when using <emphasis>scheduler-client[.bat] -h</emphasis> command:
 				<figure xml:id="scheduler_controller_admin_help"><info><title>Scheduler admin controller help</title></info>
 					<mediaobject>
 						<imageobject>

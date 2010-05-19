@@ -121,7 +121,7 @@
 
 
 	<para>
-		These two components (Scheduler and IM) are independent and run as non GUI daemon/service.
+		These two components (Scheduler and RM) are independent and run as non GUI daemon/service.
 		Thus, they can run on two different hosts.
 	</para>
 </section>
@@ -690,7 +690,7 @@ public class HelloTask extends JavaExecutable{
 	</para>
 	<para>
 	Then, you can add as many nodes as you want.
-	For this, you have to use both the <emphasis>rm-start-node</emphasis> and the <emphasis>rm-admin</emphasis> scripts.
+	For this, you have to use both the <emphasis>rm-start-node</emphasis> and the <emphasis>rm-client</emphasis> scripts.
 	So, you first have to start a new node. Type the following command to start a node called 'MyNode':
 	</para>
 	<para>
@@ -708,7 +708,7 @@ public class HelloTask extends JavaExecutable{
 	Now, you are ready to add this node to the Resource Manager. Type:
 	</para>
 	<para>
-		<code>rm-admin -a rmi://hostname:port/MyNode</code>
+		<code>rm-client -a rmi://hostname:port/MyNode</code>
 	</para>
 	<para>
 	In order to have the right to use this command, you have to use the login and the password of an administrator. By default, an administrator whose login is <emphasis>jl</emphasis> and whose password is also <emphasis>jl</emphasis> is defined. After this operation, you can see the line:</para>
@@ -722,7 +722,7 @@ public class HelloTask extends JavaExecutable{
 	You can also check all the nodes of your Resource Manager by typing:
 	</para>
 	<para>
-		<code>rm-admin -ln</code>
+		<code>rm-client -ln</code>
 	</para>
 	<para>
 	Finally, it just remains to launch the Scheduler as it was done in <xref linkend="launch_sched"/>. The Scheduler will automatically look for an existing Resource Manager first. It will therefore find the one you have launched and use it. If you have launched the Resource Manager on a host different from those on which you want to start the Scheduler, you have to precise its URL to the 'scheduler-start' script.
@@ -736,32 +736,32 @@ public class HelloTask extends JavaExecutable{
 	You can create your own deployment file and, then type the following line (with you own file) to start the RM:
 	</para>
 	<para>
-		<code>rm-admin -d ../../config/rm/deployment/Local4JVMDeployment.xml</code>
+		<code>rm-client -d ../../config/rm/deployment/Local4JVMDeployment.xml</code>
 	</para>
 	<para>
 	This command is strictly equivalent to this one:
 	</para>
 	<para>
-		<code>rm-admin -localNodes</code>
+		<code>rm-client -localNodes</code>
 	</para>
-	<note><para>The command <emphasis>rm-admin</emphasis> can also be used in iteractive mode. Just type <code>rm-admin</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
+	<note><para>The command <emphasis>rm-client</emphasis> can also be used in iteractive mode. Just type <code>rm-client</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
 	</section>
 
 	<section xml:id="submission"><info><title>Submit the job</title></info>
 
 	<para>
-	Finally, submit your job using the <emphasis>scheduler-user</emphasis> script. This script can be used not only for submitting a job, but also, for instance, for retrieving a result (see <xref linkend="retrieve_result"/>).
-	Type <code>scheduler-user -h</code> to find out all you can do wiht this script.
+	Finally, submit your job using the <emphasis>scheduler-client</emphasis> script. This script can be used not only for submitting a job, but also, for instance, for retrieving a result (see <xref linkend="retrieve_result"/>).
+	Type <code>scheduler-client -h</code> to find out all you can do wiht this script.
 	</para>
 	<para>
 	For submitting your job, type the following line:
 	</para>
 	<para>
-		<code>scheduler-user -l user1 -submit ../../samples/jobs_descriptors/Job_nativ.xml</code>
+		<code>scheduler-client -l user -submit ../../samples/jobs_descriptors/Job_nativ.xml</code>
 	</para>
 	<para>
-		The <emphasis>"-submit ../../samples/jobs_descriptors/Job_nativ.xml"</emphasis> option specifies that you want to submit a job whose xml description file is ../../samples/jobs_descriptors/Job_nativ.xml. As for the <emphasis>"-l user1"</emphasis> option, it specifies the login to use.
-		By default, a login "user1" exists and its password is "pwd1". If no login is given to the script, a prompt will ask one and, in both cases (with or without specified login), the password will be asked to you.
+		The <emphasis>"-submit ../../samples/jobs_descriptors/Job_nativ.xml"</emphasis> option specifies that you want to submit a job whose xml description file is ../../samples/jobs_descriptors/Job_nativ.xml. As for the <emphasis>"-l user"</emphasis> option, it specifies the login to use.
+		By default, a login "user" exists and its password is "pwd". If no login is given to the script, a prompt will ask one and, in both cases (with or without specified login), the password will be asked to you.
 	</para>
 	<para>
 	Once done, you can see the line <code>Job successfully submitted ! (id=1)</code> which informs you that your job has well been submitted and gives you its ID (1 in this example).
@@ -772,15 +772,15 @@ public class HelloTask extends JavaExecutable{
 
 	<para>
 	When the scheduling of a job is finished, scheduler stores its result and waits for the user to retrieve it.
-	As it has already been said, the <emphasis>scheduler-user</emphasis> script is used to retrieve results.
+	As it has already been said, the <emphasis>scheduler-client</emphasis> script is used to retrieve results.
 	Launch on scheduler host this following command
 	(still into the <code>[Scheduler_Home_Dir]/bin/[OS]/</code> directory):
 	</para>
 	<para>
-		<code>$ scheduler-user -l user1 -result ID</code>
+		<code>$ scheduler-client -l user -result ID</code>
 	</para>
 	<para>
-		Type the user1's password.
+		Type the user's password.
 		The job result is then displayed:
 	</para>
 	<para>
@@ -796,13 +796,13 @@ public class HelloTask extends JavaExecutable{
 	You have two return codes of the native programs.
 	</para>
 	<para>
-	If you want to see the output of your job, you can use the <emphasis>scheduler-user</emphasis> script with the <emphasis>output</emphasis> option.
+	If you want to see the output of your job, you can use the <emphasis>scheduler-client</emphasis> script with the <emphasis>output</emphasis> option.
 	Type:
 	</para>
 	<para>
-		<code>$ scheduler-user -l user1 -output ID</code>
+		<code>$ scheduler-client -l user -output ID</code>
 	</para>
-	<note><para>In the same way that for the command <emphasis>rm-admin</emphasis>, you can also use the command <emphasis>scheduler-user</emphasis> in interactive mode. Just type <code>scheduler-user</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
+	<note><para>In the same way that for the command <emphasis>rm-client</emphasis>, you can also use the command <emphasis>scheduler-client</emphasis> in interactive mode. Just type <code>scheduler-client</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
 	</section>
 	</section>
 	<section xml:id="sched_gui"><info><title>Using the GUI client application for job submission</title></info>
@@ -810,7 +810,7 @@ public class HelloTask extends JavaExecutable{
 	<para>
 		An RCP graphical user interface exists for jobs submition and results consultation.
 		Download the <emphasis>Scheduler RCP Client</emphasis> from
-    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.activeeon.com/downloads.html">http://www.activeeon.com/downloads.html</uri> and uncompress the application.
+    <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.activeeon.com/products">http://www.activeeon.com/products</uri> and uncompress the application.
 		Then, go to the Scheduler directory of uncompressed files, and launch the program:
 	</para>
 	<para>

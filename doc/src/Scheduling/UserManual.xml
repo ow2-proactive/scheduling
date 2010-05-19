@@ -2,7 +2,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="user_manual"><info><title>User guide</title></info>
 	<section xml:id="Create_job"><info><title>Create a job</title></info>
 		<para>
-			A job is the entity that will be submitted to the ProActive Scheduler. As it has been explained in the <xref linkend="what_is_job"/>, it is possible to create more than one type of job. A job can be created using an XML descriptor or the provided ProActive Scheduler Java API or also with a simple flat file.
+			A job is the entity that will be submitted to the ProActive Scheduler. As it has been explained in the <xref linkend="what_is_job"/>, it is currently possible to create one type of job. A job can be created using an XML descriptor or the provided ProActive Scheduler Java API or also with a simple flat file.
 		</para>
 		<section xml:id="Create_job_xml"><info><title>Job XML descriptor</title></info>
 			<para>
@@ -1082,7 +1082,7 @@ task2.setGenerationScript(gscript);
 				</mediaobject>
 			</figure>
 			<para>
-				The Scheduler (0) is always connected to default INPUT(1) and OUTPUT(6) spaces, defined by the administrator.
+				The Scheduler (0) is always connected to default INPUT(1) and OUTPUT(6) spaces, defined by the administrator or in you own job.
 				INPUT space (read-only) is used to store every files and data needed by a job. Each task should be able to
 				read and/or write data in the OUTPUT space (read-write).
 				As there are default INPUT/OUTPUT spaces, users can also define theirs own data spaces by specifying them
@@ -1138,7 +1138,7 @@ task2.setGenerationScript(gscript);
 				</para>
 				<programlisting language="java">
 //...
-//job is create above ...
+//job is created above ...
 job.setInputSpace("http://myserver/directory");
 job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path=/");
 //...
@@ -1164,7 +1164,7 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 								path to the file you want to select in the job space. For example, "bin/toto*.xml" will target
 								every files starting with 'toto' and ending with '.xml' in the 'bin' directory relative to the chosen space.
 								(mandatory)
-								Note: for read-only (as HTTP) INPUT space, includes files must not be regular expression.
+								Note: for read-only and non listable INPUT space (as HTTP), includes files must not be regular expression.
 							</para>
 						</listitem>
 						<listitem>
@@ -1255,7 +1255,7 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 //job.addTask(t);
 					</programlisting>
 					<para>
-						At the end of the task, LOCALSPACE is cleared, every files deleted.
+						<emphasis>IMPORTANT</emphasis> : At the end of the task, LOCALSPACE is cleared, every files deleted.
 					</para>
 				</section>
 				<section xml:id="Dataspace_java"><info><title>Retrieving spaces and files in a java task</title></info>
@@ -1268,12 +1268,14 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 								<para>
 									<emphasis>getInputSpace()</emphasis>: retrieves the root of INPUT space.
 									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+									(Warning ! Files are probably not on the node host)
 								</para>
 							</listitem>
 							<listitem>
 								<para>
 									<emphasis>getOutputSpace()</emphasis>: retrieves the root of OUTPUT space.
 									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+									(Warning ! Files are probably not on the node host)
 								</para>
 							</listitem>
 							<listitem>
@@ -1287,7 +1289,8 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 									<emphasis>getInputFile(pathName)</emphasis>: selects the file located at "pathName" in the INPUT space.
 									"pathName" has to be relative to the root of the INPUT.
 									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
-									File can be moved, copied or read.
+									Files can be moved, copied or read.
+									(Warning ! Files are probably not on the node host)
 								</para>
 							</listitem>
 							<listitem>
@@ -1296,6 +1299,7 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 									"pathName" has to be relative to the root of the OUTPUT.
 									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
 									File can be moved, copied, read or written.
+									(Warning ! Files are probably not on the node host)
 								</para>
 							</listitem>
 							<listitem>
@@ -1303,7 +1307,7 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 									<emphasis>getLocalFile(pathName)</emphasis>: selects the file located at "pathName" in the LOCAL space.
 									"pathName" has to be relative to the root of the LOCALSPACE.
 									You will get a DataSpacesFileObject on which it is possible to perform some file operations.
-									File can be moved, copied, read or written.
+									File can be moved, copied, read or written. (local copy)
 								</para>
 							</listitem>
 						</itemizedlist>
@@ -1366,8 +1370,8 @@ public class DSTest extends JavaExecutable {
 			</section>
 			<section xml:id="Submit_a_job_sh"><info><title>Submit a job using the shell command</title></info>
 				<para>
-					Use the provided shell script <emphasis>scheduler-user[.bat]</emphasis> to submit a job using command line.
-					This script (bin/[os]/scheduler-user[.bat] used to submit a job) has 1 mandatory option and 2 optional :
+					Use the provided shell script <emphasis>scheduler-client[.bat]</emphasis> to submit a job using command line.
+					This script (bin/[os]/scheduler-client[.bat] used to submit a job) has 1 mandatory option and 2 optional :
 					<itemizedlist>
 						<listitem>
 							<para>
@@ -1409,7 +1413,7 @@ public class DSTest extends JavaExecutable {
 				</para>
 				<para>
 					<emphasis>
-						scheduler-user[.bat] -submit ../../samples/jobs_descriptors/Job_with_dep.xml -l login -u //localhost:1099/
+						scheduler-client[.bat] -submit ../../samples/jobs_descriptors/Job_with_dep.xml -l login -u //localhost:1099/
 					</emphasis>
 					will submit the <literal>Job_with_dep</literal> job to a local
 					ProActive Scheduler on port 1099 with the username 'login', and only your password will be requested.
@@ -1417,47 +1421,51 @@ public class DSTest extends JavaExecutable {
 				</para>
 				<para>
 					<emphasis>
-						scheduler-user[.bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/cmds_file.cmd -cmdf -l demo //localhost/ -jn myJob -o myJob.log
+						scheduler-client[.bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/cmds_file.cmd -cmdf -l demo //localhost/ -jn myJob -o myJob.log
 					</emphasis>
 					will submit a job defined in a flat file, containing 4 native commands. Job is named "myJob", and a log file named "myJob.log" will be created.
 				</para>
 				<para>
 					<emphasis>
-						scheduler-user[.bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/myCmd.sh 4 -cmd -l demo -u //localhost -s ../../samples/scripts/selection/select.rb
+						scheduler-client[.bat] -submit ../../samples/jobs_descriptors/job_native_linux_cmd_file/myCmd.sh 4 -cmd -l demo -u //localhost -s ../../samples/scripts/selection/select.rb
 					</emphasis>
 					will submit the native command "myCmd.sh" with "4" as the only argument. A selection script is associated for this native command: "select.rb".
 				</para>
 				<para>
-					For more information, use -h (or --help) option (i.e. "scheduler-user[.bat] -h").
+					For more information, use -h (or --help) option (i.e. "scheduler-client[.bat] -h").
 				</para>
 			</section>
 			<section xml:id="Submit_a_job_java"><info><title>Submit a job using the Java API</title></info>
 				<para>
-					To connect the ProActive Scheduler and submit a Job using Java API, just proceed as follows:
+					To connect the ProActive Scheduler and submit a Job using Java API, just proceed as follows :
 				</para>
 				<programlisting language="java">
 //join an existing ProActive Scheduler retrieving an authentication interface.
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
-//connect and log to the Scheduler. Valid username and password are defined by the administrator
-UserSchedulerInterface scheduler = null;
 try {
-    // (1) preferred authentication method
-    scheduler = auth.logAsUser(Credentials.getCredentials());
-} catch (KeyException e) {
-    try {
-        // (2) valid authentication method
-        PublicKey pubKey = auth.getPubKey();
-        if (pubKey == null) {
-             pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
-        }
-        scheduler = auth.logAsUser(Credentials.createCredentials("username", "password", pubKey));
-    } catch (KeyException e) {
-        // (3) deprecated authentication method
-        scheduler = auth.logAsUser("username", "password");
-    }
+	SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("protocol://host:port");
+	//connect and log to the Scheduler. Valid username and password are defined by the administrator
+	Scheduler scheduler = null;
+	try {
+	    // (1) preferred authentication method
+	    scheduler = auth.login(Credentials.getCredentials());
+	} catch (KeyException ke) {
+	    try {
+	        // (2) alternative authentication method
+	        PublicKey pubKey = auth.getPublicKey();
+	        if (pubKey == null) {
+	             pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
+	        }
+	        scheduler = auth.login(Credentials.createCredentials("demo", "demo", pubKey));
+	    } catch (KeyException ke2) {
+	        //cannot find public key !
+	    }
+	}
+	// submitting a new job and get the associated id
+	JobId myJobId = scheduler.submit(job);
+} catch (ConnectionException e) {
+	//cannot join scheduler !
+	e.printStackTrace();
 }
-// submitting a new job and get the associated id
-JobId myJobId = scheduler.submit(job);
 				</programlisting>
 				<para>
 				  Connecting to the Scheduler implicates using a keypair infrastructure to establish a secure channel on
@@ -1520,7 +1528,7 @@ scheduler.submit(job);
 			</section>
 			<section xml:id="get_result_sh"><info><title>Get a job result using the shell command</title></info>
 				<para>
-					To get the result of you job using a command line, launch the command <emphasis>scheduler-user[.bat] -result jobID</emphasis> script in the bin/[os]/ directory.
+					To get the result of you job using a command line, launch the command <emphasis>scheduler-client[.bat] -result jobID</emphasis> script in the bin/[os]/ directory.
 					This script has 2 optional options:
 					<itemizedlist>
 						<listitem>
@@ -1543,13 +1551,13 @@ scheduler.submit(job);
 					toString() Java method could have done it.
 				</para>
 				<para>
-					For more information, use -h (or --help) option (i.e. "scheduler-user[.bat] -h").
+					For more information, use -h (or --help) option (i.e. "scheduler-client[.bat] -h").
 				</para>
 			</section>
 			<section xml:id="get_result_java"><info><title>Get a job result using the Java API</title></info>
 				<para>
 					To do it in Java, use the <emphasis role="bold">getJobResult(JobId)</emphasis> method in the
-					<emphasis role="bold"> UserSchedulerInterface </emphasis> interface and the job ID you got when you submitted it.
+					<emphasis role="bold"> Scheduler </emphasis> interface and the job ID you got when you submitted it.
 					A job result is in fact a list of task result ordered in three lists:
 				</para>
 				<itemizedlist>
@@ -1583,14 +1591,14 @@ scheduler.submit(job);
 					will be explain in the next section.
 				</para>
 				<programlisting language="java">
-// get the user interface
-UserSchedulerInterface scheduler = auth.logAsUser(Credentials.getCredentials());
+// get the Scheduler interface
+Scheduler scheduler = auth.login(Credentials.getCredentials());
 // get the result of the job
 JobResult myResult = scheduler.getJobResult(myJobId);
 //look at inside the JobResult to retrieve TaskResult...
 				</programlisting>
 				<para>
-					The above example is useful when you kept a reference of myJobId. If you want to submit a job and disconnect, just keep
+					<emphasis>Note</emphasis> : The above example is useful when you kept a reference of myJobId. If you want to submit a job and disconnect, just keep
 					the id as a string (using myJobId.value() ). Then when reconnecting the Scheduler to get the result,
 					just use the getJobResult(String jobId) method.
 				</para>
@@ -1638,14 +1646,14 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 		</section>
 		<section xml:id="scheduler_controller"><info><title>Using the Scheduler controller</title></info>
 			<para>
-				The Scheduler controller provides a way to interact with the Scheduler. Start it with the <emphasis>bin/[os]/scheduler-user[.bat]</emphasis>
+				The Scheduler controller provides a way to interact with the Scheduler. Start it with the <emphasis>bin/[os]/scheduler-client[.bat]</emphasis>
 				script. You can use it as a command line (as shown
 				in some examples above, go to <xref linkend="scheduler_controller_non_interactive"/>) or in interactive mode (go to
 				<xref linkend="scheduler_controller_interactive"/>).
 			</para>
 			<section xml:id="scheduler_controller_non_interactive"><info><title>Command line mode</title></info>
 				<para>
-					Here is the displayed help when using <emphasis>scheduler-user[.bat] -h</emphasis> command:
+					Here is the displayed help when using <emphasis>scheduler-client[.bat] -h</emphasis> command:
 					<figure xml:id="scheduler_controller_help"><info><title>Scheduler controller help</title></info>
 						<mediaobject>
 							<imageobject>
@@ -1660,20 +1668,20 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis>scheduler-user[.bat] -l demo -submit path/to/job/xml/descriptor</emphasis>: tries to connect user demo, prompts for
+							<emphasis>scheduler-client[.bat] -l demo -submit path/to/job/xml/descriptor</emphasis>: tries to connect user demo, prompts for
 							its password and submits the given XML descriptor file.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>scheduler-user[.bat] -l demo -cmd -jn test -submit ls -al</emphasis>: tries to connect user demo, prompts for
+							<emphasis>scheduler-client[.bat] -l demo -cmd -jn test -submit ls -al</emphasis>: tries to connect user demo, prompts for
 							its password and submits the given command line in a job named 'test'. In this case, the <emphasis role="italics">-cmd</emphasis> option forces
 							the argument of <emphasis role="italics">-submit</emphasis> option to be a command line.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>scheduler-user[.bat] -cmdf -s path/to/a/selection/script -submit path/to/a/text/file</emphasis>: prompts for a username and
+							<emphasis>scheduler-client[.bat] -cmdf -s path/to/a/selection/script -submit path/to/a/text/file</emphasis>: prompts for a username and
 							its password and submits the given commands file. It also includes the given selection script file.
 							In this case, the <emphasis role="italics">-cmdf</emphasis> option forces
 							the argument of <emphasis role="italics">-submit</emphasis> option to be a flat text file that contains
@@ -1682,19 +1690,19 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>scheduler-user[.bat] -output 12</emphasis>: prompts for a username and
+							<emphasis>scheduler-client[.bat] -output 12</emphasis>: prompts for a username and
 							its password and displays the output written by job 12 if it is finished.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>scheduler-user[.bat] -result 34</emphasis>: prompts for a username and
+							<emphasis>scheduler-client[.bat] -result 34</emphasis>: prompts for a username and
 							its password and displays the result of job 34 if it is finished.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis>scheduler-user[.bat] -priority 56 Lowest</emphasis>: prompts for a username and
+							<emphasis>scheduler-client[.bat] -priority 56 Lowest</emphasis>: prompts for a username and
 							its password and requests the Scheduler to change job 56 priority to 'LOWEST'.
 						</para>
 					</listitem>
@@ -1734,8 +1742,8 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 			<section xml:id="scheduler_controller_interactive"><info><title>Interactive mode</title></info>
 				<para>
 					Another way to interact with the Scheduler is using the interactive mode of the controller. To start it in this mode,
-					just execute the bin/[os]/scheduler-user[.bat] command without specifying a 'ctl' option:
-					<emphasis>scheduler-user[.bat] -l demo -u rmi://localhost:1313/</emphasis> is an example which connects the controller
+					just execute the bin/[os]/scheduler-client[.bat] command without specifying a 'ctl' option:
+					<emphasis>scheduler-client[.bat] -l demo -u rmi://localhost:1313/</emphasis> is an example which connects the controller
 					to a local Scheduler on the port 1313 with 'demo' login.
 				</para>
 				<para>
