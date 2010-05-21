@@ -146,9 +146,10 @@ PASchedulerProperties.updateProperties("your_property_file");
 			</para>
 			<section xml:id="PASchedulerProperties"><info><title>ProActive Scheduler properties</title></info>
 				<para>
-					<emphasis>Note1: </emphasis> some properties require a file path. File path can be given relative to the Scheduler home directory
-					(i.e. to the application root directory) OR with an absolute path. Also note that each property can be overridden by
-					using the JVM properties when starting the Scheduler. (i.e. scheduler-start[.bat] -Dpa.scheduler.core.timeout=1000)
+					<emphasis>Note1: </emphasis> some properties require a file path. File path can be given relative, and if so,
+					if will be relative to the Scheduler home directory (i.e. to the application root directory) OR with an absolute path.
+					Also note that each property can be overridden by using the JVM properties when starting the Scheduler.
+					(i.e. scheduler-start[.bat] -Dpa.scheduler.core.timeout=1000)
 				</para>
 				<para>
 					<emphasis>Note2: </emphasis> the main properties file could be found at
@@ -209,7 +210,13 @@ PASchedulerProperties.updateProperties("your_property_file");
 					<listitem>
 						<para>
 							<emphasis role="italics">pa.scheduler.core.jmx.port</emphasis>: Port number used by JMX.
-				This port is used only for JMX service and the RMI protocol. It will create a RMI registry if needed.
+							This port is used only for JMX service and the RMI protocol. It will create a RMI registry if needed.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.account.refreshrate</emphasis>: Accounting refresh rate from the database.
+							Amount of time between request to the DB for accounting purpose. (Value specified in seconds, default is 10)
 						</para>
 					</listitem>
 					<listitem>
@@ -218,6 +225,28 @@ PASchedulerProperties.updateProperties("your_property_file");
 							user is automatically disconnect after this time if no request is made to the scheduler, it can be used to restrict
 							the duration of a session.
 							Negative number indicates that session is infinite (value specified in second)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.core.starttask.timeout</emphasis>: Timeout for the start task action.
+							Time during which the scheduling process could be waiting. This value relies on the system and network capacity
+							(Value specified in milliseconds, default is 2000)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.core.starttask.threadnumber</emphasis>: Maximum number of threads used
+							for the start task action. This property define the number of blocking resources until the scheduling loop will block as well.
+							(default is 5)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.core.listener.threadnumber</emphasis>: Maximum number of threads used
+							to send events to clients. This property defines the number of clients than can block at the same time.
+							If this number is reached, every clients won't receive events until a thread unlock.
+							(default is 5)
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -237,6 +266,14 @@ PASchedulerProperties.updateProperties("your_property_file");
 						<para>
 							<emphasis role="italics">pa.scheduler.core.removejobdelay</emphasis>: time interval between the retrieval of a job result and its suppression from the Scheduler
 							specified in second. Set this time to 0 if you don't want the job to be remove anyway. (default is 3600)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="italics">pa.scheduler.core.automaticremovejobdelay</emphasis>: Automatic remove job delay.
+							(The time between the termination of the job and removing it from the scheduler).
+							Set this time to 0 if you don't want the job to be remove automatically.
+							(Value specified in seconds, default is 0)
 						</para>
 					</listitem>
 					<listitem>
@@ -427,16 +464,8 @@ PASchedulerProperties.updateProperties("your_property_file");
 				<itemizedlist>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.resourcemanager.authentication.username</emphasis>:
-							default username to connect the Resources Manager. Possible authentications are defined
-							by the RM authentication management. (default is scheduler)
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							<emphasis role="italics">pa.scheduler.resourcemanager.authentication.password</emphasis>:
-							default password to connect the Resources Manager. Possible authentications are defined
-							by the RM authentication management. (default is scheduler_pwd)
+							<emphasis role="italics">pa.scheduler.resourcemanager.authentication.credentials</emphasis>:
+							Path to the Scheduler credentials file for RM authentication. (default is config/authentication/scheduler.cred)
 						</para>
 					</listitem>
 				</itemizedlist>
@@ -488,11 +517,11 @@ PASchedulerProperties.updateProperties("your_property_file");
 					</itemizedlist>
 				</para>
 				<para>
-					For example, the following line will launch a scheduler on a Resource Manager started on "toto". It will also use
+					For example, the following line will launch a scheduler on a Resource Manager started on "localhost" (which is in fact, the same as 'no argument'). It will also use
 					the 'PriorityPolicy' scheduling policy:
 				</para>
 				<para>
-					<code>scheduler-start[.bat] -u //toto/ -p org.ow2.proactive.scheduler.policy.PriorityPolicy</code>
+					<code>scheduler-start[.bat] -u rmi://localhost/ -p org.ow2.proactive.scheduler.policy.PriorityPolicy</code>
 				</para>
 				<para>
 					By default, the "config/authentication/" directory has to contain the two authentication files (group and login).
@@ -637,9 +666,9 @@ SchedulerFactory.createScheduler(
 							<xref linkend="Submit_a_job_java"/> for how to use Credentials):
 							<programlisting language="java">
 // connecting to the scheduler
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
+SchedulerAuthenticationInterface auth = SchedulerConnection.join("rmi://localhost");
 // checking username and password
-UserSchedulerInterface scheduler = auth.logAsUser(Credentials.getCredentials());
+Scheduler scheduler = auth.login(Credentials.getCredentials());
 // submitting a new job and get the associated id
 JobId myJobId = scheduler.submit(job);
 							</programlisting>
@@ -718,13 +747,12 @@ SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
 							</programlisting>
 							<para>
 								Then, with the <emphasis role="bold">SchedulerAuthenticationInterface</emphasis>,
-								users can be connected as user or administrator roles using the
-								<emphasis role="bold">logAsUser</emphasis> or <emphasis role="bold">logAsAdmin</emphasis> methods
+								users can be connected as client using the
+								<emphasis role="bold">login</emphasis> method
 								(see <xref linkend="Submit_a_job_java"/> for how to use Credentials).
 							</para>
 							<programlisting language="java">
-UserSchedulerInterface scheduler = auth.logAsUser(Credentials.getCredentials());
-// OR AdminSchedulerInterface scheduler = auth.logAsAdmin(Credentials.getCredentials());
+Scheduler scheduler = auth.login(Credentials.getCredentials());
 							</programlisting>
 						</listitem>
 						<listitem>
@@ -743,27 +771,26 @@ UserSchedulerInterface scheduler = auth.logAsUser(Credentials.getCredentials());
 						<listitem>
 							<para>
 								If nothing goes wrong, the authentication interface will return a
-								<emphasis role="bold">UserSchedulerInterface</emphasis> or a
-								<emphasis role="bold">AdminSchedulerInterface</emphasis>
+								<emphasis role="bold">Scheduler</emphasis>
 								which is in fact a direct link to the <emphasis role="bold">Front-end</emphasis>.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
-								The user is now able to interact with the Scheduler using the returned interface.
+								The client is now able to interact with the Scheduler using the returned interface.
 							</para>
 						</listitem>
 					</orderedlist>
 				</para>
 				<para>
 					And now, to administer the ProActive Scheduler, just connect to it if it is not already done and use the
-					<emphasis role="bold">AdminSchedulerInterface</emphasis> to manage it. Take a look at the JavaDocumentation
+					<emphasis role="bold">Scheduler</emphasis> to manage it. Take a look at the JavaDocumentation
 					to get more details and features. Let's remind how to connect the Scheduler as an administrator (see
 					<xref linkend="Submit_a_job_java"/> for how to use Credentials):
 				</para>
 				<programlisting language="java">
 SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/");
-AdminSchedulerInterface scheduler = auth.logAsAdmin(Credentials.getCredentials());
+Scheduler scheduler = auth.login(Credentials.getCredentials());
 				</programlisting>
 				<para>
 					Then, use the returned 'scheduler' object to communicate with the ProActive Scheduler as an administrator. One interesting thing
@@ -784,7 +811,7 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 				To the default tmp dir, "scheduling/" will first be appended and then the 'defaultinput' and 'defaultoutput' directories.
 				Finally, the username of the job owner will be also added to the previous path.
 				For instance, if "defaultinput" is set to "myInput" and my username is "myUserName", then my INPUT data space will be
-				/tmp/scheduling/myInput/myUserName (if the temporary directory is /tmp).
+				<emphasis>/tmp/scheduling/myInput/myUserName</emphasis> (if the temporary directory is /tmp).
 			</para>
 			<para>
 				For example, to set the default INPUT space of the scheduler, just set the 3 following properties:
@@ -1024,9 +1051,13 @@ pa.scheduler.core.authentication.loginMethod=SchedulerFileLoginMethod</programli
 				The default <literal>login.cfg</literal> file is given hereafter:</para>
 				<programlisting language="java">
 admin:admin
-user1:pwd1
-user2:pwd2
-demo:demo</programlisting>
+demo:demo
+user:pwd
+test:pwd
+radmin:pwd
+nsadmin:pwd
+provider:pwd
+scheduler:scheduler_pwd</programlisting>
 				</listitem>
 				<listitem><para><emphasis>config/authentication/group.cfg</emphasis> stores the user names of memberships. For each
 				user registered in <literal>login.cfg</literal>, a group membership has to be defined in this file.
@@ -1036,9 +1067,15 @@ demo:demo</programlisting>
 				<programlisting language="java">
 admin:admin
 demo:admin
-demo:admin
-user1:user
-user2:user</programlisting>
+
+provider:providers
+
+user:user
+scheduler:user
+
+radmin:rmcoreadmins
+nsadmin:nsadmins
+admin:nsadmins</programlisting>
 				</listitem>
 			</itemizedlist>
 			<para>You can change the default paths of these two files. Edit the <emphasis>config/scheduler/settings.ini</emphasis> file and change
