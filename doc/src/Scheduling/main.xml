@@ -38,33 +38,13 @@
 		&Plugin;
 	</part>
 
-	<part xml:id="SchedulingWithMatlab">
+	<part xml:id="ProActiveSchedulingExtensions">
 		<info>
-			<title>ProActive Scheduler's Matlab extension</title>
+			<title>ProActive Scheduler's Extensions</title>
 		</info>
 		&Matlab;
-	</part>
-
-	<part xml:id="SchedulingWithScilab">
-		<info>
-			<title>ProActive Scheduler's Scilab extension</title>
-		</info>
 		&Scilab;
-	</part>
-
-	<part xml:id="SchedulingWithModelica">
-		<info>
-			<title>Scheduling examples of Modelica simulations</title>
-		</info>
 		&Modelica;
-	</part>
-
-	<part xml:id="FilesSplitMerge">
-		<info>
-			<title>
-				ProActive Scheduler's Files Split-Merge extension
-			</title>
-		</info>
 		&FilesSplitMerge;
 	</part>
 
