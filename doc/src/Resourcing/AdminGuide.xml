@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager_admin"><info><title>Administration guide</title></info>
+
+	&ConfigurationGuide;
+	&CLI;
+	&NodeSource;
+	&AdminJavaAPI;
+	&GUI;
+</chapter>

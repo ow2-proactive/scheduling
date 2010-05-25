@@ -1,49 +1,136 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_deployment"><info><title>Launch Resource Manager and deploy computing nodes</title></info>
-			<para>
-					This part explains how to launch Resource Manager and how to deploy new
-					ProActive nodes and add them to the Resource Manager. Basically, Resource Manager deploys computing nodes by using GCM deployment
-					standard implemented in ProActive. This standard provides a way to specify in XML descriptors, the whole deployment
-					of a distributed application. Resource Manager uses this standard to deploy computing nodes and aggregate them in a pool
-					of computing nodes.
-			</para>
-			<warning><para>
-			ProActive Scheduling 1.0.0 supports only 'one node per JVM' configuration (i.e. GCMD vmCapacity set to 1). In the following, the term "node" always
+<?xml version="1.0" encoding="utf-8"?>
+<section xml:id="nodes_sources"><info><title>Organizing your nodes</title></info>
+		<para>
+			The ProActive resource manager supports nodes aggregation from the heterogeneous
+			environment. As a node is just a JVM running somewhere the process of communication
+			to such nodes is unified and defined by ProActive library. The only part which has to
+			be defined is the procedure of nodes deployment which could be quite different
+			depending on infrastructures and their limitations.
+
+			After <link linkend="rm-install">installation</link> of the server and node parts
+			it is possible to configure an automatic nodes deployment.
+			Basically you are saying to the resource manager how to launch JVMs with
+			ProActive nodes and when.
+		</para>
+
+		<note><para>
+			Lets give an example here. You have a cluster of linux-x64 machines
+			permanently at your disposal with ssh access to all hosts
+			and a cluster running Windows HPC where you'd like
+			to run computations periodically (lets say from 12 to 14 each day).
+			In order to describe such kind of behavior we create 2 node sources
+			using GUI or command line interface. The first one is the node source
+			with "ssh infrastructure" and static deployment policy. The command would be
+			the following
+			<screen><![CDATA[$RM_HOME>./bin/unix/rm-client --createns "MyCluster" -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
+javaPath schedulingPath protocol port javaOptions hostsList]]></screen>
+			The semantic of this command is quite straight forward, namely the resource
+			manager tries immediately launch the command of JVM creation through ssh using a special
+			class which creates ProActive nodes inside JVMs and register them in the resource manager.
+			Static node acquisition is default and you don't have to explicitly specify it.
+		</para>
+		<para>
+			The procedure of deployment on Windows HPC is more tricky because it involves the native scheduler
+			and in order to take into account other users of the cluster we have to go through it.
+			Basically what the resource manager does is contact the windows scheduler
+			exposed as a web service (it requires additional configuration of windows cluster)
+			and submit a job launching the JVM process with ProActive. Here we also describe
+			when the deployment has to be triggered using time slot policy.
+			<screen><![CDATA[$RM_HOME>./bin/unix/rm-client --createns "WindowsCluster" -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure
+maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmPath RMUrl RMCredentialsPath javaOptions extraClassPath
+-policy org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy nodesAvailableTo administrator acquireTime releaseTime period preemptive]]></screen>
+		</para>
+		</note>
+
+		<para>
+			As you can see in the example above in order to create a node source you have to define two entities
+			<emphasis>infrastructure manager</emphasis> and
+			<emphasis>node source policy</emphasis>.
+		</para>
+		<para>
+			<emphasis>Infrastructure manager</emphasis> is responsible for communication with an infrastructure.
+			When a new node has to be deployed, an infrastructure manager will launch new JVM or just
+			request an already existing nodes running somewhere. All these details are specific to the
+			infrastructure manager implementation. ProActive library already has its own mechanism for
+			deployment called <link xlink:href="http://proactive.inria.fr/trunk/Programming/ReferenceManual/multiple_html/GCMDeployment.html">
+			ProActive Grid Component Model Deployment</link> and the resource manager reuses this framework
+			adding another flexible mechanism to perform deployment.
+		</para>
+
+		<warning><para>
+			ProActive Scheduling supports only one node per JVM. So that if you're configuring
+			the resource manager to be used with scheduler take it into account.
+			In the following, the term "node" always
 			refers to a <emphasis>single node deployed in a dedicated JVM.</emphasis>
-			</para></warning>
-			<section xml:id="RM_start"><info><title>Launch the Resource Manager</title></info>
+		</para></warning>
+
+		<para>
+			<emphasis>Node source policy</emphasis> is a set of rules and conditions which describes
+			when and how many nodes have to be acquired or released. Policies use node source API to
+			manage the node acquisition.
+		</para>
+		<para>
+			Node sources were designed in a way that:
+		</para>
+
+		<itemizedlist>
+			<listitem>
 				<para>
-					To start the Resource Manager, run the <emphasis>rm-start[.bat]</emphasis>
-					script in 'bin/[os]/' directory. By default, Resource Manager will be started empty (without computing nodes).
-					You can specify some arguments:
-					<itemizedlist>
-						<listitem> <para><emphasis>-ln</emphasis> or <emphasis>--localNodes</emphasis>,
-						to start Resource manager with deploying 4 local nodes</para>
-						</listitem>
-						<listitem> <para><emphasis>-d</emphasis> or <emphasis>--deploy</emphasis>, followed by a list
-						of GCM deployment files (GCMD, see below for GCM utilisation) - Resource Manager starts deploys
-						these GCMD.</para>
-						</listitem>
-						<listitem> <para><emphasis>-h</emphasis> or <emphasis>--help</emphasis> -
-						to print command line help.</para>
-						</listitem>
-					</itemizedlist>
+					All logic related to node acquisition is encapsulated in the infrastructure manager.
 				</para>
-			</section>
-			<section xml:id="RM_GCM"><info><title>Define GCM Deployment files</title></info>
+			</listitem>
+			<listitem>
 				<para>
-				    ProActive Resource Manager relies on GCM Deployment standard to deploy computing nodes.
-					GCM standard implies that an application could be deployed anywhere without changing the source code.
-					For instance, You can use various protocols such as rsh, ssh, Globus, LSF, etc,  for the creation
-					of the JVMs needed by the application (see details in ProActive manual, chapter 19:<emphasis>ProActive GCM Deployment</emphasis>).
-				    This section presents the main concepts of the GCM deployment mechanism, namely, how to write GCM Deployment descriptors
-				    and how to use it with Resource Manager.
+					Conditions and rules of node acquisition is described in
+					the node source policy.
 				</para>
+			</listitem>
+			<listitem>
 				<para>
-					There are many ways to add nodes to Resource Manager with GCM deployment.
-					You can acquire already deployed nodes using various protocols or deploy nodes on Microsoft CCS cluster
-					and some other platforms/protocols. You can use bridges in GCMD if remote hosts are not directly
-					reachable from your LAN.
+					New infrastructure manager or node source policy can be dynamically plugged into the Resource Manager.
+					In order to do that, it is just required to add new implemented classes in the class path and update
+					corresponding list in the configuration file (<code>[RM_HOME]/config/rm/nodesource</code>).
 				</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			In the resource manager there is always a default node source consisted of DefaultInfrastrucureManager and
+			Static policy. It is not able to deploy nodes anywhere but makes it possible to add existing nodes
+			to the RM.
+		</para>
+
+		<section xml:id="default"><info><title>Default infrastructure</title></info>
+			<para>
+				<emphasis>Default infrastructure manager</emphasis> is designed to be used with ProActive agent.
+				It cannot perform an automatic deployment but any users (including an agent) can add already existing nodes
+				into it. In order to create a node source with with infrastructure run the following command
+				<programlisting>
+$RM_HOME>./bin/unix/rm-client --createns defaultns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager
+				</programlisting>
+			</para>
+		</section>
+		<section xml:id="RM_GCM"><info><title>GCM infrastructure</title></info>
+			<para>
+				<emphasis>GCM infrastructure manager</emphasis> is able to deploy nodes on the
+				infrastructure described in GCM deployment descriptor.
+				It supports only "deploy all" / "remove all" operations
+				and cannot deploy a single node (due to GCMD limitations)
+				and as a consequence cannot be used with some policies. Here is an example of such node source
+				creation
+			</para>
+			<programlisting>
+$RM_HOME>./bin/unix/rm-client --createns gcmdns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure config/rm/deployment/Local4JVMDeployment.xml
+			</programlisting>
+
+			<para>
+			    ProActive Resource Manager relies on GCM Deployment standard to deploy computing nodes.
+				GCM standard implies that an application could be deployed anywhere without changing the source code.
+				For instance, You can use various protocols such as rsh, ssh, Globus, LSF, etc,  for the creation
+				of the JVMs needed by the application (see details in ProActive manual, chapter 19:<emphasis>ProActive GCM Deployment</emphasis>).
+			    This section presents the main concepts of the GCM deployment mechanism, namely, how to write GCM Deployment descriptors
+			    and how to use it with Resource Manager.
+			</para>
 
 				<section xml:id="RM_GCM_concepts"><info><title>Main concepts</title></info>
 					<section xml:id="RM_GCMA_GCMD"><info><title>GCM Application descriptor and GCM Deployment descriptor</title></info>
@@ -242,8 +329,93 @@
 						</para>
 						<programlisting language="xml"><textobject><textdata fileref="code_snippets/deployment/gcmd_custom.xml"/></textobject></programlisting>
 					</section>
-
-
 				</section>
 		</section>
-</chapter>
+		<section xml:id="GCM_customized"><info><title>GCM customized infrastructure</title></info>
+				<para>
+					<emphasis>GCM customized infrastructure</emphasis> can deploy / remove
+					a single node to / from the infrastructure described in GCM descriptor.
+					It makes possible to use this insfrastructure manager together with
+					more pricise policies such as "scheduler aware policy" (see below).
+					In order to create such node source user has to specify GCMD
+					and hosts list. GCMD has to define a deployment of
+					a single node and does not have to have an explicit host names.
+					Instead of this ${HOST} variable must be used and at the
+					moment of deployment the resource manager associates host
+					to the gcmd. (see $RM_HOME/config/rm/deployment/deployment_ssh_hosts_list_template.xml)
+				<programlisting>
+$RM_HOME>./bin/unix/rm-client --createns gcmns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure config/rm/deployment/deployment_ssh_hosts_list_template.xml config/rm/deployment/hostslist
+				</programlisting>
+				</para>
+		</section>
+		<section xml:id="SSH"><info><title>SSH infrastructure</title></info>
+				<para>
+				This infrastructure allows to deploy nodes over ssh. Having a list of hosts the resource manager
+				construct the ssh command to launch remote JVMs. Java path and rm distribution path on remote hosts
+				have to be specified togewther with other parameters. Example:
+				</para>
+				<programlisting>
+$RM_HOME>./bin/unix/rm-client --createns sshns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure JAVA_PATH RM_HOME rmi 1099 \"\" config/rm/deployment/hostslist
+				</programlisting>
+		</section>
+		<section xml:id="Win_HPC"><info><title>Windows HPC infrastructure</title></info>
+				<para>
+					The deployment through Windows HPC scheduler. In order to make it functional
+					the Windows HPC has to be configured according to
+					<link xlink:href="http://technet.microsoft.com/en-us/library/cc972837(WS.10).aspx">this guide</link>.
+					After exposing windows native scheduler as a web service it's possible to contact
+					it from Java and submit any command. In our case it's a command launching JVM on one of the
+					cluster nodes.
+				</para>
+				<programlisting>
+$RM_HOME>./bin/unix/rm-client --createns winhpc -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure 8 https://cluster_name/HPCBasicProfile username password trustStore trustStorePassword javaPath rmPath RMUrl RMCredentialsPath javaOptions extraClassPath
+				</programlisting>
+		</section>
+		&EC2;
+		<section xml:id="PBS"><info><title>Portable Batch System infrastructure</title></info>
+				<para>
+				This infrastructure know how to acquire nodes from PBS (ie Torque) by submitting
+				a corresponding job. It will be submitted through SSH from the RM to the PBS server.
+				As an alternative, you may consider using {@link GCMInfrastructure}
+				instead, which provides more control over the deployment, but requires more configuration.
+				</para>
+				<programlisting>
+$RM_HOME>./bin/unix/rm-client --createns pbs -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure javaPath schedulingPath protocol port javaOptions maxNodes PBSServer RMUrl RMCredentialsPath qsubOptions
+				</programlisting>
+		</section>
+		&Virtualization;
+		<section xml:id="static"><info><title>Static policy</title></info>
+				<para>
+					<emphasis>Static node source policy</emphasis> starts node acquisition when nodes are added to
+					the node source and never removes them. Nevertheless, nodes can be removed by user request.
+				</para>
+		</section>
+		<section xml:id="time"><info><title>Time slot policy</title></info>
+				<para>
+					<emphasis>Time slot policy</emphasis> is aimed to acquire nodes for particular time with an ability to do it periodically.
+				</para>
+		</section>
+		<section xml:id="scheduler_idle"><info><title>"Remove nodes when scheduler is idle" policy</title></info>
+				<para>
+					<emphasis>"Remove nodes when scheduler is idle" policy</emphasis> removes all nodes from the infrastructure
+					when the scheduler is idle and acquires them when a new job is submitted. This policy is available only
+					for the resource manager distributed with <emphasis>ProActive Scheduler</emphasis>.
+				</para>
+		</section>
+		<section xml:id="scheduler_dynamic"><info><title>"Scheduler loading" policy</title></info>
+				<para>
+					<emphasis>"Scheduler loading" policy</emphasis> acquires/releases nodes
+					according to the scheduler loading factor (number of nodes per task). For example,
+					if the policy is configured to "1 node per task" and if a job with 10 tasks is submitted, then
+					10 nodes will be dynamically acquired from the infrastructure. This policy is available only
+					for the resource manager distributed with <emphasis>ProActive Scheduler</emphasis>.
+				</para>
+		</section>
+		<section xml:id="ec2_policy"><info><title>Amazon EC2 policy</title></info>
+				<para>
+					Allocates resources according to the Scheduler loading factor,
+					releases resources considering EC2 instances are paid by the hour. This policy is available only
+					for the resource manager distributed with <emphasis>ProActive Scheduler</emphasis>.
+				</para>
+		</section>
+</section>

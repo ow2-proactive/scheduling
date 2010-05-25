@@ -1,18 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_API"><info><title>Use Resource Manager with Java API</title></info>
+<?xml version="1.0" encoding="utf-8"?><section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_API"><info><title>Administration with Java API</title></info>
 <!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
 
-	<section xml:id="RM_API_INTRO"><info><title>Introduction</title></info>
-		<para>
-		Resource Manager can be used directly from the Java code through its Java API. This chapter explains
-		how to do that, namely how to start and stop the Resource Manager, add already deployed nodes,
-		deploy nodes with GCM deployment descriptors and finally create peer to peer node source
-		Resource Manager is developed with ProActive API, so its main components are the following active objects:
-		<emphasis>RMCore</emphasis>, <emphasis>RMAdmin</emphasis>, <emphasis>RMUser</emphasis>, <emphasis>RMMonitoring</emphasis> and <emphasis>NodeSources</emphasis>.
-		For more information about active objects, take a look at ProActive API in ProActive manual
-		Part III. <emphasis> Programming With Active Objects</emphasis>.
-		</para>
-	</section>
-	<section xml:id="RM_API_start"><info><title>Start and stop Resource Manager</title></info>
+	<para>
+	The ProActive Resource Manager can be used directly from the Java code through its Java API. This chapter explains
+	how to do that, namely how to start and stop the resource manager, add existing nodes and deploy
+	new nodes with GCM deployment descriptors.
+	</para>
+	<section xml:id="RM_API_start"><info><title>Start and stop the resource manager</title></info>
 		<para>
 			Resource Manager can be started locally using a static method of RMFactory class:
 		</para>
@@ -38,28 +32,36 @@ System.out.println("RM successfully started at : " + auth.getHostURL());
 		</programlisting>
 		<para>
 		In order to perform any operations with the Resource Manager, you have to authorize and
-		acquire either RMAdmin or RMUser interface. This action is made by using RMConnection class:
+		acquire ResourceManager interface. This action is made by using RMConnection class:
 		</para>
 		<programlisting language="java">
 RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
-UserSchedulerInterface scheduler = null;
+ResourceManager resourceManager = null;
 try {
-    // (1) preferred authentication method
-    scheduler = auth.logAsAdmin(Credentials.getCredentials());
+    // (1) preferred authentication method (getting credentials from the disk)
+	resourceManager = auth.login(Credentials.getCredentials());
 } catch (KeyException e) {
     try {
-        // (2) valid authentication method
-        PublicKey pubKey = auth.getPubKey();
+        // (2) valid authentication method (creating credentials on the fly)
+        PublicKey pubKey = auth.getPublicKey();
         if (pubKey == null) {
              pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
         }
-    } catch (KeyException e) {
-        // (3) deprecated authentication method
-        scheduler = auth.logAsAdmin("username", "password");
-    }
+
+        if (pubKey != null) {
+		Credentials cred = Credentials.createCredentials("username", "password", pubKey);
+		resourceManager = auth.login(cred);
+        }
+    } catch (KeyException ex) {
+        // cannot retrieve the public key
+    } catch (LoginException ex) {
+		// incorrect user name or password
+	}
+} catch (LoginException e) {
+	// incorrect user name or password
 }</programlisting>
 		<para>
-		  Connecting to the Resource Manager implicates using a keypair infrastructure to establish a secure channel on
+		  Connecting to the resource manager implicates using a keypair infrastructure to establish a secure channel on
 		  which the credentials (username and password) will be sent securely. There are three ways to connect
 		  to the Resource Manager, as described in the example above:
 		  <orderedlist>
@@ -91,12 +93,13 @@ try {
 		  </orderedlist>
 		</para>
 		<para>
-		Besides the RMAdmin or RMUser interfaces, RMConnection allows to obtain RMMonitoring
+		Besides the ResourceManager interface you may also obtain RMMonitoring
 		interface which can be used to track resources and their states.
-		Once you have a reference to RMAdmin active object, you can perform all administrator actions such as shutdown of the Resource Manager
+		Once you have a reference to ResourceManager active object, you can perform all
+		actions according to your role (permissions) such as shutdown of the Resource Manager
 		</para>
 		<programlisting language="java">
-admin.shutdown(true); //performs preemptive shutdown	</programlisting>
+resourceManager.shutdown(true); //performs preemptive shutdown	</programlisting>
 		<para>
 		This method terminates all RM's active objects and stops JVM where RMCore is running. The boolean parameter that it takes in argument
 		defines whether the Resource Manager stops immediately, even if there are some busy
@@ -105,40 +108,41 @@ admin.shutdown(true); //performs preemptive shutdown	</programlisting>
 		</para>
 	</section>
 
-	<section xml:id="RM_API_add_node"><info><title>Add an already deployed node</title></info>
+	<section xml:id="RM_API_add_node"><info><title>Register an existing node</title></info>
 	<para>
-	RMAdmin provides a way to add ProActive nodes that are already deployed. Nodes are added using
+	ResouceManager provides a way to add ProActive nodes that are already deployed. Nodes are added using
 	their URLs.
 	</para>
 	<programlisting language="java">
-admin.addNode("rmi://host_1/comptingNode"); //adds a node identified with an URL
+resourceManager.addNode("rmi://host_1/comptingNode"); //adds a node identified with an URL
 	</programlisting>
 	</section>
-	<section xml:id="RM_API_remove_node"><info><title>Remove a node from RM</title></info>
+	<section xml:id="RM_API_remove_node"><info><title>Remove a node from the resource manager</title></info>
 	<para>
 	You can remove a node from Resource Manager with the code:
 	</para>
 	<programlisting language="java">
-admin.removeNode("rmi://nodeToRemove", true);
+resourceManager.removeNode("rmi://nodeToRemove", true);
 	</programlisting>
 	<para>
 		The first parameter is the URL of the node to remove and the second one is a boolean.
-		If this boolean is set to true, then Resource Manager removes immediately the node even if it is busy.
-		If this boolean is set to false and the node is busy, then
-		Resource Manager waits that the applications that use RM's nodes give all the busy nodes back.
-		Removal is next performed.
+		If this boolean is set to true, the resource manager removes immediately the node even if it is busy.
+		If this boolean is set to false and the node is busy, the resource manager waits until
+		the user occupied the node releases it. Once the node is released the RM removes it.
 	</para>
 	</section>
-	<section xml:id="RM_API_custom_node_source"><info><title>Create custom node sources</title></info>
+	<section xml:id="RM_API_custom_node_source"><info><title>Create a node source</title></info>
 		<para>
-		You can create different node sources using the admin interface of RM.
-		Let's take a look at the following example to know how to create the most complex node source:
+		You can create different node sources using the ResourceManager interface.
+		Let's take a look at the following example to know how to create one of them
 		</para>
 		<programlisting language="java">
 // creating infrastructure manager parameters
 Object[] imParameters = new Object[] { hostsList, GCMDeploymentData };
 // creating policy parameters
 Object[] policyParameters = new Object[] {
+		   "ALL", // nodes availability scope
+		   "USER", // administrators of this node source
            schedulerURL, // scheduler url
            username, // scheduler user name
            password, // scheduler user password
@@ -159,36 +163,4 @@ admin.createNodesource("Scheduler loading node source", GCMCustomisedInfrastruct
 		moment of the node source creation.
 		</para>
 	</section>
-	<section xml:id="RM_API_user"><info><title>Use Resource Manager as a nodes provider for your application</title></info>
-		<para>
-		You can obviously use Resource Manager as a node provider for your distributed application. RMUser active object
-		provides a way to get computing nodes and give them:
-		</para>
-		<programlisting language="java">
-RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
-RMUser user = auth.logAsUser(Credentials.getCredentials());
-
-NodeSet nodes = user.getAtMostNodes(new IntWrapper(4), null);
-
-//performs some tasks on nodes provided by Resource Manager
-	.
-	.
-	.
-//and gives nodes back
-user.freeNodes(nodes);
-
-// disconnects from the resource manager
-user.disconnect();
-		</programlisting>
-	<para>
-	First, a reference to RMUser active object is retrieved.
-	Then, a set of nodes to is required Resource Manager
-	and some tasks are performed on these nodes. Finally, nodes are given back and disconnected.
-	</para>
-		<para>
-	Above code examples show a short overview of Resource Manager API. You can refer to Java documentation
-	of Resource Manager
-   (<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/scheduler/api_complete/" />).
-	</para>
-	</section>
-</chapter>
+</section>

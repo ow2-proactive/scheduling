@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager_plugin"><info><title>Resource Manager's Eclipse Plugin</title></info>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_Manager_plugin">
+<info><title>Resource Manager Graphical User Interface</title></info>
 <!--  <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "../docbook.dtd">  -->
 	<para>
 		<emphasis role="bold">
@@ -28,7 +29,7 @@
 		</listitem>
 	</itemizedlist>
 
-<section xml:id="Starting_RM_GUI"><info><title>Starting the Resource Manager Graphical User Interface</title></info>
+<section xml:id="Starting_RM_GUI"><info><title>Launching the Resource Manager GUI</title></info>
 		<para>
 			Depending on the way you get the RM plugin, just follow one of these steps:
 			<itemizedlist>
@@ -129,7 +130,7 @@
 				</imageobject>
 				</mediaobject>
 				<para>
-					Node is <emphasis role="bold">to release</emphasis>, it currently performs a task execution,
+					Node is <emphasis role="bold">to remove</emphasis>, it currently performs a task execution,
 					and has to be removed at the end of this execution.
 					</para>
 				</listitem>
@@ -455,7 +456,7 @@ test.example.net 5
 			</figure>
 			<para>
 			Choose the node to remove in the list. As explained before, node's removal can be preemptive or not. If you don't choose
-			a preemptive removal and if the node is busy, then it will just put to the "to release" state, and will be removed at tasks' end.
+			a preemptive removal and if the node is busy, then it will just put to the "to remove" state, and will be removed at tasks' end.
 			</para>
 			<itemizedlist>
 				<listitem><para>
@@ -481,9 +482,9 @@ test.example.net 5
 			A dialog asks you to confirm RM's shutdown. All nodes are removed from Resource Manager. Node handled by static nodes sources are destroyed.
 			Nodes handled by dynamic node source are released to their infrastructures.
 			You can tick the check-box  <emphasis role="bold">Wait tasks ends on busy nodes</emphasis>.
-			If checked, and RM has busy nodes, Resource Manager put these busy nodes to the "to release" state, and wait tasks' end on these nodes, before shutting down.
+			If checked, and RM has busy nodes, Resource Manager put these busy nodes to the "to remove" state, and wait tasks' end on these nodes, before shutting down.
 			Otherwise, shutdown is performed immediately even if there are busy nodes, tasks are interrupted on these busy nodes.
 			</para>
 		</section>
 	</section>
-</chapter>
+</section>

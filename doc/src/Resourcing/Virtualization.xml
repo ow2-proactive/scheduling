@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_Virtualization"
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_Virtualization"
 		  xmlns:xlink="http://www.w3.org/1999/xlink">
-  <info><title>Virtualized Infrastructure Integration</title></info>
+  <info><title>Virtualized infrastructure</title></info>
 
   <section xml:id="Virtualization_Overview"><info><title>Hardware Virtualization Overview</title></info>
 	<para>
@@ -151,6 +151,10 @@
 	  </imageobject>
 	</mediaobject>
 	</figure>
+	or
+	<programlisting>
+$RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure Virtualbox VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMUrl RMCredentials
+	</programlisting>
   </para>
   <para>
 	The <emphasis>Infrastructure</emphasis> field inform the Resource Manager about what kind of virtualized infrastructre
@@ -269,4 +273,4 @@
 		</para>
 	  </section>
   </section>
-</chapter>
+</section>

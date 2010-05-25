@@ -8,12 +8,16 @@
 	  <!ENTITY BookInfo SYSTEM "BookInfo.xml">
 	  <!ENTITY Contributors SYSTEM "Contributors.xml">
 
-	  <!ENTITY Presentation SYSTEM "Presentation.xml">
-	  <!ENTITY Deployment SYSTEM "Deployment.xml">
-	  <!ENTITY Admin SYSTEM "Admin.xml">
-	  <!ENTITY JavaAPI SYSTEM "JavaAPI.xml">
+	  <!ENTITY Overview SYSTEM "Overview.xml">
+	  <!ENTITY Installation SYSTEM "Installation.xml">
+	  <!ENTITY UserGuide SYSTEM "UserGuide.xml">
+	  <!ENTITY AdminGuide SYSTEM "AdminGuide.xml">
+	  <!ENTITY ConfigurationGuide SYSTEM "ConfigurationGuide.xml">
+	  <!ENTITY NodeSource SYSTEM "NodeSource.xml">
+	  <!ENTITY AdminJavaAPI SYSTEM "AdminJavaAPI.xml">
 	  <!ENTITY EC2 SYSTEM "EC2.xml">
-	  <!ENTITY Plugin SYSTEM "Plugin.xml">
+	  <!ENTITY GUI SYSTEM "GUI.xml">
+	  <!ENTITY CLI SYSTEM "CLI.xml">
 	  <!ENTITY Virtualization SYSTEM "Virtualization.xml">
 	  <!ENTITY WindowsAgent SYSTEM "WindowsAgent.xml">
 ]>
@@ -26,13 +30,10 @@
 		<info>
 			<title>ProActive Resource Manager</title>
 		</info>
-		&Presentation;
-		&Deployment;
-		&Admin;
-		&JavaAPI;
-		&EC2;
-		&Plugin;
-		&Virtualization;
+		&Overview;
+		&Installation;
+		&UserGuide;
+		&AdminGuide;
 		&WindowsAgent;
 	</part>
 

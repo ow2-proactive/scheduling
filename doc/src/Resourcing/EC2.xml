@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_EC2">
-  <info><title>Amazon EC2 Integration</title></info>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_EC2">
+  <info><title>Amazon EC2 Infrastructure</title></info>
 
   <section xml:id="EC2_Overview"><info><title>Overview</title></info>
     <para>
@@ -115,15 +115,11 @@
     </para>
     <para>
       Using this configuration, you can start a Resource Manager and a Scheduler using the <emphasis>/bin/unix/rm-start</emphasis>
-      and <emphasis>/bin/unix/scheduler-start</emphasis> scripts.
-      An EC2 NodeSource can now be added using the Resource Manager's GUI:
-      <figure xml:id="RM_EC2_NS"><info><title>EC2 NodeSource creation dialog</title></info>
-	<mediaobject>
-	  <imageobject>
-	    <imagedata scalefit="1" width="55%" contentdepth="55%" fileref="images/png/rm_ec2nodeSource.png" format="PNG"/>
-	  </imageobject>
-	</mediaobject>
-      </figure>
+      script. An EC2 NodeSource can now be added using the Resource Manager's CLI:
+	<programlisting>
+$RM_HOME>./bin/unix/rm-client --createns ec2 -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure ./config/rm/deployment/ec2.properties rmUrl RMCredentialsPath nodeHttpPort
+	</programlisting>
+
       You will need to specify:
       <itemizedlist>
 	<listitem><para>
@@ -155,6 +151,4 @@
       or the Scheduler GUI.
     </para>
   </section>
-
-
-</chapter>
+</section>

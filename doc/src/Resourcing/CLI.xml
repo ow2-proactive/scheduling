@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_deployment">
+<info><title>The command line interface</title></info>
+	<para>
+			This part explains how to launch the ProActive Resource Manager and interact with it using command
+			line interface (CLI). In order to use this interface JAVA_HOME environment variable has to be
+			defined.
+	</para>
+	<section xml:id="RM_start"><info><title>Launching the resource manager</title></info>
+		<para>
+			To start the resource manager, run the <emphasis>rm-start[.bat]</emphasis> or
+			<emphasis>rm-start-clean[.bat]</emphasis>
+			script in 'bin/[os]/' directory. The second script drops all the data from
+			data base used to store the history of RM. When launching the resource manager
+			it is possible to specify few arguments:
+			<itemizedlist>
+				<listitem> <para><emphasis>-ln</emphasis> or <emphasis>--localNodes</emphasis>,
+				start the resource manager with 4 local nodes</para>
+				</listitem>
+				<listitem> <para><emphasis>-d</emphasis> or <emphasis>--deploy</emphasis>, followed by a list
+				of GCM deployment files (GCMD, see below for GCM utilisation) deploys ProActive nodes described
+				there.</para>
+				</listitem>
+				<listitem> <para><emphasis>-h</emphasis> or <emphasis>--help</emphasis> -
+				prints the command line help.</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</section>
+	<section xml:id="rm_admin_console"><info><title>Interacting with the resource manager</title></info>
+	<para><emphasis>rm-client[.bat]</emphasis>, in bin/[os] directory, provides a way to connect to the resource manager
+	and manipulate it in command line mode. This scrips supports a bunch of options
+	</para>
+		<programlisting language="java">
+usage: rm-client [-a &lt;node URLs&gt; | -cn &lt;names&gt; | -d &lt;node URLs&gt; | -jmxinfo | -ln | -lns | -r &lt;names&gt; | -reloadpermissions | -s] [-c &lt;arg&gt;]   [-f] [-g] [-h]
+       [-infrastructure &lt;params&gt;]  [-l &lt;login&gt;]   [-ns &lt;nodes URLs&gt;] [-policy &lt;params&gt;]    [-sf &lt;filePath&gt;] [-u &lt;rmURL&gt;] [-uc]
+ -a,--addnodes &lt;node URLs&gt;       &lt;ctl&gt; Add nodes by their URLs
+ -c,--credentials &lt;arg&gt;          Path to the credentials (/user/osmirnov/home/.proactive/security/creds.enc).
+ -cn,--createns &lt;names&gt;          &lt;ctl&gt; Create new node sources
+ -d,--removenodes &lt;node URLs&gt;    &lt;ctl&gt; Remove nodes by their URLs
+ -f,--force                      &lt;ctl&gt; Do not wait for busy nodes to be freed before nodes removal, node source removal and shutdown actions (-d, -r and -s)
+ -g,--gui                        Start the console in a graphical view
+ -h,--help                       Display this help
+ -infrastructure &lt;params&gt;        Specify an infrastructure when node source is created
+ -jmxinfo                        &lt;ctl&gt; Display some statistics provided by the Scheduler MBean
+ -l,--login &lt;login&gt;              The username to join the Resource Manager
+ -ln,--listnodes                 &lt;ctl&gt; List nodes handled by Resource Manager. Display is : NODESOURCE HOSTNAME STATE NODE_URL
+ -lns,--listns                   &lt;ctl&gt; List node sources on Resource Manager. Display is : NODESOURCE TYPE
+ -ns,--nodesource &lt;nodes URLs&gt;   &lt;ctl&gt; Specify an existing node source name for adding nodes
+ -policy &lt;params&gt;                Specify a policy when node source is created
+ -r,--removens &lt;names&gt;           &lt;ctl&gt; Remove given node sources
+ -reloadpermissions              &lt;ctl&gt; Reload resource manager permissions
+ -s,--shutdown                   &lt;ctl&gt; Shutdown Resource Manager
+ -sf,--script &lt;filePath&gt;         &lt;ctl&gt; Execute the given script (javascript is supported)
+ -u,--rmURL &lt;rmURL&gt;              The Resource manager URL (default rmi://localhost:1099/)
+ -uc,--use-creds                 Use credentials retreived from disk
+		</programlisting>
+
+	<para>
+			When new node source is created custom infrastructure or policy can be specified
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+					<emphasis role="italics">-infrastructure</emphasis> parameter allows to list or specify an infrastructure.
+					In order to see the list of supported infrastructures run
+			</para>
+		</listitem>
+	</itemizedlist>
+
+		<programlisting>
+>rm-admin -cn myns -infrastructure
+Available node source infrastructures:
+Name: GCM Infrastructure
+Description: Infrastructure described in GCM deployment descriptor
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure
+Parameters: &lt;class name&gt; descriptor
+
+Name: EC2 Infrastructure
+Description: Handles nodes from the Amazon Elastic Compute Cloud Service.
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure
+Parameters: &lt;class name&gt; configurationFile rmUrl RMCredentialsPath nodeHttpPort
+
+Name: Virtual Infrastructure
+Description: Virtualized Infrastructure node acquisition
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure
+Parameters: &lt;class name&gt; infrastructure VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMUrl RMCredentials
+
+Name: WinHPC Infrastructure
+Description: Windows HPC infrasturcure
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure
+Parameters: &lt;class name&gt; maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmPath RMUrl RMCredentialsPath javaOptions extraClassPath
+
+Name: SSH Infrastructure
+Description: Creates remote runtimes using SSH
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
+Parameters: &lt;class name&gt; javaPath schedulingPath protocol port javaOptions hostsList
+
+Name: GCM Customised Infrastructure
+Description: Handles hosts from the list using specified gcm deployment descriptor
+template with HOST java variable contract (see proactive documentation)
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure
+Parameters: &lt;class name&gt; descriptor hostsList
+
+Name: PBS Infrastructure
+Description: Acquires nodes from a PBS Resouce Manager
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure
+Parameters: &lt;class name&gt; javaPath schedulingPath protocol port javaOptions maxNodes PBSServer RMUrl RMCredentialsPath qsubOptions
+
+Name: Default Infrastructure Manager
+Description: Default infrastructure
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager
+		</programlisting>
+		<para>
+			Choose the one you need and add corresponding parameters to the command line
+		</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+					<emphasis role="italics">-policy</emphasis> parameter allows to list or specify a policy. First see the list
+					of available policies
+			</para>
+		</listitem>
+	</itemizedlist>
+
+		<programlisting>
+>rm-admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy
+Available node source policies:
+Name: Release Resources When Scheduler Idle
+Description: Releases all resources when scheduler is idle for specified
+time. Acquires them back on job submission.
+Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle
+Parameters: &lt;class name&gt; nodesAvailableTo administrator url schedulerCredentialsPath preemptive idleTime
+
+Name: EC2 Policy
+Description: Allocates resources according to the Scheduler loading factor,
+releases resources considering EC2 instances are paid by the hour
+Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.EC2Policy
+Parameters: &lt;class name&gt; nodesAvailableTo administrator url schedulerCredentialsPath preemptive refreshTime loadFactor releaseCycle
+
+Name: Time Slot Policy
+Description: Acquires and releases nodes at specified time.
+Class name: org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
+Parameters: &lt;class name&gt; nodesAvailableTo administrator acquireTime releaseTime period preemptive
+
+Name: Scheduler Loading Policy
+Description: Allocates as many resources as scheduler required according
+to loading factor. Releases resources smoothly.
+Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy
+Parameters: &lt;class name&gt; nodesAvailableTo administrator url schedulerCredentialsPath preemptive policyPeriod minNodes maxNodes loadingFactor releasePeriod
+
+Name: Static Policy
+Description: Static nodes acquisition.
+Class name: org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
+Parameters: &lt;class name&gt; nodesAvailableTo administrator
+
+		</programlisting>
+		<para>
+			Then select the appropriate one and specify it in the command line. Example
+		</para>
+		<programlisting>
+>rm-admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
+		</programlisting>
+
+	<section xml:id="rm_admin_js_console"><info><title>Interactive mode</title></info>
+	<para>
+		Another way to interact with the resource manager is using the interactive mode of the
+		controller. Interactive mode correspond to a JavaScript console, which is able to manage the resouce manager.
+		To start it in this mode, just launch the bin/[os]/rm-client[.bat] command without parameters.
+		Once connected, type ? or help() to get the list of provided functions:
+	</para>
+		<programlisting>
+
+ exMode(display,onDemand)        Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)
+ addnode(nodeURL, nsName)        Add node to the given node source (parameters is a string representing the node URL to add and an optional string representing the node source in which to add the node)
+ removenode(nodeURL,preempt)     Remove the given node (parameter is a string representing the node URL, node is removed immediately if second parameter is true)
+ createns(nsName,infr,pol)       Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastrucure', 'param1', ...], ['policy', 'param1', ...]))
+ removens(nsName,preempt)        Remove the given node source (parameter is a string representing the node source name to remove, node source is removed immediately if second parameter is true)
+ listnodes()                     List every handled nodes
+ listns()                        List every handled node sources
+ listInfrastructures()           List supported infrastructures
+ listPolicies()                  List available node sources policies
+ shutdown(preempt)               Shutdown the Resource Manager (RM shutdown immediately if parameter is true)
+ jmxinfo()                       Display some statistics provided by MBean
+ exec(scriptFilePath)            Execute the content of the given script file (parameter is a string representing a script-file path)
+ setLogsDir(logsDir)             Set the directory where the log are located, (default is RM_HOME/.logs
+ viewlogs(nbLines)               View the last nbLines lines of the logs file, (default nbLines is 20)
+ refreshPermissions()            Reload permissions policy file
+ exit()                          Exits RM controller
+		</programlisting>
+
+	<section xml:id="rm_admin_js_console_script"><info><title>execute actions in a Java script file</title></info>
+		<para>
+			You can script a sequence of commands to send to Resource Manager in javascript file:
+		</para>
+		<programlisting language="java">
+/* set exec mode in order to not display stack trace, and not ask for either.*/
+exMode(false,false);
+
+/* remove a node source, preemptively */
+removens("my_node_source",true);
+
+/* create a new node source with GCMD and static nodes acquisition*/
+createns("my_node_source", ['org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure', 'path_to_descriptor'], ['org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy']);
+
+/* wait for a while */
+java.lang.Thread.sleep(10000);
+
+/* check that deployment has succeed */
+listnodes();
+		</programlisting>
+		<para>
+		Then run this script by typing in interactive mode:
+		</para>
+		<programlisting>
+ > exec("myScript.js");
+		</programlisting>
+		</section>
+	</section>
+	</section>
+	<section xml:id="rm_JMX_admin"><info><title>JMX monitoring interface</title></info>
+		<para>
+			The ProActive Resource Manager provides a way to get informations or statistics through JMX using
+			standard tools.
+		</para>
+		<para>
+			It is possible to get the JMX url on which to connect to using the Authentication API of the RM. This
+			will retreive the RMI based URL to connect the JMX service.
+			For example, using the JConsole, just connect using the following URL as a remote access :
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXRMAgent</emphasis> where <emphasis>hostname</emphasis>
+					is the host name on which the RM is started.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			Once connected, you'll get an access to RM statistics and accounting.
+		</para>
+	</section>
+
+</section>
