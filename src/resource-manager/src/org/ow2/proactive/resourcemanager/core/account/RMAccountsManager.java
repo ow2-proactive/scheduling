@@ -130,8 +130,8 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
     private static String totalUsedNodeTimeSQL() {
         final StringBuilder builder = new StringBuilder("SELECT ");
         builder.append("t1.NODEOWNER, sum(t2.TIMESTAMP - t1.TIMESTAMP) ");
-        builder.append("FROM RM.RMNODEEVENT t1 ");
-        builder.append("JOIN RM.RMNODEEVENT t2 ");
+        builder.append("FROM RMNODEEVENT t1 ");
+        builder.append("JOIN RMNODEEVENT t2 ");
         builder.append("ON t1.ID = t2.PREVIOUSEVENTID AND ");
         builder.append("t1.NODESTATE = 1 AND ");
         builder.append("t2.PREVIOUSNODESTATE = 1 ");
@@ -153,7 +153,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         builder.append("UNION ");
         builder
                 .append("select t1.NODEPROVIDER as np, SUM(t2.TIMESTAMP - t1.TIMESTAMP) as d, t1.NODEURL as nc from RMNODEEVENT t1 ");
-        builder.append("JOIN RM.RMNODEEVENT t2 ON ");
+        builder.append("JOIN RMNODEEVENT t2 ON ");
         // DOWNED ADDS : ADDs followed by stop
         builder.append("(t1.ID = t2.ADDEVENTID AND t1.TYPE = 5 AND (t2.TYPE = 6 AND t2.NODESTATE = 2)) OR ");
         // NOT DOWNED REMOVED ADDS : ADDs that are followed directly by remove (without stop)
