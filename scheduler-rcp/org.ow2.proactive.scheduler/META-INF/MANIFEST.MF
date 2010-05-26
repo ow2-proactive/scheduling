@@ -4,15 +4,15 @@ Bundle-Name: Scheduler RCP
 Bundle-SymbolicName: org.ow2.proactive.scheduler;singleton:=true
 Bundle-Version: 11.22.33
 Bundle-Activator: org.ow2.proactive.scheduler.Activator
+Bundle-Vendor: ProActive Team
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.console,
  org.eclipse.core.runtime,
- org.eclipse.update.ui,
- org.eclipse.core.runtime.compatibility,
- org.eclipse.core.runtime.compatibility.auth,
  org.ow2.proactive.scheduler.lib;bundle-version="11.22.33",
- org.ow2.proactive.scheduler.plugin;bundle-version="11.22.33"
-Eclipse-LazyStart: true
-Bundle-Vendor: ProActive
-Bundle-ClassPath: classes/,
- .
+ org.objectweb.proactive.ic2d.chartit;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Eclipse-RegisterBuddy: org.ow2.proactive.scheduler.lib
+Bundle-ClassPath: bin/
+Import-Package: org.objectweb.proactive.core.ssh.httpssh
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

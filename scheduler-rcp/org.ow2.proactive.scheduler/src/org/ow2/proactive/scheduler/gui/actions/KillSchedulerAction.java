@@ -34,44 +34,46 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler;
+package org.ow2.proactive.scheduler.gui.actions;
 
-import org.eclipse.equinox.app.IApplication;
-import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Shell;
+import org.ow2.proactive.scheduler.Activator;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.gui.Internal;
+import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
 /**
- * This class controls all aspects of the application's execution
+ * @author The ProActive Team
  */
-public class Application implements IApplication {
-    public Object start(IApplicationContext context) throws Exception {
-        final Display display = PlatformUI.createDisplay();
+public class KillSchedulerAction extends SchedulerGUIAction {
+    private Shell shell = null;
 
-        try {
-            final int returnCode = PlatformUI.createAndRunWorkbench(display,
-                    new ApplicationWorkbenchAdvisor());
-            if (returnCode == PlatformUI.RETURN_RESTART) {
-                return IApplication.EXIT_RESTART;
-            }
-            return IApplication.EXIT_OK;
-        } finally {
-            display.dispose();
+    public KillSchedulerAction(Shell shell) {
+        this.shell = shell;
+        this.setText("Kill scheduler");
+        this.setToolTipText("Kill the scheduler (this kill immediately the scheduler)");
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_SCHEDULERKILL));
+        this.setEnabled(false);
+    }
+
+    @Override
+    public void run() {
+        if (MessageDialog.openConfirm(shell, "Confirm please",
+                "Are you sure you want to Kill the scheduler ?")) {
+            SchedulerProxy.getInstance().kill();
         }
     }
 
-    public void stop() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        if (workbench == null)
-            return;
-        final Display display = workbench.getDisplay();
-        display.syncExec(new Runnable() {
-            public void run() {
-                if (!display.isDisposed())
-                    workbench.close();
-            }
-        });
+    @Override
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && admin && (schedulerStatus != SchedulerStatus.UNLINKED)) {
+            setEnabled(true);
+        } else {
+            setEnabled(false);
+        }
     }
 }

@@ -46,5 +46,95 @@
      </product>
   </extension>
 
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective"
+            id="org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective"
+            name="Scheduler">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.ow2.proactive.scheduler.gui"
+            name="Scheduler">
+      </category>
+      <view
+            allowMultiple="false"
+            category="org.ow2.proactive.scheduler.gui"
+            class="org.ow2.proactive.scheduler.gui.views.SeparatedJobView"
+            icon="icons/monitoring.gif"
+            id="org.ow2.proactive.scheduler.gui.views.SeparatedJobView"
+            name="Jobs">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.ow2.proactive.scheduler.gui"
+            class="org.ow2.proactive.scheduler.gui.views.JobInfo"
+            icon="icons/info.png"
+            id="org.ow2.proactive.scheduler.gui.views.JobInfo"
+            name="Job Info">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.ow2.proactive.scheduler.gui"
+            class="org.ow2.proactive.scheduler.gui.views.TaskView"
+            icon="icons/monitoring.gif"
+            id="org.ow2.proactive.scheduler.gui.views.TaskView"
+            name="Tasks">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.ow2.proactive.scheduler.gui"
+            class="org.ow2.proactive.scheduler.gui.views.ResultPreview"
+            icon="icons/info.png"
+            id="org.ow2.proactive.scheduler.gui.views.ResultPreview"
+            name="Result Preview">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.ow2.proactive.scheduler.gui"
+            class="org.ow2.proactive.scheduler.gui.views.Users"
+            icon="icons/info.png"
+            id="org.ow2.proactive.scheduler.gui.views.Users"
+            name="Open user sessions">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.ow2.proactive.scheduler.gui"
+            class="org.ow2.proactive.scheduler.gui.views.ControllerView"
+            icon="icons/info.png"
+            id="org.ow2.proactive.scheduler.gui.views.ControllerView"
+            name="Controller">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective">
+         <perspectiveShortcut
+               id="org.ow2.proactive.scheduler.gui.perspective.SchedulerPerspective">
+         </perspectiveShortcut>
+         <viewShortcut
+               id="org.ow2.proactive.scheduler.gui.views.SeparatedJobView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.console.ConsoleView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.ow2.proactive.scheduler.gui.views.JobInfo">
+         </viewShortcut>
+         <viewShortcut
+               id="org.ow2.proactive.scheduler.gui.views.TaskView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.ow2.proactive.scheduler.gui.views.ResultPreview">
+         </viewShortcut>
+         <viewShortcut
+               id="org.ow2.proactive.scheduler.gui.views.ControllerView">
+         </viewShortcut>
+      </perspectiveExtension>
+   </extension>
 
 </plugin>

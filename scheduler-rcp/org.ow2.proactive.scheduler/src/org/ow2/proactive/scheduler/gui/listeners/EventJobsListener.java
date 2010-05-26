@@ -34,44 +34,35 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler;
+package org.ow2.proactive.scheduler.gui.listeners;
 
-import org.eclipse.equinox.app.IApplication;
-import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 
 
 /**
- * This class controls all aspects of the application's execution
+ * @author The ProActive Team
+ *
  */
-public class Application implements IApplication {
-    public Object start(IApplicationContext context) throws Exception {
-        final Display display = PlatformUI.createDisplay();
+public interface EventJobsListener {
 
-        try {
-            final int returnCode = PlatformUI.createAndRunWorkbench(display,
-                    new ApplicationWorkbenchAdvisor());
-            if (returnCode == PlatformUI.RETURN_RESTART) {
-                return IApplication.EXIT_RESTART;
-            }
-            return IApplication.EXIT_OK;
-        } finally {
-            display.dispose();
-        }
-    }
+    /**
+     * Invoked when a job has been paused on the scheduler.
+     *
+     * @param info the informations on the paused job.
+     */
+    public void pausedEvent(JobInfo info);
 
-    public void stop() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        if (workbench == null)
-            return;
-        final Display display = workbench.getDisplay();
-        display.syncExec(new Runnable() {
-            public void run() {
-                if (!display.isDisposed())
-                    workbench.close();
-            }
-        });
-    }
+    /**
+     * Invoked when a job has been resumed on the scheduler.
+     *
+     * @param info the informations on the resumed job.
+     */
+    public void resumedEvent(JobInfo info);
+
+    /**
+     * Invoked when a job priority has been changed.
+     *
+     * @param info the informations on the resumed job.
+     */
+    public void priorityChangedEvent(JobInfo info);
 }

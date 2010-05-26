@@ -14,10 +14,9 @@
    </configIni>
 
    <launcherArgs>
+      <programArgs>-data @noDefault</programArgs>
       <vmArgs>-Xmx512M -Xms512M
 -Dproactive.net.nolocal=true
--Dlog4j.configuration=file:proactive-log4j
--Dproactive.configuration=file:ProActiveConfiguration.xml
 -Dpa.scheduler.logs.provider=org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider</vmArgs>
    </launcherArgs>
 
@@ -35,14 +34,15 @@
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
 
    <plugins>
       <plugin id="org.objectweb.proactive.ic2d.chartit"/>
       <plugin id="org.ow2.proactive.scheduler"/>
       <plugin id="org.ow2.proactive.scheduler.lib"/>
-      <plugin id="org.ow2.proactive.scheduler.plugin"/>
    </plugins>
 
 

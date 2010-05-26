@@ -34,44 +34,45 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler;
+package org.ow2.proactive.scheduler.gui.actions;
 
-import org.eclipse.equinox.app.IApplication;
-import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
+import java.util.List;
+
+import org.ow2.proactive.scheduler.Activator;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.gui.Internal;
+import org.ow2.proactive.scheduler.gui.data.JobsOutputController;
+import org.ow2.proactive.scheduler.gui.data.TableManager;
 
 
 /**
- * This class controls all aspects of the application's execution
+ * @author The ProActive Team
  */
-public class Application implements IApplication {
-    public Object start(IApplicationContext context) throws Exception {
-        final Display display = PlatformUI.createDisplay();
+public class ObtainJobOutputAction extends SchedulerGUIAction {
 
-        try {
-            final int returnCode = PlatformUI.createAndRunWorkbench(display,
-                    new ApplicationWorkbenchAdvisor());
-            if (returnCode == PlatformUI.RETURN_RESTART) {
-                return IApplication.EXIT_RESTART;
-            }
-            return IApplication.EXIT_OK;
-        } finally {
-            display.dispose();
-        }
+    public ObtainJobOutputAction() {
+        this.setText("Get job output");
+        this.setToolTipText("Get the job output");
+        this.setImageDescriptor(Activator.getDefault().getImageRegistry().getDescriptor(
+                Internal.IMG_JOBOUTPUT));
+        this.setEnabled(false);
     }
 
-    public void stop() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        if (workbench == null)
-            return;
-        final Display display = workbench.getDisplay();
-        display.syncExec(new Runnable() {
-            public void run() {
-                if (!display.isDisposed())
-                    workbench.close();
-            }
-        });
+    @Override
+    public void run() {
+        List<JobId> jobsId = TableManager.getInstance().getJobsIdOfSelectedItems();
+        for (JobId jobId : jobsId)
+            JobsOutputController.getInstance().createJobOutput(jobId);
     }
+
+    @Override
+    public void setEnabled(boolean connected, SchedulerStatus schedulerStatus, boolean admin,
+            boolean jobSelected, boolean owner, boolean jobInFinishQueue) {
+        if (connected && jobSelected && (admin || owner))
+            setEnabled(true);
+        else
+            setEnabled(false);
+    }
+
 }

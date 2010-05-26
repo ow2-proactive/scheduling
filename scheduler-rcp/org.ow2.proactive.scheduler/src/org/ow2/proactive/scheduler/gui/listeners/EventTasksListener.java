@@ -34,44 +34,30 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler;
+package org.ow2.proactive.scheduler.gui.listeners;
 
-import org.eclipse.equinox.app.IApplication;
-import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
 
 /**
- * This class controls all aspects of the application's execution
+ * Class providing events for finished tasks.
+ *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 0.9
  */
-public class Application implements IApplication {
-    public Object start(IApplicationContext context) throws Exception {
-        final Display display = PlatformUI.createDisplay();
+public interface EventTasksListener {
 
-        try {
-            final int returnCode = PlatformUI.createAndRunWorkbench(display,
-                    new ApplicationWorkbenchAdvisor());
-            if (returnCode == PlatformUI.RETURN_RESTART) {
-                return IApplication.EXIT_RESTART;
-            }
-            return IApplication.EXIT_OK;
-        } finally {
-            display.dispose();
-        }
-    }
+    /**
+     * Invoke by jobs controller when a task has just been started
+     *
+     * @param info
+     */
+    public void runningTaskEvent(TaskInfo info);
 
-    public void stop() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        if (workbench == null)
-            return;
-        final Display display = workbench.getDisplay();
-        display.syncExec(new Runnable() {
-            public void run() {
-                if (!display.isDisposed())
-                    workbench.close();
-            }
-        });
-    }
+    /**
+     * Invoke by jobs controller when a task has just been terminated
+     *
+     * @param info
+     */
+    public void finishedTaskEvent(TaskInfo info);
 }

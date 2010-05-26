@@ -34,44 +34,54 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler;
-
-import org.eclipse.equinox.app.IApplication;
-import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
-
+package org.ow2.proactive.scheduler.gui.listeners;
 
 /**
- * This class controls all aspects of the application's execution
+ * @author The ProActive Team
+ *
  */
-public class Application implements IApplication {
-    public Object start(IApplicationContext context) throws Exception {
-        final Display display = PlatformUI.createDisplay();
+public interface EventSchedulerListener {
 
-        try {
-            final int returnCode = PlatformUI.createAndRunWorkbench(display,
-                    new ApplicationWorkbenchAdvisor());
-            if (returnCode == PlatformUI.RETURN_RESTART) {
-                return IApplication.EXIT_RESTART;
-            }
-            return IApplication.EXIT_OK;
-        } finally {
-            display.dispose();
-        }
-    }
+    /**
+     * Invoked when the scheduler has just been started.
+     */
+    public void startedEvent();
 
-    public void stop() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        if (workbench == null)
-            return;
-        final Display display = workbench.getDisplay();
-        display.syncExec(new Runnable() {
-            public void run() {
-                if (!display.isDisposed())
-                    workbench.close();
-            }
-        });
-    }
+    /**
+     * Invoked when the scheduler has just been stopped.
+     */
+    public void stoppedEvent();
+
+    /**
+     * Invoked when the scheduler has just been paused.
+     */
+    public void pausedEvent();
+
+    /**
+     * Invoked when the scheduler has received a paused immediate signal.
+     */
+    public void freezeEvent();
+
+    /**
+     * Invoked when the scheduler has just been resumed.
+     */
+    public void resumedEvent();
+
+    /**
+     * Invoked when the scheduler shutdown sequence is initialized.
+     */
+    public void shuttingDownEvent();
+
+    /**
+     * Invoked when the scheduler has just been shutdown.
+     *
+     * @param job the new scheduled job.
+     */
+    public void shutDownEvent();
+
+    /**
+     * Invoked when the scheduler has just been killed. Scheduler is not
+     * reachable anymore.
+     */
+    public void killedEvent();
 }

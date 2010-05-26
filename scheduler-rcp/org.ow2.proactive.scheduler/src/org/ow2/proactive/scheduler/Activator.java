@@ -40,27 +40,41 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.Permission;
 import java.util.Hashtable;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.ssh.httpssh.Handler;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.osgi.service.url.URLStreamHandlerSetter;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
+import org.ow2.proactive.scheduler.gui.Internal;
 
 
 /**
  * The activator class controls the plug-in life cycle
  */
 public class Activator extends AbstractUIPlugin {
-    // The plug-in ID
+    /** The plug-in ID */
     public static final String PLUGIN_ID = "org.ow2.proactive.scheduler";
-
-    // The shared instance
+    /** The name of the property that sets the log service provider */
+    public static final String LOGSERVICE_CLASS_PROPERTY = "pa.scheduler.logs.provider";
+    /** The shared instance */
     private static Activator plugin;
+    /** Static reference to the log forwarding service */
+    public static LogForwardingService lfs = null;
 
     /**
      * The constructor
@@ -74,22 +88,60 @@ public class Activator extends AbstractUIPlugin {
      */
     @Override
     public void start(BundleContext context) throws Exception {
-        /* Grant all permission to security manager */
-        System.setSecurityManager(new SecurityManager() {
-            @Override
-            public void checkPermission(Permission perm, Object context) {
-            }
+        // Call the upper class method as required (see AbstractUIPlugin#start javadoc) 
+        super.start(context);
 
-            @Override
-            public void checkPermission(Permission perm) {
+        // Customize the platform instance location 
+        final Location instanceLoc = Platform.getInstanceLocation();
+        URL customLocURL = null;
+        try {
+            customLocURL = new URL("file:" + System.getProperty("user.home") +
+                "/.ProActive_Scheduler/workspace/");
+            instanceLoc.set(customLocURL, false);
+        } catch (Exception e) {
+            if (e instanceof IllegalStateException) {
+                System.err.println("Unable to set the platform instance location to " + customLocURL);
+                System.err.println("The current location is " + instanceLoc.getURL());
+                System.err.println("Be sure that the program arguments contains -data @noDefault");
             }
-        });
-        /* This code is used to the httpssh, fixes an Eclipse bug */
+            e.printStackTrace();
+        }
+
+        // Get the bundle (this real location of this plugin)
+        final Bundle bundle = context.getBundle();
+        final URL configFolderURL = FileLocator.toFileURL(bundle.getEntry("/config"));
+
+        // Specify the security policy file if it was not specified
+        final String securityPolicyProperty = System.getProperty("java.security.policy");
+        if (securityPolicyProperty == null) {
+            System.setProperty("java.security.policy", configFolderURL.toString() + "scheduler.java.policy");
+        }
+
+        // Specify default log4j configuration file if it was not specified
+        final String log4jConfProperty = System.getProperty(CentralPAPropertyRepository.LOG4J.getName());
+        if (log4jConfProperty == null) {
+            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), configFolderURL.toString() +
+                "proactive-log4j");
+        }
+
+        // Specify default ProActive configuration file if it was not specified
+        final String paConfProperty = System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
+                .getName());
+        if (paConfProperty == null) {
+            System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), configFolderURL
+                    .toString() +
+                "ProActiveConfiguration.xml");
+        }
+
+        // Load proactive configuration 
+        ProActiveConfiguration.load();
+
+        // This code is used to the httpssh, fixes an Eclipse bug
         Hashtable<String, String[]> properties = new Hashtable<String, String[]>(1);
         properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] { "httpssh" });
         String serviceClass = URLStreamHandlerService.class.getName();
         context.registerService(serviceClass, new IC2DHandler(), properties);
-        super.start(context);
+
     }
 
     /**
@@ -98,7 +150,39 @@ public class Activator extends AbstractUIPlugin {
     @Override
     public void stop(BundleContext context) throws Exception {
         plugin = null;
+        terminateLoggerServer();
+        // Dispose the image registry
+        final ImageRegistry reg = super.getImageRegistry();
+        if (reg != null) {
+            reg.dispose();
+        }
         super.stop(context);
+    }
+
+    /**
+     * Start a new logger server
+     * @throws LogForwardingException if the logger server cannot be started
+     */
+    public static void startLoggerServer() throws LogForwardingException {
+        // start the log server
+        String logProviderClass = System.getProperty(LOGSERVICE_CLASS_PROPERTY);
+        if (logProviderClass != null && !logProviderClass.equals("")) {
+            lfs = new LogForwardingService(logProviderClass);
+            lfs.initialize();
+        } else {
+            throw new LogForwardingException("Cannot find " + LOGSERVICE_CLASS_PROPERTY + " property");
+        }
+    }
+
+    /**
+     * Stop the current logger server.
+     * @throws LogForwardingException if the logger server cannot be stopped
+     */
+    public static void terminateLoggerServer() throws LogForwardingException {
+        if (lfs != null) {
+            lfs.terminate();
+        }
+        lfs = null;
     }
 
     /**
@@ -119,6 +203,53 @@ public class Activator extends AbstractUIPlugin {
      */
     public static ImageDescriptor getImageDescriptor(String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    /**
+     * Logs into the RPC's log file
+     * @param severity - the severity, see IStatus
+     * @param message
+     * @param t
+     */
+    public static void log(int severity, String message, Throwable t) {
+        IStatus status = new Status(severity, Activator.getDefault().getBundle().getSymbolicName(),
+            IStatus.OK, message, t);
+        Activator.getDefault().getLog().log(status);
+    }
+
+    /**
+     * Initializes an image registry with images which are frequently used by the plugin. 
+     * @see the registry to initialize
+     */
+    @Override
+    protected void initializeImageRegistry(final ImageRegistry reg) {
+        super.initializeImageRegistry(reg);
+        reg.put(Internal.IMG_CONNECT, Activator.getImageDescriptor("icons/" + Internal.IMG_CONNECT));
+        reg.put(Internal.IMG_DISCONNECT, Activator.getImageDescriptor("icons/" + Internal.IMG_DISCONNECT));
+        reg.put(Internal.IMG_FILEOBJ, Activator.getImageDescriptor("icons/" + Internal.IMG_FILEOBJ));
+        reg.put(Internal.IMG_HORIZONTAL, Activator.getImageDescriptor("icons/" + Internal.IMG_HORIZONTAL));
+        reg.put(Internal.IMG_JOBKILL, Activator.getImageDescriptor("icons/" + Internal.IMG_JOBKILL));
+        reg.put(Internal.IMG_JOBOUTPUT, Activator.getImageDescriptor("icons/" + Internal.IMG_JOBOUTPUT));
+        reg.put(Internal.IMG_JOBPAUSERESUME, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_JOBPAUSERESUME));
+        reg.put(Internal.IMG_JOBPRIORITY, Activator.getImageDescriptor("icons/" + Internal.IMG_JOBPRIORITY));
+        reg.put(Internal.IMG_JOBSUBMIT, Activator.getImageDescriptor("icons/" + Internal.IMG_JOBSUBMIT));
+        reg.put(Internal.IMG_MAXIMIZE, Activator.getImageDescriptor("icons/" + Internal.IMG_MAXIMIZE));
+        reg.put(Internal.IMG_SCHEDULERFREEZE, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERFREEZE));
+        reg.put(Internal.IMG_SCHEDULERKILL, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERKILL));
+        reg.put(Internal.IMG_SCHEDULERPAUSE, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERPAUSE));
+        reg.put(Internal.IMG_SCHEDULERRESUME, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERRESUME));
+        reg.put(Internal.IMG_SCHEDULERSHUTDOWN, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERSHUTDOWN));
+        reg.put(Internal.IMG_SCHEDULERSTART, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERSTART));
+        reg.put(Internal.IMG_SCHEDULERSTOP, Activator.getImageDescriptor("icons/" +
+            Internal.IMG_SCHEDULERSTOP));
+        reg.put(Internal.IMG_VERTICAL, Activator.getImageDescriptor("icons/" + Internal.IMG_VERTICAL));
     }
 
     //
