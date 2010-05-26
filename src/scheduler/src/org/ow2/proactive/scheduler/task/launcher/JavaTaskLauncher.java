@@ -153,6 +153,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                  * forked java task, then only finalizing loggers is enough.
                  */
                 this.finalizeLoggers();
+                PAActiveObject.terminateActiveObject(true);
             }
         }
     }

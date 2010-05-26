@@ -244,6 +244,7 @@ public abstract class TaskLauncher implements InitActive {
             core.terminate(taskId);
         }
         this.currentExecutable = null;
+        PAActiveObject.terminateActiveObject(true);
     }
 
     /**
