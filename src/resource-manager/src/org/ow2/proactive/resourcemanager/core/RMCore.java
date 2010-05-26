@@ -1239,14 +1239,6 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         return client;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public BooleanWrapper reloadPermissions() {
-        Policy.getPolicy().refresh();
-        return new BooleanWrapper(true);
-    }
-
     // Deprecated methods
     /**
      * {@inheritDoc}

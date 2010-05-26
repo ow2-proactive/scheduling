@@ -81,10 +81,6 @@ function viewlogs(nbLines){
 	ResourceManagerModel.viewlogs(""+nbLines);
 }
 
-function reloadpermissions(){
-	ResourceManagerModel.reloadpermissions();
-}
-
 function exit(){
 	return ResourceManagerModel.exit();
 }

@@ -272,12 +272,4 @@ public interface ResourceManager {
      */
     public BooleanWrapper shutdown(boolean preempt);
 
-    /**
-     * Reloads security permissions from the java security policy file.
-     *
-     * @return true if permissions are successfully loaded from updated java security file,
-     * runtime exception otherwise
-     */
-    public BooleanWrapper reloadPermissions();
-
 }

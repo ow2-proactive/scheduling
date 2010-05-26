@@ -133,7 +133,6 @@ public class ResourceManagerModel extends ConsoleModel {
             "Set the directory where the log are located, (default is RM_HOME/.logs"));
         commands.add(new Command("viewlogs(nbLines)",
             "View the last nbLines lines of the logs file, (default nbLines is 20)"));
-        commands.add(new Command("refreshPermissions()", "Reload permissions policy file"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exits RM controller"));
         }
@@ -552,10 +551,5 @@ public class ResourceManagerModel extends ConsoleModel {
         for (PluginDescriptor plugin : getModel().rm.getSupportedNodeSourcePolicies()) {
             getModel().print(plugin.toString());
         }
-    }
-
-    public static void reloadPermissions() {
-        getModel().checkIsReady();
-        getModel().rm.reloadPermissions();
     }
 }

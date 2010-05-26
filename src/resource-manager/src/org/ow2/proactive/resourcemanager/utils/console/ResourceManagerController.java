@@ -486,8 +486,6 @@ public class ResourceManagerController {
             for (String nsName : nsNames) {
                 ResourceManagerModel.removens(nsName, preempt);
             }
-        } else if (cmd.hasOption("reloadpermissions")) {
-            ResourceManagerModel.reloadPermissions();
         } else if (cmd.hasOption("shutdown")) {
             ResourceManagerModel.shutdown(cmd.hasOption("f"));
         } else if (cmd.hasOption("jmxinfo")) {
