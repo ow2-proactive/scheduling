@@ -6,13 +6,12 @@ Bundle-Version: 11.22.33
 Bundle-Activator: org.ow2.proactive.scheduler.Activator
 Bundle-Vendor: ProActive Team
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.ui,
- org.eclipse.ui.console,
- org.eclipse.core.runtime,
- org.ow2.proactive.scheduler.lib;bundle-version="11.22.33",
- org.objectweb.proactive.ic2d.chartit;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Eclipse-RegisterBuddy: org.ow2.proactive.scheduler.lib
 Bundle-ClassPath: bin/
-Import-Package: org.objectweb.proactive.core.ssh.httpssh
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.console,
+ org.eclipse.core.runtime,
+ org.ow2.proactive.scheduler.lib,
+ org.objectweb.proactive.ic2d.chartit
