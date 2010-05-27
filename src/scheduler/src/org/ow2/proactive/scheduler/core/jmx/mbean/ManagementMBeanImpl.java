@@ -80,7 +80,7 @@ public final class ManagementMBeanImpl extends StandardMBean implements Manageme
     public long getLastRefreshDurationInMilliseconds() {
         return this.accountsManager.getLastRefreshDurationInMilliseconds();
     }
-    
+
     public void refreshPermissionPolicy() {
         Policy.getPolicy().refresh();
     }

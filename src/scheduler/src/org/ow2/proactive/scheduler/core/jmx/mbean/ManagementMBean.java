@@ -43,7 +43,7 @@ package org.ow2.proactive.scheduler.core.jmx.mbean;
  * @since ProActive Scheduling 2.1
  */
 public interface ManagementMBean {
-   
+
     /**
      * Returns the accounts refresh rate in seconds.
      * @return refresh rate in seconds 
