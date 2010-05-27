@@ -48,6 +48,7 @@ public class RMStatsViewer extends TableViewer {
     TableItem freeNodesItem;
     TableItem busyNodesItem;
     TableItem downNodesItem;
+    TableItem totalNodesItem;
 
     public RMStatsViewer(Composite parent) {
         super(parent);

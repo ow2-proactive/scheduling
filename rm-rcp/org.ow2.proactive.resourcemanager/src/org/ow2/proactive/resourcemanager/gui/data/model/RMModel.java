@@ -413,6 +413,10 @@ public class RMModel {
         return downNodesNumber;
     }
 
+    public int getTotalNodesNumber() {
+        return freeNodesNumber + busyNodesNumber + downNodesNumber;
+    }
+
     public void setUpdateViews(boolean updateViews) {
         this.updateViews = updateViews;
     }

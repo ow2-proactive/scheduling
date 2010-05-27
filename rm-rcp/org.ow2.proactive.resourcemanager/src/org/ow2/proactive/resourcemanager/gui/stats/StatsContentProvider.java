@@ -45,13 +45,16 @@ public class StatsContentProvider implements IStructuredContentProvider {
 
     public Object[] getElements(Object model) {
         if (model instanceof RMModel) {
-            StatsItem freeNodesStat = new StatsItem("# free nodes", Integer.toString(((RMModel) model)
+            RMModel rmmodel = (RMModel) model;
+            StatsItem freeNodesStat = new StatsItem("# free nodes", Integer.toString(rmmodel
                     .getFreeNodesNumber()));
-            StatsItem busyNodesStat = new StatsItem("# busy nodes", Integer.toString(((RMModel) model)
+            StatsItem busyNodesStat = new StatsItem("# busy nodes", Integer.toString(rmmodel
                     .getBusyNodesNumber()));
-            StatsItem downNodesStat = new StatsItem("# down nodes", Integer.toString(((RMModel) model)
+            StatsItem downNodesStat = new StatsItem("# down nodes", Integer.toString(rmmodel
                     .getDownNodesNumber()));
-            return new StatsItem[] { freeNodesStat, busyNodesStat, downNodesStat };
+            StatsItem totalNodesStat = new StatsItem("# total nodes", Integer.toString(rmmodel
+                    .getTotalNodesNumber()));
+            return new StatsItem[] { freeNodesStat, busyNodesStat, downNodesStat, totalNodesStat };
         }
         //should never return this, RMStatsViewer
         return new Object[] {};
