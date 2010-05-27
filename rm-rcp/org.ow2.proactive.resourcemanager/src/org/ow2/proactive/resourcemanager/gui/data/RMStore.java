@@ -126,18 +126,15 @@ public class RMStore {
             SelectResourceManagerDialog.saveInformations();
             isConnected = true;
             //ControllerView.getInstance().connectedEvent(isAdmin);
-            RMStatusBarItem.getInstance().setText("connected");
 
             // Initialize the JMX chartit action
             JMXActionsManager.getInstance().initJMXClient(auth, new Object[] { login, creds });
 
         } catch (ActiveObjectCreationException e) {
-            RMStatusBarItem.getInstance().setText("disconnected");
             Activator.log(IStatus.ERROR, "Exception when creating active object", e);
             e.printStackTrace();
             throw new RMException(e.getMessage(), e);
         } catch (NodeException e) {
-            RMStatusBarItem.getInstance().setText("disconnected");
             Activator.log(IStatus.ERROR, "Node exeption", e);
             e.printStackTrace();
             throw new RMException(e.getMessage(), e);

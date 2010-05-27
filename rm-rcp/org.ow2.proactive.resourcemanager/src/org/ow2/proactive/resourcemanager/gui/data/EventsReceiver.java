@@ -66,12 +66,10 @@ public class EventsReceiver implements InitActive, RMEventListener {
 
     public EventsReceiver(RMMonitoring monitorStub) {
         this.monitor = monitorStub;
-    }
-
-    public void initActivity(Body body) {
         model = RMStore.getInstance().getModel();
         RMInitialState initialState = monitor.addRMEventListener((RMEventListener) PAActiveObject
                 .getStubOnThis());
+
         for (RMNodeSourceEvent nodeSourceEvent : initialState.getNodeSource()) {
             model.addNodeSource(nodeSourceEvent);
         }
@@ -79,7 +77,9 @@ public class EventsReceiver implements InitActive, RMEventListener {
         for (RMNodeEvent nodeEvent : initialState.getNodesEvents()) {
             model.addNode(nodeEvent);
         }
+    }
 
+    public void initActivity(Body body) {
         model.setUpdateViews(true);
         // Init opened views AFTER model's construction
         Display.getDefault().syncExec(new Runnable() {
