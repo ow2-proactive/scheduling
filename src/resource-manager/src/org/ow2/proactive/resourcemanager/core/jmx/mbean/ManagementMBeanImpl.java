@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
+import java.security.Policy;
+
 import javax.management.NotCompliantMBeanException;
 import javax.management.StandardMBean;
 
@@ -76,5 +78,9 @@ public final class ManagementMBeanImpl extends StandardMBean implements Manageme
 
     public long getLastRefreshDurationInMilliseconds() {
         return this.accountsManager.getLastRefreshDurationInMilliseconds();
+    }
+
+    public void refreshPermissionPolicy() {
+        Policy.getPolicy().refresh();
     }
 }

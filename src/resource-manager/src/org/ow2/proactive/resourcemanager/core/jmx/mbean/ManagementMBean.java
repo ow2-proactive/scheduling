@@ -37,22 +37,43 @@
 package org.ow2.proactive.resourcemanager.core.jmx.mbean;
 
 /**
- * MBean interface for the management of representing the attributes of an account.
+ * MBean interface for the management of the Resource Manager.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.1
  */
 public interface ManagementMBean {
 
+    /**
+     * Returns the accounts refresh rate in seconds.
+     * @return refresh rate in seconds 
+     */
     public int getAccountingRefreshRateInSeconds();
 
-    public void setAccountingRefreshRateInSeconds(int refreshDelayInSeconds);
+    /**
+     * Sets a new refresh rate in seconds.  
+     * @param refreshRateInSeconds the new refresh rate in seconds
+     */
+    public void setAccountingRefreshRateInSeconds(int refreshRateInSeconds);
 
+    /**
+     * Sets the refresh rate to the  one defined in the configuration file.
+     */
     public void setDefaultAccountingRefreshRateInSeconds();
 
+    /**
+     * Refreshes all accounts.
+     */
     public void refreshAllAccounts();
 
+    /**
+     * Returns the last duration in milliseconds of all accounts refresh.
+     * @return the last refresh duration in milliseconds
+     */
     public long getLastRefreshDurationInMilliseconds();
 
-    // TODO: Use TabularData
+    /**
+     * Refreshes the permission policy, reloads permissions from the policy file. 
+     */
+    public void refreshPermissionPolicy();
 }
