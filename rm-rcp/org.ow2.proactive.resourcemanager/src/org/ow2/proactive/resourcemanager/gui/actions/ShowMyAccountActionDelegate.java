@@ -88,6 +88,7 @@ public final class ShowMyAccountActionDelegate extends ActionDelegate implements
     @Override
     public void init(final IAction action) {
         action.setEnabled(false);
+        action.setId(NAME);
         this.manager.addAction(action);
     }
 

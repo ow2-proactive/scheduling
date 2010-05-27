@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -94,6 +96,14 @@ public class JMXActionsManager {
         // Disable all actions of this manager
         for (final IAction a : this.actions) {
             a.setEnabled(false);
+            // Close the corresponding window
+            try {
+                JMXActionsManager.activateIfFound(a.getId(), false);
+            } catch (Exception t) {
+                MessageDialog.openError(Display.getDefault().getActiveShell(), "Unable to close the " +
+                    a.getId(), t.getMessage());
+                t.printStackTrace();
+            }
         }
     }
 
