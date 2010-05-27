@@ -109,8 +109,13 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** State of the node */
     private NodeState state;
 
+    /** Time stamp of the latest state change */
+    private long stateChangeTime;
+
+    /** client registered the node in the resource manager */
     private Client provider;
 
+    /** client taken the node for computations */
     private Client owner;
 
     /** The add event */
@@ -135,6 +140,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         this.hostName = node.getNodeInformation().getVMInformation().getHostName();
         this.scriptStatus = new HashMap<SelectionScript, Integer>();
         this.state = NodeState.FREE;
+        this.stateChangeTime = System.currentTimeMillis();
         this.addEvent = null;
         this.lastEvent = null;
     }
@@ -219,6 +225,7 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.BUSY;
+        this.stateChangeTime = System.currentTimeMillis();
         this.owner = owner;
     }
 
@@ -231,6 +238,7 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.FREE;
+        this.stateChangeTime = System.currentTimeMillis();
         this.owner = null;
     }
 
@@ -250,6 +258,7 @@ public class RMNodeImpl implements RMNode, Serializable {
             throw new NodeException("The node is down");
         }
         this.state = NodeState.TO_BE_RELEASED;
+        this.stateChangeTime = System.currentTimeMillis();
     }
 
     /**
@@ -446,5 +455,12 @@ public class RMNodeImpl implements RMNode, Serializable {
      */
     public void setAddEvent(final RMNodeEvent addEvent) {
         this.addEvent = addEvent;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getStateChangeTime() {
+        return stateChangeTime;
     }
 }

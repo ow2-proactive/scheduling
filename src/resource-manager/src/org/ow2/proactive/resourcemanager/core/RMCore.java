@@ -1115,6 +1115,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public List<RMNodeSourceEvent> getNodeSourcesList() {
         return getRMInitialState().getNodeSource();
     }
@@ -1122,6 +1123,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public List<RMNodeEvent> getNodesList() {
         return getRMInitialState().getNodesEvents();
     }
@@ -1272,9 +1274,8 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
      */
     @Deprecated
     public void setAllNodeSourcesPingFrequency(int frequency) {
-        List<RMNodeSourceEvent> nodeSources = getNodeSourcesList();
-        for (RMNodeSourceEvent ns : nodeSources) {
-            setNodeSourcePingFrequency(frequency, ns.getSourceName());
+        for (String nsName : nodeSources.keySet()) {
+            setNodeSourcePingFrequency(frequency, nsName);
         }
     }
 

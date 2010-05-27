@@ -160,6 +160,13 @@ public interface RMNode extends Comparable<RMNode> {
     public NodeState getState();
 
     /**
+     * Returns the time of the last node state change.
+     *  
+     * @return the time of the last node state change
+     */
+    public long getStateChangeTime();
+
+    /**
      * Gets the provider of the node (who created and deployed it)
      * @return the node provider
      */
@@ -244,4 +251,5 @@ public interface RMNode extends Comparable<RMNode> {
     public void setAddEvent(final RMNodeEvent addEvent);
 
     public void setLastEvent(final RMNodeEvent lastEvent);
+
 }

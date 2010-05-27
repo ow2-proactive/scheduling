@@ -165,6 +165,7 @@ public final class RMNodeEvent extends RMEvent {
         this.hostName = rmNode.getHostName();
         this.VMName = rmNode.getDescriptorVMName();
         this.nodeState = rmNode.getState();
+        this.timeStamp = rmNode.getStateChangeTime();
         this.previousNodeState = previousNodeState;
         this.nodeProvider = rmNode.getProvider() == null ? null : rmNode.getProvider().getName();
         this.nodeOwner = rmNode.getOwner() == null ? null : rmNode.getOwner().getName();
