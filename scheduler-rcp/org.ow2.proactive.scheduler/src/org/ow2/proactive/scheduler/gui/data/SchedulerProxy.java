@@ -492,7 +492,7 @@ public class SchedulerProxy implements Scheduler {
 
             @Override
             public void run() {
-                boolean ping = false;
+                boolean ping = true;
                 while (!isInterrupted()) {
                     try {
                         Thread.sleep(SCHEDULER_SERVER_PING_FREQUENCY);
