@@ -98,7 +98,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
             layout.marginWidth = marginWidth;
             waitShell.setLayout(layout);
             final Label jobNameLabel = new Label(waitShell, SWT.NONE);
-            jobNameLabel.setText("Download scheduler state, please wait...");
+            jobNameLabel.setText("Downloading Scheduler state, please wait...");
 
             // Progress bar showing to the user that the application still running
             final ProgressBar bar = new ProgressBar(waitShell, SWT.INDETERMINATE);
