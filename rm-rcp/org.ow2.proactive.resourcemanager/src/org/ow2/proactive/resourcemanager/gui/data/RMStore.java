@@ -127,7 +127,7 @@ public class RMStore {
             //ControllerView.getInstance().connectedEvent(isAdmin);
 
             // Initialize the JMX chartit action
-            JMXActionsManager.getInstance().initJMXClient(auth, new Object[] { login, creds });
+            JMXActionsManager.getInstance().initJMXClient(url, auth, new Object[] { login, creds });
 
         } catch (ActiveObjectCreationException e) {
             Activator.log(IStatus.ERROR, "Exception when creating active object", e);

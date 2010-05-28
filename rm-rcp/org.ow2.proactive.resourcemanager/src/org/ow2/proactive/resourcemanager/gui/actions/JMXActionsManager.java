@@ -1,5 +1,7 @@
 package org.ow2.proactive.resourcemanager.gui.actions;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.jmx.JMXClientHelper;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 
 
@@ -68,20 +71,36 @@ public class JMXActionsManager {
     /**
      * Initializes the JMX client and if the initialization was successful enables this action if
      * not sets as tool tip a message.
+     * @param rmURL the URL of the resource manager
      * @param auth the resource manager authentication interface
      * @param creds the credentials required for authentication 
      */
-    public void initJMXClient(final RMAuthentication auth, final Object[] creds) {
+    public void initJMXClient(final String rmURL, final RMAuthentication auth, final Object[] creds) {
         this.jmxClient = new JMXClientHelper(auth, creds);
-        // Connect the JMX client
-        if (this.jmxClient.connect()) {
+        // By default the protocol used for JMX connection 
+        // is RO, if the protocol of the resource manager URL is RMI
+        // it will be used for JMX connection
+        JMXTransportProtocol jmxProtocol = JMXTransportProtocol.RO;
+        try {
+            final URI uri = new URI(rmURL);
+            final String protocol = uri.getScheme().toLowerCase();
+            if (JMXTransportProtocol.RMI.toString().toLowerCase().equals(protocol)) {
+                jmxProtocol = JMXTransportProtocol.RMI;
+            }
+        } catch (URISyntaxException e) {
+            // Nothing to do, we can still try to connect 
+        }
+        // Connect the JMX client using the specified protocol
+        final boolean isConnected = this.jmxClient.connect(jmxProtocol);
+        // If connected enable the actions
+        if (isConnected) {
             for (final IAction a : this.actions) {
                 a.setEnabled(true);
             }
         } else {
             for (final IAction a : this.actions) {
                 // Show a tool tip text in case of connection failure
-                a.setToolTipText("Unable to show the JMX Monitoring due to " +
+                a.setToolTipText("Unable to connect the JMX client due to " +
                     this.jmxClient.getLastException());
             }
         }
