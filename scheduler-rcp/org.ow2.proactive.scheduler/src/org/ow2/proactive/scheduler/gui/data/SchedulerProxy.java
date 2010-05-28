@@ -96,7 +96,6 @@ public class SchedulerProxy implements Scheduler {
     private SchedulerAuthenticationInterface sai;
     private Scheduler scheduler = null;
     private String userName = null;
-    private Boolean logAsAdmin = false;
     private Thread pinger;
     private String schedulerURL;
     private boolean connected = false;
@@ -445,7 +444,6 @@ public class SchedulerProxy implements Scheduler {
     public int connectToScheduler(SelectSchedulerDialogResult dialogResult) throws Throwable {
         try {
             userName = dialogResult.getLogin();
-            logAsAdmin = dialogResult.isLogAsAdmin();
             schedulerURL = dialogResult.getUrl();
 
             sai = SchedulerConnection.join(schedulerURL);
@@ -453,9 +451,7 @@ public class SchedulerProxy implements Scheduler {
             final Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
                     .getPublicKey());
 
-            if (scheduler == null || !scheduler.isConnected()) { // If escape key was pressed during the init of the scheduler
-                //new authentication does not care about admin behavior or not
-                //but RCP kept the admin/user behavior (in the way it hides button or not)
+            if (scheduler == null || !scheduler.isConnected()) {
                 scheduler = sai.login(creds);
             }
 
@@ -463,7 +459,7 @@ public class SchedulerProxy implements Scheduler {
 
             startPinger();
             connected = true;
-            ControllerView.getInstance().connectedEvent(logAsAdmin);
+            ControllerView.getInstance().connectedEvent();
 
             JMXActionsManager.getInstance().initJMXClient(schedulerURL, sai,
                     new Object[] { dialogResult.getLogin(), creds });
@@ -472,12 +468,10 @@ public class SchedulerProxy implements Scheduler {
             e.printStackTrace();
             // exception is handled by the GUI
             userName = null;
-            logAsAdmin = false;
             return LOGIN_OR_PASSWORD_WRONG;
         } catch (Throwable t) {
             Activator.log(IStatus.ERROR, "- Error when connecting to the scheduler ", t);
             userName = null;
-            logAsAdmin = false;
             throw t;
         }
     }
@@ -525,17 +519,10 @@ public class SchedulerProxy implements Scheduler {
     }
 
     public Boolean isItHisJob(String userName) {
-        if (logAsAdmin) {
-            return true;
-        }
         if ((this.userName == null) || (userName == null)) {
             return false;
         }
         return this.userName.equals(userName);
-    }
-
-    public boolean isAnAdmin() {
-        return logAsAdmin;
     }
 
     // -------------------------------------------------------------------- //

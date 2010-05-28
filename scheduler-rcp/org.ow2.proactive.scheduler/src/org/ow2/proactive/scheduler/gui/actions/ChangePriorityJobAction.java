@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.gui.Internal;
-import org.ow2.proactive.scheduler.gui.data.SchedulerProxy;
 
 
 /**
@@ -79,17 +78,14 @@ public class ChangePriorityJobAction extends Action implements IMenuCreator {
         }
 
         fMenu = new Menu(parent);
-        boolean isAnAdmin = SchedulerProxy.getInstance().isAnAdmin();
-        if (isAnAdmin) {
-            addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.IDLE));
-        }
+
+        addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.IDLE));
         addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.LOWEST));
         addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.LOW));
         addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.NORMAL));
-        if (isAnAdmin) {
-            addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.HIGH));
-            addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.HIGHEST));
-        }
+        addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.HIGH));
+        addActionToMenu(fMenu, PriorityJobAction.getInstance(JobPriority.HIGHEST));
+
         return fMenu;
     }
 

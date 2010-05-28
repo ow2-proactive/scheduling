@@ -84,7 +84,6 @@ public class SelectSchedulerDialog extends Dialog {
     /** Name of the file which store good logins */
     // proactive/scheduler/
     public static final String LOGIN_FILE = "logins";
-    private static final String SERVER_URL_PROPERTY_NAME = "pa.scheduler.serverURL";
 
     private static List<String> urls = null;
     private static List<String> logins = null;
@@ -93,10 +92,8 @@ public class SelectSchedulerDialog extends Dialog {
     private static String defaultUrl = null;
     private static String login = null;
     private static String pwd = null;
-    private static Boolean logAsAdmin = null;
     private static Combo urlCombo = null;
     private static Combo loginCombo = null;
-    private Button adminCheck = null;
     private Shell shell = null;
     private Button okButton = null;
     private Button cancelButton = null;
@@ -131,7 +128,6 @@ public class SelectSchedulerDialog extends Dialog {
         loginCombo = new Combo(shell, SWT.BORDER);
         Label pwdLabel = new Label(shell, SWT.NONE);
         final Text pwdText = new Text(shell, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
-        adminCheck = new Button(shell, SWT.CHECK);
         okButton = new Button(shell, SWT.NONE);
         cancelButton = new Button(shell, SWT.NONE);
 
@@ -185,16 +181,6 @@ public class SelectSchedulerDialog extends Dialog {
         pwdFormData.right = new FormAttachment(100, -5);
         pwdText.setLayoutData(pwdFormData);
 
-        // admin check
-        adminCheck.setText("log as admin");
-        FormData checkFormData = new FormData();
-        checkFormData.top = new FormAttachment(loginCombo, 5);
-        checkFormData.left = new FormAttachment(50, -45);
-        adminCheck.setLayoutData(checkFormData);
-        adminCheck.setSelection(true);
-        adminCheck.setEnabled(false);
-        adminCheck.setVisible(false);
-
         // button "OK"
         okButton.setText("OK");
         okButton.addListener(SWT.Selection, new Listener() {
@@ -203,13 +189,12 @@ public class SelectSchedulerDialog extends Dialog {
                 url = urlCombo.getText();
                 login = loginCombo.getText();
                 pwd = pwdText.getText();
-                logAsAdmin = adminCheck.getSelection();
                 shell.close();
             }
         });
 
         FormData okFormData = new FormData();
-        okFormData.top = new FormAttachment(adminCheck, 5);
+        okFormData.top = new FormAttachment(loginCombo, 5);
         okFormData.left = new FormAttachment(25, 20);
         okFormData.right = new FormAttachment(50, -10);
         okButton.setLayoutData(okFormData);
@@ -225,7 +210,7 @@ public class SelectSchedulerDialog extends Dialog {
         });
 
         FormData cancelFormData = new FormData();
-        cancelFormData.top = new FormAttachment(adminCheck, 5);
+        cancelFormData.top = new FormAttachment(loginCombo, 5);
         cancelFormData.left = new FormAttachment(50, 10);
         cancelFormData.right = new FormAttachment(75, -20);
         cancelButton.setLayoutData(cancelFormData);
@@ -460,7 +445,7 @@ public class SelectSchedulerDialog extends Dialog {
                 return null;
             }
             url = url.trim();
-            return new SelectSchedulerDialogResult(url, login, pwd, logAsAdmin);
+            return new SelectSchedulerDialogResult(url, login, pwd);
         }
         return null;
     }

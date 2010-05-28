@@ -66,7 +66,6 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
     private boolean isConnected = false;
     private Shell waitShell = null;
     private int res = 0;
-    private boolean errorOnConnection = false;
 
     public ConnectDeconnectSchedulerAction(Composite parent) {
         this.parent = parent;

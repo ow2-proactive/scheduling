@@ -187,32 +187,24 @@ public class SeparatedJobView extends ViewPart {
         subMenuJob.add(submitFlatJob);
 
         manager.add(pauseResumeJobAction);
-        subMenuPriority = new MenuManager("Change job priority") {
-        };
+        subMenuPriority = new MenuManager("Change job priority");
         manager.add(subMenuPriority);
-        if (SchedulerProxy.getInstance() != null) {
-            if (SchedulerProxy.getInstance().isAnAdmin()) {
-                subMenuPriority.add(priorityIdleJobAction);
-            }
-        }
+        subMenuPriority.add(priorityIdleJobAction);
         subMenuPriority.add(priorityLowestJobAction);
         subMenuPriority.add(priorityLowJobAction);
         subMenuPriority.add(priorityNormalJobAction);
         manager.add(obtainJobOutputAction);
         manager.add(killJobAction);
-        if (SchedulerProxy.getInstance() != null) {
-            if (SchedulerProxy.getInstance().isAnAdmin()) {
-                subMenuPriority.add(priorityHighJobAction);
-                subMenuPriority.add(priorityHighestJobAction);
-                manager.add(new Separator());
-                manager.add(startStopSchedulerAction);
-                manager.add(freezeSchedulerAction);
-                manager.add(pauseSchedulerAction);
-                manager.add(resumeSchedulerAction);
-                manager.add(shutdownSchedulerAction);
-                manager.add(killSchedulerAction);
-            }
-        }
+
+        subMenuPriority.add(priorityHighJobAction);
+        subMenuPriority.add(priorityHighestJobAction);
+        manager.add(new Separator());
+        manager.add(startStopSchedulerAction);
+        manager.add(freezeSchedulerAction);
+        manager.add(pauseSchedulerAction);
+        manager.add(resumeSchedulerAction);
+        manager.add(shutdownSchedulerAction);
+        manager.add(killSchedulerAction);
 
         // // Other plug-ins can contribute there actions here
         // manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

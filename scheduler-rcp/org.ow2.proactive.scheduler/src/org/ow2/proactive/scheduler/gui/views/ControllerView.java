@@ -128,7 +128,7 @@ public class ControllerView extends ViewPart {
         }
     }
 
-    public void connectedEvent(boolean isAdmin) {
+    public void connectedEvent() {
         scheduler = SchedulerProxy.getInstance();
 
         startConsole(SchedulerModel.getNewModel(false));

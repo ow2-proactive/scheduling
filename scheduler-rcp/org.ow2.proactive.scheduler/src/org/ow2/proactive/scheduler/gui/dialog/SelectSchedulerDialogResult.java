@@ -40,20 +40,18 @@ import java.io.Serializable;
 
 
 /**
- * @author The ProActive Team
- *
+ * @author The ProActive Team 
  */
+@SuppressWarnings("serial")
 public class SelectSchedulerDialogResult implements Serializable {
-    private String url = null;
-    private String login = null;
-    private String password = null;
-    private Boolean logAsAdmin = false;
+    private final String url;
+    private final String login;
+    private final String password;
 
-    public SelectSchedulerDialogResult(String url, String login, String password, Boolean logAsAdmin) {
+    public SelectSchedulerDialogResult(String url, String login, String password) {
         this.url = url;
         this.login = login;
         this.password = password;
-        this.logAsAdmin = logAsAdmin;
     }
 
     public String getUrl() {
@@ -66,9 +64,5 @@ public class SelectSchedulerDialogResult implements Serializable {
 
     public String getPassword() {
         return password;
-    }
-
-    public Boolean isLogAsAdmin() {
-        return logAsAdmin;
     }
 }
