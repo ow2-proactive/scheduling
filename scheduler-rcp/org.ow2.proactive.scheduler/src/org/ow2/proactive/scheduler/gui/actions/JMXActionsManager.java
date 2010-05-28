@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.gui.actions;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -45,6 +48,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.ow2.proactive.jmx.JMXClientHelper;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 
 
@@ -108,20 +112,37 @@ public class JMXActionsManager {
     /**
      * Initializes the JMX client and if the initialization was successful enables this action if
      * not sets as tool tip a message.
+     * @param schedulerURL the URL of the Scheduler
      * @param auth the Scheduler authentication interface
      * @param creds the credentials required for authentication
      */
-    public void initJMXClient(final SchedulerAuthenticationInterface auth, final Object[] creds) {
+    public void initJMXClient(final String schedulerURL, final SchedulerAuthenticationInterface auth,
+            final Object[] creds) {
         this.jmxClient = new JMXClientHelper(auth, creds);
-        // Connect the JMX client
-        if (this.jmxClient.connect()) {
+        // By default the protocol used for JMX connection 
+        // is RO, if the protocol of the scheduler URL is RMI
+        // it will be used for JMX connection
+        JMXTransportProtocol jmxProtocol = JMXTransportProtocol.RO;
+        try {
+            final URI uri = new URI(schedulerURL);
+            final String protocol = uri.getScheme().toLowerCase();
+            if (JMXTransportProtocol.RMI.toString().toLowerCase().equals(protocol)) {
+                jmxProtocol = JMXTransportProtocol.RMI;
+            }
+        } catch (URISyntaxException e) {
+            // Nothing to do, we can still try to connect 
+        }
+        // Connect the JMX client using the specified protocol
+        final boolean isConnected = this.jmxClient.connect(jmxProtocol);
+        // If connected enable the actions
+        if (isConnected) {
             for (final Action a : this.actions) {
                 a.setEnabled(true);
             }
         } else {
             for (final Action a : this.actions) {
                 // Show a tool tip text in case of connection failure
-                a.setToolTipText("Unable to show the JMX Monitoring due to " +
+                a.setToolTipText("Unable to connect the JMX client due to " +
                     this.jmxClient.getLastException());
             }
         }

@@ -447,6 +447,7 @@ public class SchedulerProxy implements Scheduler {
             userName = dialogResult.getLogin();
             logAsAdmin = dialogResult.isLogAsAdmin();
             schedulerURL = dialogResult.getUrl();
+
             sai = SchedulerConnection.join(schedulerURL);
 
             final Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
@@ -464,7 +465,7 @@ public class SchedulerProxy implements Scheduler {
             connected = true;
             ControllerView.getInstance().connectedEvent(logAsAdmin);
 
-            JMXActionsManager.getInstance().initJMXClient(sai,
+            JMXActionsManager.getInstance().initJMXClient(schedulerURL, sai,
                     new Object[] { dialogResult.getLogin(), creds });
             return CONNECTED;
         } catch (LoginException e) {
