@@ -290,7 +290,10 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
     }
 
     /**
-     * {@inheritDoc}
+     * Return the URL of this Scheduler.
+     * This URL must be used to contact this Scheduler.
+     *
+     * @return the URL of this Scheduler.
      */
     public String getHostURL() {
         return Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));

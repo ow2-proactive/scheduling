@@ -228,7 +228,10 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
     }
 
     /**
-     * {@inheritDoc}
+     * Return the URL of this Resource Manager.
+     * This URL must be used to contact this Resource Manager.
+     *
+     * @return the URL of this Resource Manager.
      */
     public String getHostURL() {
         return getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));
