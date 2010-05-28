@@ -491,13 +491,12 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Terminates a node source active object when shutdown confirmation is received from the pinger and the policy. 
+     * Terminates a node source active object when the policy is shutdown. 
      */
     public void finishNodeSourceShutdown(Client initiator) {
         PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(this,
             RMEventType.NODESOURCE_REMOVED, initiator.getName())));
 
-        // got confirmation from pinger and policy
         PAActiveObject.terminateActiveObject(false);
 
         synchronized (NodeSource.class) {

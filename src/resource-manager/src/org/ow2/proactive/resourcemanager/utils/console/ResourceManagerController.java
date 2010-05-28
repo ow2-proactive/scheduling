@@ -363,11 +363,6 @@ public class ResourceManagerController {
         removeNSOpt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(removeNSOpt);
 
-        Option permissionsOpt = new Option("reloadpermissions", false, control +
-            "Reload resource manager permissions");
-        permissionsOpt.setRequired(false);
-        actionGroup.addOption(permissionsOpt);
-
         Option shutdownOpt = new Option("s", "shutdown", false, control + "Shutdown Resource Manager");
         shutdownOpt.setRequired(false);
         actionGroup.addOption(shutdownOpt);
