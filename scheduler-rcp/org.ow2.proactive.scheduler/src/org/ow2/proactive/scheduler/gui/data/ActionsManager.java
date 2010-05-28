@@ -99,7 +99,7 @@ public class ActionsManager {
         }
 
         for (SchedulerGUIAction action : actions) {
-            action.setEnabled(connected, schedulerStatus, SchedulerProxy.getInstance().isAnAdmin(),
+            action.setEnabled(connected, schedulerStatus, /*SchedulerProxy.getInstance().isAnAdmin()*/true,
                     jobSelected, owner, jobInFinishQueue);
         }
     }

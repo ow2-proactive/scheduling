@@ -118,6 +118,7 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
 
                     try {
                         // Connection to the scheduler
+                        res = 0;
                         res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
                     } catch (Throwable t) {
                         errorConnect(t, dialogResult);

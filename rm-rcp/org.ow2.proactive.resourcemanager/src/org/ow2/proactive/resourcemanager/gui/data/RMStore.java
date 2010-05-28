@@ -99,7 +99,6 @@ public class RMStore {
                 auth = RMConnection.join(url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
             } catch (RMException e) {
                 throw new RMException("Resource manager does not exist on the following url: " + url, e);
-
             }
 
             Credentials creds = null;
