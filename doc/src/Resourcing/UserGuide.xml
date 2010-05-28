@@ -1,124 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="RM_USER_API"><info><title>User guide</title></info>
 <!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
-<para>
-	This chapter describes how to connect to the resource manager and request nodes to run parallel
-	computations. If you use ProActive Scheduler you do not have to worry about it as scheduler
-	does it for you. If you would like to run the computations directly on nodes, you
-	have to do this to connect to the existing resource manager.
-</para>
+	<para>
+		This chapter describes how to connect to the resource manager and request nodes to run parallel
+		computations. If you use ProActive Scheduler you do not have to worry about it as scheduler
+		does it for you. If you would like to run the computations directly on nodes, you
+		have to do this to connect to the existing resource manager.
+	</para>
+	<para>
+		All the code snippets described in this section can be found in the <emphasis role="italics">org.ow2.proactive.resourcemanager.examples.documentation</emphasis>
+		package in the Resource Manager sources.
+	</para>
 	<section xml:id="RM_API_connecting"><info><title>Connecting to the resource manager</title></info>
 		<para> Classes which are required to connect to the resource manager are located in
 		$RM_HOME/dist/lib/ProActive_ResourceManager-client.jar. The ProActive
 		library and all its dependencies are needed as well in the class path in order to communicate
 		with the resource manager and nodes.
 		</para>
-		<programlisting language="java">
-RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
-ResourceManager resourceManager = null;
-try {
-    // (1) preferred authentication method (getting credentials from the disk)
-	resourceManager = auth.login(Credentials.getCredentials());
-} catch (KeyException e) {
-    try {
-        // (2) valid authentication method (creating credentials on the fly)
-        PublicKey pubKey = auth.getPublicKey();
-        if (pubKey == null) {
-             pubKey = Credentials.getPublicKey(Credentials.getPubKeyPath());
-        }
-
-        if (pubKey != null) {
-		Credentials cred = Credentials.createCredentials("username", "password", pubKey);
-		resourceManager = auth.login(cred);
-        }
-    } catch (KeyException ex) {
-        // cannot retrieve the public key
-    } catch (LoginException ex) {
-		// incorrect user name or password
-	}
-} catch (LoginException e) {
-	// incorrect user name or password
-}
-		</programlisting>
+		<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_Connect.snip"/></textobject></programlisting>
+		<warning>
+			<para>
+				This piece of code will not work unless you have started a resource manager with at least one computing node beforehand.
+				If not, go to the <literal>bin/[unix|windows]/</literal> directory and launch the <literal>rm-start[.bat]</literal> script
+				with the <literal>-ln</literal> argument.
+			</para>
+			<screen>$ rm-start -ln</screen>
+			<para>To learn more about the command line interface, please refer to <xref linkend="CommandLineInterface" />.</para>
+		</warning>
 	</section>
 	<section xml:id="RM_API_gr"><info><title>Getting and releasing nodes</title></info>
 	<para>
-		Now we have a reference to the resource manager and can get computing nodes
+		Now that we have a reference to the resource manager, we can get computing nodes:
 	</para>
-	<programlisting language="java">
-// requesting nodes
-NodeSet nodes = resourceManager.getAtMostNodes(10, null);
-
-// performing some computations
-
-...
-
-// giving nodes back
-resourceManager.freeNodes(nodes);
-
-// disconnecting from the resource manager
-resourceManager.disconnect();
-	</programlisting>
+	<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_GetNodes.snip"/></textobject></programlisting>
 	<para>
-	In the example above we requested 10 nodes without providing any criteria. The resource
-	manager does not guaranties that it will find 10 nodes, but anyway it provides the maximum.
-	After computations are completed user releases nodes and they become available to others.
-	</para>
-	<para>
-		Lets now request nodes with some criteria. Criteria are described in selection scripts
+		In the example above, we have requested <literal>nbOfNodes</literal> nodes providing <literal>selectionScipt</literal> as criteria. The resource
+		manager does not guaranty that it will find <literal>nbOfNodes</literal> nodes, but it will provide as many nodes as it can.
+		<literal>selectionScript</literal> be <literal>null</literal> and in this case, no particular selection will be performed (all nodes will be accepted).
+		Let us now request nodes with some criteria. Criteria are described in selection scripts
 		which are executed on nodes before they are selected. All the information which is possible
-		to get from JVM could be used for selection decision. Some examples
-		are available in the resource manager distribution in samples/scripts/selection folder.
-		Here is an example of script which selects only windows machines
+		to get from JVMs could be used for selection decisions. Some examples
+		are available in the resource manager distribution in the <emphasis role="italics">samples/scripts/selection</emphasis> folder.
+		Here is an example of script which selects only linux machines:
 	</para>
-	<programlisting language="java">
-/* Check if OS name is Windows and their is wireless connection available */
-if (SelectionUtils.checkOSName("windows")){
-        selected = true;
-} else {
-        selected = false;
-}
-	</programlisting>
+	<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_LinuxScript.snip"/></textobject></programlisting>
 	<para>
-	There are 2 type of scripts - static and dynamic. Static script is executed on node
-	only once and the resource manager remembers the result of execution. Next time
-	it sees the same criteria in the user request it uses this knowledge to select nodes
-	without contacting them. The script listed about more likely has to be the static.
-	On the contrary dynamic scripts are executed each time the request came. Dynamic
-	scripts could be those which detects free memory, current system loading etc.
-
-	Lets see how to use them in	"ResourceManager.getAtMostNodes" request.
+		In the previous example, we have written the script directly in a String object but it is fortunatly possible to write it in a file and use this
+		file for creating a SelectionScript object.
 	</para>
-	<programlisting language="java">
-SelectionScript windowsSelectionScript = new SelectionScript(new File(scriptPath), new String[] {}, false);
-NodeSet nodes = resourceManager.getAtMostNodes(10, windowsSelectionScript);
-	</programlisting>
+	<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_WindowsScript.snip"/></textobject></programlisting>
+	<para>
+		After computations are completed, user can release nodes to make them available for other users.
+	</para>
+	<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_ReleaseNodes.snip"/></textobject></programlisting>
+	<para>
+		Finally, a user can disconnect from the resource manager as follows:
+	</para>
+	<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_Disconnect.snip"/></textobject></programlisting>
+	<note>
+		<title>
+			Static and dynamic scripts
+		</title>
+		<para>
+			There are 2 types of scripts: static and dynamic. Static scripts are executed on node
+			only once and the resource manager remembers the result of execution. Next time
+			it will see the same criteria in a user request, it will use this knowledge to select nodes
+			without contacting them. One should prefer using static scripts for performance reasons.
+			On the contrary, dynamic scripts are executed each time a request came. Dynamic
+			scripts could be those which detect free memory, current system loading etc.
+		</para>
+	</note>
 
 	<para>
-		Here is just a short overview of Resource Manager user API. For details see Java documentation
-	   <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/ResourceManager/api_published/" />.
+		This was just a short overview of Resource Manager user API. For more details, see
+	   <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://proactive.inria.fr/release-doc/ResourceManager/api_published/">the Resource Manager API</link>.
 	</para>
 	</section>
 	<section xml:id="RM_API_limitations"><info><title>Limitations</title></info>
 		<para>
-		When the resource manager is used directly there are two limitations
+		When the resource manager is used directly, there are two limitations:
 		</para>
 		<itemizedlist>
-				<listitem>
+			<listitem>
 				<para>
-				<emphasis>Remote class loading</emphasis> will work only with rmi protocol. So if you would like to run
-				your application on remote nodes using another communication protocol you have to take care about
-				availability of your classes on each node and probably restart the node adding
-				your classes to the class path.
+					<emphasis>Remote class loading</emphasis> will work only with rmi protocol. So if you would like to run
+					your application on remote nodes using another communication protocol, you have to take care about
+					availability of your classes on each node and probably restart the node adding
+					your classes to the class path.
 				</para>
-				</listitem>
-				<listitem>
+			</listitem>
+			<listitem>
 				<para>
-				<emphasis>Application logs</emphasis> are forwarded to the resource manager server
-				log file, not to the client side. In order to see them you have to have an access to
-				the resource manager logs directory.
+					<emphasis>Application logs</emphasis> are forwarded to the resource manager server
+					log file, not to the client side. In order to see them, you have to have an access to
+					the resource manager logs directory.
 				</para>
-				</listitem>
+			</listitem>
 		</itemizedlist>
 	</section>
 </chapter>

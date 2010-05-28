@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Resource_deployment">
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="CommandLineInterface">
 <info><title>The command line interface</title></info>
 	<para>
 			This part explains how to launch the ProActive Resource Manager and interact with it using command
