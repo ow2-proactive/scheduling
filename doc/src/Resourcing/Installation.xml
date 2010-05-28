@@ -56,7 +56,7 @@
 			ProActive nodes from the resource manager just pointing to the ProActive home.
 		</para>
 		<para>
-			The resource manager and scheduler graphical user interface are written as Eclipse RCP plugins
+			The resource manager and scheduler graphical user interfaces are written as Eclipse RCP plugins
 			and can be embedded into Eclipse or launched as standalone applications. Download appropriate
 			version for your platform, unzip and run it. It already has ProActive inside, so nothing has to
 			be installed on your system (except Java of course).

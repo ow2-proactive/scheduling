@@ -3,15 +3,15 @@
 <!-- <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V5.0//EN" "docbook.dtd">  -->
 <para>
 	This chapter describes how to connect to the resource manager and request nodes to run parallel
-	computations. If you use ProActive Scheduler you don't have to worry about it as scheduler
-	does all work for you. If you would like to run the computations directly on nodes first you
-	have to do is to connect to the existing resource manager.
+	computations. If you use ProActive Scheduler you do not have to worry about it as scheduler
+	does it for you. If you would like to run the computations directly on nodes, you
+	have to do this to connect to the existing resource manager.
 </para>
 	<section xml:id="RM_API_connecting"><info><title>Connecting to the resource manager</title></info>
 		<para> Classes which are required to connect to the resource manager are located in
 		$RM_HOME/dist/lib/ProActive_ResourceManager-client.jar. The ProActive
-		library with all dependencies is needed as well in the class path in order to communicate to
-		to the resource manager and nodes.
+		library and all its dependencies are needed as well in the class path in order to communicate
+		with the resource manager and nodes.
 		</para>
 		<programlisting language="java">
 RMAuthentication auth = RMConnection.join("rmi://my_rm_host");
