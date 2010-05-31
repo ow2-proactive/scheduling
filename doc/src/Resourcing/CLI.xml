@@ -3,15 +3,15 @@
 <info><title>The command line interface</title></info>
 	<para>
 			This part explains how to launch the ProActive Resource Manager and interact with it using command
-			line interface (CLI). In order to use this interface JAVA_HOME environment variable has to be
+			line interface (CLI). In order to use this interface the <emphasis role="italics">JAVA_HOME</emphasis> environment variable has to be
 			defined.
 	</para>
 	<section xml:id="RM_start"><info><title>Launching the resource manager</title></info>
 		<para>
 			To start the resource manager, run the <emphasis>rm-start[.bat]</emphasis> or
 			<emphasis>rm-start-clean[.bat]</emphasis>
-			script in 'bin/[os]/' directory. The second script drops all the data from
-			data base used to store the history of RM. When launching the resource manager
+			script in <literal>bin/[os]/</literal> directory. The second script drops all the data from
+			data base used to store the history of RM. When launching the resource manager,
 			it is possible to specify few arguments:
 			<itemizedlist>
 				<listitem> <para><emphasis>-ln</emphasis> or <emphasis>--localNodes</emphasis>,
@@ -28,11 +28,10 @@
 		</para>
 	</section>
 	<section xml:id="rm_admin_console"><info><title>Interacting with the resource manager</title></info>
-	<para><emphasis>rm-client[.bat]</emphasis>, in bin/[os] directory, provides a way to connect to the resource manager
-	and manipulate it in command line mode. This scrips supports a bunch of options
+	<para><emphasis>rm-client[.bat]</emphasis>, in <literal>bin/[os]</literal> directory, provides a way to connect to the resource manager
+	and manipulate it in command line mode. This scrips supports a bunch of options:
 	</para>
-		<programlisting language="java">
-usage: rm-client [-a &lt;node URLs&gt; | -cn &lt;names&gt; | -d &lt;node URLs&gt; | -jmxinfo | -ln | -lns | -r &lt;names&gt; | -reloadpermissions | -s] [-c &lt;arg&gt;]   [-f] [-g] [-h]
+		<screen>usage: rm-client [-a &lt;node URLs&gt; | -cn &lt;names&gt; | -d &lt;node URLs&gt; | -jmxinfo | -ln | -lns | -r &lt;names&gt; | -reloadpermissions | -s] [-c &lt;arg&gt;]   [-f] [-g] [-h]
        [-infrastructure &lt;params&gt;]  [-l &lt;login&gt;]   [-ns &lt;nodes URLs&gt;] [-policy &lt;params&gt;]    [-sf &lt;filePath&gt;] [-u &lt;rmURL&gt;] [-uc]
  -a,--addnodes &lt;node URLs&gt;       &lt;ctl&gt; Add nodes by their URLs
  -c,--credentials &lt;arg&gt;          Path to the credentials (/user/osmirnov/home/.proactive/security/creds.enc).
@@ -53,11 +52,10 @@ usage: rm-client [-a &lt;node URLs&gt; | -cn &lt;names&gt; | -d &lt;node URLs&gt
  -s,--shutdown                   &lt;ctl&gt; Shutdown Resource Manager
  -sf,--script &lt;filePath&gt;         &lt;ctl&gt; Execute the given script (javascript is supported)
  -u,--rmURL &lt;rmURL&gt;              The Resource manager URL (default rmi://localhost:1099/)
- -uc,--use-creds                 Use credentials retreived from disk
-		</programlisting>
+ -uc,--use-creds                 Use credentials retreived from disk</screen>
 
 	<para>
-			When new node source is created custom infrastructure or policy can be specified
+			When new node source is created custom infrastructure or policy can be specified:
 	</para>
 	<itemizedlist>
 		<listitem>
@@ -68,8 +66,7 @@ usage: rm-client [-a &lt;node URLs&gt; | -cn &lt;names&gt; | -d &lt;node URLs&gt
 		</listitem>
 	</itemizedlist>
 
-		<programlisting>
->rm-admin -cn myns -infrastructure
+		<screen>>rm-client -l admin -cn myns -infrastructure
 Available node source infrastructures:
 Name: GCM Infrastructure
 Description: Infrastructure described in GCM deployment descriptor
@@ -109,22 +106,20 @@ Parameters: &lt;class name&gt; javaPath schedulingPath protocol port javaOptions
 
 Name: Default Infrastructure Manager
 Description: Default infrastructure
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager
-		</programlisting>
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager</screen>
 		<para>
-			Choose the one you need and add corresponding parameters to the command line
+			Choose the one you need and add the corresponding parameters to the command line.
 		</para>
 	<itemizedlist>
 		<listitem>
 			<para>
 					<emphasis role="italics">-policy</emphasis> parameter allows to list or specify a policy. First see the list
-					of available policies
+					of available policies:
 			</para>
 		</listitem>
 	</itemizedlist>
 
-		<programlisting>
->rm-admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy
+		<screen>>rm-client -l admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy
 Available node source policies:
 Name: Release Resources When Scheduler Idle
 Description: Releases all resources when scheduler is idle for specified
@@ -152,26 +147,20 @@ Parameters: &lt;class name&gt; nodesAvailableTo administrator url schedulerCrede
 Name: Static Policy
 Description: Static nodes acquisition.
 Class name: org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
-Parameters: &lt;class name&gt; nodesAvailableTo administrator
-
-		</programlisting>
+Parameters: &lt;class name&gt; nodesAvailableTo administrator</screen>
 		<para>
-			Then select the appropriate one and specify it in the command line. Example
+			Then select the appropriate one and specify it in the command line. Example:
 		</para>
-		<programlisting>
->rm-admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
-		</programlisting>
+		<screen>>rm-client -l admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy</screen>
 
 	<section xml:id="rm_admin_js_console"><info><title>Interactive mode</title></info>
 	<para>
 		Another way to interact with the resource manager is using the interactive mode of the
 		controller. Interactive mode correspond to a JavaScript console, which is able to manage the resouce manager.
-		To start it in this mode, just launch the bin/[os]/rm-client[.bat] command without parameters.
+		To start it in this mode, just launch the <emphasis role="bold">bin/[os]/rm-client[.bat]</emphasis> command without any parameter.
 		Once connected, type ? or help() to get the list of provided functions:
 	</para>
-		<programlisting>
-
- exMode(display,onDemand)        Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)
+		<screen> exMode(display,onDemand)        Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)
  addnode(nodeURL, nsName)        Add node to the given node source (parameters is a string representing the node URL to add and an optional string representing the node source in which to add the node)
  removenode(nodeURL,preempt)     Remove the given node (parameter is a string representing the node URL, node is removed immediately if second parameter is true)
  createns(nsName,infr,pol)       Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastrucure', 'param1', ...], ['policy', 'param1', ...]))
@@ -186,12 +175,11 @@ Parameters: &lt;class name&gt; nodesAvailableTo administrator
  setLogsDir(logsDir)             Set the directory where the log are located, (default is RM_HOME/.logs
  viewlogs(nbLines)               View the last nbLines lines of the logs file, (default nbLines is 20)
  refreshPermissions()            Reload permissions policy file
- exit()                          Exits RM controller
-		</programlisting>
+ exit()                          Exits RM controller</screen>
 
 	<section xml:id="rm_admin_js_console_script"><info><title>execute actions in a Java script file</title></info>
 		<para>
-			You can script a sequence of commands to send to Resource Manager in javascript file:
+			You can script a sequence of commands to send to Resource Manager in a javascript file:
 		</para>
 		<programlisting language="java">
 /* set exec mode in order to not display stack trace, and not ask for either.*/
@@ -212,9 +200,7 @@ listnodes();
 		<para>
 		Then run this script by typing in interactive mode:
 		</para>
-		<programlisting>
- > exec("myScript.js");
-		</programlisting>
+		<screen>> exec("myScript.js");</screen>
 		</section>
 	</section>
 	</section>
@@ -224,15 +210,17 @@ listnodes();
 			standard tools.
 		</para>
 		<para>
-			It is possible to get the JMX url on which to connect to using the Authentication API of the RM. This
-			will retreive the RMI based URL to connect the JMX service.
-			For example, using the JConsole, just connect using the following URL as a remote access :
+			It is possible to get the JMX url on which to connect to using the Authentication API of the RM or reading the log file
+			located in <literal>$RM_HOME/.logs/RM.log</literal>. In the log file, the address you have to retrieve is the one where 
+			the JMX RMI connector server has been strarted.
+			For example, using the JConsole, you can connect using a jmx url looking like:
 		</para>
 		<itemizedlist>
 			<listitem>
 				<para>
-					<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXRMAgent</emphasis> where <emphasis>hostname</emphasis>
-					is the host name on which the RM is started.
+					<emphasis>service:jmx:rmi:///jndi/rmi://hostname:port/JMXRMAgent</emphasis> where <emphasis>hostname</emphasis>
+					is the host name on which the RM is started and <emphasis role="bold">port</emphasis> is the port number on which the JMX RMI connector server
+					has been started.
 				</para>
 			</listitem>
 		</itemizedlist>
