@@ -4,9 +4,6 @@ import java.io.File;
 import java.security.KeyException;
 import java.security.PublicKey;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -19,8 +16,6 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
-
-import com.sun.script.util.ScriptEngineFactoryBase;
 
 public class UserGuide {
 

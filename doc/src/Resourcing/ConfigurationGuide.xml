@@ -21,7 +21,7 @@
 		<listitem>
 			<para>
 				<emphasis>pa.rm.node.source.ping.frequency</emphasis>:
-				the resource manager checks whether computing nodes are still alive. This property set this verification frequency in milliseconds.
+				the resource manager checks whether computing nodes are still alive. This property sets this verification frequency in milliseconds.
 				Default is <emphasis role="italics">45000</emphasis>.
 			</para>
 		</listitem>
@@ -29,14 +29,14 @@
 			<para>
 				<emphasis>pa.rm.client.ping.frequency</emphasis>:
 				the resource manager checks whether clients running computations on nodes are connected.
-				When they disconnect nodes taken by this client are released. This property set this verification frequency in milliseconds.
+				When they disconnect, nodes taken by this client are released. This property sets this verification frequency in milliseconds.
 				Default is <emphasis role="italics">45000</emphasis>.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
 				<emphasis>pa.rm.aliveevent.frequency</emphasis>:
-				the period of sending "alive" event to resource manager's listeners (in ms)
+				the period of sending "alive" event to resource manager's listeners (in ms).
 				Default is <emphasis role="italics">300000</emphasis>.
 			</para>
 		</listitem>
@@ -60,7 +60,7 @@
 			<para>
 				<emphasis>pa.rm.gcm.template.application.file</emphasis>:
 				path of default GCM Application descriptor, used for nodes deployments in GCM based node sources.
-				If this file path is a relative, path is evaluated from the Resource manager dir
+				If this file path is a relative, path is evaluated from the resource manager directory
 				(variable <emphasis role="italics">pa.rm.home</emphasis>), otherwise path is directly interpreted.
 				See <xref linkend="RM_GCM"/> part.
 				Default is <emphasis role="italics">config/rm/deployment/GCMNodeSourceApplication.xml</emphasis>.
@@ -79,14 +79,14 @@
 				<emphasis>pa.rm.home</emphasis>:
 				The resource Manager home directory.
 				Default is <emphasis role="italics">.</emphasis>, but this property is overridden in Resource Manager launching scripts, rm-start[.bat],
-				in order to build an absolute path of Resource manager installation directory.
+				in order to build an absolute path of Resource Manager installation directory.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
 				<emphasis>pa.rm.nodesource.infrastructures</emphasis>:
 				path to a file containing the list of supported infrastructures in the resource manager.
-				Default is <emphasis>config/rm/nodesource/infrastructures</emphasis>.
+				Default is <emphasis role="italics">config/rm/nodesource/infrastructures</emphasis>.
 			</para>
 		</listitem>
 		<listitem>
@@ -133,7 +133,7 @@
 			<para>
 				<emphasis>pa.rm.account.refreshrate</emphasis>:
 				The statistics cache layer refresh rate. It is requested periodically by clients
-				and in order to avoid data base contacting all the time it's stored in dedicated structures.
+				and in order to avoid data base contacting all the time, it is stored in dedicated structures.
 				Default is <emphasis role="italics">10 secs</emphasis>.
 			</para>
 		</listitem>
@@ -191,7 +191,7 @@
 		<listitem>
 			<para>
 				<emphasis>pa.rm.authentication.loginMethod</emphasis>:
-				property that define the method that have to be used for logging users to the resource manager.
+				property that defines the method that has to be used for logging users to the resource manager.
 				Default is <emphasis role="italics">RMFileLoginMethod</emphasis>.
 			</para>
 		</listitem>
@@ -212,7 +212,7 @@
 	</itemizedlist>
 </section>
 <section xml:id="rm_authentication"><info><title>Users authentication</title></info>
-		<para> As presented before clients of the resource manager are authenticated at connection time by
+		<para> As presented before, clients of the resource manager are authenticated at connection time by
 		providing their credentials incapsulating encripted login and a password.
 		</para>
 
@@ -239,7 +239,7 @@
 		    <screen><![CDATA[
 bin/unix $ ./key-gen -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 ]]></screen>
-		    Accordingly, the Scheduler configuration must be set so that, when started:
+		    Accordingly, the Resource Manager configuration must be set so that, when started:
 		    <itemizedlist>
 		      <listitem><para>
 			  <emphasis>pa.rm.auth.privkey.path=</emphasis>$HOME/.proactive/priv.key
@@ -248,9 +248,9 @@ bin/unix $ ./key-gen -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 			  <emphasis>pa.rm.auth.pubkey.path=</emphasis>$HOME/.proactive/pub.key
 		      </para></listitem>
 		    </itemizedlist>
-		    Although no encryption should be performed on server side, the public key should be known from the Scheduler :
-		    indeed, a client can request the public key to the Scheduler so that it may encrypt its credentials to perform
-		    authentication. This method doesn't require the Scheduler's administrator to manually propagate public keys
+		    Although no encryption should be performed on server side, the public key should be known from the Resource Manager:
+		    indeed, a client can request the public key to the Resource Manager so that it may encrypt its credentials to perform
+		    authentication. This method does not require the Resource Manager's administrator to manually propagate public keys
 		    to all its users.
 		    Users can encrypt their credentials with the <emphasis>create-cred[.bat]</emphasis> script.
 		    See <xref linkend="RM_API_start"/> for client-side configuration.
@@ -259,7 +259,7 @@ bin/unix $ ./key-gen -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 
 		<section xml:id="rm_authent_select"><info><title>Select authentication method</title></info>
 			<para>
-			The resource manager manage users authentication and authorization, it has to store users account/password, and check login and password at connection.
+			The resource manager manages users authentication and authorization, it has to store users account/password, and check login and password at connection.
 			This storage of users accounts can be managed in two ways: by files, or by LDAP. A Resource Manager property (in config/rm/settings.ini)
 			specifies which kind of authentication will be used:
 			</para>
@@ -275,6 +275,7 @@ pa.rm.authentication.loginMethod=RMFileLoginMethod
 			replace the "RMFileLoginMethod" value by "RMLDAPLoginMethod".
 			</para>
 		</section>
+
 		<section xml:id="file_rm_authent"><info><title>Configure file-based authentication</title></info>
 			<para> By default, the resource manager stores users accounts, passwords, and group memberships (user or admin), in two files:
 			</para>
@@ -285,8 +286,7 @@ pa.rm.authentication.loginMethod=RMFileLoginMethod
 				<programlisting language="java">
 admin:admin
 user:pwd
-demo:demo
-				</programlisting>
+demo:demo</programlisting>
 				</listitem>
 				<listitem><para><emphasis>config/authentication/group.cfg</emphasis> stores users membership. For each
 				user registered in login.cfg, a group membership has to be defined in this file.
@@ -296,8 +296,7 @@ demo:demo
 				<programlisting language="java">
 admin:admin
 demo:admin
-user:user
-				</programlisting>
+user:user</programlisting>
 				</listitem>
 			</itemizedlist>
 			<para>You can change the default paths of these two files. Edit file <emphasis>config/rm/settings.ini</emphasis> and change
@@ -305,14 +304,15 @@ user:user
 			</para>
 			<itemizedlist>
 				<listitem><para><emphasis>pa.rm.defaultloginfilename</emphasis> - To define a user/password file, change this line as follows:
-				pa.rm.defaultloginfilename=/etc/rm/mylogins.cfg</para>
+				<emphasis role="bold">pa.rm.defaultloginfilename=/etc/rm/mylogins.cfg</emphasis></para>
 				</listitem>
 				<listitem><para><emphasis>pa.rm.defaultgroupfilenamee</emphasis> - To define a group membership file, change the line as follows:
-				pa.rm.defaultloginfilename=/etc/rm/mygroups.cfg</para>
+				<emphasis role="bold">pa.rm.defaultloginfilename=/etc/rm/mygroups.cfg</emphasis></para>
 				</listitem>
 			</itemizedlist>
-			</section>
-			<section xml:id="LDAP_RM_authent"><info><title>Configure LDAP-based authentication</title></info>
+		</section>
+
+		<section xml:id="LDAP_RM_authent"><info><title>Configure LDAP-based authentication</title></info>
 			<para>
 				The resource manager is able to connect to an existing LDAP, to check users login/password and verify users group membership.
 				This authentication method can be used with existing LDAP server which is already configured.
@@ -322,23 +322,23 @@ user:user
 				and configuration of SSL/TLS if you want a secured connection between the resource manager and LDAP.
 			</para>
 			<para>
-				We assume that LDAP server is configures in the way that
+				We assume that LDAP server is configured in the way that:
 				<itemizedlist>
 					<listitem><para>
-					all existing users and groups are located under single domain
+						all existing users and groups are located under single domain
 					</para></listitem>
 					<listitem><para>
-					users have object class specified in parameter "pa.ldap.user.objectclass"
+						users have object class specified in parameter "pa.ldap.user.objectclass"
 					</para></listitem>
 					<listitem><para>
-					groups have object class  specified in parameter "pa.ldap.group.objectclass"
+						groups have object class  specified in parameter "pa.ldap.group.objectclass"
 					</para></listitem>
 					<listitem><para>
-					user and group name is defined in cn (Common Name) attribute
+						user and group name is defined in cn (Common Name) attribute
 					</para></listitem>
 				</itemizedlist>
 
-				<programlisting language="java">
+				<programlisting language="sh">
 # EXAMPLE of user entry
 #
 # dn: cn=jdoe,dc=example,dc=com
@@ -354,12 +354,11 @@ user:user
 # firstName: John
 # lastName: Doe
 # uniqueMember: cn=djoe,dc=example,dc=com
-# objectClass: groupOfUniqueNames
-			</programlisting>
+# objectClass: groupOfUniqueNames</programlisting>
 			</para>
 			<para>
 			<emphasis>settings.ini</emphasis> in <emphasis>config/rm</emphasis> directory, defines a path to a configuration file that contains all LDAP connection and authentication properties.
-			Default value for this property defines a default configuration file;  <emphasis>config/authentication/ldap.cfg</emphasis>. Specify your LDAP properties in this file. Properties are explained below.
+			Default value for this property defines a default configuration file: <emphasis>config/authentication/ldap.cfg</emphasis>. Specify your LDAP properties in this file. Properties are explained below.
 			</para>
 			<section xml:id="RM_LDAP_users_URL"><info><title>Set LDAP url</title></info>
 				<para> First, you have to define the LDAP's URL of your organisation. This address corresponds to the property: <emphasis>pa.ldap.url</emphasis>.
@@ -368,9 +367,9 @@ user:user
 				 </para>
 			</section>
 			<section xml:id="RM_LDAP_users_subtree"><info><title>Define object class of user and group entities</title></info>
-				<para>Then you need to define how to deffer user and group entities in LDAP tree.
-				The users object class is defined by property <emphasis>pa.ldap.user.objectclass</emphasis> and by default is "inetOrgPerson".
-				For groups the property <emphasis>pa.ldap.group.objectclass</emphasis> has a default value "groupOfUniqueNames" which could
+				<para>Then you need to define how to differ user and group entities in LDAP tree.
+				The users object class is defined by property <emphasis>pa.ldap.user.objectclass</emphasis> and by default is <emphasis role="italics">"inetOrgPerson"</emphasis>.
+				For groups, the property <emphasis>pa.ldap.group.objectclass</emphasis> has a default value <emphasis role="italics">"groupOfUniqueNames"</emphasis> which could
 				be changed.
 				</para>
 			</section>
@@ -383,7 +382,7 @@ user:user
 					</listitem>
 					<listitem><para><emphasis>simple</emphasis> - the resource manager performs connection to LDAP with a specified login/password (see below for user password setting).</para>
 					</listitem>
-					<listitem><para>You can also specify a SASL mechanism for LDAPv3. There are many SASL mechanisms available:
+					<listitem><para>You can also specify a SASL mechanism for LDAPv3. There are many SASL available mechanisms:
 					<emphasis>cram-md5</emphasis>, <emphasis>digest-md5</emphasis>, <emphasis>kerberos4</emphasis>... Just put <emphasis>sasl</emphasis> to this property
 					to let the resource manager JVM choose SASL authentication mechanism.</para>
 					</listitem>
@@ -401,31 +400,28 @@ user:user
 				</para>
 		</section>
 		<section xml:id="RM_LDAP_SSL"><info><title>Set SSL/TLS parameters</title></info>
-				<para>The ProActive Resource Manager is able to communicate with LDAP with a secured SSL/TLS layer. It can be useful if your network is not trusted, and critical information are transmitted
-				between the rm server and LDAP, such as users passwords.
-				First, set the LDAP URL property <emphasis>pa.ldap.url</emphasis> to a URL of type ldaps://myLdap.
-				Then set <emphasis>pa.ldap.authentication.method</emphasis> to none so as to delegate authentication to SSL.
+			<para>
+				The ProActive Resource Manager is able to communicate with LDAP with a secured SSL/TLS layer. It can be useful if your network is not trusted, and critical information are transmitted
+				between the rm server and LDAP, such as user passwords.
+				First, set the LDAP URL property <emphasis>pa.ldap.url</emphasis> to a URL of type <emphasis role="italics">ldaps://myLdap</emphasis>.
+				Then set <emphasis>pa.ldap.authentication.method</emphasis> to <emphasis role="italics">none</emphasis> so as to delegate authentication to SSL.
 				</para>
 				<para>For using SSL properly, you have to specify your certificate and public keys for SSL handshake. Java stores
-				certificates in a keyStore and public keys in a trustStore. In most of cases, you just have to define a trustStore with public
+				certificates in a keyStore and public keys in a trustStore. In most of the cases, you just have to define a trustStore with public
 				key part of LDAP's certificate. Put certificate in a keyStore, and public keys in a trustStore
 				with the keytool command (keytool command is distributed with standard java platforms):
 				</para>
+				<screen>keytool -import -alias myAlias -file myCertificate -keystore myKeyStore</screen>
 				<para>
-				keytool -import -alias myAlias -file myCertificate -keystore myKeyStore
-				</para>
-				<para>
-				<emphasis>myAlias</emphasis> is alias name of your certificate, <emphasis>myCertificate</emphasis> is your private certificate file and
+				<emphasis>myAlias</emphasis> is the alias name of your certificate, <emphasis>myCertificate</emphasis> is your private certificate file and
 				<emphasis>myKeyStore</emphasis> is the new keyStore file produced in output. This command asks you to enter a password for your keyStore.
 				</para>
 				<para>
 				Put LDAP certificate's public key in a trustStore, with the keytool command:
 				</para>
+				<screen>keytool -import -alias myAlias -file myPublicKey -keystore myTrustStore</screen>
 				<para>
-				keytool -import -alias myAlias -file myPublicKey -keystore myTrustStore
-				</para>
-				<para>
-				<emphasis>myAlias</emphasis> is alias name of your certificate's public key, <emphasis>myPublicKey</emphasis> is your certificate's public
+				<emphasis>myAlias</emphasis> is the alias name of your certificate's public key, <emphasis>myPublicKey</emphasis> is your certificate's public
 				key file and <emphasis>myTrustore</emphasis> is the new trustStore file produced in output. This command asks you to enter a password for your trustStore.
 				</para>
 				<para>
@@ -449,9 +445,9 @@ user:user
 			<section xml:id="RM_LDAP_fall-back"><info><title>Use fall back to file authentication</title></info>
 				<para>You can use simultaneously file-based authentication and LDAP-based authentication.
 				Then Resource Manager can check user password and group membership in login and group files, as performed in FileLogin method,
-				if user or group is not found in LDAP. It uses pa.rm.defaultloginfilename  and
-				pa.rm.defaultgroupfilename files to authenticate user and check group membership.
-				There are two rules :
+				if user or group is not found in LDAP. It uses <emphasis role="bold">pa.rm.defaultloginfilename</emphasis>  and
+				<emphasis role="bold">pa.rm.defaultgroupfilename</emphasis> files to authenticate user and check group membership.
+				There are two rules:
 				</para>
 				<itemizedlist>
 					<listitem><para>
@@ -460,7 +456,7 @@ user:user
 					to <emphasis>true</emphasis>, in LDAP configuration file.</para>
 					</listitem>
 					<listitem><para>
-					If an user is not found in LDAP, fall back to authentication and group membership checking with login and group files.
+					If a user is not found in LDAP, fall back to authentication and group membership checking with login and group files.
 					To activate this behavior, set <emphasis>pa.ldap.authentication.fallback</emphasis> to <emphasis>true</emphasis>, in
 					LDAP configuration file.</para>
 					</listitem>
@@ -471,16 +467,16 @@ user:user
 <section xml:id="rm-jaas"><info><title>User authorization</title></info>
 <para>
 	All users authenticated in the resource manager have they own role according to granted permissions.
-	In the resource manager we use standard Java Authentication and Authorization Service (JAAS)
+	In the resource manager, we use standard Java Authentication and Authorization Service (JAAS)
 	to address these needs. Security support on the method call level is provided by ProActive
-	programming. This mechanism wont be discussed here and is described in details in the
-	<link xlink:href="http://proactive.inria.fr/release-doc/ProActive/multiple_html/Security.html">ProActive Programming documentation</link>.
+	programming. This mechanism will not be discussed here and is described in details in the
+	<link xlink:href="http://proactive.inria.fr/trunk/Programming/AdvancedFeatures/multiple_html/Security.html">ProActive Programming documentation</link>.
 </para>
 <para>
-	On the resource manager level permissions allow to
+	On the resource manager, level permissions allow to:
 	<itemizedlist>
 		<listitem><para>
-			perform user actions, like get/release nodes, add/remove node etc
+			perform user actions, like get/release nodes, add/remove node, etc.
 		</para>
 		</listitem>
 		<listitem><para>
@@ -490,9 +486,9 @@ user:user
 	</itemizedlist>
 </para>
 <para>
-	Users are organized in groups and after authentication each of them have a single UserPrincipal
-	and some GroupPrincipals (may not have them). Using this principals the permissions are granted in
-	the security policy file, like the following
+	Users are organized in groups and after authentication each of them has a single UserPrincipal
+	and some GroupPrincipals (may not have them). Using this principals, the permissions are granted in
+	the security policy file, like the following:
 	<programlisting language="java">
 grant principal org.ow2.proactive.authentication.principals.UserNamePrincipal "john" {
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAtMostNodes";
@@ -503,7 +499,7 @@ grant principal org.ow2.proactive.authentication.principals.UserNamePrincipal "j
 	cannot perform any administrative actions (they have to be listed explicitly).
 </para>
 <para>
-	Permissions could be granted to groups and in this case will be applicable to all group members. For example
+	Permissions could be granted to groups and in this case will be applicable to all group members. For example,
 	we may define a group of users who provides computing resourses. We allow them to call add/remove nodes methods,
 	so that they will be able to add their nodes to the resource manager.
 	<programlisting language="java">
@@ -530,26 +526,26 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
 };
 	</programlisting>
-	But having the permission of add/remove method call is not enough to actually add nodes. As all nodes
+	But having the permission of add/remove method call is not enough to actually add nodes. As all the nodes
 	in the resource manager are organized in node sources user has to have the node source administration permission.
 	This permission cannot be granted in java security policy file and defines at
 	node source creation time by specifying which group or user will use nodes from this source and
 	administrate them.
 </para>
 <para>
-	There is a permission which authorized to perform any actions. For this needs we implemented
-	custom org.ow2.proactive.permissions.AllPermission to seperate an absulute freedom inside
+	There is a permission which authorized to perform any actions. For this needs, we have implemented
+	custom <emphasis role="italics">org.ow2.proactive.permissions.AllPermission</emphasis> to seperate an absulute freedom inside
 	the resource manager from JVM. The following is the usage of this permission in group
-	of administrators
+	of administrators:
 	<programlisting language="java">
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "admin" {
     permission org.ow2.proactive.permissions.AllPermission;
 };
 	</programlisting>
-	The longest security check is at the moment of removing node. Here we verify that user
+	The longest security check is at the moment of removing node. Here we verify that the user
 	<itemizedlist>
 		<listitem><para>
-			can call removeNode method
+			can call <emphasis role="italics">removeNode</emphasis> method
 		</para>
 		</listitem>
 		<listitem><para>
@@ -563,8 +559,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 	</itemizedlist>
 </para>
 <para>
-	In order to use JMX monotoring interface the standart javax.management.MBeanPermission has to be granted.
-	Through JMX we expose an account data as well and for non-admin users we show them only their accounts
+	In order to use JMX monotoring interface, the standart <emphasis role="italics">javax.management.MBeanPermission</emphasis> has to be granted.
+	Through JMX, we expose an account data as well and for non-admin users we show them only their accounts
 	<programlisting language="java">
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "user" {
 	...
@@ -578,25 +574,10 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     ...
 };
 	</programlisting>
-	The longest security check is at the moment of removing node. Here we verify that user
-	<itemizedlist>
-		<listitem><para>
-			can call removeNode method
-		</para>
-		</listitem>
-		<listitem><para>
-			can administrate the node source where the node is
-		</para>
-		</listitem>
-		<listitem><para>
-			is the one who added the node (or has AllPermission)
-		</para>
-		</listitem>
-	</itemizedlist>
 </para>
 <para>
 	The default java security file used with the resource manager is located in config directory
-	$RM_HOME/config/security.java.policy.
+	<emphasis role="bold">$RM_HOME/config/security.java.policy</emphasis>.
 </para>
 </section>
 </section>
