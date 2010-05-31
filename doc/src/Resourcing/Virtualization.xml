@@ -7,37 +7,37 @@
 	<para>
 		Virtualized Infrastructure here means a part of an Infrastructure that runs a virtualization
 		software. This virtualized infrastructure can then be used as a resource pool for Resource
-		Manager execution. A brief introduction about how to install and use the virtualization
+		Manager execution. A brief introduction to the installation and the use of the virtualization
 		software handled by the Resource Manager is given below. The following section is dedicated
 		to explain the use of the Resource Manager for such an infrastructure.
 	</para>
 	<para>
 		Hardware virtualization allows to run several operating systems on a unique machine. This is done thanks
-		to a specific software called <quote>Virtual Machine Monitor</quote> ( vmm ). Every virtualization solutions
-		need a particular operating system to work ( <quote>Dom0</quote> in case of bare metal, vmm and
-		<quote>host OS</quote> in case of hosted virtualization, we will dig deeper in this later ). The vmm can either
-		emulates specific hardware devices or grants access to real hardware to the virtual machine ( or guest operating
-		system ie. vm ). One thus benefits many features for different purposes. We identify 2 kinds of vmm:
+		to a specific software called <quote>Virtual Machine Monitor</quote> (VMM). Every virtualization solution
+		needs a particular operating system to work (<quote>Dom0</quote> in case of bare metal, VMM and
+		<quote>host OS</quote> in case of hosted virtualization, we will dig deeper with this later on). The VMM can either
+		emulates specific hardware devices or grants access to real hardware to the virtual machine (or guest operating
+		system i.e. VM). One thus benefits from many features for different purposes. We identify 2 kinds of VMM:
 		<itemizedlist>
 			<listitem>
 				<para>
-					<emphasis>Type 1 hypervisor</emphasis> ( or bare metal ).
+					<emphasis>Type 1 hypervisor</emphasis> (or bare metal).
 				</para>
 				<para>
-					This type of hypervisor is named "bare metal" because it doesn't need any
+					This type of hypervisor is named "bare metal" because it does not need any
 				operating system beneath to work. Depending on what kind of product you
-				use, you will benefit different drivers for different hardware and,
-				maybe, won't be able to get the software functional because of unsupported
-				hardware ( see a description at:
-				<link xlink:href="http://en.wikipedia.org/wiki/Hypervisor">http://en.wikipedia.org/wiki/Hypervisor</link> ). The most often,
-				you'll need a <quote>DOM 0</quote> virtual machine, which is in fact the operating
-				system that stands for your workspace, to manage your virtual infrastructure. The
+				use, you will benefit from different drivers for different hardware and,
+				maybe, will not be able to get the software functional because of unsupported
+				hardware (see a description at:
+				<link xlink:href="http://en.wikipedia.org/wiki/Hypervisor">http://en.wikipedia.org/wiki/Hypervisor</link>). Most often,
+				you will need a <quote>DOM 0</quote> virtual machine, which is in fact the operating
+				system that stands for your workspace to manage your virtual infrastructure. The
 				virtual machine monitor (VMM) itself is a small footprint software (about 50Mo) which
 				will only check and schedule underlying hardware access. To set up your virtual environment
-				you need an extra software ( xm for XenOss, xe for XenServer, vmx for ESX ... ) which is useable
+				you need an extra software (xm for XenOss, xe for XenServer, vmx for ESX ...) which is usable
 				directly from your DOM 0. This type of hypervisor is, in general, more efficient and faster than
 				other hypervisors as it implements its own hardware access policy at the lowest possible level and
-				because you avoid overhead induced by an underlying operating system.
+				since you avoid overhead induced by an underlying operating system.
 				Here are some well-known type 1 hypervisors:
 				<link xlink:href="http://community.citrix.com/cdn/xs">XenServer</link>,
 				<link xlink:href="http://www.microsoft.com/hyper-v-server/en/us/default.aspx">Hyper-V</link>,
@@ -48,16 +48,16 @@
 			</listitem>
 			<listitem>
 				<para>
-					<emphasis>Type 2 hypervisor</emphasis> ( or hosted ).
+					<emphasis>Type 2 hypervisor</emphasis> (or hosted).
 				</para>
 				<para>
 				This type of hypervisor is running on top of an operating system and is seen as a common process
 				like every virtual machine containers. We can thus measure the host operating system overhead that treat
 				the guest operating system as a child process whereas it was more a "brother" in the case of type one
 				hypervisor. Furthermore, every kind of virtualization process cannot be used in hosted virtualization
-				for some reasons ( browse
+				for some reasons (browse
 				<link xlink:href="http://en.wikipedia.org/wiki/Platform_virtualization">http://en.wikipedia.org/wiki/Platform_virtualization</link>
-				for more details). Here are the main type two hypervisors:
+				for more details). Here are the main type 2 hypervisors:
 				<link xlink:href="http://www.virtualbox.org/">Virtualbox</link>,
 				<link xlink:href="http://www.vmware.com/products/server/">VMware Server</link>,
 				<link xlink:href="http://www.qumranet.com/">KVM</link>
@@ -71,26 +71,26 @@
 		<itemizedlist>
 			<listitem>
 				<para>
-					<emphasis>Bridge Networking.</emphasis> Here, the network routing is made at the 3rd level of the OSI/ISO stack. Your computer's NIC binded to your
+					<emphasis>Bridge Networking</emphasis> - Here, the network routing is made at the 3rd level of the OSI/ISO stack. Your computer's NIC binded to your
 					company/internet network is setup in <quote>PROMISCUOUS MODE</quote> to intercept not only packet intended for the host/dom0 IP but also
 					for newly created Virtual interfaces designed to provide network to virtual machines. Depending on what kind of virtualization product you use, you
-					may have to create the virtual interfaces by yourself ( brctl/openvpn on linux systems &amp; Network Manager on Windows ). With this solution, your
+					may have to create the virtual interfaces by yourself (brctl/openvpn on linux systems &amp; Network Manager on Windows). With this solution, your
 					guest operating systems are part of the company network like your host computer. That means a fully point-to-point connectivity between both
 					hardware/virtual machine on your network.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					<emphasis>Nat/Route.</emphasis> The network routing is also made at the 3rd level of the OSI/ISO stack. This time, a newly created virtual interface will
+					<emphasis>Nat/Route</emphasis> - The network routing is also made at the 3rd level of the OSI/ISO stack. This time, a newly created virtual interface will
 					ensure POST/PRE-ROUTING &amp; MASQUERADE for your virtual machine to have network access. It is really easy to find such configuration example on the internet
-					( <link xlink:href="http://www.revsys.com/writings/quicktips/nat.html">Here for linux for instance</link> ).
+					(<link xlink:href="http://www.revsys.com/writings/quicktips/nat.html">Here for linux for instance</link>).
 				</para>
 			</listitem>
 			<listitem>
 				<para>
-					<emphasis>NAT user.</emphasis> This time network routing is made at the virtualization software layer. For the outer world ( the host machine comprised )
-					the virtual machines are unreachable. The most often, the associated subnet has the netmask 10.0.0.1/24, 10.0.0.1 &amp; 10.0.0.2 are the IPs for the host
-					machine ( only seen by the virtual machines ) and every virtual machines belongs to its own subnet ( virtual machines can't speak to each other ).
+					<emphasis>NAT user</emphasis> - This time network routing is made at the virtualization software layer. For the outer world (the host machine included),
+					the virtual machines are unreachable. Most often, the associated subnet has the netmask 10.0.0.1/24, 10.0.0.1 &amp; 10.0.0.2 are the IPs for the host
+					machine (only seen by the virtual machines) and every virtual machines belongs to its own subnet (virtual machines cannot speak to each other).
 				</para>
 			</listitem>
 		</itemizedlist>
@@ -104,12 +104,12 @@
 				<para>
 					<emphasis>Contact the virtual machine manager</emphasis> and ask it to clone and power on the virtual
 					machines that will be used to run RM Nodes. To get that done, you must provide the pieces of information
-					required: the virtual machine monitor's url ( this one depends on the underlying virtual infrastructure,
-					we will dig deeper into this subject later ), a virtual machine monitor's user and his password, the
-					template virtual machine you want to use ( the most often, the name of the virtual machine as it appears
-					in your virtual infrastructure management tool ), the maximum number of this instance the virtual machine
+					required: the url of the virtual machine monitor (this one depends on the underlying virtual infrastructure,
+					we will dig deeper into this subject later), a user of the virtual machine monitor as well as his password, the
+					template virtual machine you want to use (most of the cases, the name of the virtual machine as it appears
+					in your virtual infrastructure management tool), the maximum number of this instance the virtual machine
 					monitor can handle. Some other information are needed but are related to the virtual infrastructure such
-					as the host capacity ( the number of RM Node that will be launched per virtual machine ), the Resource
+					as the host capacity (the number of RM Node that will be launched per virtual machine), the Resource
 					Manager's url and credentials to be able to register the created RM Nodes.
 				</para>
 			</listitem>
@@ -117,9 +117,9 @@
 				<para>
 					<emphasis>Start the RM Nodes</emphasis> once the virtual machine starts. This step requires the retrieval
 					of the information provided in the previous step from the inside of the virtual machine. To get that done
-					we provide template daemon files located in scripts/virtualization ( rm-node-starter.bat &amp;
-					rm-node-starter.sh ). These scripts needs additional tools to work. To get more information about
-					how does it work, refer to the section of the corresponding virtualization tool
+					we provide template daemon files located in scripts/virtualization (rm-node-starter.bat &amp;
+					rm-node-starter.sh). These scripts needs additional tools to work. To get more information about
+					how it works, refer to the section of the corresponding virtualization tool
 					<link linkend="virtualization-vmware">VMware</link>, <link linkend="virtualization-xenserver">XenServer</link>, <link linkend="virtualization-virtualbox">Virtualbox</link>
 				</para>
 			</listitem>
@@ -127,22 +127,22 @@
 				<para>
 					<emphasis>Register RM Node</emphasis> in the Resource Manager. This step can be done either by
 					remote node registration or by local node registration. In the first case, the newly started
-					nodes remotely connect to the Resource Manager and register themselves as available ( this
-					method is applied if you provide the Resource Manager's url ). The latter ensures a local node registration,
+					nodes remotely connect to the Resource Manager and register themselves as available (this
+					method is applied if you provide the Resource Manager's url). The latter ensures a local node registration,
 					this means that once the RM Nodes are started, they communicate their url to the virtual machine
-					monitor. The Resource Manager on its side "poll" the virtual machine monitor to know when the
-					newly created RM Nodes are available and register them. This second method is more attractive
+					monitor. The Resource Manager on its side "polls" the virtual machine monitor to know when the
+					newly created RM Nodes are available and registers them. This second method is more attractive
 					if you want to use Scheduler aware policies for example because the Resource Manager will
 					cache available nodes for futur reuse. In case of remote registration, you must ensure that
-					the Resource Manager is able to contact RM Nodes ( that means that the communication protocol
+					the Resource Manager is able to contact RM Nodes (that means that the communication protocol
 					used for communication is well suited for the kind of network connection used. For example, in case
-					of NAT User, you'll have to use ProActive Message Routing Protocol i.e PAMR ).
+					of NAT User, you will have to use ProActive Message Routing Protocol i.e. PAMR).
 				</para>
 			</listitem>
 		</itemizedlist>
   </para>
   <para>
-	Here is a snapshot of the panel for the information keyboarding:
+	Here is a snapshot of the panel for the information keyboarding that you can find in the <link linkend="Resource_Manager_plugin">Resource Manager GUI</link>:
 	<figure>
 	<info><title>Virtual Infrastructure NodeSource creation dialog</title></info>
 	<mediaobject>
@@ -152,52 +152,50 @@
 	</mediaobject>
 	</figure>
 	or
-	<programlisting>
-$RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure Virtualbox VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMUrl RMCredentials
-	</programlisting>
+	<screen>$RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure Virtualbox VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMUrl RMCredentials</screen>
   </para>
   <para>
-	The <emphasis>Infrastructure</emphasis> field inform the Resource Manager about what kind of virtualized infrastructre
-	to manager. At this time, only <link linkend="virtualization-vmware">vmware</link>,
+	The <emphasis>Infrastructure</emphasis> field informs the Resource Manager about what kind of virtualized infrastructre
+	to manage. For the time being, only <link linkend="virtualization-vmware">vmware</link>,
 	<link linkend="virtualization-xenserver">xenserver</link> and <link linkend="virtualization-virtualbox">virtualbox</link>
 	are supported.
 	The <emphasis>PA Config</emphasis> field points to a file describing ProActive properties used to update
-	RM Nodes environment. You can thus dinamically precise the node's environment for example a precise network communication
+	RM Nodes environment. You can thus dynamically precise the node's environment like a precise network communication
 	protocol.
 	The <emphasis>RM Url</emphasis> field holds the Resource Manager's url that will be used to connect remotely, from the virtual
-	machine, by the RM Nodes to register themself as available. If you don't fill this field, local node registration will
-	be used. The "Load from file" button alows you to fill field providing a file of "key = value" entries. The key
-	must be the field's name without whitespaces ( case sensitive, an example can be found in config/rm/deployment/vmm.properties ).
+	machine, by the RM Nodes to register themself as available. If you do not fill this field, local node registration will
+	be used. The "Load from file" button allows you to fill field providing a file of "key = value" entries. The key
+	must be the field names without whitespaces (case sensitive, an example can be found in <literal>config/rm/deployment/vmm.properties</literal>).
   </para>
 	  <section xml:id="virtualization-vmware">
 		<info><title>VMware Products</title></info>
 		<para>
-			This section deals with VMware products <link xlink:href="http://www.vmware.com/products/vi/">Virtual Infrastructure compliant</link>.
+			This section deals with VMware products (<link xlink:href="http://www.vmware.com/products/vi/">Virtual Infrastructure compliant</link>).
 			To use this kind of products for Resource Manager Node acquisition, you must first create your virtual machine, then,
-			copy your Resource Manager release inside the virtual machine. Next, use one of the scripts that we provide
-			( scripts/virtualization/rm-node-starter.[sh|bat] ) to register a new service on your virtual machine.
-			Note that for both case, you have to get python installed and available in the PATH variable, and especially for
+			copy your Resource Manager distribution inside the virtual machine. Next, use one of the scripts that we provide
+			(<literal>scripts/virtualization/rm-node-starter.[sh|bat]</literal>) to register a new service on your virtual machine.
+			Note that for both case, you have to get python installed and available in the <emphasis role="italics">PATH</emphasis> variable, and especially for
 			windows, you must use the <link xlink:href="http://www.microsoft.com/Downloads/details.aspx?FamilyID=9d467a69-57ff-4ae7-96ee-b18c4790cffd&amp;displaylang=en">AutoEXnt software</link>.
-			You also need to install VMware Guest Tools ( from vi web management interface, right panel, install guest tools ), and
+			You also need to install VMware Guest Tools (from vi web management interface, right panel, install guest tools), and
 			have them available in the PATH variable.
-			You must modify the rm-node-starter scripts in the virtual machine to match your current Resource Manager setup.
+			You must modify the <literal>rm-node-starter</literal> scripts in the virtual machine to match your current Resource Manager setup.
 		</para>
 		<para>
 			Once you have your virtual machine template correctly installed, you can use it from the Resource Manager as
 			a RM Node pool. The <emphasis>Infrastructure</emphasis> field appearing on the snapshot above must contain the value "vmware".
 			The <emphasis>VMM Url</emphasis> field holds the address of your VMware virtual machine monitor. For VMware
-			Virtual Infrastructure compliant products, the most often, it is either http://yourAddress:8222/sdk
-			or https://youAddress:8333/sdk by default. If you decide to provide a <emphasis>VM Max</emphasis> number
+			Virtual Infrastructure compliant products, most often, it is either <emphasis role="italics">http://yourAddress:8222/sdk</emphasis>
+			or <emphasis role="italics">https://youAddress:8333/sdk</emphasis> by default. If you decide to provide a <emphasis>VM Max</emphasis> number
 			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisionning.
 			The clone feature for VMware product is provided by the product itself. The clone virtual machine shares
 			the entire set of device of the cloned virtual machine. The templates virtual disk(s) is(are) attached
 			to the clone in independent-nonpersistent mode, that means that every power off on the clone will
 			erase every data modification made since last startup. Note that during the clone up time, the template
 			virtual machine cannot be used anymore as the virtual disk(s) is(are) locked by the clone.
-			When the clone virtual machines aren't used anymore, they are destroyed. If a problem occurs during destruction
+			When the clone virtual machines are not used anymore, they are destroyed. If a problem occurs during destruction
 			time, the best way to come back to a clean environment state is to detach every virtual disk from the clone virtual
-			machines ( not from the template ) and to remove every clone ( check the "Delete this virtual machine's files
-			from the disk" when confirmation is asked. This way, all disks but the template one will be removed ).
+			machines (not from the template) and to remove every clone (check the "Delete this virtual machine's files
+			from the disk" when confirmation is asked. This way, all disks but the template one will be removed).
 		</para>
 	  </section>
 	  <section xml:id="virtualization-xenserver">
@@ -205,23 +203,23 @@ $RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.pro
 		<para>
 			This section deals with Citrix's XenServer product.
 			To use this kind of products for Resource Manager Node acquisition, you must first create your virtual machine, then,
-			copy your Resource Manager release inside the virtual machine. Next, use one of the scripts that we provide
-			( scripts/virtualization/rm-node-starter.[sh|bat] ) to register a new service on your virtual machine.
-			Note that for both case, you have to get python installed and available in the PATH variable, and especially for
+			copy your Resource Manager distribution inside the virtual machine. Next, use one of the scripts that we provide
+			(<literal>scripts/virtualization/rm-node-starter.[sh|bat]</literal>) to register a new service on your virtual machine.
+			Note that for both cases, you have to get python installed and available in the <emphasis role="italics">PATH</emphasis> variable, and especially for
 			windows, you must use the <link xlink:href="http://www.microsoft.com/Downloads/details.aspx?FamilyID=9d467a69-57ff-4ae7-96ee-b18c4790cffd&amp;displaylang=en">AutoEXnt software</link>.
-			You must modify the rm-node-starter scripts in the virtual machine to match your current Resource Manager setup.
+			You must modify the <literal>rm-node-starter</literal> scripts in the virtual machine to match your current Resource Manager setup.
 		</para>
 		<para>
-			Because Citrix doesn't provide any equivalent of VMware guest tools, we use the embeded mysql server to
+			Because Citrix does not provide any equivalent of VMware guest tools, we use the embeded mysql server to
 			hold deployment information. To be able to access these data from the inside of the virtual machine, we
 			use the python XenAPI.py lib to connect to the running XenServer and get the pieces of information.
-			They are stored in the XenServer DataStore at the VirtualMachine object level as a Hashtable. Every
-			data holded by this table are retrieved thanks to one of the virtual machine MAC address ( XenServer
-			ensures that every MAC address allocated are different ). Thus, to be sure that the Node acquisition will
+			They are stored in the XenServer DataStore at the VirtualMachine object level as a Hashtable. All the
+			data holded by this table are retrieved thanks to one of the virtual machine MAC address (XenServer
+			ensures that every allocated MAC address is different). Thus, to be sure that the Node acquisition will
 			be effective, you must ensure the uniqueness of MAC address for your entire virtual infrastructure.
 			<emphasis>You also need to fill</emphasis> the associated server information located in the file
-			scripts/virtualization/xenserver/xenserver.py in the virtual machine, <emphasis>xenServerAddress</emphasis> : the url of the
-			XenServer running your virtual machine, <emphasis>xenServerUserID</emphasis> : the username you use to
+			<literal>scripts/virtualization/xenserver/xenserver.py</literal> in the virtual machine, <emphasis>xenServerAddress</emphasis>: the url of the
+			XenServer running your virtual machine, <emphasis>xenServerUserID</emphasis>: the username you use to
 			connect to your XenServer and his password: <emphasis>xenServerUserPWD</emphasis>.
 		</para>
 		<para>
@@ -230,10 +228,10 @@ $RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.pro
 			The <emphasis>VMM Url</emphasis> field holds the address of your XenServer.
 			By default this is the http url of the server. If you decide to provide a <emphasis>VM Max</emphasis> number
 			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisionning.
-			The clone feature is provided by the virtual machine monitor. The way XenServer clone a virtual machine rely
-			on the underlying disk store file system type. If you want to enable efficient clone feature ( using
-			differential disks ) you must ensure that the virtual disks used by your template virtual machine are stored
-			on a EXT3 base store ( the default store is LVM base ). To change this characteristic refer to this
+			The clone feature is provided by the virtual machine monitor. The way XenServer clone a virtual machine relies
+			on the underlying disk store file system type. If you want to enable efficient clone feature (using
+			differential disks) you must ensure that the virtual disks used by your template virtual machine are stored
+			on a EXT3 base store (the default store is LVM base). To change this characteristic refer to this
 			<link xlink:href="http://www.tokeshi.com/index.php?option=com_content&amp;task=view&amp;id=5025">good tutorial</link>.
 		</para>
 	  </section>
@@ -242,34 +240,32 @@ $RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.pro
 		<para>
 			This section deals with Sun's xVM Virtualbox product.
 			To use this kind of products for Resource Manager Node acquisition, you must first create your virtual machine, then,
-			copy your Resource Manager release inside the virtual machine. Next, use one of the scripts that we provide
-			( scripts/virtualization/rm-node-starter.[sh|bat] ) to register a new service on your virtual machine.
-			Note that for both case, you have to get python installed and available in the PATH variable, and especially for
+			copy your Resource Manager distribution inside the virtual machine. Next, use one of the scripts that we provide
+			(<literal>scripts/virtualization/rm-node-starter.[sh|bat]</literal>) to register a new service on your virtual machine.
+			Note that for both case, you have to get python installed and available in the <emphasis role="italics">PATH variable</emphasis>, and especially for
 			windows, you must use the <link xlink:href="http://www.microsoft.com/Downloads/details.aspx?FamilyID=9d467a69-57ff-4ae7-96ee-b18c4790cffd&amp;displaylang=en">AutoEXnt software</link>.
-			You also need to install Virtualbox Guest Tools ( from Virtual Machine window, devices, install guest additions ), and
+			You also need to install Virtualbox Guest Tools (from Virtual Machine window devices, install guest additions), and
 			have them available in the PATH variable.
-			You also must modify the rm-node-starter scripts in the virtual machine to match your current Resource Manager setup.
+			You also must modify the <literal>rm-node-starter</literal> scripts in the virtual machine to match your current Resource Manager setup.
 		</para>
 		<para>
 			Once you have your virtual machine template correctly installed, you can use it from the Resource Manager as
 			a RM Node pool. The <emphasis>Infrastructure</emphasis> field appearing on the snapshot above must contain the value "virtualbox".
-			The <emphasis>VMM Url</emphasis> field holds the address of the vboxwebsrv program shiped with xVM Virtualbox.
-			We recommend to run it with a -t parameter set to 20. Note that the default value for the -p parameter is
-			18083, that means that the default VMM Url would http://vboxwebsrvAddress:18083.We also notices that some vboxwebsrv releases
+			The <emphasis>VMM Url</emphasis> field holds the address of the vboxwebsrv program shipped with xVM Virtualbox.
+			We recommend to run it with a <emphasis role="bold">-t</emphasis> parameter set to <emphasis role="bold">20</emphasis>. Note that the default value for the <emphasis role="bold">-p</emphasis> parameter is
+			<emphasis role="bold">18083</emphasis>, that means that the default VMM Url would be <emphasis role="italics">http://vboxwebsrvAddress:18083</emphasis>. We also notices that some vboxwebsrv releases
 			had some troubles with authentication. If it is your case, just submit the following command:
-			<programlisting>
-						VBoxManage setproperty websrvauthlibrary null
-			</programlisting>
+			<screen>VBoxManage setproperty websrvauthlibrary null</screen>
 			and restart vboxwebsrv.
 			If you decide to provide a <emphasis>VM Max</emphasis> number
 			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisionning.
 			The clone feature is not provided by xVM Virtualbox itself. To emulate it, you must snapshot the template
 			virtual machine. The snapshot for Virtualbox is in fact the creation of a new differential disk hierarchy.
 			That means that every newly created virtual machine attached to this snapshot will create a new differential
-			disk. When the clone virtual machines aren't used anymore, they are destroyed. If a problem occurs during destruction
+			disk. When the clone virtual machines are not used anymore, they are destroyed. If a problem occurs during destruction
 			time, the best way to come back to a clean environment state is to remove every clone virtual machine and from the
 			virtual disk management window, remove every virtual disk belonging to the snapshot hierarchy of the template virtual
-			machine that are not attached to a virtual machine.
+			machine that is not attached to a virtual machine.
 		</para>
 	  </section>
   </section>
