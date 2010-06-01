@@ -38,6 +38,7 @@ package functionaltests;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import junit.framework.Assert;
@@ -79,7 +80,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        Runtime.getRuntime().exec("killall " + unixPTKProcessName);
+        killAll(unixPTKProcessName);
 
         SchedulerTHelper.log("Test 1 : Creating jobs...");
 
@@ -144,6 +145,19 @@ public class TestProcessTreeKiller extends FunctionalTest {
 
         res = SchedulerTHelper.getJobResult(id2);
         Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
+    }
+
+    private void killAll(String processName) throws Throwable {
+        byte[] out = new byte[1024];
+        //get PIDs of processName
+        Process p = Runtime.getRuntime().exec("pidof " + processName);
+        int n = p.getInputStream().read(out);
+        //contains PIDs separated with spaces
+        String pids = new String(out, 0, n);
+        if (pids != null && pids.length() > 1) {
+            //kill this processes
+            Runtime.getRuntime().exec("kill " + pids);
+        }
     }
 
     private int getProcessNumber(String executableName) throws IOException {
