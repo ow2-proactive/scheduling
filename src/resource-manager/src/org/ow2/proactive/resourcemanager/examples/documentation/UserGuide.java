@@ -3,9 +3,11 @@ package org.ow2.proactive.resourcemanager.examples.documentation;
 import java.io.File;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.Iterator;
 
 import javax.security.auth.login.LoginException;
 
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -63,8 +65,8 @@ public class UserGuide {
             // incorrect user name or password
             e.printStackTrace();
         }
-        return resourceManager;
         //@snippet-end UserGuide_Connect
+        return resourceManager;
     }
 
     public static NodeSet getNodes(ResourceManager resourceManager, int nbOfNodes,
@@ -139,6 +141,10 @@ public class UserGuide {
             System.out.println("No Windows node has been got");
         } else {
             System.out.println(nodeSet.size() + "Windows nodes have been got");
+            for (Iterator<Node> iterator = nodeSet.iterator(); iterator.hasNext();) {
+                Node node = iterator.next();
+                System.out.println(node.getNodeInformation().getURL());
+            }
         }
 
         selectionScript = UserGuide.getLinuxScript();
@@ -148,7 +154,11 @@ public class UserGuide {
         if (nodeSet == null || nodeSet.size() == 0) {
             System.out.println("No Linux node has been got");
         } else {
-            System.out.println(nodeSet.size() + " Linux nodes have been got");
+            System.out.println(nodeSet.size() + " Linux nodes have been got: ");
+            for (Iterator<Node> iterator = nodeSet.iterator(); iterator.hasNext();) {
+                Node node = iterator.next();
+                System.out.println(node.getNodeInformation().getURL());
+            }
         }
 
         BooleanWrapper released = UserGuide.releaseNodes(resourceManager, nodeSet);

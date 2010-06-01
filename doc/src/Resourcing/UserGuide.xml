@@ -27,6 +27,44 @@
 			<screen>$ rm-start -ln</screen>
 			<para>To learn more about the command line interface, please refer to <xref linkend="CommandLineInterface" />.</para>
 		</warning>
+		<para>
+		  Connecting to the resource manager implicates using a keypair infrastructure to establish a secure channel on
+		  which the credentials (username and password) will be sent securely. There are three ways to connect
+		  to the Resource Manager, as described in the example above:
+		  <orderedlist>
+		    <listitem><para>
+			Retreive the Credentials from disk: supposes the script <emphasis>create-cred[.bat]</emphasis> was previously used to generate those credentials.
+			It requires knowing the location of the public key corresponding to the private key that will be used for decryption on server side.
+			To obtain the key, you need to contact the administrator of the Scheduler.
+		      </para>
+		      <para>
+			<programlisting language="sh"><![CDATA[
+# use local public key to generate credentials for user 'demo'
+/bin/unix $ ./create-cred -P $HOME/.proactive/rm_pubkey -o $HOME/.proactive/my_encrypted_credentials -l demo
+# use rmi://example.com/RMAUTHENTICATION's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
+/bin/unix $ ./create-cred -U rmi://example.com/RMAUTHENTICATION -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
+]]></programlisting>
+			Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; i.e. using
+			<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>.
+		    </para></listitem>
+		    <listitem><para>
+			Create the encrypted Credentials on client side: as safe as the previous method, but requires user input, which prevents automation,
+			or storing clear credentials on the disk, which can result to security breaches. This method also requires knowing the public key,
+			which should be offered by the Resource Manager through the Authentication object with the getPubKey() method.
+			If the Resource Manager does not know the public key, it can be stored locally on client side and designated by the
+			<emphasis>pa.common.auth.pubkey</emphasis> Java property; i.e. using <emphasis>java -Dpa.common.auth.pubkey=$HOME/.proactive/pub.key</emphasis>.
+		    </para></listitem>
+		    <listitem><para>
+			If you cannot retrieve the public key, you can use the old deprecated API, which sends clear credentials on the network, and requires user input.
+		    </para></listitem>
+		  </orderedlist>
+		</para>
+		<para>
+		With the ResourceManager interface, you are now able to obtain the RMMonitoring
+		interface which can be used to track resources and their states.
+		Once you have a reference to the ResourceManager active object, you can perform all
+		actions according to your role (permissions) such as shutdown of the Resource Manager if you are an administrator.
+		</para>
 	</section>
 	<section xml:id="RM_API_gr"><info><title>Getting and releasing nodes</title></info>
 	<para>

@@ -148,5 +148,10 @@
 	<classpathentry kind="lib" path="lib/ProActive/fractal-adl-2.4-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/fractal-api-2.0.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/fractal-gcm-api-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/core/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/annotation/hibernate-commons-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/core/slf4j-api-1.5.6.jar"/>
+	<classpathentry kind="lib" path="lib/common/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/core/geronimo-spec-jta-1.0.1B-rc4.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
