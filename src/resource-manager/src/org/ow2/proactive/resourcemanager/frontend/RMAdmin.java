@@ -66,7 +66,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
  */
 @Deprecated
 @PublicAPI
-public interface RMAdmin extends RMUser, Serializable {
+public interface RMAdmin extends RMUser {
 
     /**
      * Set the ping frequency to the default node source

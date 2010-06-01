@@ -37,7 +37,6 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import java.security.Permission;
-import java.security.Policy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -194,9 +193,9 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
     /** Client pinger */
     private ClientPinger clientPinger;
 
-    private transient RMAccountsManager accountsManager;
+    private RMAccountsManager accountsManager;
 
-    private transient RMJMXHelper jmxHelper;
+    private RMJMXHelper jmxHelper;
 
     /**
      * ProActive Empty constructor
