@@ -74,23 +74,21 @@ public class RMStore {
 
     /*    public static StatusLineContributionItem statusItem =
      new StatusLineContributionItem("LoggedInStatus");*/
-    private ResourceManager resourceManager = null;
+    private ResourceManagerProxy resourceManagerAO = null;
 
     private RMMonitoring rmMonitoring = null;
     private EventsReceiver receiver = null;
     private RMModel model = null;
     private String baseURL;
 
-    /*    static {
-     statusItem.setText("diconnected");
-     }*/
-
-    private RMStore(String url, String login, String password) throws RMException, SecurityException {
+    private RMStore(String url, String login, String password) throws RMException {
         try {
+            resourceManagerAO = PAActiveObject.newActive(ResourceManagerProxy.class, new Object[] {});
             baseURL = url;
 
-            if (url != null && !url.endsWith("/"))
+            if (url != null && !url.endsWith("/")) {
                 url += "/";
+            }
 
             RMAuthentication auth = null;
             try {
@@ -108,20 +106,20 @@ public class RMStore {
                 } catch (KeyException e) {
                     throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
                 }
-                resourceManager = auth.login(creds);
+                resourceManagerAO.connect(auth, creds);
+                //resourceManager = auth.login(creds);
             } catch (LoginException e) {
                 Activator.log(IStatus.INFO, "Login exception for user " + login, e);
                 throw new RMException(e.getMessage());
             }
 
-            rmMonitoring = resourceManager.getMonitoring();
+            rmMonitoring = resourceManagerAO.getMonitoring();
             // checking if there were no exception
             rmMonitoring.toString();
 
-            RMStore.instance = this;
-            model = new RMModel();
-            receiver = (EventsReceiver) PAActiveObject.newActive(EventsReceiver.class.getName(),
-                    new Object[] { rmMonitoring });
+            instance = this;
+            receiver = PAActiveObject.newActive(EventsReceiver.class, new Object[] {});
+            receiver.init(rmMonitoring);
             SelectResourceManagerDialog.saveInformations();
             isConnected = true;
             //ControllerView.getInstance().connectedEvent(isAdmin);
@@ -154,20 +152,25 @@ public class RMStore {
     }
 
     public RMModel getModel() {
+        if (model == null) {
+            model = new RMModel();
+        }
         return model;
     }
 
     /**
      * To get the rmAdmin
+     *
      * @return the rmAdmin
      * @throws RMException
      */
     public ResourceManager getResourceManager() {
-        return resourceManager;
+        return resourceManagerAO;
     }
 
     /**
      * To get the rmMonitoring
+     *
      * @return the rmMonitoring
      */
     public RMMonitoring getRMMonitoring() {
@@ -222,10 +225,10 @@ public class RMStore {
         try {
             //disconnect user if user has not failed
             //protect it by a try catch
-            resourceManager.disconnect();
+            resourceManagerAO.disconnect();
         } catch (Exception e) {
         }
-        resourceManager = null;
+        resourceManagerAO = null;
         rmMonitoring = null;
         model = null;
         baseURL = null;
@@ -234,4 +237,5 @@ public class RMStore {
         RMStatusBarItem.getInstance().setText("disconnected");
         //ControllerView.clearInstance();
     }
+
 }

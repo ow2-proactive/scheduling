@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.data.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +45,6 @@ import org.eclipse.swt.widgets.Display;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.gui.data.RMStore;
 import org.ow2.proactive.resourcemanager.gui.handlers.RemoveNodeSourceHandler;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
@@ -52,7 +52,7 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
 
-public class RMModel {
+public class RMModel implements Serializable {
 
     private Root root = null;
 

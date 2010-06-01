@@ -37,8 +37,6 @@
 package org.ow2.proactive.resourcemanager.gui.data;
 
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
@@ -54,7 +52,7 @@ import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
 
-public class EventsReceiver implements InitActive, RMEventListener {
+public class EventsReceiver implements RMEventListener {
 
     private static final long RM_SERVER_PING_FREQUENCY = 5000;
     private RMModel model = null;
@@ -64,46 +62,47 @@ public class EventsReceiver implements InitActive, RMEventListener {
     public EventsReceiver() {
     }
 
-    public EventsReceiver(RMMonitoring monitorStub) {
+    public void init(RMMonitoring monitorStub) throws RMException {
         this.monitor = monitorStub;
-        model = RMStore.getInstance().getModel();
-        RMInitialState initialState = monitor.addRMEventListener((RMEventListener) PAActiveObject
-                .getStubOnThis());
+        try {
+            model = RMStore.getInstance().getModel();
+            RMInitialState initialState = monitor.addRMEventListener((RMEventListener) PAActiveObject
+                    .getStubOnThis());
 
-        for (RMNodeSourceEvent nodeSourceEvent : initialState.getNodeSource()) {
-            model.addNodeSource(nodeSourceEvent);
-        }
-
-        for (RMNodeEvent nodeEvent : initialState.getNodesEvents()) {
-            model.addNode(nodeEvent);
-        }
-    }
-
-    public void initActivity(Body body) {
-        model.setUpdateViews(true);
-        // Init opened views AFTER model's construction
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                //init Tab view if tab panel is displayed
-                if (ResourcesTabView.getTabViewer() != null) {
-                    ResourcesTabView.init();
-                }
-                //init Tree view if tree panel is displayed
-                if (ResourceExplorerView.getTreeViewer() != null) {
-                    ResourceExplorerView.init();
-                    ResourceExplorerView.getTreeViewer().expandAll();
-                }
-                //init Tree view if tree panel is displayed
-                if (ResourcesCompactView.getCompactViewer() != null) {
-                    ResourcesCompactView.getCompactViewer().loadMatrix();
-                }
-                //init stats view if stats panel is displayed
-                if (StatisticsView.getStatsViewer() != null) {
-                    StatisticsView.init();
-                }
+            for (RMNodeSourceEvent nodeSourceEvent : initialState.getNodeSource()) {
+                model.addNodeSource(nodeSourceEvent);
             }
-        });
-        startPinger();
+
+            for (RMNodeEvent nodeEvent : initialState.getNodesEvents()) {
+                model.addNode(nodeEvent);
+            }
+            model.setUpdateViews(true);
+            // Init opened views AFTER model's construction
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    //init Tab view if tab panel is displayed
+                    if (ResourcesTabView.getTabViewer() != null) {
+                        ResourcesTabView.init();
+                    }
+                    //init Tree view if tree panel is displayed
+                    if (ResourceExplorerView.getTreeViewer() != null) {
+                        ResourceExplorerView.init();
+                        ResourceExplorerView.getTreeViewer().expandAll();
+                    }
+                    //init Tree view if tree panel is displayed
+                    if (ResourcesCompactView.getCompactViewer() != null) {
+                        ResourcesCompactView.getCompactViewer().loadMatrix();
+                    }
+                    //init stats view if stats panel is displayed
+                    if (StatisticsView.getStatsViewer() != null) {
+                        StatisticsView.init();
+                    }
+                }
+            });
+            startPinger();
+        } catch (Throwable t) {
+            throw new RMException(t);
+        }
     }
 
     private void startPinger() {

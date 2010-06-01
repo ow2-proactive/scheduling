@@ -96,10 +96,8 @@ public class CreateSourceDialog extends Dialog {
 
             okButton.addListener(SWT.Selection, new Listener() {
                 public void handleEvent(Event event) {
-
                     try {
                         validateForm();
-
                         ResourceManager rm = RMStore.getInstance().getResourceManager();
                         Object[] policyParams = policy.getParameters();
                         rm.createNodeSource(name.getNodeSourceName(),
@@ -141,7 +139,6 @@ public class CreateSourceDialog extends Dialog {
     private ConfigurablePanel policy;
 
     private CreateSourceDialog(Shell parent) throws RMException {
-
         // Pass the default styles here
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 

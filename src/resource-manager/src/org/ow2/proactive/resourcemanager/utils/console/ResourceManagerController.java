@@ -102,6 +102,8 @@ public class ResourceManagerController {
     protected RMAuthentication auth = null;
     protected ResourceManagerModel model;
 
+    protected String jsEnv = null;
+
     /**
      * Start the RM controller
      *
@@ -166,6 +168,9 @@ public class ResourceManagerController {
             if (cmd.hasOption("h")) {
                 displayHelp = true;
             } else {
+                if (cmd.hasOption("jsenv")) {
+                    model.setInitEnv(cmd.getOptionValue("jsenv"));
+                }
                 String url;
                 if (cmd.hasOption("u")) {
                     url = cmd.getOptionValue("u");
@@ -393,6 +398,12 @@ public class ResourceManagerController {
         script.setArgName("filePath");
         script.setArgs(1);
         script.setRequired(false);
+        options.addOption(script);
+
+        script = new Option("js", "jsenv", true, "Execute the given script and go into interactive mode");
+        script.setArgName("filePath");
+        script.setRequired(false);
+        script.setArgs(1);
         options.addOption(script);
 
         Option useCreds = new Option("uc", "use-creds", false, "Use credentials retreived from disk");

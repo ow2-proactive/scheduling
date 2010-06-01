@@ -27,6 +27,14 @@ function removenode(nodeURL,preemptively){
 }
 
 function createns(nsName,infrastructure,policy){
+	if (infrastructure == undefined){
+		infrastructure = null;
+		println("Infrastructure will be the default one as it is not set");
+	}
+	if (policy == undefined){
+		policy = null;
+		println("Policy will be the default one as it is not set");
+	}
 	return ResourceManagerModel.createns(nsName,infrastructure,policy);
 }
 

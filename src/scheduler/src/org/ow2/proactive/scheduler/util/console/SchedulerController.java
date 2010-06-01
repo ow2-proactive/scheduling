@@ -77,20 +77,20 @@ import org.ow2.proactive.utils.console.VisualConsole;
 
 
 /**
- * Controller will help you to manage and interact with the scheduler.<br>
+ * SchedulerController will help you to manage and interact with the scheduler.<br>
  * Use this class to submit jobs, get results, pause job, etc...
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-public class Controller {
+public class SchedulerController {
 
     protected static final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
 
     protected static final String control = "<ctl> ";
     protected static final String newline = System.getProperty("line.separator");
     protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
-    protected static Controller shell;
+    protected static SchedulerController shell;
 
     protected CommandLine cmd = null;
     protected String user = null;
@@ -100,6 +100,8 @@ public class Controller {
     protected SchedulerAuthenticationInterface auth = null;
     protected SchedulerModel model;
 
+    protected String jsEnv = null;
+
     /**
      * Start the Scheduler controller
      *
@@ -107,22 +109,22 @@ public class Controller {
      */
     public static void main(String[] args) {
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
-        shell = new Controller(null);
+        shell = new SchedulerController(null);
         shell.load(args);
     }
 
     /**
-     * Create a new instance of Controller
+     * Create a new instance of SchedulerController
      */
-    protected Controller() {
+    protected SchedulerController() {
     }
 
     /**
-     * Create a new instance of Controller
+     * Create a new instance of SchedulerController
      *
      * Convenience constructor to let the default one do nothing
      */
-    protected Controller(Object o) {
+    protected SchedulerController(Object o) {
         model = SchedulerModel.getModel(true);
     }
 
@@ -162,6 +164,10 @@ public class Controller {
             if (cmd.hasOption("h")) {
                 displayHelp = true;
             } else {
+
+                if (cmd.hasOption("jsenv")) {
+                    model.setInitEnv(cmd.getOptionValue("jsenv"));
+                }
                 String url;
                 if (cmd.hasOption("u")) {
                     url = cmd.getOptionValue("u");
@@ -407,6 +413,12 @@ public class Controller {
         actionGroup.addOption(opt);
 
         opt = new Option("script", "sf", true, control + "Execute the given script (javascript is supported)");
+        opt.setArgName("filePath");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        actionGroup.addOption(opt);
+
+        opt = new Option("js", "jsenv", true, "Execute the given script and go into interactive mode");
         opt.setArgName("filePath");
         opt.setRequired(false);
         opt.setArgs(1);

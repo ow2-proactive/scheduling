@@ -70,6 +70,8 @@ import org.ow2.proactive.utils.console.MBeanInfoViewer;
  */
 public class ResourceManagerModel extends ConsoleModel {
 
+    private static final String DEFAULT_INIT_JS = System.getProperty("user.home") + File.separator +
+        ".proactive" + File.separator + "rm-client.js";
     private static final String JS_INIT_FILE = "ResourceManagerActions.js";
     protected static final int cmdHelpMaxCharLength = 28;
     protected ResourceManager rm;
@@ -81,6 +83,8 @@ public class ResourceManagerModel extends ConsoleModel {
     private static final String rmLogFile = "RM.log";
 
     protected MBeanInfoViewer jmxInfoViewer = null;
+
+    private String initEnvFileName = null;
 
     /**
      * Get this model. Also specify if the exit command should do something or not
@@ -160,6 +164,18 @@ public class ResourceManagerModel extends ConsoleModel {
         BufferedReader br = new BufferedReader(new InputStreamReader(ResourceManagerController.class
                 .getResourceAsStream(JS_INIT_FILE)));
         eval(readFileContent(br));
+        //read default js env file if exist
+        if (new File(DEFAULT_INIT_JS).exists()) {
+            this.exec_(DEFAULT_INIT_JS);
+        }
+        //read js env argument if any
+        if (this.initEnvFileName != null) {
+            this.exec_(this.initEnvFileName);
+        }
+    }
+
+    void setInitEnv(String fileName) {
+        this.initEnvFileName = fileName;
     }
 
     /**

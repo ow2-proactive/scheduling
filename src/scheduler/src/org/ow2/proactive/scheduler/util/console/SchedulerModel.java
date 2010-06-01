@@ -79,7 +79,10 @@ import org.ow2.proactive.utils.console.MBeanInfoViewer;
  */
 public class SchedulerModel extends ConsoleModel {
 
+    private static final String DEFAULT_INIT_JS = System.getProperty("user.home") + File.separator +
+        ".proactive" + File.separator + "scheduler-client.js";
     private static final String JS_INIT_FILE = "Actions.js";
+
     private static final String YES = "yes";
     private static final String NO = "no";
     private static final String YES_NO = "(" + YES + "/" + NO + ")";
@@ -94,6 +97,8 @@ public class SchedulerModel extends ConsoleModel {
     private ArrayList<Command> commands;
     protected Scheduler scheduler;
     protected MBeanInfoViewer jmxInfoViewer = null;
+
+    private String initEnvFileName = null;
 
     static {
         TaskState.setSortingBy(TaskState.SORT_BY_ID);
@@ -208,9 +213,17 @@ public class SchedulerModel extends ConsoleModel {
     protected void initialize() throws IOException {
         super.initialize();
         //read and launch Action.js
-        BufferedReader br = new BufferedReader(new InputStreamReader(Controller.class
+        BufferedReader br = new BufferedReader(new InputStreamReader(SchedulerController.class
                 .getResourceAsStream(JS_INIT_FILE)));
         eval(readFileContent(br));
+        //read default js env file if exist
+        if (new File(DEFAULT_INIT_JS).exists()) {
+            this.exec_(DEFAULT_INIT_JS);
+        }
+        //read js env argument if any
+        if (this.initEnvFileName != null) {
+            this.exec_(this.initEnvFileName);
+        }
     }
 
     /**
@@ -222,6 +235,10 @@ public class SchedulerModel extends ConsoleModel {
         if (scheduler == null) {
             throw new RuntimeException("Scheduler is not set, it must be set before starting the model");
         }
+    }
+
+    void setInitEnv(String fileName) {
+        this.initEnvFileName = fileName;
     }
 
     /**
