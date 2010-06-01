@@ -351,8 +351,11 @@ public class ResourceManagerModel extends ConsoleModel {
             Object[] imPackedParams = packPluginParameters(imInputParams);
             Object[] policyPackedParams = packPluginParameters(policyInputParams);
 
-            rm.createNodeSource(nodeSourceName, imName, imPackedParams, policyName, policyPackedParams);
-            print("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
+            BooleanWrapper result = rm.createNodeSource(nodeSourceName, imName, imPackedParams, policyName,
+                    policyPackedParams);
+            if (result.booleanValue()) {
+                print("Node source '" + nodeSourceName + "' creation request sent to Resource Manager");
+            }
         } catch (Exception e) {
             handleExceptionDisplay("Error while creating node source '" + nodeSourceName, e);
             return false;
