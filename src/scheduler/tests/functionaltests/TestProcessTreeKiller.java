@@ -153,10 +153,12 @@ public class TestProcessTreeKiller extends FunctionalTest {
         Process p = Runtime.getRuntime().exec("pidof " + processName);
         int n = p.getInputStream().read(out);
         //contains PIDs separated with spaces
-        String pids = new String(out, 0, n);
-        if (pids != null && pids.length() > 1) {
-            //kill this processes
-            Runtime.getRuntime().exec("kill " + pids);
+        if (n > 0) {
+            String pids = new String(out, 0, n);
+            if (pids != null && pids.length() > 1) {
+                //kill this processes
+                Runtime.getRuntime().exec("kill " + pids);
+            }
         }
     }
 
