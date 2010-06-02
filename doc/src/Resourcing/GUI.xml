@@ -10,12 +10,12 @@
 		of computing nodes, creation of node sources and removal of nodes.
 	</para>
 	<para>
-	The Resource Manager Eclipse Plugin is available in two forms:
+		The Resource Manager Eclipse Plugin is available in two forms:
 	</para>
 	<itemizedlist>
 		<listitem>
 			<para>
-			A<emphasis role="bold"> Java stand alone application</emphasis> based on
+			A <emphasis role="bold">Java stand alone application</emphasis> based on
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
 			Eclipse Rich Client Platform (RCP)
 			</link>, available for any platform (Windows, Linux, Mac OSX, Solaris...).
@@ -41,7 +41,8 @@
 				<listitem>
 				<para>
 					<emphasis role="bold">If you are using the Eclipse plugins set</emphasis>, install it as an eclipse plugin
-					and restart Eclipse. Then, select Resource Manager Perspective.
+					and restart Eclipse. To do this, copy all the jar files from the <literal>plugins/</literal> directory of your Resource Manager RCP distirbution into
+					the <literal>plugins/</literal> directory of your Eclipse distribution and restart Eclipse.
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -61,12 +62,13 @@
 	</section>
 	<section xml:id="Connect_RM_GUI"><info><title>Connect to an existing Resource Manager</title></info>
 		<para>
-			A Resource Manager has to be already started before connecting the Scheduler GUI. If no RM has been started, please refer
+			A Resource Manager has to be already started before connecting the Resource Manager GUI. If no RM has been started, please refer
 			to <xref linkend="RM_start"/>.
 		</para>
 		<para>
-		Right click on Resource Explorer area. A pop-up menu with one activated action ("connect a Resource Manager") should appear.
-		Clicking on this action, the following dialog box will show up:
+			Normally, when starting the GUI, a connection dialog box should appear on top of the main screen.
+			If not, right click on Resource Explorer area and select "Connect" on the pop-up menu.
+			Clicking on this action, the following dialog box will show up:
 		</para>
 		<figure xml:id="rm_connection_screen"><info><title>Connection screen</title></info>
 				<mediaobject>
@@ -76,11 +78,12 @@
 				</mediaobject>
 		</figure>
 		<para>
-			Enter the URL of an existing Resource Manager and login information.
+			Enter the URL of an existing Resource Manager and login information. 
+			You can use for example "demo" as a login and "demo" again as a password. This user is an administrator so you will
+			be able to perform any action such as management of nodes and node sources, shutdown of resource manager and so on... without any permission problems.
+			Regular users can only get information about resources and their states.
 			The URL is composed of the protocol, the host name on which the RM is started and the port on
-			which it is listening. Ticking "log as admin" check box allows to perform administrator actions
-			such as management of nodes and node sources, shutdown of resource manager and so on... Regular users
-			can only get information about resources and their states.
+			which it is listening.
 		</para>
 		<para>
 			You are now connected and ready to perform administrative actions on the remote Resource Manager.
@@ -111,7 +114,7 @@
 						</imageobject>
 					</mediaobject>
 					<para>
-					Node is <emphasis role="bold">free</emphasis>, ready to be provided to Scheduler to perform a task.
+					Node is <emphasis role="bold">free</emphasis>, ready to be provided for performing a task (to the Scheduler or another application).
 					</para>
 				</listitem>
 				<listitem>
@@ -136,13 +139,13 @@
 				</listitem>
 				<listitem>
 					<mediaobject>
-					<imageobject>
-						<imagedata scalefit="1" fileref="images/png/plugin/down.png" format="PNG"/>
-				</imageobject>
-				</mediaobject>
-				<para>
-					Node is <emphasis role="bold">down</emphasis>, it is unreachable by Resource Manager or is broken. A failure
-					has occurred on the node (network failed, computer got down, Java runtime that manages this node got down...).
+						<imageobject>
+							<imagedata scalefit="1" fileref="images/png/plugin/down.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+					<para>
+						Node is <emphasis role="bold">down</emphasis>, it is unreachable by Resource Manager or is broken. A failure
+						has occurred on the node (network failed, computer got down, Java runtime that manages this node got down...).
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -158,28 +161,37 @@
 		</figure>
 			<itemizedlist>
 				<listitem><para>
-					<emphasis role="bold">[1] Disconnect</emphasis> - Leave current Resource Manager, perform disconnection.</para>
+					<emphasis role="bold">[1] Connect</emphasis> - Open the connection dialiog box.</para>
 				</listitem>
 				<listitem><para>
-					<emphasis role="bold">[2] Create Node Source</emphasis> - Create a new static node source, with a deployment descriptor,
-					or a peer to peer node source. See below.</para>
+					<emphasis role="bold">[2] Disconnect</emphasis> - Leave the current Resource Manager.</para>
 				</listitem>
 				<listitem><para>
-					<emphasis role="bold">[3] Remove Node Source</emphasis> - Remove a node source from Resource Manager, and release all its nodes.</para>
+					<emphasis role="bold">[3] Add node</emphasis> - Add an existing node to Resource Manager providing its URL.</para>
 				</listitem>
 				<listitem><para>
-					<emphasis role="bold">[4] Shutdown Resource Manager</emphasis> - Stop Resource Manager application, remove all the nodes, and stop
+					<emphasis role="bold">[4] Remove node</emphasis> - Remove selected nodes. Using the tree view, it is possible for example to remove
+					all the nodes belonging to a JVM, a host or a node source.</para>
+				</listitem>
+				<listitem><para>
+					<emphasis role="bold">[5] Create Node Source</emphasis> - Create a new node source. See <xref linkend="rm_gui_create_ns"/>.</para>
+				</listitem>
+				<listitem><para>
+					<emphasis role="bold">[6] Remove Node Source</emphasis> - Remove a node source from Resource Manager, and release all its nodes.</para>
+				</listitem>
+				<listitem><para>
+					<emphasis role="bold">[7] Shutdown Resource Manager</emphasis> - Stop Resource Manager application, remove all the nodes, and stop
 					Resource Manager daemon.</para>
 				</listitem>
 				<listitem><para>
-					<emphasis role="bold">[5] Add node</emphasis> - Add existing node to Resource Manager providing its URL.</para>
+					<emphasis role="bold">[8] Runtime information</emphasis> - </para>
 				</listitem>
 				<listitem><para>
-					<emphasis role="bold">[6] Remove nodes</emphasis> - Remove nodes that are handled by Resource Manager</para>
+					<emphasis role="bold">[9] Accouting information</emphasis> - </para>
 				</listitem>
 			</itemizedlist>
 			<para>
-			All these actions are explained later.
+			All these actions are explained hereafter.
 			</para>
 		</section>
 		<section xml:id="rm_gui_other_views"><info><title>Other views</title></info>
@@ -246,7 +258,7 @@
 			</section>
 			<section xml:id="rm_gui_gcm_customized_infrastructure"><info><title>GCM Customized infrastructure</title></info>
 				<para>If GCM Customized infrastructure is chosen, then select a GCM deployment template that describes how to deploy one node
-				to the host (for example see config/rm/deployment/deployment_ssh_hosts_list_template.xml). The template has to use HOST
+				to the host (for example see config/rm/deployment/deployment_ssh_hosts_list_template.xml). The template has to use <emphasis role="italics">HOST</emphasis>
 				java variable. This variable will be defined at runtime by the infrastructure manager. Host list should be a file
 				containing host names.
 				</para>
@@ -261,18 +273,18 @@
 			<section xml:id="rm_gui_ssh_infrastructure"><info><title>SSH infrastructure</title></info>
 			  <para>
 			    SSH Infrastructure provides a basic but functional way to acquire resources through an SSH connection.
-			    Although such acquisition can be achieved using a GCM descriptor, this Infrastructure can in some situations
+			    Although such acquisition can be achieved using a GCM descriptor, this infrastructure can in some situations
 			    be easier to use for SSH-only use-cases.
 			  </para>
 			  <para>
-			    To acquire nodes, this infrastructure will need to start runtimes on remote hosts.
+			    To acquire nodes, this infrastructure needs to start runtimes on remote hosts.
 			    To do so, it needs to know some information, assumed to be true for all hosts:
 			    <itemizedlist>
 			      <listitem><para>
 				  <emphasis role="bold">Java Path</emphasis>: path to the java executable on the remote hosts.
 			      </para></listitem>
 			      <listitem><para>
-				  <emphasis role="bold">Scheduling Path</emphasis>: path to the Scheduling installation directory on the remote hosts.
+				  <emphasis role="bold">Scheduling Path</emphasis>: path to the Scheduling/RM installation directory on the remote hosts.
 			      </para></listitem>
 			      <listitem><para>
 				  <emphasis role="bold">Protocol</emphasis>: protocol (rmi, http...) used by the remote host to communicate with the RM.
@@ -306,9 +318,9 @@ test.example.net 5
 			</section>
 			<section xml:id="rm_gui_pbs_infrastructure"><info><title>PBS infrastructure</title></info>
 			  <para>
-			    PBS Infrastructure acquires resources on an existing PBS (ie Torque) installation. Useful to add a NodeSource to manage
+			    PBS Infrastructure acquires resources on an existing PBS (i.e. Torque) installation. Useful to add a NodeSource to manage
 			    nodes from a cluster on which the configuration is not alterable.
-			    To acquire nodes, this Infrastructure will connect to the PBS server through SSH, and submit commands
+			    To acquire nodes, this infrastructure will connect to the PBS server through SSH, and submit commands
 			    using the qsub client.
 			    To start nodes, some information needs to be filled in:
 			    <itemizedlist>
@@ -316,7 +328,7 @@ test.example.net 5
 				  <emphasis role="bold">Java Path</emphasis>: path to the java executable on the remote hosts (ie the PBS slaves).
 			      </para></listitem>
 			      <listitem><para>
-				  <emphasis role="bold">Scheduling Path</emphasis>: path to the Scheduling installation directory on the remote hosts.
+				  <emphasis role="bold">Scheduling Path</emphasis>: path to the Scheduling/RM installation directory on the remote hosts.
 			      </para></listitem>
 			      <listitem><para>
 				  <emphasis role="bold">Protocol</emphasis>: protocol (rmi, http...) used by the remote host to communicate with the RM.
@@ -329,18 +341,18 @@ test.example.net 5
 				  on the remote host.
 			      </para></listitem>
 			      <listitem><para>
-				  <emphasis role="bold">Max Nodes</emphasis>: maximum number of nodes this Infrastructure can simultaneously hold from the PBS server.
-				  Useful considering PBS does not provide a mechanism to evaluate the number of currently available or idle cores on the cluster;
-				  this can result to asking more resources than physically available, and waiting for the resources to come up for a very long time
+				  <emphasis role="bold">Max Nodes</emphasis>: maximum number of nodes this infrastructure can simultaneously hold from the PBS server.
+				  That is useful considering that PBS does not provide a mechanism to evaluate the number of currently available or idle cores on the cluster.
+				  This can result to asking more resources than physically available, and waiting for the resources to come up for a very long time
 				  as the request would be queued until satisfiable.
 			      </para></listitem>
 			      <listitem><para>
 				  <emphasis role="bold">PBS Server</emphasis>: URL of the PBS server, which is responsible for acquiring PBS nodes.
-				  this server will be contacted by the Resource Manager through an SSH connection.
+				  This server will be contacted by the Resource Manager through an SSH connection.
 			      </para></listitem>
 			      <listitem><para>
 				  <emphasis role="bold">RM Url</emphasis>: URL of the Resource Manager from the PBS nodes point of view:
-				  this is the URL the nodes will try to lookup when attempting to register to the RM upon creation.
+				  this is the URL the nodes will try to lookup when attempting to register to the RM after their creation.
 			      </para></listitem>
 			      <listitem><para>
 				  <emphasis role="bold">RM Credentials</emphasis>: Encrypted credentials file, as created by the create-cred[.bat] utility.
@@ -374,7 +386,7 @@ test.example.net 5
 			<section xml:id="rm_gui_time_slot"><info><title>Node source time slot policy</title></info>
 				<para>Time slot policy acquires nodes only at "Acquire time" and releases them at "Release time".
 				This action could be done periodically if period is specified. Preemptive option set to true means that
-				nodes will be released despite the fact that some jobs are still running.
+				nodes will be released despite the fact that some jobs are still running on.
 				</para>
 				<figure xml:id="pic_time_slot_policy"><info><title>Time slot policy configuration panel</title></info>
 					<mediaobject>
@@ -397,6 +409,11 @@ test.example.net 5
 					</imageobject>
 					</mediaobject>
 				</figure>
+				<note>
+					<para>
+						This policy is only available when using the Resource Manager with the ProActive Scheduler
+					</para>
+				</note>
 			</section>
 			<section xml:id="rm_gui_scheduler_loading_policy"><info><title>Scheduler loading policy</title></info>
 				<para>This policy allows to configure the number of resources which will be always enough for the
@@ -415,6 +432,11 @@ test.example.net 5
 					</imageobject>
 					</mediaobject>
 				</figure>
+				<note>
+					<para>
+						This policy is only available when using the Resource Manager with the ProActive Scheduler
+					</para>
+				</note>
 			</section>
 		</section>
 
@@ -461,7 +483,7 @@ test.example.net 5
 			<itemizedlist>
 				<listitem><para>
 				If the node to remove is handled by a Static node Source and the node's Java Virtual Machine contains only the node to remove
-				(RM doesn't handle other node from the same JVM), then the JVM is killed.</para>
+				(RM does not handle other node from the same JVM), then the JVM is killed.</para>
 				</listitem>
 				<listitem><para>
 				If the node to remove is handled by a dynamic Node Source,
