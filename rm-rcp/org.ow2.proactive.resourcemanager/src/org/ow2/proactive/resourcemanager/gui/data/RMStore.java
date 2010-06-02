@@ -147,6 +147,10 @@ public class RMStore {
         return instance;
     }
 
+    public static void setConnected(boolean con) {
+        isConnected = con;
+    }
+
     public static boolean isConnected() {
         return isConnected;
     }

@@ -69,6 +69,8 @@ public class EventsReceiver implements RMEventListener {
             RMInitialState initialState = monitor.addRMEventListener((RMEventListener) PAActiveObject
                     .getStubOnThis());
 
+            RMStore.setConnected(true);
+
             for (RMNodeSourceEvent nodeSourceEvent : initialState.getNodeSource()) {
                 model.addNodeSource(nodeSourceEvent);
             }

@@ -131,7 +131,6 @@ public class CompactViewer implements ISelectionProvider {
      * Recursively creates graphical representation of the element and all its child.
      */
     private View createView(TreeLeafElement element) {
-
         View view = ViewFractory.createView(element, filter);
         view.setPosition(currentPosition);
 
@@ -156,6 +155,7 @@ public class CompactViewer implements ISelectionProvider {
     public void addView(final TreeLeafElement element) {
         // checking if element is added into the middle of the matrix
         // if true -> reload everything
+
         final View parent = rootView.findView(element.getParent());
 
         if (parent == null || !lastElement(element)) {
@@ -316,11 +316,16 @@ public class CompactViewer implements ISelectionProvider {
     public void updateView(final TreeLeafElement element) {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                View view = rootView.findView(element);
-                if (view != null) {
-                    view.update();
+                try {
+                    System.out.println("sdfsdfsd");
+                    View view = rootView.findView(element);
+                    if (view != null) {
+                        view.update();
+                    }
+                    composite.layout();
+                } catch (Throwable t) {
+                    t.printStackTrace();
                 }
-                composite.layout();
             }
         });
     }
