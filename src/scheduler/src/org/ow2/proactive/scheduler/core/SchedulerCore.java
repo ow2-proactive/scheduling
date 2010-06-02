@@ -602,12 +602,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 if (td != null && (td.getStatus() == TaskStatus.RUNNING) &&
                     !PAActiveObject.pingActiveObject(td.getExecuterInformations().getLauncher())) {
                     //check if the task has not been terminated while pinging
-                    if (td.getStatus() != TaskStatus.RUNNING) {
-                        continue;
-                    }
-
                     synchronized (currentlyRunningTasks) {
-                        currentlyRunningTasks.get(job.getId()).remove(td.getId());
+                        if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
+                            continue;
+                        }
                     }
 
                     logger_dev.info("Node failed on job '" + job.getId() + "', task '" + td.getId() + "'");
@@ -841,20 +839,22 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         //get the internal task
         InternalTask descriptor = job.getIHMTasks().get(taskId);
 
-        // job might have already been removed if job has failed...
-        Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
-        if (runningTasks != null) {
-            if (runningTasks.remove(taskId) == null) {
-                //This case is checked to avoid race condition when starting a task.
-                //The doTask(...) action could have been performed while the starter thread has considered it
-                //as timed out. In this particular case, this terminate(taskId) method could have been called anyway.
-                //We must not consider this call !
-                logger_dev.info("This taskId represents a non running task");
+        synchronized (currentlyRunningTasks) {
+            // job might have already been removed if job has failed...
+            Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
+            if (runningTasks != null) {
+                if (runningTasks.remove(taskId) == null) {
+                    //This case is checked to avoid race condition when starting a task.
+                    //The doTask(...) action could have been performed while the starter thread has considered it
+                    //as timed out. In this particular case, this terminate(taskId) method could have been called anyway.
+                    //We must not consider this call !
+                    logger_dev.info("This taskId represents a non running task");
+                    return;
+                }
+            } else {
+                logger_dev.error("RunningTasks list was null, This is an abnormal case");
                 return;
             }
-        } else {
-            logger_dev.error("RunningTasks list was null, This is an abnormal case");
-            return;
         }
         try {
             //first unload the executable container that we don't need until next execution (if re-execution)
