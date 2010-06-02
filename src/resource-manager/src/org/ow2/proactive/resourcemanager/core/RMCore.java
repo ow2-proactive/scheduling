@@ -182,6 +182,17 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
 
     private Client caller = null;
 
+    // Client which represents internal objects as core, sources,...
+    private static class InternalClient extends Client {
+        public boolean isAlive() {
+            return true;
+        }
+
+        public String toString() {
+            return "RM service";
+        }
+    }
+
     /**
      * Map of connected clients.
      * It is statically used due to drawbacks in the client pinger functionality
@@ -296,15 +307,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             clientPinger = (ClientPinger) PAActiveObject.newActive(ClientPinger.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 
-            final Client internalClient = new Client() {
-                public boolean isAlive() {
-                    return true;
-                }
-
-                public String toString() {
-                    return "RM service";
-                }
-            };
+            final Client internalClient = new InternalClient();
 
             // adding shutdown hook
             final RMCore rmcoreStub = (RMCore) PAActiveObject.getStubOnThis();
