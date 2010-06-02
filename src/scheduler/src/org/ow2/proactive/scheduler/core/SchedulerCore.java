@@ -605,6 +605,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     if (td.getStatus() != TaskStatus.RUNNING) {
                         continue;
                     }
+
+                    synchronized (currentlyRunningTasks) {
+                        currentlyRunningTasks.get(job.getId()).remove(td.getId());
+                    }
+
                     logger_dev.info("Node failed on job '" + job.getId() + "', task '" + td.getId() + "'");
 
                     try {
