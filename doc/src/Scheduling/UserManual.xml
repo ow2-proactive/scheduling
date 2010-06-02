@@ -1906,6 +1906,19 @@ Job 4 is not finished or unknown !
 				<para>
 					In this case, we get some error messages but no exception and the script can terminate without prompting to view stack trace.
 				</para>
+				<para>
+					<emphasis>Note :</emphasis>Interactive mode can also be started using a javascript environment.
+					To do so, just put a file named <emphasis>scheduler-client.js</emphasis> in the [user.home]/.proactive directory OR
+					just reference your own file when starting the controller :
+					<itemizedlist>
+						<listitem>
+							<para>
+								<emphasis>scheduler-client -uc -js myenv.js</emphasis> : This command will
+								start the scheduler controller in interactive mode first loading the 'myenv.js' script !
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
 			</section>
 		</section>
 		<section xml:id="scheduler_JMX_anonym"><info><title>Connecting to JMX as anonymous user</title></info>
