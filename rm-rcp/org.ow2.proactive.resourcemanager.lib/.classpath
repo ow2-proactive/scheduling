@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/netty-3.2.0.ALPHA2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fractal-adl-2.4-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fractal-api-2.0.3-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fractal-gcm-api-1.1.1.jar"/>
