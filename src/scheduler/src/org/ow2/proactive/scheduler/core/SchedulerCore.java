@@ -723,6 +723,16 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param jobStatus the type of the end for this job. (failed/canceled/killed)
      */
     void endJob(InternalJob job, InternalTask task, String errorMsg, JobStatus jobStatus) {
+
+        // job can be already ended (SCHEDULING-700)
+        JobStatus currentStatus = job.getStatus();
+        if (currentStatus == JobStatus.CANCELED || currentStatus == JobStatus.FAILED ||
+            currentStatus == JobStatus.KILLED) {
+            logger_dev.info("Job ending request for already ended job '" + job.getId() + "'");
+            // job is already ended nothing to do
+            return;
+        }
+
         TaskResult taskResult = null;
 
         if (task != null) {
