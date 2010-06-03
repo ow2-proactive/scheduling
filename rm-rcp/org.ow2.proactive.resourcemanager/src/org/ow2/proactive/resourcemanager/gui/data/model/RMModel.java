@@ -113,8 +113,7 @@ public class RMModel implements Serializable {
                 }
             }
 
-            newNode = new Node(nodeEvent.getNodeUrl(), nodeEvent.getNodeState(), nodeEvent
-                    .getTimeStampFormatted());
+            newNode = new Node(nodeEvent);
             vm.addChild(newNode);
 
             if (parentToRefresh == null) {
@@ -228,7 +227,7 @@ public class RMModel implements Serializable {
         synchronized (root) {
             source = (TreeParentElement) find(root, nodeSourceEvent.getSourceName());
             if (source == null) {
-                source = new Source(nodeSourceEvent.getSourceName(), nodeSourceEvent.getSourceDescription());
+                source = new Source(nodeSourceEvent);
                 root.addChild(source);
             }
         }

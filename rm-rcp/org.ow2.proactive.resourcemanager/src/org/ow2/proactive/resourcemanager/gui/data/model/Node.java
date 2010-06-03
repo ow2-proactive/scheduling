@@ -46,11 +46,15 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 public class Node extends TreeLeafElement {
     private NodeState state = null;
     private String stateChangeTime;
+    private String provider;
+    private String owner;
 
-    public Node(String name, NodeState state, String stateChangeTime) {
-        super(name, TreeElementType.NODE);
-        this.state = state;
-        this.stateChangeTime = stateChangeTime;
+    public Node(RMNodeEvent nodeEvent) {
+        super(nodeEvent.getNodeUrl(), TreeElementType.NODE);
+        this.state = nodeEvent.getNodeState();
+        this.stateChangeTime = nodeEvent.getTimeStampFormatted();
+        this.provider = nodeEvent.getNodeProvider();
+        this.owner = nodeEvent.getNodeOwner();
     }
 
     /**
@@ -70,9 +74,19 @@ public class Node extends TreeLeafElement {
     public void setState(RMNodeEvent event) {
         this.state = event.getNodeState();
         this.stateChangeTime = event.getTimeStampFormatted();
+        this.owner = event.getNodeOwner();
     }
 
     public String getStateChangeTime() {
         return stateChangeTime;
     }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
 }

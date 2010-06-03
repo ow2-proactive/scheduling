@@ -317,7 +317,6 @@ public class CompactViewer implements ISelectionProvider {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 try {
-                    System.out.println("sdfsdfsd");
                     View view = rootView.findView(element);
                     if (view != null) {
                         view.update();

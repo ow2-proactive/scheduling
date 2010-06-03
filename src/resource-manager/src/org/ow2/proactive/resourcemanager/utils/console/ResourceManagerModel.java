@@ -261,6 +261,7 @@ public class ResourceManagerModel extends ConsoleModel {
         list = new ArrayList<String>();
         list.add("SOURCE NAME");
         list.add("DESCRIPTION");
+        list.add("PROVIDER");
         oaf.setTitle(list);
         //separator
         oaf.addEmptyLine();
@@ -268,6 +269,7 @@ public class ResourceManagerModel extends ConsoleModel {
             list = new ArrayList<String>();
             list.add(evt.getSourceName());
             list.add(evt.getSourceDescription());
+            list.add(evt.getNodeSourceProvider());
             oaf.addLine(list);
         }
         print(Tools.getStringAsArray(oaf));
@@ -295,6 +297,8 @@ public class ResourceManagerModel extends ConsoleModel {
             list.add("STATE");
             list.add("SINCE");
             list.add("URL");
+            list.add("PROVIDER");
+            list.add("OWNER");
             oaf.setTitle(list);
             //separator
             oaf.addEmptyLine();
@@ -305,6 +309,8 @@ public class ResourceManagerModel extends ConsoleModel {
                 list.add(evt.getNodeState().toString());
                 list.add(evt.getTimeStampFormatted());
                 list.add(evt.getNodeUrl());
+                list.add(evt.getNodeProvider() == null ? "" : evt.getNodeProvider());
+                list.add(evt.getNodeOwner() == null ? "" : evt.getNodeOwner());
                 oaf.addLine(list);
             }
             print(Tools.getStringAsArray(oaf));

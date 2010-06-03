@@ -70,6 +70,8 @@ public class NodeView extends View {
 
         String nodeName = element.getName();
         String since = ((Node) element).getState() + " since: " + ((Node) element).getStateChangeTime();
+        String provider = ((Node) element).getProvider() == null ? "" : ((Node) element).getProvider();
+        String owner = ((Node) element).getOwner() == null ? "" : ((Node) element).getOwner();
         String vmName = element.getParent().getName();
         String hostName = element.getParent().getParent().getName();
         String nodeSourceName = element.getParent().getParent().getParent().getName();
@@ -78,7 +80,9 @@ public class NodeView extends View {
         tooltip += since + "\n";
         tooltip += "VM: " + vmName + "\n";
         tooltip += "Host: " + hostName + "\n";
-        tooltip += "Node Source: " + nodeSourceName;
+        tooltip += "Node Source: " + nodeSourceName + "\n";
+        tooltip += "Provider: " + provider + "\n";
+        tooltip += "Owner: " + owner;
 
         return tooltip;
     }

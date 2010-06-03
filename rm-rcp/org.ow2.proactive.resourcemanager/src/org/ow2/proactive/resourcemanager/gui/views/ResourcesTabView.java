@@ -84,12 +84,12 @@ public class ResourcesTabView extends ViewPart {
         final TableViewerColumn hostTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
         hostTableViewerColumn.setLabelProvider(new TableLabelProvider(1));
         hostTableViewerColumn.getColumn().setText("Host");
-        hostTableViewerColumn.getColumn().setWidth(150);
+        hostTableViewerColumn.getColumn().setWidth(120);
 
         final TableViewerColumn stateTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
         stateTableViewerColumn.setLabelProvider(new TableLabelProvider(2));
         stateTableViewerColumn.getColumn().setText("State");
-        stateTableViewerColumn.getColumn().setWidth(60);
+        stateTableViewerColumn.getColumn().setWidth(40);
         stateTableViewerColumn.getColumn().setResizable(false);
         stateTableViewerColumn.getColumn().setAlignment(SWT.CENTER);
 
@@ -101,7 +101,17 @@ public class ResourcesTabView extends ViewPart {
         final TableViewerColumn urlTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
         urlTableViewerColumn.setLabelProvider(new TableLabelProvider(4));
         urlTableViewerColumn.getColumn().setText("URL");
-        urlTableViewerColumn.getColumn().setWidth(10);
+        urlTableViewerColumn.getColumn().setWidth(300);
+
+        final TableViewerColumn providerTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
+        providerTableViewerColumn.setLabelProvider(new TableLabelProvider(5));
+        providerTableViewerColumn.getColumn().setText("Provider");
+        providerTableViewerColumn.getColumn().setWidth(100);
+
+        final TableViewerColumn ownerTableViewerColumn = new TableViewerColumn(tabViewer, SWT.NONE);
+        ownerTableViewerColumn.setLabelProvider(new TableLabelProvider(6));
+        ownerTableViewerColumn.getColumn().setText("Owner");
+        ownerTableViewerColumn.getColumn().setWidth(100);
 
         table.setSortColumn(table.getColumn(1));
         hookContextMenu();

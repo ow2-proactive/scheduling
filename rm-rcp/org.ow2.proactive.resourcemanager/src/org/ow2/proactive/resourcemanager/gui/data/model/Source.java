@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.gui.data.model;
 
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
 
@@ -45,10 +46,12 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 public class Source extends TreeParentElement {
 
     private String description = null;
+    private String provider = null;
 
-    public Source(String name, String description) {
-        super(name, TreeElementType.SOURCE);
-        this.description = description;
+    public Source(RMNodeSourceEvent nodeSourceEvent) {
+        super(nodeSourceEvent.getSourceName(), TreeElementType.SOURCE);
+        this.description = nodeSourceEvent.getSourceDescription();
+        this.provider = nodeSourceEvent.getNodeSourceProvider();
     }
 
     public boolean isTheDefault() {
@@ -59,8 +62,12 @@ public class Source extends TreeParentElement {
         return description;
     }
 
+    public String getProvider() {
+        return provider;
+    }
+
     @Override
     public String toString() {
-        return getName() + " [" + description + "]";
+        return getName() + " [" + description + "]" + " provided by \"" + provider + "\"";
     }
 }
