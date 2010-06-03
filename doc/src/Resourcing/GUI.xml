@@ -184,10 +184,10 @@
 					Resource Manager daemon.</para>
 				</listitem>
 				<listitem><para>
-					<emphasis role="bold">[8] Runtime information</emphasis> - </para>
+					<emphasis role="bold">[8] Runtime information</emphasis> - Show runtime information in the form of graphics.</para>
 				</listitem>
 				<listitem><para>
-					<emphasis role="bold">[9] Accouting information</emphasis> - </para>
+					<emphasis role="bold">[9] Accouting information</emphasis> - Show accounting information in the form of graphics.</para>
 				</listitem>
 			</itemizedlist>
 			<para>

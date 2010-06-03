@@ -121,23 +121,23 @@
       You will need to specify:
       <itemizedlist>
 	<listitem><para>
-	    Configuration file: <emphasis>/config/rm/deployment/ec2.properties</emphasis>,
-	    which you should have filled with your AWS credentials beforehand.
+	    <emphasis role="bold">configurationFile</emphasis> - EC2 configuration file such as <emphasis>/config/rm/deployment/ec2.properties</emphasis>,
+		which you should have filled with your AWS credentials beforehand.
 	</para></listitem>
 	<listitem><para>
-	    RM Url: a fully qualified URL conforming to <emphasis>protocol://IP:port/</emphasis>,
+	    <emphasis role="bold">rmUrl</emphasis> - a fully qualified URL conforming to <emphasis>protocol://IP:port/</emphasis>,
 	    where IP is the public IP of the machine where the Resource Manager is launched.
 	    Protocol and port are mandatory, as these values will be used to configure
 	    the ProActive runtime of the EC2 instances at boot. It describes the protocol and port used
 	    for communications from the instance to the Resource Manager.
 	</para></listitem>
 	<listitem><para>
-	    RM login and password: to register on the Resource Manager, nodes need these
+	    <emphasis role="bold">RMCredentialsPath</emphasis> - to register on the Resource Manager, nodes need these
 	    credentials to log in. That can be found in
 	    <emphasis>/config/authentication/login.cfg</emphasis> when using default configuration.
 	</para></listitem>
 	<listitem><para>
-	    Node Port: As stated before, the EC2 node will expose itself with the HTTP protocol.
+	    <emphasis role="bold">nodeHttpPort</emphasis> - As stated before, the EC2 node will expose itself with the HTTP protocol.
 	    You can configure which port it will use. This is useful if the machine on which the RM is started
 	    has restrictive firewall rules for outgoing connections.
 	</para></listitem>

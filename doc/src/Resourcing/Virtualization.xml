@@ -143,6 +143,7 @@
   </para>
   <para>
 	Here is a snapshot of the panel for the information keyboarding that you can find in the <link linkend="Resource_Manager_plugin">Resource Manager GUI</link>:
+	</para>
 	<figure>
 	<info><title>Virtual Infrastructure NodeSource creation dialog</title></info>
 	<mediaobject>
@@ -151,22 +152,76 @@
 	  </imageobject>
 	</mediaobject>
 	</figure>
-	or
-	<screen>$RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure Virtualbox VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMUrl RMCredentials</screen>
-  </para>
-  <para>
-	The <emphasis>Infrastructure</emphasis> field informs the Resource Manager about what kind of virtualized infrastructre
-	to manage. For the time being, only <link linkend="virtualization-vmware">vmware</link>,
-	<link linkend="virtualization-xenserver">xenserver</link> and <link linkend="virtualization-virtualbox">virtualbox</link>
-	are supported.
-	The <emphasis>PA Config</emphasis> field points to a file describing ProActive properties used to update
-	RM Nodes environment. You can thus dynamically precise the node's environment like a precise network communication
-	protocol.
-	The <emphasis>RM Url</emphasis> field holds the Resource Manager's url that will be used to connect remotely, from the virtual
-	machine, by the RM Nodes to register themself as available. If you do not fill this field, local node registration will
-	be used. The "Load from file" button allows you to fill field providing a file of "key = value" entries. The key
-	must be the field names without whitespaces (case sensitive, an example can be found in <literal>config/rm/deployment/vmm.properties</literal>).
-  </para>
+	<note>
+		<para>
+		The "Load from file" button allows you to fill fields providing a file of "key = value" entries. The key
+		must be the field names without whitespaces (case sensitive, an example can be found in <literal>config/rm/deployment/vmm.properties</literal>).
+		</para>
+	</note>
+	<para>
+		or
+	</para>
+	<screen>$RM_HOME>./bin/unix/rm-client -uc --createns virtual -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure infrastructure VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMUrl RMCredentials</screen>
+
+	<para>where:</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				<emphasis>infrastructure</emphasis> - Kind of virtualized infrastructre	to manage. For the time being, only <link linkend="virtualization-vmware">vmware</link>, <link linkend="virtualization-xenserver">xenserver</link> and <link linkend="virtualization-virtualbox">virtualbox</link> are supported.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="bold">VMMUrl</emphasis> - Url of the Hypervisor.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="bold">VMMUser</emphasis> - Hypervisor's user name.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="bold">VMMPwd</emphasis> - Hypervisor's password name.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="bold">VMMTemplate</emphasis> - Template virtual machine.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="bold">VMMax</emphasis> - The maximum number of virtual machine.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="bold">hostCapacity</emphasis> - The number of nodes per virtual machine.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis>PAConfig</emphasis> - File describing ProActive properties used to update
+				RM Nodes environment. You can thus dynamically precise the node's environment like a precise network communication
+				protocol.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis>RMUrl</emphasis> field holds the Resource Manager's url that will be used to connect remotely, from the virtual
+				machine, by the RM Nodes to register themself as available. If you do not fill this field, local node registration will
+				be used.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<emphasis role="bold">RMCredentials</emphasis> - Encrypted credentials file, as created by the create-cred[.bat] utility.
+				  These credentials will be used by the nodes to authenticate on the Resource Manager.
+			</para>
+		</listitem>
+	</itemizedlist>
 	  <section xml:id="virtualization-vmware">
 		<info><title>VMware Products</title></info>
 		<para>
