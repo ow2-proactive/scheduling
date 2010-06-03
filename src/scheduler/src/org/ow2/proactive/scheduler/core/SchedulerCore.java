@@ -52,6 +52,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AsyncAppender;
@@ -139,6 +141,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.CORE);
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.CORE);
+
+    /** Number of threads used to call TaskLauncher.terminate() */
+    private static final int TERMINATE_THREAD_NUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
+            .getValueAsInt();;
 
     /** Scheduler main loop time out */
     private static final int SCHEDULER_TIME_OUT = PASchedulerProperties.SCHEDULER_TIME_OUT.getValueAsInt();
@@ -358,7 +364,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             this.jobsToBeLogged = new Hashtable<JobId, AsyncAppender>();
             this.jobsToBeLoggedinAFile = new Hashtable<JobId, FileAppender>();
             this.currentlyRunningTasks = new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
-
+            this.threadPoolForTerminateTL = Executors.newFixedThreadPool(TERMINATE_THREAD_NUMBER);
             this.resourceManager = rmp;
             this.frontend = frontend;
             this.currentJobToSubmit = jobSubmitLink;
@@ -582,6 +588,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         DatabaseManager.getInstance().close();
         //stop dataspace
         dataSpaceNSStarter.terminateNamingService();
+        threadPoolForTerminateTL.shutdownNow();
         //terminate this active object
         PAActiveObject.terminateActiveObject(false);
         logger.info("Scheduler is now shutdown !");
@@ -733,7 +740,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 //try to terminate the task
                 try {
                     logger_dev.info("Force terminating task '" + td.getId() + "'");
-                    td.getExecuterInformations().getLauncher().terminate();
+                    td.getExecuterInformations().getLauncher().terminate(false);
                 } catch (Exception e) { /* (nothing to do) */
                 }
 
@@ -822,7 +829,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      *
      * @param taskId the identification of the executed task.
      */
-    public void terminate(TaskId taskId) {
+    private ExecutorService threadPoolForTerminateTL;
+
+    public void terminate(final TaskId taskId) {
         boolean hasBeenReleased = false;
         int nativeIntegerResult = 0;
         JobId jobId = taskId.getJobId();
@@ -839,11 +848,12 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         //get the internal task
         InternalTask descriptor = job.getIHMTasks().get(taskId);
 
+        final TaskLauncher taskLauncher;
         synchronized (currentlyRunningTasks) {
             // job might have already been removed if job has failed...
             Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
             if (runningTasks != null) {
-                if (runningTasks.remove(taskId) == null) {
+                if ((taskLauncher = runningTasks.remove(taskId)) == null) {
                     //This case is checked to avoid race condition when starting a task.
                     //The doTask(...) action could have been performed while the starter thread has considered it
                     //as timed out. In this particular case, this terminate(taskId) method could have been called anyway.
@@ -856,6 +866,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 return;
             }
         }
+
         try {
             //first unload the executable container that we don't need until next execution (if re-execution)
             DatabaseManager.getInstance().unload(descriptor);
@@ -870,6 +881,17 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             //unwrap future
             TaskResultImpl res = (TaskResultImpl) PAFuture.getFutureValue(tmp);
             logger_dev.info("Task '" + taskId + "' futur result unwrapped");
+
+            // at this point, the TaskLauncher can be terminated
+            threadPoolForTerminateTL.submit(new Runnable() {
+                public void run() {
+                    try {
+                        taskLauncher.terminate(true);
+                    } catch (Throwable t) {
+                        logger_dev.info("Cannot terminate task launcher for task '" + taskId + "'", t);
+                    }
+                }
+            });
 
             updateTaskIdReferences(res, descriptor.getId());
 
@@ -1533,7 +1555,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         NodeSet nodes = td.getExecuterInformations().getNodes();
 
                         try {
-                            td.getExecuterInformations().getLauncher().terminate();
+                            td.getExecuterInformations().getLauncher().terminate(false);
                         } catch (Exception e) {
                             /* Tested, nothing to do */
                             logger_dev.error("", e);

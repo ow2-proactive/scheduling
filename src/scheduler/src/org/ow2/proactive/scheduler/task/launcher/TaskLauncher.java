@@ -244,7 +244,6 @@ public abstract class TaskLauncher implements InitActive {
             core.terminate(taskId);
         }
         this.currentExecutable = null;
-        PAActiveObject.terminateActiveObject(true);
     }
 
     /**
@@ -524,23 +523,24 @@ public abstract class TaskLauncher implements InitActive {
      * This method will terminate the task that has been launched.
      * In fact it will terminate the launcher.
      */
-    public void terminate() {
+    public void terminate(boolean normalTermination) {
+        if (!normalTermination) {
+            if (this.currentExecutable != null) {
+                this.currentExecutable.kill();
+                this.hasBeenKilled = true;
+                this.currentExecutable = null;
+            }
 
-        if (this.currentExecutable != null) {
-            this.currentExecutable.kill();
-            this.hasBeenKilled = true;
-            this.currentExecutable = null;
-        }
-
-        // unset env
-        this.unsetEnv();
-        // reset stdout/err    
-        try {
-            this.finalizeLoggers();
-        } catch (RuntimeException e) {
-            // exception should not be thrown to the scheduler core
-            // the result has been computed and must be returned !
-            logger_dev.warn("Loggers are not shut down !", e);
+            // unset env
+            this.unsetEnv();
+            // reset stdout/err    
+            try {
+                this.finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to the scheduler core
+                // the result has been computed and must be returned !
+                logger_dev.warn("Loggers are not shutdown !", e);
+            }
         }
         PAActiveObject.terminateActiveObject(true);
     }
