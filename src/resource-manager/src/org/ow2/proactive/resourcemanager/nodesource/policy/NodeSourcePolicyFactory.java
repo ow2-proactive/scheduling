@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.Properties;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 
@@ -106,14 +107,20 @@ public class NodeSourcePolicyFactory {
             throw new RuntimeException(e);
         }
 
-        // activating the policy
+        // turning policy into an active object
         NodeSourcePolicy stub;
         try {
             stub = (NodeSourcePolicy) PAActiveObject.turnActive(policy);
-            stub.configure(policyParameters);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        // initializing parameters
+        BooleanWrapper result = stub.configure(policyParameters);
+        if (!result.booleanValue()) {
+            throw new RuntimeException("Cannot configure the policy " + policyClassName);
+        }
+
         return stub;
     }
 

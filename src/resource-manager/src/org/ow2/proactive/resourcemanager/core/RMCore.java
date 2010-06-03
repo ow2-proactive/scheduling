@@ -730,6 +730,11 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             throw new IllegalStateException("Cannot register the node source");
         }
 
+        BooleanWrapper result = nodeSource.activate();
+        if (!result.booleanValue()) {
+            logger.error("Node source " + nodeSourceName + " cannot be activated");
+        }
+
         // adding access to the core for node source and policy
         RMCore.clients.put(nsId, caller);
         RMCore.clients.put(policyId, caller);
@@ -739,9 +744,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_CREATED,
             caller.getName()));
 
-        nodeSource.activate();
-
-        logger.info("Node source : " + nodeSourceName + " has been successfully created by " + caller);
+        logger.info("Node source " + nodeSourceName + " has been successfully created by " + caller);
 
         return new BooleanWrapper(true);
     }

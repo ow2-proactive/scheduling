@@ -474,9 +474,9 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Activates a node source policy.
      */
-    public void activate() {
+    public BooleanWrapper activate() {
         logger.info("[" + name + "] Activating the policy " + nodeSourcePolicy);
-        nodeSourcePolicy.activate();
+        return nodeSourcePolicy.activate();
     }
 
     /**

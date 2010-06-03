@@ -71,7 +71,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     protected boolean preemptive = false;
 
     protected SchedulerState state;
-    protected Scheduler userInterface;
+    protected Scheduler scheduler;
 
     @Override
     public BooleanWrapper configure(Object... params) {
@@ -85,7 +85,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         try {
             authentication = SchedulerConnection.join(params[2].toString());
             Credentials creds = Credentials.getCredentialsBase64((byte[]) params[3]);
-            userInterface = authentication.login(creds);
+            scheduler = authentication.login(creds);
             preemptive = Boolean.parseBoolean(params[4].toString());
         } catch (Throwable t) {
             throw new IllegalArgumentException(t);
@@ -98,10 +98,10 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     public BooleanWrapper activate() {
         SchedulerAuthenticationInterface authentication;
         try {
-            state = userInterface.addEventListener(getSchedulerListener(), false, true, getEventsList());
+            state = scheduler.addEventListener(getSchedulerListener(), false, true, getEventsList());
         } catch (Exception e) {
             logger.error("", e);
-            return new BooleanWrapper(false);
+            throw new RuntimeException(e.getMessage(), e);
         }
         return new BooleanWrapper(true);
     }
@@ -109,8 +109,8 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     @Override
     public void shutdown(Client initiator) {
         try {
-            userInterface.removeEventListener();
-            userInterface.disconnect();
+            scheduler.removeEventListener();
+            scheduler.disconnect();
         } catch (Exception e) {
             logger.error("", e);
         }
