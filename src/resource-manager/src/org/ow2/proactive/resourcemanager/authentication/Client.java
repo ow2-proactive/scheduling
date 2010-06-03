@@ -42,7 +42,6 @@ import java.security.PrivilegedAction;
 
 import javax.security.auth.Subject;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -50,15 +49,12 @@ import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
-import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 
 
 /**
  * This class represents a client of the resource manager(RM).
- * Basically it is a combination of an authenticated user and its location, so that the same user
- * could connect and use the resource manager simultaneously from different locations.
+ * It could be an internal service or connected remote user.
  *
  * The class is used to track and associate all activities inside the RM to particular user.
  *
@@ -80,6 +76,9 @@ public class Client implements Serializable {
     /** Unique id of the client */
     private UniqueID id;
 
+    /** Defines if this client has to be pinged */
+    boolean pingable = false;
+
     /** Body of the sender of request */
     private transient UniversalBody body;
 
@@ -87,15 +86,22 @@ public class Client implements Serializable {
     }
 
     /**
-     * Constructs the client object from given client name.
-     * @param clientName the name of the client authenticated in the resource manager
+     * Constructs the client object from given client subject.
+     * @param subject with the name of the client authenticated in the resource manager (can be null)
+     * @param pingable defines if client has to be pinged
      */
-    public Client(Subject subject) {
+    public Client(Subject subject, boolean pingable) {
         this.subject = subject;
-        UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
-        this.name = unPrincipal.getName();
-        this.id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        this.body = PAActiveObject.getContext().getCurrentRequest().getSender();
+        this.pingable = pingable;
+
+        if (subject != null) {
+            UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
+            this.name = unPrincipal.getName();
+        }
+        if (pingable) {
+            this.id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+            this.body = PAActiveObject.getContext().getCurrentRequest().getSender();
+        }
     }
 
     /**
@@ -110,12 +116,32 @@ public class Client implements Serializable {
      * Gets the id of the client
      * @return the id of the client
      */
-    public UniqueID getID() {
+    public UniqueID getId() {
         return id;
     }
 
     /**
-     * Redefined equals method based on client id
+     * Sets the id of the client
+     * @param the new client's id
+     */
+    public void setId(UniqueID id) {
+        this.id = id;
+    }
+
+    /**
+     * Defines if the client has to be pinged.
+     * Client of the core could be an internal service
+     * or connected active object. We heed to ping only connected
+     * ones.
+     *
+     * @return true if ping is requires
+     */
+    public boolean isPingable() {
+        return pingable;
+    }
+
+    /**
+     * Redefined equals method based on client's name
      */
     public boolean equals(Object o) {
         if (o == null) {
@@ -125,6 +151,9 @@ public class Client implements Serializable {
         return name.equals(client.getName());
     }
 
+    /**
+     * @return string representation of the client
+     */
     public String toString() {
         return "\"" + name + "\"";
     }
@@ -139,13 +168,15 @@ public class Client implements Serializable {
      * @return true if the client is alive, false otherwise
      */
     public boolean isAlive() {
-        if (body == null) {
-            throw new RuntimeException("Cannot detect if the client " + this + " is alive");
-        }
-        try {
-            body.receiveFTMessage(hb);
-        } catch (Exception e) {
-            return false;
+        if (pingable) {
+            if (body == null) {
+                throw new RuntimeException("Cannot detect if the client " + this + " is alive");
+            }
+            try {
+                body.receiveFTMessage(hb);
+            } catch (Exception e) {
+                return false;
+            }
         }
         return true;
     }
@@ -158,7 +189,6 @@ public class Client implements Serializable {
      * @return an active object body id
      */
     public static UniqueID getId(Object service) {
-
         if (service instanceof StubObject && ((StubObject) service).getProxy() != null) {
             Proxy proxy = ((StubObject) service).getProxy();
 
@@ -170,6 +200,9 @@ public class Client implements Serializable {
         return null;
     }
 
+    /**
+     * @return the subject of the client
+     */
     public Subject getSubject() {
         return subject;
     }

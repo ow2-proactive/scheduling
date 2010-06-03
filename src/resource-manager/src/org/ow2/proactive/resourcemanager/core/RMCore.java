@@ -182,19 +182,8 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
 
     private Client caller = null;
 
-    // Client which represents internal objects as core, sources,...
-    private static class InternalClient extends Client {
-        public boolean isAlive() {
-            return true;
-        }
-
-        public String toString() {
-            return "RM service";
-        }
-    }
-
     /**
-     * Map of connected clients.
+     * Map of connected clients and internal services that have an access to the core.
      * It is statically used due to drawbacks in the client pinger functionality
      * @see Client
      */
@@ -307,15 +296,13 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             clientPinger = (ClientPinger) PAActiveObject.newActive(ClientPinger.class.getName(),
                     new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
 
-            final Client internalClient = new InternalClient();
-
             // adding shutdown hook
             final RMCore rmcoreStub = (RMCore) PAActiveObject.getStubOnThis();
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     if (!toShutDown) {
-                        RMCore.clients.put(PAActiveObject.getBodyOnThis().getID(), internalClient);
+                        RMCore.clients.put(PAActiveObject.getBodyOnThis().getID(), new Client(null, false));
                         rmcoreStub.shutdown(true);
                     }
 
@@ -336,10 +323,10 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             this.monitoring.rmEvent(new RMEvent(RMEventType.STARTED));
 
             // registering internal clients of the core
-            clients.put(Client.getId(authentication), internalClient);
-            clients.put(Client.getId(monitoring), internalClient);
-            clients.put(Client.getId(selectionManager), internalClient);
-            clients.put(Client.getId(clientPinger), internalClient);
+            clients.put(Client.getId(authentication), new Client(null, false));
+            clients.put(Client.getId(monitoring), new Client(null, false));
+            clients.put(Client.getId(selectionManager), new Client(null, false));
+            clients.put(Client.getId(clientPinger), new Client(null, false));
 
             authentication.setActivated(true);
             clientPinger.ping();
@@ -723,7 +710,10 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
         } catch (Exception e) {
             throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
         }
-        // adding node source as client to the core
+
+        // Adding access to the core for node source and policy.
+        // In order to do it node source and policy active objects are added to the clients list.
+        // They will be removed from this list when node source is unregistered.
         UniqueID nsId = Client.getId(nodeSource);
         UniqueID policyId = Client.getId(policy);
         if (nsId == null || policyId == null) {
@@ -735,12 +725,17 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
             logger.error("Node source " + nodeSourceName + " cannot be activated");
         }
 
-        // adding access to the core for node source and policy
-        RMCore.clients.put(nsId, caller);
-        RMCore.clients.put(policyId, caller);
+        Client nsService = new Client(caller.getSubject(), false);
+        Client policyService = new Client(caller.getSubject(), false);
+
+        nsService.setId(nsId);
+        policyService.setId(policyId);
+
+        RMCore.clients.put(nsId, nsService);
+        RMCore.clients.put(policyId, policyService);
 
         this.nodeSources.put(nodeSourceName, nodeSource);
-        // create the event
+        // generate the event of node source creation
         this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_CREATED,
             caller.getName()));
 
@@ -952,26 +947,25 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.core.RMCoreSourceInterface#nodeSourceUnregister(java.lang.String,
-     *      org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
+     * Unregisters node source from the resource manager core.
      */
-    public BooleanWrapper nodeSourceUnregister(String sourceId, RMNodeSourceEvent evt) {
-        NodeSource nodeSource = this.nodeSources.remove(sourceId);
+    public BooleanWrapper nodeSourceUnregister(String sourceName, RMNodeSourceEvent evt) {
+        NodeSource nodeSource = this.nodeSources.remove(sourceName);
 
         if (nodeSource == null) {
-            logger.warn("Attempt to remove non-existing node source " + sourceId);
+            logger.warn("Attempt to remove non-existing node source " + sourceName);
             new BooleanWrapper(false);
         }
 
-        // remove just node source from clients
-        // policy will be removed by client pinger
+        // remove node source from clients list
+        // policy has been already already removed
         UniqueID id = Client.getId(nodeSource);
-        if (id == null) {
-            RMCore.clients.remove(id);
+        if (id != null) {
+            disconnect(id);
         } else {
-            logger.error("Cannot extract the body id of the node source " + sourceId);
+            logger.error("Cannot extract the body id of the node source " + sourceName);
         }
-        logger.info("Node Source removed : " + sourceId);
+        logger.info("Node Source removed : " + sourceName);
         // create the event
         this.monitoring.nodeSourceEvent(evt);
 
@@ -1202,6 +1196,8 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
                 }
             }
             logger.info(client + " disconnected");
+        } else {
+            logger.warn("Trying to disconnect unknown client with id " + clientId);
         }
     }
 

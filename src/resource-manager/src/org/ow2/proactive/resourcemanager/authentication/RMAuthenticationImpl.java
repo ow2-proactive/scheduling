@@ -124,7 +124,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      */
     @Deprecated
     public RMAdmin logAsAdmin(Credentials cred) throws LoginException {
-        Client client = new Client(authenticate(cred));
+        Client client = new Client(authenticate(cred), true);
 
         Set<GroupNamePrincipal> groupPrincipals = client.getSubject().getPrincipals(GroupNamePrincipal.class);
         boolean userOrAdmin = groupPrincipals.contains(new GroupNamePrincipal("admin"));
@@ -132,11 +132,11 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
             throw new LoginException("User does not belong to \"admins\" group");
         }
 
-        if (RMCore.clients.containsKey(client.getID())) {
+        if (RMCore.clients.containsKey(client.getId())) {
             throw new LoginException(ERROR_ALREADY_CONNECTED);
         }
 
-        RMCore.clients.put(client.getID(), client);
+        RMCore.clients.put(client.getId(), client);
         logger.info(client + " connected");
         return rmcore;
     }
@@ -146,7 +146,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      */
     @Deprecated
     public RMUser logAsUser(Credentials cred) throws LoginException {
-        Client client = new Client(authenticate(cred));
+        Client client = new Client(authenticate(cred), true);
 
         Set<GroupNamePrincipal> groupPrincipals = client.getSubject().getPrincipals(GroupNamePrincipal.class);
         boolean userOrAdmin = groupPrincipals.contains(new GroupNamePrincipal("user")) ||
@@ -155,11 +155,11 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
             throw new LoginException("User does not belong to either \"users\" or \"admins\" group");
         }
 
-        if (RMCore.clients.containsKey(client.getID())) {
+        if (RMCore.clients.containsKey(client.getId())) {
             throw new LoginException(ERROR_ALREADY_CONNECTED);
         }
 
-        RMCore.clients.put(client.getID(), client);
+        RMCore.clients.put(client.getId(), client);
         logger.info(client + " connected");
         return rmcore;
     }
@@ -168,13 +168,13 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      * Performs client authentication
      */
     public ResourceManager login(Credentials cred) throws LoginException {
-        Client client = new Client(authenticate(cred));
+        Client client = new Client(authenticate(cred), true);
 
-        if (RMCore.clients.containsKey(client.getID())) {
+        if (RMCore.clients.containsKey(client.getId())) {
             throw new LoginException(ERROR_ALREADY_CONNECTED);
         }
 
-        RMCore.clients.put(client.getID(), client);
+        RMCore.clients.put(client.getId(), client);
         logger.info(client + " connected");
         return rmcore;
     }

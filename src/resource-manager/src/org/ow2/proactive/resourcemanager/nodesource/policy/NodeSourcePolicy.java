@@ -98,6 +98,7 @@ public abstract class NodeSourcePolicy implements Serializable {
             nodesAvailableTo = policyParameters[0].toString();
             administrator = policyParameters[1].toString();
         }
+
         // else using default values
         return new BooleanWrapper(true);
     }
@@ -113,6 +114,10 @@ public abstract class NodeSourcePolicy implements Serializable {
      */
     public void shutdown(Client initiator) {
         nodeSource.finishNodeSourceShutdown(initiator);
+        // the policy shutdown is finished and it has to be removed from clients
+        // list of the resource manager
+        nodeSource.getRMCore().disconnect(Client.getId(PAActiveObject.getStubOnThis()));
+
         PAActiveObject.terminateActiveObject(false);
     }
 
@@ -128,6 +133,7 @@ public abstract class NodeSourcePolicy implements Serializable {
      */
     public void setNodeSource(NodeSource nodeSource) {
         this.nodeSource = nodeSource;
+        Thread.currentThread().setName("Node Source Policy \"" + nodeSource.getName() + "\"");
     }
 
     /**

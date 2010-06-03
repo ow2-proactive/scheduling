@@ -234,8 +234,12 @@ public class ResourceManagerModel extends ConsoleModel {
 
     private void removens_(String nodeSourceName, boolean preempt) {
         try {
-            rm.removeNodeSource(nodeSourceName, preempt);
-            print("Node source '" + nodeSourceName + "' removal request sent to Resource Manager");
+            BooleanWrapper res = rm.removeNodeSource(nodeSourceName, preempt);
+            if (res.booleanValue()) {
+                print("Node source '" + nodeSourceName + "' removal request sent to Resource Manager");
+            } else {
+                print("Cannot send '" + nodeSourceName + "' removal request to Resource Manager");
+            }
         } catch (Exception e) {
             handleExceptionDisplay("Error while removing node source '" + nodeSourceName, e);
         }

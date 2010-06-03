@@ -89,18 +89,29 @@ public class ClientPinger implements InitActive {
             // in order not to hold the lock while iterating
             List<Client> clients = new LinkedList<Client>();
             synchronized (RMCore.clients) {
-                logger.debug("Number of clients to ping " + RMCore.clients.size());
+                logger.debug("Number of registered clients " + RMCore.clients.size());
                 clients.addAll(RMCore.clients.values());
             }
 
+            int numberOfPingedClients = 0;
             for (Client client : clients) {
+                if (!client.isPingable()) {
+                    continue;
+                }
+
+                numberOfPingedClients++;
                 if (client.isAlive()) {
                     logger.debug("Client " + client + " is alive.");
                 } else {
-                    logger.debug("Client " + client + " is down.");
-                    rmcore.disconnect(client.getID());
+                    logger.warn("Client " + client + " is down.");
+                    rmcore.disconnect(client.getId());
                 }
             }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Number of pinged clients " + numberOfPingedClients);
+            }
+
         }
     }
 

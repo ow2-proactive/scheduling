@@ -171,6 +171,8 @@ public class NodeSource implements InitActive, RunActive {
         infrastructureManager.setNodeSource(this);
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
+        Thread.currentThread().setName("Node Source \"" + name + "\"");
+
         try {
             // executor service initialization
             initExecutorService();
