@@ -165,7 +165,13 @@ public final class RMNodeEvent extends RMEvent {
         this.hostName = rmNode.getHostName();
         this.VMName = rmNode.getDescriptorVMName();
         this.nodeState = rmNode.getState();
-        this.timeStamp = rmNode.getStateChangeTime();
+
+        // when node is requested to be removed
+        // there is no state change in the node itself
+        // so the time stamp of the event has to be used
+        if (eventType != RMEventType.NODE_REMOVED) {
+            this.timeStamp = rmNode.getStateChangeTime();
+        }
         this.previousNodeState = previousNodeState;
         this.nodeProvider = rmNode.getProvider() == null ? null : rmNode.getProvider().getName();
         this.nodeOwner = rmNode.getOwner() == null ? null : rmNode.getOwner().getName();
