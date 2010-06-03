@@ -64,7 +64,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
     @Configurable
-    protected String url = "";
+    protected String schedulerUrl = "";
     @Configurable(credential = true)
     protected File schedulerCredentialsPath;
     @Configurable

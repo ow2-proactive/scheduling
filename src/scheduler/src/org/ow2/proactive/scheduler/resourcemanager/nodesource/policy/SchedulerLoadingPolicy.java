@@ -78,16 +78,16 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private Map<JobId, Integer> activeTasks = new HashMap<JobId, Integer>();
     private int activeTask = 0;
 
-    @Configurable(description = "period of recalculating required number of nodes")
-    private int policyPeriod = 10000;
+    @Configurable(description = "refresh frequency (ms)")
+    private int refreshTime = 10000;
     @Configurable
     private int minNodes = 0;
     @Configurable
     private int maxNodes = 100;
     @Configurable(description = "number of tasks per node")
-    private int loadingFactor = 10;
+    private int loadFactor = 10;
     @Configurable(description = "delay between each node release (in ms)")
-    private int releasePeriod = 1000;
+    private int releaseDelay = 1000;
 
     // policy state
     private int currentNodeNumberInNodeSource = 0;
@@ -112,11 +112,11 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
         try {
             int index = 5;
-            policyPeriod = Integer.parseInt(policyParameters[index++].toString());
+            refreshTime = Integer.parseInt(policyParameters[index++].toString());
             minNodes = Integer.parseInt(policyParameters[index++].toString());
             maxNodes = Integer.parseInt(policyParameters[index++].toString());
-            loadingFactor = Integer.parseInt(policyParameters[index++].toString());
-            releasePeriod = Integer.parseInt(policyParameters[index++].toString());
+            loadFactor = Integer.parseInt(policyParameters[index++].toString());
+            releaseDelay = Integer.parseInt(policyParameters[index++].toString());
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(e);
         }
@@ -137,12 +137,12 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         // recalculating nodes number only once per policy period
         while (body.isActive()) {
 
-            service.blockingServeOldest(policyPeriod);
+            service.blockingServeOldest(refreshTime);
 
             delta += System.currentTimeMillis() - timeStamp;
             timeStamp = System.currentTimeMillis();
 
-            if (delta > policyPeriod) {
+            if (delta > refreshTime) {
                 synchronized (monitor) {
                     if (nodeSource != null) {
                         try {
@@ -301,7 +301,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             return;
         }
 
-        int requiredNodesNumber = activeTask / loadingFactor + (activeTask % loadingFactor == 0 ? 0 : 1);
+        int requiredNodesNumber = activeTask / loadFactor + (activeTask % loadFactor == 0 ? 0 : 1);
         logger.debug("Required node number " + requiredNodesNumber);
 
         if (requiredNodesNumber == potentialNodeNumberInResourceManager) {
@@ -400,7 +400,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                     thisStub.removeNodes(1, preemptive);
                 }
             }
-        }, releasePeriod, releasePeriod);
+        }, releaseDelay, releaseDelay);
     }
 
     @Override
@@ -411,7 +411,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [Max Nodes: " + maxNodes +
-            " Min Nodes: " + minNodes + " Job Per Node: " + loadingFactor + "]";
+            " Min Nodes: " + minNodes + " Job Per Node: " + loadFactor + "]";
     }
 
     /**

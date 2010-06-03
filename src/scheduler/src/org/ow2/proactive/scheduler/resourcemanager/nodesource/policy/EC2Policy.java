@@ -96,18 +96,18 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     /**
      * Delay in seconds between each time the policy refreshes its internal state
      */
-    @Configurable(description = "Refresh frequency (s)")
+    @Configurable(description = "refresh frequency (s)")
     private int refreshTime = 5;
     /**
      * The policy will try to maintain a number <code>schedulerTasks/loadFactor</code> nodes in the whole RM
      */
-    @Configurable(description = "Tasks per node")
+    @Configurable(description = "tasks per node")
     private int loadFactor = 10;
     /**
      * Time after which a node is considered 'releasable', since the time of its acquisition
      */
-    @Configurable(description = "Release cycle (s)")
-    private int releaseCycle = 3600;
+    @Configurable(description = "delay between each node release (in ms)")
+    private int releaseDelay = 3600;
 
     private EC2Policy thisStub;
 
@@ -159,7 +159,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
             int index = 5;
             refreshTime = Integer.parseInt(params[index++].toString());
             loadFactor = Integer.parseInt(params[index++].toString());
-            releaseCycle = Integer.parseInt(params[index++].toString());
+            releaseDelay = Integer.parseInt(params[index++].toString());
         } catch (RuntimeException e) {
             throw new IllegalArgumentException("Unable to parse parameters", e);
         }
@@ -288,7 +288,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
                 long dt = now - acq;
                 // 10secs delay at worse should be enough for the terminate request to be sent in time
                 int delay = Math.max(refreshTime, 10);
-                if ((dt + delay) % releaseCycle <= delay) {
+                if ((dt + delay) % releaseDelay <= delay) {
                     nodeSource.getRMCore().removeNode(nodeUrl, super.preemptive);
                     diff--;
                     if (diff == 0) {
@@ -311,7 +311,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
             // this is *wildly* inaccurate, but as the useful info is kept on IM side,
             // this provides at least the guarantee that nodes won't stay pending forever,
             // which is far worse than unexpected nodes poping in the NS without being expected
-            if (System.currentTimeMillis() - l > (this.releaseCycle / 2) * 1000) {
+            if (System.currentTimeMillis() - l > (this.releaseDelay / 2) * 1000) {
                 it.remove();
             } else {
                 break;
@@ -429,7 +429,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     @Override
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " [release cycle: " +
-            releaseCycle + "s refresh frequency: " + refreshTime + "s load factor: " + loadFactor + "]";
+            releaseDelay + "s refresh frequency: " + refreshTime + "s load factor: " + loadFactor + "]";
     }
 
     /**
