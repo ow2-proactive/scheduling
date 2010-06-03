@@ -156,7 +156,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
     public BooleanWrapper configure(Object... params) {
         super.configure(params);
         try {
-            int index = 5;
+            int index = 4;
             refreshTime = Integer.parseInt(params[index++].toString());
             loadFactor = Integer.parseInt(params[index++].toString());
             releaseDelay = Integer.parseInt(params[index++].toString());
@@ -289,7 +289,7 @@ public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunAc
                 // 10secs delay at worse should be enough for the terminate request to be sent in time
                 int delay = Math.max(refreshTime, 10);
                 if ((dt + delay) % releaseDelay <= delay) {
-                    nodeSource.getRMCore().removeNode(nodeUrl, super.preemptive);
+                    nodeSource.getRMCore().removeNode(nodeUrl, false);
                     diff--;
                     if (diff == 0) {
                         break;

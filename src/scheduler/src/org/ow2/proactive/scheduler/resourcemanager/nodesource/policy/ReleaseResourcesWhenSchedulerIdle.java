@@ -75,7 +75,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
     public BooleanWrapper configure(Object... policyParameters) {
         super.configure(policyParameters);
         try {
-            idleTime = Long.parseLong(policyParameters[5].toString());
+            idleTime = Long.parseLong(policyParameters[4].toString());
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(e);
         }
@@ -145,7 +145,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
                         @Override
                         public void run() {
                             synchronized (timer) {
-                                thisStub.removeAllNodes(preemptive);
+                                thisStub.removeAllNodes(false);
                                 resourcesReleased = true;
                             }
                         }

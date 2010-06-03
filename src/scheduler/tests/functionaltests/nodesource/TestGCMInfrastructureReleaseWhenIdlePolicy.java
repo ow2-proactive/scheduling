@@ -75,8 +75,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
                 .join(SchedulerTHelper.schedulerDefaultURL);
         Credentials creds = Credentials.createCredentials(SchedulerTHelper.username,
                 SchedulerTHelper.password, auth.getPublicKey());
-        return new Object[] { "USER", "ALL", SchedulerTHelper.schedulerDefaultURL, creds.getBase64(), "true",
-                "30000" };
+        return new Object[] { "USER", "ALL", SchedulerTHelper.schedulerDefaultURL, creds.getBase64(), "30000" };
     }
 
     protected String getDescriptor() {

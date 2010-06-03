@@ -111,7 +111,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         super.configure(policyParameters);
 
         try {
-            int index = 5;
+            int index = 4;
             refreshTime = Integer.parseInt(policyParameters[index++].toString());
             minNodes = Integer.parseInt(policyParameters[index++].toString());
             maxNodes = Integer.parseInt(policyParameters[index++].toString());
@@ -397,7 +397,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
                     releaseNodesNumber--;
                     pendingNodesNumberRel++;
-                    thisStub.removeNodes(1, preemptive);
+                    thisStub.removeNodes(1, false);
                 }
             }
         }, releaseDelay, releaseDelay);

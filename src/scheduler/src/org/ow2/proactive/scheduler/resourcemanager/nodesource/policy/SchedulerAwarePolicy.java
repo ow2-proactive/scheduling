@@ -67,8 +67,6 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     protected String schedulerUrl = "";
     @Configurable(credential = true)
     protected File schedulerCredentialsPath;
-    @Configurable
-    protected boolean preemptive = false;
 
     protected SchedulerState state;
     protected Scheduler scheduler;
@@ -86,7 +84,6 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
             authentication = SchedulerConnection.join(params[2].toString());
             Credentials creds = Credentials.getCredentialsBase64((byte[]) params[3]);
             scheduler = authentication.login(creds);
-            preemptive = Boolean.parseBoolean(params[4].toString());
         } catch (Throwable t) {
             throw new IllegalArgumentException(t);
         }
