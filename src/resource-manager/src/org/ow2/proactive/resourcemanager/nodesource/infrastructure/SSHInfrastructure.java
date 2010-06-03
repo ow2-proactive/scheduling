@@ -142,13 +142,13 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
 
         // build the command used to start the runtime on the remote host
 
-        String paJar = schedulingPath + "/dist/lib/ProActive.jar:";
+        String paJar = schedulingPath + "/dist/lib/jython-engine.jar:";
+        paJar += schedulingPath + "/dist/lib/script-js.jar:";
+        paJar += schedulingPath + "/dist/lib/jruby-engine.jar:";
+        paJar += schedulingPath + "/dist/lib/ProActive.jar:";
         paJar += schedulingPath + "/dist/lib/ProActive_ResourceManager-client.jar:";
         paJar += schedulingPath + "/dist/lib/ProActive_Scheduler-worker.jar:";
         paJar += schedulingPath + "/dist/lib/ProActive_SRM-common-client.jar:";
-        paJar += schedulingPath + "/dist/lib/script-js.jar:";
-        paJar += schedulingPath + "/dist/lib/jruby-engine.jar:";
-        paJar += schedulingPath + "/dist/lib/jython-engine.jar:";
         paJar += schedulingPath + "/dist/lib/commons-logging-1.0.4.jar";
 
         String cmd = this.javaPath + " -cp " + paJar;
