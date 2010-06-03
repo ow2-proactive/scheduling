@@ -143,10 +143,26 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
     private static String totalProvidedNodeTimeAndNodeCountSQL() {
         final StringBuilder builder = new StringBuilder("SELECT ");
         builder.append("tab.np, SUM(tab.d), COUNT(DISTINCT tab.nc) FROM ");
-        // EMPTY ADDS : ADDs not followed by stop or remove
-        builder.append("(select t1.NODEPROVIDER as np, SUM(" + System.currentTimeMillis() +
+        // Compute all inconsistent adds before last start (the duration is computed using the heartbeat)
+        builder
+                .append("(select t1.NODEPROVIDER as np,  SUM(h1.TIMESTAMP - t1.TIMESTAMP) as d, t1.NODEURL as nc ");
+        builder.append("from RMNODEEVENT t1 JOIN RMEVENT h1 ON ");
+        builder.append("t1.TIMESTAMP < h1.TIMESTAMP WHERE ");
+        builder.append("t1.TYPE=5 AND ");
+        builder.append("h1.TIMESTAMP = (select MAX(TIMESTAMP) from RM.RMEVENT h where ");
+        builder.append("h.type = 8 AND ");
+        builder
+                .append("h.timestamp < (select MIN(TIMESTAMP) from RM.RMEVENT where type = 2 AND timestamp > t1.timestamp)) ");
+        builder
+                .append("AND (NOT EXISTS (select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2)))) ");
+        builder.append("GROUP BY t1.NODEPROVIDER, t1.NODEURL ");
+        builder.append("UNION ");
+        // Same for current adds not followed by stop or remove
+        builder.append("select t1.NODEPROVIDER as np, SUM(" + System.currentTimeMillis() +
             " - t1.TIMESTAMP) as d, t1.NODEURL as nc from RMNODEEVENT t1 ");
-        builder.append("WHERE t1.TYPE=5 AND (NOT EXISTS ");
+        builder.append("WHERE t1.TYPE=5 AND ");
+        builder.append("(t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2)) AND ");
+        builder.append("(NOT EXISTS ");
         builder
                 .append("(select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2)))) ");
         builder.append("GROUP BY t1.NODEPROVIDER, t1.NODEURL ");
@@ -154,9 +170,9 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         builder
                 .append("select t1.NODEPROVIDER as np, SUM(t2.TIMESTAMP - t1.TIMESTAMP) as d, t1.NODEURL as nc from RMNODEEVENT t1 ");
         builder.append("JOIN RMNODEEVENT t2 ON ");
-        // DOWNED ADDS : ADDs followed by stop
+        // Consistent adds are followed by stop
         builder.append("(t1.ID = t2.ADDEVENTID AND t1.TYPE = 5 AND (t2.TYPE = 6 AND t2.NODESTATE = 2)) OR ");
-        // NOT DOWNED REMOVED ADDS : ADDs that are followed directly by remove (without stop)
+        // Or  followed by remove (without stop)
         builder
                 .append("(t1.ID = t2.ADDEVENTID AND t1.TYPE = 5 AND t2.TYPE = 7 AND t2.PREVIOUSNODESTATE <> 2) ");
         builder.append("GROUP BY t1.NODEPROVIDER, t1.NODEURL ");
@@ -164,3 +180,58 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         return builder.toString();
     }
 }
+
+// FULL SQL REQUEST :
+
+//SELECT tab.np, SUM(tab.d), COUNT(DISTINCT tab.nc) FROM
+//(
+//-- All inconsistent adds before the last restart
+//select t1.NODEPROVIDER as np,  SUM(h1.TIMESTAMP - t1.TIMESTAMP) as d, t1.NODEURL as nc
+//from RMNODEEVENT t1
+//JOIN RMEVENT h1
+//ON
+//    t1.TIMESTAMP < h1.TIMESTAMP
+//WHERE
+//    -- Node added event
+//    t1.TYPE=5 AND
+//    -- Before the last start
+//--            (t1.TIMESTAMP <
+//--                (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2)) AND
+//    -- The next heartbeat before the next start 
+//    h1.TIMESTAMP = (select MAX(TIMESTAMP) from RM.RMEVENT h where
+//                     h.type = 8 AND
+//                     h.timestamp < (select MIN(TIMESTAMP) from RM.RMEVENT where type = 2 AND timestamp > t1.timestamp))
+//    -- Inconsistent means not stopped and not removed
+//    AND
+//    (NOT EXISTS
+//        (select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2))))
+// GROUP BY t1.NODEPROVIDER, t1.NODEURL
+// UNION
+//-- All inconsistent adds after the last restart (currently provided nodes) must be SUM(System.currentTimeMillis() - t1.TIMESTAMP)
+//select t1.NODEPROVIDER as np, SUM(t1.TIMESTAMP) as d, t1.NODEURL as nc
+//from RMNODEEVENT t1
+//WHERE
+//    -- Node added event
+//    t1.TYPE=5
+//    AND
+//    -- From the last start
+//    (t1.TIMESTAMP >
+//        (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2))
+//    -- Inconsistent means not stopped and not removed
+//    AND
+//    (NOT EXISTS
+//        (select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2))))
+//    GROUP BY t1.NODEPROVIDER, t1.NODEURL
+//UNION
+//-- All consistent adds
+//select t1.NODEPROVIDER as np, SUM(t2.TIMESTAMP - t1.TIMESTAMP) as d, t1.NODEURL as nc from RMNODEEVENT t1
+//JOIN RMNODEEVENT t2 ON
+//(
+//    t1.ID = t2.ADDEVENTID AND
+//    t1.TYPE = 5 AND
+//    (t2.TYPE = 6 AND t2.NODESTATE = 2)
+//) OR
+//(t1.ID = t2.ADDEVENTID AND t1.TYPE = 5 AND t2.TYPE = 7 AND t2.PREVIOUSNODESTATE <> 2)
+//GROUP BY t1.NODEPROVIDER, t1.NODEURL
+//) tab
+//GROUP BY tab.np
