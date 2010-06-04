@@ -23,8 +23,8 @@ import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingServiceDeployer;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.Selector;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
-import org.ow2.proactive.scheduler.task.launcher.dataspace.AntFileSelector;
 
 
 public class TestAntFileSelector {
@@ -151,7 +151,7 @@ public class TestAntFileSelector {
     }
 
     public ArrayList<String> test() throws Exception {
-        AntFileSelector ant = new AntFileSelector();
+        FastFileSelector ant = new FastFileSelector();
         ant.setIncludes(new String[] { "T*.class", "nodesource/*.xml", "**/*.ini", "executables/*.sh" });
         ant.setCaseSensitive(true);
 

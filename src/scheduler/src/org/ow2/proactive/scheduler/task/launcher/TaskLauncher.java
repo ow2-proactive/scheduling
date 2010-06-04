@@ -65,6 +65,8 @@ import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelector;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -82,8 +84,6 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppen
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
-import org.ow2.proactive.scheduler.task.launcher.dataspace.AntFileSelector;
-import org.ow2.proactive.scheduler.task.launcher.dataspace.AntSelector;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.scripting.PropertyUtils;
 import org.ow2.proactive.scripting.Script;
@@ -632,16 +632,16 @@ public abstract class TaskLauncher implements InitActive {
             ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
             FileSystemException toBeThrown = null;
             for (InputSelector is : inputFiles) {
-                //fill ant file selector
-                AntFileSelector ant = new AntFileSelector();
-                ant.setIncludes(is.getInputFiles().getIncludes());
-                ant.setExcludes(is.getInputFiles().getExcludes());
-                ant.setCaseSensitive(is.getInputFiles().isCaseSensitive());
+                //fill fast file selector
+                FastFileSelector fast = new FastFileSelector();
+                fast.setIncludes(is.getInputFiles().getIncludes());
+                fast.setExcludes(is.getInputFiles().getExcludes());
+                fast.setCaseSensitive(is.getInputFiles().isCaseSensitive());
                 switch (is.getMode()) {
                     case TransferFromInputSpace:
                         //search in INPUT
                         try {
-                            AntSelector.findFiles(INPUT, ant, true, results);
+                            FastSelector.findFiles(INPUT, fast, true, results);
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
@@ -653,7 +653,7 @@ public abstract class TaskLauncher implements InitActive {
                     case TransferFromOutputSpace:
                         //search in OUTPUT
                         try {
-                            AntSelector.findFiles(OUTPUT, ant, true, results);
+                            FastSelector.findFiles(OUTPUT, fast, true, results);
                         } catch (FileSystemException fse) {
                             logger_dev_dataspace.info("", fse);
                             toBeThrown = new FileSystemException(
@@ -729,15 +729,15 @@ public abstract class TaskLauncher implements InitActive {
             ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
             FileSystemException toBeThrown = null;
             for (OutputSelector os : outputFiles) {
-                //fill ant file selector
-                AntFileSelector ant = new AntFileSelector();
-                ant.setIncludes(os.getOutputFiles().getIncludes());
-                ant.setExcludes(os.getOutputFiles().getExcludes());
-                ant.setCaseSensitive(os.getOutputFiles().isCaseSensitive());
+                //fill fast file selector
+                FastFileSelector fast = new FastFileSelector();
+                fast.setIncludes(os.getOutputFiles().getIncludes());
+                fast.setExcludes(os.getOutputFiles().getExcludes());
+                fast.setCaseSensitive(os.getOutputFiles().isCaseSensitive());
                 switch (os.getMode()) {
                     case TransferToOutputSpace:
                         try {
-                            AntSelector.findFiles(SCRATCH, ant, true, results);
+                            FastSelector.findFiles(SCRATCH, fast, true, results);
                             //debug ---
                             if (!logger_dev_dataspace.isDebugEnabled()) {
                                 if (results == null || results.size() == 0) {
