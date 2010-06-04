@@ -1,0 +1,30 @@
+$RM_HOME/bin/unix$ rm-client -l admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy
+
+Available node source policies:
+Name: Release Resources When Scheduler Idle
+Description: Releases all resources when scheduler is idle for specified
+time. Acquires them back on job submission.
+Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle
+Parameters: <class name> nodesAvailableTo administrator schedulerUrl schedulerCredentialsPath idleTime
+
+Name: EC2 Policy
+Description: Allocates resources according to the Scheduler loading factor,
+releases resources considering EC2 instances are paid by the hour
+Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.EC2Policy
+Parameters: <class name> nodesAvailableTo administrator schedulerUrl schedulerCredentialsPath refreshTime loadFactor releaseDelay
+
+Name: Time Slot Policy
+Description: Acquires and releases nodes at specified time.
+Class name: org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
+Parameters: <class name> nodesAvailableTo administrator acquireTime releaseTime period preemptive
+
+Name: Scheduler Loading Policy
+Description: Allocates as many resources as scheduler required according
+to loading factor. Releases resources smoothly.
+Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy
+Parameters: <class name> nodesAvailableTo administrator schedulerUrl schedulerCredentialsPath refreshTime minNodes maxNodes loadFactor releaseDelay
+
+Name: Static Policy
+Description: Static nodes acquisition.
+Class name: org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
+Parameters: <class name> nodesAvailableTo administrator

@@ -1,0 +1,42 @@
+$RM_HOME/bin/unix$ rm-client -l admin -cn myns -infrastructure
+
+Available node source infrastructures:
+Name: GCM Infrastructure
+Description: Infrastructure described in GCM deployment descriptor
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure
+Parameters: <class name> descriptor
+
+Name: EC2 Infrastructure
+Description: Handles nodes from the Amazon Elastic Compute Cloud Service.
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure
+Parameters: <class name> configurationFile rmUrl RMCredentialsPath nodeHttpPort
+
+Name: Virtual Infrastructure
+Description: Virtualized Infrastructure node acquisition
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure
+Parameters: <class name> infrastructure VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMUrl RMCredentials
+
+Name: WinHPC Infrastructure
+Description: Windows HPC infrasturcure
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure
+Parameters: <class name> maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmPath RMUrl RMCredentialsPath javaOptions extraClassPath
+
+Name: SSH Infrastructure
+Description: Creates remote runtimes using SSH
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
+Parameters: <class name> javaPath schedulingPath protocol port javaOptions hostsList
+
+Name: GCM Customised Infrastructure
+Description: Handles hosts from the list using specified gcm deployment descriptor
+template with HOST java variable contract (see proactive documentation)
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure
+Parameters: <class name> descriptor hostsList
+
+Name: PBS Infrastructure
+Description: Acquires nodes from a PBS Resouce Manager
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure
+Parameters: <class name> javaPath schedulingPath protocol port javaOptions maxNodes PBSServer RMUrl RMCredentialsPath qsubOptions
+
+Name: Default Infrastructure Manager
+Description: Default infrastructure
+Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager

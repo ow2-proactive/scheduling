@@ -31,29 +31,7 @@
 	<para><emphasis>rm-client[.bat]</emphasis>, in <literal>bin/[os]</literal> directory, provides a way to connect to the resource manager
 	and manipulate it in command line mode. This scrips supports a bunch of options:
 	</para>
-		<screen>usage: rm-client [-a &lt;node URLs&gt; | -cn &lt;names&gt; | -d &lt;node URLs&gt; | -jmxinfo | -ln | -lns | -r &lt;names&gt; | -reloadpermissions | -s] [-c &lt;arg&gt;]   [-f] [-g] [-h]
-       [-infrastructure &lt;params&gt;]  [-l &lt;login&gt;]   [-ns &lt;nodes URLs&gt;] [-policy &lt;params&gt;]    [-sf &lt;filePath&gt;] [-u &lt;rmURL&gt;] [-uc]
- -a,--addnodes &lt;node URLs&gt;       &lt;ctl&gt; Add nodes by their URLs
- -c,--credentials &lt;arg&gt;          Path to the credentials (/user/osmirnov/home/.proactive/security/creds.enc).
- -cn,--createns &lt;names&gt;          &lt;ctl&gt; Create new node sources
- -d,--removenodes &lt;node URLs&gt;    &lt;ctl&gt; Remove nodes by their URLs
- -f,--force                      &lt;ctl&gt; Do not wait for busy nodes to be freed before nodes removal, node source removal and shutdown actions (-d, -r and -s)
- -g,--gui                        Start the console in a graphical view
- -h,--help                       Display this help
- -infrastructure &lt;params&gt;        Specify an infrastructure when node source is created
- -jmxinfo                        &lt;ctl&gt; Display some statistics provided by the Scheduler MBean
- -l,--login &lt;login&gt;              The username to join the Resource Manager
- -ln,--listnodes                 &lt;ctl&gt; List nodes handled by Resource Manager. Display is : NODESOURCE HOSTNAME STATE NODE_URL
- -lns,--listns                   &lt;ctl&gt; List node sources on Resource Manager. Display is : NODESOURCE TYPE
- -ns,--nodesource &lt;nodes URLs&gt;   &lt;ctl&gt; Specify an existing node source name for adding nodes
- -policy &lt;params&gt;                Specify a policy when node source is created
- -r,--removens &lt;names&gt;           &lt;ctl&gt; Remove given node sources
- -reloadpermissions              &lt;ctl&gt; Reload resource manager permissions
- -s,--shutdown                   &lt;ctl&gt; Shutdown Resource Manager
- -sf,--script &lt;filePath&gt;         &lt;ctl&gt; Execute the given script (javascript is supported)
- -u,--rmURL &lt;rmURL&gt;              The Resource manager URL (default rmi://localhost:1099/)
- -uc,--use-creds                 Use credentials retreived from disk</screen>
-
+	<programlisting><textobject><textdata fileref="code_snippets/admin/rm-client-help.txt"/></textobject></programlisting>
 	<para>
 			When new node source is created custom infrastructure or policy can be specified:
 	</para>
@@ -65,48 +43,8 @@
 			</para>
 		</listitem>
 	</itemizedlist>
+	<programlisting><textobject><textdata fileref="code_snippets/admin/rm-client-infrastructure.txt"/></textobject></programlisting>
 
-		<screen>>rm-client -l admin -cn myns -infrastructure
-Available node source infrastructures:
-Name: GCM Infrastructure
-Description: Infrastructure described in GCM deployment descriptor
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure
-Parameters: &lt;class name&gt; descriptor
-
-Name: EC2 Infrastructure
-Description: Handles nodes from the Amazon Elastic Compute Cloud Service.
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure
-Parameters: &lt;class name&gt; configurationFile rmUrl RMCredentialsPath nodeHttpPort
-
-Name: Virtual Infrastructure
-Description: Virtualized Infrastructure node acquisition
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure
-Parameters: &lt;class name&gt; infrastructure VMMUrl VMMUser VMMPwd VMTemplate VMMax hostCapacity PAConfig RMUrl RMCredentials
-
-Name: WinHPC Infrastructure
-Description: Windows HPC infrasturcure
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure
-Parameters: &lt;class name&gt; maxNodes serviceUrl userName password trustStore trustStorePassword javaPath rmPath RMUrl RMCredentialsPath javaOptions extraClassPath
-
-Name: SSH Infrastructure
-Description: Creates remote runtimes using SSH
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure
-Parameters: &lt;class name&gt; javaPath schedulingPath protocol port javaOptions hostsList
-
-Name: GCM Customised Infrastructure
-Description: Handles hosts from the list using specified gcm deployment descriptor
-template with HOST java variable contract (see proactive documentation)
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure
-Parameters: &lt;class name&gt; descriptor hostsList
-
-Name: PBS Infrastructure
-Description: Acquires nodes from a PBS Resouce Manager
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure
-Parameters: &lt;class name&gt; javaPath schedulingPath protocol port javaOptions maxNodes PBSServer RMUrl RMCredentialsPath qsubOptions
-
-Name: Default Infrastructure Manager
-Description: Default infrastructure
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager</screen>
 		<para>
 			Choose the one you need and add the corresponding parameters to the command line.
 		</para>
@@ -119,35 +57,7 @@ Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultI
 		</listitem>
 	</itemizedlist>
 
-		<screen>>rm-client -l admin -cn myns -infrastructure org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager -policy
-Available node source policies:
-Name: Release Resources When Scheduler Idle
-Description: Releases all resources when scheduler is idle for specified
-time. Acquires them back on job submission.
-Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle
-Parameters: &lt;class name&gt; nodesAvailableTo administrator url schedulerCredentialsPath preemptive idleTime
-
-Name: EC2 Policy
-Description: Allocates resources according to the Scheduler loading factor,
-releases resources considering EC2 instances are paid by the hour
-Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.EC2Policy
-Parameters: &lt;class name&gt; nodesAvailableTo administrator url schedulerCredentialsPath preemptive refreshTime loadFactor releaseCycle
-
-Name: Time Slot Policy
-Description: Acquires and releases nodes at specified time.
-Class name: org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
-Parameters: &lt;class name&gt; nodesAvailableTo administrator acquireTime releaseTime period preemptive
-
-Name: Scheduler Loading Policy
-Description: Allocates as many resources as scheduler required according
-to loading factor. Releases resources smoothly.
-Class name: org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy
-Parameters: &lt;class name&gt; nodesAvailableTo administrator url schedulerCredentialsPath preemptive policyPeriod minNodes maxNodes loadingFactor releasePeriod
-
-Name: Static Policy
-Description: Static nodes acquisition.
-Class name: org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
-Parameters: &lt;class name&gt; nodesAvailableTo administrator</screen>
+	<programlisting><textobject><textdata fileref="code_snippets/admin/rm-client-policy.txt"/></textobject></programlisting>
 		<para>
 			Then select the appropriate one and specify it in the command line. Example:
 		</para>
