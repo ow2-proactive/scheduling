@@ -36,9 +36,12 @@ package org.ow2.proactive.scheduler.core;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 import org.ow2.proactive.threading.CallableWithTimeoutAction;
 
 
@@ -49,6 +52,8 @@ import org.ow2.proactive.threading.CallableWithTimeoutAction;
  * @since ProActive Scheduling 2.0
  */
 public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> {
+
+    private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
 
     private AtomicBoolean timeoutCalled = new AtomicBoolean(false);
     private InternalTask task;
@@ -84,17 +89,21 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
                 //check if timeout occurs
                 if (timeoutCalled.get()) {
                     //return null if timeout occurs (task may have to be restarted later)
+                    logger_dev.info("Task '" + task.getId() + "' has timed out");
                     return null;
                 } else {
-                    //return task result if everything was OK
+                    //return task result if everything was OK : normal behavior
                     return tr;
                 }
             } else {
                 //return null if launcher was null (should never append)
+                logger_dev.warn("Launcher was null");
                 return null;
             }
         } catch (Exception e) {
             //return null if something wrong occurs during task deployment
+            logger_dev.warn("DoTask had an exception : " + e.getMessage());
+            logger_dev.debug("StackTrace :", e);
             return null;
         }
     }
@@ -103,6 +112,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<TaskResult> 
      * {@inheritDoc}
      */
     public void timeoutAction() {
+        logger_dev.debug("Task '" + task.getId() + "' timeout action called");
         timeoutCalled.set(true);
     }
 

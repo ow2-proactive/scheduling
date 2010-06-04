@@ -71,7 +71,7 @@ public class TestProcessTreeKiller extends FunctionalTest {
 
     private static int detachedProcNumber = 4;
 
-    private final static int wait_time = 4000;
+    private final static int wait_time = 6000;
 
     /**
      * Tests start here.
