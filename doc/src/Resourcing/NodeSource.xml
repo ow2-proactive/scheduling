@@ -616,7 +616,9 @@ test.example.net 5
 		<section xml:id="scheduler_idle"><info><title>"Remove nodes when scheduler is idle" policy</title></info>
 				<para>
 					<emphasis>"Remove nodes when scheduler is idle" policy</emphasis> removes all nodes from the infrastructure
-					when the scheduler is idle and acquires them when a new job is submitted.
+					when the scheduler is idle and acquires them when a new job is submitted. This policy may be useful 
+					if there is no need to keep nodes alive permanently. Nodes will be released after a specified "idle time". 
+					This policy will use a listener of the scheduler, that is why its URL, its user name and its password have to be specified.
 				</para>
 				<para>For using this policy, you have to precise the following parameters:</para>
 				<itemizedlist>
@@ -669,7 +671,14 @@ test.example.net 5
 		<section xml:id="scheduler_dynamic"><info><title>"Scheduler loading" policy</title></info>
 				<para>
 					<emphasis>"Scheduler loading" policy</emphasis> acquires/releases nodes
-					according to the scheduler loading factor.
+					according to the scheduler loading factor. This policy allows to configure the number of resources 
+					which will be always enough for the scheduler. Nodes are acquired and released according to scheduler loading factor 
+					which is a number of tasks per node. In the same manner as the previous policy, this one also requires scheduler URL, 
+					user name and password. It is important to correctly configure maximum and minimum nodes that this policy will try to hold. 
+					Maximum number should not be greater than potential nodes number which is possible to deploy to underlying infrastructure. 
+					If there are more currently acquired nodes than necessary, policy will release them one by one after having waited for a "release period" delay. 
+					This smooth release procedure is implemented because deployment time is greater than the release one. 
+					Thus, this waiting time deters policy from spending all its time trying to deploy nodes.
 				</para>
 				<para>For using this policy, you have to precise the following parameters:</para>
 				<itemizedlist>
