@@ -49,7 +49,6 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -256,7 +255,6 @@ public class RMTHelper {
      * @throws Exception if an error occurs.
      */
     public static void startRM(String configurationFile) throws Exception {
-
         PAResourceManagerProperties.updateProperties(configurationFile);
         deployRMGCMA();
         GCMVirtualNode vn = gcmad.getVirtualNode("VN");
