@@ -43,7 +43,9 @@ import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
+import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
@@ -100,6 +102,11 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher {
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) executableContainer
                     .createExecutableInitializer();
             fjei.setJavaTaskLauncherInitializer(initializer);
+            //create initializer
+            ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
+            eci.setClassServer(((ForkedJavaExecutableContainer) executableContainer).getClassServer());
+            fjei.getJavaExecutableContainer().init(eci);
+            //initialize
             callInternalInit(ForkedJavaExecutable.class, ForkedJavaExecutableInitializer.class, fjei);
 
             //activate logs if necessary

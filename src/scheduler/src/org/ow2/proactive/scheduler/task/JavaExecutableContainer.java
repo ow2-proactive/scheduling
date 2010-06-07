@@ -166,6 +166,15 @@ public class JavaExecutableContainer extends ExecutableContainer {
     }
 
     /**
+     * Get the classServer
+     *
+     * @return the classServer
+     */
+    public TaskClassServer getClassServer() {
+        return classServer;
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.task.ExecutableContainer#createExecutableInitializer()
      */
     @Override

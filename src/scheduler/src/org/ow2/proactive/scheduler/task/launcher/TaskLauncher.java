@@ -550,7 +550,6 @@ public abstract class TaskLauncher implements InitActive {
      * if it does not finish before the walltime. If it does finish before the walltime then the timer will be canceled
      */
     protected void scheduleTimer() {
-        logger_dev.info("Execute timer because task '" + taskId + "' is walltimed");
         scheduleTimer(currentExecutable);
     }
 
@@ -560,6 +559,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     protected void scheduleTimer(Executable executable) {
         if (isWallTime()) {
+            logger_dev.info("Execute timer because task '" + taskId + "' is walltimed");
             killTaskTimer = new KillTask(executable, wallTime);
             killTaskTimer.schedule();
         }
