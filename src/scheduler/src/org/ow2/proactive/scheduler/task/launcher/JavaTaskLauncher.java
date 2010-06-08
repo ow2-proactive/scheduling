@@ -41,6 +41,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -58,6 +60,7 @@ import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
 public class JavaTaskLauncher extends TaskLauncher {
 
     public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.LAUNCHER);
+    protected static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
 
     /**
      * ProActive Empty Constructor
@@ -89,6 +92,8 @@ public class JavaTaskLauncher extends TaskLauncher {
         long duration = -1;
         long sample = 0;
         try {
+            //init dataspace
+            initDataSpaces();
 
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
@@ -155,6 +160,51 @@ public class JavaTaskLauncher extends TaskLauncher {
                 this.finalizeLoggers();
             }
         }
+    }
+
+    /**
+     * Configure node to use dataspace !
+     * MUST ONLY BE USED BY FORKED EXECUTABLE
+     * 
+     * @return true if configuration went right
+     */
+    public boolean configureNode() {
+        try {
+            // configure node for Data Spaces
+            String scratchDir;
+            if (System.getProperty(NODE_DATASPACE_SCRATCHDIR) == null) {
+                //if scratch dir java property is not set, set to default
+                scratchDir = System.getProperty("java.io.tmpdir");
+            } else {
+                //else use the property
+                scratchDir = System.getProperty(NODE_DATASPACE_SCRATCHDIR);
+            }
+            final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration(null,
+                scratchDir);
+            DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
+                    scratchConf);
+        } catch (Throwable t) {
+            logger_dev.error("Cannot configure dataSpace", t);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Close node dataspace configuration !
+     * MUST ONLY BE USED BY FORKED EXECUTABLE
+     * 
+     * @return true if configuration went right
+     */
+    public boolean closeNodeConfiguration() {
+        try {
+            DataSpacesNodes.closeNodeConfig(PAActiveObject
+                    .getActiveObjectNode(PAActiveObject.getStubOnThis()));
+        } catch (Throwable t) {
+            logger_dev.error("Cannot close dataSpace configuration !", t);
+            return false;
+        }
+        return true;
     }
 
 }

@@ -102,6 +102,8 @@ public class NativeTaskLauncher extends TaskLauncher {
         long duration = -1;
         long sample = 0;
         try {
+            //init dataspace
+            initDataSpaces();
 
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();

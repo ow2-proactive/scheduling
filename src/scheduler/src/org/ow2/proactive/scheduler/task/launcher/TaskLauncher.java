@@ -218,8 +218,6 @@ public abstract class TaskLauncher implements InitActive {
         // set the launcher as initialized
         this.launcherInitialized.countDown();
         logger_dev.debug("TaskLauncher initialized");
-        //init dataspace
-        initDataSpaces();
     }
 
     /**

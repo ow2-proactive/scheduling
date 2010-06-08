@@ -172,6 +172,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
             //the deployed java task must not notify the core from termination
             //the forked java task launcher will do that in place
             logger_dev.debug("Starting java task");
+            newJavaTaskLauncher.configureNode();
             TaskResult result = newJavaTaskLauncher.doTask(null,
                     execInitializer.getJavaExecutableContainer(), results);
 
@@ -198,6 +199,7 @@ public class ForkedJavaExecutable extends JavaExecutable {
 
             if (!isKilled()) {
                 logs = newJavaTaskLauncher.getLogs();
+                newJavaTaskLauncher.closeNodeConfiguration();
             } else {
                 logger_dev.debug("Task has been killed");
                 FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
