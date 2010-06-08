@@ -178,7 +178,7 @@ public class SchedulerController {
                 auth = SchedulerConnection.join(url);
                 logger.info("\t-> Connection established on " + url);
 
-                logger.info(newline + "Connecting admin to the Scheduler");
+                logger.info(newline + "Connecting client to the Scheduler");
 
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
