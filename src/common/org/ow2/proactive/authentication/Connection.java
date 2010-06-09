@@ -188,7 +188,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      * Normalize the URL <code>url</code>.<br>
      *
      * @param url, the URL to normalize.
-     * @return  //localhost/ if the given url is null.<br>
+     * @return  the default base URI if the given url is null. @see {@link RemoteObjectFactory}<br>
      *          the given URL with // prepended if it does not contain any scheme identifier
      *          the given URL with / appended if URL does not end with / and does not
      *          contain any path element,<br>
@@ -196,16 +196,12 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      */
     public static String normalize(String url) {
         if (url == null || url.trim().equals("")) {
-            if (CentralPAPropertyRepository.PA_NET_NOLOOPBACK.isTrue()) {
-                try {
-                    RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
-                    //url = "//" + URIBuilder.fromLocalhostToHostname(null) + "/";
-                    url = rof.getBaseURI().toString();
-                } catch (Exception e) {
-                    url = "//" + ProActiveInet.getInstance().getHostname() + "/";
-                }
-            } else {
-                url = "//localhost/";
+            try {
+                RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
+                // NO_LOOP_BACK property is handled by getBaseURI()
+                url = rof.getBaseURI().toString();
+            } catch (Exception e) {
+                url = "//" + ProActiveInet.getInstance().getHostname() + "/";
             }
         } else {
             url = url.trim();
