@@ -204,7 +204,6 @@ class ProActiveSocketServer:
                 break
             except Exception:
                 varI = varI + 1
-                PA_LISTENING_PORT = PA_LISTENING_PORT + 1
                 print("An error occured while creating socket server")
                 traceback.print_exc()
         print("new ProActiveSocketServer created. Listening on port " + repr(self.ss.getsockname()[1]))
