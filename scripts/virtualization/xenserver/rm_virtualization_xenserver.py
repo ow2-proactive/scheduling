@@ -67,12 +67,20 @@ class XenServer_Helper :
         """getMacAddress returns an array filled with every
         detected NIC's mac address on the current computer"""
         proc = None
+        res = []
         if sys.platform == 'win32':
             proc = Popen( args = "ipconfig /all", stdout = PIPE, stderr = PIPE)
         else:
             proc = Popen( args = "/sbin/ifconfig", stdout = PIPE, stderr = PIPE)
         output = proc.communicate()[0]
-        res = re.findall("(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}",output)
+        try:
+            output = output.decode()
+        except Exception:
+            print("An error occurred while decoding mac address string")
+            traceback.print_exc()
+        tmp = re.findall("(?:[0-9a-fA-F]{2}[-:]){5}[0-9a-fA-F]{2}",output)
+        for i, mac in enumerate(tmp):
+            res.append(mac.replace("-", ":"))
         return res
 
     def __fixHoldingVirtualMachine(self):
