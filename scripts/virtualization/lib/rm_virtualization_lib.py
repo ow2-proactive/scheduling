@@ -53,9 +53,9 @@ NODE_STARTER_REGISTER = "org.ow2.proactive.resourcemanager.utils.VirtualInfrastr
 EOF_MARKER = "EOF"
 PA_MESSAGE_LENGTH = 1000
 #The nodes' classpath
-NODE_CLASSPATH = ["commons-logging-1.0.4.jar","ProActive.jar","ProActive_SRM-common-client.jar","ProActive_ResourceManager-client.jar",\
-                  "ProActive_Scheduler-client.jar","script-js.jar","jruby-engine.jar","jython-engine.jar","ProActive_SRM-common.jar",\
-                  "ProActive_ResourceManager.jar"]
+NODE_CLASSPATH = ["script-js.jar","jruby-engine.jar","jython-engine.jar","commons-logging-1.0.4.jar","ProActive.jar",\
+                  "ProActive_SRM-common-client.jar","ProActive_ResourceManager-client.jar",\
+                  "ProActive_Scheduler-client.jar","ProActive_SRM-common.jar","ProActive_ResourceManager.jar"]
 
 #This file gives an implementation of base class for Resource Manager node starter.
 #Each implementation is "Virtualization Software dependent".
