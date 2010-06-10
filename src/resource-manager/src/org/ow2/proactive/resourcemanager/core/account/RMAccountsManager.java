@@ -58,7 +58,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
     /** Scheduler database manager used to submit SQL requests */
     private final org.ow2.proactive.db.DatabaseManager dbmanager;
 
-    private final String totalUsedNodeTimeSQL;
+    //private final String totalUsedNodeTimeSQL;
 
     //private final String totalProvidedNodeTimeAndNodeCountSQL;
 
@@ -73,7 +73,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         this.dbmanager = DatabaseManager.getInstance();
 
         // Create the requests
-        this.totalUsedNodeTimeSQL = RMAccountsManager.totalUsedNodeTimeSQL();
+        //this.totalUsedNodeTimeSQL = RMAccountsManager.totalUsedNodeTimeSQL();
         //this.totalProvidedNodeTimeAndNodeCountSQL = RMAccountsManager.totalProvidedNodeTimeAndNodeCountSQL();
     }
 
@@ -82,7 +82,8 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
      */
     @Override
     public int getDefaultRefreshRateInSeconds() {
-        return PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE.getValueAsInt();
+        int value = PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE.getValueAsInt();
+        return value;
     }
 
     /**
@@ -90,7 +91,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
      */
     protected void internalRefresh(final Map<String, RMAccount> map) {
         // Get totalUsedNodeTime per node owner
-        final List<?> usedRes = this.dbmanager.sqlQuery(this.totalUsedNodeTimeSQL);
+        final List<?> usedRes = this.dbmanager.sqlQuery(RMAccountsManager.totalUsedNodeTimeSQL());
 
         // The result of the query is the tuple <NODEOWNER, DURATION>
         for (int i = 0; i < usedRes.size(); i++) {
@@ -125,19 +126,75 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         }
     }
 
-    // Untested with inconsistent get/release
-    // Returned tuple: <NODEOWNER, DURATION>
+    // Returned tuple: <NODEPROVIDER, DURATION>
     private static String totalUsedNodeTimeSQL() {
-        final StringBuilder builder = new StringBuilder("SELECT ");
-        builder.append("t1.NODEOWNER, sum(t2.TIMESTAMP - t1.TIMESTAMP) ");
-        builder.append("FROM RMNODEEVENT t1 ");
-        builder.append("JOIN RMNODEEVENT t2 ");
-        builder.append("ON t1.ID = t2.PREVIOUSEVENTID AND ");
-        builder.append("t1.NODESTATE = 1 AND ");
-        builder.append("t2.PREVIOUSNODESTATE = 1 ");
-        builder.append("GROUP BY t1.NODEOWNER");
+        final StringBuilder builder = new StringBuilder("SELECT tab.np, tab.duration FROM ");
+        builder.append("( ");
+        builder.append("SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration ");
+        builder.append("FROM RMNODEEVENT t1 JOIN RMNODEEVENT t2 ON ");
+        builder.append("t2.PREVIOUSEVENTID = t1.ID AND ");
+        builder.append("t2.TYPE = 6 AND t2.NODESTATE=0 AND ");
+        builder.append("t2.PREVIOUSNODESTATE=1 AND t1.TYPE = 6 AND t1.NODESTATE=1 ");
+        builder.append("GROUP BY t1.NODEPROVIDER ");
+        builder.append("UNION ");
+        builder.append("SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration ");
+        builder.append("FROM RMNODEEVENT t1 JOIN RMNODEEVENT t2 ON ");
+        builder.append("(t2.PREVIOUSEVENTID = t1.ID AND ");
+        builder.append("t2.TYPE = 7 AND t1.TYPE = 6 AND t1.NODESTATE=1) OR ");
+        builder.append("(t2.PREVIOUSEVENTID = t1.ID AND ");
+        builder.append("t2.TYPE = 6 AND t2.NODESTATE=2 AND t1.TYPE = 6 AND t1.NODESTATE=1) ");
+        builder.append("GROUP BY t1.NODEPROVIDER ");
+        builder.append("UNION ");
+        builder.append("select t1.NODEPROVIDER as np, sum(" + System.currentTimeMillis() +
+            " - t1.TIMESTAMP) as duration ");
+        builder.append("from RMNODEEVENT t1 WHERE ");
+        builder.append("t1.TYPE = 6 AND t1.NODESTATE=1 AND ");
+        builder.append("t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2) AND ");
+        builder
+                .append("(NOT EXISTS (select * from RMNODEEVENT WHERE PREVIOUSEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2)))) ");
+        builder.append("GROUP BY t1.NODEPROVIDER ");
+        builder.append(") tab");
         return builder.toString();
     }
+
+    // FULL SQL REQUEST :
+
+    //SELECT tab.np, tab.duration FROM
+    //(
+    //-- Consistent GET duration from get->release
+    //SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration
+    //FROM RMNODEEVENT t1 JOIN RMNODEEVENT t2 ON
+    //t2.PREVIOUSEVENTID = t1.ID AND
+    //t2.TYPE = 6 AND t2.NODESTATE=0 AND
+    //t2.PREVIOUSNODESTATE=1 AND t1.TYPE = 6 AND t1.NODESTATE=1
+    //GROUP BY t1.NODEPROVIDER
+    //UNION
+    //-- Inconsistent GET duration from get->remove or get->down
+    //SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration
+    //FROM RMNODEEVENT t1 JOIN RMNODEEVENT t2 ON
+    // -- remove
+    //(t2.PREVIOUSEVENTID = t1.ID AND
+    //t2.TYPE = 7 AND t1.TYPE = 6 AND t1.NODESTATE=1)
+    //OR
+    //-- down
+    //(t2.PREVIOUSEVENTID = t1.ID AND
+    //t2.TYPE = 6 AND t2.NODESTATE=2 AND t1.TYPE = 6 AND t1.NODESTATE=1)
+    //GROUP BY t1.NODEPROVIDER
+    // -- Inconsistent GET that are after the last restart (currently used nodes) must be SUM(System.currentTimeMillis() - t1.TIMESTAMP)
+    //select t1.NODEPROVIDER as np, sum(t1.TIMESTAMP) as duration
+    //from RMNODEEVENT t1
+    //WHERE
+    //-- Node GET event
+    //t1.TYPE = 6 AND t1.NODESTATE=1
+    //AND
+    // -- From the last start
+    //t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2)
+    //-- Inconsistent means not stopped and not removed
+    //AND
+    //(NOT EXISTS
+    //   (select * from RMNODEEVENT WHERE PREVIOUSEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2))))
+    //GROUP BY t1.NODEPROVIDER    
+    //) tab
 
     // Returned tuple: <NODEPROVIDER, DURATION, NODESCOUNT>
     private static String totalProvidedNodeTimeAndNodeCountSQL() {
