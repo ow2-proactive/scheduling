@@ -3,7 +3,7 @@
  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds 
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -123,6 +123,8 @@ public class IOTools {
 
     public static class RedirectionThread implements Runnable, Serializable {
 
+        /**  */
+        private static final long serialVersionUID = 200;
         private InputStream is;
         private OutputStream os;
 
@@ -152,6 +154,8 @@ public class IOTools {
      */
     public static class LoggingThread implements Runnable, Serializable {
 
+        /**  */
+        private static final long serialVersionUID = 200;
         private String appendMessage;
         /**  */
         public Boolean goon = true;
@@ -160,6 +164,7 @@ public class IOTools {
 
         /**  */
         public ArrayList<String> output = new ArrayList<String>();
+        private PrintStream debugStream;
 
         /**
          * Create a new instance of LoggingThread.
@@ -198,13 +203,28 @@ public class IOTools {
             this.out = out;
         }
 
+        /**
+        * Create a new instance of LoggingThread.
+        *
+        * @param is
+        * @param appendMessage
+        * @param out
+        */
+        public LoggingThread(InputStream is, String appendMessage, PrintStream out, PrintStream ds) {
+            this.br = new BufferedReader(new InputStreamReader(is));
+            this.appendMessage = appendMessage;
+            this.out = out;
+            this.debugStream = ds;
+        }
+
         private String getLineOrDie() {
             String answer = null;
             try {
-                while (!br.ready()) {
+
+                while (!ready()) {
                     Thread.sleep(10);
                 }
-                answer = br.readLine();
+                answer = readLine();
 
             } catch (IOException e) {
 
@@ -212,6 +232,18 @@ public class IOTools {
 
             }
             return answer;
+        }
+
+        private boolean ready() throws IOException {
+            synchronized (br) {
+                return br.ready();
+            }
+        }
+
+        private String readLine() throws IOException {
+            synchronized (br) {
+                return br.readLine();
+            }
         }
 
         /**
@@ -224,11 +256,19 @@ public class IOTools {
                 synchronized (out) {
                     if (first_line && line.trim().length() > 0) {
                         first_line = false;
-                        out.println(appendMessage + line);
+                        out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
                         out.flush();
+                        if (debugStream != null) {
+                            debugStream.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
+                            debugStream.flush();
+                        }
                     } else if (!first_line) {
-                        out.println(appendMessage + line);
+                        out.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
                         out.flush();
+                        if (debugStream != null) {
+                            debugStream.println("[ " + new java.util.Date() + " ]" + appendMessage + line);
+                            debugStream.flush();
+                        }
                     }
                 }
             }
@@ -242,9 +282,42 @@ public class IOTools {
             }
         }
 
-        public void setStream(PrintStream st) {
+        public void closeStream() {
             synchronized (out) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+
+                }
+            }
+        }
+
+        public void setStream(PrintStream st, PrintStream ds) {
+            synchronized (out) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+
+                }
+                if (debugStream != null) {
+                    try {
+                        debugStream.close();
+                    } catch (Exception e) {
+
+                    }
+                }
                 out = st;
+                debugStream = ds;
+            }
+        }
+
+        public void setStream(PrintStream st) {
+            setStream(st, null);
+        }
+
+        public void setInputStream(InputStream is) {
+            synchronized (br) {
+                br = new BufferedReader(new InputStreamReader(is));
             }
         }
     }

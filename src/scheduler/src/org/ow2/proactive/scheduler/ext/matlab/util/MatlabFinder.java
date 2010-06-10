@@ -3,7 +3,7 @@
  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds 
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -95,7 +95,8 @@ public class MatlabFinder {
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = IOTools.getContentAsList(is);
             String tmpDir = System.getProperty("java.io.tmpdir");
-            String nodeName = PAActiveObject.getNode().getNodeInformation().getName().replace('-', '_');
+            String nodeName = PAActiveObject.getNode().getVMInformation().getName().replace('-', '_') + "_" +
+                PAActiveObject.getNode().getNodeInformation().getName().replace('-', '_');
             File nodeDir = new File(tmpDir, nodeName);
             if (!nodeDir.exists()) {
                 nodeDir.mkdir();

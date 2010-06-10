@@ -1,6 +1,6 @@
 /* ptmatlab.cc - Java Native Interface to the matlab engine API
 
- Copyright (c) 1998-2008 The Regents of the University of California and
+ Copyright (c) 1998-2009 The Regents of the University of California and
  Research in Motion Limited.
  All rights reserved.
  Permission is hereby granted, without written agreement and without
@@ -28,7 +28,7 @@
                                         COPYRIGHTENDKEY
 
 Authors: Zoltan Kemenczy and Sean Simmons, Research in Motion Limited
-Version $Id: ptmatlab.cc,v 1.10 2005/03/24 02:21:30 cxh Exp $
+Version $Id: ptmatlab.cc 54523 2009-06-18 19:18:45Z cxh $
 */
 
 // jni assumes MSVC and __int64
@@ -37,7 +37,7 @@ typedef long long __int64;
 #endif
 
 // Define MX_COMPAT_32 so that mwSize, mwIndex are defined.
-
+// See extern/include/tmwtypes.h
 #undef MX_COMPAT_32
 #define MX_COMPAT_32
 
@@ -56,6 +56,38 @@ typedef long long __int64;
 #include "ptmatlab.h"
 #include "engine.h"
 
+// These defines were needed for Matlab r2009a under Mac OS X.
+// They also seem to work for r2008a under Linux and Windows
+// $PTII/configure sets PTMATLAB_CC_FLAGS to these defines:
+//#define PT_NO_ENGGETARRAY
+//#define PT_NO_ENGPUTARRAY
+//#define PT_NO_MXGETNAME
+
+#ifdef PT_NO_ENGGETARRAY
+#ifndef PT_INCLUDE_MEX_H
+#define PT_INCLUDE_MEX_H
+#endif
+#endif
+
+#ifdef PT_NO_ENGPUTARRAY
+
+#ifndef PT_INCLUDE_MEX_H
+#define PT_INCLUDE_MEX_H
+#endif
+
+#endif //PT_NO_ENGPUTARRAY
+
+
+#ifdef PT_NO_MXGETNAME
+#define mxGetName(a) "a"
+#endif
+
+
+#ifdef PT_INCLUDE_MEX_H
+#include "mex.h"
+#endif
+
+// Used in Windows 64
 #ifdef _W64
 #include "BaseTsd.h"
 #endif
@@ -75,11 +107,11 @@ typedef long long __int64;
 #define mxGetLogicals(ma) mxGetPr(ma)
 #endif
 
-// Declare an integer type that correctly casts a pointer
+// Declare an integer type that correctly casts a long
 #ifdef _WIN64
-typedef UINT_PTR ptrint;
+typedef UINT_PTR ptrlong;
 #else
-typedef long ptrint;
+typedef long ptrlong;
 #endif
 
 #include <stdio.h>
@@ -110,13 +142,13 @@ extern "C"
     int retStatus = 0;
     if (cmdString != NULL) cmd = jni->GetStringUTFChars(cmdString, 0);
 
-    #ifdef _WIN32
+    #if defined(_WIN32) || defined(_WIN64) || defined(_W64)
         ep = engOpenSingleUse(cmd, NULL, &retStatus); 
     #else
         ep = engOpen(cmd);
     #endif
     if (ep != NULL) {
-      retval = (ptrint)ep;
+      retval = (ptrlong)ep;
     }
     else {
       printf("ptmatlabEngOpen: %s failed!\nIf your operating system is microsoft windows, it might be because the COM registration of Matlab is corrupted (did you install several instances of Matlab?).\n You can solve this problem by running \"matlab /regserver\" from the command line as explained here:\nhttp://www.mathworks.com/access/helpdesk_r13/help/techdoc/apiref/engopensingleuse.shtml\n", cmd==NULL?"":cmd); fflush(stdout);
@@ -131,9 +163,8 @@ extern "C"
    jlong e,
    jlong p)
   {
-    Engine *ep = (Engine*)(ptrint)e;
-    // done to test freeing bug
-    char* output_buf = (char*)(long)p;
+    Engine *ep = (Engine*)(ptrlong)e;
+    char* output_buf = (char*)(ptrlong)p;
     const char debug = ptmatlabGetDebug(jni,obj);
     if (debug > 1) {
         printf("ptmatlabEngClose: calling engClose(%d)\n", ep);  fflush(stdout);
@@ -155,7 +186,7 @@ extern "C"
    jlong e,
    jstring evalStr)
   {
-    Engine *ep = (Engine*)(ptrint)e;
+    Engine *ep = (Engine*)(ptrlong)e;
     const char *str = jni->GetStringUTFChars(evalStr, 0);
     int retval = engEvalString(ep, str);
     jni->ReleaseStringUTFChars(evalStr, str);
@@ -168,16 +199,20 @@ extern "C"
    jlong e,
    jstring name)
   {
-      Engine *ep = (Engine*)(ptrint) e;
+      Engine *ep = (Engine*)(ptrlong) e;
     char debug = ptmatlabGetDebug(jni,obj);
     const char *str = jni->GetStringUTFChars(name, 0);
+#ifdef PT_NO_ENGGETARRAY
+    mxArray *ma = engGetVariable(ep, str);
+#else
     mxArray *ma = engGetArray(ep, str);
+#endif
     if (debug > 1 && ma != NULL) {
         const int *dimArray = mxGetDimensions(ma);
         printf("ptmatlabEngGetArray(%s) %d x %d\n", str, dimArray[0], dimArray[1]);
     }
     jni->ReleaseStringUTFChars(name, str);
-    return (ptrint) ma;
+    return (ptrlong) ma;
   }
 
   JNIEXPORT jint JNICALL Java_ptolemy_matlab_Engine_ptmatlabEngPutArray
@@ -188,13 +223,19 @@ extern "C"
    jlong pma)
   {
     char debug = ptmatlabGetDebug(jni,obj);
-    Engine *ep = (Engine*)(ptrint) e;
+    Engine *ep = (Engine*)(ptrlong) e;
     const char *str = jni->GetStringUTFChars(name, 0);
-    mxArray *ma = (mxArray*)(ptrint)pma;
+    mxArray *ma = (mxArray*)(ptrlong)pma;
+#ifdef PT_NO_ENGPUTARRAY
+    // Daniel Crawl says to use engPutVariable(), see
+    // http://www.mathworks.com/access/helpdesk/help/techdoc/index.html?/access/helpdesk/help/techdoc/rn/f34-998197.html
+    int retval = engPutVariable(ep, str, ma);
+#else
     mxSetName(ma, str);
     const int *dimArray = mxGetDimensions(ma);
     if (debug > 1) printf("ptmatlabEngPutArray(%s) %d x %d\n", str, dimArray[0], dimArray[1]);
     int retval = engPutArray(ep, ma);
+#endif
     jni->ReleaseStringUTFChars(name, str);
     return retval;
   }
@@ -205,7 +246,7 @@ extern "C"
    jlong e,
    jint n)
   {
-    Engine *ep = (Engine*)(ptrint) e;
+    Engine *ep = (Engine*)(ptrlong) e;
     char debug = ptmatlabGetDebug(jni,obj);
     char *p = (char*)calloc(n+1,sizeof(char));
     if (p == NULL) {
@@ -216,7 +257,7 @@ extern "C"
         printf("ptmatlabEngOutputBuffer: set, engine=%d, p=0x%x, n=%d\n", ep, p, n);  fflush(stdout);
     }
     engOutputBuffer(ep, p, n);
-    return (ptrint)p;
+    return (ptrlong)p;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateCellMatrix
@@ -234,7 +275,7 @@ extern "C"
       printf("ptmatlabCreateCellMatrix(%s) %d x %d\n", nstr, n, m);
       jni->ReleaseStringUTFChars(name, nstr);
     }
-    return (ptrint) ma;
+    return (ptrlong) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateString
@@ -264,7 +305,7 @@ extern "C"
       }
     }
     jni->ReleaseStringUTFChars(s, str);
-    return (ptrint) ma;
+    return (ptrlong) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateDoubleMatrixOneDim
@@ -286,7 +327,7 @@ extern "C"
     }
 
     jni->GetDoubleArrayRegion(a, 0, length, pr);
-    return (ptrint) ma;
+    return (ptrlong) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateDoubleMatrix
@@ -318,7 +359,7 @@ extern "C"
       jni->ReleasePrimitiveArrayCritical(row, rowelements, 0);
       jni->DeleteLocalRef(row);         // free references
     }
-    return (ptrint) ma;
+    return (ptrlong) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateComplexMatrixOneDim
@@ -351,7 +392,7 @@ extern "C"
       *(pi+j) = jni->GetDoubleField(element, complexImagFieldID);
       jni->DeleteLocalRef(element);
     }
-    return (ptrint) ma;
+    return (ptrlong) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateComplexMatrix
@@ -389,7 +430,7 @@ extern "C"
       }
       jni->DeleteLocalRef(jcolumn);
     }
-    return (ptrint) ma;
+    return (ptrlong) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateStructMatrix
@@ -410,7 +451,8 @@ extern "C"
     jsize nfields = jni->GetArrayLength(fieldNames);
     // MSVC can't deal with variable length arrays
     //char *names[nfields];
-    char **names = (char **)malloc(nfields * sizeof(char));
+    // char **names = (char **)malloc(nfields * sizeof(char));
+    char **names = (char **)malloc(nfields * sizeof(char *));
     for (i = 0; i < nfields; i++) {
       names[i] = (char*) jni->GetStringUTFChars((jstring)jni->GetObjectArrayElement(fieldNames,i),0);
       if (debug > 1) printf(" %s", names[i]);
@@ -422,7 +464,7 @@ extern "C"
       jni->ReleaseStringUTFChars((jstring)jni->GetObjectArrayElement(fieldNames,i),names[i]);
     }
     free(names);
-    return (ptrint) ma;
+    return (ptrlong) ma;
   }
 
   JNIEXPORT void JNICALL Java_ptolemy_matlab_Engine_ptmatlabDestroy
@@ -432,7 +474,7 @@ extern "C"
    jstring name)
   {
     char debug = ptmatlabGetDebug(jni,obj);
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     if (debug > 1) {
         const char *str = jni->GetStringUTFChars(name, 0);
         printf("ptmatlabDestroy(%s)\n", str); fflush(stdout);
@@ -449,7 +491,7 @@ extern "C"
    jint m)
   {
     char debug = ptmatlabGetDebug(jni,obj);
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     int subs[] = {n, m};
     int index = mxCalcSingleSubscript(ma, 2, subs);
     mxArray *fma = mxGetCell(ma, index);
@@ -457,7 +499,7 @@ extern "C"
         const int *dimArray = mxGetDimensions(fma);
         printf("ptmatlabGetCell(%s,%d,%d) %d x %d\n", mxGetName(ma), n, m, dimArray[0], dimArray[1]);
     }
-    return (ptrint) fma;
+    return (ptrlong) fma;
   }
 
   JNIEXPORT jstring JNICALL Java_ptolemy_matlab_Engine_ptmatlabGetClassName
@@ -467,7 +509,7 @@ extern "C"
   {
     char debug = ptmatlabGetDebug(jni,obj);
 
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     const char *classNameStr = mxGetClassName(ma);
     if (debug > 1) printf("ptmatlabGetClassName(%s) = %s\n", mxGetName(ma), classNameStr);
     return jni->NewStringUTF(classNameStr);
@@ -480,7 +522,7 @@ extern "C"
   {
     char debug = ptmatlabGetDebug(jni,obj);
 
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     jint ndims = mxGetNumberOfDimensions(ma);
     const int *dims = mxGetDimensions(ma);
     // MSVC can't deal with variable length arrays
@@ -502,7 +544,7 @@ extern "C"
    jint k)
   {
     char debug = ptmatlabGetDebug(jni,obj);
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     const char* fieldNameStr = mxGetFieldNameByNumber(ma, k);
     if (debug > 1) printf("ptmatlabGetFieldNameByNumber(%s,%d) = %s\n",mxGetName(ma), k, fieldNameStr);
     return jni->NewStringUTF(fieldNameStr);
@@ -517,7 +559,7 @@ extern "C"
    jint m)
   {
     char debug = ptmatlabGetDebug(jni,obj);
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     int subs[] = {n, m};
     int index = mxCalcSingleSubscript(ma, 2, subs);
     mxArray *fma = mxGetFieldByNumber(ma, index, k);
@@ -525,7 +567,7 @@ extern "C"
         const int *dimArray = mxGetDimensions(fma);
         printf("ptmatlabGetFieldByNumber(%s,%d,%d,%d) %d x %d\n", mxGetName(ma), k, n, m, dimArray[0], dimArray[1]);
     }
-    return (ptrint) fma;
+    return (ptrlong) fma;
   }
 
   JNIEXPORT jint JNICALL Java_ptolemy_matlab_Engine_ptmatlabGetNumberOfFields
@@ -534,7 +576,7 @@ extern "C"
    jlong pma)
   {
     char debug = ptmatlabGetDebug(jni,obj);
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     if (debug > 1) printf("ptmatlabGetNumberOfFields(%s) = %d\n",mxGetName(ma), mxGetNumberOfFields(ma));
     return (jint) mxGetNumberOfFields(ma);
   }
@@ -546,7 +588,7 @@ extern "C"
    jint n)
   {
     char debug = ptmatlabGetDebug(jni,obj);
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     const int *dims = mxGetDimensions(ma);
     int strlen = dims[1];
     int nrows = dims[0];
@@ -571,7 +613,7 @@ extern "C"
    jint n)
   {
     char debug = ptmatlabGetDebug(jni,obj);
-    char *p = (char*)(ptrint)jp;
+    char *p = (char*)(ptrlong)jp;
     if (debug > 1) printf("ptmatlabGetOutput(%d) = %s\n", n, p);
     jstring retval = jni->NewStringUTF(p);
     return retval;
@@ -583,7 +625,7 @@ extern "C"
    jobject obj,
    jlong pma)
   {
-      mxArray *ma = (mxArray*)(ptrint) pma;
+      mxArray *ma = (mxArray*)(ptrlong) pma;
 
     char debug = ptmatlabGetDebug(jni,obj);
     if (debug > 1) printf("ptmatlabIsComplex(%s) = %d\n",mxGetName(ma), mxIsComplex(ma));
@@ -600,7 +642,7 @@ extern "C"
   {
     char debug = ptmatlabGetDebug(jni,obj);
 
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     jdouble *pr = (jdouble*) mxGetPr(ma); // Cast assumes jdouble is double
 
     if (debug > 1) printf("ptmatlabGetDoubleMatrix(%s) %d x %d\n",mxGetName(ma), n, m);
@@ -630,7 +672,7 @@ extern "C"
   {
     char debug = ptmatlabGetDebug(jni,obj);
 
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     jdouble *pr = (jdouble*) mxGetPr(ma); // Cast assumes jdouble is double
     jdouble *pi = (jdouble*) mxGetPi(ma);
 
@@ -669,7 +711,7 @@ extern "C"
   {
     char debug = ptmatlabGetDebug(jni,obj);
 
-    mxArray *ma = (mxArray*)(ptrint) pma;
+    mxArray *ma = (mxArray*)(ptrlong) pma;
     mxLogical *pr = (mxLogical*) mxGetLogicals(ma);
 
     if (debug > 1) printf("ptmatlabGetLogicalMatrix(%s) %d x %d\n",mxGetName(ma), n, m);
@@ -703,7 +745,7 @@ extern "C"
   {
     char debug = ptmatlabGetDebug(jni,obj);
     char *str = (char*) jni->GetStringUTFChars(s, 0);
-    mxArray *ma = (mxArray *)(ptrint)pma;
+    mxArray *ma = (mxArray *)(ptrlong)pma;
     mxChar *d = (mxChar*)mxGetData(ma);
     const int *dims = mxGetDimensions(ma);
     int nrows = dims[0];
@@ -730,8 +772,8 @@ extern "C"
   {
     char debug = ptmatlabGetDebug(jni,obj);
 
-    mxArray *structMa = (mxArray *)(ptrint) sma;
-    mxArray *fieldMa = (mxArray *)(ptrint) fma;
+    mxArray *structMa = (mxArray *)(ptrlong) sma;
+    mxArray *fieldMa = (mxArray *)(ptrlong) fma;
     int subs[] = {n, m};
     int index = mxCalcSingleSubscript(structMa, 2, subs);
     const char *str = jni->GetStringUTFChars(fieldName, 0);
@@ -757,8 +799,8 @@ extern "C"
   {
     char debug = ptmatlabGetDebug(jni,obj);
 
-    mxArray *cellArray = (mxArray *)(ptrint)sma;
-    mxArray *cell = (mxArray *)(ptrint)fma;
+    mxArray *cellArray = (mxArray *)(ptrlong)sma;
+    mxArray *cell = (mxArray *)(ptrlong)fma;
     int subs[] = {n, m};
     int index = mxCalcSingleSubscript(cellArray, 2, subs);
     mxSetCell(cellArray, index, cell);

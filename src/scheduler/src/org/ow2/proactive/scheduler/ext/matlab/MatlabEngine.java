@@ -71,6 +71,13 @@ public class MatlabEngine {
     /**
      * Is the engine currently used by a thread ?
      */
+
+    private static boolean debug = false;
+
+    private static byte debugLevel = 0;
+
+    private static Thread hook = null;
+
     private static Lock lock = new Lock() {
         public void lock() {
 
@@ -113,11 +120,12 @@ public class MatlabEngine {
         if (eng == null) {
             try {
                 eng = new Engine();
+                eng.setDebugging(debugLevel);
 
-                eng.setDebugging((byte) 0);
-
-                System.out.println("Starting a new Matlab engine:");
-                System.out.println(configuration);
+                if (debug) {
+                    System.out.println("Starting a new Matlab engine:");
+                    System.out.println(configuration);
+                }
 
                 // we build the matlab command, depending on the os
                 if (os.equals(OperatingSystem.unix)) {
@@ -126,12 +134,17 @@ public class MatlabEngine {
                 } else {
                     engineHandle = eng.open(configuration.getMatlabCommandName() + " -automation", true);
                 }
-                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+
+                hook = new Thread(new Runnable() {
                     public void run() {
-                        eng.close(engineHandle);
-                        eng = null;
+                        if (eng != null) {
+                            eng.close(engineHandle);
+                            eng = null;
+                        }
                     }
-                }));
+                });
+
+                Runtime.getRuntime().addShutdownHook(hook);
 
                 // highly verbose exceptions
             } catch (UnsatisfiedLinkError e) {
@@ -156,11 +169,13 @@ public class MatlabEngine {
                 throw ne;
             }
         }
+
     }
 
-    public static void setDebug(byte debug) throws IllegalActionException {
-        init();
-        eng.setDebugging(debug);
+    public static void setDebug(byte dL) {
+        debugLevel = dL;
+        debug = (dL > 0);
+
     }
 
     public static void setConfiguration(MatlabConfiguration config) {
@@ -240,8 +255,11 @@ public class MatlabEngine {
      */
     public synchronized static void close() {
         lock.lock();
-        eng.close(engineHandle);
-        eng = null;
+        if (eng != null) {
+            eng.close(engineHandle);
+            eng = null;
+            Runtime.getRuntime().removeShutdownHook(hook);
+        }
         lock.unlock();
     }
 

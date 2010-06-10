@@ -163,6 +163,8 @@ PTJNI_LIBRARIES = @PTJNI_LIBRARIES@
 # $PTII/ptolemy/matlab/makefile if the Matlab was found.
 PTMATLAB_CC =	@PTMATLAB_CC@
 
+PTMATLAB_CC_FLAGS = @PTMATLAB_CC_FLAGS@
+
 # Set to matlab and used in $PTII/ptolemy/makefile if
 # matlab was found.
 PTMATLAB_DIR =	@PTMATLAB_DIR@

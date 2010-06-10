@@ -38,6 +38,8 @@ package org.ow2.proactive.scheduler.ext.matlab;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.io.*;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
@@ -53,6 +55,9 @@ import ptolemy.data.Token;
  */
 public class AOMatlabWorker implements Serializable {
 
+    /**  */
+    private static final long serialVersionUID = 200;
+
     protected boolean debug;
 
     static String nl = System.getProperty("line.separator");
@@ -67,17 +72,32 @@ public class AOMatlabWorker implements Serializable {
      */
     private ArrayList<String> scriptLines = new ArrayList<String>();
 
+    private PrintStream outDebug;
+
     public AOMatlabWorker() {
     }
 
     public AOMatlabWorker(MatlabConfiguration matlabConfig) {
         MatlabEngine.setConfiguration(matlabConfig);
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public void run() {
+                try {
+                    MatlabEngine.close();
+                } catch (Exception e) {
+                }
+            }
+        }));
     }
 
     public void init(String inputScript, ArrayList<String> scriptLines, boolean debug) {
         this.inputScript = inputScript;
         this.scriptLines = scriptLines;
         this.debug = debug;
+        if (debug) {
+            MatlabEngine.setDebug((byte) 2);
+        } else {
+            MatlabEngine.setDebug((byte) 0);
+        }
     }
 
     public Serializable execute(int index, TaskResult... results) throws Throwable {
@@ -115,11 +135,14 @@ public class AOMatlabWorker implements Serializable {
             executeScript(conn);
             if (debug) {
                 System.out.println("Receiving output:");
+                //outDebug.println("Receiving output:");
             }
             out = conn.get("out");
             if (debug) {
                 System.out.println(out);
+                //outDebug.println(out);
                 System.out.flush();
+                //	outDebug.flush();
             }
         } finally {
             conn.release();
@@ -145,7 +168,9 @@ public class AOMatlabWorker implements Serializable {
         if (inputScript != null) {
             if (debug) {
                 System.out.println("Feeding input:");
+                //outDebug.println("Feeding input:");
                 System.out.println(inputScript);
+                //	outDebug.println(inputScript);
             }
             conn.evalString(inputScript);
         }
@@ -153,12 +178,16 @@ public class AOMatlabWorker implements Serializable {
         String execScript = prepareScript();
         if (debug) {
             System.out.println("Executing Matlab command:");
+            //outDebug.println("Executing Matlab command:");
             System.out.println(execScript);
+            //outDebug.println(execScript);
             System.out.flush();
+            //	outDebug.flush();
         }
         conn.evalString(execScript);
         if (debug) {
             System.out.println("Matlab command completed successfully");
+            //outDebug.println("Matlab command completed successfully");
         }
     }
 

@@ -90,9 +90,9 @@ if str2num(v(1:3)) > 7.2
      end
  end
 
- if nargout(func)~=1
-     error('func parameter should be a function with one and only one output parameter');
- end
+ %if nargout(func)~=1
+ %    error('func parameter should be a function with one and only one output parameter');
+ %end
 
 % Get the solver from memory
 solver = PAgetsolver();
@@ -143,7 +143,12 @@ end
 [pathstr, name, ext, versn] = fileparts(mfilename('fullpath'));
 scriptUrl = java.net.URL(['file:' pathstr filesep 'checkMatlab' '.js']);
 % find the list of toolboxes used by the user function and give it as parameter to the script
-tblist = findUsedToolboxes(func2str(func));
+if strfunc(2) ~= '('
+    tblist = findUsedToolboxes(func2str(func));
+else
+    % if func is an anonymous function, we can't find dependencies
+    tblist = {'matlab'};
+end
 scriptParams = javaArray('java.lang.String',length(args));
 for i=1:length(tblist)
     scriptParams(i) = java.lang.String(tblist{i});    

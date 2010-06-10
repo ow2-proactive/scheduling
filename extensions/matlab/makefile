@@ -77,7 +77,7 @@ all: $(PROACTIVE)/lib/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)/$(PTLIB)
 # $(PTMATLAB_cC) is set to cl or gcc by configure in $PTII/mk/ptII.mk
 #$(PTLIB): ptmatlab.cc Engine.class
 #	CLASSPATH="$(CLASSPATH)" "$(PTJAVA_DIR)/bin/javah" -jni -o ptmatlab.h ptolemy.matlab.Engine
-#	"$(PTMATLAB_CC)" \
+	"$(PTMATLAB_CC)" $(PTMATLAB_CC_FLAGS) \
 #		"-I$(MATLAB_DIR)/extern/include" \
 #		"-I$(PTJAVA_HOME)/../include" \
 #		"-I$(PTJAVA_HOME)/../include/$(PTJNI_ARCHITECTURE)" \
@@ -107,14 +107,17 @@ all: $(PROACTIVE)/lib/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)/$(PTLIB)
 
 $(PTLIB): ptmatlab.cc $(PTOLEMY_LIB)
 	CLASSPATH="$(CLASSPATH)" "$(PTJAVA_DIR)/bin/javah" -jni -o ptmatlab.h ptolemy.matlab.Engine
-	$(PTCC) -v -shared $(CFLAGS) \
+	$(PTCC) -v -shared $(CFLAGS) $(PTMATLAB_CC_FLAGS) \
 		"-I$(MATLAB_DIR_NO_CYGDRIVE)/extern/include" \
 		"-I$(PTJAVA_DIR_NO_CYGDRIVE)/include" \
 		"-I$(PTJAVA_DIR_NO_CYGDRIVE)/include/$(PTJNI_ARCHITECTURE)" \
 		$< \
 		-fno-exceptions \
 		-o $@ \
-		"-L$(MATLAB_DIR_NO_CYGDRIVE)/$(MATLAB_LIBDIR)" $(PTJNI_SHAREDLIBRARY_LDFLAG) -leng -lmx
+		"-L$(MATLAB_DIR_NO_CYGDRIVE)/$(MATLAB_LIBDIR)" "-L$(MATLAB_DIR_NO_CYGDRIVE)/extern/lib/$(PTJNI_ARCHITECTURE)/microsoft" $(PTJNI_SHAREDLIBRARY_LDFLAG) -leng -lmx -lmex
+
+
+#		"-L$(MATLAB_DIR_NO_CYGDRIVE)/$(MATLAB_LIBDIR)" $(PTJNI_SHAREDLIBRARY_LDFLAG) -leng -lmx
 		
 $(PROACTIVE)/lib/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)/$(PTLIB) : $(PTLIB)
 	mkdir -p $(PROACTIVE)/lib/ProActive/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)

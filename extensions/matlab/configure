@@ -605,6 +605,7 @@ LIBOBJS
 CFLAGS
 TOOLS_JAR
 PTMATLAB_LD_ARGS
+PTMATLAB_CC_FLAGS
 PTMATLAB_DIR
 PTJNI_LIBRARIES
 PTJNI_SHAREDLIBRARY_SUFFIX
@@ -632,6 +633,7 @@ CLASSPATHSEPARATOR
 ARCH_INT
 PTMATLAB_CC
 MATLAB
+JAVAH
 PTCC
 JAVA
 JAVAC
@@ -677,6 +679,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_verbose
 with_find
 with_java
 '
@@ -1298,6 +1301,12 @@ if test -n "$ac_init_help"; then
 
   cat <<\_ACEOF
 
+Optional Features:
+  --disable-option-checking  ignore unrecognized --enable/--with options
+  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-verbose,	configure prints verbose msgs
+
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
@@ -1804,6 +1813,46 @@ case "`uname -s`" in
 			esac
 
 
+#PT_VERBOSE=1
+
+# Check whether --enable-verbose was given.
+if test "${enable_verbose+set}" = set; then
+  enableval=$enable_verbose; PTVERBOSE=1
+fi
+
+
+if test "${PTVERBOSE:-none}" = "none"; then
+    { $as_echo "$as_me:$LINENO: result: For more verbose output, run ./configure --enable-verbose" >&5
+$as_echo "For more verbose output, run ./configure --enable-verbose" >&6; }
+fi
+
+
+# PT_MSG_RESULT
+
+# PT_MSG_STATUS
+
+
+# Java does not find things in c:/program files/java
+{ $as_echo "$as_me:$LINENO: checking if your path has 'program files/java' instead of 'Program Files/Java' " >&5
+$as_echo_n "checking if your path has 'program files/java' instead of 'Program Files/Java' ... " >&6; }
+echo "$PATH" | egrep 'program files/java' > /dev/null
+status=$?
+if test "$status" -eq 0 ; then
+   { $as_echo "$as_me:$LINENO: WARNING:
+    Temporarily changing your path within configure for Java because
+    Java can't find c:/program files/java, but can find
+    c:/Program files/Java." >&5
+$as_echo "$as_me: WARNING:
+    Temporarily changing your path within configure for Java because
+    Java can't find c:/program files/java, but can find
+    c:/Program files/Java." >&2;}
+   PATH="`echo $PATH | sed 's@program files/java@Program Files/Java@g'`"
+else
+   if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; fi
+fi
+
 
 # We must have PTII set before running configure.
 #if test -z "$PTII"; then
@@ -1836,10 +1885,11 @@ $as_echo_n "checking if \$PTII ('$PTII') has backslashes... " >&6; }
 echo "$PTII" | egrep '\\' > /dev/null
 status=$?
 if test "$status" -eq 1 ; then
-       { $as_echo "$as_me:$LINENO: result: ok
+       if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: ok
     '$PTII' does not contain backslashes" >&5
 $as_echo "ok
-    '$PTII' does not contain backslashes" >&6; }
+    '$PTII' does not contain backslashes" >&6; }; fi
 else
     { { $as_echo "$as_me:$LINENO: error:
     \$PTII == $PTII,
@@ -2004,10 +2054,10 @@ fi
 
 
 if test `echo "$FIND" | grep system32`; then
-    { $as_echo "$as_me:$LINENO: WARNING: \"Your path is probably messed up, you have a system32
-    directory in your path before /bin\"" >&5
-$as_echo "$as_me: WARNING: \"Your path is probably messed up, you have a system32
-    directory in your path before /bin\"" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: Your path is probably messed up, you have a system32
+    directory in your path before /bin" >&5
+$as_echo "$as_me: WARNING: Your path is probably messed up, you have a system32
+    directory in your path before /bin" >&2;}
     FIND=/bin/find
 fi
 
@@ -2028,6 +2078,7 @@ PTII_LOCALURL=`echo "file:///$PTII_DIR" | sed 's/ /%20/g'`
 #       you are looking for Java jar files.
 #       Note that PTJAVA_HOME is set to the jre/ directory, wheras
 #       PTJAVA_DIR is set to the directory above the jre/ directory.
+#       PTJAVA_HOME will _not_ have a trailing slash.
 #--------------------------------------------------------------------
 
 
@@ -2038,20 +2089,20 @@ fi
 
 
 if test -d "$PTJAVA_DIR"; then
-	{ $as_echo "$as_me:$LINENO: result:
+	if test "${PTVERBOSE:-none}" != "none"; then { $as_echo "$as_me:$LINENO: result:
     PTJAVA_DIR environment variable was set to
     '$PTJAVA_DIR', and there is a directory
     at that location, so we will try it." >&5
 $as_echo "
     PTJAVA_DIR environment variable was set to
     '$PTJAVA_DIR', and there is a directory
-    at that location, so we will try it." >&6; }
+    at that location, so we will try it." >&6; }; fi
 else
     if test -z "$PTJAVA_DIR"; then
-	{ $as_echo "$as_me:$LINENO: result: PTJAVA_DIR environment variable was not set,
+	if test "${PTVERBOSE:-none}" != "none"; then { $as_echo "$as_me:$LINENO: result: PTJAVA_DIR environment variable was not set,
     so we search for the java compiler." >&5
 $as_echo "PTJAVA_DIR environment variable was not set,
-    so we search for the java compiler." >&6; }
+    so we search for the java compiler." >&6; }; fi
 
     else
 	{ $as_echo "$as_me:$LINENO: WARNING: PTJAVA_DIR environment variable is set to
@@ -2176,13 +2227,14 @@ fi
 
 
 #
-# Check that we have the java that corresponds with PTJAVA_DIR in our path
+# Check that we have the javac that corresponds with PTJAVA_DIR in our path
 #
 { $as_echo "$as_me:$LINENO: checking for the java runtime in $PTJAVA_DIR/bin" >&5
 $as_echo_n "checking for the java runtime in $PTJAVA_DIR/bin... " >&6; }
 if test -f "$PTJAVA_DIR/bin/java" -o -f "$PTJAVA_DIR/bin/java.exe"; then
-    { $as_echo "$as_me:$LINENO: result: $PTJAVA_DIR/bin/java" >&5
-$as_echo "$PTJAVA_DIR/bin/java" >&6; }
+    if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: $PTJAVA_DIR/bin/java" >&5
+$as_echo "$PTJAVA_DIR/bin/java" >&6; }; fi
     { $as_echo "$as_me:$LINENO: checking that you have the right java in your path." >&5
 $as_echo_n "checking that you have the right java in your path.... " >&6; }
     # Extract the first word of "java", so it can be a program name with args.
@@ -2226,12 +2278,12 @@ fi
 
 
     if test "$PTJAVA_DIR/bin/java" = "$JAVA"; then
-	{ $as_echo "$as_me:$LINENO: result:     You have the right java in your path,
+	if test "${PTVERBOSE:-none}" != "none"; then { $as_echo "$as_me:$LINENO: result:     You have the right java in your path,
     \"$PTJAVA_DIR/bin/java\"
       = \"$JAVA\"" >&5
 $as_echo "    You have the right java in your path,
     \"$PTJAVA_DIR/bin/java\"
-      = \"$JAVA\"" >&6; }
+      = \"$JAVA\"" >&6; }; fi
     else
 	{ $as_echo "$as_me:$LINENO: WARNING: '$PTJAVA_DIR/bin/java' is not
     the same as '$JAVA'.
@@ -2248,15 +2300,84 @@ $as_echo "$as_me: WARNING: '$PTJAVA_DIR/bin/java' is not
 	JAVA="$PTJAVA_DIR/bin/java"
     fi
 else
+   if test -f "$PTJAVA_DIR/Commands/java"; then
+       if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: $PTJAVA_DIR/Commands/java" >&5
+$as_echo "$PTJAVA_DIR/Commands/java" >&6; }; fi
+       # Extract the first word of "java", so it can be a program name with args.
+set dummy java; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_JAVA+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  case $JAVA in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_JAVA="$JAVA" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_JAVA="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+JAVA=$ac_cv_path_JAVA
+if test -n "$JAVA"; then
+  { $as_echo "$as_me:$LINENO: result: $JAVA" >&5
+$as_echo "$JAVA" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+       if test "$PTJAVA_DIR/Commands/java" = "$JAVA"; then
+           if test "${PTVERBOSE:-none}" != "none"; then { $as_echo "$as_me:$LINENO: result:     You have the right java in your path,
+    \"$PTJAVA_DIR/Commands/java\"
+      = \"$JAVA\"" >&5
+$as_echo "    You have the right java in your path,
+    \"$PTJAVA_DIR/Commands/java\"
+      = \"$JAVA\"" >&6; }; fi
+       else
+           { $as_echo "$as_me:$LINENO: WARNING: '$PTJAVA_DIR/Commands/java' is not
+    the same as '$JAVA'.
+    Perhaps '$JAVA' is in your path before
+    '$PTJAVA_DIR/Commands/java'?
+    If you have problems later, be sure that you don't have a mismatch
+    in JDK versions." >&5
+$as_echo "$as_me: WARNING: '$PTJAVA_DIR/Commands/java' is not
+    the same as '$JAVA'.
+    Perhaps '$JAVA' is in your path before
+    '$PTJAVA_DIR/Commands/java'?
+    If you have problems later, be sure that you don't have a mismatch
+    in JDK versions." >&2;}
+	JAVA="$PTJAVA_DIR/Commands/java"
+      fi
+   else
     { { $as_echo "$as_me:$LINENO: error:
-  Cannot find '$PTJAVA_DIR/bin/java'.
+  Cannot find '$PTJAVA_DIR/bin/java' or '$PTJAVA_DIR/Commands/java'.
   Try --with-java=DIR, or set the PTJAVA_DIR environment variable.
 " >&5
 $as_echo "$as_me: error:
-  Cannot find '$PTJAVA_DIR/bin/java'.
+  Cannot find '$PTJAVA_DIR/bin/java' or '$PTJAVA_DIR/Commands/java'.
   Try --with-java=DIR, or set the PTJAVA_DIR environment variable.
 " >&2;}
    { (exit 1); exit 1; }; }
+fi
+
 fi
 
 #
@@ -2265,8 +2386,9 @@ fi
 { $as_echo "$as_me:$LINENO: checking for the java compiler in $PTJAVA_DIR/bin" >&5
 $as_echo_n "checking for the java compiler in $PTJAVA_DIR/bin... " >&6; }
 if test -f "$PTJAVA_DIR/bin/javac"; then
-    { $as_echo "$as_me:$LINENO: result: $PTJAVA_DIR/bin/javac" >&5
-$as_echo "$PTJAVA_DIR/bin/javac" >&6; }
+    if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: $PTJAVA_DIR/bin/javac" >&5
+$as_echo "$PTJAVA_DIR/bin/javac" >&6; }; fi
     { $as_echo "$as_me:$LINENO: checking that you have the right javac in your path." >&5
 $as_echo_n "checking that you have the right javac in your path.... " >&6; }
     # Extract the first word of "javac", so it can be a program name with args.
@@ -2320,12 +2442,12 @@ $as_echo "$as_me: WARNING: Failed to find the 'javac' command in your path.
 	then you may want to adjust your path" >&2;}
     fi
     if test "$PTJAVA_DIR/bin/javac" = "$JAVAC"; then
-        { $as_echo "$as_me:$LINENO: result:     You have the right javac in your path,
+        if test "${PTVERBOSE:-none}" != "none"; then { $as_echo "$as_me:$LINENO: result:     You have the right javac in your path,
     \"$PTJAVA_DIR/bin/javac\"
       = \"$JAVAC\"" >&5
 $as_echo "    You have the right javac in your path,
     \"$PTJAVA_DIR/bin/javac\"
-      = \"$JAVAC\"" >&6; }
+      = \"$JAVAC\"" >&6; }; fi
     else
         { $as_echo "$as_me:$LINENO: WARNING: '$PTJAVA_DIR/bin/javac' is not
 	 the same as '$JAVAC'.
@@ -2342,14 +2464,83 @@ $as_echo "$as_me: WARNING: '$PTJAVA_DIR/bin/javac' is not
 	JAVAC="$PTJAVA_DIR/bin/javac"
     fi
 else
+   if test -f "$PTJAVA_DIR/Commands/javac"; then
+       if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: $PTJAVA_DIR/Commands/javac" >&5
+$as_echo "$PTJAVA_DIR/Commands/javac" >&6; }; fi
+       # Extract the first word of "javac", so it can be a program name with args.
+set dummy javac; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_JAVAC+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  case $JAVAC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_JAVAC="$JAVAC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_JAVAC="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+JAVAC=$ac_cv_path_JAVAC
+if test -n "$JAVAC"; then
+  { $as_echo "$as_me:$LINENO: result: $JAVAC" >&5
+$as_echo "$JAVAC" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+       if test "$PTJAVA_DIR/Commands/javac" = "$JAVAC"; then
+           if test "${PTVERBOSE:-none}" != "none"; then { $as_echo "$as_me:$LINENO: result:     You have the right java in your path,
+    \"$PTJAVA_DIR/Commands/javac\"
+      = \"$JAVAC\"" >&5
+$as_echo "    You have the right java in your path,
+    \"$PTJAVA_DIR/Commands/javac\"
+      = \"$JAVAC\"" >&6; }; fi
+       else
+           { $as_echo "$as_me:$LINENO: WARNING: '$PTJAVA_DIR/Commands/javac' is not
+    the same as '$JAVAC'.
+    Perhaps '$JAVAC' is in your path before
+    '$PTJAVA_DIR/Commands/javac'?
+    If you have problems later, be sure that you don't have a mismatch
+    in JDK versions." >&5
+$as_echo "$as_me: WARNING: '$PTJAVA_DIR/Commands/javac' is not
+    the same as '$JAVAC'.
+    Perhaps '$JAVAC' is in your path before
+    '$PTJAVA_DIR/Commands/javac'?
+    If you have problems later, be sure that you don't have a mismatch
+    in JDK versions." >&2;}
+	JAVAC="$PTJAVA_DIR/Commands/javac"
+      fi
+   else
     { { $as_echo "$as_me:$LINENO: error:
-  Cannot find '$PTJAVA_DIR/bin/javac'.
+  Cannot find '$PTJAVA_DIR/bin/javac' or '$PTJAVA_DIR/Commands/javac'.
   Try --with-java=DIR, or set the PTJAVA_DIR environment variable." >&5
 $as_echo "$as_me: error:
-  Cannot find '$PTJAVA_DIR/bin/javac'.
+  Cannot find '$PTJAVA_DIR/bin/javac' or '$PTJAVA_DIR/Commands/javac'.
   Try --with-java=DIR, or set the PTJAVA_DIR environment variable." >&2;}
    { (exit 1); exit 1; }; }
 fi
+fi
+
 
 if test -f "$PTJAVA_DIR/jre/bin/java"; then
 	{ $as_echo "$as_me:$LINENO: result:   Found the JRE at '$PTJAVA_DIR/jre' " >&5
@@ -2380,8 +2571,352 @@ case "`uname -s`" in
     CYGWIN_98-*) CLASSPATHSEPARATOR=";";;
     *) CLASSPATHSEPARATOR=":";;
 esac
-{ $as_echo "$as_me:$LINENO: result: '$CLASSPATHSEPARATOR'" >&5
-$as_echo "'$CLASSPATHSEPARATOR'" >&6; }
+if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$CLASSPATHSEPARATOR'" >&5
+$as_echo "'$CLASSPATHSEPARATOR'" >&6; }; fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #--------------------------------------------------------------------
@@ -2392,6 +2927,9 @@ $as_echo "'$CLASSPATHSEPARATOR'" >&6; }
 # PTJNI_DIR is set to jni and used in
 # $PTII/makefile if gcc or cc is found.
 PTJNI_DIR=
+
+
+
 
 { $as_echo "$as_me:$LINENO: checking for the proper gcc compiler" >&5
 $as_echo_n "checking for the proper gcc compiler... " >&6; }
@@ -2404,17 +2942,17 @@ CYGWIN*)
     fi
     if !(test -f "$MINGW/bin/gcc.exe" -a -x "$MINGW/bin/gcc.exe"); then
 	    echo "$MINGW\bin\gcc.exe doesn't exist or is not executable"
-          echo "Trying $MINGW\bin\x86_64-w64-mingw32-gcc.exe"
-          if !(test -f "$MINGW\bin\x86_64-w64-mingw32-gcc.exe" -a -x "$MINGW\bin\x86_64-w64-mingw32-gcc.exe"); then
-             echo "$MINGW\bin\x86_64-w64-mingw32-gcc.exe doesn't exist or is not executable"
-		 exit 3
-          else
-		PTMINGW=$(echo $(cygpath -u $MINGW))
-	 	PTCC=$PTMINGW/bin/x86_64-w64-mingw32-gcc.exe
+        echo "Trying $MINGW\bin\x86_64-w64-mingw32-gcc.exe"
+        if !(test -f "$MINGW\bin\x86_64-w64-mingw32-gcc.exe" -a -x "$MINGW\bin\x86_64-w64-mingw32-gcc.exe"); then
+            echo "$MINGW\bin\x86_64-w64-mingw32-gcc.exe doesn't exist or is not executable"
+		    exit 3
+        else
+		    PTMINGW=$(echo $(cygpath -u $MINGW))
+	 	    PTCC=$PTMINGW/bin/x86_64-w64-mingw32-gcc.exe
 	    fi
     else
-    	 PTMINGW=$(echo $(cygpath -u $MINGW))
-	 PTCC=$PTMINGW/bin/gcc.exe
+    	PTMINGW=$(echo $(cygpath -u $MINGW))
+	    PTCC=$PTMINGW/bin/gcc.exe
     fi
 
 	 CFLAGS="-Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at"
@@ -2461,11 +2999,11 @@ fi
 
 
 if test "${PTCC:-none}" != "none"; then
-    PTJNI_DIR=jni
+       PTJNI_DIR=jni
 else
-    { $as_echo "$as_me:$LINENO: WARNING: Failed to find gcc" >&5
+        { $as_echo "$as_me:$LINENO: WARNING: Failed to find gcc" >&5
 $as_echo "$as_me: WARNING: Failed to find gcc" >&2;}
-    # Extract the first word of "cc", so it can be a program name with args.
+        # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 { $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
@@ -2506,9 +3044,10 @@ fi
 
 
     if test "${PTCC:-none}" != "none"; then
-        { $as_echo "$as_me:$LINENO: result: $PTCC" >&5
-$as_echo "$PTCC" >&6; }
-        PTJNI_DIR=jni
+            if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: $PTCC" >&5
+$as_echo "$PTCC" >&6; }; fi
+            PTJNI_DIR=jni
     else
         { $as_echo "$as_me:$LINENO: WARNING: Failed to find gcc or cc, so we will
 not be able to compile the JNI interface in $PTII/jni" >&5
@@ -2516,6 +3055,53 @@ $as_echo "$as_me: WARNING: Failed to find gcc or cc, so we will
 not be able to compile the JNI interface in $PTII/jni" >&2;};
     fi
 fi
+
+# Extract the first word of "javah", so it can be a program name with args.
+set dummy javah; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_JAVAH+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  case $JAVAH in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_JAVAH="$JAVAH" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_JAVAH="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+JAVAH=$ac_cv_path_JAVAH
+if test -n "$JAVAH"; then
+  { $as_echo "$as_me:$LINENO: result: $JAVAH" >&5
+$as_echo "$JAVAH" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+# Under MacOS X, JAVAH might be a link
+if test ! -e "$JAVAH"; then
+    { $as_echo "$as_me:$LINENO: WARNING:  Failed to find javah at '$JAVAH', perhaps Java is not installed?" >&5
+$as_echo "$as_me: WARNING:  Failed to find javah at '$JAVAH', perhaps Java is not installed?" >&2;}
+fi
+
 if ! test -n "$CFLAGS"; then
    CFLAGS=
 fi
@@ -2528,66 +3114,72 @@ case "`uname -s`" in
 	CYGWIN_98-*) PTJNI_ARCHITECTURE=win32;;
 	Linux) PTJNI_ARCHITECTURE=linux;;
 	SunOS) PTJNI_ARCHITECTURE=solaris;;
-	Darwin) PTJNI_ARCHITECTURE=darwin
-		PTJNI_DIR=
-		{ $as_echo "$as_me:$LINENO: WARNING:
-		The Ptolemy JNI facilty is not supported on MacOS
-   		because Apple laid out the Java directory differently
-   		than the Windows, Solaris and Linux Java directories.
-   		As a result, the Ptolemy JNI facility will not work." >&5
-$as_echo "$as_me: WARNING:
-		The Ptolemy JNI facilty is not supported on MacOS
-   		because Apple laid out the Java directory differently
-   		than the Windows, Solaris and Linux Java directories.
-   		As a result, the Ptolemy JNI facility will not work." >&2;};
-		;;
+	Darwin) PTJNI_ARCHITECTURE=darwin;;
 	*) PTJNI_ARCHITECTURE=unknown;;
 esac
 
 if test ! -z $PTJNI_DIR; then
-    { $as_echo "$as_me:$LINENO: result: '$PTJNI_ARCHITECTURE'" >&5
-$as_echo "'$PTJNI_ARCHITECTURE'" >&6; }
+    if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$PTJNI_ARCHITECTURE'" >&5
+$as_echo "'$PTJNI_ARCHITECTURE'" >&6; }; fi
 
     { $as_echo "$as_me:$LINENO: checking for the proper JNI architecture include directory" >&5
 $as_echo_n "checking for the proper JNI architecture include directory... " >&6; }
-    if test ! -d "$PTJAVA_HOME/../include/$PTJNI_ARCHITECTURE"; then
-    	{ $as_echo "$as_me:$LINENO: WARNING: \"$PTJAVA_HOME/../include/$PTJNI_ARCHITECTURE\" was not found.
-		As a result, compilation of JNI actors will fail." >&5
-$as_echo "$as_me: WARNING: \"$PTJAVA_HOME/../include/$PTJNI_ARCHITECTURE\" was not found.
-		As a result, compilation of JNI actors will fail." >&2;}
+    if test $PTJNI_ARCHITECTURE = "darwin"; then
+    	PTJNI_INCLUDE="$PTJAVA_HOME/../Headers"
     else
-    	{ $as_echo "$as_me:$LINENO: result: $PTJAVA_HOME/../include/$PTJNI_ARCHITECTURE" >&5
-$as_echo "$PTJAVA_HOME/../include/$PTJNI_ARCHITECTURE" >&6; }
+    	PTJNI_INCLUDE="$PTJAVA_HOME/../include"
     fi
 
-    { $as_echo "$as_me:$LINENO: checking for the proper JNI architecture" >&5
-$as_echo_n "checking for the proper JNI architecture... " >&6; }
+    if test ! -d "$PTJNI_INCLUDE"; then
+	    	{ $as_echo "$as_me:$LINENO: WARNING: $PTJNI_INCLUDE was not found.  As a result, compilation of JNI actors will fail." >&5
+$as_echo "$as_me: WARNING: $PTJNI_INCLUDE was not found.  As a result, compilation of JNI actors will fail." >&2;}
+    else
+	    	if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: $PTJNI_INCLUDE" >&5
+$as_echo "$PTJNI_INCLUDE" >&6; }; fi
+    fi
+
+        { $as_echo "$as_me:$LINENO: checking for the proper JNI library architecture" >&5
+$as_echo_n "checking for the proper JNI library architecture... " >&6; }
     case "`uname -p`" in
     	*86) PTJNI_LIB_ARCHITECTURE=i386;;
-    	x86_64) PTJNI_LIB_ARCHITECTURE=amd64;;
     	sparc) PTJNI_LIB_ARCHITECTURE=sparc;;
-    	unknown) if test $PTJNI_ARCHITECTURE = "win32"; then
+	    unknown) # Some platforms do not properly implement uname -p
+                     if test $PTJNI_ARCHITECTURE = "win32" -o $PTJNI_ARCHITECTURE = "linux"; then
 	         PTJNI_LIB_ARCHITECTURE=i386
+	     elif  test $PTJNI_ARCHITECTURE = "win64"; then
+	         PTJNI_LIB_ARCHITECTURE=amd64
 	     else
 	         PTJNI_LIB_ARCHITECTURE=unknown
 	     fi
                  ;;
+	    x86_64) PTJNI_LIB_ARCHITECTURE=amd64;;
     	*) PTJNI_LIB_ARCHITECTURE=unknown;;
     esac
 
-    { $as_echo "$as_me:$LINENO: result: '$PTJNI_LIB_ARCHITECTURE'" >&5
-$as_echo "'$PTJNI_LIB_ARCHITECTURE'" >&6; }
+    if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$PTJNI_LIB_ARCHITECTURE'" >&5
+$as_echo "'$PTJNI_LIB_ARCHITECTURE'" >&6; }; fi
 
     { $as_echo "$as_me:$LINENO: checking for the proper JNI architecture lib directory" >&5
 $as_echo_n "checking for the proper JNI architecture lib directory... " >&6; }
-    if test ! -d "$PTJAVA_HOME/lib/$PTJNI_LIB_ARCHITECTURE"; then
-    	{ $as_echo "$as_me:$LINENO: WARNING: \"$PTJAVA_HOME/lib/$PTJNI_LIB_ARCHITECTURE\" was not found.
+
+    if test $PTJNI_ARCHITECTURE = "darwin"; then
+		PTJNI_LIB="$PTJAVA_HOME/../Libraries"
+	else
+		PTJNI_LIB="$PTJAVA_HOME/lib/$PTJNI_LIB_ARCHITECTURE"
+	fi
+
+    if test ! -d "$PTJNI_LIB"; then
+	    { $as_echo "$as_me:$LINENO: WARNING: $PTJNI_LIB was not found.
 		As a result, $PTII/jni/launcher/launcher might not work." >&5
-$as_echo "$as_me: WARNING: \"$PTJAVA_HOME/lib/$PTJNI_LIB_ARCHITECTURE\" was not found.
+$as_echo "$as_me: WARNING: $PTJNI_LIB was not found.
 		As a result, $PTII/jni/launcher/launcher might not work." >&2;}
     else
-    	{ $as_echo "$as_me:$LINENO: result: $PTJAVA_HOME/lib/$PTJNI_ARCHITECTURE" >&5
-$as_echo "$PTJAVA_HOME/lib/$PTJNI_ARCHITECTURE" >&6; }
+	    if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: $PTJNI_LIB" >&5
+$as_echo "$PTJNI_LIB" >&6; }; fi
     fi
 
     { $as_echo "$as_me:$LINENO: checking for if the -mno-cygwin flag is available" >&5
@@ -2598,20 +3190,35 @@ $as_echo_n "checking for if the -mno-cygwin flag is available... " >&6; }
     	CYGWIN_98-*) PTJNI_NO_CYGWIN=-mno-cygwin;;
     	*) PTJNI_NO_CYGWIN=;;
     esac
-    { $as_echo "$as_me:$LINENO: result: '$PTJNI_NO_CYGWIN'" >&5
-$as_echo "'$PTJNI_NO_CYGWIN'" >&6; }
+        if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$PTJNI_NO_CYGWIN'" >&5
+$as_echo "'$PTJNI_NO_CYGWIN'" >&6; }; fi
+
+        { $as_echo "$as_me:$LINENO: checking for the proper shared library gcc flag" >&5
+$as_echo_n "checking for the proper shared library gcc flag... " >&6; }
+        case "`uname -s`" in
+	     Darwin) PTJNI_GCC_SHARED_FLAG=-dynamiclib;;
+	     *) PTJNI_GCC_SHARED_FLAG=-shared;
+        esac
+        if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$PTJNI_GCC_SHARED_FLAG'" >&5
+$as_echo "'$PTJNI_GCC_SHARED_FLAG'" >&6; }; fi
 
     { $as_echo "$as_me:$LINENO: checking for the proper shared library cc flag" >&5
 $as_echo_n "checking for the proper shared library cc flag... " >&6; }
+	# Under Cygwin with gcc, we need -D__int64="long long"
+	# FIXME: we should have a test for this instead of setting it explictly
     case "`uname -s`" in
-        CYGWIN_ME-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
-    	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
-    	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
+            CYGWIN_ME-*) PTJNI_SHAREDLIBRARY_CFLAG="-D__int64=\"long long\"";;
+	    CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_CFLAG="-D__int64=\"long long\"";;
+	    CYGWIN_98-*) PTJNI_SHAREDLIBRARY_CFLAG="-D__int64=\"long long\"";;
+	    Linux)	 PTJNI_SHAREDLIBRARY_CFLAG=-fPIC;;
     	SunOS)	 PTJNI_SHAREDLIBRARY_CFLAG=-fPIC;;
-    	*) PTJNI_SHAREDLIBRARY_CFLAG=-fPIC;;
+    	*) PTJNI_SHAREDLIBRARY_CFLAG=;;
     esac
-    { $as_echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_CFLAG'" >&5
-$as_echo "'$PTJNI_SHAREDLIBRARY_CFLAG'" >&6; }
+    if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_CFLAG'" >&5
+$as_echo "'$PTJNI_SHAREDLIBRARY_CFLAG'" >&6; }; fi
 
     { $as_echo "$as_me:$LINENO: checking for the proper shared library link flag" >&5
 $as_echo_n "checking for the proper shared library link flag... " >&6; }
@@ -2619,11 +3226,13 @@ $as_echo_n "checking for the proper shared library link flag... " >&6; }
         CYGWIN_ME-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
     	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
     	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
+	    Linux)	 PTJNI_SHAREDLIBRARY_LDFLAG=-fPIC;;
     	SunOS)	 PTJNI_SHAREDLIBRARY_LDFLAG=-fPIC;;
-    	*) PTJNI_SHAREDLIBRARY_LDFLAG=-fPIC;;
+    	*) PTJNI_SHAREDLIBRARY_LDFLAG=;;
     esac
-    { $as_echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_LDFLAG'" >&5
-$as_echo "'$PTJNI_SHAREDLIBRARY_LDFLAG'" >&6; }
+        if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_LDFLAG'" >&5
+$as_echo "'$PTJNI_SHAREDLIBRARY_LDFLAG'" >&6; }; fi
 
     { $as_echo "$as_me:$LINENO: checking for the proper shared library prefix" >&5
 $as_echo_n "checking for the proper shared library prefix... " >&6; }
@@ -2634,8 +3243,9 @@ $as_echo_n "checking for the proper shared library prefix... " >&6; }
     	SunOS)	 PTJNI_SHAREDLIBRARY_PREFIX=lib;;
     	*) PTJNI_SHAREDLIBRARY_PREFIX=lib;;
     esac
-    { $as_echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_PREFIX'" >&5
-$as_echo "'$PTJNI_SHAREDLIBRARY_PREFIX'" >&6; }
+        if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_PREFIX'" >&5
+$as_echo "'$PTJNI_SHAREDLIBRARY_PREFIX'" >&6; }; fi
 
     { $as_echo "$as_me:$LINENO: checking for the proper shared library suffix" >&5
 $as_echo_n "checking for the proper shared library suffix... " >&6; }
@@ -2645,10 +3255,12 @@ $as_echo_n "checking for the proper shared library suffix... " >&6; }
     	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_SUFFIX=dll;;
     	SunOS)	 PTJNI_SHAREDLIBRARY_SUFFIX=so;;
     	Linux)   PTJNI_SHAREDLIBRARY_SUFFIX=so;;
+	    Darwin)      PTJNI_SHAREDLIBRARY_SUFFIX=dylib;;
     	*) PTJNI_SHAREDLIBRARY_SUFFIX=unknown;;
     esac
-    { $as_echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_SUFFIX'" >&5
-$as_echo "'$PTJNI_SHAREDLIBRARY_SUFFIX'" >&6; }
+    if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_SUFFIX'" >&5
+$as_echo "'$PTJNI_SHAREDLIBRARY_SUFFIX'" >&6; }; fi
 
     { $as_echo "$as_me:$LINENO: checking for JNI libraries needed to link JNI" >&5
 $as_echo_n "checking for JNI libraries needed to link JNI... " >&6; }
@@ -2658,12 +3270,15 @@ $as_echo_n "checking for JNI libraries needed to link JNI... " >&6; }
     	CYGWIN_NT-*) PTJNI_LIBRARIES=-lcygwin;;
     	CYGWIN_98-*) PTJNI_LIBRARIES=-lcygwin;;
     	Linux) PTJNI_LIBRARIES=
-       PTJNI_DL_LIBRARY=-ldl;;
+            PTJNI_DL_LIBRARY=-ldl;;
     	*) PTJNI_LIBRARIES=;;
     esac
-    { $as_echo "$as_me:$LINENO: result: '$PTJNI_LIBRARIES'" >&5
-$as_echo "'$PTJNI_LIBRARIES'" >&6; }
+
+    if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$PTJNI_LIBRARIES'" >&5
+$as_echo "'$PTJNI_LIBRARIES'" >&6; }; fi
 fi
+
 
 #--------------------------------------------------------------------
 #       MATLAB Interface
@@ -2672,11 +3287,18 @@ fi
 # PTMATLAB_DIR is set to matlab and used in $PTII/ptolemy/makefile
 # if matlab and gcc are found; PTMATLAB_LIBDIR is then also set to
 # the platform-dependent directory containg Matlab's engine libraries
+
+{ $as_echo "$as_me:$LINENO: checking for Matlab" >&5
+$as_echo_n "checking for Matlab... " >&6; }
+
 PTMATLAB_DIR=
 PTMATLAB_LIBDIR=
 
 PTMATLAB_SUPPORTED=no
 case "`uname -s`" in
+Darwin)
+	PTMATLAB_SUPPORTED=yes
+	;;
 Linux)
 	PTMATLAB_SUPPORTED=yes
 	;;
@@ -2689,10 +3311,6 @@ SunOS*)
 esac
 
 
-if test "$PTMATLAB_SUPPORTED" = "no"; then
-    { $as_echo "$as_me:$LINENO: WARNING: The Matlab interface is not supported on this platform (you are running \`uname -s\`)." >&5
-$as_echo "$as_me: WARNING: The Matlab interface is not supported on this platform (you are running \`uname -s\`)." >&2;}
-else
 
 	# Extract the first word of "matlab", so it can be a program name with args.
 set dummy matlab; ac_word=$2
@@ -2759,8 +3377,9 @@ $as_echo_n "checking the value of the Matlab root directory ... " >&6; }
 		MATLAB_DIR=$MATLAB_DIR_TMP
 
 
-	    { $as_echo "$as_me:$LINENO: result: '$MATLAB_DIR'" >&5
-$as_echo "'$MATLAB_DIR'" >&6; }
+		    if test "${PTVERBOSE:-none}" = "none"; then { $as_echo "$as_me:$LINENO: result: ok" >&5
+$as_echo "ok" >&6; }; else { $as_echo "$as_me:$LINENO: result: '$MATLAB_DIR'" >&5
+$as_echo "'$MATLAB_DIR'" >&6; }; fi
 
 
 	    cd "$startdir"
@@ -2774,19 +3393,29 @@ $as_echo "$as_me: WARNING: Failed to find '${MATLAB_DIR}'
     		\$PTII/ptolemy/matlab will not be usable." >&2;};
 	    else
 			MATLAB_USE_MSVC="no"
+            # These flags work for MacOSX r2009a, Linux r2008a, Windows r2008a
+            		PTMATLAB_CC_FLAGS="-DPT_NO_ENGGETARRAY -DPT_NO_ENGPUTARRAY -DPT_NO_MXGETNAME"
 			case "`uname -s`" in
 				Linux)
-					case "`uname -i`" in
-						i386*)
-							MATLAB_LIBDIR=bin/glnx86
-							;;
-						x86_64*)
-							MATLAB_LIBDIR=bin/glnxa64
-							;;
-						*)
-							MATLAB_LIBDIR=bin/glnx86
-							;;
-					esac
+					#case "`uname -i`" in
+					#	i386*)
+					#		MATLAB_LIBDIR=bin/glnx86
+					#		;;
+					#	x86_64*)
+					#		MATLAB_LIBDIR=bin/glnxa64
+					#		;;
+					#	*)
+					#		MATLAB_LIBDIR=bin/glnx86
+					#		;;
+					#esac
+					if test "`uname -m`" = "x86_64"; then
+			            MATLAB_LIBDIR=bin/glnxa64
+		            else
+			            MATLAB_LIBDIR=bin/glnx86
+			            if ! test -d ${MATLAB_DIR}; then
+				            MATLAB_LIBDIR=${MATLAB_DIR}/extern/lib/glnx86
+			            fi
+		            fi
 					;;
 				CYGWIN*)
 					case "`uname`" in
@@ -2800,16 +3429,34 @@ $as_echo "$as_me: WARNING: Failed to find '${MATLAB_DIR}'
 
 					;;
 				SunOS*)
-					MATLAB_LIBDIR=extern/lib/sol2
+					MATLAB_LIBDIR=${MATLAB_DIR}/extern/lib/sol2
+			if test ! -d "$MATLAB_LIBDIR"; then
+			    # Why, under Unix, are the libs in the bin dir?
+			    MATLAB_LIBDIR=${MATLAB_DIR}/bin
+			    if test ! -f "$MATLAB_LIBDIR/libmx.so"; then
+			        MATLAB_LIBDIR=${MATLAB_DIR}/bin/sol64
+				PTMATLAB_CC_FLAGS="-m64 $PTMATLAB_CC_FLAGS"
+                            fi
+			else
+			    if test ! -f "$MATLAB_LIBDIR/libmx.so"; then
+			        # Why, under Unix, are the libs in the bin dir?
+			        # matlab r2006a
+			        MATLAB_LIBDIR=${MATLAB_DIR}/bin
+			    fi
+                        fi
+			;;
+		Darwin)
+			MATLAB_LIBDIR=${MATLAB_DIR}/bin/maci
+			;;
+		*)
+			MATLAB_LIBDIR=${MATLAB_DIR}/extern/lib
 					;;
-				*)
-					MATLAB_LIBDIR=extern/lib
-					;;
-			esac
-			{ $as_echo "$as_me:$LINENO: result: using '${MATLAB_DIR}/${MATLAB_LIBDIR}' for Matlab's engine libraries" >&5
-$as_echo "using '${MATLAB_DIR}/${MATLAB_LIBDIR}' for Matlab's engine libraries" >&6; }
+		esac
+    if test "${PTVERBOSE:-none}" != "none"; then { $as_echo "$as_me:$LINENO: result: using '${MATLAB_LIBDIR}' for Matlab's engine libraries" >&5
+$as_echo "using '${MATLAB_LIBDIR}' for Matlab's engine libraries" >&6; }; fi
 
-
+		if test "${PTVERBOSE:-none}" != "none"; then { $as_echo "$as_me:$LINENO: result: using '${PTMATLAB_CC_FLAGS}' for Matlab's cc flags" >&5
+$as_echo "using '${PTMATLAB_CC_FLAGS}' for Matlab's cc flags" >&6; }; fi
 			if test $MATLAB_USE_MSVC = "yes"; then
 		    	{ $as_echo "$as_me:$LINENO: checking for Microsoft Visual C cl" >&5
 $as_echo_n "checking for Microsoft Visual C cl... " >&6; }
@@ -2855,7 +3502,10 @@ fi
 
 		    	if test "${PTMATLAB_CC:-none}" != "none"; then
 		        	PTMATLAB_DIR=matlab
-					PTMATLAB_LD_ARGS="/Tpptmatlab.cc /Feptmatlab.dll /link /dll /libpath:\"${MATLAB_DIR}/extern/lib/win32/microsoft/msvc70\" libeng.lib libmx.lib"
+			MATLAB_LIBPATH_DIR="${MATLAB_DIR}/extern/lib/win32/microsoft"
+			MATLAB_LIBPATH=`echo "$MATLAB_LIBPATH_DIR" | sed 's/ /\\\\\ /'`
+			PTMATLAB_LD_ARGS="/Tpptmatlab.cc /Feptmatlab.dll /link /dll /libpath:\\\"${MATLAB_LIBPATH}\\\" libeng.lib libmx.lib"
+
 	            else
 					{ $as_echo "$as_me:$LINENO: WARNING: Failed to find cl" >&5
 $as_echo "$as_me: WARNING: Failed to find cl" >&2;}
@@ -2913,8 +3563,26 @@ $as_echo "$as_me: WARNING: Failed to find MSVC cl or GNU gcc, so we will
 					fi
 		    	fi
             else
-		    	PTMATLAB_LD_ARGS="ptmatlab.cc -fno-exceptions -shared -c -o ${PTJNI_SHAREDLIBRARY_PREFIX}ptmatlab.${PTJNI_SHAREDLIBRARY_SUFFIX}	-L\"${MATLAB_LIBDIR}\" ${PTJNI_SHAREDLIBRARY_LDFLAG} -lc -leng -lmx"
+		    if test $PTJNI_ARCHITECTURE = "darwin"; then
+		        PTMATLAB_LD_ARGS="ptmatlab.cc -fno-exceptions -dynamiclib -o ${PTJNI_SHAREDLIBRARY_PREFIX}ptmatlab.${PTJNI_SHAREDLIBRARY_SUFFIX}	-L\"${MATLAB_LIBDIR}\" ${PTJNI_SHAREDLIBRARY_LDFLAG} -leng -lmx -lmex"
+		    elif test $PTJNI_ARCHITECTURE = "win64"; then
+		        PTMATLAB_LD_ARGS="-shared ptmatlab.cc -fno-exceptions -o ${PTJNI_SHAREDLIBRARY_PREFIX}ptmatlab.${PTJNI_SHAREDLIBRARY_SUFFIX}	-L\"${MATLAB_LIBDIR}\" ${PTJNI_SHAREDLIBRARY_LDFLAG} -leng -lmx -lmex"
+		    else
+		        PTMATLAB_LD_ARGS="-shared ptmatlab.cc -fno-exceptions -o ${PTJNI_SHAREDLIBRARY_PREFIX}ptmatlab.${PTJNI_SHAREDLIBRARY_SUFFIX}	-L\"${MATLAB_LIBDIR}\" ${PTJNI_SHAREDLIBRARY_LDFLAG} -lc -leng -lmx -lmex"
+		        if test "`uname -m`" = "x86_64"; then
+		            PTMATLAB_LD_ARGS="$PTMATLAB_LD_ARGS -fPIC"
+		        fi
+		    fi
 
+		    # Under MacOS X, JAVAH might be a link
+		    if test ! -e "$JAVAH"; then
+		        { $as_echo "$as_me:$LINENO: WARNING: Failed to find javah at '$JAVAH',
+    perhaps the JDK is not installed?
+    We will not be able to compile the Matlab interface in ptolemy/matlab" >&5
+$as_echo "$as_me: WARNING: Failed to find javah at '$JAVAH',
+    perhaps the JDK is not installed?
+    We will not be able to compile the Matlab interface in ptolemy/matlab" >&2;};
+                    else
 		    	{ $as_echo "$as_me:$LINENO: checking for gcc" >&5
 $as_echo_n "checking for gcc... " >&6; }
 		    	# Extract the first word of "gcc", so it can be a program name with args.
@@ -3034,6 +3702,1678 @@ $as_echo "${MATLAB_VERSION}" >&6; }
 	    fi
 	fi
 fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Cygdrive versions, removing all cygdrive paths
 case "`uname -s`" in
@@ -3160,8 +5500,12 @@ esac
 # $PTII/ptolemy/matlab/makefile if the Matlab was found.
 
 
+
+
 # Set to matlab and used in
 # $PTII/ptolemy/makefile if the Matlab was found.
+
+
 
 
 # Linker args for Matlab
@@ -3169,6 +5513,9 @@ esac
 
 
 # Location of tools.jar, usually $(PTJAVA_HOME)/../lib/tools.jar
+
+
+# The javah binary, used by jni for matlab.
 
 
 # Use of MinGW

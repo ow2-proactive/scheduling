@@ -102,7 +102,7 @@ else
             dist_lib_dir = strtrim(dist_lib_dir);
             [s,w] = dos('dir /x ProActive.jar');
             p1 = [dist_lib_dir filesep shortname(w,'ProActive.jar')];
-            [s,w] = dos('dir /x ProActive_Scheduler-core.jar');
+            [s,w] = dos('dir /x ProActive_Scheduler-client.jar');
             p2 = [dist_lib_dir filesep shortname(w,'ProActive_Scheduler-client.jar')];
             [s,w] = dos('dir /x ProActive_ResourceManager.jar');
             p3 = [dist_lib_dir filesep shortname(w,'ProActive_ResourceManager-client.jar')];
@@ -128,6 +128,13 @@ else
 
     end
 end
+
+% ensure that the correct class loader is used inside proactive
+th = java.lang.Thread.currentThread();
+sw = org.objectweb.proactive.core.util.wrapper.StringWrapper('toto');
+cl = sw.getClass().getClassLoader();
+th.setContextClassLoader(cl);
+
 end
 
 function out = shortname(in, match)

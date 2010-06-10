@@ -5,12 +5,21 @@
 # 2) path to matlab libraries (relative from matlab root)
 # 3) matlab version (major.minor i.e. 7.1 7.2 7.3 etc...)
  
-matlabs=(matlab matlab2007b matlab2007a matlab2006b matlab2006a matlab71 matlab7)
-i=0
-cmd_line=
-while [[ $i -lt 7 && "$cmd_line" == "" ]]; do
-    m1=`which ${matlabs[i]} 2>/dev/null|grep -v alias`
-    if [ "$m1" != "" ]; then
+	matlabs=(matlab matlab2009b matlab2009a matlab2008b matlab2008a matlab2007b matlab2007a matlab2006b matlab2006a matlab71 matlab7)
+	i=0
+	cmd_line=
+	while [[ $i -lt ${#matlabs[@]} && "$cmd_line" == "" ]]; do
+        if [ "${matlabs[i]}" == "matlab" ]; then			
+		m1=`alias matlab 2>/dev/null | sed "s/[^']*'//1" | sed "s/'//"`
+		if [ "$m1" == "" ]; then
+		   m1=`which $MATLAB 2>/dev/null`
+		fi
+ 
+        else 		
+		m1=`which ${matlabs[i]} 2>/dev/null | grep -v alias` 
+        fi
+    	if [ "$m1" != "" ]; then
+		
 		# finding matlab home
 		cmd_line=`readlink -f $m1`
 		matlab_home=$(readlink -f $(dirname $cmd_line)/..)

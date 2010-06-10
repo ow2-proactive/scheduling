@@ -3,7 +3,7 @@
  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds 
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -99,6 +99,9 @@ import ptolemy.data.Token;
  * @author The ProActive Team
  */
 public class AOMatlabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
+
+    /**  */
+    private static final long serialVersionUID = 200;
 
     /**
      * URL to the scheduler
@@ -279,7 +282,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         try {
             auth = SchedulerConnection.join(url);
         } catch (Exception e1) {
-            System.err.println(e1.getMessage());
+            e1.printStackTrace();
+            //            System.err.println(e1.getMessage());
             return false;
         }
         this.schedulerUrl = url;
@@ -562,6 +566,14 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
             } else {
 
                 String logs = res.getOutput().getAllLogs(false);
+                String logs2 = res.getOutput().getStderrLogs(false);
+                if (logs2.length() > 0) {
+                    System.err.println(logs2);
+                }
+                String logs3 = res.getOutput().getStdoutLogs(false);
+                if (logs3.length() > 0) {
+                    System.out.println(logs3);
+                }
                 if (res.hadException()) {
 
                     //Exception took place inside the framework
@@ -719,6 +731,9 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      *         Internal class for filtering requests in the queue
      */
     protected class FindNotWaitFilter implements RequestFilter {
+
+        /**  */
+        private static final long serialVersionUID = 200;
 
         /**
          * Creates the filter
