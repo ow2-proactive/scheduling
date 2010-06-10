@@ -239,7 +239,9 @@ public class NodeSource implements InitActive, RunActive {
             nodeToAdd = lookupNode(nodeUrl, NODE_LOOKUP_TIMEOUT);
             logger.info("The node " + nodeUrl + " has been successfully looked up");
         } catch (Exception e) {
-            logger.warn("Cannot look up the node " + nodeUrl + " within " + NODE_LOOKUP_TIMEOUT + " ms", e);
+            logger.warn("Cannot look up the node " + nodeUrl + " within " + NODE_LOOKUP_TIMEOUT +
+                " ms due to " + e.getMessage());
+            logger.debug("Detailled lookup exception :", e);
             throw new AddingNodesException(e);
         }
 

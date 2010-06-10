@@ -42,6 +42,7 @@ import java.net.UnknownHostException;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.ssh.SSHClient;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -72,6 +73,11 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
      */
     @Configurable
     protected String javaPath = System.getProperty("java.home") + "/bin/java";
+    /**
+     * ShhClient options (@see {@link SSHClient})
+     */
+    @Configurable
+    protected String sshOptions;
     /**
      * Path to the Scheduling installation on the remote hosts
      */
@@ -104,20 +110,25 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
      * Configures the Infrastructure
      * 
      * @param parameters
-     *            parameters[0]: path to the JVM on the remote host 
-     *            parameters[1]: path to the Scheduling installation on the remote host
+     *            parameters[0]: path to the JVM on the remote host
+     *            parameters[1]: ssh options
+     *            parameters[2]: path to the Scheduling installation on the remote host
+     *            parameters[3]: remote protocol
+     *            parameters[4]: remote port
+     *            parameters[5]: remote java options
      */
     @Override
     public BooleanWrapper configure(Object... parameters) {
-        if (parameters != null && parameters.length >= 5) {
+        if (parameters != null && parameters.length >= 6) {
             this.javaPath = parameters[0].toString();
             if (!new File(this.javaPath).isAbsolute()) {
                 this.javaPath = "java";
             }
-            this.schedulingPath = parameters[1].toString();
-            this.protocol = parameters[2].toString();
-            this.port = parameters[3].toString();
-            this.javaOptions = parameters[4].toString();
+            this.sshOptions = parameters[1].toString();
+            this.schedulingPath = parameters[2].toString();
+            this.protocol = parameters[3].toString();
+            this.port = parameters[4].toString();
+            this.javaOptions = parameters[5].toString();
         } else {
             throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
         }
@@ -143,6 +154,7 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
             "/dist/lib/ProActive.jar";
         sshCmd += " -Dproactive.useIPaddress=true ";
         sshCmd += " org.objectweb.proactive.core.ssh.SSHClient";
+        sshCmd += " " + sshOptions;
         sshCmd += " " + host.getHostName();
         sshCmd += " \"" + cmd + "\"";
 
@@ -154,7 +166,7 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
         } catch (UnknownHostException e) {
         }
 
-        logger.debug("Executing SSH command: '" + sshCmd + "'");
+        logger.info("Executing SSH command: '" + sshCmd + "'");
 
         Process p = null;
         // start the SSH command in a new process and not a thread:

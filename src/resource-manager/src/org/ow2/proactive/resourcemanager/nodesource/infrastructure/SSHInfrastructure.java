@@ -166,9 +166,11 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
         for (int i = 0; i < 16; i++) {
             nn += alpha.charAt(rand.nextInt(alpha.length()));
         }
-        String nodeUrl = this.protocol + "://" + host.getHostAddress();
-        nodeUrl += ":" + this.port + "/SSH-" + nodeSource.getName() + "-" + nn;
-        cmd += nodeUrl;
+        String nodeName = "SSH-" + nodeSource.getName() + "-" + nn;
+        // HACK HACK GNACK
+        // node URL is guessed ... FIXME : does not work with PAMR
+        String nodeUrl = this.protocol + "://" + host.getHostAddress() + ":" + this.port + "/" + nodeName;
+        cmd += nodeName;
 
         Process p = runSSHCommand(host, cmd);
 
@@ -220,7 +222,7 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
             }
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
             } catch (Exception e) {
                 return;
             }
@@ -231,20 +233,20 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
      * Configures the Infrastructure
      * 
      * @param parameters
-     *            parameters[0;1] : super
-     *            parameters[2]   : path to the scheduling installation on the hosts from the list
+     *            parameters[0;5] : super
+     *            parameters[6]   : path to the scheduling installation on the hosts from the list
      * @throws IllegalArgumentException configuration failed
      */
     @Override
     public BooleanWrapper configure(Object... parameters) {
         super.configure(parameters);
 
-        if (parameters != null && parameters.length >= 6) {
-            if (parameters[5] == null) {
+        if (parameters != null && parameters.length >= 7) {
+            if (parameters[6] == null) {
                 throw new IllegalArgumentException("Host file must be specified");
             }
             try {
-                byte[] hosts = (byte[]) parameters[5];
+                byte[] hosts = (byte[]) parameters[6];
                 File f = File.createTempFile("hosts", "list");
                 FileToBytesConverter.convertByteArrayToFile(hosts, f);
                 readHosts(f);
