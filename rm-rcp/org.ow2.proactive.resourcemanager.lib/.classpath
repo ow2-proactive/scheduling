@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/asm-3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bundlerepository-1.4.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/dtdparser-1.21.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fractal-adl-2.7-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/http-2.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/julia-asm-2.5.3-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/julia-mixins-2.5.3-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/julia-runtime-2.5.3-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/servicebinder-0.9.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/shell-1.4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/shelltui-1.4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.5.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-log4j12-1.5.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-log4j12-1.5.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/netty-3.2.0.ALPHA2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/fractal-adl-2.4-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fractal-api-2.0.3-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fractal-gcm-api-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive_ResourceManager.jar"/>
@@ -34,7 +47,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/batik-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/batik-xml.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bouncycastle.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/bundlerepository.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cog-jglobus-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cog-ogce.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/colobus-0.1.jar"/>
@@ -46,9 +58,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/cryptix-asn1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/derby.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/derbytools.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/dtdparser.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/glite-wms-jdlj.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/http.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ibis-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ibis-connect-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ibis-util-1.0.jar"/>
@@ -59,29 +69,21 @@
 	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jdom.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/julia-asm.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/julia-mixins.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/julia-runtime.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jung-1.7.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/moduleloader.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/msv.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/oscar.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/osgi.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ow_deployment_scheduling.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ptolemy.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/puretls.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/relaxngDatatype.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rngpack-1.1a.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/servicebinder.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/shell.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/shellgui.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/shellplugin.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/shelltui.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/simple.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/soap.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sunxacml.jar"/>
