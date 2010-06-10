@@ -46,7 +46,6 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.junit.Assert;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -126,25 +125,25 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
 
         // ADD, GET, RELEASE, REMOVE
         // 1) ADD
+        final long beforeAddTime = System.currentTimeMillis();
         Node node = RMTHelper.createNode("test");
         final String nodeURL = node.getNodeInformation().getURL();
-        PAFuture.waitFor(r.addNode(nodeURL));
-        final long addTime = System.currentTimeMillis();
+        r.addNode(nodeURL).booleanValue();
 
         // 2) GET
+        final long beforeGetTime = System.currentTimeMillis();
         node = r.getAtMostNodes(1, null).get(0);
-        final long getTime = System.currentTimeMillis();
 
         // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
         Thread.sleep(GR_DURATION);
 
         // 3) RELEASE
-        PAFuture.waitFor(r.releaseNode(node));
-        final long getReleaseDurationInMilliseconds = System.currentTimeMillis() - getTime;
+        r.releaseNode(node).booleanValue();
+        final long getReleaseMaxDuration = System.currentTimeMillis() - beforeGetTime;
 
         // 4) REMOVE  
-        PAFuture.waitFor(r.removeNode(nodeURL, true));
-        final long addRemoveDurationInMilliseconds = System.currentTimeMillis() - addTime;
+        r.removeNode(nodeURL, true).booleanValue();
+        final long addRemoveMaxDuration = System.currentTimeMillis() - beforeAddTime;
 
         // Refresh the account manager
         conn.invoke(managementMBeanName, "refreshAllAccounts", null, null);
@@ -165,9 +164,9 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
 
         Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
-            (usedNodeTime <= getReleaseDurationInMilliseconds));
+            (usedNodeTime <= getReleaseMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodeTime attribute",
-                (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveDurationInMilliseconds));
+                (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodesCount attribute", (providedNodesCount == 1));
     }
 }

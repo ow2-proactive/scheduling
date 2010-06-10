@@ -46,7 +46,6 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.junit.Assert;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -129,11 +128,11 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
         final String name = "test";
         Node node = RMTHelper.createNode(name);
         final String nodeURL = node.getNodeInformation().getURL();
-        PAFuture.waitFor(r.addNode(nodeURL));
+        r.addNode(nodeURL).booleanValue();
 
         // 2) GET
+        final long beforeGetTime = System.currentTimeMillis();
         node = r.getAtMostNodes(1, null).get(0);
-        final long getTime = System.currentTimeMillis();
 
         // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
         Thread.sleep(GR_DURATION);
@@ -144,10 +143,10 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
             Thread.sleep(500);
         }
 
-        final long getDownDurationInMilliseconds = System.currentTimeMillis() - getTime;
+        final long getDownMaxDuration = System.currentTimeMillis() - beforeGetTime;
 
         // 4) REMOVE  
-        PAFuture.waitFor(r.removeNode(nodeURL, true));
+        r.removeNode(nodeURL, true).booleanValue();
 
         // Refresh the account manager
         conn.invoke(managementMBeanName, "refreshAllAccounts", null, null);
@@ -163,6 +162,6 @@ public final class AddGetDownRemoveTest extends FunctionalTest {
         // Check account values validity
         usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime");
         Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
-            (usedNodeTime <= getDownDurationInMilliseconds));
+            (usedNodeTime <= getDownMaxDuration));
     }
 }

@@ -128,9 +128,8 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
 
     // Returned tuple: <NODEPROVIDER, DURATION>
     private static String totalUsedNodeTimeSQL() {
-        final StringBuilder builder = new StringBuilder("SELECT tab.np, tab.duration FROM ");
-        builder.append("( ");
-        builder.append("SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration ");
+        final StringBuilder builder = new StringBuilder("SELECT tab.np, SUM(tab.duration) FROM ");
+        builder.append("(SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration ");
         builder.append("FROM RMNODEEVENT t1 JOIN RMNODEEVENT t2 ON ");
         builder.append("t2.PREVIOUSEVENTID = t1.ID AND ");
         builder.append("t2.TYPE = 6 AND t2.NODESTATE=0 AND ");
@@ -151,15 +150,15 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         builder.append("t1.TYPE = 6 AND t1.NODESTATE=1 AND ");
         builder.append("t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2) AND ");
         builder
-                .append("(NOT EXISTS (select * from RMNODEEVENT WHERE PREVIOUSEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2)))) ");
+                .append("(NOT EXISTS (select * from RMNODEEVENT WHERE PREVIOUSEVENTID=t1.ID AND PREVIOUSNODESTATE=1)) ");
         builder.append("GROUP BY t1.NODEPROVIDER ");
-        builder.append(") tab");
+        builder.append(") tab GROUP BY tab.np");
         return builder.toString();
     }
 
     // FULL SQL REQUEST :
 
-    //SELECT tab.np, tab.duration FROM
+    //SELECT tab.np, SUM(tab.duration) FROM
     //(
     //-- Consistent GET duration from get->release
     //SELECT t1.NODEPROVIDER as np, sum(t2.TIMESTAMP - t1.TIMESTAMP) as duration
@@ -180,6 +179,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
     //(t2.PREVIOUSEVENTID = t1.ID AND
     //t2.TYPE = 6 AND t2.NODESTATE=2 AND t1.TYPE = 6 AND t1.NODESTATE=1)
     //GROUP BY t1.NODEPROVIDER
+    //UNION
     // -- Inconsistent GET that are after the last restart (currently used nodes) must be SUM(System.currentTimeMillis() - t1.TIMESTAMP)
     //select t1.NODEPROVIDER as np, sum(t1.TIMESTAMP) as duration
     //from RMNODEEVENT t1
@@ -192,9 +192,10 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
     //-- Inconsistent means not stopped and not removed
     //AND
     //(NOT EXISTS
-    //   (select * from RMNODEEVENT WHERE PREVIOUSEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2))))
+    //   (select * from RMNODEEVENT WHERE PREVIOUSEVENTID = t1.ID AND PREVIOUSNODESTATE=1))
     //GROUP BY t1.NODEPROVIDER    
     //) tab
+    //GROUP BY tab.np
 
     // Returned tuple: <NODEPROVIDER, DURATION, NODESCOUNT>
     private static String totalProvidedNodeTimeAndNodeCountSQL() {

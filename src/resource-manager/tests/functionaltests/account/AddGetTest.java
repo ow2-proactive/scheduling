@@ -46,7 +46,6 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.junit.Assert;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -126,14 +125,14 @@ public final class AddGetTest extends FunctionalTest {
 
         // ADD, GET
         // 1) ADD
+        final long beforeAddTime = System.currentTimeMillis();
         Node node = RMTHelper.createNode("test");
         final String nodeURL = node.getNodeInformation().getURL();
-        PAFuture.waitFor(r.addNode(nodeURL));
-        final long addTime = System.currentTimeMillis();
+        r.addNode(nodeURL).booleanValue();
 
         // 2) GET
+        final long beforeGetTime = System.currentTimeMillis();
         node = r.getAtMostNodes(1, null).get(0);
-        final long getTime = System.currentTimeMillis();
 
         // Sleep a certain amount of time that will be the minimum amount of the GET duration 
         Thread.sleep(GR_DURATION);
@@ -150,8 +149,8 @@ public final class AddGetTest extends FunctionalTest {
         } while (refreshDuration <= 0);
 
         final long currentTime = System.currentTimeMillis();
-        final long addRefreshDurationInMillis = currentTime - addTime;
-        final long getRefreshDurationInMillis = currentTime - getTime;
+        final long addRefreshMaxDuration = currentTime - beforeAddTime;
+        final long getRefreshMaxDuration = currentTime - beforeGetTime;
 
         // Check account values validity                      
         atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime", "ProvidedNodeTime",
@@ -161,9 +160,9 @@ public final class AddGetTest extends FunctionalTest {
         providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
 
         Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
-            (usedNodeTime <= getRefreshDurationInMillis));
+            (usedNodeTime <= addRefreshMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodeTime attribute",
-                (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRefreshDurationInMillis));
+                (providedNodeTime >= usedNodeTime) && (providedNodeTime <= getRefreshMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodesCount attribute", (providedNodesCount == 1));
     }
 }
