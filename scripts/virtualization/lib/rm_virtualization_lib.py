@@ -62,6 +62,7 @@ NODE_CLASSPATH = ["script-js.jar","jruby-engine.jar","jython-engine.jar","common
 class Abstract_Runtime :
 
     __socketServer = None
+    SOCKET_TIMEOUT = 20
     __providers = [] #to keep known implementations
     __runtimes = [] #to keep known runtimes, to be able to ask for termination
 
@@ -86,7 +87,7 @@ class Abstract_Runtime :
         """build the command and start the node starter register"""
         classpath = Abstract_Runtime.__buildClassPath()
         procs = []
-        for i in range(hostCapacity+1)[1:] :
+        for i in [ i for i in range(hostCapacity+1)][1:] :
             command = [ "java" ]
             for prop in propList:
                 command.append(prop)
@@ -196,34 +197,47 @@ class ProActiveSocketServer:
 
     def __init__(self,nbClients):
         varI = 0
-        while varI <= 1000: #circuit broker
+        while varI <= 10: #circuit broker
             try:
+                socket.setdefaulttimeout(Abstract_Runtime.SOCKET_TIMEOUT)
                 self.ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.ss.bind(("127.0.0.1",0))
                 self.ss.listen(nbClients)
                 break
             except Exception:
                 varI = varI + 1
-                print("An error occured while creating socket server")
+                print("An error occurred while creating socket server")
                 traceback.print_exc()
-        print("new ProActiveSocketServer created. Listening on port " + repr(self.ss.getsockname()[1]))
+        print("new ProActiveSocketServer for node creation created. Listening on port " + repr(self.ss.getsockname()[1]))
 
     def processChildComm(self):
-        print("PASocketServer is waiting for a connection")
-        (cs, address) = self.ss.accept()
+        print("PASocketServer is waiting for a connection for node creation on port ", self.getPort())
         result = []
-        varI = 0
-        while varI <= 1000: #circuit broker
-            received = cs.recv(PA_MESSAGE_LENGTH).decode("utf-8").strip().rstrip()
-            if received.find(EOF_MARKER) != -1:
-                break
-            if len(received) == 0:
-                print("A problem occurred while listening for node creation")
-                break
-            print("received a new node creation: " + received)
-            result.append(received)
-            varI =varI + 1
-        cs.close()
+        varJ = 0
+        while varJ <= 5: #circuit broker
+            try:
+                (cs, address) = self.ss.accept()
+                varI = 0
+                while varI <= 10: #circuit broker
+                    try:
+                        received = cs.recv(PA_MESSAGE_LENGTH).decode("utf-8").strip().rstrip()
+                        if received.find(EOF_MARKER) != -1:
+                            break
+                        if len(received) == 0:
+                            print("A problem occurred while listening for node creation")
+                            break
+                        print("received a new node creation: " + received)
+                        result.append(received)
+                    except Exception:
+                        varI = varI + 1
+                        print("An error occurred while processing communication for node creation")
+                        traceback.print_exc()
+                cs.close()
+                return result
+            except Exception:
+                varJ = varJ + 1
+                print("An error occurred while accepting communication for node creation")
+                traceback.print_exc()
         return result
 
     def getPort(self):

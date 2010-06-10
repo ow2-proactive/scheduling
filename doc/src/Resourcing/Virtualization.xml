@@ -120,7 +120,7 @@
 					we provide template daemon files located in scripts/virtualization (rm-node-starter.bat &amp;
 					rm-node-starter.sh). These scripts needs additional tools to work. To get more information about
 					how it works, refer to the section of the corresponding virtualization tool
-					<link linkend="virtualization-vmware">VMware</link>, <link linkend="virtualization-xenserver">XenServer</link>, <link linkend="virtualization-virtualbox">Virtualbox</link>
+					<link linkend="virtualization-vmware">VMware</link>, <link linkend="virtualization-xenserver">XenServer</link>, <link linkend="virtualization-virtualbox">Virtualbox</link> or <link linkend="virtualization-hyperv">Hyper-V</link>.
 				</para>
 			</listitem>
 			<listitem>
@@ -321,6 +321,36 @@
 			time, the best way to come back to a clean environment state is to remove every clone virtual machine and from the
 			virtual disk management window, remove every virtual disk belonging to the snapshot hierarchy of the template virtual
 			machine that is not attached to a virtual machine.
+		</para>
+	  </section>
+		  <section xml:id="virtualization-hyperv">
+		<info><title>Microsoft Hyper-V</title></info>
+		<para>
+			This section deals with Microsoft's Hyper-V product.
+			To use this kind of products for Resource Manager Node acquisition, you must first create your virtual machine, then,
+			copy your Resource Manager distribution inside the virtual machine. Next, register one of the scripts that we provide
+			(<literal>scripts/virtualization/rm-node-starter.[sh|bat]</literal>) as a new service on your virtual machine.
+			Note that for both case, you have to get python installed and available in the <emphasis role="italics">PATH variable</emphasis>, and especially for
+			windows, you must use the <link xlink:href="http://www.microsoft.com/Downloads/details.aspx?FamilyID=9d467a69-57ff-4ae7-96ee-b18c4790cffd&amp;displaylang=en">AutoEXnt software</link>.
+			You also need to install Hyper-V guest drivers ( if not available, fill <literal>scripts/virtualization/hyperv/hyperv.py</literal> properties to be able to connect to the Hyper-V host ).
+			You also must modify the <literal>rm-node-starter</literal> scripts in the virtual machine to match your current Resource Manager setup.
+		</para>
+		<para>
+			Once you have your virtual machine template correctly installed, you can use it from the Resource Manager as
+			a RM Node pool. The <emphasis>Infrastructure</emphasis> field appearing on the snapshot above must contain the value "hyperv-wmi" or "hyperv-winrm" depending on what kind of management tool you want to use.
+			See one of the following instructions to set the appropriated tool:
+			<itemizedlist>
+				<listitem><para><emphasis>WMI</emphasis>: it is based on DCOM, so you have to allow DCOM communication through your firewall</para></listitem>
+				<listitem><para><emphasis>WinRM</emphasis>: uses http, you must set up the host configuration like explained in <link xlink:href="http://blogs.dirteam.com/blogs/sanderberkouwer/archive/2008/02/23/remotely-managing-your-server-core-using-winrm-and-winrs.aspx">this tutorial</link></para></listitem>
+			</itemizedlist>
+			The <emphasis>VMM Url</emphasis> field holds the address of the Hyper-V host and depends on the protocol you want to use.
+			For WinRM, use a url like: <emphasis>http(s)://your.host.com/wsman</emphasis>, for WMI, use the FQDN of your server.
+			If you decide to provide a <emphasis>VM Max</emphasis> number
+			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisionning.
+			The clone feature is not provided by Hyper-V itself. To emulate it, we create a new virtual machine with a differencing hard disk attached to the template virtual machine's hard disk.
+			When the clone virtual machines are not used anymore, they are destroyed, and so do the attached differencing hard disks. If a problem occurs during destruction
+			time, the best way to come back to a clean environment state is to remove every clone virtual machine by hand with their associated differencing hard disks.
+			Note that when you clone a virtual machine, you cannot use the template virtual machine anymore without jeopardizing the integrity of the clone virtual machine.
 		</para>
 	  </section>
   </section>

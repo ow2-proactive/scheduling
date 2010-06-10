@@ -1094,6 +1094,20 @@ public class VirtualInfrastructure extends InfrastructureManager {
                     throws VirtualServiceException {
                 return new VirtualboxVMM(url, user, pwd);
             }
+        },
+        HYPERV_WMI("hyperv-wmi") {
+            @Override
+            protected VirtualMachineManager2 getVMM(String url, String user, String pwd)
+                    throws VirtualServiceException {
+                return new org.ow2.proactive.virtualizing.hypervwmi.HyperVVMM(url, user, pwd);
+            }
+        },
+        HYPERV_WINRM("hyperv-winrm") {
+            @Override
+            protected VirtualMachineManager2 getVMM(String url, String user, String pwd)
+                    throws VirtualServiceException {
+                return new org.ow2.proactive.virtualizing.hypervwinrm.HyperVVMM(url, user, pwd);
+            }
         };
 
         private final String id;
@@ -1122,6 +1136,10 @@ public class VirtualInfrastructure extends InfrastructureManager {
                 return VMWARE;
             } else if (VIRTUALBOX.getValue().compareToIgnoreCase(type) == 0) {
                 return VIRTUALBOX;
+            } else if (HYPERV_WINRM.getValue().compareToIgnoreCase(type) == 0) {
+                return HYPERV_WINRM;
+            } else if (HYPERV_WMI.getValue().compareToIgnoreCase(type) == 0) {
+                return HYPERV_WMI;
             } else {
                 return null;
             }

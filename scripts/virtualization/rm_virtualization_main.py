@@ -38,6 +38,9 @@ pathname = os.path.dirname(sys.argv[0])
 #updating lib path
 sys.path.append(os.path.abspath(pathname + os.path.sep +  "lib"))
 import rm_virtualization_lib
+#updating hyperv path
+sys.path.append(os.path.abspath(pathname + os.path.sep + "hyperv"))
+import hyperv
 #updating vmware path
 sys.path.append(os.path.abspath(pathname + os.path.sep + "vmware"))
 import vmware
@@ -62,6 +65,7 @@ print ("Begining log: ", time.strftime('%d/%m/%y %H:%M',time.localtime()))
 x = None
 
 #you can register new Abstract_Runtime implementation here
+rm_virtualization_lib.Abstract_Runtime.addProvider(hyperv.HyperV_Runtime())
 rm_virtualization_lib.Abstract_Runtime.addProvider(vmware.VMware_Runtime())
 rm_virtualization_lib.Abstract_Runtime.addProvider(virtualbox.Virtualbox_Runtime())
 if sys.version_info[0] == 2 :
