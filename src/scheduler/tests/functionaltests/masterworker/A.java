@@ -35,10 +35,10 @@
  */
 package functionaltests.masterworker;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
-
-import java.io.Serializable;
 
 
 public class A implements Serializable, Task<Integer> {
@@ -46,8 +46,6 @@ public class A implements Serializable, Task<Integer> {
     /**
      *
      */
-
-    private static final long serialVersionUID = 420L;
 
     private int taskcounter;
     private long delay;

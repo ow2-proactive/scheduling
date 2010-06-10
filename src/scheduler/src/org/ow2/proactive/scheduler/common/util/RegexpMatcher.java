@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.util;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,9 +50,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9.1
  */
 @PublicAPI
-public class RegexpMatcher implements Serializable {
+public class RegexpMatcher {
 
-    private static final long serialVersionUID = 3248173020881015123L;
     private Pattern pattern = null;
     private Matcher matcher = null;
     private ArrayList<String> matches;

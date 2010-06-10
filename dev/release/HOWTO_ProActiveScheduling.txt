@@ -1,5 +1,5 @@
 
-For a major release (aka x.y.0):
+For a major or minor release (aka x.y.0):
 	- Create a dedicated branch
 		- Set serialVersionUid to xy for all serializable class
 		- Check copyrights

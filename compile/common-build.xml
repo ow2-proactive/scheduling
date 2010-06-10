@@ -193,7 +193,7 @@
 				</classpath>
 
 				<jvmarg value="@{log4jconfig}"/>
-				<jvmarg value="-Djava.security.policy=${base.dir}/config/security.java.policy" />
+				<jvmarg value="-Djava.security.policy=${base.dir}/config/security.java.policy-client" />
 				<jvmarg value="-Dproactive.http.jetty.xml=${base.dir}/config/rm/deployment/jetty.xml"/>
 				<jvmargs />
 

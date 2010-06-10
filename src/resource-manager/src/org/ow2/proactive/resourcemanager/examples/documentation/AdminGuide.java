@@ -2,7 +2,6 @@ package org.ow2.proactive.resourcemanager.examples.documentation;
 
 import org.objectweb.proactive.core.node.StartNode;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extensions.osgi.StartNodeCommand;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.RMInitializer;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -27,7 +26,9 @@ public class AdminGuide {
         System.out.println("RM home directory = " + PAResourceManagerProperties.RM_HOME);
         init.setRMHomePath(PAResourceManagerProperties.RM_HOME.toString());
         init.setLog4jConfiguration(PAResourceManagerProperties.RM_HOME + "config/log4j/rm-log4j-server");
-        init.setJavaSecurityPolicy(PAResourceManagerProperties.RM_HOME + "config/security.java.policy");
+        init
+                .setJavaSecurityPolicy(PAResourceManagerProperties.RM_HOME +
+                    "config/security.java.policy-server");
         init.setProActiveConfiguration(PAResourceManagerProperties.RM_HOME +
             "config/proactive/ProActiveConfiguration.xml");
         init.setResourceManagerPropertiesConfiguration(PAResourceManagerProperties.RM_HOME +

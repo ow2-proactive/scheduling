@@ -451,7 +451,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 			<itemizedlist>
 				<listitem><para>You get an access denied error: this is probably due to your default java.security.policy file which cannot be found. If you want to specify another policy file, you have to add a JVM parameter
 				in the agent configuration. A policy file is supplied in the scheduling directory. To use it, add the following line in the JVM parameter box of the agent configuration (<xref linkend="PWA_config_editor_general_FIGURE"/>):</para>
-				<screen>-Djava.security.poly=&lt;scheduler directory&gt;/config/security.java.policy</screen>
+				<screen>-Djava.security.poly=&lt;scheduler directory&gt;/config/security.java.policy-client</screen>
 				</listitem>
 				<listitem>
 					<para>

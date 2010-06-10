@@ -577,7 +577,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 </para>
 <para>
 	The default java security file used with the resource manager is located in config directory
-	<emphasis role="bold">$RM_HOME/config/security.java.policy</emphasis>.
+	<emphasis role="bold">$RM_HOME/config/security.java.policy-server</emphasis>.
 </para>
 </section>
 </section>

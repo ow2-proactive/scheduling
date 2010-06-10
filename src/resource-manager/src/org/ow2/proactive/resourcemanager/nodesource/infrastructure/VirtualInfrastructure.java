@@ -86,7 +86,6 @@ import org.xml.sax.SAXException;
 /** This class provides a way to manager Virtualized Infrastructure. */
 public class VirtualInfrastructure extends InfrastructureManager {
 
-    private static final long serialVersionUID = 1L;
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     @Configurable(description = "Virtual Infrastructure Type")

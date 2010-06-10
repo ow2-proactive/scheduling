@@ -32,7 +32,7 @@ print_jars() {
 # ----
 # Set up the classpath using classes dir or jar files
 #
- # Check if classes exists and is not empty
+# Check if classes exists and is not empty
 if [ -d "$PA_SCHEDULER/classes/scheduler" ]
 then
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/classes/common"
@@ -66,7 +66,15 @@ else
 	LOG4J_FILE=file:${PA_SCHEDULER}/config/log4j/$1
 fi
 
-JAVACMD="$JAVA_HOME/bin/java -Djava.security.manager -Dproactive.configuration=\"$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml\" -Djava.security.policy=\"$PA_SCHEDULER/config/security.java.policy\" -Dlog4j.configuration=\"$LOG4J_FILE\" -Dproactive.home=\"$PA_SCHEDULER\" -Dpa.scheduler.home=\"$PA_SCHEDULER\" -Dpa.rm.home=\"$PA_SCHEDULER\""
+#if log4j file is client, use standard ProActive java.security.policy file
+if [ "$1" = "log4j-client" ]
+then
+	JAVA_POLICY=$PA_SCHEDULER/config/security.java.policy-client
+else
+	JAVA_POLICY=$PA_SCHEDULER/config/security.java.policy-server
+fi
+
+JAVACMD="$JAVA_HOME/bin/java -Djava.security.manager -Dproactive.configuration=\"$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml\" -Djava.security.policy=\"$JAVA_POLICY\" -Dlog4j.configuration=\"$LOG4J_FILE\" -Dproactive.home=\"$PA_SCHEDULER\" -Dpa.scheduler.home=\"$PA_SCHEDULER\" -Dpa.rm.home=\"$PA_SCHEDULER\""
 
 #echo $JAVACMD
 

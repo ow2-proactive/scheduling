@@ -153,7 +153,7 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
 
         String cmd = this.javaPath + " -cp " + paJar;
         cmd += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
-        cmd += schedulingPath + "/config/security.java.policy";
+        cmd += schedulingPath + "/config/security.java.policy-server";
         cmd += " -Dproactive.communication.protocol=" + this.protocol;
         cmd += " -Dproactive.useIPaddress=true ";
         cmd += " " + this.javaOptions + " ";

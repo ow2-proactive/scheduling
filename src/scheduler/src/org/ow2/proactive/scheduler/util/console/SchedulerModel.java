@@ -62,7 +62,6 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Command;
@@ -676,11 +675,7 @@ public class SchedulerModel extends ConsoleModel {
 
     private void test_() {
         try {
-            String descriptorPath = PASchedulerProperties.SCHEDULER_HOME + "/samples/jobs_descriptors/";
-            if (System.getProperty("pa.scheduler.home") == null) {
-                System.setProperty("pa.scheduler.home", PASchedulerProperties.SCHEDULER_HOME
-                        .getValueAsString());
-            }
+            String descriptorPath = System.getProperty("pa.scheduler.home") + "/samples/jobs_descriptors/";
             getModel().submit_(descriptorPath + "Job_2_tasks.xml");
             getModel().submit_(descriptorPath + "Job_8_tasks.xml");
             getModel().submit_(descriptorPath + "Job_Aborted.xml");

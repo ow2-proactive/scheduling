@@ -133,7 +133,6 @@ public class EnvVars extends TreeMap<String, String> {
             return new TreeMap<String, String>(EnvVars.masterEnvVars);
         }
 
-        private static final long serialVersionUID = 1L;
     }
 
     /**

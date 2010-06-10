@@ -295,7 +295,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
 
         command = this.javaPath + " -cp " + classpath;
         command += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
-        command += rmPath + "/config/security.java.policy";
+        command += rmPath + "/config/security.java.policy-server";
         command += " -Dproactive.useIPaddress=true ";
         command += " " + this.javaOptions + " ";
         command += " org.ow2.proactive.resourcemanager.utils.PAAgentServiceRMStarter ";
