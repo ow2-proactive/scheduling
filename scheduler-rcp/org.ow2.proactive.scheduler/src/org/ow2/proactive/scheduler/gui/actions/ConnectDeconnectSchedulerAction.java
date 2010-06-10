@@ -39,10 +39,16 @@ package org.ow2.proactive.scheduler.gui.actions;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.ow2.proactive.scheduler.Activator;
@@ -64,7 +70,6 @@ import org.ow2.proactive.scheduler.gui.views.SeparatedJobView;
 public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
     private Composite parent = null;
     private boolean isConnected = false;
-    private Shell waitShell = null;
     private int res = 0;
 
     public ConnectDeconnectSchedulerAction(Composite parent) {
@@ -87,20 +92,40 @@ public class ConnectDeconnectSchedulerAction extends SchedulerGUIAction {
         if (dialogResult != null) {
 
             final ConnectDeconnectSchedulerAction btnConnect = this;
-            waitShell = new Shell(parent.getShell(), SWT.PRIMARY_MODAL);
+            // Create a temporary shell with a progress bar during the downloading of the RM state
+            final Shell waitShell = new Shell(parent.getShell(), SWT.APPLICATION_MODAL);
             // Disable the escape key
-            waitShell.setEnabled(false);
+            waitShell.addListener(SWT.Traverse, new Listener() {
+                public void handleEvent(Event e) {
+                    if (e.detail == SWT.TRAVERSE_ESCAPE) {
+                        e.doit = false;
+                    }
+                }
+            });
 
             GridLayout layout = new GridLayout();
             int marginWidth = 50;
             layout.marginHeight = 30;
             layout.marginWidth = marginWidth;
+            layout.verticalSpacing = 15;
             waitShell.setLayout(layout);
             final Label jobNameLabel = new Label(waitShell, SWT.NONE);
             jobNameLabel.setText("Downloading Scheduler state, please wait...");
 
             // Progress bar showing to the user that the application still running
             final ProgressBar bar = new ProgressBar(waitShell, SWT.INDETERMINATE);
+
+            final Button cancelButton = new Button(waitShell, SWT.PUSH);
+            cancelButton.setText("Cancel");
+            cancelButton.setToolTipText("Cancel the downloading and exit");
+            cancelButton.setLayoutData(new GridData(SWT.CENTER, SWT.END, false, true));
+            cancelButton.addSelectionListener(new SelectionAdapter() {
+                public void widgetSelected(SelectionEvent e) {
+                    System.exit(0);
+                }
+            });
+            waitShell.setDefaultButton(cancelButton);
+
             // Useless without the escape key use
             //Label connectionCancel = new Label(waitShell, SWT.NONE);
             //connectionCancel.setText("Press Escape to cancel");
