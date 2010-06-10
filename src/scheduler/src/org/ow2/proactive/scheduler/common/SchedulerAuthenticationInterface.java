@@ -41,6 +41,7 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
 
@@ -141,6 +142,7 @@ public interface SchedulerAuthenticationInterface extends Authentication {
      * @param cred Object encapsulating encrypted credentials, and information on how to decrypt them
      * @return The {@link Scheduler} interface if this client is allowed to access the scheduler.
      * @throws LoginException thrown if this user/password does not match any entries.
+     * @throws AlreadyConnectedException thrown if this client is already connected to the Scheduler.
      */
-    public Scheduler login(Credentials cred) throws LoginException;
+    public Scheduler login(Credentials cred) throws LoginException, AlreadyConnectedException;
 }

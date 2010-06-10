@@ -65,7 +65,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
-import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
+import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.MaxJobIdReachedException;
@@ -306,10 +306,10 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * @throws SchedulerException If an error occurred during connection with the front-end.
      */
     public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification)
-            throws SchedulerException {
+            throws AlreadyConnectedException {
         if (identifications.containsKey(sourceBodyID)) {
             logger.warn("Active object already connected for this user :" + identification.getUsername());
-            throw new InternalSchedulerException("This active object is already connected to the scheduler !");
+            throw new AlreadyConnectedException("This active object is already connected to the scheduler !");
         }
         logger.info(identification.getUsername() + " successfully connected !");
         identifications.put(sourceBodyID, identification);

@@ -56,6 +56,7 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.backwardcompatibility.SchedulerAdminAdapter;
+import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
@@ -220,7 +221,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
     /**
      * {@inheritDoc}
      */
-    public Scheduler login(Credentials cred) throws LoginException {
+    public Scheduler login(Credentials cred) throws LoginException, AlreadyConnectedException {
         Subject subject = authenticate(cred);
 
         UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
@@ -230,12 +231,8 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         // add this user to the scheduler front-end
         UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
         ident.setHostName(getSenderHostName());
-        try {
-            this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
-        } catch (SchedulerException e) {
-            logger_dev.error("", e);
-            throw new LoginException(e.getMessage());
-        }
+
+        this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident);
 
         // return the created interface
         return this.frontend;

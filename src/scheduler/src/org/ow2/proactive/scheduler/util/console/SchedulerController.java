@@ -63,6 +63,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -291,7 +292,7 @@ public class SchedulerController {
         System.exit(0);
     }
 
-    protected void connect() throws LoginException {
+    protected void connect() throws LoginException, AlreadyConnectedException {
         Scheduler scheduler = auth.login(credentials);
         model.connectScheduler(scheduler);
         String userStr = (user != null) ? "'" + user + "' " : "";
