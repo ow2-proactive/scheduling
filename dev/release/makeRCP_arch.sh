@@ -166,6 +166,7 @@ do
 
 		# samples -----------------------------
 		cp -r $ROOT_DIRECTORY/samples $NEW_FILE_DIR/
+		rm -r $NEW_FILE_DIR/samples/munin
 		if [ "$PRODUCT" = "rm" ]
 		then
 			rm -r $NEW_FILE_DIR/samples/jobs_descriptors
@@ -180,6 +181,7 @@ do
 		then
 			mkdir $NEW_FILE_DIR/config/rm
 			cp -r $ROOT_DIRECTORY/config/rm/deployment $NEW_FILE_DIR/config/rm
+			rm $NEW_FILE_DIR/config/rm/deployment/GCMNodeSourceApplication.xml
 		fi
 
 		# add ProActive configuration reference in product.ini

@@ -127,8 +127,8 @@ function build_and_clean() {
 function generate_credential(){
 	echo "********************** Generating credential ************************"
 	../bin/unix/key-gen -P ../config/authentication/keys/pub.key -p ../config/authentication/keys/priv.key
-	../bin/unix/create-cred -F ../config/authentication/keys/pub.key -l admin -p admin -o ../config/authentication/rm.cred
-	cp ../config/authentication/rm.cred ../config/authentication/scheduler.cred
+	../bin/unix/create-cred -F ../config/authentication/keys/pub.key -l rm -p rm_pwd -o ../config/authentication/rm.cred
+	../bin/unix/create-cred -F ../config/authentication/keys/pub.key -l scheduler -p scheduler_pwd -o ../config/authentication/scheduler.cred
 }
 
 function replace_version() {
