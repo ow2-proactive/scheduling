@@ -98,7 +98,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
         long startTime = System.currentTimeMillis();
         logger.debug("Looking for appropriate nodes");
 
-        Collection<RMNode> filteredList = new ArrayList<RMNode>();
+        List<RMNode> filteredList = new ArrayList<RMNode>();
         if (exclusionNodes != null && exclusionNodes.size() > 0) {
             for (RMNode rmnode : freeNodes) {
                 if (!contains(exclusionNodes, rmnode)) {
@@ -114,6 +114,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
         // if no scripts are specified return filtered free nodes 
         if (!scriptSpecified) {
             logger.debug("Selection script was not specified");
+            Collections.shuffle(filteredList);
             return filteredList;
         }
 
