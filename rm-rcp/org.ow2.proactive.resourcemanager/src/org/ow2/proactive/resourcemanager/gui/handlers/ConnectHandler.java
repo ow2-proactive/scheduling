@@ -44,10 +44,16 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -64,7 +70,6 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
     /** A boolean value to know if the dialog box is already open */
     private boolean isDialogOpen;
     private static ConnectHandler thisHandler;
-    private Shell waitShell = null;
 
     public ConnectHandler() {
         thisHandler = this;
@@ -95,16 +100,23 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
         }
         this.isDialogOpen = true;
         final SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(parent);
+
         if (dialogResult != null && !dialogResult.isCanceled()) {
-
-            /* start progress bar thread */
-            waitShell = new Shell(parent.getShell(), SWT.PRIMARY_MODAL);
+            // Create a temporary shell with a progress bar during the downloading of the RM state
+            final Shell waitShell = new Shell(parent.getShell(), SWT.APPLICATION_MODAL);
             // Disable the escape key
-            waitShell.setEnabled(false);
+            waitShell.addListener(SWT.Traverse, new Listener() {
+                public void handleEvent(Event e) {
+                    if (e.detail == SWT.TRAVERSE_ESCAPE) {
+                        e.doit = false;
+                    }
+                }
+            });
 
-            GridLayout layout = new GridLayout();
-            int marginWidth = 50;
+            final GridLayout layout = new GridLayout();
+            final int marginWidth = 50;
             layout.marginHeight = 30;
+            layout.verticalSpacing = 15;
             layout.marginWidth = marginWidth;
             waitShell.setLayout(layout);
             final Label jobNameLabel = new Label(waitShell, SWT.NONE);
@@ -112,6 +124,18 @@ public class ConnectHandler extends AbstractHandler implements IHandler {
 
             // Progress bar showing to the user that the application still running
             final ProgressBar bar = new ProgressBar(waitShell, SWT.INDETERMINATE);
+
+            final Button cancelButton = new Button(waitShell, SWT.PUSH);
+            cancelButton.setText("Cancel");
+            cancelButton.setToolTipText("Cancel the downloading and exit");
+            cancelButton.setLayoutData(new GridData(SWT.CENTER, SWT.END, false, true));
+            cancelButton.addSelectionListener(new SelectionAdapter() {
+                public void widgetSelected(SelectionEvent e) {
+                    System.exit(0);
+                }
+            });
+            waitShell.setDefaultButton(cancelButton);
+
             // Useless without the escape key use
             //Label connectionCancel = new Label(waitShell, SWT.NONE);
             //connectionCancel.setText("Press Escape to cancel");
