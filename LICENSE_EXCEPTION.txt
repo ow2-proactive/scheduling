@@ -2,7 +2,7 @@
 	PROACTIVE PARALLEL SUITE LICENSE EXCEPTION
 
 
-Proactive Parallel Suite 4.2 (Programming 4.2.1, Scheduling 2.0.1, Resourcing 2.0.1, IC2D 4.2.1) is linked with and distributed with :
+Proactive Parallel Suite 4.3 (Programming 4.3.0, Scheduling 2.1.0, Resourcing 2.1.0, IC2D 4.3.0) is linked with and distributed with :
 
 org.eclipse.jface.databinding_1.3.100.I20090825-0800.jar
 org.eclipse.birt.chart.ui.extension_2.5.0.v20090604.jar
