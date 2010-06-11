@@ -1,5 +1,7 @@
 #! /bin/sh
 
+SERVER_NAME=server
+
 function warn_and_exit {
 	echo "$1" 1>&2
 	exit 1
@@ -55,7 +57,7 @@ function init_env() {
 
 function copy_to_tmp() {
 	echo "********************** Copying the product to tmp dir ************************"
-	TMP_DIR="${TMP}/$RELEASE_BASENAME-${VERSION}_core"
+	TMP_DIR="${TMP}/$RELEASE_BASENAME-${VERSION}_${SERVER_NAME}"
 	output=$(mkdir ${TMP_DIR} 2>&1)
 	if [ "$?" -ne 0 ] ; then
 		if [ -e ${TMP_DIR} ] ; then
@@ -144,6 +146,6 @@ function replace_version() {
 function build_archive() {
 	echo "********************** Building archive ************************"
 	cd ${TMP} || warn_and_exit "Cannot move in ${TMP}"
-	tar cvfz $RELEASE_BASENAME-${VERSION}_core.tar.gz $RELEASE_BASENAME-${VERSION}_core
-	zip -r   $RELEASE_BASENAME-${VERSION}_core.zip    $RELEASE_BASENAME-${VERSION}_core
+	tar cvfz $RELEASE_BASENAME-${VERSION}_${SERVER_NAME}.tar.gz $RELEASE_BASENAME-${VERSION}_${SERVER_NAME}
+	zip -r   $RELEASE_BASENAME-${VERSION}_${SERVER_NAME}.zip    $RELEASE_BASENAME-${VERSION}_${SERVER_NAME}
 }
