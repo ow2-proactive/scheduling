@@ -60,8 +60,6 @@ import org.ow2.proactive.jmx.JMXClientHelper;
 public final class MBeanInfoViewer {
     /** The authentication interface */
     private final Authentication auth;
-    /** The name of MBean */
-    private final String name;
     /** The connector environment */
     private final HashMap<String, Object> env;
     /** The name of the MBean to view */
@@ -77,17 +75,74 @@ public final class MBeanInfoViewer {
      * Creates a new instance of MBeanInfoViewer.
      * 
      * @param auth the authentication interface
-     * @param name a string representation of the object name of the MBean
      * @param user the user that wants to connect to the JMX infrastructure 
      * @param creds the credentials of the user
      */
-    public MBeanInfoViewer(final Authentication auth, final String name, final String user,
-            final Credentials creds) {
+    public MBeanInfoViewer(final Authentication auth, final String user, final Credentials creds) {
         this.auth = auth;
-        this.name = name;
         this.env = new HashMap<String, Object>(2);
         // Fill the env with credentials 
         this.env.put(JMXConnector.CREDENTIALS, new Object[] { user, creds });
+    }
+
+    private void lazyConnect() {
+        if (this.connection == null) {
+            // By default try the connector over RMI
+            final JMXConnector jmxConnector = JMXClientHelper.tryJMXoverRMI(this.auth, this.env);
+            try {
+                this.connection = jmxConnector.getMBeanServerConnection();
+            } catch (Exception e) {
+                throw new RuntimeException("Unable create the MBeanInfoViewer about " + mbeanName, e);
+            }
+        }
+    }
+
+    /**
+     * Sets the value of a specific attribute of a named MBean. The MBean
+     * is identified by its object name as a String.
+     * The first time this method is called it connects to the JMX connector server.
+     * The default behavior will try to establish a connection using RMI protocol, if it fails 
+     * the RO (Remote Object) protocol is used.
+     *
+     * @param mbeanNameAsString the object name of the MBean
+     * @param attributeName the name of the attribute
+     * @param value the new value of the attribute
+     */
+    public void setAttribute(final String mbeanNameAsString, final String attributeName, final Object value) {
+        this.lazyConnect();
+        try {
+            // If new name create a new ObjectName
+            if (this.mbeanName == null || !this.mbeanName.getCanonicalName().equals(mbeanNameAsString)) {
+                this.mbeanName = new ObjectName(mbeanNameAsString);
+            }
+            this.connection.setAttribute(this.mbeanName, new Attribute(attributeName, value));
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to set the attribute " + attributeName + " of " +
+                mbeanNameAsString, e);
+        }
+    }
+
+    /**
+     * Invokes an operation on an MBean.
+     * The first time this method is called it connects to the JMX connector server.
+     * The default behavior will try to establish a connection using RMI protocol, if it fails 
+     * the RO (Remote Object) protocol is used.
+     *
+     * @param mbeanNameAsString the object name of the MBean
+     * @param operationName the name of the operation to invoke
+     * @param params the array of parameters of the operation
+     */
+    public void invoke(final String mbeanNameAsString, final String operationName, final Object[] params) {
+        this.lazyConnect();
+        try {
+            // If new name create a new ObjectName
+            if (this.mbeanName == null || !this.mbeanName.getCanonicalName().equals(mbeanNameAsString)) {
+                this.mbeanName = new ObjectName(mbeanNameAsString);
+            }
+            this.connection.invoke(this.mbeanName, operationName, params, null);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to invoke " + operationName + " on " + mbeanNameAsString, e);
+        }
     }
 
     /**
@@ -96,26 +151,17 @@ public final class MBeanInfoViewer {
      * The default behavior will try to establish a connection using RMI protocol, if it fails 
      * the RO (Remote Object) protocol is used.
      *
+     * @param mbeanNameAsString the object name of the MBean
      * @return the informations about the MBean as a formatted string
      */
-    public String getInfo() {
+    public String getInfo(final String mbeanNameAsString) {
         // Lazy initial connection
-        if (this.connection == null) {
-            // By default try the connector over RMI 
-            final JMXConnector jmxConnector = JMXClientHelper.tryJMXoverRMI(this.auth, this.env);
-
-            // Create the MBean viewer
-            try {
-                this.mbeanName = new ObjectName(this.name);
-                this.connection = jmxConnector.getMBeanServerConnection();
-            } catch (Exception e) {
-                throw new RuntimeException("Unable create the MBeanInfoViewer about " + name, e);
-            }
-        }
-
+        this.lazyConnect();
         try {
-            // Attribute names can't change so it is asked only once from the MBean
-            if (this.names == null) {
+            // If new name create a new ObjectName and refresh attribute names
+            if (this.mbeanName == null || !this.mbeanName.getCanonicalName().equals(mbeanNameAsString)) {
+                this.mbeanName = new ObjectName(mbeanNameAsString);
+                this.padding = 0;
                 final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName)
                         .getAttributes();
                 this.names = new String[attrs.length];

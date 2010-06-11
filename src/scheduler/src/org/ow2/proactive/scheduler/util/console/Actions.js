@@ -66,8 +66,20 @@ function listjobs(){
 	SchedulerModel.schedulerState();
 }
 
-function jmxinfo(){
-	SchedulerModel.JMXinfo();
+function showRuntimeData(){
+	SchedulerModel.showRuntimeData();
+}
+
+function showMyAccount(){
+	SchedulerModel.showMyAccount();
+}
+
+function showAccount(username){
+	SchedulerModel.showAccount(username);
+}
+
+function refreshPermissionPolicy(){
+	SchedulerModel.refreshPermissionPolicy();
 }
 
 function test(){

@@ -304,8 +304,7 @@ public class ResourceManagerController {
     }
 
     protected void connectJMXClient() {
-        final String name = "ProActiveResourceManager:name=RuntimeData";
-        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
+        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, user, credentials);
         this.model.setJMXInfo(viewer);
     }
 
@@ -495,8 +494,10 @@ public class ResourceManagerController {
             }
         } else if (cmd.hasOption("shutdown")) {
             ResourceManagerModel.shutdown(cmd.hasOption("f"));
-        } else if (cmd.hasOption("jmxinfo")) {
-            ResourceManagerModel.JMXinfo();
+        } else if (cmd.hasOption("showRuntimeData")) {
+            ResourceManagerModel.showRuntimeData();
+        } else if (cmd.hasOption("showMyAccount")) {
+            ResourceManagerModel.showMyAccount();
         } else if (cmd.hasOption("script")) {
             ResourceManagerModel.exec(cmd.getOptionValue("script"));
         } else {

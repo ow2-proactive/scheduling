@@ -129,7 +129,10 @@ public class ResourceManagerModel extends ConsoleModel {
         commands.add(new Command("listPolicies()", "List available node sources policies"));
         commands.add(new Command("shutdown(preempt)",
             "Shutdown the Resource Manager (RM shutdown immediately if parameter is true)"));
-        commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
+        commands.add(new Command("showRuntimeData()", "Display some statistics about the Resource Manager"));
+        commands.add(new Command("showMyAccount()", "Display current user account information"));
+        commands.add(new Command("showAccount(username)", "Display account information by username"));
+        commands.add(new Command("refreshPermissionPolicy()", "Reloads the permission file"));
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
@@ -405,17 +408,48 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    public static void JMXinfo() {
-        getModel().checkIsReady();
-        getModel().JMXinfo_();
+    public static void showRuntimeData() {
+        final ResourceManagerModel model = getModel();
+        model.checkIsReady();
+        try {
+            model.print(model.jmxInfoViewer.getInfo("ProActiveResourceManager:name=RuntimeData"));
+        } catch (Exception e) {
+            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
     }
 
-    private void JMXinfo_() {
+    public static void showMyAccount() {
+        final ResourceManagerModel model = getModel();
+        model.checkIsReady();
         try {
-            print(jmxInfoViewer.getInfo());
+            model.print(model.jmxInfoViewer.getInfo("ProActiveResourceManager:name=MyAccount"));
         } catch (Exception e) {
-            handleExceptionDisplay("Error while retrieving JMX informations", e);
+            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
+    }
+
+    public static void showAccount(final String username) {
+        final ResourceManagerModel model = getModel();
+        model.checkIsReady();
+        try {
+            model.jmxInfoViewer.setAttribute("ProActiveResourceManager:name=AllAccounts", "Username",
+                    username);
+            model.print(model.jmxInfoViewer.getInfo("ProActiveResourceManager:name=MyAccount"));
+        } catch (Exception e) {
+            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
+
+    public static void refreshPermissionPolicy() {
+        final ResourceManagerModel model = getModel();
+        model.checkIsReady();
+        try {
+            model.jmxInfoViewer.invoke("ProActiveResourceManager:name=Management", "refreshPermissionPolicy",
+                    new Object[0]);
+        } catch (Exception e) {
+            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+        getModel().print("\nThe permission file has been successfully reloaded.");
     }
 
     public static void exec(String commandFilePath) {

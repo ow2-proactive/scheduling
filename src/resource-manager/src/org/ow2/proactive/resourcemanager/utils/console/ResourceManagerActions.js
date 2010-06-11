@@ -70,8 +70,20 @@ function shutdown(preemptively){
 	return ResourceManagerModel.shutdown(preemptively);
 }
 
-function jmxinfo(){
-	ResourceManagerModel.JMXinfo();
+function showRuntimeData(){
+	ResourceManagerModel.showRuntimeData();
+}
+
+function showMyAccount(){
+	ResourceManagerModel.showMyAccount();
+}
+
+function showAccount(username){
+	ResourceManagerModel.showAccount(username);
+}
+
+function refreshPermissionPolicy(){
+	ResourceManagerModel.refreshPermissionPolicy();
 }
 
 function exec(commandFilePath){

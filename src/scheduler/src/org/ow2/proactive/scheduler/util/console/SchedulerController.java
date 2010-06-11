@@ -554,8 +554,10 @@ public class SchedulerController {
             SchedulerModel.jobState(cmd.getOptionValue("jobstate"));
         } else if (cmd.hasOption("listjobs")) {
             SchedulerModel.schedulerState();
-        } else if (cmd.hasOption("jmxinfo")) {
-            SchedulerModel.JMXinfo();
+        } else if (cmd.hasOption("showRuntimeData")) {
+            SchedulerModel.showRuntimeData();
+        } else if (cmd.hasOption("showMyAccount")) {
+            SchedulerModel.showMyAccount();
         } else if (cmd.hasOption("script")) {
             SchedulerModel.exec(cmd.getOptionValue("script"));
         } else if (cmd.hasOption("test")) {
@@ -586,8 +588,7 @@ public class SchedulerController {
     }
 
     protected void connectJMXClient() {
-        final String name = "ProActiveScheduler:name=RuntimeData";
-        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, name, user, credentials);
+        final MBeanInfoViewer viewer = new MBeanInfoViewer(auth, user, credentials);
         this.model.setJMXInfo(viewer);
     }
 

@@ -177,7 +177,10 @@ public class SchedulerModel extends ConsoleModel {
                 .add(new Command("jobstate(id)",
                     "Get the current state of the given job (parameter is an int or a string representing the jobId)"));
         commands.add(new Command("listjobs()", "Display the list of jobs managed by the scheduler"));
-        commands.add(new Command("jmxinfo()", "Display some statistics provided by the Scheduler MBean"));
+        commands.add(new Command("showRuntimeData()", "Display some statistics about the Scheduler"));
+        commands.add(new Command("showMyAccount()", "Display current user account information"));
+        commands.add(new Command("showAccount(username)", "Display account information by username"));
+        commands.add(new Command("refreshPermissionPolicy()", "Reloads the permission file"));
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
@@ -657,16 +660,46 @@ public class SchedulerModel extends ConsoleModel {
         return list;
     }
 
-    public static void JMXinfo() {
-        getModel().JMXinfo_();
+    public static void showRuntimeData() {
+        final SchedulerModel model = getModel();
+        try {
+            model.print(model.jmxInfoViewer.getInfo("ProActiveScheduler:name=RuntimeData"));
+        } catch (Exception e) {
+            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
     }
 
-    private void JMXinfo_() {
+    public static void showMyAccount() {
+        final SchedulerModel model = getModel();
+        model.checkIsReady();
         try {
-            print(jmxInfoViewer.getInfo());
+            model.print(model.jmxInfoViewer.getInfo("ProActiveScheduler:name=MyAccount"));
         } catch (Exception e) {
-            handleExceptionDisplay("Error while retrieving JMX informations", e);
+            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
+    }
+
+    public static void showAccount(final String username) {
+        final SchedulerModel model = getModel();
+        model.checkIsReady();
+        try {
+            model.jmxInfoViewer.setAttribute("ProActiveScheduler:name=AllAccounts", "Username", username);
+            model.print(model.jmxInfoViewer.getInfo("ProActiveResourceManager:name=MyAccount"));
+        } catch (Exception e) {
+            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
+
+    public static void refreshPermissionPolicy() {
+        final SchedulerModel model = getModel();
+        model.checkIsReady();
+        try {
+            model.jmxInfoViewer.invoke("ProActiveScheduler:name=Management", "refreshPermissionPolicy",
+                    new Object[0]);
+        } catch (Exception e) {
+            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+        getModel().print("\nThe permission file has been successfully reloaded.");
     }
 
     public static void test() {
