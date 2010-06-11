@@ -161,7 +161,7 @@ public abstract class SelectionManager {
                         rmnode.getNodeURL() + " from " + rmnode.getNodeSource());
                 } catch (SecurityException e) {
                     // client does not have an access to this node
-                    logger.debug(e.getMessage());
+                    logger.warn(e.getMessage());
                     continue;
                 }
 
