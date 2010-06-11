@@ -148,28 +148,12 @@ if (System.getProperty("os.name").startsWith("Windows")) {
 }
 else {
     try {
-        selected = (java.lang.Runtime.getRuntime().exec("which matlab2007b").waitFor() == 0);
-        command = "matlab2007b";
-        if (!selected) {
-            selected = (java.lang.Runtime.getRuntime().exec("which matlab2007a").waitFor() == 0);
-            command = "matlab2007a";
-        }
-        if (!selected) {
-            selected = (java.lang.Runtime.getRuntime().exec("which matlab2006b").waitFor() == 0);
-            command = "matlab2006b";
-        }
-        if (!selected) {
-            selected = (java.lang.Runtime.getRuntime().exec("which matlab2006a").waitFor() == 0);
-            command = "matlab2006a";
-        }
-        if (!selected) {
-            selected = (java.lang.Runtime.getRuntime().exec("which matlab71").waitFor() == 0);
-            command = "matlab71";
-        }
-        if (!selected) {
-            selected = (java.lang.Runtime.getRuntime().exec("which matlab").waitFor() == 0);
-            command = "matlab";
-        }
+        myArray = [ 'matlab2009b', 'matlab2009a', 'matlab2008b', 'matlab2008a', 'matlab2007b', 'matlab2007a', 'matlab2006b', 'matlab2006a', 'matlab71' ];
+
+        for (i=0; i < myArray.length && !selected ; i++) {
+            selected = (java.lang.Runtime.getRuntime().exec("which "+myArray[i]).waitFor() == 0);
+            command = myArray[i];
+        }        
     }
     catch(err) {
         selected = false;

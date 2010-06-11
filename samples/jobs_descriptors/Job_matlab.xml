@@ -3,10 +3,8 @@
     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
     xmlns="urn:proactive:jobdescriptor:dev" name="Matlab_job" priority="normal" logFile="matlab_job.log" >
     <variables>
-        <variable name="SCHEDULER_HOME"
-            value="/home/user/Scheduler" /> <!-- CHANGE ME -->
         <variable name="MATLAB_SCRIPTS"
-            value="${SCHEDULER_HOME}/extensions/matlab/examples" />
+            value="${pa.scheduler.home}/extensions/matlab/examples" />
     </variables>
     <description>A simple Matlab taskflow, which computes the sum of a randomly-generated array</description>
     <taskFlow>
@@ -14,7 +12,7 @@
             <description>Splits a big array</description>
             <selection>
                 <script>
-                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                    <file url="file:${pa.scheduler.home}/samples/scripts/selection/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabSplitter">
@@ -32,7 +30,7 @@
             </depends>
             <selection>
                 <script>
-                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                    <file url="file:${pa.scheduler.home}/samples/scripts/selection/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
@@ -49,7 +47,7 @@
             </depends>
             <selection>
                 <script>
-                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                    <file url="file:${pa.scheduler.home}/samples/scripts/selection/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
@@ -66,7 +64,7 @@
             </depends>
             <selection>
                 <script>
-                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                    <file url="file:${pa.scheduler.home}/samples/scripts/selection/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
@@ -83,7 +81,7 @@
             </depends>
             <selection>
                 <script>
-                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                    <file url="file:${pa.scheduler.home}/samples/scripts/selection/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
@@ -100,7 +98,7 @@
             </depends>
             <selection>
                 <script>
-                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                    <file url="file:${pa.scheduler.home}/samples/scripts/selection/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
@@ -117,7 +115,7 @@
             </depends>
             <selection>
                 <script>
-                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                    <file url="file:${pa.scheduler.home}/samples/scripts/selection/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabTask">
@@ -139,7 +137,7 @@
             </depends>
             <selection>
                 <script>
-                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                    <file url="file:${pa.scheduler.home}/samples/scripts/selection/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.ow2.proactive.scheduler.ext.matlab.MatlabCollector">
