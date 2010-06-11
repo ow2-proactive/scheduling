@@ -415,8 +415,24 @@ public class SchedulerController {
         opt.setArgs(0);
         actionGroup.addOption(opt);
 
-        opt = new Option("jmxinfo", false, control +
-            "Display some statistics provided by the Scheduler MBean");
+        opt = new Option("stats", "statistics", false, control +
+            "Display some statistics about the Scheduler");
+        opt.setRequired(false);
+        opt.setArgs(0);
+        actionGroup.addOption(opt);
+
+        opt = new Option("ma", "myaccount", false, control + "Display current user account information");
+        opt.setRequired(false);
+        opt.setArgs(0);
+        actionGroup.addOption(opt);
+
+        opt = new Option("ua", "useraccount", false, control + "Display account information by username");
+        opt.setRequired(false);
+        opt.setArgs(1);
+        opt.setArgName("username");
+        actionGroup.addOption(opt);
+
+        opt = new Option("rp", "reloadpermissions", false, control + "Reloads the permission file");
         opt.setRequired(false);
         opt.setArgs(0);
         actionGroup.addOption(opt);
@@ -554,10 +570,14 @@ public class SchedulerController {
             SchedulerModel.jobState(cmd.getOptionValue("jobstate"));
         } else if (cmd.hasOption("listjobs")) {
             SchedulerModel.schedulerState();
-        } else if (cmd.hasOption("showRuntimeData")) {
+        } else if (cmd.hasOption("stats")) {
             SchedulerModel.showRuntimeData();
-        } else if (cmd.hasOption("showMyAccount")) {
+        } else if (cmd.hasOption("ma")) {
             SchedulerModel.showMyAccount();
+        } else if (cmd.hasOption("ua")) {
+            SchedulerModel.showAccount(cmd.getOptionValue("ua"));
+        } else if (cmd.hasOption("rp")) {
+            SchedulerModel.refreshPermissionPolicy();
         } else if (cmd.hasOption("script")) {
             SchedulerModel.exec(cmd.getOptionValue("script"));
         } else if (cmd.hasOption("test")) {

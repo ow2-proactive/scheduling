@@ -54,11 +54,11 @@ function listns(){
     return ResourceManagerModel.listns();
 }
 
-function listInfrastructures(){
+function listinfrastructures(){
 	return ResourceManagerModel.listInfrastructures();
 }
 
-function listPolicies(){
+function listpolicies(){
 	return ResourceManagerModel.listPolicies();
 }
 
@@ -70,19 +70,19 @@ function shutdown(preemptively){
 	return ResourceManagerModel.shutdown(preemptively);
 }
 
-function showRuntimeData(){
+function stats(){
 	ResourceManagerModel.showRuntimeData();
 }
 
-function showMyAccount(){
+function myaccount(){
 	ResourceManagerModel.showMyAccount();
 }
 
-function showAccount(username){
+function account(username){
 	ResourceManagerModel.showAccount(username);
 }
 
-function refreshPermissionPolicy(){
+function reloadpermissions(){
 	ResourceManagerModel.refreshPermissionPolicy();
 }
 

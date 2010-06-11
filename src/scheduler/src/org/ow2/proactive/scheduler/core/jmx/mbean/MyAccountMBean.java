@@ -44,16 +44,6 @@ package org.ow2.proactive.scheduler.core.jmx.mbean;
  */
 public interface MyAccountMBean {
 
-    public boolean isConnected();
-
-    public long getConnectionTime();
-
-    public long getLastSubmitTime();
-
-    public int getSubmitCount();
-
-    public String getHostname();
-
     public int getTotalJobCount();
 
     public long getTotalJobDuration();

@@ -66,19 +66,19 @@ function listjobs(){
 	SchedulerModel.schedulerState();
 }
 
-function showRuntimeData(){
+function stats(){
 	SchedulerModel.showRuntimeData();
 }
 
-function showMyAccount(){
+function myaccount(){
 	SchedulerModel.showMyAccount();
 }
 
-function showAccount(username){
+function account(username){
 	SchedulerModel.showAccount(username);
 }
 
-function refreshPermissionPolicy(){
+function reloadpermissions(){
 	SchedulerModel.refreshPermissionPolicy();
 }
 

@@ -371,11 +371,27 @@ public class ResourceManagerController {
         shutdownOpt.setRequired(false);
         actionGroup.addOption(shutdownOpt);
 
-        Option jmx = new Option("jmxinfo", false, control +
-            "Display some statistics provided by the Scheduler MBean");
-        jmx.setRequired(false);
-        jmx.setArgs(0);
-        actionGroup.addOption(jmx);
+        Option acopt = new Option("stats", "statistics", false, control +
+            "Display some statistics about the Resource Manager");
+        acopt.setRequired(false);
+        acopt.setArgs(0);
+        actionGroup.addOption(acopt);
+
+        acopt = new Option("ma", "myaccount", false, control + "Display current user account informations");
+        acopt.setRequired(false);
+        acopt.setArgs(0);
+        actionGroup.addOption(acopt);
+
+        acopt = new Option("ua", "useraccount", false, control + "Display account information by username");
+        acopt.setRequired(false);
+        acopt.setArgs(1);
+        acopt.setArgName("username");
+        actionGroup.addOption(acopt);
+
+        acopt = new Option("rp", "reloadpermissions", false, control + "Reload the permission file");
+        acopt.setRequired(false);
+        acopt.setArgs(0);
+        actionGroup.addOption(acopt);
 
         options.addOptionGroup(actionGroup);
 
@@ -494,10 +510,14 @@ public class ResourceManagerController {
             }
         } else if (cmd.hasOption("shutdown")) {
             ResourceManagerModel.shutdown(cmd.hasOption("f"));
-        } else if (cmd.hasOption("showRuntimeData")) {
+        } else if (cmd.hasOption("stats")) {
             ResourceManagerModel.showRuntimeData();
-        } else if (cmd.hasOption("showMyAccount")) {
+        } else if (cmd.hasOption("ma")) {
             ResourceManagerModel.showMyAccount();
+        } else if (cmd.hasOption("ua")) {
+            ResourceManagerModel.showAccount(cmd.getOptionValue("ua"));
+        } else if (cmd.hasOption("rp")) {
+            ResourceManagerModel.refreshPermissionPolicy();
         } else if (cmd.hasOption("script")) {
             ResourceManagerModel.exec(cmd.getOptionValue("script"));
         } else {

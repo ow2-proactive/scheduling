@@ -85,26 +85,6 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
         this.perThreadAccount = new ThreadLocal<SchedulerAccount>();
     }
 
-    public boolean isConnected() {
-        return this.perThreadAccount.get().isConnected();
-    }
-
-    public long getConnectionTime() {
-        return this.perThreadAccount.get().getConnectionTime();
-    }
-
-    public long getLastSubmitTime() {
-        return this.perThreadAccount.get().getLastSubmitTime();
-    }
-
-    public int getSubmitCount() {
-        return this.perThreadAccount.get().getSubmitCount();
-    }
-
-    public String getHostname() {
-        return this.perThreadAccount.get().getHostname();
-    }
-
     public int getTotalTaskCount() {
         return this.perThreadAccount.get().getTotalTaskCount();
     }

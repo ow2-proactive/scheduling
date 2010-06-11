@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.5.0_21" class="java.beans.XMLDecoder"> 
+<java version="1.5.0_16" class="java.beans.XMLDecoder"> 
  <int>3</int> 
  <object class="org.objectweb.proactive.ic2d.chartit.data.ChartModel"> 
   <void property="chartType"> 
@@ -10,6 +10,9 @@
   </void> 
   <void property="name"> 
    <string>Accounting Values</string> 
+  </void> 
+  <void property="refreshPeriodInMs"> 
+   <long>10000</long> 
   </void> 
   <void property="runtimeNames"> 
    <array class="java.lang.String" length="5"> 
@@ -78,6 +81,9 @@
   <void property="name"> 
    <string>Avarage Job/Task Duration</string> 
   </void> 
+  <void property="refreshPeriodInMs"> 
+   <long>10000</long> 
+  </void> 
   <void property="runtimeNames"> 
    <array class="java.lang.String" length="2"> 
     <void index="0"> 
@@ -127,6 +133,9 @@
   </void> 
   <void property="name"> 
    <string>Total Execution Time History</string> 
+  </void> 
+  <void property="refreshPeriodInMs"> 
+   <long>10000</long> 
   </void> 
   <void property="runtimeNames"> 
    <array class="java.lang.String" length="1"> 

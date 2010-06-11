@@ -36,10 +36,7 @@
  */
 package org.ow2.proactive.scheduler.core.account;
 
-import java.lang.ref.WeakReference;
-
 import org.ow2.proactive.account.Account;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
 
 
 /**
@@ -51,41 +48,16 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
  */
 public final class SchedulerAccount implements Account {
     String username;
-    WeakReference<UserIdentification> ref;
     int totalTaskCount;
     long totalTaskDuration;
     int totalJobCount;
     long totalJobDuration;
 
     public boolean isConnected() {
-        return this.ref != null && this.ref.get() != null;
-    }
-
-    public long getConnectionTime() {
-        if (this.isConnected()) {
-            return this.ref.get().getConnectionTime();
-        }
-        return 0;
-    }
-
-    public long getLastSubmitTime() {
-        if (this.isConnected()) {
-            return this.ref.get().getLastSubmitTime();
-        }
-        return 0;
-    }
-
-    public int getSubmitCount() {
-        if (this.isConnected()) {
-            return this.ref.get().getSubmitNumber();
-        }
-        return 0;
+        return false;
     }
 
     public String getHostname() {
-        if (this.isConnected()) {
-            return this.ref.get().getHostName();
-        }
         return "";
     }
 

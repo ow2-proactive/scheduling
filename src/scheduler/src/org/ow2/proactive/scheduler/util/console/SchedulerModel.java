@@ -177,10 +177,10 @@ public class SchedulerModel extends ConsoleModel {
                 .add(new Command("jobstate(id)",
                     "Get the current state of the given job (parameter is an int or a string representing the jobId)"));
         commands.add(new Command("listjobs()", "Display the list of jobs managed by the scheduler"));
-        commands.add(new Command("showRuntimeData()", "Display some statistics about the Scheduler"));
-        commands.add(new Command("showMyAccount()", "Display current user account information"));
-        commands.add(new Command("showAccount(username)", "Display account information by username"));
-        commands.add(new Command("refreshPermissionPolicy()", "Reloads the permission file"));
+        commands.add(new Command("stats()", "Display some statistics about the Scheduler"));
+        commands.add(new Command("myaccount()", "Display current user account information"));
+        commands.add(new Command("account(username)", "Display account information by username"));
+        commands.add(new Command("reloadpermissions()", "Reloads the permission file"));
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
@@ -684,7 +684,7 @@ public class SchedulerModel extends ConsoleModel {
         model.checkIsReady();
         try {
             model.jmxInfoViewer.setAttribute("ProActiveScheduler:name=AllAccounts", "Username", username);
-            model.print(model.jmxInfoViewer.getInfo("ProActiveResourceManager:name=MyAccount"));
+            model.print(model.jmxInfoViewer.getInfo("ProActiveScheduler:name=MyAccount"));
         } catch (Exception e) {
             model.handleExceptionDisplay("Error while retrieving JMX informations", e);
         }

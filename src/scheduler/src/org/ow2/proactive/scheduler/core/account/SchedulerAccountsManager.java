@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core.account;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,6 @@ import javax.persistence.Table;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.account.AbstractAccountsManager;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerDatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -71,9 +69,9 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
 
     /** Scheduler db manager used to submit SQL requests */
     private final SchedulerDatabaseManager dbmanager;
-    /** The list of connected users */
-    private final SchedulerUsers connectedUsers;
 
+    /** The list of connected users */
+    //private final SchedulerUsers connectedUsers;
     /**
      * Create a new instance of this class.
      */
@@ -85,7 +83,7 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
         this.dbmanager = DatabaseManager.getInstance();
 
         // Connected users will be used later
-        this.connectedUsers = connectedUsers;
+        //this.connectedUsers = connectedUsers;
     }
 
     /**
@@ -138,22 +136,22 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
         }
 
         // Add all connected users info
-        for (final UserIdentification userIdent : this.connectedUsers.getUsers()) {
-            final String username = userIdent.getUsername();
-            SchedulerAccount account = map.get(username);
-            // Maybe there are some cases where a user is connected and is not
-            // in the db
-            if (account == null) {
-                account = new SchedulerAccount();
-                account.username = username;
-                map.put(username, account);
-            }
-            // If the user is in database and has never been connected
-            // or has reconnected
-            if (account.ref == null || account.ref.get() == null) {
-                account.ref = new WeakReference<UserIdentification>(userIdent);
-            }
-        }
+        //        for (final UserIdentification userIdent : this.connectedUsers.getUsers()) {
+        //            final String username = userIdent.getUsername();
+        //            SchedulerAccount account = map.get(username);
+        //            // Maybe there are some cases where a user is connected and is not
+        //            // in the db
+        //            if (account == null) {
+        //                account = new SchedulerAccount();
+        //                account.username = username;
+        //                map.put(username, account);
+        //            }
+        //            // If the user is in database and has never been connected
+        //            // or has reconnected
+        //            if (account.ref == null || account.ref.get() == null) {
+        //                account.ref = new WeakReference<UserIdentification>(userIdent);
+        //            }
+        //        }
     }
 
     /**

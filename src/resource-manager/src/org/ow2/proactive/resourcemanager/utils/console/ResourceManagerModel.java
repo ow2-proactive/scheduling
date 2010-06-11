@@ -125,14 +125,14 @@ public class ResourceManagerModel extends ConsoleModel {
                 + " nodeSource is removed immediately if second parameter is true)"));
         commands.add(new Command("listnodes()", "List every handled nodes"));
         commands.add(new Command("listns()", "List every handled node sources"));
-        commands.add(new Command("listInfrastructures()", "List supported infrastructures"));
-        commands.add(new Command("listPolicies()", "List available node sources policies"));
+        commands.add(new Command("listinfrastructures()", "List supported infrastructures"));
+        commands.add(new Command("listpolicies()", "List available node sources policies"));
         commands.add(new Command("shutdown(preempt)",
             "Shutdown the Resource Manager (RM shutdown immediately if parameter is true)"));
-        commands.add(new Command("showRuntimeData()", "Display some statistics about the Resource Manager"));
-        commands.add(new Command("showMyAccount()", "Display current user account information"));
-        commands.add(new Command("showAccount(username)", "Display account information by username"));
-        commands.add(new Command("refreshPermissionPolicy()", "Reloads the permission file"));
+        commands.add(new Command("stats()", "Display some statistics about the Resource Manager"));
+        commands.add(new Command("myaccount()", "Display current user account information"));
+        commands.add(new Command("account(username)", "Display account information by username"));
+        commands.add(new Command("reloadpermissions()", "Reload the permission file"));
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
