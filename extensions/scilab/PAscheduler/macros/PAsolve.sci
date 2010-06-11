@@ -75,7 +75,7 @@ function out = PAsolve(funcname, args, varargin)
 
              schedulerdir = getenv('SCHEDULER_HOME');
 
-             selectionScript = strcat(['file:',fullfile(schedulerdir,'extensions','scilab','embedded', 'checkScilab.js')]);
+             selectionScript = strcat(['file:',fullfile(schedulerdir,'extensions','scilab','checkScilab.js')]);
 
              results = sciSolve(inputscripts, funccode_flat, mainscript, selectionScript, debugv);
 
