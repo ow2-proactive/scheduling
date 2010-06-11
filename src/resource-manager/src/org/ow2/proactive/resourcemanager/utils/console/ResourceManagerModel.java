@@ -108,7 +108,7 @@ public class ResourceManagerModel extends ConsoleModel {
         commands = new ArrayList<Command>();
         commands
                 .add(new Command(
-                    "exMode(display,onDemand)",
+                    "exmode(display,onDemand)",
                     "Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)"));
         commands.add(new Command("addnode(nodeURL, nsName)",
             "Add node to the given node source (parameters is a string representing the node URL to add &"
@@ -133,7 +133,7 @@ public class ResourceManagerModel extends ConsoleModel {
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
-        commands.add(new Command("setLogsDir(logsDir)",
+        commands.add(new Command("setlogsdir(logsDir)",
             "Set the directory where the log are located, (default is RM_HOME/.logs"));
         commands.add(new Command("viewlogs(nbLines)",
             "View the last nbLines lines of the logs file, (default nbLines is 20)"));

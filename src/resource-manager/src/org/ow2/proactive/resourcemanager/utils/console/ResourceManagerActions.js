@@ -1,6 +1,6 @@
 importClass(org.ow2.proactive.resourcemanager.utils.console.ResourceManagerModel);
 
-function exMode(displayStack, displayOnDemand){
+function exmode(displayStack, displayOnDemand){
 	if (displayStack == undefined){
 		displayStack = true;
 	}
@@ -78,7 +78,7 @@ function exec(commandFilePath){
 	return ResourceManagerModel.exec(commandFilePath);
 }
 
-function setLogsDir(logsDir){
+function setlogsdir(logsDir){
 	if (logsDir == undefined){
 		logsDir = "";
 	}

@@ -1,6 +1,6 @@
 importClass(org.ow2.proactive.scheduler.util.console.SchedulerModel);
 
-function exMode(displayStack, displayOnDemand){
+function exmode(displayStack, displayOnDemand){
 	if (displayStack == undefined){
 		displayStack = true;
 	}
@@ -34,19 +34,19 @@ function removejob(jobId){
     SchedulerModel.remove(""+jobId);
 }
 
-function result(jobId){
+function jobresult(jobId){
     return SchedulerModel.result(""+jobId);
 }
 
-function tresult(jobId,taskName){
+function taskresult(jobId,taskName){
     return SchedulerModel.tresult(""+jobId,""+taskName);
 }
 
-function output(jobId){
+function joboutput(jobId){
     SchedulerModel.output(""+jobId);
 }
 
-function toutput(jobId,taskName){
+function taskoutput(jobId,taskName){
     SchedulerModel.toutput(""+jobId,""+taskName);
 }
 
@@ -110,7 +110,7 @@ function linkrm(rmURL){
 	return SchedulerModel.linkRM(""+rmURL);
 }
 
-function setLogsDir(logsDir){
+function setlogsdir(logsDir){
 	if (logsDir == undefined){
 		logsDir = "";
 	}
@@ -121,11 +121,11 @@ function viewlogs(nbLines){
 	SchedulerModel.viewlogs(""+nbLines);
 }
 
-function viewDevlogs(nbLines){
+function viewdevlogs(nbLines){
 	SchedulerModel.viewDevlogs(""+nbLines);
 }
 
-function changePolicy(newPolicyName){
+function changepolicy(newPolicyName){
 	SchedulerModel.changePolicy(""+newPolicyName);
 }
 

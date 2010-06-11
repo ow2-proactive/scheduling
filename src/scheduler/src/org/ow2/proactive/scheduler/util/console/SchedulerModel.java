@@ -140,7 +140,7 @@ public class SchedulerModel extends ConsoleModel {
         commands = new ArrayList<Command>();
         commands
                 .add(new Command(
-                    "exMode(display,onDemand)",
+                    "exmode(display,onDemand)",
                     "Change the way exceptions are displayed (if display is true, stacks are displayed - if onDemand is true, prompt before displaying stacks)"));
         commands.add(new Command("submit(XMLdescriptor)",
             "Submit a new job (parameter is a string representing the job XML descriptor URL)"));
@@ -158,17 +158,17 @@ public class SchedulerModel extends ConsoleModel {
             "Resume the given job (parameter is an int or a string representing the jobId)"));
         commands.add(new Command("killjob(id)",
             "Kill the given job (parameter is an int or a string representing the jobId)"));
-        commands.add(new Command("result(id)",
+        commands.add(new Command("jobresult(id)",
             "Get the result of the given job (parameter is an int or a string representing the jobId)"));
         commands
                 .add(new Command(
-                    "tresult(id,taskName)",
+                    "taskresult(id,taskName)",
                     "Get the result of the given task (parameter is an int or a string representing the jobId, and the task name)"));
-        commands.add(new Command("output(id)",
+        commands.add(new Command("joboutput(id)",
             "Get the output of the given job (parameter is an int or a string representing the jobId)"));
         commands
                 .add(new Command(
-                    "toutput(id,taskName)",
+                    "taskoutput(id,taskName)",
                     "Get the output of the given task (parameter is an int or a string representing the jobId, and the task name)"));
         commands
                 .add(new Command("removejob(id)",
@@ -192,13 +192,13 @@ public class SchedulerModel extends ConsoleModel {
         commands.add(new Command("kill()", "Kill every tasks and jobs and shutdown Scheduler"));
         commands.add(new Command("linkrm(rmURL)",
             "Reconnect a Resource Manager (parameter is a string representing the new rmURL)"));
-        commands.add(new Command("changePolicy(fullName)",
+        commands.add(new Command("changepolicy(fullName)",
             "Change the current scheduling policy, (argument is the new policy full name)"));
-        commands.add(new Command("setLogsDir(logsDir)",
+        commands.add(new Command("setlogsdir(logsDir)",
             "Set the directory where the log are located, (default is SCHEDULER_HOME/.logs"));
         commands.add(new Command("viewlogs(nbLines)",
             "View the last nbLines lines of the admin logs file, (default nbLines is 20)"));
-        commands.add(new Command("viewDevlogs(nbLines)",
+        commands.add(new Command("viewdevlogs(nbLines)",
             "View the last nbLines lines of the dev logs file, (default nbLines is 20)"));
         if (allowExitCommand) {
             commands.add(new Command("exit()", "Exit Scheduler controller"));

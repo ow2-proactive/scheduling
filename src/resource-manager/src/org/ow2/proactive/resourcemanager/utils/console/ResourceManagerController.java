@@ -168,8 +168,8 @@ public class ResourceManagerController {
             if (cmd.hasOption("h")) {
                 displayHelp = true;
             } else {
-                if (cmd.hasOption("jsenv")) {
-                    model.setInitEnv(cmd.getOptionValue("jsenv"));
+                if (cmd.hasOption("environment")) {
+                    model.setInitEnv(cmd.getOptionValue("environment"));
                 }
                 String url;
                 if (cmd.hasOption("u")) {
@@ -337,7 +337,7 @@ public class ResourceManagerController {
         createNSOpt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(createNSOpt);
 
-        Option infrastuctureOpt = new Option("infrastructure", true,
+        Option infrastuctureOpt = new Option("i", "infrastructure", true,
             "Specify an infrastructure when node source is created");
         infrastuctureOpt.setArgName("params");
         infrastuctureOpt.setRequired(false);
@@ -345,7 +345,7 @@ public class ResourceManagerController {
         infrastuctureOpt.setArgs(Option.UNLIMITED_VALUES);
         options.addOption(infrastuctureOpt);
 
-        Option policyOpt = new Option("policy", true, "Specify a policy when node source is created");
+        Option policyOpt = new Option("p", "policy", true, "Specify a policy when node source is created");
         policyOpt.setArgName("params");
         policyOpt.setOptionalArg(true);
         policyOpt.setRequired(false);
@@ -400,13 +400,14 @@ public class ResourceManagerController {
         script.setRequired(false);
         options.addOption(script);
 
-        script = new Option("js", "jsenv", true, "Execute the given script and go into interactive mode");
+        script = new Option("env", "environment", true,
+            "Execute the given script and go into interactive mode");
         script.setArgName("filePath");
         script.setRequired(false);
         script.setArgs(1);
         options.addOption(script);
 
-        Option useCreds = new Option("uc", "use-creds", false, "Use credentials retreived from disk");
+        Option useCreds = new Option("uc", "usecreds", false, "Use credentials retreived from disk");
         useCreds.setRequired(false);
         useCreds.setArgs(0);
         options.addOption(useCreds);

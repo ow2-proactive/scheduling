@@ -142,7 +142,7 @@ public class SchedulerController {
         username.setRequired(false);
         options.addOption(username);
 
-        Option schedulerURL = new Option("u", "schedulerURL", true, "The scheduler URL (default " +
+        Option schedulerURL = new Option("u", "url", true, "The scheduler URL (default " +
             SCHEDULER_DEFAULT_URL + ")");
         schedulerURL.setArgName("schedulerURL");
         schedulerURL.setRequired(false);
@@ -162,16 +162,16 @@ public class SchedulerController {
             Parser parser = new GnuParser();
             cmd = parser.parse(options, args);
 
-            if (cmd.hasOption("h")) {
+            if (cmd.hasOption("help")) {
                 displayHelp = true;
             } else {
 
-                if (cmd.hasOption("jsenv")) {
-                    model.setInitEnv(cmd.getOptionValue("jsenv"));
+                if (cmd.hasOption("env")) {
+                    model.setInitEnv(cmd.getOptionValue("env"));
                 }
                 String url;
-                if (cmd.hasOption("u")) {
-                    url = cmd.getOptionValue("u");
+                if (cmd.hasOption("url")) {
+                    url = cmd.getOptionValue("url");
                 } else {
                     url = SCHEDULER_DEFAULT_URL;
                 }
@@ -181,13 +181,14 @@ public class SchedulerController {
 
                 logger.info(newline + "Connecting client to the Scheduler");
 
-                if (cmd.hasOption("l")) {
-                    user = cmd.getOptionValue("l");
+                if (cmd.hasOption("login")) {
+                    user = cmd.getOptionValue("login");
                 }
 
-                if (cmd.hasOption("uc")) {
-                    if (cmd.hasOption("c")) {
-                        System.setProperty(Credentials.credentialsPathProperty, cmd.getOptionValue("c"));
+                if (cmd.hasOption("usecreds")) {
+                    if (cmd.hasOption("credentials")) {
+                        System.setProperty(Credentials.credentialsPathProperty, cmd
+                                .getOptionValue("credentials"));
                     }
                     try {
                         this.credentials = Credentials.getCredentials();
@@ -197,7 +198,7 @@ public class SchedulerController {
                         throw e;
                     }
                 } else {
-                    if (cmd.hasOption("l")) {
+                    if (cmd.hasOption("login")) {
                         pwdMsg = user + "'s password: ";
                     } else {
                         System.out.print("login: ");
@@ -309,100 +310,107 @@ public class SchedulerController {
     protected OptionGroup addCommandLineOptions(Options options) {
         OptionGroup actionGroup = new OptionGroup();
 
-        Option opt = new Option("submit", true, control + "Submit the given job XML file");
+        Option opt = new Option("s", "submit", true, control + "Submit the given job XML file");
         opt.setArgName("XMLDescriptor");
         opt.setRequired(false);
         opt.setArgs(Option.UNLIMITED_VALUES);
         actionGroup.addOption(opt);
 
-        opt = new Option("cmd", false, control +
+        opt = new Option("cmd", "command", false, control +
             "If mentionned, -submit argument becomes a command line, ie: -submit command args...");
         opt.setRequired(false);
         options.addOption(opt);
-        opt = new Option("cmdf", false, control +
+        opt = new Option("cmdf", "commandf", false, control +
             "If mentionned, -submit argument becomes a text file path containing command lines to schedule");
         opt.setRequired(false);
         options.addOption(opt);
-        opt = new Option("o", true, control +
+
+        opt = new Option("o", "output", true, control +
             "Used with submit action, specify a log file path to store job output");
         opt.setArgName("logFile");
         opt.setRequired(false);
         opt.setArgs(1);
         options.addOption(opt);
-        opt = new Option("s", true, control + "Used with submit action, specify a selection script");
-        opt.setArgName("selScript");
+
+        opt = new Option("ss", "selectscript", true, control +
+            "Used with -cmd or -cmdf, specify a selection script");
+        opt.setArgName("selectScript");
         opt.setRequired(false);
         opt.setArgs(1);
         options.addOption(opt);
-        opt = new Option("jn", true, control + "Used with submit action, specify the job name");
+
+        opt = new Option("jn", "jobname", true, control + "Used with -cmd or -cmdf, specify the job name");
         opt.setArgName("jobName");
         opt.setRequired(false);
         opt.setArgs(1);
         options.addOption(opt);
 
-        opt = new Option("pausejob", true, control + "Pause the given job (pause every non-running tasks)");
+        opt = new Option("pj", "pausejob", true, control +
+            "Pause the given job (pause every non-running tasks)");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("resumejob", true, control + "Resume the given job (restart every paused tasks)");
+        opt = new Option("rj", "resumejob", true, control +
+            "Resume the given job (restart every paused tasks)");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("killjob", true, control + "Kill the given job (cause the job to finish)");
+        opt = new Option("kj", "killjob", true, control + "Kill the given job (cause the job to finish)");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("removejob", true, control + "Remove the given job");
+        opt = new Option("rmj", "removejob", true, control + "Remove the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("result", true, control + "Get the result of the given job");
+        opt = new Option("jr", "jobresult", true, control + "Get the result of the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("tresult", true, control + "Get the result of the given task");
+        opt = new Option("tr", "taskresult", true, control + "Get the result of the given task");
         opt.setArgName("jobId taskName");
         opt.setRequired(false);
         opt.setArgs(2);
         actionGroup.addOption(opt);
 
-        opt = new Option("output", true, control + "Get the output of the given job");
+        opt = new Option("jo", "joboutput", true, control + "Get the output of the given job");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("toutput", true, control + "Get the output of the given task");
+        opt = new Option("to", "taskoutput", true, control + "Get the output of the given task");
         opt.setArgName("jobId taskName");
         opt.setRequired(false);
         opt.setArgs(2);
         actionGroup.addOption(opt);
 
-        opt = new Option("priority", true, control +
+        opt = new Option("jp", "jobpriority", true, control +
             "Change the priority of the given job (Idle, Lowest, Low, Normal, High, Highest)");
         opt.setArgName("jobId newPriority");
         opt.setRequired(false);
         opt.setArgs(2);
         actionGroup.addOption(opt);
 
-        opt = new Option("jobstate", true, control +
+        opt = new Option("js", "jobstate", true, control +
             "Get the current state of the given job (Also tasks description)");
         opt.setArgName("jobId");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("listjobs", false, control + "Display the list of jobs managed by the scheduler");
+        opt = new Option("lj", "listjobs", false, control +
+            "Display the list of jobs managed by the scheduler");
         opt.setRequired(false);
         opt.setArgs(0);
         actionGroup.addOption(opt);
@@ -413,13 +421,13 @@ public class SchedulerController {
         opt.setArgs(0);
         actionGroup.addOption(opt);
 
-        opt = new Option("script", "sf", true, control + "Execute the given script (javascript is supported)");
+        opt = new Option("sf", "script", true, control + "Execute the given script (javascript is supported)");
         opt.setArgName("filePath");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("js", "jsenv", true, "Execute the given script and go into interactive mode");
+        opt = new Option("env", "environment", true, "Execute the given script and go into interactive mode");
         opt.setArgName("filePath");
         opt.setRequired(false);
         opt.setArgs(1);
@@ -431,7 +439,7 @@ public class SchedulerController {
         opt.setArgs(0);
         actionGroup.addOption(opt);
 
-        opt = new Option("uc", "use-creds", false, "Use credentials retreived from disk");
+        opt = new Option("uc", "usecreds", false, "Use credentials retreived from disk");
         opt.setRequired(false);
         opt.setArgs(0);
         options.addOption(opt);
@@ -444,43 +452,43 @@ public class SchedulerController {
 
         options.addOptionGroup(actionGroup);
 
-        opt = new Option("start", false, control + "Start the Scheduler");
+        opt = new Option("start", "schedulerstart", false, control + "Start the Scheduler");
         opt.setRequired(false);
         actionGroup.addOption(opt);
 
-        opt = new Option("stop", false, control + "Stop the Scheduler");
+        opt = new Option("stop", "schedulerstop", false, control + "Stop the Scheduler");
         opt.setRequired(false);
         actionGroup.addOption(opt);
 
-        opt = new Option("pause", false, control +
+        opt = new Option("pause", "schedulerpause", false, control +
             "Pause the Scheduler (cause all non-running jobs to be paused)");
         opt.setRequired(false);
         actionGroup.addOption(opt);
 
-        opt = new Option("freeze", false, control +
+        opt = new Option("freeze", "schedulerfreeze", false, control +
             "Freeze the Scheduler (cause all non-running tasks to be paused)");
         opt.setRequired(false);
         actionGroup.addOption(opt);
 
-        opt = new Option("resume", false, control + "Resume the Scheduler");
+        opt = new Option("resume", "schedulerresume", false, control + "Resume the Scheduler");
         opt.setRequired(false);
         actionGroup.addOption(opt);
 
-        opt = new Option("shutdown", false, control + "Shutdown the Scheduler");
+        opt = new Option("shutdown", "schedulershutdown", false, control + "Shutdown the Scheduler");
         opt.setRequired(false);
         actionGroup.addOption(opt);
 
-        opt = new Option("kill", false, control + "Kill the Scheduler");
+        opt = new Option("kill", "schedulerkill", false, control + "Kill the Scheduler");
         opt.setRequired(false);
         actionGroup.addOption(opt);
 
-        opt = new Option("linkrm", true, control + "Reconnect a RM to the scheduler");
+        opt = new Option("lrm", "linkrm", true, control + "Reconnect a RM to the scheduler");
         opt.setArgName("rmURL");
         opt.setRequired(false);
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("policy", true, control + "Change the current scheduling policy");
+        opt = new Option("p", "policy", true, control + "Change the current scheduling policy");
         opt.setArgName("fullName");
         opt.setRequired(false);
         opt.setArgs(1);
@@ -493,7 +501,7 @@ public class SchedulerController {
 
     private void startCommandListener() throws Exception {
         Console console;
-        if (cmd.hasOption("g")) {
+        if (cmd.hasOption("gui")) {
             console = new VisualConsole();
         } else {
             console = new SimpleConsole();
@@ -518,26 +526,26 @@ public class SchedulerController {
             } else {
                 SchedulerModel.submit(cmd.getOptionValue("submit"));
             }
-        } else if (cmd.hasOption("result")) {
-            SchedulerModel.result(cmd.getOptionValue("result"));
-        } else if (cmd.hasOption("tresult")) {
-            String[] optionValues = cmd.getOptionValues("tresult");
+        } else if (cmd.hasOption("jobresult")) {
+            SchedulerModel.result(cmd.getOptionValue("jobresult"));
+        } else if (cmd.hasOption("taskresult")) {
+            String[] optionValues = cmd.getOptionValues("taskresult");
             if (optionValues == null || optionValues.length != 2) {
-                model.error("tresult must have two arguments. Start with --help for more informations");
+                model.error("taskresult must have two arguments. Start with --help for more informations");
             }
             SchedulerModel.tresult(optionValues[0], optionValues[1]);
-        } else if (cmd.hasOption("output")) {
-            SchedulerModel.output(cmd.getOptionValue("output"));
-        } else if (cmd.hasOption("toutput")) {
-            String[] optionValues = cmd.getOptionValues("toutput");
+        } else if (cmd.hasOption("joboutput")) {
+            SchedulerModel.output(cmd.getOptionValue("joboutput"));
+        } else if (cmd.hasOption("taskoutput")) {
+            String[] optionValues = cmd.getOptionValues("taskoutput");
             if (optionValues == null || optionValues.length != 2) {
-                model.error("toutput must have two arguments. Start with --help for more informations");
+                model.error("taskoutput must have two arguments. Start with --help for more informations");
             }
             SchedulerModel.toutput(optionValues[0], optionValues[1]);
-        } else if (cmd.hasOption("priority")) {
+        } else if (cmd.hasOption("jobpriority")) {
             try {
-                SchedulerModel.priority(cmd.getOptionValues("priority")[0],
-                        cmd.getOptionValues("priority")[1]);
+                SchedulerModel.priority(cmd.getOptionValues("jobpriority")[0], cmd
+                        .getOptionValues("jobpriority")[1]);
             } catch (ArrayIndexOutOfBoundsException e) {
                 model.print("Missing arguments for job priority. Arguments must be <jobId> <newPriority>" +
                     newline + "\t" + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
@@ -593,14 +601,14 @@ public class SchedulerController {
             String jobGivenName = null;
             String jobGivenOutput = null;
             String givenSelScript = null;
-            if (cmd.hasOption("jn")) {
-                jobGivenName = cmd.getOptionValue("jn");
+            if (cmd.hasOption("jobname")) {
+                jobGivenName = cmd.getOptionValue("jobname");
             }
-            if (cmd.hasOption("o")) {
-                jobGivenOutput = cmd.getOptionValue("o");
+            if (cmd.hasOption("output")) {
+                jobGivenOutput = cmd.getOptionValue("output");
             }
-            if (cmd.hasOption("s")) {
-                givenSelScript = cmd.getOptionValue("s");
+            if (cmd.hasOption("selectscript")) {
+                givenSelScript = cmd.getOptionValue("selectscript");
             }
 
             if (cmd.hasOption("cmd")) {
