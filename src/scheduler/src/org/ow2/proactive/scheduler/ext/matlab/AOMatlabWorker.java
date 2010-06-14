@@ -36,10 +36,9 @@
  */
 package org.ow2.proactive.scheduler.ext.matlab;
 
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.io.*;
-import org.objectweb.proactive.api.PAActiveObject;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
@@ -54,9 +53,6 @@ import ptolemy.data.Token;
  * @author The ProActive Team
  */
 public class AOMatlabWorker implements Serializable {
-
-    /**  */
-    private static final long serialVersionUID = 200;
 
     protected boolean debug;
 
