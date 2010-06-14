@@ -73,8 +73,8 @@ public class StatisticsView extends ViewPart {
         table.setLinesVisible(true);
         TableColumn tc1 = new TableColumn(table, SWT.LEFT);
         TableColumn tc2 = new TableColumn(table, SWT.LEFT);
-        tc1.setText("state");
-        tc2.setText("aggregate");
+        tc1.setText("Name");
+        tc2.setText("Value");
         tc1.setWidth(120);
         tc2.setWidth(150);
         tc1.setMoveable(true);
