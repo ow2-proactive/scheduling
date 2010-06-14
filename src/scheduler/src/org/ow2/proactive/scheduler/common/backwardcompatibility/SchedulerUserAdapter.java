@@ -63,7 +63,9 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
  */
 public class SchedulerUserAdapter implements UserSchedulerInterface {
 
-    protected Scheduler frontend;
+    /**  */
+	private static final long serialVersionUID = 21L;
+	protected Scheduler frontend;
 
     public SchedulerUserAdapter(Scheduler frontend) {
         this.frontend = frontend;

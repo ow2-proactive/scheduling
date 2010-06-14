@@ -58,7 +58,10 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  */
 public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
 
-    /** Task id */
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	/** Task id */
     private TaskId id;
 
     /** Number of parents remaining (initial value must be 0) */

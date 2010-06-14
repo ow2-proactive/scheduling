@@ -42,7 +42,6 @@ import java.util.HashMap;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -60,7 +59,9 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  */
 public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
-    /** hosts list */
+    /**  */
+	private static final long serialVersionUID = 21L;
+	/** hosts list */
     HashMap<String, DeploymentData> hosts = new HashMap<String, DeploymentData>();
     /** path to the file with host names */
     @Configurable(fileBrowser = true)

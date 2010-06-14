@@ -61,7 +61,10 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 
 public class WinHPCInfrastructure extends DefaultInfrastructureManager {
 
-    /** logger */
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	/** logger */
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /**

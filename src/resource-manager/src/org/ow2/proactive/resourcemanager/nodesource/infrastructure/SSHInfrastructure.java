@@ -75,7 +75,10 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class SSHInfrastructure extends AbstractSSHInfrastructure {
 
-    @Configurable(fileBrowser = true)
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	@Configurable(fileBrowser = true)
     protected File hostsList;
 
     /**

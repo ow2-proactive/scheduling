@@ -99,11 +99,11 @@ public class JobFactory_stax extends JobFactory {
 
     public static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.FACTORY);
     /** Location of the schema used to parse job descriptor. */
-    public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng";
+    public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/21/schedulerjob.rng";
     /** Variables styleScheet location. */
     public static final String STYLESHEET_LOCATION = "/org/ow2/proactive/scheduler/common/xml/stylesheets/variables.xsl";
     /** Job name space. */
-    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:dev";
+    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:21";
     /** Job prefix. */
     public static final String JOB_PREFIX = "js";
     /** Variables pattern definition */
@@ -325,7 +325,10 @@ public class JobFactory_stax extends JobFactory {
         //create a job that will just temporary store the common properties of the job
         Job jtmp = new Job() {
 
-            @Override
+            /**  */
+			private static final long serialVersionUID = 21L;
+
+			@Override
             public JobId getId() {
                 throw new RuntimeException("Not Available !");
             }
@@ -604,6 +607,9 @@ public class JobFactory_stax extends JobFactory {
         try {
             Task toReturn = null;
             Task tmpTask = (taskToFill != null) ? taskToFill : new Task() {
+
+				/**  */
+				private static final long serialVersionUID = 21L;
             };
             //parse job attributes and fill the temporary one
             int attrLen = cursorTask.getAttributeCount();

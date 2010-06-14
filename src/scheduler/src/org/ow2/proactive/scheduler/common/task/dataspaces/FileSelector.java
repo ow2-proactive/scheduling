@@ -133,7 +133,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Proxy(lazy = false)
 public class FileSelector implements Serializable {
 
-    @Id
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	@Id
     @GeneratedValue
     protected long hId;
 

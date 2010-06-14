@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+<job xmlns="urn:proactive:jobdescriptor:21" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:21 ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/21/schedulerjob.xsd"
 	name="job_2_tasks" priority="low" projectName="myProject" cancelJobOnError="true">
 	<description>2 tasks with variable durations</description>
 	<genericInformation>

@@ -53,7 +53,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public abstract class UserIdentification implements Serializable, Comparable<UserIdentification> {
 
-    /** Value for  */
+    /**  */
+	private static final long serialVersionUID = 21L;
+	/** Value for  */
     public static final int SORT_BY_NAME = 1;
     /**  */
     public static final int SORT_BY_SUBMIT = 3;

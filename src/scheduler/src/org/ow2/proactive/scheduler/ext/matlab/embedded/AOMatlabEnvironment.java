@@ -101,7 +101,7 @@ import ptolemy.data.Token;
 public class AOMatlabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
 
     /**  */
-    private static final long serialVersionUID = 200;
+    private static final long serialVersionUID = 21L;
 
     /**
      * URL to the scheduler
@@ -733,7 +733,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
     protected class FindNotWaitFilter implements RequestFilter {
 
         /**  */
-        private static final long serialVersionUID = 200;
+        private static final long serialVersionUID = 21L;
 
         /**
          * Creates the filter

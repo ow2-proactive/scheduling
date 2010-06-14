@@ -44,7 +44,10 @@ package org.ow2.proactive.scripting;
  */
 public class ScriptException extends RuntimeException {
 
-    /**
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	/**
      * Constructor.
      */
     public ScriptException() {

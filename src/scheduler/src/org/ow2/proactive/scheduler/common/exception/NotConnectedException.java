@@ -46,7 +46,10 @@ package org.ow2.proactive.scheduler.common.exception;
  */
 public class NotConnectedException extends SchedulerException {
 
-    /**
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	/**
      * Create a new instance of NotConnectedException
      *
      * @param msg the message to attach

@@ -44,7 +44,9 @@ import java.io.Serializable;
 
 public class SplittedResult implements Serializable {
 
-    /**
+    /**  */
+	private static final long serialVersionUID = 21L;
+	/**
      *
      */
     private ArrayToken token;

@@ -74,7 +74,10 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 @Proxy(lazy = false)
 public class TaskInfoImpl implements TaskInfo {
 
-    private static final String HOSTNAME_SEPARATOR = ",";
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	private static final String HOSTNAME_SEPARATOR = ",";
 
     @Id
     @GeneratedValue

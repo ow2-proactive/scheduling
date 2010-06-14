@@ -50,7 +50,10 @@ import org.ow2.proactive.scripting.GenerationScript;
  */
 public class NativeExecutableInitializer implements ExecutableInitializer {
 
-    /** Command that should be executed */
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	/** Command that should be executed */
     protected String command[];
 
     /** Generation script for the given executable */

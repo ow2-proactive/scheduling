@@ -42,7 +42,10 @@ package org.ow2.proactive.scheduler.ext.scilab.exception;
  * @author The ProActive Team
  */
 public class InvalidParameterException extends Exception {
-    public InvalidParameterException(Class<?> class1) {
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	public InvalidParameterException(Class<?> class1) {
         super(class1.getCanonicalName());
     }
 }

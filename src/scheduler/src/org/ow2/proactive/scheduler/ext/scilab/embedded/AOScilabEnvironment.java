@@ -95,7 +95,10 @@ import org.ow2.proactive.scripting.SelectionScript;
  */
 public class AOScilabEnvironment implements Serializable, SchedulerEventListener, InitActive, RunActive {
 
-    private boolean loggedin;
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	private boolean loggedin;
 
     /**
      * Connection to the scheduler
@@ -642,7 +645,10 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
     protected class FindNotWaitFilter implements RequestFilter {
 
-        /**
+        /**  */
+		private static final long serialVersionUID = 21L;
+
+		/**
          * Creates the filter
          */
         public FindNotWaitFilter() {

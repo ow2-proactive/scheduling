@@ -78,7 +78,10 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @AccessType("field")
 @Proxy(lazy = false)
 public class JobResultImpl implements JobResult {
-    @Id
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     private long hId;

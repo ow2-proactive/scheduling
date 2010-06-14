@@ -49,7 +49,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class UnknownJobException extends SchedulerException {
 
-    /**
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	/**
      * Create a new instance of UnknownJobException
      *
      * @param msg the message to attach.

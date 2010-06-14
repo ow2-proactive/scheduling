@@ -89,7 +89,9 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  */
 public class NoCallbackHandler implements CallbackHandler, Serializable {
 
-    /**
+    /**  */
+	private static final long serialVersionUID = 21L;
+	/**
      * Properties of particular authentication method
      */
     private Map<String, Object> items;

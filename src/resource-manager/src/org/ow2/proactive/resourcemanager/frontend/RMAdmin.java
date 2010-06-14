@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import java.io.Serializable;
 import java.util.Collection;
 
 import org.objectweb.proactive.annotation.PublicAPI;

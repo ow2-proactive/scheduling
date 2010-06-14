@@ -91,7 +91,10 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 @PolicyRestriction(supportedInfrastructures = { "org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure" })
 public class EC2Policy extends SchedulerAwarePolicy implements InitActive, RunActive, RMEventListener {
 
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
     /**
      * Delay in seconds between each time the policy refreshes its internal state

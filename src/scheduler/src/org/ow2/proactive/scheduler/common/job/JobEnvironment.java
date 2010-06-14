@@ -65,7 +65,10 @@ import org.ow2.proactive.scheduler.common.util.JarUtils;
 @AccessType("field")
 @Proxy(lazy = false)
 public class JobEnvironment implements Serializable {
-    @Id
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     private long hId;

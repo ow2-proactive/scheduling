@@ -73,7 +73,10 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure" })
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive {
 
-    protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
 
     private Map<JobId, Integer> activeTasks = new HashMap<JobId, Integer>();
     private int activeTask = 0;

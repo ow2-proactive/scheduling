@@ -64,7 +64,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @AccessType("field")
 @Proxy(lazy = false)
 public class ForkEnvironment implements Serializable {
-    @Id
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     private long hId;

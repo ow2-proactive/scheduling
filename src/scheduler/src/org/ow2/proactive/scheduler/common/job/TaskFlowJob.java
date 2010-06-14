@@ -61,7 +61,9 @@ import org.ow2.proactive.scheduler.common.task.Task;
 @PublicAPI
 public class TaskFlowJob extends Job {
 
-    /** Task count for unset task name */
+    /**  */
+	private static final long serialVersionUID = 21L;
+	/** Task count for unset task name */
     private int taskCountForUnSetTaskName = 1;
     /** List of task for the task flow job */
     private Map<String, Task> tasks = new HashMap<String, Task>();

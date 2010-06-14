@@ -43,7 +43,6 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
@@ -1011,7 +1010,10 @@ public class MatlabTask extends JavaExecutable {
      */
     public static class DummyJVMProcess extends JVMProcessImpl implements Serializable {
 
-        public DummyJVMProcess() {
+        /**  */
+		private static final long serialVersionUID = 21L;
+
+		public DummyJVMProcess() {
             super();
         }
 

@@ -37,7 +37,6 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
-import java.security.Policy;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -51,11 +50,9 @@ import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMAdmin;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMInfrastructure;

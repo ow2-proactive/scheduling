@@ -76,7 +76,9 @@ import org.ow2.proactive.jmx.provider.JMXProviderUtils;
  * @author The ProActive Team
  */
 public class ROServerImpl implements Serializable {
-    private static final Logger LOGGER = Logger.getLogger(ROServerImpl.class);
+    /**  */
+	private static final long serialVersionUID = 21L;
+	private static final Logger LOGGER = Logger.getLogger(ROServerImpl.class);
     /** The current connection number */
     private static int connectionNumber;
     /** The reference on the MBeanServer */

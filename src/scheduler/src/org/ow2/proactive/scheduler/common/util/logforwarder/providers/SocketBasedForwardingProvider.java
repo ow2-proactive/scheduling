@@ -92,7 +92,9 @@ public class SocketBasedForwardingProvider implements LogForwardingProvider {
      */
     public static class SocketAppenderProvider implements AppenderProvider {
 
-        private String hostname;
+        /**  */
+		private static final long serialVersionUID = 21L;
+		private String hostname;
         private int port;
 
         /**

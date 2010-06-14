@@ -69,7 +69,9 @@ import org.ow2.proactive.resourcemanager.utils.RMLoggers;
  */
 public abstract class NodeSourcePolicy implements Serializable {
 
-    /** logger */
+    /**  */
+	private static final long serialVersionUID = 21L;
+	/** logger */
     private static Logger logger = ProActiveLogger.getLogger(RMLoggers.POLICY);
     /** Node source of the policy */
     protected NodeSource nodeSource;
@@ -216,6 +218,9 @@ public abstract class NodeSourcePolicy implements Serializable {
         // creating fake anonymous class to filter out all meaningful principals
         // in node source and create permission like PrincipalPermission(empty)
         return new IdentityPrincipal("") {
+
+			/**  */
+			private static final long serialVersionUID = 21L;
         }.getClass();
     }
 
@@ -238,6 +243,9 @@ public abstract class NodeSourcePolicy implements Serializable {
         // creating fake anonymous class to filter out all meaningful principals
         // in node source and create permission like PrincipalPermission(empty)
         return new IdentityPrincipal("") {
+
+			/**  */
+			private static final long serialVersionUID = 21L;
         }.getClass();
     }
 }

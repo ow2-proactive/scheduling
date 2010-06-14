@@ -44,7 +44,10 @@ package org.ow2.proactive.scheduler.common.exception;
  */
 public class AlreadyConnectedException extends SchedulerException {
 
-    /**
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	/**
      * Attaches a message to the AlreadyConnectedException.
      *
      * @param msg message attached.

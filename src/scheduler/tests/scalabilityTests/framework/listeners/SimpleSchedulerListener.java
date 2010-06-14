@@ -53,7 +53,9 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 @RemoteObject
 public class SimpleSchedulerListener implements SchedulerEventListener, Serializable {
 
-    protected static final Logger logger = Logger.getLogger(SimpleSchedulerListener.class);
+    /**  */
+	private static final long serialVersionUID = 21L;
+	protected static final Logger logger = Logger.getLogger(SimpleSchedulerListener.class);
 
     public SimpleSchedulerListener() {
     }

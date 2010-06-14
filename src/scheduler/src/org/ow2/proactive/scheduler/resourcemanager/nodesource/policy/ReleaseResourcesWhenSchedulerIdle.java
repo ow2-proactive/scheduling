@@ -43,7 +43,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -56,7 +55,9 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy implements InitActive,
         SchedulerEventListener {
 
-    private transient Timer timer = new Timer(true);
+    /**  */
+	private static final long serialVersionUID = 21L;
+	private transient Timer timer = new Timer(true);
     private int activeJobs = 0;
 
     @Configurable(description = "ms")

@@ -50,7 +50,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
-import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -67,11 +66,16 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class GCMInfrastructure extends DefaultInfrastructureManager {
 
-    /**
+    /**  */
+	private static final long serialVersionUID = 21L;
+
+	/**
      * Deployment data container
      */
     protected class DeploymentData implements Serializable {
-        byte[] data;
+        /**  */
+		private static final long serialVersionUID = 21L;
+		byte[] data;
         boolean deployed = false;
     }
 

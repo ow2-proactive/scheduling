@@ -62,7 +62,9 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @AccessType("field")
 @Proxy(lazy = false)
 public class InternalTaskFlowJob extends InternalJob {
-    @Id
+    /**  */
+	private static final long serialVersionUID = 21L;
+	@Id
     @GeneratedValue
     @SuppressWarnings("unused")
     private long hId;

@@ -50,7 +50,9 @@ import java.util.LinkedList;
  */
 public class BoundedLinkedList<E> extends LinkedList<E> {
 
-    private int size;
+    /**  */
+	private static final long serialVersionUID = 21L;
+	private int size;
 
     /**
      * Create a new instance of Bounded Linked List

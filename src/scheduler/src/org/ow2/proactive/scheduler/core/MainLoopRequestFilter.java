@@ -52,7 +52,9 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
  * @since ProActive Scheduling 0.9
  */
 public class MainLoopRequestFilter implements RequestFilter, Serializable {
-    private ArrayList<String> methodNames = new ArrayList<String>();
+    /**  */
+	private static final long serialVersionUID = 21L;
+	private ArrayList<String> methodNames = new ArrayList<String>();
 
     /**
      * MainLoopRequestFilter Constructor with a list of string method name to filter.
