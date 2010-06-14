@@ -40,6 +40,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.ow2.proactive.resourcemanager.gui.views.ResourceExplorerView;
+import org.ow2.proactive.resourcemanager.gui.views.ResourcesCompactView;
 import org.ow2.proactive.resourcemanager.gui.views.ResourcesTabView;
 import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
 
@@ -50,19 +51,10 @@ import org.ow2.proactive.resourcemanager.gui.views.StatisticsView;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class ResourceManagerPerspective implements IPerspectiveFactory {
+public final class ResourceManagerPerspective implements IPerspectiveFactory {
 
-    /** the id */
+    /** The perspective id */
     public static final String ID = "org.ow2.proactive.resourcemanager.gui.ResourceManagerPerspective";
-
-    /** Top folder's id. */
-    public static final String ID_TOP_FOLDER = ID + ".topFolder";
-
-    /** Left folder's id. */
-    public static final String ID_LEFT_FOLDER = ID + ".leftFolder";
-
-    /** Bottom folder's id. */
-    public static final String ID_BOTTOM_FOLDER = ID + ".bottomFolder";
 
     // -------------------------------------------------------------------- //
     // ----------------- implements IPerspectiveFactory ------------------- //
@@ -70,23 +62,24 @@ public class ResourceManagerPerspective implements IPerspectiveFactory {
     /**
      * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
      */
-    public void createInitialLayout(IPageLayout layout) {
-
-        String editorArea = layout.getEditorArea();
+    public void createInitialLayout(final IPageLayout layout) {
+        // Get identifier of the editor area of the page layout
+        final String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(false);
 
-        IFolderLayout topFolderTab = layout.createFolder(ID_TOP_FOLDER, IPageLayout.TOP, 0.7f, editorArea);
-        topFolderTab.addView(ResourcesTabView.ID);
+        // The top folder will contain the table explorer view and the tree explorer view  
+        final IFolderLayout topFolder = layout.createFolder("topLeft", IPageLayout.TOP, 0.3f, editorArea);
+        topFolder.addView(ResourcesTabView.ID);
+        topFolder.addView(ResourceExplorerView.ID);
 
-        IFolderLayout topFolderTree = layout.createFolder(ID_TOP_FOLDER, IPageLayout.TOP, 0.7f, editorArea);
-        topFolderTree.addView(ResourceExplorerView.ID);
+        // The bottom left folder contains the statistics view
+        final IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.7f,
+                "topLeft");
+        bottomLeftFolder.addView(StatisticsView.ID);
 
-        IFolderLayout subleftFolder = layout.createFolder(ID_LEFT_FOLDER, IPageLayout.BOTTOM, 0.3f,
-                editorArea);
-        subleftFolder.addView(StatisticsView.ID);
-        //
-        //        IFolderLayout subsubleftFolder = layout.createFolder(ID_BOTTOM_FOLDER, IPageLayout.RIGHT, 0.5f,
-        //                ID_LEFT_FOLDER);
-        //        subsubleftFolder.addView(NodeInfoView.ID);
+        // The bottom left folder contains the compact view
+        final IFolderLayout bottomRightFolder = layout.createFolder("bottomRight", IPageLayout.RIGHT, 0.5f,
+                "bottomLeft");
+        bottomRightFolder.addView(ResourcesCompactView.ID);
     }
 }
