@@ -108,14 +108,20 @@ public class SelectionUtilsTest {
         Assert.assertTrue(SelectionUtils.checkFreeMemory(Runtime.getRuntime().freeMemory() - 1));
 
         log("checkExec");
-        String path = System.getenv("PATH");
-        String[] tokens = path.split(File.pathSeparator);
-        File dir = new File(tokens[0]);
-        File[] files = dir.listFiles();
-        String nameOfExistingFile = files[0].getName();
         Assert.assertFalse(SelectionUtils.checkExec(null));
         Assert.assertFalse(SelectionUtils.checkExec(""));
-        Assert.assertTrue(SelectionUtils.checkExec(nameOfExistingFile));
+        String path = System.getenv("PATH");
+        String[] tokens = path.split(File.pathSeparator);
+        //Find first PATH entry that contains an executable
+        //If no exec is found, test is considered as passed ! (this case should never happen)
+        for (String s : tokens) {
+            File dir = new File(s);
+            File[] files = dir.listFiles();
+            if (files != null && files.length > 0) {
+                Assert.assertTrue(SelectionUtils.checkExec(files[0].getName()));
+                break;
+            }
+        }
     }
 
     private void log(String s) {
