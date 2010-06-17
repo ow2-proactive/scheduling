@@ -576,6 +576,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
 
         if (this.allNodes.containsKey(nodeUrl)) {
             RMNode rmnode = this.allNodes.get(nodeUrl);
+            logger.debug("Request to remove node " + rmnode);
 
             NodeSource nodeSource = rmnode.getNodeSource();
             // checking that client has the permission to change this node source
@@ -638,7 +639,7 @@ public class RMCore implements ResourceManager, RMAdmin, RMUser, InitActive, Run
                     break;
                 }
 
-                if (node.getNodeSource().getName().equals(nodeSourceName)) {
+                if (node.isBusy() && node.getNodeSource().getName().equals(nodeSourceName)) {
                     removeNode(node.getNodeURL(), preemptive);
                     numberOfRemovedNodes++;
                 }
