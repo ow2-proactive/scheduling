@@ -65,7 +65,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     protected static Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /**
-     * maximum number of nodes this infrastructure can ask simultaneously to the pbs scheduler
+     * maximum number of nodes this infrastructure can ask simultaneously to the WinHPC scheduler
      */
     @Configurable
     protected int maxNodes = 1;
@@ -145,9 +145,12 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     @Override
     public void acquireNode() {
 
-        if (submittedJobs.size() >= maxNodes) {
-            logger.warn("Attempting to acquire nodes while maximum reached");
-            return;
+        synchronized (submittedJobs) {
+            if (submittedJobs.size() >= maxNodes) {
+                logger.warn("Attempting to acquire nodes while maximum reached: max nodes " + maxNodes +
+                    ", current nodes " + submittedJobs.size());
+                return;
+            }
         }
 
         // Set up the environment for the SSL verificaton
@@ -190,10 +193,20 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             EndpointReferenceType[] eprs = new EndpointReferenceType[1];
 
             // Generate the HPCBP acitivty from Axis2 generated JSDL objects
-            String nodeURL = "WINHPC-" + nodeSource.getName() + "-" + randomString();
-            String fullCommand = command + " -n " + "WINHPC-" + nodeSource.getName() + "-" + randomString();
+            String nodeName = "WINHPC-" + nodeSource.getName() + "-" + randomString();
+            String fullCommand = command + " -n " + nodeName;
             fullCommand += " -s " + nodeSource.getName();
             fullCommand = "cmd /C \" " + fullCommand + " \"";
+
+            synchronized (submittedJobs) {
+                if (submittedJobs.size() >= maxNodes) {
+                    logger.warn("Attempting to acquire nodes while maximum reached: max nodes " + maxNodes +
+                        ", current nodes " + submittedJobs.size());
+                    return;
+                } else {
+                    submittedJobs.put(nodeName, eprs);
+                }
+            }
 
             logger.debug("Executing: " + fullCommand);
             eprs[0] = deployer.createActivity(WinHPCDeployer.createJSDLDocument(fullCommand));
@@ -209,8 +222,6 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
                 logger.info(elements[i].toString());
             }
 
-            submittedJobs.put(nodeURL, eprs);
-
             // getting job status to detect failed jobs
             GetActivityStatusResponseType[] status = null;
             long timeStamp = System.currentTimeMillis();
@@ -218,11 +229,13 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             do {
                 Thread.currentThread().sleep(1000);
                 status = deployer.getActivityStatuses(eprs);
-                logger.debug("Node " + nodeURL + " deployment status - " +
+                logger.debug("Node " + nodeName + " deployment status - " +
                     status[0].getActivityStatus().getState().toString());
                 if (status[0].getActivityStatus().getState() == ActivityStateEnumeration.Failed) {
                     // job failed
-                    submittedJobs.remove(nodeURL);
+                    synchronized (submittedJobs) {
+                        submittedJobs.remove(nodeName);
+                    }
                     break;
                 }
                 if (timeout > 0) {
@@ -326,11 +339,13 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         try {
             new File(trustStorePath).delete();
 
-            for (EndpointReferenceType[] ert : submittedJobs.values()) {
-                if (deployer != null) {
-                    deployer.terminateActivity(ert);
-                } else {
-                    logger.error("Win HPC deployer cannot be null");
+            synchronized (submittedJobs) {
+                for (EndpointReferenceType[] ert : submittedJobs.values()) {
+                    if (deployer != null) {
+                        deployer.terminateActivity(ert);
+                    } else {
+                        logger.error("Win HPC deployer cannot be null");
+                    }
                 }
             }
 
@@ -344,8 +359,15 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
      */
     public void removeNode(Node node) throws RMException {
         // the job will be finished when JVM is killed
+        synchronized (submittedJobs) {
+            logger.debug("Removing node " + node.getNodeInformation().getName());
+            if (submittedJobs.containsKey(node.getNodeInformation().getName())) {
+                submittedJobs.remove(node.getNodeInformation().getName());
+            } else {
+                logger.warn("Unknown node " + node.getNodeInformation().getName());
+            }
+        }
         super.removeNode(node);
-        submittedJobs.remove(node.getNodeInformation().getURL());
     }
 
     public String getDescription() {
