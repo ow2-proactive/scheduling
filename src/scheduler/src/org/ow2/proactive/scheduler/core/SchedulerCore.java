@@ -144,7 +144,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
     /** Number of threads used to call TaskLauncher.terminate() */
     private static final int TERMINATE_THREAD_NUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
-            .getValueAsInt();;
+            .getValueAsInt();
 
     /** Scheduler main loop time out */
     private static final int SCHEDULER_TIME_OUT = PASchedulerProperties.SCHEDULER_TIME_OUT.getValueAsInt();
