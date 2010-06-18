@@ -230,7 +230,7 @@ ec2-upload-bundle -b $BUCKET \
 echo "Registering new AMI: $AMI_NAME"
 ec2-register $BUCKET/$AMI_NAME.manifest.xml &>/dev/null
 
-rm -f /root/* /tmp/* &>/dev/null
+rm -f /root/* /tmp/* &>/dev/null || true
 
 echo "All done, exiting"
 
