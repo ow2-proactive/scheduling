@@ -127,6 +127,8 @@ public class MatlabTask extends JavaExecutable {
      */
     protected static boolean shutdownhookSet = false;
 
+    protected static Thread shutdownHook = null;
+
     protected static int taskCount = 0;
     protected static int taskCountBeforeJVMRespawn;
     protected static int nodeCount = 0;
@@ -229,6 +231,7 @@ public class MatlabTask extends JavaExecutable {
 
         jvminfo.setProcess(null);
         jvminfo.setWorker(null);
+        removeShutdownHook();
 
     }
 
@@ -341,6 +344,28 @@ public class MatlabTask extends JavaExecutable {
         return true;
     }
 
+    protected void addShutdownHook() {
+        shutdownHook = new Thread(new Runnable() {
+            public void run() {
+                for (MatlabJVMInfo info : jvmInfos.values()) {
+                    try {
+                        destroyProcess(info);
+                        //info.getProcess().destroy();
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        });
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+        shutdownhookSet = true;
+    }
+
+    protected void removeShutdownHook() {
+        Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        shutdownHook = null;
+        shutdownhookSet = false;
+    }
+
     protected void handleProcess(MatlabJVMInfo jvminfo) throws Throwable {
         if (debug) {
             System.out.println("[" + new java.util.Date() + " " + host +
@@ -386,18 +411,7 @@ public class MatlabTask extends JavaExecutable {
                     outDebug.println("[" + new java.util.Date() + " " + host +
                         " MATLAB TASK] Adding shutDownHook");
                 }
-                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                    public void run() {
-                        for (MatlabJVMInfo info : jvmInfos.values()) {
-                            try {
-                                destroyProcess(info);
-                                //info.getProcess().destroy();
-                            } catch (Exception e) {
-                            }
-                        }
-                        shutdownhookSet = true;
-                    }
-                }));
+                addShutdownHook();
             }
         }
 
@@ -988,7 +1002,6 @@ public class MatlabTask extends JavaExecutable {
                             " MATLAB TASK] waking up main thread");
 
                     }
-                    semaphore.release();
 
                 }
             } catch (Exception e) {

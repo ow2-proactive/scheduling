@@ -134,22 +134,35 @@ public class IOTools {
         private InputStream is;
         private OutputStream os;
 
+        private PrintStream out;
+        private BufferedReader br;
+
         public RedirectionThread(InputStream is, OutputStream os) {
             this.is = is;
             this.os = os;
+            this.out = new PrintStream(new BufferedOutputStream(os));
+            this.br = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
         }
 
         public void run() {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
-            PrintStream out = new PrintStream(new BufferedOutputStream(os));
+
             String s;
             try {
                 while ((s = br.readLine()) != null) {
-                    out.println(s);
+                    synchronized (out) {
+                        out.println(s);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        public void setOutputStream(OutputStream os) {
+            synchronized (out) {
+                out = new PrintStream(new BufferedOutputStream(os));
+            }
+
         }
     }
 

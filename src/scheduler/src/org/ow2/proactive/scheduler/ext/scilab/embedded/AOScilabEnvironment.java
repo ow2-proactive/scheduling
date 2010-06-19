@@ -84,6 +84,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
+import org.ow2.proactive.scheduler.ext.scilab.ScilabTaskException;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -121,7 +122,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      * Results gathered
      */
 
-    private ArrayList<SciData> results;
+    //private ArrayList<SciData> results;
+    private ArrayList<ResultsAndLogs> results;
 
     private ArrayList<String> job_logs;
 
@@ -229,7 +231,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
     @SuppressWarnings("unchecked")
     public void initActivity(Body body) {
         stubOnThis = (AOScilabEnvironment) PAActiveObject.getStubOnThis();
-        results = new ArrayList<SciData>();
+        //results = new ArrayList<SciData>();
+        results = new ArrayList<ResultsAndLogs>();
         job_logs = new ArrayList<String>();
     }
 
@@ -256,20 +259,25 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
         if (schedulerStopped) {
             System.err.println("[AOScilabEnvironment] The scheduler has been stopped");
+            errorToThrow = new IllegalStateException("The scheduler has been stopped");
         } else if (jobKilled) {
             // Job killed
             System.err.println("[AOScilabEnvironment] The job has been killed");
-        } else if (errorToThrow != null) {
+            errorToThrow = new IllegalStateException("The job has been killed");
+        }
+
+        if (errorToThrow != null) {
+
             // Error inside job
             if (debug) {
                 System.err.println("[AOScilabEnvironment] Exception inside the job");
             }
-            answer.add(new ResultsAndLogs(new SciStringMatrix("out", 0, 0), errorLogs, errorToThrow));
+            answer.add(new ResultsAndLogs(null, null, errorToThrow, false));
 
         } else {
             // Normal termination
             for (int i = 0; i < results.size(); i++) {
-                answer.add(new ResultsAndLogs(results.get(i), job_logs.get(i), null));
+                answer.add(results.get(i));
             }
         }
 
@@ -294,7 +302,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         }
 
         this.debug = debug;
-        this.job_logs.clear();
+
         // We store the script selecting the nodes to use it later at termination.
 
         if (currentJobId != null) {
@@ -400,7 +408,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      * @param printStack do we print the stack trace ?
      * @param logs       logs of the task creating the problem
      */
-    private void jobDidNotSucceed(JobId jobId, Throwable ex, boolean printStack, String logs) {
+    private void jobDidNotSucceed(String jobId, Throwable ex, boolean printStack, String logs) {
         System.err.println("[AOScilabEnvironment] Job did not succeed");
         if (printStack) {
             ex.printStackTrace();
@@ -436,6 +444,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         switch (notification.getEventType()) {
             case JOB_RUNNING_TO_FINISHED:
                 JobInfo info = notification.getData();
+                String jid = info.getJobId().value();
                 if (info.getStatus() == JobStatus.KILLED) {
                     if (logger.isDebugEnabled()) {
                         logger.info("Received job killed event...");
@@ -465,79 +474,95 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                     try {
                         jResult = scheduler.getJobResult(info.getJobId());
                         if (jResult == null) {
-                            jobDidNotSucceed(info.getJobId(), new RuntimeException(
-                                "[AOScilabEnvironment] Job id = " + info.getJobId() +
-                                    " was not returned by the scheduler"), false, null);
+                            jobDidNotSucceed(jid, new RuntimeException("[AOScilabEnvironment] Job id = " +
+                                info.getJobId() + " was not returned by the scheduler"), false, null);
                             return;
                         }
                     } catch (SchedulerException e) {
-                        jobDidNotSucceed(info.getJobId(), e, true, null);
+                        jobDidNotSucceed(jid, e, true, null);
                         return;
                     }
 
-                    if (debug) {
-                        System.out.println("[AOScilabEnvironment] Updating results of job: " +
-                            jResult.getName() + "(" + info.getJobId() + ")");
-                    }
-
-                    // Geting the task results from the job result
-                    Map<String, TaskResult> task_results = null;
-                    if (jResult.hadException()) {
-                        task_results = jResult.getExceptionResults();
-                    } else {
-                        // sorted results
-
-                        task_results = jResult.getAllResults();
-                    }
-                    ArrayList<Integer> keys = new ArrayList<Integer>();
-                    for (String key : task_results.keySet()) {
-                        keys.add(Integer.parseInt(key));
-                    }
-                    Collections.sort(keys);
-                    // Iterating over the task results
-                    for (Integer key : keys) {
-                        TaskResult res = task_results.get("" + key);
-                        if (debug) {
-                            System.out.println("[AOScilabEnvironment] Looking for result of task: " + key);
-                        }
-
-                        // No result received
-                        if (res == null) {
-                            jobDidNotSucceed(info.getJobId(), new RuntimeException(
-                                "[AOScilabEnvironment] Task id = " + key +
-                                    " was not returned by the scheduler"), false, null);
-
-                        } else if (res.hadException()) {
-                            //Exception took place inside the framework
-                            jobDidNotSucceed(info.getJobId(), res.getException(), true, res.getOutput()
-                                    .getAllLogs(true));
-
-                        } else {
-                            // Normal success
-                            SciData computedResult = null;
-                            String logs = null;
-                            try {
-                                logs = res.getOutput().getAllLogs(true);
-                                computedResult = ((ArrayList<SciData>) res.value()).get(0);
-                                results.add(computedResult);
-                                // We print the logs of the job, if any
-                                if (debug && logs.length() > 0) {
-                                    System.out.println(logs);
-                                }
-
-                                job_logs.add(logs);
-
-                            } catch (Throwable e2) {
-                                jobDidNotSucceed(info.getJobId(), e2, true, logs);
-                            }
-                        }
-                    }
+                    updateJobResult(jid, jResult);
 
                     isJobFinished = true;
 
                 }
                 break;
         }
+    }
+
+    private void updateJobResult(String jid, JobResult jResult) {
+
+        if (debug) {
+            System.out.println("[AOScilabEnvironment] Updating results of job: " + jResult.getName() + "(" +
+                jid + ")");
+        }
+
+        // Geting the task results from the job result
+        Map<String, TaskResult> task_results = null;
+        if (jResult.hadException()) {
+            task_results = jResult.getExceptionResults();
+        } else {
+            // sorted results
+
+            task_results = jResult.getAllResults();
+        }
+        ArrayList<Integer> keys = new ArrayList<Integer>();
+        for (String key : task_results.keySet()) {
+            keys.add(Integer.parseInt(key));
+        }
+        Collections.sort(keys);
+        // Iterating over the task results
+        for (Integer key : keys) {
+            TaskResult res = task_results.get("" + key);
+            if (debug) {
+                System.out.println("[AOScilabEnvironment] Looking for result of task: " + key);
+            }
+
+            // No result received
+            if (res == null) {
+                jobDidNotSucceed(jid, new RuntimeException("[AOScilabEnvironment] Task id = " + key +
+                    " was not returned by the scheduler"), false, null);
+
+            } else {
+
+                String logs = res.getOutput().getAllLogs(true);
+                String logs2 = res.getOutput().getStderrLogs(true);
+
+                if (logs2.length() > 0 && debug) {
+                    System.err.println(logs);
+                }
+                String logs3 = res.getOutput().getStdoutLogs(false);
+                if (logs3.length() > 0 && debug) {
+                    System.out.println(logs3);
+                }
+
+                if (res.hadException()) {
+                    //Exception took place inside the framework
+                    if (res.getException() instanceof ScilabTaskException) {
+                        results.add(new ResultsAndLogs(null, logs, null, true));
+                        //jobDidNotSucceed(jid, res.getException(), false, logs);
+                    } else {
+                        results.add(new ResultsAndLogs(null, logs, res.getException(), false));
+                        //jobDidNotSucceed(jid, res.getException(), true, logs);
+                    }
+
+                } else {
+                    // Normal success
+                    SciData computedResult = null;
+
+                    try {
+                        computedResult = ((ArrayList<SciData>) res.value()).get(0);
+                        results.add(new ResultsAndLogs(computedResult, logs, null, false));
+
+                    } catch (Throwable e2) {
+                        jobDidNotSucceed(jid, e2, true, logs);
+                    }
+                }
+            }
+        }
+
     }
 
     /**
