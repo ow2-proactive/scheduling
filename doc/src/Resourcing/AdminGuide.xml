@@ -5,6 +5,7 @@
 	&CLI;
 	&NodeSource;
 	&AdminJavaAPI;
+	&Accounting;
 	&JMX;
 	&GUI;
 </chapter>
