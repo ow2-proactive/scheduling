@@ -18,6 +18,7 @@
 	  <!ENTITY EC2 SYSTEM "EC2.xml">
 	  <!ENTITY GUI SYSTEM "GUI.xml">
 	  <!ENTITY CLI SYSTEM "CLI.xml">
+	  <!ENTITY JMX SYSTEM "JMX.xml">
 	  <!ENTITY Virtualization SYSTEM "Virtualization.xml">
 	  <!ENTITY WindowsAgent SYSTEM "WindowsAgent.xml">
 ]>
