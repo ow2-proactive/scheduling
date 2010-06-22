@@ -6,7 +6,7 @@
 	</info>
 	<para>
 		The users (clients) of the Resource Manager may request and offer nodes for computation. To keep track on how much node time
-		was consumed or contributed by a particular user the Resource Manager associates a user to an account.	
+		was consumed or contributed by a particular user, the Resource Manager associates a user to an account.	
 	</para>
 	<para>
 		More precisely, the nodes can be manipulated by the following basic operations available to the users:
@@ -17,7 +17,7 @@
 					initiated by a user considered as a node provider.
 				 </para>
 				<para>
-					A node can be added, through the API, as a result of a deployement process, an agent or manually from the command line interface.
+					A node can be added, through the API, as a result of a deployement process, through an agent or manually from the command line interface.
 				</para>
 			</listitem>
 			<listitem>
