@@ -55,6 +55,8 @@ import java.util.ArrayList;
  */
 public class IOTools {
 
+    private static String nl = System.getProperty("line.separator");
+
     public static ProcessResult blockingGetProcessResult(Process process) {
 
         final InputStream is = process.getInputStream();
@@ -178,6 +180,7 @@ public class IOTools {
         public Boolean goon = true;
         private PrintStream out;
         private BufferedReader br;
+        private boolean skipNextNL = false;
 
         /**  */
         public ArrayList<String> output = new ArrayList<String>();
@@ -258,9 +261,38 @@ public class IOTools {
         }
 
         private String readLine() throws IOException {
-            synchronized (br) {
-                return br.readLine();
+            StringBuilder line = new StringBuilder();
+            int chr;
+
+            while (true) {
+                while (!ready()) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                    }
+                }
+                synchronized (br) {
+                    chr = br.read();
+                }
+                if (chr < 0) {
+                    skipNextNL = false;
+                    return line.toString();
+                } else if (chr == '\n') {
+                    if (skipNextNL) {
+                        skipNextNL = false;
+                    } else {
+                        return line.toString();
+                    }
+                } else if (chr == '\r') {
+                    //eating \n
+                    skipNextNL = true;
+                    return line.toString();
+                } else {
+                    skipNextNL = false;
+                    line.append((char) chr);
+                }
             }
+
         }
 
         /**

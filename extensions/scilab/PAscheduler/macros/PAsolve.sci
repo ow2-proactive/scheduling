@@ -23,7 +23,9 @@ function out = PAsolve(funcname, args, varargin)
              if length(varargin) > 0
                  if (varargin(1) == 'debug') | (varargin(1) == 'd') | (varargin(1) == '-d') | (varargin(1) == '-debug')
                      debugv = 1;
-                     execstr(strcat(['funccode = fun2string(';funcname;');']));
+                     execline = strcat(['funccode = fun2string(';funcname;',''';funcname;''');'])
+                     execstr(execline);
+                     
                  else
                      file1 = varargin(1);
                      // Read file function definition into string
@@ -33,7 +35,8 @@ function out = PAsolve(funcname, args, varargin)
                      debugv = 1;
                  end
              else
-                execstr(strcat(['funccode = fun2string(';funcname;');']));
+                execline = strcat(['funccode = fun2string(';funcname;',''';funcname;''');']);
+                execstr(execline);
              end
              s=size(funccode);
              // We flatten the funccode
@@ -41,6 +44,7 @@ function out = PAsolve(funcname, args, varargin)
              for i=1:(s(1)-1)
                   funccode_flat=funccode_flat+funccode(i)+ascii(31);
              end
+             funccode_flat=funccode_flat+funccode(s(1));
 
              // Create input script list
 
@@ -77,7 +81,7 @@ function out = PAsolve(funcname, args, varargin)
 
              selectionScript = strcat(['file:',fullfile(schedulerdir,'extensions','scilab','checkScilab.js')]);
 
-             results = sciSolve(inputscripts, funccode_flat, mainscript, selectionScript, debugv);
+             results = sciSolve(inputscripts, funcname, funccode_flat, mainscript, selectionScript, debugv);
 
              out = list();
              for i=1:max(size(results))

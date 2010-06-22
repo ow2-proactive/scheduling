@@ -47,30 +47,32 @@ int sci_connect(char *fname)
 
 int sci_sciSolve(char *fname)
 {
- int m1,n1,m2,n2,l2,m3,n3,l3,m4,n4,l4,m5,n5,l5,nsmm6,nsnn6,err=0;
- char  **Str1,**Str6;
- CheckRhs(5,5);
+ int m1,n1,m2,n2,l2,m3,n3,l3,m4,n4,l4,m5,n5,l5,m6,n6,l6,nsmm7,nsnn7,err=0;
+ char  **Str1,**Str7;
+ CheckRhs(6,6);
  CheckLhs(1,1);
  /*  checking variable inputscripts */
  GetRhsVar(1,"S",&m1,&n1,&Str1);
  CheckOneDim(1,1,m1,1);
- /*  checking variable functionsDefinition */
+ /*  checking variable functionName */
  GetRhsVar(2,"c",&m2,&n2,&l2);
- /*  checking variable mainscript */
+ /*  checking variable functionsDefinition */
  GetRhsVar(3,"c",&m3,&n3,&l3);
- /*  checking variable selectScript */
+ /*  checking variable mainscript */
  GetRhsVar(4,"c",&m4,&n4,&l4);
+ /*  checking variable selectScript */
+ GetRhsVar(5,"c",&m5,&n5,&l5);
  /*  checking variable debug */
- GetRhsVar(5,"i",&m5,&n5,&l5);
- CheckScalar(5,m5,n5);
+ GetRhsVar(6,"i",&m6,&n6,&l6);
+ CheckScalar(6,m6,n6);
  /* cross variable size checking */
- C2F(csciSolve)(&Str1,cstk(l2),cstk(l3),cstk(l4),istk(l5),&Str6,&n1,&m2,&m3,&m4,&err);
+ C2F(csciSolve)(&Str1,cstk(l2),cstk(l3),cstk(l4),cstk(l5),istk(l6),&Str7,&n1,&m2,&m3,&m4,&m5,&err);
  if (err >  0) {
   Scierror(999,"%s: Internal Error \n",fname);
   return 0;
  };
- LhsVar(1)= 6;
- CreateVarFromPtr(6, "S",&m1,&n1,Str6);
- FreeRhsSVar(Str6);
+ LhsVar(1)= 7;
+ CreateVarFromPtr(7, "S",&m1,&n1,Str7);
+ FreeRhsSVar(Str7);
  return 0;
 }

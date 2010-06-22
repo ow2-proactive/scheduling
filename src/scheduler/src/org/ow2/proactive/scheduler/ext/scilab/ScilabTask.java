@@ -96,6 +96,12 @@ public class ScilabTask extends JavaExecutable {
     protected String functionsDefinition = null;
 
     /**
+     * Scilab Function name
+     */
+
+    protected String functionName = null;
+
+    /**
      * The lines of the Scilab script
      */
     protected ArrayList<String> scriptLines = null;
@@ -488,6 +494,11 @@ public class ScilabTask extends JavaExecutable {
             functionsDefinition = functionsDef;
         }
 
+        String funcn = (String) args.get("functionName");
+        if (funcn != null) {
+            functionName = funcn;
+        }
+
         String outputs = (String) args.get("outputs");
         if (outputs != null) {
             out_set = outputs.split("[ ,]+");
@@ -542,7 +553,7 @@ public class ScilabTask extends JavaExecutable {
             outDebug.println("[" + new java.util.Date() + " " + host + " ScilabTask] Initializing");
         }
 
-        sw.init(inputScript, functionsDefinition, scriptLines, out_set, debug);
+        sw.init(inputScript, functionName, functionsDefinition, scriptLines, out_set, debug);
 
         if (debug) {
             System.out.println("[" + new java.util.Date() + " " + host + " ScilabTask] Executing");

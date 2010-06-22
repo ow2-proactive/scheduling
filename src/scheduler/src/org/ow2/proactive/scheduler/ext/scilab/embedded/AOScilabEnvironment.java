@@ -294,8 +294,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      * @param mainScripts  main scripts
      * @param priority     priority of the job
      */
-    public ArrayList<ResultsAndLogs> solve(String[] inputScripts, String functionsDefinition,
-            String mainScripts, URL scriptURL, JobPriority priority, boolean debug) {
+    public ArrayList<ResultsAndLogs> solve(String[] inputScripts, String functionName,
+            String functionsDefinition, String mainScripts, URL scriptURL, JobPriority priority, boolean debug) {
         if (schedulerStopped) {
             System.err.println("[AOScilabEnvironment] The Scheduler is stopped");
             return new ArrayList<ResultsAndLogs>();
@@ -340,6 +340,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
             job.setLogFile(logFile.getPath());
         }
         if (debug) {
+            System.out.println("[AOScilabEnvironment] function name:");
+            System.out.println(functionName);
             System.out.println("[AOScilabEnvironment] function definition:");
             System.out.println(functionsDefinition);
             System.out.println("[AOScilabEnvironment] main script:");
@@ -358,6 +360,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                 schedulerTask.addArgument("debug", "true");
                 System.out.println(inputScripts[i]);
             }
+            schedulerTask.addArgument("functionName", functionName);
             schedulerTask.addArgument("functionsDefinition", functionsDefinition);
             schedulerTask.addArgument("script", mainScripts);
 
@@ -693,9 +696,9 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                 .getName(), new Object[] {});
         aose.join("//localhost");
         aose.login("demo", "demo");
-        ArrayList<ResultsAndLogs> ret = aose.solve(new String[] { "in=2" }, "out=in*in;", null, null,
-                JobPriority.NORMAL, true);
-        System.out.println(ret);
+        //ArrayList<ResultsAndLogs> ret = aose.solve(new String[] { "in=2" }, "out=in*in;", null, null,
+        //        JobPriority.NORMAL, true);
+        //System.out.println(ret);
     }
 
 }

@@ -70,7 +70,7 @@ void C2F(cinitEmbedded) (int *err)
     }
 
     //solveId = (*env)->GetStaticMethodID(env,scilabSolverClass, "solve", "([Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)[[Ljava/lang/String;");
-    solveId = (*env)->GetStaticMethodID(env,scilabSolverClass, "solve", "([Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)[Lorg/ow2/proactive/scheduler/ext/scilab/embedded/ResultsAndLogs;");
+    solveId = (*env)->GetStaticMethodID(env,scilabSolverClass, "solve", "([Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)[Lorg/ow2/proactive/scheduler/ext/scilab/embedded/ResultsAndLogs;");
     if (solveId == 0) {
         sciprint("[ScilabEmbeddedc] Couldn't get solve method\n");
         *err = 2;
@@ -178,17 +178,19 @@ void C2F(cconnect) (url, login, passwd, u, l, p, err)
 
 }
 
-void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript, debug, results, n, t, m, s, err)
+void C2F(csciSolve)(inputScripts, functionName, functionsDefinition, mainscript, selectScript, debug, results, n, t, m, s, err)
     int *n,*t, *m,*s,*debug, *err;
     char ***inputScripts;
     char ***results;
     const char *mainscript;
     const char *selectScript;
+    const char *functionName;
     const char *functionsDefinition;
 {
     jstring jstr ;
     jobjectArray inputScriptsArray ;
     jstring currentMainScript;
+    jstring functionNameJava;
     jstring functionsDefinitionJava;
     jstring selectionScript ;
     jobjectArray resultsArray;
@@ -220,6 +222,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
 
     // Initialization of the main scripts
     currentMainScript = (*env)->NewStringUTF(env,mainscript);
+    functionNameJava = (*env)->NewStringUTF(env,functionName);
     functionsDefinitionJava = (*env)->NewStringUTF(env,functionsDefinition);
     selectionScript = (*env)->NewStringUTF(env,selectScript);
     debugVal = *debug;
@@ -230,7 +233,7 @@ void C2F(csciSolve)(inputScripts, functionsDefinition, mainscript, selectScript,
         (*env)->SetObjectArrayElement(env, inputScriptsArray, i, jstr);
     }
 
-    resultsAndLogsArray = (jobjectArray) (*env)->CallStaticObjectMethod(env,scilabSolverClass, solveId, inputScriptsArray, functionsDefinitionJava, currentMainScript,selectionScript, 3, debugVal);
+    resultsAndLogsArray = (jobjectArray) (*env)->CallStaticObjectMethod(env,scilabSolverClass, solveId, inputScriptsArray, functionNameJava, functionsDefinitionJava, currentMainScript,selectionScript, 3, debugVal);
     if (checkException()) {
        sciprint("[ScilabEmbeddedc] Exception occured in the job execution\n");
         *err = 1;

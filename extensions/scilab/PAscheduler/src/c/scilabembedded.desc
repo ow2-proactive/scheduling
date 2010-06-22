@@ -16,16 +16,18 @@ passwd          char
 
 out empty
 ***********************
-sciSolve    inputscripts functionsDefinition mainscript selectScript debug
+sciSolve    inputscripts functionName functionsDefinition mainscript selectScript debug
 inputscripts        stringmat 1 n
+functionName        string k
 functionsDefinition string t
 mainscript          string m
 selectScript        string s
 debug               scalar
 results             stringmat 1 n
 
-csciSolve    inputscripts functionsDefinition mainscript selectScript debug results n t m s err
+csciSolve    inputscripts functionName functionsDefinition mainscript selectScript debug results n k t m s err
 inputscripts        Cstringv
+functionName        char
 functionsDefinition char
 mainscript          char
 selectScript        char
