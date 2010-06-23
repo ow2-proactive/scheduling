@@ -43,13 +43,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
@@ -74,6 +80,10 @@ public class ResourceManagerModel extends ConsoleModel {
         ".proactive" + File.separator + "rm-client.js";
     private static final String JS_INIT_FILE = "ResourceManagerActions.js";
     protected static final int cmdHelpMaxCharLength = 28;
+    private static final String YES = "yes";
+    private static final String NO = "no";
+    private static final String YES_NO = "(" + YES + "/" + NO + ")";
+
     protected ResourceManager rm;
     private ArrayList<Command> commands;
 
@@ -133,6 +143,7 @@ public class ResourceManagerModel extends ConsoleModel {
         commands.add(new Command("myaccount()", "Display current user account information"));
         commands.add(new Command("account(username)", "Display account information by username"));
         commands.add(new Command("reloadpermissions()", "Reload the permission file"));
+        commands.add(new Command("reconnect()", "Try to reconnect this console to the server"));
         commands
                 .add(new Command("exec(scriptFilePath)",
                     "Execute the content of the given script file (parameter is a string representing a script-file path)"));
@@ -169,10 +180,12 @@ public class ResourceManagerModel extends ConsoleModel {
         eval(readFileContent(br));
         //read default js env file if exist
         if (new File(DEFAULT_INIT_JS).exists()) {
+            console.print("! Loading environment from '" + DEFAULT_INIT_JS + "' !" + newline);
             this.exec_(DEFAULT_INIT_JS);
         }
         //read js env argument if any
         if (this.initEnvFileName != null) {
+            console.print("! Loading environment from '" + this.initEnvFileName + "' !" + newline);
             this.exec_(this.initEnvFileName);
         }
     }
@@ -203,39 +216,44 @@ public class ResourceManagerModel extends ConsoleModel {
         console.stop();
     }
 
+    @Override
+    public void handleExceptionDisplay(String msg, Throwable t) {
+        if (t instanceof ProActiveRuntimeException) {
+            String tmp = msg + " : ResourceManager server seems to be unreachable !";
+            if (!displayOnStdStream) {
+                console.error(tmp);
+            } else {
+                System.err.printf(tmp);
+            }
+        } else {
+            super.handleExceptionDisplay(msg, t);
+        }
+    }
+
     //***************** COMMAND LISTENER *******************
+    //note : method marked with a "_" are called from JS evaluation
 
-    public static void setExceptionMode(boolean displayStack, boolean displayOnDemand) {
-        getModel().checkIsReady();
-        getModel().setExceptionMode_(displayStack, displayOnDemand);
-    }
-
-    public static void help() {
-        getModel().checkIsReady();
-        getModel().help_();
-    }
-
-    public static void shutdown(boolean preempt) {
-        getModel().checkIsReady();
-        getModel().shutdown_(preempt);
-    }
-
-    private void shutdown_(boolean preempt) {
+    public void shutdown_(boolean preempt) {
         try {
-            rm.shutdown(preempt);
-            print("Shutdown request sent to Resource Manager, controller will shutdown !");
-            terminated = true;
+            boolean success = false;
+            if (!displayOnStdStream) {
+                String s = console.readStatement("Are you sure you want to shutdown the Resource Manager ? " +
+                    YES_NO + " > ");
+                success = s.equalsIgnoreCase(YES);
+            }
+            if (success || displayOnStdStream) {
+                rm.shutdown(preempt);
+                print("Shutdown request sent to Resource Manager, controller will shutdown !");
+                terminated = true;
+            } else {
+                print("Shutdown aborted !");
+            }
         } catch (Exception e) {
             handleExceptionDisplay("Error while shutting down the RM", e);
         }
     }
 
-    public static void removens(String nodeSourceName, boolean preempt) {
-        getModel().checkIsReady();
-        getModel().removens_(nodeSourceName, preempt);
-    }
-
-    private void removens_(String nodeSourceName, boolean preempt) {
+    public void removens_(String nodeSourceName, boolean preempt) {
         try {
             BooleanWrapper res = rm.removeNodeSource(nodeSourceName, preempt);
             if (res.booleanValue()) {
@@ -248,81 +266,74 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    public static void listns() {
-        getModel().checkIsReady();
-        getModel().listns_();
-    }
-
-    private void listns_() {
-        List<String> list;
-        List<RMNodeSourceEvent> listns = rm.getMonitoring().getState().getNodeSource();
-        ObjectArrayFormatter oaf = new ObjectArrayFormatter();
-        oaf.setMaxColumnLength(70);
-        //space between column
-        oaf.setSpace(3);
-        //title line
-        list = new ArrayList<String>();
-        list.add("SOURCE NAME");
-        list.add("DESCRIPTION");
-        list.add("PROVIDER");
-        oaf.setTitle(list);
-        //separator
-        oaf.addEmptyLine();
-        for (RMNodeSourceEvent evt : listns) {
-            list = new ArrayList<String>();
-            list.add(evt.getSourceName());
-            list.add(evt.getSourceDescription());
-            list.add(evt.getNodeSourceProvider());
-            oaf.addLine(list);
-        }
-        print(Tools.getStringAsArray(oaf));
-    }
-
-    public static void listnodes() {
-        getModel().checkIsReady();
-        getModel().listnodes_();
-    }
-
-    private void listnodes_() {
-        List<RMNodeEvent> listne = rm.getMonitoring().getState().getNodesEvents();
-        if (listne.size() == 0) {
-            print("No nodes handled by Resource Manager");
-        } else {
+    public void listns_() {
+        try {
             List<String> list;
+            List<RMNodeSourceEvent> listns = rm.getMonitoring().getState().getNodeSource();
             ObjectArrayFormatter oaf = new ObjectArrayFormatter();
-            oaf.setMaxColumnLength(80);
+            oaf.setMaxColumnLength(70);
             //space between column
-            oaf.setSpace(2);
+            oaf.setSpace(3);
             //title line
             list = new ArrayList<String>();
             list.add("SOURCE NAME");
-            list.add("HOSTNAME");
-            list.add("STATE");
-            list.add("SINCE");
-            list.add("URL");
+            list.add("DESCRIPTION");
             list.add("PROVIDER");
-            list.add("OWNER");
             oaf.setTitle(list);
             //separator
             oaf.addEmptyLine();
-            for (RMNodeEvent evt : listne) {
+            for (RMNodeSourceEvent evt : listns) {
                 list = new ArrayList<String>();
-                list.add(evt.getNodeSource());
-                list.add(evt.getHostName());
-                list.add(evt.getNodeState().toString());
-                list.add(evt.getTimeStampFormatted());
-                list.add(evt.getNodeUrl());
-                list.add(evt.getNodeProvider() == null ? "" : evt.getNodeProvider());
-                list.add(evt.getNodeOwner() == null ? "" : evt.getNodeOwner());
+                list.add(evt.getSourceName());
+                list.add(evt.getSourceDescription());
+                list.add(evt.getNodeSourceProvider());
                 oaf.addLine(list);
             }
             print(Tools.getStringAsArray(oaf));
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retreiving nodeSources informations", e);
         }
     }
 
-    public static boolean createns(String nodeSourceName, String[] imParams, String[] policyParams) {
-        getModel().checkIsReady();
-        return getModel().createns_(nodeSourceName, imParams, policyParams);
+    public void listnodes_() {
+        try {
+            List<RMNodeEvent> listne = rm.getMonitoring().getState().getNodesEvents();
+            if (listne.size() == 0) {
+                print("No nodes handled by Resource Manager");
+            } else {
+                List<String> list;
+                ObjectArrayFormatter oaf = new ObjectArrayFormatter();
+                oaf.setMaxColumnLength(80);
+                //space between column
+                oaf.setSpace(2);
+                //title line
+                list = new ArrayList<String>();
+                list.add("SOURCE NAME");
+                list.add("HOSTNAME");
+                list.add("STATE");
+                list.add("SINCE");
+                list.add("URL");
+                list.add("PROVIDER");
+                list.add("OWNER");
+                oaf.setTitle(list);
+                //separator
+                oaf.addEmptyLine();
+                for (RMNodeEvent evt : listne) {
+                    list = new ArrayList<String>();
+                    list.add(evt.getNodeSource());
+                    list.add(evt.getHostName());
+                    list.add(evt.getNodeState().toString());
+                    list.add(evt.getTimeStampFormatted());
+                    list.add(evt.getNodeUrl());
+                    list.add(evt.getNodeProvider() == null ? "" : evt.getNodeProvider());
+                    list.add(evt.getNodeOwner() == null ? "" : evt.getNodeOwner());
+                    oaf.addLine(list);
+                }
+                print(Tools.getStringAsArray(oaf));
+            }
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retreiving nodes informations", e);
+        }
     }
 
     private Object[] packPluginParameters(String[] params) throws RMException, ClassNotFoundException {
@@ -348,7 +359,7 @@ public class ResourceManagerModel extends ConsoleModel {
         return null;
     }
 
-    private boolean createns_(String nodeSourceName, String[] imInputParams, String[] policyInputParams) {
+    public boolean createns_(String nodeSourceName, String[] imInputParams, String[] policyInputParams) {
 
         try {
             String imName = DefaultInfrastructureManager.class.getName();
@@ -376,22 +387,16 @@ public class ResourceManagerModel extends ConsoleModel {
         return true;
     }
 
-    public static void removenode(String nodeURL, boolean preempt) {
-        getModel().checkIsReady();
-        getModel().removenode_(nodeURL, preempt);
+    public void removenode_(String nodeURL, boolean preempt) {
+        try {
+            rm.removeNode(nodeURL, preempt);
+            print("Nodes '" + nodeURL + "' removal request sent to Resource Manager");
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while removing node", e);
+        }
     }
 
-    private void removenode_(String nodeURL, boolean preempt) {
-        rm.removeNode(nodeURL, preempt);
-        print("Nodes '" + nodeURL + "' removal request sent to Resource Manager");
-    }
-
-    public static void addnode(String nodeName, String nodeSourceName) {
-        getModel().checkIsReady();
-        getModel().addnode_(nodeName, nodeSourceName);
-    }
-
-    private void addnode_(String nodeName, String nodeSourceName) {
+    public void addnode_(String nodeName, String nodeSourceName) {
         try {
             BooleanWrapper result;
             if (nodeSourceName != null) {
@@ -403,61 +408,90 @@ public class ResourceManagerModel extends ConsoleModel {
             if (result.booleanValue()) {
                 print("Adding node '" + nodeName + "' request sent to Resource Manager");
             }
-        } catch (AddingNodesException e) {
+        } catch (Exception e) {
             handleExceptionDisplay("Error while adding node '" + nodeName + "'", e);
         }
     }
 
-    public static void showRuntimeData() {
-        final ResourceManagerModel model = getModel();
-        model.checkIsReady();
+    public void listInfrastructures_() {
         try {
-            model.print(model.jmxInfoViewer.getInfo("ProActiveResourceManager:name=RuntimeData"));
+            Collection<PluginDescriptor> plugins = rm.getSupportedNodeSourceInfrastructures();
+            print("Available node source infrastructures:");
+            for (PluginDescriptor plugin : plugins) {
+                print(plugin.toString());
+            }
         } catch (Exception e) {
-            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+            handleExceptionDisplay("Error while retreiving infrastructure informations", e);
         }
     }
 
-    public static void showMyAccount() {
-        final ResourceManagerModel model = getModel();
-        model.checkIsReady();
+    public void listPolicies_() {
         try {
-            model.print(model.jmxInfoViewer.getInfo("ProActiveResourceManager:name=MyAccount"));
+            Collection<PluginDescriptor> plugins = rm.getSupportedNodeSourcePolicies();
+            print("Available node source policies:");
+            for (PluginDescriptor plugin : plugins) {
+                print(plugin.toString());
+            }
         } catch (Exception e) {
-            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+            handleExceptionDisplay("Error while retreiving policies informations", e);
         }
     }
 
-    public static void showAccount(final String username) {
-        final ResourceManagerModel model = getModel();
-        model.checkIsReady();
+    public void reconnect_() {
         try {
-            model.jmxInfoViewer.setAttribute("ProActiveResourceManager:name=AllAccounts", "Username",
-                    username);
-            model.print(model.jmxInfoViewer.getInfo("ProActiveResourceManager:name=MyAccount"));
+            connectRM(authentication, credentials);
+            print("Console has been successfully re-connected to the ResourceManager !");
+        } catch (LoginException e) {
+            //should not append in such a context !
+        } catch (RuntimeException re) {
+            try {
+                authentication = RMConnection.join(this.serverURL);
+                connectRM(authentication, credentials);
+                print("Console has been successfully re-connected to the ResourceManager !");
+            } catch (Exception e) {
+                handleExceptionDisplay("*ERROR*", e);
+            }
         } catch (Exception e) {
-            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+            handleExceptionDisplay("*ERROR*", e);
         }
     }
 
-    public static void refreshPermissionPolicy() {
-        final ResourceManagerModel model = getModel();
-        model.checkIsReady();
+    public void showRuntimeData_() {
         try {
-            model.jmxInfoViewer.invoke("ProActiveResourceManager:name=Management", "refreshPermissionPolicy",
+            print(jmxInfoViewer.getInfo("ProActiveResourceManager:name=RuntimeData"));
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
+
+    public void showMyAccount_() {
+        try {
+            print(jmxInfoViewer.getInfo("ProActiveResourceManager:name=MyAccount"));
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
+
+    public void showAccount_(final String username) {
+        try {
+            jmxInfoViewer.setAttribute("ProActiveResourceManager:name=AllAccounts", "Username", username);
+            print(jmxInfoViewer.getInfo("ProActiveResourceManager:name=AllAccounts"));
+        } catch (Exception e) {
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
+        }
+    }
+
+    public void refreshPermissionPolicy_() {
+        try {
+            jmxInfoViewer.invoke("ProActiveResourceManager:name=Management", "refreshPermissionPolicy",
                     new Object[0]);
+            print("\nThe permission file has been successfully reloaded.");
         } catch (Exception e) {
-            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
-        getModel().print("\nThe permission file has been successfully reloaded.");
     }
 
-    public static void exec(String commandFilePath) {
-        getModel().checkIsReady();
-        getModel().exec_(commandFilePath);
-    }
-
-    private void exec_(String commandFilePath) {
+    public void exec_(String commandFilePath) {
         try {
             File f = new File(commandFilePath.trim());
             BufferedReader br = new BufferedReader(new FileReader(f));
@@ -468,30 +502,30 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    public static void setLogsDir(String logsDir) {
+    public void setLogsDir_(String logsDir) {
         if (logsDir == null || "".equals(logsDir)) {
-            getModel().error("Given logs directory is null or empty !");
+            error("Given logs directory is null or empty !");
             return;
         }
         File dir = new File(logsDir);
         if (!dir.exists()) {
-            getModel().error("Given logs directory does not exist !");
+            error("Given logs directory does not exist !");
             return;
         }
         if (!dir.isDirectory()) {
-            getModel().error("Given logsDir is not a directory !");
+            error("Given logsDir is not a directory !");
             return;
         }
         dir = new File(logsDir + File.separator + rmLogFile);
         if (!dir.exists()) {
-            getModel().error("Given logs directory does not contains Scheduler logs files !");
+            error("Given logs directory does not contains Scheduler logs files !");
             return;
         }
-        getModel().print("Logs Directory set to '" + logsDir + "' !");
+        print("Logs Directory set to '" + logsDir + "' !");
         logsDirectory = logsDir;
     }
 
-    public static void viewlogs(String nbLines) {
+    public void viewlogs_(String nbLines) {
         if (!"".equals(nbLines)) {
             try {
                 logsNbLines = Integer.parseInt(nbLines);
@@ -499,7 +533,7 @@ public class ResourceManagerModel extends ConsoleModel {
                 //logsNbLines not set
             }
         }
-        getModel().print(readLastNLines(rmLogFile));
+        print(readLastNLines(rmLogFile));
     }
 
     /**
@@ -532,12 +566,7 @@ public class ResourceManagerModel extends ConsoleModel {
         return toret.toString();
     }
 
-    public static void exit() {
-        getModel().checkIsReady();
-        getModel().exit_();
-    }
-
-    private void exit_() {
+    public void exit_() {
         if (allowExitCommand) {
             console.print("Exiting controller.");
             try {
@@ -550,12 +579,7 @@ public class ResourceManagerModel extends ConsoleModel {
         }
     }
 
-    public static ResourceManager getResourceManager() {
-        getModel().checkIsReady();
-        return getModel().getResourceManager_();
-    }
-
-    private ResourceManager getResourceManager_() {
+    public ResourceManager getResourceManager() {
         return rm;
     }
 
@@ -579,14 +603,30 @@ public class ResourceManagerModel extends ConsoleModel {
 
     //**************** GETTER / SETTER ******************
 
+    protected String serverURL;
+    protected RMAuthentication authentication;
+    protected Credentials credentials;
+
     /**
-     * Connect the Resource manager value to the given rm value
+     * Connect the RM using given authentication interface and credentials
      *
-     * @param rm the Resource manager to connect
+     * @param auth the authentication interface on which to connect
+     * @param credentials the credentials to be used for the connection
+     * @throws LoginException If bad credentials are provided
      */
+    public void connectRM(RMAuthentication auth, Credentials credentials) throws LoginException {
+        if (auth == null || credentials == null) {
+            throw new NullPointerException("Given authentication part is null");
+        }
+        this.rm = auth.login(credentials);
+        this.authentication = auth;
+        this.credentials = credentials;
+        this.serverURL = auth.getHostURL();
+    }
+
     public void connectRM(ResourceManager rm) {
         if (rm == null) {
-            throw new NullPointerException("Given Resource Manager is null");
+            throw new NullPointerException("Given RM must not be null");
         }
         this.rm = rm;
     }
@@ -600,19 +640,4 @@ public class ResourceManagerModel extends ConsoleModel {
         jmxInfoViewer = info;
     }
 
-    public static void listInfrastructures() {
-        getModel().checkIsReady();
-        getModel().print("Available node source infrastructures:");
-        for (PluginDescriptor plugin : getModel().rm.getSupportedNodeSourceInfrastructures()) {
-            getModel().print(plugin.toString());
-        }
-    }
-
-    public static void listPolicies() {
-        getModel().checkIsReady();
-        getModel().print("Available node source policies:");
-        for (PluginDescriptor plugin : getModel().rm.getSupportedNodeSourcePolicies()) {
-            getModel().print(plugin.toString());
-        }
-    }
 }

@@ -47,9 +47,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.security.auth.login.LoginException;
+
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -131,10 +139,6 @@ public class SchedulerModel extends ConsoleModel {
         return (SchedulerModel) model;
     }
 
-    private static SchedulerModel getModel() {
-        return (SchedulerModel) model;
-    }
-
     protected SchedulerModel(boolean allowExitCommand) {
         this.allowExitCommand = allowExitCommand;
         commands = new ArrayList<Command>();
@@ -197,6 +201,7 @@ public class SchedulerModel extends ConsoleModel {
             "Reconnect a Resource Manager (parameter is a string representing the new rmURL)"));
         commands.add(new Command("changepolicy(fullName)",
             "Change the current scheduling policy, (argument is the new policy full name)"));
+        commands.add(new Command("reconnect()", "Try to reconnect this console to the server"));
         commands.add(new Command("setlogsdir(logsDir)",
             "Set the directory where the log are located, (default is SCHEDULER_HOME/.logs"));
         commands.add(new Command("viewlogs(nbLines)",
@@ -220,10 +225,12 @@ public class SchedulerModel extends ConsoleModel {
         eval(readFileContent(br));
         //read default js env file if exist
         if (new File(DEFAULT_INIT_JS).exists()) {
+            console.print("! Loading environment from '" + DEFAULT_INIT_JS + "' !" + newline);
             this.exec_(DEFAULT_INIT_JS);
         }
         //read js env argument if any
         if (this.initEnvFileName != null) {
+            console.print("! Loading environment from '" + this.initEnvFileName + "' !" + newline);
             this.exec_(this.initEnvFileName);
         }
     }
@@ -252,9 +259,13 @@ public class SchedulerModel extends ConsoleModel {
         console.start(" > ");
         console.print("Type command here (type '?' or help() to see the list of commands)" + newline);
         initialize();
-        String stmt;
+        SchedulerStatus status;
         while (!terminated) {
-            SchedulerStatus status = scheduler.getStatus();
+            status = null;
+            try {
+                status = scheduler.getStatus();
+            } catch (Exception e) {
+            }
             String prompt = " ";
             if (status != SchedulerStatus.STARTED) {
                 try {
@@ -264,7 +275,7 @@ public class SchedulerModel extends ConsoleModel {
                     prompt += "[Unknown] ";
                 }
             }
-            stmt = console.readStatement(prompt + "> ");
+            String stmt = console.readStatement(prompt + "> ");
             if ("?".equals(stmt)) {
                 console.print(newline + helpScreen());
             } else {
@@ -277,8 +288,22 @@ public class SchedulerModel extends ConsoleModel {
 
     @Override
     public void handleExceptionDisplay(String msg, Throwable t) {
-        if (t instanceof PermissionException) {
+        if (t instanceof NotConnectedException) {
+            String tmp = "Your session has expired, please try to reconnect server using reconnect() command !";
+            if (!displayOnStdStream) {
+                console.error(tmp);
+            } else {
+                System.err.printf(tmp);
+            }
+        } else if (t instanceof PermissionException) {
             String tmp = msg + " : " + (t.getMessage() == null ? t : t.getMessage());
+            if (!displayOnStdStream) {
+                console.error(tmp);
+            } else {
+                System.err.printf(tmp);
+            }
+        } else if (t instanceof ProActiveRuntimeException) {
+            String tmp = msg + " : Scheduler server seems to be unreachable !";
             if (!displayOnStdStream) {
                 console.error(tmp);
             } else {
@@ -290,23 +315,9 @@ public class SchedulerModel extends ConsoleModel {
     }
 
     //***************** COMMAND LISTENER *******************
+    //note : method marked with a "_" are called from JS evaluation
 
-    public static void setExceptionMode(boolean displayStack, boolean displayOnDemand) {
-        getModel().checkIsReady();
-        getModel().setExceptionMode_(displayStack, displayOnDemand);
-    }
-
-    public static void help() {
-        getModel().checkIsReady();
-        getModel().help_();
-    }
-
-    public static String submit(String xmlDescriptor) {
-        getModel().checkIsReady();
-        return getModel().submit_(xmlDescriptor);
-    }
-
-    private String submit_(String xmlDescriptor) {
+    public String submit_(String xmlDescriptor) {
         try {
             Job job = JobFactory.getFactory().createJob(xmlDescriptor);
             JobId id = scheduler.submit(job);
@@ -318,12 +329,7 @@ public class SchedulerModel extends ConsoleModel {
         return "";
     }
 
-    public static boolean pause(String jobId) {
-        getModel().checkIsReady();
-        return getModel().pause_(jobId);
-    }
-
-    private boolean pause_(String jobId) {
+    public boolean pause_(String jobId) {
         boolean success = false;
         try {
             success = scheduler.pauseJob(jobId);
@@ -339,12 +345,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static boolean resume(String jobId) {
-        getModel().checkIsReady();
-        return getModel().resume_(jobId);
-    }
-
-    private boolean resume_(String jobId) {
+    public boolean resume_(String jobId) {
         boolean success = false;
         try {
             success = scheduler.resumeJob(jobId);
@@ -360,12 +361,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static boolean kill(String jobId) {
-        getModel().checkIsReady();
-        return getModel().kill_(jobId);
-    }
-
-    private boolean kill_(String jobId) {
+    public boolean kill_(String jobId) {
         boolean success = false;
         try {
             success = scheduler.killJob(jobId);
@@ -381,12 +377,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static void remove(String jobId) {
-        getModel().checkIsReady();
-        getModel().remove_(jobId);
-    }
-
-    private void remove_(String jobId) {
+    public void remove_(String jobId) {
         try {
             scheduler.removeJob(jobId);
             print("Job " + jobId + " removed.");
@@ -395,12 +386,7 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public static JobResult result(String jobId) {
-        getModel().checkIsReady();
-        return getModel().result_(jobId);
-    }
-
-    private JobResult result_(String jobId) {
+    public JobResult result_(String jobId) {
         try {
             JobResult result = scheduler.getJobResult(jobId);
 
@@ -427,12 +413,7 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public static TaskResult tresult(String jobId, String taskName) {
-        getModel().checkIsReady();
-        return getModel().tresult_(jobId, taskName);
-    }
-
-    private TaskResult tresult_(String jobId, String taskName) {
+    public TaskResult tresult_(String jobId, String taskName) {
         try {
             TaskResult result = scheduler.getTaskResult(jobId, taskName);
 
@@ -454,12 +435,7 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public static void output(String jobId) {
-        getModel().checkIsReady();
-        getModel().output_(jobId);
-    }
-
-    private void output_(String jobId) {
+    public void output_(String jobId) {
         try {
             JobResult result = scheduler.getJobResult(jobId);
 
@@ -483,12 +459,7 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public static void toutput(String jobId, String taskName) {
-        getModel().checkIsReady();
-        getModel().toutput_(jobId, taskName);
-    }
-
-    private void toutput_(String jobId, String taskName) {
+    public void toutput_(String jobId, String taskName) {
         try {
             TaskResult result = scheduler.getTaskResult(jobId, taskName);
 
@@ -507,12 +478,7 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public static void priority(String jobId, String newPriority) {
-        getModel().checkIsReady();
-        getModel().priority_(jobId, newPriority);
-    }
-
-    private void priority_(String jobId, String newPriority) {
+    public void priority_(String jobId, String newPriority) {
         try {
             JobPriority prio = JobPriority.findPriority(newPriority);
             scheduler.changeJobPriority(jobId, prio);
@@ -522,12 +488,7 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public static JobState jobState(String jobId) {
-        getModel().checkIsReady();
-        return getModel().jobState_(jobId);
-    }
-
-    private JobState jobState_(String jobId) {
+    public JobState jobState_(String jobId) {
         List<String> list;
         try {
             JobState js = scheduler.getJobState(jobId);
@@ -587,12 +548,7 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public static void schedulerState() {
-        getModel().checkIsReady();
-        getModel().schedulerState_();
-    }
-
-    private void schedulerState_() {
+    public void schedulerState_() {
         List<String> list;
         try {
             SchedulerState state = scheduler.getState();
@@ -660,75 +616,59 @@ public class SchedulerModel extends ConsoleModel {
         return list;
     }
 
-    public static void showRuntimeData() {
-        final SchedulerModel model = getModel();
+    public void showRuntimeData_() {
         try {
-            model.print(model.jmxInfoViewer.getInfo("ProActiveScheduler:name=RuntimeData"));
+            print(jmxInfoViewer.getInfo("ProActiveScheduler:name=RuntimeData"));
         } catch (Exception e) {
-            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
     }
 
-    public static void showMyAccount() {
-        final SchedulerModel model = getModel();
-        model.checkIsReady();
+    public void showMyAccount_() {
         try {
-            model.print(model.jmxInfoViewer.getInfo("ProActiveScheduler:name=MyAccount"));
+            print(jmxInfoViewer.getInfo("ProActiveScheduler:name=MyAccount"));
         } catch (Exception e) {
-            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
     }
 
-    public static void showAccount(final String username) {
-        final SchedulerModel model = getModel();
-        model.checkIsReady();
+    public void showAccount_(final String username) {
         try {
-            model.jmxInfoViewer.setAttribute("ProActiveScheduler:name=AllAccounts", "Username", username);
-            model.print(model.jmxInfoViewer.getInfo("ProActiveScheduler:name=MyAccount"));
+            jmxInfoViewer.setAttribute("ProActiveScheduler:name=AllAccounts", "Username", username);
+            print(jmxInfoViewer.getInfo("ProActiveScheduler:name=AllAccounts"));
         } catch (Exception e) {
-            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
     }
 
-    public static void refreshPermissionPolicy() {
-        final SchedulerModel model = getModel();
-        model.checkIsReady();
+    public void refreshPermissionPolicy_() {
         try {
-            model.jmxInfoViewer.invoke("ProActiveScheduler:name=Management", "refreshPermissionPolicy",
+            jmxInfoViewer.invoke("ProActiveScheduler:name=Management", "refreshPermissionPolicy",
                     new Object[0]);
         } catch (Exception e) {
-            model.handleExceptionDisplay("Error while retrieving JMX informations", e);
+            handleExceptionDisplay("Error while retrieving JMX informations", e);
         }
-        getModel().print("\nThe permission file has been successfully reloaded.");
+        print("\nThe permission file has been successfully reloaded.");
     }
 
-    public static void test() {
-        getModel().test_();
-    }
-
-    private void test_() {
+    public void test_() {
         try {
             String descriptorPath = System.getProperty("pa.scheduler.home") + "/samples/jobs_descriptors/";
-            getModel().submit_(descriptorPath + "Job_2_tasks.xml");
-            getModel().submit_(descriptorPath + "Job_8_tasks.xml");
-            getModel().submit_(descriptorPath + "Job_Aborted.xml");
-            getModel().submit_(descriptorPath + "Job_fork.xml");
-            getModel().submit_(descriptorPath + "Job_nativ.xml");
-            getModel().submit_(descriptorPath + "Job_PI.xml");
-            getModel().submit_(descriptorPath + "Job_pre_post.xml");
-            getModel().submit_(descriptorPath + "Job_with_dep.xml");
-            getModel().submit_(descriptorPath + "Job_with_select_script.xml");
+            submit_(descriptorPath + "Job_2_tasks.xml");
+            submit_(descriptorPath + "Job_8_tasks.xml");
+            submit_(descriptorPath + "Job_Aborted.xml");
+            submit_(descriptorPath + "Job_fork.xml");
+            submit_(descriptorPath + "Job_nativ.xml");
+            submit_(descriptorPath + "Job_PI.xml");
+            submit_(descriptorPath + "Job_pre_post.xml");
+            submit_(descriptorPath + "Job_with_dep.xml");
+            submit_(descriptorPath + "Job_with_select_script.xml");
         } catch (Exception e) {
             handleExceptionDisplay("Error while starting examples", e);
         }
     }
 
-    public static void exec(String commandFilePath) {
-        getModel().checkIsReady();
-        getModel().exec_(commandFilePath);
-    }
-
-    private void exec_(String commandFilePath) {
+    public void exec_(String commandFilePath) {
         try {
             File f = new File(commandFilePath.trim());
             BufferedReader br = new BufferedReader(new FileReader(f));
@@ -739,12 +679,7 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public static void exit() {
-        getModel().checkIsReady();
-        getModel().exit_();
-    }
-
-    private void exit_() {
+    public void exit_() {
         if (allowExitCommand) {
             console.print("Exiting controller.");
             try {
@@ -757,20 +692,11 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public static Scheduler getUserScheduler() {
-        getModel().checkIsReady();
-        return getModel().getUserScheduler_();
-    }
-
-    private Scheduler getUserScheduler_() {
+    public Scheduler getUserScheduler_() {
         return scheduler;
     }
 
-    public static boolean start() {
-        return getModel().start_();
-    }
-
-    private boolean start_() {
+    public boolean start_() {
         boolean success = false;
         try {
             success = scheduler.start();
@@ -786,11 +712,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static boolean stop() {
-        return getModel().stop_();
-    }
-
-    private boolean stop_() {
+    public boolean stop_() {
         boolean success = false;
         try {
             success = scheduler.stop();
@@ -806,11 +728,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static boolean pause() {
-        return getModel().pause_();
-    }
-
-    private boolean pause_() {
+    public boolean pause_() {
         boolean success = false;
         try {
             success = scheduler.pause();
@@ -826,11 +744,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static boolean freeze() {
-        return getModel().freeze_();
-    }
-
-    private boolean freeze_() {
+    public boolean freeze_() {
         boolean success = false;
         try {
             success = scheduler.freeze();
@@ -846,11 +760,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static boolean resume() {
-        return getModel().resume_();
-    }
-
-    private boolean resume_() {
+    public boolean resume_() {
         boolean success = false;
         try {
             success = scheduler.resume();
@@ -866,11 +776,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static boolean shutdown() {
-        return getModel().shutdown_();
-    }
-
-    private boolean shutdown_() {
+    public boolean shutdown_() {
         boolean success = false;
         try {
             if (!displayOnStdStream) {
@@ -900,11 +806,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static boolean kill() {
-        return getModel().kill_();
-    }
-
-    private boolean kill_() {
+    public boolean kill_() {
         boolean success = false;
         try {
             if (!displayOnStdStream) {
@@ -934,11 +836,7 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static boolean linkRM(String rmURL) {
-        return getModel().linkRM_(rmURL);
-    }
-
-    private boolean linkRM_(String rmURL) {
+    public boolean linkRM_(String rmURL) {
         boolean success = false;
         try {
             success = scheduler.linkResourceManager(rmURL.trim());
@@ -953,30 +851,49 @@ public class SchedulerModel extends ConsoleModel {
         return success;
     }
 
-    public static void setLogsDir(String logsDir) {
+    public void reconnect_() {
+        try {
+            connectScheduler(authentication, credentials);
+            print("Console has been successfully re-connected to the Scheduler !");
+        } catch (LoginException e) {
+            //should not append in such a context !
+        } catch (RuntimeException re) {
+            try {
+                authentication = SchedulerConnection.join(this.serverURL);
+                connectScheduler(authentication, credentials);
+                print("Console has been successfully re-connected to the Scheduler !");
+            } catch (Exception e) {
+                handleExceptionDisplay("*ERROR*", e);
+            }
+        } catch (Exception e) {
+            handleExceptionDisplay("*ERROR*", e);
+        }
+    }
+
+    public void setLogsDir_(String logsDir) {
         if (logsDir == null || "".equals(logsDir)) {
-            getModel().error("Given logs directory is null or empty !");
+            error("Given logs directory is null or empty !");
             return;
         }
         File dir = new File(logsDir);
         if (!dir.exists()) {
-            getModel().error("Given logs directory does not exist !");
+            error("Given logs directory does not exist !");
             return;
         }
         if (!dir.isDirectory()) {
-            getModel().error("Given logsDir is not a directory !");
+            error("Given logsDir is not a directory !");
             return;
         }
         dir = new File(logsDir + File.separator + schedulerLogFile);
         if (!dir.exists()) {
-            getModel().error("Given logs directory does not contains Scheduler logs files !");
+            error("Given logs directory does not contains Scheduler logs files !");
             return;
         }
-        getModel().print("Logs Directory set to '" + logsDir + "' !");
+        print("Logs Directory set to '" + logsDir + "' !");
         logsDirectory = logsDir;
     }
 
-    public static void viewlogs(String nbLines) {
+    public void viewlogs_(String nbLines) {
         if (!"".equals(nbLines)) {
             try {
                 logsNbLines = Integer.parseInt(nbLines);
@@ -984,10 +901,10 @@ public class SchedulerModel extends ConsoleModel {
                 //logsNbLines not set
             }
         }
-        getModel().print(readLastNLines(schedulerLogFile));
+        print(readLastNLines(schedulerLogFile));
     }
 
-    public static void viewDevlogs(String nbLines) {
+    public void viewDevlogs_(String nbLines) {
         if (!"".equals(nbLines)) {
             try {
                 logsNbLines = Integer.parseInt(nbLines);
@@ -995,7 +912,7 @@ public class SchedulerModel extends ConsoleModel {
                 //logsNbLines not set
             }
         }
-        getModel().print(readLastNLines(schedulerDevLogFile));
+        print(readLastNLines(schedulerDevLogFile));
     }
 
     /**
@@ -1028,26 +945,20 @@ public class SchedulerModel extends ConsoleModel {
         return toret.toString();
     }
 
-    public static void changePolicy(String newPolicyFullName) {
-        getModel().changePolicy_(newPolicyFullName);
-    }
-
     @SuppressWarnings("unchecked")
-    private void changePolicy_(String newPolicyFullName) {
+    public void changePolicy_(String newPolicyFullName) {
+        boolean success = false;
         try {
             Class<? extends Policy> klass = (Class<? extends Policy>) Class.forName(newPolicyFullName);
-            scheduler.changePolicy(klass);
+            success = scheduler.changePolicy(klass);
+            if (success) {
+                print("Policy successfully changed !");
+            } else {
+                error("Policy was not changed !");
+            }
         } catch (Exception e) {
             handleExceptionDisplay("*ERROR*", e);
         }
-    }
-
-    public static Scheduler getSchedulerInterface() {
-        return getModel().getSchedulerInterface_();
-    }
-
-    private Scheduler getSchedulerInterface_() {
-        return scheduler;
     }
 
     //****************** HELP SCREEN ********************
@@ -1078,14 +989,35 @@ public class SchedulerModel extends ConsoleModel {
         return scheduler;
     }
 
+    protected String serverURL;
+    protected SchedulerAuthenticationInterface authentication;
+    protected Credentials credentials;
+
     /**
-     * Connect the scheduler value to the given scheduler value
+     * Connect the scheduler using given authentication interface and creadentials
      *
-     * @param scheduler the scheduler to connect
+     * @param auth the authentication interface on which to connect
+     * @param credentials the credentials to be used for the connection
+     * @throws LoginException If bad credentials are provided
      */
+    public void connectScheduler(SchedulerAuthenticationInterface auth, Credentials credentials)
+            throws LoginException {
+        if (auth == null || credentials == null) {
+            throw new NullPointerException("Given authentication part is null");
+        }
+        try {
+            this.scheduler = auth.login(credentials);
+            this.authentication = auth;
+            this.credentials = credentials;
+            this.serverURL = auth.getHostURL();
+        } catch (AlreadyConnectedException e) {
+            //miam miam
+        }
+    }
+
     public void connectScheduler(Scheduler scheduler) {
         if (scheduler == null) {
-            throw new NullPointerException("Given Scheduler is null");
+            throw new NullPointerException("Given scheduler must not be null");
         }
         this.scheduler = scheduler;
     }

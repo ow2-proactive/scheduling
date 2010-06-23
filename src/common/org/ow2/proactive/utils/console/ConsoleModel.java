@@ -133,7 +133,7 @@ public abstract class ConsoleModel {
      * @param displayStack true if the stack must be displayed, false otherwise. If false, second parameter is ignored.
      * @param displayOnDemand true if the console ask if user want to display the stack or not.
      */
-    protected void setExceptionMode_(boolean displayStack, boolean displayOnDemand) {
+    public void setExceptionMode_(boolean displayStack, boolean displayOnDemand) {
         this.displayStack = displayStack;
         this.displayOnDemand = displayOnDemand;
         String msg = "Exception display mode changed : ";
@@ -149,7 +149,7 @@ public abstract class ConsoleModel {
         print(msg);
     }
 
-    protected void help_() {
+    public void help_() {
         print(newline + helpScreen());
     }
 
@@ -200,6 +200,7 @@ public abstract class ConsoleModel {
                 error("*ERROR* - Standard input stream has been terminated !");
                 terminated = true;
             } else {
+                checkIsReady();
                 engine.eval(cmd);
             }
         } catch (ScriptException e) {

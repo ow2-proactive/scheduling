@@ -121,7 +121,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public static final Logger logger_console = ProActiveLogger.getLogger(SchedulerLoggers.CONSOLE);
 
     /** A repeated warning message */
-    private static final String ACCESS_DENIED = "Access denied !";
+    private static final String ACCESS_DENIED = "Access denied ! Your session has expired !";
 
     /** Maximum duration of a session for a useless client */
     private static final long USER_SESSION_DURATION = PASchedulerProperties.SCHEDULER_USER_SESSION_TIME

@@ -65,7 +65,6 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
@@ -297,8 +296,7 @@ public class ResourceManagerController {
     }
 
     protected void connect() throws LoginException {
-        ResourceManager rm = auth.login(credentials);
-        model.connectRM(rm);
+        model.connectRM(auth, credentials);
         String userStr = (user != null) ? "'" + user + "' " : "";
         logger.info("\t-> Client " + userStr + " successfully connected" + newline);
     }
@@ -454,18 +452,18 @@ public class ResourceManagerController {
             if (cmd.hasOption("ns")) {
                 String nsName = cmd.getOptionValue("ns");
                 for (String nUrl : nodesURls) {
-                    ResourceManagerModel.addnode(nUrl, nsName);
+                    model.addnode_(nUrl, nsName);
                 }
             } else {
                 for (String nUrl : nodesURls) {
-                    ResourceManagerModel.addnode(nUrl, null);
+                    model.addnode_(nUrl, null);
                 }
             }
         } else if (cmd.hasOption("removenodes")) {
             String[] nodesURls = cmd.getOptionValues("removenodes");
             boolean preempt = cmd.hasOption("f");
             for (String nUrl : nodesURls) {
-                ResourceManagerModel.removenode(nUrl, preempt);
+                model.removenode_(nUrl, preempt);
             }
         } else if (cmd.hasOption("createns")) {
 
@@ -477,7 +475,7 @@ public class ResourceManagerController {
                 imParams = cmd.getOptionValues("infrastructure");
                 if (imParams == null) {
                     // list available infrastructures
-                    ResourceManagerModel.listInfrastructures();
+                    model.listInfrastructures_();
                     return false;
                 }
             }
@@ -487,39 +485,39 @@ public class ResourceManagerController {
                 policyParams = cmd.getOptionValues("policy");
                 if (policyParams == null) {
                     // list available policies
-                    ResourceManagerModel.listPolicies();
+                    model.listPolicies_();
                     return false;
                 }
             }
 
             for (String nsName : nsNames) {
                 // if imParams is null or policyParams is null use default
-                if (!ResourceManagerModel.createns(nsName, imParams, policyParams)) {
+                if (!model.createns_(nsName, imParams, policyParams)) {
                     break;
                 }
             }
         } else if (cmd.hasOption("listnodes")) {
-            ResourceManagerModel.listnodes();
+            model.listnodes_();
         } else if (cmd.hasOption("listns")) {
-            ResourceManagerModel.listns();
+            model.listns_();
         } else if (cmd.hasOption("removens")) {
             String[] nsNames = cmd.getOptionValues("removens");
             boolean preempt = cmd.hasOption("f");
             for (String nsName : nsNames) {
-                ResourceManagerModel.removens(nsName, preempt);
+                model.removens_(nsName, preempt);
             }
         } else if (cmd.hasOption("shutdown")) {
-            ResourceManagerModel.shutdown(cmd.hasOption("f"));
+            model.shutdown_(cmd.hasOption("f"));
         } else if (cmd.hasOption("stats")) {
-            ResourceManagerModel.showRuntimeData();
+            model.showRuntimeData_();
         } else if (cmd.hasOption("ma")) {
-            ResourceManagerModel.showMyAccount();
+            model.showMyAccount_();
         } else if (cmd.hasOption("ua")) {
-            ResourceManagerModel.showAccount(cmd.getOptionValue("ua"));
+            model.showAccount_(cmd.getOptionValue("ua"));
         } else if (cmd.hasOption("rp")) {
-            ResourceManagerModel.refreshPermissionPolicy();
+            model.refreshPermissionPolicy_();
         } else if (cmd.hasOption("script")) {
-            ResourceManagerModel.exec(cmd.getOptionValue("script"));
+            model.exec_(cmd.getOptionValue("script"));
         } else {
             model.setDisplayOnStdStream(false);
             return true;

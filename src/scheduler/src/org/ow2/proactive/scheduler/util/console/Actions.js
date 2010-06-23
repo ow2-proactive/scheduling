@@ -1,5 +1,8 @@
 importClass(org.ow2.proactive.scheduler.util.console.SchedulerModel);
 
+var s_ = SchedulerModel.getModel(false);
+var scheduler = s_.getScheduler();
+
 function exmode(displayStack, displayOnDemand){
 	if (displayStack == undefined){
 		displayStack = true;
@@ -7,138 +10,145 @@ function exmode(displayStack, displayOnDemand){
 	if (displayOnDemand == undefined){
 		displayOnDemand = true;
 	}
-	SchedulerModel.setExceptionMode(displayStack, displayOnDemand);
+	s_.setExceptionMode_(displayStack, displayOnDemand);
 }
 
 function help(){
-	SchedulerModel.help();
+	s_.help_();
 }
 
 function submit(xmlDescriptor){
-    return SchedulerModel.submit(""+xmlDescriptor);
+    return s_.submit_(""+xmlDescriptor);
 }
 
 function pausejob(jobId){
-    return SchedulerModel.pause(""+jobId);
+    return s_.pause_(""+jobId);
 }
 
 function resumejob(jobId){
-    return SchedulerModel.resume(""+jobId);
+    return s_.resume_(""+jobId);
 }
 
 function killjob(jobId){
-    return SchedulerModel.kill(""+jobId);
+    return s_.kill_(""+jobId);
 }
 
 function removejob(jobId){
-    SchedulerModel.remove(""+jobId);
+	s_.remove_(""+jobId);
 }
 
 function jobresult(jobId){
-    return SchedulerModel.result(""+jobId);
+    return s_.result_(""+jobId);
 }
 
 function taskresult(jobId,taskName){
-    return SchedulerModel.tresult(""+jobId,""+taskName);
+    return s_.tresult_(""+jobId,""+taskName);
 }
 
 function joboutput(jobId){
-    SchedulerModel.output(""+jobId);
+	s_.output_(""+jobId);
 }
 
 function taskoutput(jobId,taskName){
-    SchedulerModel.toutput(""+jobId,""+taskName);
+	s_.toutput_(""+jobId,""+taskName);
 }
 
 function priority(jobId, priority){
-    SchedulerModel.priority(""+jobId,""+priority);
+	s_.priority_(""+jobId,""+priority);
 }
 
 function jobstate(jobId){
-	return SchedulerModel.jobState(""+jobId);
+	return s_.jobState_(""+jobId);
 }
 
 function exec(commandFilePath){
-	SchedulerModel.exec(""+commandFilePath);
+	s_.exec_(""+commandFilePath);
 }
 
 function listjobs(){
-	SchedulerModel.schedulerState();
+	s_.schedulerState_();
 }
 
 function stats(){
-	SchedulerModel.showRuntimeData();
+	s_.showRuntimeData_();
 }
 
 function myaccount(){
-	SchedulerModel.showMyAccount();
+	s_.showMyAccount_();
 }
 
 function account(username){
-	SchedulerModel.showAccount(username);
+	s_.showAccount_(username);
 }
 
 function reloadpermissions(){
-	SchedulerModel.refreshPermissionPolicy();
+	s_.refreshPermissionPolicy_();
 }
 
 function test(){
-	SchedulerModel.test();
+	s_.test_();
 }
 
 function exit(){
-	SchedulerModel.exit();
+	s_.exit_();
 }
 
 function start(){
-    return SchedulerModel.start();
+    return s_.start_();
 }
 
 function stop(){
-    return SchedulerModel.stop();
+    return s_.stop_();
 }
 
 function pause(){
-    return SchedulerModel.pause();
+    return s_.pause_();
 }
 
 function freeze(){
-    return SchedulerModel.freeze();
+    return s_.freeze_();
 }
 
 function resume(){
-    return SchedulerModel.resume();
+    return s_.resume_();
 }
 
 function shutdown(){
-    return SchedulerModel.shutdown();
+    return s_.shutdown_();
 }
 
 function kill(){
-    return SchedulerModel.kill();
+    return s_.kill_();
 }
 
 function linkrm(rmURL){
-	return SchedulerModel.linkRM(""+rmURL);
+	return s_.linkRM_(""+rmURL);
 }
+
+function changepolicy(newPolicyName){
+	s_.changePolicy_(""+newPolicyName);
+}
+
+function reconnect(schedURL){
+	if (schedURL == undefined){
+		schedURL = null;
+	}
+	s_.reconnect_();
+}
+
 
 function setlogsdir(logsDir){
 	if (logsDir == undefined){
 		logsDir = "";
 	}
-	SchedulerModel.setLogsDir(""+logsDir);
+	s_.setLogsDir_(""+logsDir);
 }
 
 function viewlogs(nbLines){
-	SchedulerModel.viewlogs(""+nbLines);
+	s_.viewlogs_(""+nbLines);
 }
 
 function viewdevlogs(nbLines){
-	SchedulerModel.viewDevlogs(""+nbLines);
+	s_.viewDevlogs_(""+nbLines);
 }
 
-function changepolicy(newPolicyName){
-	SchedulerModel.changePolicy(""+newPolicyName);
-}
-
-var scheduler = SchedulerModel.getSchedulerInterface();
