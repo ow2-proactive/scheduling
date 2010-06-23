@@ -160,14 +160,14 @@ public class SchedulerProxy implements Scheduler {
      * {@inheritDoc}
      */
     public void disconnect() {
-        if (pinger != null) {
-            pinger.interrupt();
-        }
         if (scheduler != null) {
             try {
                 //disconnect scheduler if it is not dead
                 //protect disconnection with a try catch
                 scheduler.disconnect();
+                if (pinger != null) {
+                    pinger.interrupt();
+                }
                 connected = false;
             } catch (Exception e) {
                 // Nothing to do
@@ -300,11 +300,12 @@ public class SchedulerProxy implements Scheduler {
      * {@inheritDoc}
      */
     public boolean kill() {
-        if (pinger != null) {
-            pinger.interrupt();
-        }
         try {
-            return scheduler.kill();
+            boolean b = scheduler.kill();
+            if (pinger != null) {
+                pinger.interrupt();
+            }
+            return b;
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on kill action ", e);
             displayError(e.getMessage());
@@ -355,11 +356,12 @@ public class SchedulerProxy implements Scheduler {
      * {@inheritDoc}
      */
     public boolean shutdown() {
-        if (pinger != null) {
-            pinger.interrupt();
-        }
         try {
-            return scheduler.shutdown();
+            boolean b = scheduler.shutdown();
+            if (pinger != null) {
+                pinger.interrupt();
+            }
+            return b;
         } catch (SchedulerException e) {
             Activator.log(IStatus.ERROR, "- Scheduler Proxy: Error on shut down action ", e);
             displayError(e.getMessage());
