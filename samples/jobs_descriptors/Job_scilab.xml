@@ -5,10 +5,8 @@
     xmlns="urn:proactive:jobdescriptor:21" name="Scilab_job"
     priority="normal" logFile="scilab_job.log">
     <variables>
-        <variable name="SCHEDULER_HOME"
-            value="/home/user/Scheduler" /> <!-- CHANGE ME -->
         <variable name="SCILAB_SCRIPTS"
-            value="${SCHEDULER_HOME}/extensions/scilab/examples" />
+            value="${pa.scheduler.home}/extensions/scilab/examples" />
     </variables>
     <description>
         A simple Scilab batch job, which computes the numerical
@@ -23,7 +21,7 @@
             <selection>
                 <script>
                     <file
-                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                        url="file:${pa.scheduler.home}/samples/scripts/selection/checkScilab.js" />
                 </script>
             </selection>
             <javaExecutable
@@ -44,7 +42,7 @@
             <selection>
                 <script>
                     <file
-                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                        url="file:${pa.scheduler.home}/samples/scripts/selection/checkScilab.js" />
                 </script>
             </selection>
             <javaExecutable
@@ -65,7 +63,7 @@
             <selection>
                 <script>
                     <file
-                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                        url="file:${pa.scheduler.home}/samples/scripts/selection/checkScilab.js" />
                 </script>
             </selection>
             <javaExecutable
@@ -86,7 +84,7 @@
             <selection>
                 <script>
                     <file
-                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                        url="file:${pa.scheduler.home}/samples/scripts/selection/checkScilab.js" />
                 </script>
             </selection>
             <javaExecutable
@@ -107,7 +105,7 @@
             <selection>
                 <script>
                     <file
-                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                        url="file:${pa.scheduler.home}/samples/scripts/selection/checkScilab.js" />
                 </script>
             </selection>
             <javaExecutable
@@ -132,7 +130,7 @@
             <selection>
                 <script>
                     <file
-                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                        url="file:${pa.scheduler.home}/samples/scripts/selection/checkScilab.js" />
                 </script>
             </selection>
             <javaExecutable
