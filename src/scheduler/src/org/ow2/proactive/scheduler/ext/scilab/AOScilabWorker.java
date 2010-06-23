@@ -86,6 +86,8 @@ public class AOScilabWorker implements Serializable {
     protected boolean debug = true;
 
     private boolean initialized = false;
+    private boolean initErrorOccured = false;
+    private Throwable initError = null;
 
     /**
      * Definition of user-functions
@@ -117,7 +119,8 @@ public class AOScilabWorker implements Serializable {
                 }
                 System.out.println("Starting a new Scilab engine:");
                 System.out.println(config);
-                Scilab.init();
+                scilabStarter();
+
                 if (debug) {
                     System.out.println("Initialization Complete!");
                 }
@@ -141,7 +144,10 @@ public class AOScilabWorker implements Serializable {
                 NoClassDefFoundError ne = new NoClassDefFoundError(error_message.toString());
                 ne.initCause(e);
                 throw ne;
+            } catch (ScilabInitializationException e) {
+                throw e;
             } catch (Throwable e) {
+
                 StringWriter error_message = new StringWriter();
                 PrintWriter pw = new PrintWriter(error_message);
                 pw.println("Error initializing Scilab in " + java.net.InetAddress.getLocalHost());
@@ -163,6 +169,39 @@ public class AOScilabWorker implements Serializable {
             initialized = true;
         }
 
+    }
+
+    private void scilabStarter() throws Throwable {
+
+        Runnable runner = new Runnable() {
+            public void run() {
+                try {
+                    Scilab.init();
+                    initialized = true;
+                } catch (Throwable t) {
+                    initError = t;
+                    initErrorOccured = true;
+                }
+            }
+        };
+
+        Thread starter = new Thread(runner);
+        starter.start();
+
+        int nbwait = 0;
+        while (!initialized && !initErrorOccured && nbwait < 200) {
+            try {
+                Thread.sleep(50);
+                nbwait++;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (initErrorOccured)
+            throw initError;
+        if (!initialized)
+            throw new ScilabInitializationException(
+                "Couldn't initialize the Scilab engine, this is due to a known bug in Scilab initialization");
     }
 
     public void init(String inputScript, String functionsDefinition, ArrayList<String> scriptLines,
@@ -217,14 +256,14 @@ public class AOScilabWorker implements Serializable {
         if (debug) {
             Scilab.Exec("errclear();clear;mode(3);lines(0);funcprot(0);");
         } else {
-            Scilab.Exec("errclear();clear;lines(0);funcprot(0);");
+            Scilab.Exec("errclear();clear;mode(3);lines(0);funcprot(0);");
         }
 
         if (functionsDefinition != null) {
             ok = executeFunctionDefinition();
         }
         if (!ok)
-            return getResults();
+            throw new IllegalStateException("Error in function definitions");
         if (inputScript != null) {
             if (debug) {
                 System.out.println("[AOScilabWorker] Executing inputscript");
@@ -235,7 +274,7 @@ public class AOScilabWorker implements Serializable {
             }
         }
         if (!ok)
-            return getResults();
+            throw new IllegalStateException("Error executing inputscript");
         if (debug) {
             System.out.println("[AOScilabWorker] Executing mainscript");
         }
@@ -244,7 +283,10 @@ public class AOScilabWorker implements Serializable {
             System.out.println("[AOScilabWorker] End of mainscript execution " + (ok ? "ok" : "ko"));
         }
 
-        return getResults();
+        if (!ok)
+            throw new ScilabTaskException();
+
+        return getResults(ok);
 
     }
 
@@ -274,9 +316,11 @@ public class AOScilabWorker implements Serializable {
         out.write(functionsDefinition.replaceAll("" + ((char) 31), System.getProperty("line.separator")));
         out.close();
         if (debug) {
-            Scilab.Exec("getf('" + temp.getAbsolutePath() + "');");
-        } else {
+            System.out.println("[AOScilabWorker] Executing function definiition");
             Scilab.Exec("getf('" + temp.getAbsolutePath() + "')");
+
+        } else {
+            Scilab.Exec("getf('" + temp.getAbsolutePath() + "');");
         }
         int errorcode = Scilab.GetLastErrorCode();
         if ((errorcode != 0) && (errorcode != 2)) {
@@ -292,7 +336,7 @@ public class AOScilabWorker implements Serializable {
      *
      * @return list of Scilab data
      */
-    protected ArrayList<SciData> getResults() {
+    protected ArrayList<SciData> getResults(boolean error) {
 
         if (debug) {
             System.out.println("[AOScilabWorker] Receiving outputs");
@@ -373,6 +417,9 @@ public class AOScilabWorker implements Serializable {
         } else {
             File temp;
             BufferedWriter out;
+            if (debug) {
+                System.out.println("[AOScilabWorker] Executing inputscript: " + script);
+            }
             temp = File.createTempFile("inpuscript", ".sce");
             temp.deleteOnExit();
             out = new BufferedWriter(new FileWriter(temp));
@@ -380,10 +427,13 @@ public class AOScilabWorker implements Serializable {
             out.close();
             if (debug) {
                 Scilab.Exec("exec('" + temp.getAbsolutePath() + "',3);");
-                Scilab.Exec("errclear();");
             } else {
                 Scilab.Exec("exec('" + temp.getAbsolutePath() + "',0);");
-                Scilab.Exec("errclear();");
+            }
+            int errorcode = Scilab.GetLastErrorCode();
+            if ((errorcode != 0) && (errorcode != 2)) {
+                writeError();
+                return false;
             }
         }
         return true;
@@ -396,6 +446,8 @@ public class AOScilabWorker implements Serializable {
 
         Scilab
                 .Exec("[str2,n2,line2,func2]=lasterror(%t);printf('!-- error %i\n%s\n at line %i of function %s\n',n2,str2,line2,func2)");
+
+        Scilab.Exec("errclear();");
     }
 
     /**

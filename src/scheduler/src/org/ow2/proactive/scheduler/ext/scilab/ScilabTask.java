@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.ext.scilab;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -114,6 +115,10 @@ public class ScilabTask extends JavaExecutable {
      */
     protected static boolean shutdownhookSet = false;
 
+    protected static Thread shutdownHook = null;
+
+    private static boolean threadstarted = false;
+
     /**
      * tool to build the JavaCommand
      */
@@ -145,6 +150,8 @@ public class ScilabTask extends JavaExecutable {
     private RegistrationListener registrationListener;
 
     protected static boolean startingProcess = false;
+
+    private static boolean redeploying = false;
 
     /**
      * ProActive No Arg Constructor
@@ -187,44 +194,134 @@ public class ScilabTask extends JavaExecutable {
             jvmInfos.put(nodeName, jvminfo);
         }
 
-        handleProcess(jvminfo);
-
-        if (debug) {
-            System.out.println("[" + new java.util.Date() + " " + host + " ScilabTask] Executing the task");
-            outDebug.println("[" + new java.util.Date() + " " + host + " ScilabTask] Executing the task");
-        }
-
         Serializable res = null;
 
-        try {
-            // finally we call the internal version of the execute method
-            res = executeInternal(results);
-        } finally {
-            jvminfo.getIsLogger().closeStream();
-            jvminfo.getEsLogger().closeStream();
+        int nbAttempts = 1;
+
+        redeploying = false;
+
+        while (res == null) {
+
+            handleProcess(jvminfo);
+
             if (debug) {
-                outDebug.println("[" + new java.util.Date() + " " + host + " ScilabTask] Closing output");
-                outDebug.close();
+                System.out.println("[" + new java.util.Date() + " " + host +
+                    " ScilabTask] Executing the task");
+                outDebug.println("[" + new java.util.Date() + " " + host + " ScilabTask] Executing the task");
+            }
+
+            try {
+                // finally we call the internal version of the execute method
+                redeploying = false;
+                res = executeInternal(results);
+            } catch (FutureMonitoringPingFailureException e2) {
+                redeploying = true;
+                if (debug) {
+                    e2.printStackTrace(outDebug);
+                    System.out.println("[" + new java.util.Date() + " " + host +
+                        " Scilab Task] Scilab Engine and JVM crashed, redeploying");
+                    outDebug.println("[" + new java.util.Date() + " " + host +
+                        " Scilab Task] Scilab Engine and JVM crashed, redeploying");
+                }
+                destroyProcess(jvminfo);
+
+                if (nbAttempts >= 5) {
+                    throw e2;
+                }
+                nbAttempts++;
+
+            } catch (ScilabInitializationException e) {
+                redeploying = true;
+                if (debug) {
+                    e.printStackTrace(outDebug);
+                    System.out.println("[" + new java.util.Date() + " " + host +
+                        " Scilab Task] Scilab Engine initialization hanged, redeploying");
+                    outDebug.println("[" + new java.util.Date() + " " + host +
+                        " Scilab Task] Scilab Engine initialization hanged, redeploying");
+                }
+                destroyProcess(jvminfo);
+
+                if (nbAttempts >= 5) {
+                    throw e;
+                }
+                nbAttempts++;
+            } finally {
+                if (res != null) {
+                    jvminfo.getIsLogger().closeStream();
+                    jvminfo.getEsLogger().closeStream();
+                }
+                if (res != null && debug) {
+                    outDebug
+                            .println("[" + new java.util.Date() + " " + host + " Scilab Task] Closing output");
+                    outDebug.close();
+                } else if (nbAttempts >= 3 && debug) {
+                    outDebug
+                            .println("[" + new java.util.Date() + " " + host + " Scilab Task] Closing output");
+                    outDebug.close();
+                }
             }
         }
 
         return res;
     }
 
+    protected void destroyProcess(ScilabJVMInfo jvminfo) {
+
+        try {
+            jvminfo.getNode().killAllActiveObjects();
+        } catch (Exception e1) {
+        }
+
+        jvminfo.getProcess().destroy();
+
+        //jvminfo.getProcess().destroy();
+
+        jvminfo.setProcess(null);
+        jvminfo.setWorker(null);
+        removeShutdownHook();
+
+    }
+
+    protected void addShutdownHook() {
+        shutdownHook = new Thread(new Runnable() {
+            public void run() {
+                for (ScilabJVMInfo info : jvmInfos.values()) {
+                    try {
+                        destroyProcess(info);
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        });
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+        shutdownhookSet = true;
+    }
+
+    protected void removeShutdownHook() {
+        Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        shutdownHook = null;
+        shutdownhookSet = false;
+    }
+
     protected void handleProcess(ScilabJVMInfo jvminfo) throws Throwable {
         if (jvminfo.getProcess() == null) {
 
-            // First we try to find SCILAB
-            if (debug) {
-                System.out.println("[" + new java.util.Date() + " " + host +
-                    " ScilabTask] launching script to find Scilab");
-                outDebug.println("[" + new java.util.Date() + " " + host +
-                    " ScilabTask] launching script to find Scilab");
-            }
-            scilabConfig = ScilabFinder.findScilab(debug);
-            if (debug) {
-                System.out.println("[" + new java.util.Date() + " " + host + " ScilabTask] " + scilabConfig);
-                outDebug.println("[" + new java.util.Date() + " " + host + " ScilabTask] " + scilabConfig);
+            if (scilabConfig == null) {
+                // First we try to find SCILAB
+                if (debug) {
+                    System.out.println("[" + new java.util.Date() + " " + host +
+                        " ScilabTask] launching script to find Scilab");
+                    outDebug.println("[" + new java.util.Date() + " " + host +
+                        " ScilabTask] launching script to find Scilab");
+                }
+                scilabConfig = ScilabFinder.findScilab(debug);
+
+                if (debug) {
+                    System.out.println("[" + new java.util.Date() + " " + host + " ScilabTask] " +
+                        scilabConfig);
+                    outDebug
+                            .println("[" + new java.util.Date() + " " + host + " ScilabTask] " + scilabConfig);
+                }
             }
 
             if (debug) {
@@ -239,28 +336,36 @@ public class ScilabTask extends JavaExecutable {
 
             // We add a shutdownhook to terminate children processes
             if (!shutdownhookSet) {
-                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                    public void run() {
-                        for (ScilabJVMInfo info : jvmInfos.values()) {
-                            info.getProcess().destroy();
-                        }
-                    }
-                }));
-                shutdownhookSet = true;
+                addShutdownHook();
+            }
+        }
+
+        if (!threadstarted) {
+
+            if (debug) {
+                System.out.println("[" + new java.util.Date() + " " + host +
+                    " Scilab Task] Starting the Threads");
+                outDebug.println("[" + new java.util.Date() + " " + host +
+                    " Scilab Task] Starting the Threads");
             }
 
             LoggingThread lt1 = null;
             LoggingThread lt2 = null;
 
             if (debug) {
-                lt1 = new LoggingThread(p.getInputStream(), "[" + host + " OUT]", System.out, outDebug);
-                lt2 = new LoggingThread(p.getErrorStream(), "[" + host + " ERR]", System.err, outDebug);
+                lt1 = new LoggingThread(jvminfo.getProcess().getInputStream(), "[" + host + " OUT]",
+                    System.out, outDebug);
+                lt2 = new LoggingThread(jvminfo.getProcess().getErrorStream(), "[" + host + " ERR]",
+                    System.err, outDebug);
             } else {
-                lt1 = new LoggingThread(p.getInputStream(), "[" + host + " OUT]", System.out);
-                lt2 = new LoggingThread(p.getErrorStream(), "[" + host + " ERR]", System.err);
+                lt1 = new LoggingThread(jvminfo.getProcess().getInputStream(), "[" + host + " OUT]",
+                    System.out);
+                lt2 = new LoggingThread(jvminfo.getProcess().getErrorStream(), "[" + host + " ERR]",
+                    System.err);
             }
 
-            IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, p.getOutputStream());
+            IOTools.RedirectionThread rt1 = new IOTools.RedirectionThread(System.in, jvminfo.getProcess()
+                    .getOutputStream());
 
             // We define the loggers which will write on standard output what comes from the java process
             jvminfo.setIsLogger(lt1);
@@ -279,7 +384,53 @@ public class ScilabTask extends JavaExecutable {
             Thread t3 = new Thread(rt1, "Redirecting I/O Scilab");
             t3.setDaemon(true);
             t3.start();
+            threadstarted = true;
 
+        } else if (startingProcess) {
+            if (debug) {
+                System.out.println("[" + new java.util.Date() + " " + host +
+                    " Scilab Task] Connecting process out to threads");
+                outDebug.println("[" + new java.util.Date() + " " + host +
+                    " Scilab Task] Connecting process out to threads");
+            }
+            jvminfo.getIsLogger().setInputStream(jvminfo.getProcess().getInputStream());
+            jvminfo.getEsLogger().setInputStream(jvminfo.getProcess().getErrorStream());
+            jvminfo.getIoThread().setOutputStream(jvminfo.getProcess().getOutputStream());
+
+            if (!redeploying) {
+                if (debug) {
+                    jvminfo.getIsLogger().setStream(System.out, outDebug);
+                    jvminfo.getEsLogger().setStream(System.err, outDebug);
+                } else {
+                    jvminfo.getIsLogger().setStream(System.out);
+                    jvminfo.getEsLogger().setStream(System.err);
+                }
+            }
+
+            startingProcess = false;
+        } else {
+            if (debug) {
+                jvminfo.getIsLogger().setStream(System.out, outDebug);
+                jvminfo.getEsLogger().setStream(System.err, outDebug);
+            } else {
+                jvminfo.getIsLogger().setStream(System.out);
+                jvminfo.getEsLogger().setStream(System.err);
+            }
+        }
+
+        AOScilabWorker sw = jvminfo.getWorker();
+        if (sw == null) {
+            if (debug) {
+                System.out.println("[" + new java.util.Date() + " " + host +
+                    " Scilab Task] waiting for deployment");
+                outDebug.println("[" + new java.util.Date() + " " + host +
+                    " Scilab Task] waiting for deployment");
+            }
+            waitForRegistration();
+
+            sw = deploy();
+
+            registrationListener.unsubscribeJMXRuntimeEvent();
         }
 
     }
@@ -385,34 +536,13 @@ public class ScilabTask extends JavaExecutable {
     protected Serializable executeInternal(TaskResult... results) throws Throwable {
         ScilabJVMInfo jvminfo = jvmInfos.get(nodeName);
         AOScilabWorker sw = jvminfo.getWorker();
-        if (sw == null) {
-            if (debug) {
-                System.out.println("[" + new java.util.Date() + " " + host +
-                    " Scilab Task] waiting for deployment");
-                outDebug.println("[" + new java.util.Date() + " " + host +
-                    " Scilab Task] waiting for deployment");
-            }
-            waitForRegistration();
-            sw = deploy();
-        }
+
         if (debug) {
             System.out.println("[" + new java.util.Date() + " " + host + " ScilabTask] Initializing");
             outDebug.println("[" + new java.util.Date() + " " + host + " ScilabTask] Initializing");
         }
-        try {
-            sw.init(inputScript, functionsDefinition, scriptLines, out_set, debug);
-        } catch (Exception e) {
-            // in case the active object died
-            e.printStackTrace();
-            if (debug) {
-                System.out.println("[" + new java.util.Date() + " " + host +
-                    " ScilabTask] Re-deploying Worker");
-                outDebug
-                        .println("[" + new java.util.Date() + " " + host + " ScilabTask] Re-deploying Worker");
-            }
-            sw = deploy();
-            sw.init(inputScript, functionsDefinition, scriptLines, out_set, debug);
-        }
+
+        sw.init(inputScript, functionsDefinition, scriptLines, out_set, debug);
 
         if (debug) {
             System.out.println("[" + new java.util.Date() + " " + host + " ScilabTask] Executing");
@@ -643,12 +773,13 @@ public class ScilabTask extends JavaExecutable {
                     try {
                         scilabNode = childRuntime.createLocalNode("Scilab_" + nodeName + "_" + nodeCount,
                                 true, null, null, null);
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         if (debug) {
                             e.printStackTrace();
                             e.printStackTrace(outDebug);
+                            outDebug.flush();
                         }
-                        throw e;
+                        throw new IllegalStateException(e);
                     }
                     nodeCount++;
                     if (debug) {
@@ -666,13 +797,13 @@ public class ScilabTask extends JavaExecutable {
                             " Scilab Task] waking up main thread");
 
                     }
-                    semaphore.release();
 
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
                 if (debug) {
                     e.printStackTrace(outDebug);
+                    outDebug.flush();
                 }
             } finally {
                 semaphore.release();

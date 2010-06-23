@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.ext.scilab.embedded;
 
 import javasci.SciData;
+import javasci.SciStringMatrix;
 
 import java.io.Serializable;
 
@@ -53,24 +54,46 @@ public class ResultsAndLogs implements Serializable {
 	private SciData result;
     private String logs;
     private Throwable exception;
+    private boolean scilabError;
 
-    public ResultsAndLogs(SciData result, String logs, Throwable exception) {
+    public ResultsAndLogs(SciData result, String logs, Throwable exception, boolean scilabError) {
         this.result = result;
         this.logs = logs;
         this.exception = exception;
+        this.scilabError = scilabError;
     }
 
     public SciData getResult() {
         return result;
     }
 
+    public String getResultAsString() {
+        if (result == null)
+            return null;
+        if (((SciStringMatrix) result).getNbRow() > 0) {
+            return ((SciStringMatrix) result).getData()[0];
+        } else {
+            return "output = %f";
+        }
+    }
+
     public String getLogs() {
         return logs;
     }
 
+    public boolean hadScilabError() {
+        return scilabError;
+    }
+
     @Override
     public String toString() {
-        return result.toString();
+        if (result != null)
+            return result.toString();
+        else if (exception != null) {
+            return exception.getMessage();
+        } else {
+            return "Error in scilab code";
+        }
     }
 
     public Throwable getException() {

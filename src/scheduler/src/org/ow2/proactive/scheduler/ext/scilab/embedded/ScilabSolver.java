@@ -66,13 +66,13 @@ public class ScilabSolver {
         scilabSolver = null;
     }
 
-    public static String[][] solve(String[] inputScripts, String functionsDefinition, String mainScript,
-            String scriptURL, int priority, int debugVal) throws Throwable {
+    public static ResultsAndLogs[] solve(String[] inputScripts, String functionsDefinition,
+            String mainScript, String scriptURL, int priority, int debugVal) throws Throwable {
         boolean debug = debugVal > 0;
         if (debug) {
             System.out.println("[ScilabSolver] In Solver");
         }
-        String[][] results = null;
+        ResultsAndLogs[] results = null;
         ArrayList<ResultsAndLogs> sciResults;
         sciResults = scilabSolver.solve(inputScripts, functionsDefinition, mainScript, null, JobPriority
                 .findPriority(priority), debug);
@@ -83,24 +83,29 @@ public class ScilabSolver {
                 System.out.println(sciResults);
                 System.out.println("[ScilabSolver] Solved");
             }
-
-            results = new String[3][sciResults.size()];
+            results = new ResultsAndLogs[sciResults.size()];
 
             for (int i = 0; i < sciResults.size(); i++) {
-                if (((SciStringMatrix) sciResults.get(i).getResult()).getNbRow() > 0) {
-                    results[0][i] = ((SciStringMatrix) sciResults.get(i).getResult()).getData()[0];
-                } else {
-                    results[0][i] = "output = %f";
-                }
-                results[1][i] = sciResults.get(i).getLogs();
-                if (sciResults.get(i).getException() != null) {
-                    results[2][i] = sciResults.get(i).getException().getMessage();
-                    throw sciResults.get(i).getException();
-                } else {
-                    results[2][i] = null;
-                }
-
+                results[i] = sciResults.get(i);
             }
+
+            //            results = new String[3][sciResults.size()];
+            //
+            //            for (int i = 0; i < sciResults.size(); i++) {
+            //                if (((SciStringMatrix) sciResults.get(i).getResult()).getNbRow() > 0) {
+            //                    results[0][i] = ((SciStringMatrix) sciResults.get(i).getResult()).getData()[0];
+            //                } else {
+            //                    results[0][i] = "output = %f";
+            //                }
+            //                results[1][i] = sciResults.get(i).getLogs();
+            //                if (sciResults.get(i).getException() != null) {
+            //                    results[2][i] = sciResults.get(i).getException().getMessage();
+            //                    throw sciResults.get(i).getException();
+            //                } else {
+            //                    results[2][i] = null;
+            //                }
+            //
+            //            }
         } else {
             System.out.println("[ScilabSolver] Solve returned NULL...");
         }
