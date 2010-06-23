@@ -104,11 +104,7 @@
 					protocol is the RMI Connector accessible at the following url:
 				</para>
 				<para>
-					<literal>service:jmx:rmi:///jndi/rmi://</literal>
-					<emphasis>HOSTNAME</emphasis>
-					<literal>:</literal>
-					<emphasis>PORT</emphasis>
-					<literal>/JMXRMAgent</literal>
+					<literal>service:jmx:rmi:///jndi/rmi://</literal><emphasis>HOSTNAME</emphasis><literal>:</literal><emphasis>PORT</emphasis><literal>/JMXRMAgent</literal>
 				</para>
 				<para>where</para>
 				<itemizedlist>
@@ -134,13 +130,7 @@
 				<para>The ProActive Remote Objects Connector provides ProActive
 					protocol aware connector accessible at the following url:</para>
 				<para>
-					<literal>service:jmx:ro:///jndi/</literal>
-					<emphasis>PA_PROTOCOL</emphasis>
-					<literal>://</literal>
-					<emphasis>HOSTNAME</emphasis>
-					<literal>:</literal>
-					<emphasis>PORT</emphasis>
-					<literal>/JMXRMAgent</literal>
+					<literal>service:jmx:ro:///jndi/</literal><emphasis>PA_PROTOCOL</emphasis><literal>://</literal><emphasis>HOSTNAME</emphasis><literal>:</literal><emphasis>PORT</emphasis><literal>/JMXRMAgent</literal>
 				</para>
 				<para>where</para>
 				<itemizedlist>
@@ -183,10 +173,7 @@
 		<literal>$RM_HOME/.logs/RM.log</literal>
 		. In that log file, the address you have to retrieve is the one where
 		the JMX RMI connector server has been started:
-		<screen>[INFO 2010-06-17 10:23:27,813] [RM.AbstractJMXHelper.boot]
-			Started JMX RMI connector server at
-			service:jmx:rmi:///jndi/rmi://kisscool.inria.fr:5822/JMXRMAgent
-		</screen>
+		<screen>[INFO 2010-06-17 10:23:27,813] [RM.AbstractJMXHelper.boot] Started JMX RMI connector server at service:jmx:rmi:///jndi/rmi://kisscool.inria.fr:5822/JMXRMAgent </screen>
 		Once connected, you'll get an access to RM statistics and accounting.
 	</para>
 	<para>

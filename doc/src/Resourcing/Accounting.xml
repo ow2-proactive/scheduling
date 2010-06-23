@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0"
+	xml:id="Accounting">
+	<info>
+		<title>Accounting</title>
+	</info>
+	<para>
+		The users (clients) of the Resource Manager may request and offer nodes for computation. To keep track on how much node time
+		was consumed or contributed by a particular user the Resource Manager associates a user to an account.	
+	</para>
+	<para>
+		More precisely, the nodes can be manipulated by the following basic operations available to the users:
+		<itemizedlist>
+			<listitem>
+				<para>
+					The <emphasis>ADD</emphasis> operation is a registration of a node into the Resource Manager
+					initiated by a user considered as a node provider.
+				 </para>
+				<para>
+					A node can be added, through the API, as a result of a deployement process, an agent or manually from the command line interface.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The <emphasis>REMOVE</emphasis> operation is the unregistration of a node from the Resource Manager.
+				</para>
+				<para>
+					A node can be removed, through the API, by a user or automatically if it is unreachable by the Resource Manager.					
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The <emphasis>GET</emphasis> operation is a node reservation, for an unknown amount of time, by a user considered as a node owner.
+				</para>
+				<para>
+					For example, the ProActive Scheduler can be considered as a user that reserves a node for a task computation.
+				</para>						
+			</listitem>
+			<listitem>
+				<para>
+					The <emphasis>RELEASE</emphasis> operation on a reserved node by any user.
+				</para>
+			</listitem>
+		</itemizedlist>				
+	</para>	
+	<para>
+		The following accounting data is gathered by the Resource Manager:
+		<itemizedlist>
+			<listitem>
+				<para><emphasis>The used node time</emphasis>: The amount of time other users have spent in using the resources of a particular user.</para>
+				<para>
+					More precisely, for a specific node owner, it is the sum of all time intervals from <emphasis>GET</emphasis> to <emphasis>RELEASE</emphasis>.
+				</para>
+			</listitem>
+			<listitem>
+				<para><emphasis>The provided node time</emphasis>: The amount of time a user has offered resources to the Resource Manager.</para>
+				<para>
+					More precisely, for a specific node provider, it is the sum of all time intervals from <emphasis>ADD</emphasis> to <emphasis>REMOVE</emphasis>.
+				</para>				
+			</listitem>
+			<listitem>
+				<para><emphasis>The provided node count</emphasis>: The number of provided nodes.</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+
+	<para>
+		The accounting information can be accessed through a JMX client or through the Resource Manager GUI.
+	</para>
+</section>

@@ -19,6 +19,7 @@
 	  <!ENTITY GUI SYSTEM "GUI.xml">
 	  <!ENTITY CLI SYSTEM "CLI.xml">
 	  <!ENTITY JMX SYSTEM "JMX.xml">
+	  <!ENTITY Accounting SYSTEM "Accounting.xml">
 	  <!ENTITY Virtualization SYSTEM "Virtualization.xml">
 	  <!ENTITY WindowsAgent SYSTEM "WindowsAgent.xml">
 ]>
