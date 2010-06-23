@@ -66,16 +66,17 @@ public class ScilabSolver {
         scilabSolver = null;
     }
 
-    public static ResultsAndLogs[] solve(String[] inputScripts, String functionsDefinition,
-            String mainScript, String scriptURL, int priority, int debugVal) throws Throwable {
+    public static ResultsAndLogs[] solve(String[] inputScripts, String functionName,
+            String functionsDefinition, String mainScript, String scriptURL, int priority, int debugVal)
+            throws Throwable {
         boolean debug = debugVal > 0;
         if (debug) {
             System.out.println("[ScilabSolver] In Solver");
         }
         ResultsAndLogs[] results = null;
         ArrayList<ResultsAndLogs> sciResults;
-        sciResults = scilabSolver.solve(inputScripts, functionsDefinition, mainScript, null, JobPriority
-                .findPriority(priority), debug);
+        sciResults = scilabSolver.solve(inputScripts, functionName, functionsDefinition, mainScript, null,
+                JobPriority.findPriority(priority), debug);
         sciResults = (ArrayList<ResultsAndLogs>) PAFuture.getFutureValue(sciResults);
 
         if (sciResults != null) {

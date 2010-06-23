@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.ext.scilab;
 
 import javasci.SciData;
 import javasci.Scilab;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.scilab.util.ScilabConfiguration;
 import org.ow2.proactive.scheduler.ext.scilab.exception.InvalidParameterException;
@@ -93,6 +94,10 @@ public class AOScilabWorker implements Serializable {
      * Definition of user-functions
      */
     private String functionsDefinition = null;
+    private String functionName = null;
+
+    private String nodeName = null;
+    private File tmpDirNode = null;
 
     public AOScilabWorker() {
     }
@@ -166,6 +171,14 @@ public class AOScilabWorker implements Serializable {
                     Scilab.Finish();
                 }
             }));
+
+            nodeName = PAActiveObject.getNode().getVMInformation().getName().replace('-', '_');
+            File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+            tmpDirNode = new File(tmpDir, nodeName);
+            if (!tmpDirNode.exists() || !tmpDirNode.isDirectory()) {
+                tmpDirNode.mkdir();
+            }
+
             initialized = true;
         }
 
@@ -204,13 +217,14 @@ public class AOScilabWorker implements Serializable {
                 "Couldn't initialize the Scilab engine, this is due to a known bug in Scilab initialization");
     }
 
-    public void init(String inputScript, String functionsDefinition, ArrayList<String> scriptLines,
-            String[] outputVars, boolean debug) {
+    public void init(String inputScript, String functionName, String functionsDefinition,
+            ArrayList<String> scriptLines, String[] outputVars, boolean debug) {
         this.inputScript = inputScript;
         this.mainscriptLines = scriptLines;
         this.outputVars = outputVars;
         this.debug = debug;
         this.functionsDefinition = functionsDefinition;
+        this.functionName = functionName;
     }
 
     public Serializable execute(TaskResult... results) throws Throwable {
@@ -261,9 +275,10 @@ public class AOScilabWorker implements Serializable {
 
         if (functionsDefinition != null) {
             ok = executeFunctionDefinition();
+            if (!ok)
+                throw new IllegalStateException("Error in function definitions");
         }
-        if (!ok)
-            throw new IllegalStateException("Error in function definitions");
+
         if (inputScript != null) {
             if (debug) {
                 System.out.println("[AOScilabWorker] Executing inputscript");
@@ -308,19 +323,24 @@ public class AOScilabWorker implements Serializable {
      * @throws IOException
      */
     protected boolean executeFunctionDefinition() throws IOException {
-        File temp;
-        BufferedWriter out;
-        temp = File.createTempFile("functions", ".sce");
-        temp.deleteOnExit();
-        out = new BufferedWriter(new FileWriter(temp));
+
+        File functionFile = new File(tmpDirNode, functionName + ".sci");
+        if (functionFile.exists()) {
+            functionFile.delete();
+        }
+        functionFile.createNewFile();
+        functionFile.deleteOnExit();
+
+        BufferedWriter out = new BufferedWriter(new FileWriter(functionFile));
         out.write(functionsDefinition.replaceAll("" + ((char) 31), System.getProperty("line.separator")));
         out.close();
         if (debug) {
-            System.out.println("[AOScilabWorker] Executing function definiition");
-            Scilab.Exec("getf('" + temp.getAbsolutePath() + "')");
+            System.out.println("[AOScilabWorker] Executing function definition : " +
+                functionFile.getAbsolutePath());
+            Scilab.Exec("exec('" + functionFile.getAbsolutePath() + "')");
 
         } else {
-            Scilab.Exec("getf('" + temp.getAbsolutePath() + "');");
+            Scilab.Exec("exec('" + functionFile.getAbsolutePath() + "');");
         }
         int errorcode = Scilab.GetLastErrorCode();
         if ((errorcode != 0) && (errorcode != 2)) {
@@ -349,10 +369,14 @@ public class AOScilabWorker implements Serializable {
             }
             if (Scilab.ExistVar(var)) {
                 SciData output = Scilab.receiveDataByName(var);
+                if (output == null) {
+                    throw new IllegalStateException("Variable " + var +
+                        " existing in scilab engine but couldn't be retrieved (this is a known bug in Scilab 5.2)");
+                }
                 if (debug) {
                     System.out.println(output);
                 }
-                out.add(Scilab.receiveDataByName(var));
+                out.add(output);
             } else {
                 throw new IllegalStateException("Variable " + var + " not found");
             }
@@ -420,7 +444,11 @@ public class AOScilabWorker implements Serializable {
             if (debug) {
                 System.out.println("[AOScilabWorker] Executing inputscript: " + script);
             }
-            temp = File.createTempFile("inpuscript", ".sce");
+            temp = new File(tmpDirNode, "inpuscript.sce");
+            if (temp.exists()) {
+                temp.delete();
+            }
+            temp.createNewFile();
             temp.deleteOnExit();
             out = new BufferedWriter(new FileWriter(temp));
             out.write(script);
@@ -432,7 +460,8 @@ public class AOScilabWorker implements Serializable {
             }
             int errorcode = Scilab.GetLastErrorCode();
             if ((errorcode != 0) && (errorcode != 2)) {
-                writeError();
+                Scilab.Exec("disp(lasterror())");
+                Scilab.Exec("errclear();");
                 return false;
             }
         }
