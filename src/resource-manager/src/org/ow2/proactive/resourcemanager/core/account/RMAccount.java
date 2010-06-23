@@ -52,23 +52,35 @@ public final class RMAccount implements Account {
     long providedNodeTime;
     int providedNodesCount;
 
+    /**
+     * Returns the username of this account. 
+     * @return the username of this account
+     */
     public String getName() {
         return this.username;
     }
 
+    /**
+     * The amount of time in milliseconds other users have spent in using the resources of the current user.
+     * @return the used node time in milliseconds
+     */
     public long getUsedNodeTime() {
         return this.usedNodeTime;
     }
 
+    /**
+     * The amount of time in milliseconds the current user has offered resources to the Resource Manager.
+     * @return the provided node time in milliseconds
+     */
     public long getProvidedNodeTime() {
         return this.providedNodeTime;
     }
 
+    /**
+     * Returns the number of provided nodes.
+     * @return the used node time in milliseconds
+     */
     public int getProvidedNodesCount() {
         return this.providedNodesCount;
-    }
-
-    public boolean isConnected() {
-        return false;
     }
 }

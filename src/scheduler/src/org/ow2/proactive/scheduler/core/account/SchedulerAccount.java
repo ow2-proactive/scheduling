@@ -53,30 +53,42 @@ public final class SchedulerAccount implements Account {
     int totalJobCount;
     long totalJobDuration;
 
-    public boolean isConnected() {
-        return false;
-    }
-
-    public String getHostname() {
-        return "";
-    }
-
+    /**
+     * The total count of tasks completed by the current user. 
+     * @return the total task count
+     */
     public int getTotalTaskCount() {
         return this.totalTaskCount;
     }
 
+    /**
+     * The total time duration in milliseconds of tasks completed by the current user. 
+     * @return the total task duration in milliseconds
+     */
     public long getTotalTaskDuration() {
         return this.totalTaskDuration;
     }
 
+    /**
+     * The total count of jobs completed by the current user. 
+     * @return the total jobs count
+     */
     public int getTotalJobCount() {
         return this.totalJobCount;
     }
 
+    /**
+     * The total time duration in milliseconds of jobs completed by the current user. 
+     * @return the total job duration in milliseconds
+     */
     public long getTotalJobDuration() {
         return this.totalJobDuration;
     }
 
+    /**
+     * Returns the username of this account. 
+     * @return the username of this account
+     */
     public String getName() {
         return this.username;
     }

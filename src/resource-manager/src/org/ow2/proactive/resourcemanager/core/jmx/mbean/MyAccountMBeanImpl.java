@@ -82,10 +82,6 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
         this.perThreadAccount = new ThreadLocal<RMAccount>();
     }
 
-    public boolean isConnected() {
-        return this.perThreadAccount.get().isConnected();
-    }
-
     public long getUsedNodeTime() {
         return this.perThreadAccount.get().getUsedNodeTime();
     }

@@ -44,12 +44,22 @@ package org.ow2.proactive.resourcemanager.core.jmx.mbean;
  */
 public interface MyAccountMBean {
 
-    public boolean isConnected();
-
+    /**
+     * The amount of time in milliseconds other users have spent in using the resources of the current user.
+     * @return the used node time in milliseconds
+     */
     public long getUsedNodeTime();
 
+    /**
+     * The amount of time in milliseconds the current user has offered resources to the Resource Manager.
+     * @return the provided node time in milliseconds
+     */
     public long getProvidedNodeTime();
 
+    /**
+     * Returns the number of provided nodes.
+     * @return the used node time in milliseconds
+     */
     public int getProvidedNodesCount();
 
 }

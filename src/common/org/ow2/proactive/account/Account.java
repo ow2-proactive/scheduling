@@ -37,13 +37,16 @@
 package org.ow2.proactive.account;
 
 /**
+ * The common definition of an account.
  *
- * @author vbodnart
- *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 2.1
  */
 public interface Account {
 
+    /**
+     * Returns the name of this account.
+     * @return The name of this account
+     */
     public String getName();
-
-    public boolean isConnected();
 }
