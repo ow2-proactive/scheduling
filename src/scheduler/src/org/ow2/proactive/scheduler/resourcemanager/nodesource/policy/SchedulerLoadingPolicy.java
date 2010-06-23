@@ -50,7 +50,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.PolicyRestriction;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
@@ -93,6 +93,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private int releaseDelay = 1000;
 
     // policy state
+    private boolean active = false;
     private int currentNodeNumberInNodeSource = 0;
     private int currentNodeNumberInResourceManager = 0;
     private int pendingNodesNumberAcq = 0;
@@ -128,7 +129,6 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     public void initActivity(Body body) {
         thisStub = (SchedulerLoadingPolicy) PAActiveObject.getStubOnThis();
-        PAActiveObject.setImmediateService("getTotalNodeNumber");
     }
 
     public void runActivity(Body body) {
@@ -147,7 +147,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
             if (delta > refreshTime) {
                 synchronized (monitor) {
-                    if (nodeSource != null) {
+                    if (active && nodeSource != null) {
                         try {
                             updateNumberOfNodes();
                         } catch (BodyTerminatedRequestException e) {
@@ -174,6 +174,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             activeTask += js.getNumberOfRunningTasks();
         }
 
+        active = true;
         logger.debug("Policy activated. Current number of tasks " + activeTask);
         return new BooleanWrapper(true);
     }
@@ -189,14 +190,15 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         return thisStub;
     }
 
-    protected IntWrapper getTotalNodeNumber() {
-        return new IntWrapper(nodeSource.getRMCore().getState().getTotalAliveNodesNumber());
-    }
-
     private void refreshPolicyState() {
 
         // recalculating the current node number in resource manager and the node source
-        currentNodeNumberInResourceManager = thisStub.getTotalNodeNumber().intValue();
+        try {
+            currentNodeNumberInResourceManager = nodeSource.getRMCore().getState().getTotalAliveNodesNumber();
+        } catch (RuntimeException e) {
+            logger.debug(e.getMessage(), e);
+            return;
+        }
         int newNodeNumberInNodeSource = nodeSource.getNodesCount();
 
         // recalculating pending nodes to release and to acquire
@@ -456,4 +458,12 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void shutdown(Client initiator) {
+        active = false;
+        super.shutdown(initiator);
+    }
 }
