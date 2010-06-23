@@ -867,7 +867,30 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 				</itemizedlist>
 			</para>
 		</section>
-		<section xml:id="scheduler_JMX_admin"><info><title>Connecting to JMX as administrator</title></info>
+		<section xml:id="accounting"><info><title>Accounting</title></info>
+			<para>
+				The Scheduler keeps track on how much jobs and tasks were done by a user. All the values are computed since the creation of the
+				database.
+			</para>
+				<itemizedlist>
+					<listitem>
+						<para>The total job count: the count of all jobs initiated by a user.</para>
+					</listitem>
+					<listitem>
+						<para>The total job duration: the overall amount of time spent in job execution initiated by a user.</para>
+					</listitem>					
+					<listitem>
+						<para>The total task count: the count of all tasks initiated by a user.</para>
+					</listitem>
+					<listitem>
+						<para>The total task duration: the overall amount of time spent in task execution.</para>
+					</listitem>
+				</itemizedlist>
+			<para>
+				The accounting information can be accessed through a JMX client or through the Scheduler GUI.
+			</para>				
+		</section>
+		<section xml:id="jmx"><info><title>Connecting to JMX as administrator</title></info>
 		
 		<para>
 			The JMX interface for remote management and monitoring provides information about the running ProActive Scheduler and allows the user to modify its configuration.			 
