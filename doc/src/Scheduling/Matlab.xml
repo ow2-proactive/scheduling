@@ -86,12 +86,17 @@
                 </listitem>
                 <listitem>
                     <para>
-                        Linux 64 bits / Matlab 7.5
+                        Linux 64 bits / Matlab 7.5,7.7,7.9
                     </para>
                 </listitem>
                 <listitem>
                     <para>
-                        Windows 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5
+                        Windows 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5,7.7,7.9
+                    </para>
+                </listitem>
+            <listitem>
+                    <para>
+                        Windows 64 bits / Matlab 7.5,7.7,7.9
                     </para>
                 </listitem>
         </itemizedlist>
@@ -664,15 +669,20 @@
                 </listitem>
                 <listitem>
                     <para>
-                        Linux 64 bits / Matlab 7.5
+                        Linux 64 bits / Matlab 7.5,7.7,7.9
                     </para>
                 </listitem>
                 <listitem>
                     <para>
-                        Windows 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5
+                        Windows 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5,7.7,7.9
                     </para>
                 </listitem>
-            </itemizedlist>
+            <listitem>
+                    <para>
+                        Windows 64 bits / Matlab 7.5,7.7,7.9
+                    </para>
+                </listitem>
+        </itemizedlist>
             <para>
                 If your architecture/version is not in the list, you'll need to compile the interface as described in
                 <xref linkend="SciMat_Matlab_Installation"/>. The compilation process will
