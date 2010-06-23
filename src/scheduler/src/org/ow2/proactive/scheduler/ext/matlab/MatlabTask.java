@@ -535,7 +535,7 @@ public class MatlabTask extends JavaExecutable {
             String tmpPath = System.getProperty("java.io.tmpdir");
 
             // log file writer used for debugging
-            File logFile = new File(tmpPath, "Task" + nodeName + ".log");
+            File logFile = new File(tmpPath, "MatlabTask" + nodeName + ".log");
             if (!logFile.exists()) {
                 logFile.createNewFile();
             }
