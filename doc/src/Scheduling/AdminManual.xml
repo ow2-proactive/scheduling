@@ -868,35 +868,155 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 			</para>
 		</section>
 		<section xml:id="scheduler_JMX_admin"><info><title>Connecting to JMX as administrator</title></info>
-
-			<para>
-				ProActive Scheduling provides a way to get informations or statistics through JMX using standard tools. Their are two different access.
-				Anonym access can be used to retrieve some general scheduling informations when Administrator access could be used to retrieve
-				the same informations plus some specified job statistics. Admin can also perform operations.
-
-
-				It is possible to get the JMX url on which to connect to using the Authentication API of the Scheduler. This
-				will retreive the RMI based URL to connect the JMX service.
-				For example, using the JConsole, just connect using the following URL as a remote access :
-			</para>
+		
+		<para>
+			The JMX interface for remote management and monitoring provides information about the running ProActive Scheduler and allows the user to modify its configuration.			 
+			For more details about JMX concepts please refer to official documentation about the <link xlink:href="http://java.sun.com/j2se/1.5.0/docs/guide/jmx/overview/architecture.html">JMX architecture</link>.  
+		</para>
+		<para>
+			<figure xml:id="jmx_archi">
+				<info>
+					<title>Structure of the Scheduler JMX interface</title>
+				</info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"
+							fileref="images/png/jmx/jmx_archi.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>		
+		<para>
+			The following aspects (or services) of the ProActive Scheduler are instrumented using MBeans that are managed through a JMX agent.
+			<itemizedlist>
+			<listitem>
+				<para>
+					The Scheduler <emphasis>Core</emphasis> exposes various runtime information using the <emphasis>RuntimeDataMBean</emphasis> such as:
+					<itemizedlist>
+						<listitem>
+							<para>The Scheduler status</para>
+						</listitem>						
+						<listitem>
+							<para>Pending/Running/Finished/Total job and task count</para>
+						</listitem>
+						<listitem>
+							<para>Some average values</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The <emphasis>Accounts Manager</emphasis> exposes accounting information for a specific user with the <emphasis>MyAccountMBean</emphasis> and <emphasis>AllAccountsMBean</emphasis> such as:
+					<itemizedlist>
+						<listitem>
+							<para>The total job and task count</para>
+						</listitem>						
+						<listitem>
+							<para>The total job and task duration</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Various management operations are exposed using the <emphasis>ManagementMBean</emphasis> such as:
+					<itemizedlist>
+						<listitem>
+							<para>Setting the accounts refresh rate</para>
+						</listitem>						
+						<listitem>
+							<para>Refresh all accounts</para>
+						</listitem>
+						<listitem>
+							<para>Reload the permission policy file</para>
+						</listitem>
+					</itemizedlist>					
+				</para>
+			</listitem>
+		</itemizedlist>			
+		</para>
+		<para>
+			As shown on <xref linkend="jmx_archi"/> the MBean server can be accessed by remote applications using one of the two available connectors:
 			<itemizedlist>
 				<listitem>
+					<para>The standard solution based on Remote Method Invocation (RMI) protocol is the RMI Connector accessible at the following url:</para>
 					<para>
-						<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXSchedulerAgent</emphasis> where <emphasis>hostname</emphasis> is the host name on which is
-						started the Scheduler. (Anonym access)
+						<literal>service:jmx:rmi:///jndi/rmi://</literal><emphasis>HOSTNAME</emphasis><literal>:</literal><emphasis>PORT</emphasis><literal>/JMXSchedulerAgent</literal>
 					</para>
+					<para>where</para>
+					<itemizedlist>
+						<listitem>
+							<para><emphasis>HOSTNAME</emphasis> is the hostname on which the Scheduler is started</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis>PORT</emphasis> (5822 by default) is the port number on which the JMX RMI connector server
+								has been started, it is defined by the property <emphasis>pa.scheduler.jmx.port</emphasis>
+							</para>
+						</listitem>
+					</itemizedlist>
 				</listitem>
 				<listitem>
+					<para>The ProActive Remote Objects Connector provides ProActive protocol aware connector accessible at the following url:</para>									
 					<para>
-						<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXSchedulerAgent_admin</emphasis> where <emphasis>hostname</emphasis> is the host name on which is
-						started the Scheduler. (Admin access)
-						In this case, add Scheduler Admin username and password. (demo//demo for example)
+						<literal>service:jmx:ro:///jndi/</literal><emphasis>PA_PROTOCOL</emphasis><literal>://</literal><emphasis>HOSTNAME</emphasis><literal>:</literal><emphasis>PORT</emphasis><literal>/JMXSchedulerAgent</literal>
 					</para>
+					<para>where</para>
+					<itemizedlist>
+						<listitem>
+							<para><emphasis>PA_PROTOCOL</emphasis> is the protocol defined by the <emphasis>proactive.communication.protocol</emphasis> property</para>
+						</listitem>
+						<listitem>
+							<para><emphasis>HOSTNAME</emphasis> is the hostname on which the Scheduler is started</para>
+						</listitem>
+						<listitem>
+							<para><emphasis>PORT</emphasis> is the protocol dependent port number usually defined by the property <emphasis>proactive.PA_PROTOCOL.port</emphasis>  
+							</para>
+						</listitem>
+					</itemizedlist>
 				</listitem>
-			</itemizedlist>
-			<para>
-				Once connected, you'll get access to some statistics on general scheduling process, specified jobs, tasks and perform operations.
-			</para>
+			</itemizedlist>		
+		</para>
+		<para>
+			The name of the connector (JMXSchedulerAgent by default) is defined by the property <emphasis>pa.scheduler.jmx.connectorname</emphasis>.
+		</para>
+		<para>
+			The JMX url on which to connect can obtained from the Authentication API of the Scheduler or by reading the log file
+			located in <literal>$SCHEDULER_HOME/.logs/SchedulerDev.log</literal>. In the log file, the address you have to retrieve is the one where 
+			the JMX RMI connector server has been started.
+			Once connected, you'll get an access to Scheduler statistics and accounting.
+		</para>
+		<para>
+			For example, to connect to the Scheduler JMX Agent with the popular JConsole tool, just enter the url of the standard
+			RMI Connector as shown on the <xref linkend="jmx_jconsole_connect"/>, as well as the username and the password.
+		</para> 			  
+			<figure xml:id="jmx_jconsole_connect">
+				<info>
+					<title>Connection using JConsole</title>
+				</info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"
+							fileref="images/png/jmx/jmx_jconsole_connect.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		
+		<para>
+			Then depending on the allowed permissions browse the attributes of the MBeans.
+		</para>			  
+			<figure xml:id="jmx_jconsole">
+				<info>
+					<title>Browse MBean attributes</title>
+				</info>
+				<mediaobject>
+					<imageobject>
+						<imagedata scalefit="1" width="100%" contentdepth="100%"
+							fileref="images/png/jmx/jmx_jconsole.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>									
 		</section>
 		<section xml:id="Extend_scheduler"><info><title>Extend the ProActive Scheduler</title></info>
 			<section xml:id="Extend_scheduler_policy"><info><title>Add a new scheduling policy</title></info>

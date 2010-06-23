@@ -1920,22 +1920,5 @@ Job 4 is not finished or unknown !
 					</itemizedlist>
 				</para>
 			</section>
-		</section>
-		<section xml:id="scheduler_JMX_anonym"><info><title>Connecting to JMX as anonymous user</title></info>
-			<para>
-				ProActive Scheduling also provides a way to get informations or statistics through JMX using standard tools. For
-				example, using the JConsole, just connect using the following url :
-			</para>
-			<itemizedlist>
-				<listitem>
-					<para>
-						<emphasis>service:jmx:rmi:///jndi/rmi://hostname/JMXSchedulerAgent</emphasis> where hostname is the host name on which is
-						started the Scheduler.
-					</para>
-				</listitem>
-			</itemizedlist>
-			<para>
-				Once connected, you'll get access to some statistics on general scheduling process.
-			</para>
-		</section>
+		</section>		
 </chapter>
