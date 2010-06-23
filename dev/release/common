@@ -126,9 +126,9 @@ function build_and_clean() {
 	rm -rf dev/
 }
 
-function generate_credential(){
+function generate_credential() {
 	echo "********************** Generating credential ************************"
-	../bin/unix/key-gen -P ../config/authentication/keys/pub.key -p ../config/authentication/keys/priv.key
+	# ../bin/unix/key-gen -P ../config/authentication/keys/pub.key -p ../config/authentication/keys/priv.key
 	../bin/unix/create-cred -F ../config/authentication/keys/pub.key -l rm -p rm_pwd -o ../config/authentication/rm.cred
 	../bin/unix/create-cred -F ../config/authentication/keys/pub.key -l scheduler -p scheduler_pwd -o ../config/authentication/scheduler.cred
 }
