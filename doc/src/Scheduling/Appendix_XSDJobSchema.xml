@@ -4,5 +4,5 @@
 		<title xml:id="XSD_Job_Schema_42">XSD Job Schema</title>
 	</info>
 
-	<programlisting language="xml"><textobject><textdata fileref="../../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/21/schedulerjob.xsd"/></textobject></programlisting>
+	<programlisting language="xml"><textobject><textdata fileref="../../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/2.1/schedulerjob.xsd"/></textobject></programlisting>
 </chapter>

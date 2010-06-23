@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:21" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:jobdescriptor:21 ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/21/schedulerjob.xsd"
+<job xmlns="urn:proactive:jobdescriptor:2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:2.1 ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/2.1/schedulerjob.xsd"
 	name="job_native_4_hosts" priority="normal" cancelJobOnError="false">
 	<variables>
 		<!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->

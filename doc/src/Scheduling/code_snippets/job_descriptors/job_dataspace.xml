@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:21" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:jobdescriptor:21 http://proactive.inria.fr/schemas/jobdescriptor/21/schedulerjob.xsd"
+<job xmlns="urn:proactive:jobdescriptor:2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:2.1 http://proactive.inria.fr/schemas/jobdescriptor/2.1/schedulerjob.xsd"
 	name="job_name" priority="normal" projectName="project_name" cancelJobOnError="true" logFile="path/to/a/log/file.log">
 
 	<description>Job description</description>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="../../../src/Extra/org.ow2.proactive.scheduler/common/xml/stylesheets/variables.xsl"?>
 <job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="urn:proactive:jobdescriptor:21 http://proactive.inria.fr/schemas/jobdescriptor/21/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:21" id="Scilab_job"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:2.1 http://proactive.inria.fr/schemas/jobdescriptor/2.1/schedulerjob.xsd"
+    xmlns="urn:proactive:jobdescriptor:2.1" id="Scilab_job"
     priority="normal" logFile="scilab_job.log">
     <description>
         A simple Scilab batch job, which computes the numerical
