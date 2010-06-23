@@ -117,7 +117,7 @@ listnodes();
 	<section xml:id="rm_JMX_admin"><info><title>JMX interface</title></info>
 		<para>
 			The JMX interface for remote management and monitoring provides information about the running ProActive Resource Manager and allows the user to modify its configuration.			 
-			For more details about JMX concepts please refer to official documentation about the <link xlink:href="http://java.sun.com/j2se/1.5.0/docs/guide/jmx/overview/architecture.html">JMX architecture</link>.  
+			For more details about JMX concepts, please refer to official documentation about the <link xlink:href="http://java.sun.com/j2se/1.5.0/docs/guide/jmx/overview/architecture.html">JMX architecture</link>.  
 		</para>
 		<para>
 			<figure xml:id="jmx_archi">
@@ -186,7 +186,7 @@ listnodes();
 		</itemizedlist>			
 		</para>
 		<para>
-			As shown on <xref linkend="jmx_archi"/> the MBean server can be accessed by remote applications using one of the two available connectors:
+			As shown on <xref linkend="jmx_archi"/>, the MBean server can be accessed by remote applications using one of the two available connectors:
 			<itemizedlist>
 				<listitem>
 					<para>The standard solution based on Remote Method Invocation (RMI) protocol is the RMI Connector accessible at the following url:</para>
@@ -201,7 +201,7 @@ listnodes();
 						<listitem>
 							<para>
 								<emphasis>PORT</emphasis> (5822 by default) is the port number on which the JMX RMI connector server
-								has been started, it is defined by the property <emphasis>pa.rm.jmx.port</emphasis>
+								has been started. It is defined by the property <emphasis>pa.rm.jmx.port</emphasis>.
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -231,9 +231,10 @@ listnodes();
 			The name of the connector (JMXRMAgent by default) is defined by the property <emphasis>rm.jmx.connectorname</emphasis>.
 		</para>
 		<para>
-			The JMX url on which to connect can obtained from the Authentication API of the RM or by reading the log file
-			located in <literal>$RM_HOME/.logs/RM.log</literal>. In the log file, the address you have to retrieve is the one where 
-			the JMX RMI connector server has been started.
+			The JMX url on which to connect can be obtained from the Authentication API of the RM or by reading the log file
+			located in <literal>$RM_HOME/.logs/RM.log</literal>. In that log file, the address you have to retrieve is the one where 
+			the JMX RMI connector server has been started:
+			<screen>[INFO 2010-06-17 10:23:27,813] [RM.AbstractJMXHelper.boot] Started JMX RMI connector server at service:jmx:rmi:///jndi/rmi://kisscool.inria.fr:5822/JMXRMAgent</screen>
 			Once connected, you'll get an access to RM statistics and accounting.
 		</para>
 		<para>
