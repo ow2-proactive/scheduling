@@ -727,7 +727,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         // job can be already ended (SCHEDULING-700)
         JobStatus currentStatus = job.getStatus();
         if (currentStatus == JobStatus.CANCELED || currentStatus == JobStatus.FAILED ||
-            currentStatus == JobStatus.KILLED) {
+            currentStatus == JobStatus.KILLED || currentStatus == JobStatus.FINISHED) {
             logger_dev.info("Job ending request for already ended job '" + job.getId() + "'");
             // job is already ended nothing to do
             return;
