@@ -443,6 +443,7 @@ public class SchedulerProxy implements Scheduler {
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
+
     public int connectToScheduler(SelectSchedulerDialogResult dialogResult) throws Throwable {
         try {
             userName = dialogResult.getLogin();
@@ -450,11 +451,11 @@ public class SchedulerProxy implements Scheduler {
 
             sai = SchedulerConnection.join(schedulerURL);
 
-            final Credentials creds = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
+            Credentials credentials = Credentials.createCredentials(userName, dialogResult.getPassword(), sai
                     .getPublicKey());
 
             if (scheduler == null || !scheduler.isConnected()) {
-                scheduler = sai.login(creds);
+                scheduler = sai.login(credentials);
             }
 
             sendConnectionCreatedEvent(dialogResult.getUrl(), userName, dialogResult.getPassword());
@@ -464,7 +465,7 @@ public class SchedulerProxy implements Scheduler {
             ControllerView.getInstance().connectedEvent();
 
             JMXActionsManager.getInstance().initJMXClient(schedulerURL, sai,
-                    new Object[] { dialogResult.getLogin(), creds });
+                    new Object[] { dialogResult.getLogin(), credentials });
             return CONNECTED;
         } catch (LoginException e) {
             e.printStackTrace();

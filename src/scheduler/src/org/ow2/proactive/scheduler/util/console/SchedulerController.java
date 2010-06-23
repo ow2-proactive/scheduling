@@ -60,7 +60,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.passwordhandler.PasswordField;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
@@ -294,8 +293,7 @@ public class SchedulerController {
     }
 
     protected void connect() throws LoginException, AlreadyConnectedException {
-        Scheduler scheduler = auth.login(credentials);
-        model.connectScheduler(scheduler);
+        model.connectScheduler(auth, credentials);
         String userStr = (user != null) ? "'" + user + "' " : "";
         logger.info("\t-> Admin " + userStr + "successfully connected" + newline);
     }
@@ -443,7 +441,8 @@ public class SchedulerController {
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
-        opt = new Option("env", "environment", true, "Execute the given script and go into interactive mode");
+        opt = new Option("env", "environment", true,
+            "Execute the given script as an environment for the interactive mode");
         opt.setArgName("filePath");
         opt.setRequired(false);
         opt.setArgs(1);
@@ -529,77 +528,76 @@ public class SchedulerController {
     protected boolean startCommandLine(CommandLine cmd) {
         model.setDisplayOnStdStream(true);
         if (cmd.hasOption("pausejob")) {
-            SchedulerModel.pause(cmd.getOptionValue("pausejob"));
+            model.pause_(cmd.getOptionValue("pausejob"));
         } else if (cmd.hasOption("resumejob")) {
-            SchedulerModel.resume(cmd.getOptionValue("resumejob"));
+            model.resume_(cmd.getOptionValue("resumejob"));
         } else if (cmd.hasOption("killjob")) {
-            SchedulerModel.kill(cmd.getOptionValue("killjob"));
+            model.kill_(cmd.getOptionValue("killjob"));
         } else if (cmd.hasOption("removejob")) {
-            SchedulerModel.remove(cmd.getOptionValue("removejob"));
+            model.remove_(cmd.getOptionValue("removejob"));
         } else if (cmd.hasOption("submit")) {
             if (cmd.hasOption("cmd") || cmd.hasOption("cmdf")) {
                 submitCMD();
             } else {
-                SchedulerModel.submit(cmd.getOptionValue("submit"));
+                model.submit_(cmd.getOptionValue("submit"));
             }
         } else if (cmd.hasOption("jobresult")) {
-            SchedulerModel.result(cmd.getOptionValue("jobresult"));
+            model.result_(cmd.getOptionValue("jobresult"));
         } else if (cmd.hasOption("taskresult")) {
             String[] optionValues = cmd.getOptionValues("taskresult");
             if (optionValues == null || optionValues.length != 2) {
                 model.error("taskresult must have two arguments. Start with --help for more informations");
             }
-            SchedulerModel.tresult(optionValues[0], optionValues[1]);
+            model.tresult_(optionValues[0], optionValues[1]);
         } else if (cmd.hasOption("joboutput")) {
-            SchedulerModel.output(cmd.getOptionValue("joboutput"));
+            model.output_(cmd.getOptionValue("joboutput"));
         } else if (cmd.hasOption("taskoutput")) {
             String[] optionValues = cmd.getOptionValues("taskoutput");
             if (optionValues == null || optionValues.length != 2) {
                 model.error("taskoutput must have two arguments. Start with --help for more informations");
             }
-            SchedulerModel.toutput(optionValues[0], optionValues[1]);
+            model.toutput_(optionValues[0], optionValues[1]);
         } else if (cmd.hasOption("jobpriority")) {
             try {
-                SchedulerModel.priority(cmd.getOptionValues("jobpriority")[0], cmd
-                        .getOptionValues("jobpriority")[1]);
+                model.priority_(cmd.getOptionValues("jobpriority")[0], cmd.getOptionValues("jobpriority")[1]);
             } catch (ArrayIndexOutOfBoundsException e) {
                 model.print("Missing arguments for job priority. Arguments must be <jobId> <newPriority>" +
                     newline + "\t" + "where priorities are Idle, Lowest, Low, Normal, High, Highest");
             }
         } else if (cmd.hasOption("jobstate")) {
-            SchedulerModel.jobState(cmd.getOptionValue("jobstate"));
+            model.jobState_(cmd.getOptionValue("jobstate"));
         } else if (cmd.hasOption("listjobs")) {
-            SchedulerModel.schedulerState();
+            model.schedulerState_();
         } else if (cmd.hasOption("stats")) {
-            SchedulerModel.showRuntimeData();
+            model.showRuntimeData_();
         } else if (cmd.hasOption("ma")) {
-            SchedulerModel.showMyAccount();
+            model.showMyAccount_();
         } else if (cmd.hasOption("ua")) {
-            SchedulerModel.showAccount(cmd.getOptionValue("ua"));
+            model.showAccount_(cmd.getOptionValue("ua"));
         } else if (cmd.hasOption("rp")) {
-            SchedulerModel.refreshPermissionPolicy();
+            model.refreshPermissionPolicy_();
         } else if (cmd.hasOption("script")) {
-            SchedulerModel.exec(cmd.getOptionValue("script"));
+            model.exec_(cmd.getOptionValue("script"));
         } else if (cmd.hasOption("test")) {
-            SchedulerModel.test();
+            model.test_();
         } else if (cmd.hasOption("start")) {
-            SchedulerModel.start();
+            model.start_();
         } else if (cmd.hasOption("stop")) {
-            SchedulerModel.stop();
+            model.stop_();
         } else if (cmd.hasOption("pause")) {
-            SchedulerModel.pause();
+            model.pause_();
         } else if (cmd.hasOption("freeze")) {
-            SchedulerModel.freeze();
+            model.freeze_();
         } else if (cmd.hasOption("resume")) {
-            SchedulerModel.resume();
+            model.resume_();
         } else if (cmd.hasOption("shutdown")) {
-            SchedulerModel.shutdown();
+            model.shutdown_();
         } else if (cmd.hasOption("kill")) {
-            SchedulerModel.kill();
+            model.kill_();
         } else if (cmd.hasOption("linkrm")) {
-            SchedulerModel.linkRM(cmd.getOptionValue("linkrm"));
+            model.linkRM_(cmd.getOptionValue("linkrm"));
         } else if (cmd.hasOption("policy")) {
-            SchedulerModel.changePolicy(cmd.getOptionValue("policy"));
+            model.changePolicy_(cmd.getOptionValue("policy"));
         } else {
             model.setDisplayOnStdStream(false);
             return true;

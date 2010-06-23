@@ -1,5 +1,9 @@
 importClass(org.ow2.proactive.resourcemanager.utils.console.ResourceManagerModel);
 
+var rm_ = ResourceManagerModel.getModel(false);
+var rm = rm_.getResourceManager();
+
+
 function exmode(displayStack, displayOnDemand){
 	if (displayStack == undefined){
 		displayStack = true;
@@ -7,7 +11,7 @@ function exmode(displayStack, displayOnDemand){
 	if (displayOnDemand == undefined){
 		displayOnDemand = true;
 	}
-	ResourceManagerModel.setExceptionMode(displayStack, displayOnDemand);
+	rm_.setExceptionMode_(displayStack, displayOnDemand);
 }
 
 function addnode(nodeURL, nodeSourceName){
@@ -15,7 +19,7 @@ function addnode(nodeURL, nodeSourceName){
 		nodeSourceName = null;
 		println("Node Source will be the default one as it is not set");
 	}
-	return ResourceManagerModel.addnode(nodeURL, nodeSourceName);
+	return rm_.addnode_(nodeURL, nodeSourceName);
 }
 
 function removenode(nodeURL,preemptively){
@@ -23,7 +27,7 @@ function removenode(nodeURL,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-    return ResourceManagerModel.removenode(nodeURL,preemptively);
+    return rm_.removenode_(nodeURL,preemptively);
 }
 
 function createns(nsName,infrastructure,policy){
@@ -35,7 +39,7 @@ function createns(nsName,infrastructure,policy){
 		policy = null;
 		println("Policy will be the default one as it is not set");
 	}
-	return ResourceManagerModel.createns(nsName,infrastructure,policy);
+	return rm_.createns_(nsName,infrastructure,policy);
 }
 
 function removens(nodeSourceName,preemptively){
@@ -43,23 +47,23 @@ function removens(nodeSourceName,preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return ResourceManagerModel.removens(nodeSourceName,preemptively);
+	return rm_.removens_(nodeSourceName,preemptively);
 }
 
 function listnodes(){
-    return ResourceManagerModel.listnodes();
+    return rm_.listnodes_();
 }
 
 function listns(){
-    return ResourceManagerModel.listns();
+    return rm_.listns_();
 }
 
 function listinfrastructures(){
-	return ResourceManagerModel.listInfrastructures();
+	return rm_.listInfrastructures_();
 }
 
 function listpolicies(){
-	return ResourceManagerModel.listPolicies();
+	return rm_.listPolicies_();
 }
 
 function shutdown(preemptively){
@@ -67,46 +71,51 @@ function shutdown(preemptively){
 		preemptively = false;
 		println("Preemptive mode will be false as it is not set");
 	}
-	return ResourceManagerModel.shutdown(preemptively);
+	return rm_.shutdown_(preemptively);
 }
 
 function stats(){
-	ResourceManagerModel.showRuntimeData();
+	rm_.showRuntimeData_();
 }
 
 function myaccount(){
-	ResourceManagerModel.showMyAccount();
+	rm_.showMyAccount_();
 }
 
 function account(username){
-	ResourceManagerModel.showAccount(username);
+	rm_.showAccount_(username);
 }
 
 function reloadpermissions(){
-	ResourceManagerModel.refreshPermissionPolicy();
+	rm_.refreshPermissionPolicy_();
+}
+
+function reconnect(rmURL){
+	if (rmURL == undefined){
+		rmURL = null;
+	}
+	rm_.reconnect_();
 }
 
 function exec(commandFilePath){
-	return ResourceManagerModel.exec(commandFilePath);
+	return rm_.exec_(commandFilePath);
 }
 
 function setlogsdir(logsDir){
 	if (logsDir == undefined){
 		logsDir = "";
 	}
-	ResourceManagerModel.setLogsDir(""+logsDir);
+	rm_.setLogsDir_(""+logsDir);
 }
 
 function viewlogs(nbLines){
-	ResourceManagerModel.viewlogs(""+nbLines);
+	rm_.viewlogs_(""+nbLines);
 }
 
 function exit(){
-	return ResourceManagerModel.exit();
+	return rm_.exit_();
 }
 
 function help(){
-	ResourceManagerModel.help();
+	rm_.help_();
 }
-
-var rm = ResourceManagerModel.getResourceManager();

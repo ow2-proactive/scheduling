@@ -101,7 +101,6 @@ public class ControllerView extends ViewPart {
             //scheduler is connected
 
             scheduler = SchedulerProxy.getInstance();
-
             startConsole(SchedulerModel.getModel(false));
 
             scrollableContainer = new JScrollPane(console.getJContentPane());

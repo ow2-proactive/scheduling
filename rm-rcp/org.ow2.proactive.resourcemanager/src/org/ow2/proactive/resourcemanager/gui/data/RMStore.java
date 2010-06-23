@@ -90,23 +90,24 @@ public class RMStore {
                 url += "/";
             }
 
-            RMAuthentication auth = null;
+            RMAuthentication rmAuthentication;
             try {
                 System.out.println("Joining resource manager on the following url " + url +
                     RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
-                auth = RMConnection.join(url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
+                rmAuthentication = RMConnection.join(url + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
             } catch (RMException e) {
                 throw new RMException("Resource manager does not exist on the following url: " + url, e);
             }
 
-            Credentials creds = null;
+            Credentials credentials;
             try {
                 try {
-                    creds = Credentials.createCredentials(login, password, auth.getPublicKey());
+                    credentials = Credentials.createCredentials(login, password, rmAuthentication
+                            .getPublicKey());
                 } catch (KeyException e) {
                     throw new LoginException("Could not create encrypted credentials: " + e.getMessage());
                 }
-                resourceManagerAO.connect(auth, creds);
+                resourceManagerAO.connect(rmAuthentication, credentials);
                 //resourceManager = auth.login(creds);
             } catch (LoginException e) {
                 Activator.log(IStatus.INFO, "Login exception for user " + login, e);
@@ -125,7 +126,8 @@ public class RMStore {
             //ControllerView.getInstance().connectedEvent(isAdmin);
 
             // Initialize the JMX chartit action
-            JMXActionsManager.getInstance().initJMXClient(url, auth, new Object[] { login, creds });
+            JMXActionsManager.getInstance().initJMXClient(url, rmAuthentication,
+                    new Object[] { login, credentials });
 
         } catch (ActiveObjectCreationException e) {
             Activator.log(IStatus.ERROR, "Exception when creating active object", e);
