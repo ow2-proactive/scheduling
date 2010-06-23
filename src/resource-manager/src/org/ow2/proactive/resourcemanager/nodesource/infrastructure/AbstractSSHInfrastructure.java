@@ -75,6 +75,18 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
      */
     @Configurable
     protected String javaPath = System.getProperty("java.home") + "/bin/java";
+
+    /**
+     * Use the Java from JAVA_HOME if defined
+     */
+    {
+        String jhome = System.getenv("JAVA_HOME");
+        File f = new File(jhome);
+        if (f.exists() && f.isDirectory()) {
+            javaPath = jhome + ((jhome.endsWith("/")) ? "" : "/") + "bin/java";
+        }
+    }
+
     /**
      * ShhClient options (@see {@link SSHClient})
      */
