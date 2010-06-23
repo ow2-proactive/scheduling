@@ -37,7 +37,6 @@
 package org.ow2.proactive.utils.console;
 
 import java.util.HashMap;
-import java.util.ListIterator;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -116,6 +115,7 @@ public final class MBeanInfoViewer {
                 this.mbeanName = new ObjectName(mbeanNameAsString);
             }
             this.connection.setAttribute(this.mbeanName, new Attribute(attributeName, value));
+            this.mbeanName = null;
         } catch (Exception e) {
             throw new RuntimeException("Unable to set the attribute " + attributeName + " of " +
                 mbeanNameAsString, e);
@@ -175,13 +175,19 @@ public final class MBeanInfoViewer {
                 this.padding += 2;
             }
             // Get the list of attributes in a single JMX call  
-            final AttributeList list = this.connection.getAttributes(this.mbeanName, names);
-            final ListIterator<?> it = list.listIterator();
+            final AttributeList list = this.connection.getAttributes(this.mbeanName, this.names);
             final StringBuilder out = new StringBuilder();
-            while (it.hasNext()) {
-                Attribute att = (Attribute) it.next();
-                out.append(String
-                        .format("  %1$-" + this.padding + "s" + att.getValue() + "\n", att.getName()));
+            for (int i = 0; i < this.names.length; i++) {
+                final String attName = this.names[i];
+                Object value = "Unavailable";
+                for (int j = 0; j < list.size(); j++) {
+                    final Attribute a = (Attribute) list.get(j);
+                    if (a.getName().equals(attName)) {
+                        value = a.getValue();
+                        break;
+                    }
+                }
+                out.append(String.format("  %1$-" + this.padding + "s" + value + "\n", attName));
             }
             return out.toString();
         } catch (Exception e) {
