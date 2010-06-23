@@ -8,7 +8,7 @@ PREVIOUS_TAG=dev
 cd $SCHEDULER_DIR
 WORKING_DIR=$PWD
 
-# Replace all 'dev' version number by this version number in every XML, XSD, RNC files
+# Replace all '$PREVIOUS_TAG' version number by this version number in every XML, XSD, RNC files
 echo Replacing \'$PREVIOUS_TAG\' tag with current version for XML files
 
 # Do not replace in .* dirs (like .git...)
@@ -24,8 +24,8 @@ done
 # create local dir for schemas
 cd ./src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/
 mkdir $VERSION
-cp ./dev/* ./$VERSION/
-rm -r ./dev/*
+cp ./$PREVIOUS_TAG/* ./$VERSION/
+rm -r ./$PREVIOUS_TAG/*
 
 
 cd $WORKING_DIR
