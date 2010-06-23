@@ -58,4 +58,8 @@ public class SplittedResult implements Serializable {
     public Token getResult(int index) {
         return token.getElement(index);
     }
+
+    public String toString() {
+        return token.toString();
+    }
 }
