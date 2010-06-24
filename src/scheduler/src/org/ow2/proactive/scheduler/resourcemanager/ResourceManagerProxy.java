@@ -41,6 +41,7 @@ import java.security.KeyException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
@@ -61,6 +62,7 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.resourcemanager.frontend.RMUser;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -86,6 +88,7 @@ public class ResourceManagerProxy implements InitActive, RunActive {
     private static Logger logger = ProActiveLogger.getLogger(SchedulerLoggers.RMPROXY);
     private static Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.RMPROXY);
     private static final long VERIF_TIMEOUT = 10000;
+    private static final Map<URI, ResourceManagerProxy> proxiesByURL = new HashMap<URI, ResourceManagerProxy>();
     private ResourceManager resourceManager;
     private HashMap<Node, ScriptResult<?>> nodes;
     private boolean running = true;
@@ -120,8 +123,14 @@ public class ResourceManagerProxy implements InitActive, RunActive {
         String url = uriIM.toString();
 
         RMAuthentication auth = RMConnection.join(url);
-        return (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class.getCanonicalName(),
-                new Object[] { auth });
+
+        //check if proxy exists
+        ResourceManagerProxy proxy;
+        if ((proxy = proxiesByURL.get(uriIM)) == null) {
+            proxy = PAActiveObject.newActive(ResourceManagerProxy.class, new Object[] { auth });
+            proxiesByURL.put(uriIM, proxy);
+        }
+        return proxy;
     }
 
     public boolean isAlive() {
