@@ -87,7 +87,8 @@ public class ClientsPolicy extends Policy {
 
         String debugProperty = System.getProperty("java.security.debug");
         if (debugProperty != null) {
-            // with "custompolicy" only traces of this policy will be printed
+            // if the property is set to "clients" it won't affect the rest of security system
+            // so no other traces except from this policy will appear
             if (debugProperty.contains("all") || debugProperty.contains("policy") ||
                 debugProperty.contains("clients")) {
                 debug = true;
