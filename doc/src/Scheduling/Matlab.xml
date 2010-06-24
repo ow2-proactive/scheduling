@@ -44,13 +44,6 @@
             <itemizedlist>
                 <listitem>
                     <para>
-                        The ability to write simple Matlab tasks workflows and
-                        submit these workflows to the ProActive Scheduler (with the possibility to define dependencies
-                        between tasks and transfering results from one task to the other).
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
                         A parallelization facility directly integrated in the Matlab environment (such
                         as Mathworks Parallel Computing Toolbox). Matlab will create a connection to the scheduler, and
                         users will be able, directly from Matlab, to parallelize scripts and retrieve results.
@@ -59,6 +52,13 @@
                         <xref linkend="Scheduler_Matlab_Embedded"/>
                     </para>
                 </listitem>
+                <listitem>
+                    <para>
+                        The ability to write simple Matlab tasks workflows and
+                        submit these workflows to the ProActive Scheduler (with the possibility to define dependencies
+                        between tasks and transfering results from one task to the other).
+                    </para>
+                </listitem>                
             </itemizedlist>
         </section>
     </section>
@@ -69,7 +69,7 @@
 
         <para>
             This Scheduler Matlab interface supports many Matlab releases (from
-            7.1 on).
+            7.2 on).
         </para>
 
         <para>
@@ -81,7 +81,7 @@
         <itemizedlist>
                 <listitem>
                     <para>
-                        Linux 32 bits / Matlab 7.1,7.3,7.5
+                        Linux 32 bits / Matlab 7.3,7.5
                     </para>
                 </listitem>
                 <listitem>
@@ -91,7 +91,7 @@
                 </listitem>
                 <listitem>
                     <para>
-                        Windows 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5,7.7,7.9
+                        Windows 32 bits / Matlab 7.2,7.3,7.4,7.5,7.7,7.9
                     </para>
                 </listitem>
             <listitem>
@@ -101,13 +101,209 @@
                 </listitem>
         </itemizedlist>
         <para>
-            For other architectures versions, the instructions for compiling the linkage
+            For other architectures/version couple, the instructions for compiling the linkage
             are in the file SCHEDULING/extensions/matlab/README :
         </para>
 
         <programlisting><textobject><textdata fileref="../../../extensions/matlab/README"/></textobject></programlisting>
     </section>
 
+
+    <section xml:id="Scheduler_Matlab_Embedded">
+        <info>
+            <title>Matlab embedded parallelization</title>
+        </info>
+        <para>
+            This section describes the integration of ProActive Scheduler inside the Matlab environment.
+        </para>
+        <para>
+            The purpose of this toolkit is to allow parallel execution directly inside the Matlab environment. The user
+            can transparently launch parallel scripts and functions using its familiar way of programming within Matlab.
+            The feature currently supports embarassingly parrallel problems only, meaning that for a set of scripts
+            launched in parallel, each script's execution must be independant from other script's execution.
+        </para>
+        <section xml:id="SciMat_Embedded_installation">
+            <info>
+                <title>Installation</title>
+            </info>
+            <para>
+                The toolkit requires a connection to the
+                <emphasis>ProActive Scheduler</emphasis>
+                and<emphasis>Resource Manager</emphasis>. In consequence the scheduler needs to be installed and
+                running. Explanation on how to install and use the ProActive Scheduler and Resource Manager are detailed
+                in the Scheduler documentation. When a parallel script is executed, the toolkit wraps the scripts
+                inside a job definition and submits it to the running scheduler. Execution of the job can therefore be
+                monitored using the Scheduler GUI. The scheduler will run several Matlab engines in order to parallelize
+                scripts. In consequence, these engines will need a Matlab licence (up to 4 engines
+                running on the same computer will take only one licence though). Finally, the Scheduler will need to
+                have acces to the native Java interface to Matlab in order to launch the Matlab engines. It's already
+                compiled for a set of Matlab versions and architectures (see list above)
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Linux 32 bits / Matlab 7.3,7.5
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Linux 64 bits / Matlab 7.5,7.7,7.9
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Windows 32 bits / Matlab 7.2,7.3,7.4,7.5,7.7,7.9
+                    </para>
+                </listitem>
+            <listitem>
+                    <para>
+                        Windows 64 bits / Matlab 7.5,7.7,7.9
+                    </para>
+                </listitem>
+        </itemizedlist>
+            <para>
+                If your architecture/version is not in the list, you'll need to compile the interface as described in
+                <xref linkend="SciMat_Matlab_Installation"/>. The compilation process will
+                put the generated native library inside the ProActive library directory. You can then launch the
+                Scheduler : it will have access to the native libraries you've compiled.
+            </para>
+            <para>
+                One other step needed before using the toolkit it to create a file that grants the matlab jvm the necessary rights to work with ProActive.
+                There are two ways of doing this. Both ways have pros and cons and users must determine what's best for them:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Create a file called <emphasis>.java.policy</emphasis> (notice the "dot" in front of the file name) in the <emphasis>HOME</emphasis> directory of the current user.
+                For Windows users the HOME directory is the folder "\Documents And Settings\username". The file must contain the following text:
+                    </para>
+                    <screen>grant {
+  permission java.security.AllPermission;
+};</screen>
+                    <para>
+                        Pros of this method is that it has to be done once and will remain for every matlab session afterwards for the same user. Cons is that it overrides the default security scheme used by java, and thus every jvm started by the user will have a relaxed security scheme.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Create a <emphasis>java.opts</emphasis> file in the bin/_arch_ directory of your matlab installation. _arch_ is a directory found in MATLAB_HOME/bin which countains executables for your specific environment (i.e. "win32" for Windows 32 bit, "glnxa64" for Linux 64-bit etc). Create as well a <emphasis>matlab.java.policy</emphasis> file in the same directory. The matlab.java.policy must have the same content as the .java.policy file above. The java.opts file should contain:
+                    </para>
+                    <screen>-Djava.security.manager -Djava.security.policy=/full/path/to/the/matlab.java.policy/file</screen>
+                    <para>WARNING: be very careful on the format of the java.opts file. as the content of this file is read to add command line arguments to the Java Virtual Machine run with Matlab, the format is very sensible and depends on the Operating System. On some systems, Matlab doesn't accept if you simply write the two options -D... on a single line. You'll have to write them separately in two lines. If even this doesn't work, you can try adding a backslash at the end of the first line. You can make sure that Matlab correctly read the file by typing the following command at the Matlab prompt : java.lang.System.getProperty('java.security.policy'). If the command returns the path to the matlab.java.policy file, then everything is fine.</para>
+                    <para>
+                        Pros of this method is that it allows users to specify that only the matlab jvm has relaxed permission and not every jvms run on the computer. Cons is that it needs write access to the directories where matlab is installed, and it's bit more complicated to set up than the other method.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Finally, on Windows systems, it is strongly recommended to add the different ProActive jar (library) files to the collection of libraries used by Matlab at startup. It has been often observed on Windows that Matlab fails to load the ProActive libraries dynamically after being started. Adding the libraries statically before Matlab starts solve this problem.
+                In order to do that, you'll need to edit the file "classpath.txt" located in MATLAB_HOME/toolbox/local directory and add the following lines at the end:
+            </para>
+            <screen>path_to_scheduler\dist\lib\ProActive.jar
+path_to_scheduler\dist\lib\ProActive_Scheduler-core.jar
+path_to_scheduler\dist\lib\ProActive_ResourceManager.jar
+path_to_scheduler\dist\lib\ProActive_SRM-common.jar</screen>
+        </section>
+        <section xml:id="SciMat_Embedded_Usage">
+            <info>
+                <title>Usage</title>
+            </info>
+            <para>
+                Once the Scheduler and Resource Mananger are running, here is the procedure to use the toolkit :
+            </para>
+            <orderedlist>
+                <listitem>
+                    <para>
+                        Start a Matlab session.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Add the scripts contained in <emphasis>SCHEDULER/extensions/matlab/embedded</emphasis> to your Matlab path :
+                    </para>
+                    <screen>&gt;&gt; addpath('/mypath-to-scheduler/extensions/matlab/embedded');</screen>
+                    <para>
+                        Alternatively and for repeated use, you can add this line at the end of the matlabrc.m file - used by Matlab at startup - and located in  the MATLAB_HOME/toolbox/local folder.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Execute the following command on the Matlab prompt:
+                    </para>
+                    <screen>&gt;&gt; PAconnect('//machine-where-the scheduler-is-running');</screen>
+                    <para>
+                        This will try to connect to the Scheduler at the specified location.
+                        If the scheduler can be found on the machine you specified, a pop up window will
+                        appear asking you to enter your login information. In order to create accounts for the
+                        scheduler, read the scheduler documentation.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        You're now ready to run some parallel scripts. In order to run a Matlab function in parallel you'll need to call the function PAsolve() as
+                        follows:
+                    </para>
+                    <screen>&gt;&gt; resl = PAsolve( @factorial, {{1}, {2}, {3}, {4}, {5}} );</screen>
+                    <para>
+                        This for example will execute the factorial function on 5 different machines, the first machine
+                        using the parameter 1, the second, the parameter 2, etc...
+                        The second argument to PAsolve is a cell array of cell arrays. Each internal cell array represents the list of arguments to give to the desired function.
+                        Here factorial takes only one argument, accordingly each internal cell array is of length 1.
+                        The function used cannot be a Mex function, unless the same mex function is made manually available on the remote engines.
+                    </para>
+                    <para>
+                        The file system between your Matlab session and the remote engines needs to be shared (through
+                        NFS or something equivalent). Your local user path will be automatically copied to the remote
+                        engine. Meaning that if you are using a Matlab function f located in the m-file f.m at path P,
+                        then the remote engine will try to look at the function at the same path P. That's why it is mandatory that the path P is accessible from both the local session and remote engine.
+                    </para>
+                    <para>
+                        The result of the PAsolve function is a Matlab Object of type PAResultList. When displayed this object will print:
+                    </para>
+                    <screen>&gt;&gt; resl
+Awaited Result List</screen>
+                    <para>
+			This means that the result from the PAsolve function is not yet available. The PAsolve is thus called "asynchronously" and doesn't block the matlab interpreter execution.
+			This allows for example to run other PAsolve(s) while the first PAsolve is still computing the result. If, at some point, the results of a PAsolve function is needed, this can be achieved by manipulating the PAResultList object.
+			A manipulation of the object will trigger a wait-by-necessity mechanism, this means that the matlab interpreter will block and wait until the result is available. The object can be manipulated either by using indexation, thus displaying a single member of the list (or more, depending on the index):
+                    </para>
+                    <screen>&gt;&gt; resl(3) # triggers wait_by_necessity
+6  # fact(3)</screen>
+                    <para>
+			Or by using the object attribute <emphasis>wait</emphasis>, in that case the result of the wait attribute will be the whole result list:
+                    </para>
+                    <screen>&gt;&gt; resl.wait # triggers wait_by_necessity
+[1] [2] [6] [24] [120]</screen>
+                </listitem>
+                <listitem>
+			<para>
+				Finally a PAeval function exists, it is similar to PAsolve but takes only one argument instead of a list of argument and returns only a PAResult instead of a PAResultList:
+			</para>
+			<screen>&gt;&gt; res = PAeval( @factorial, {5} )
+Awaited Result
+&gt;&gt; res.wait   # wait_by_necessity
+120</screen>
+                </listitem>
+            </orderedlist>
+            <para>
+		Thanks to the mechanism of asynchronous results, the ProActive Matlab interface can help you run Matlab code in parallel, or turn algorithms to parallel versions, thus improving their speed.
+		Each invidual task submitted in parallel should take enough time in order to have a benefit from the parallelization.
+		For example, if each matlab task run remotely would run locally in less than a milisecond, no gain would be observed from the parallelization, as the overhead from the network and the different layers in action are far above a milisecond time.
+            </para>
+            <para>
+                On the remote nodes, scripts will be launched to find automatically where matlab is installed. By default the scripts will select the latest Matlab version available. This might cause problems if for example you want to use a specific matlab version instead of the default one.
+                On Windows, it is strongly recommended to have only one instance of Matlab installed on any machine. On Linux, it's possible to override the script behaviour by specifying a MATLAB environment variable such as this in the .bashrc file of the account used to run the scheduler:
+            </para>
+            <programlisting>export MATLAB=/usr/local/bin/matlab2008b</programlisting>
+            <para>
+                Further releases of the
+                extension will allow a finer control over that by
+                specifying Matlab's minimum version requirement
+                inside job descriptors.
+            </para>
+
+        </section>
+    </section>
     <section xml:id="Scheduler_Matlab_SchedulerJobs">
         <info>
             <title>Matlab Scheduler Jobs</title>
@@ -151,10 +347,14 @@
                     configuration script, you won't have to bother where
                     Matlab is installed at runtime, the Scheduler will
                     determine it for you. A little drawback to this is
-                    that the scheduler will use the first Matlab
+                    that the scheduler will use the latest Matlab
                     installation found on the system, so it might not do
                     what you want when several Matlab installations are
-                    on the same machine. Further releases of the
+                    on the same machine. On Windows, it is strongly recommended to have only one instance of Matlab installed on any machine. On Linux, it's possible to override the script behaviour by specifying a MATLAB environment variable such as this in the .bashrc file:
+                </para>
+                <programlisting>export MATLAB=/usr/local/bin/matlab2008b</programlisting>
+                <para>
+                    Further releases of the
                     extension will allow a finer control over that by
                     specifying Matlab's minimum version requirement
                     inside job descriptors.
@@ -280,7 +480,7 @@
                         <xref linkend="Scheduler_Matlab_AdvancedTasks"/>,
                         we describe more advanced tasks. The
                         javaExecutable tag contains a child tag called
-                        <emphasis>parameters</emphasis>. 
+                        <emphasis>parameters</emphasis>.
 						This tag contains a list of
                         <emphasis>parameter</emphasis>
                         tags which define the task parameters. Each
@@ -630,190 +830,5 @@
             </section>
         </section>
     </section>
-    <section xml:id="Scheduler_Matlab_Embedded">
-        <info>
-            <title>Matlab embedded parallelization</title>
-        </info>
-        <para>
-            This section describes the integration of ProActive Scheduler inside the Matlab environment.
-        </para>
-        <para>
-            The purpose of this toolkit is to allow parallel execution directly inside the Matlab environment. The user
-            can transparently launch parallel scripts and functions using its familiar way of programming within Matlab.
-            The feature currently supports embarassingly parrallel problems only, meaning that for a set of scripts
-            launched in parallel, each script's execution must be independant from other script's execution.
-        </para>
-        <section xml:id="SciMat_Embedded_installation">
-            <info>
-                <title>Installation</title>
-            </info>
-            <para>
-                The toolkit requires a connection to the
-                <emphasis>ProActive Scheduler</emphasis>
-                and<emphasis>Resource Manager</emphasis>. In consequence the scheduler needs to be installed and
-                running. Explanation on how to install and use the ProActive Scheduler and Resource Manager are detailed
-                in the Scheduler documentation. When a parallel script is executed, the toolkit wraps the scripts
-                inside a job definition and submits it to the running scheduler. Execution of the job can therefore be
-                monitored using the Scheduler GUI. The scheduler will run several Matlab engines in order to parallelize
-                scripts. In consequence, these engines will need a Matlab licence (up to 4 engines
-                running on the same computer will take only one licence though). Finally, the Scheduler will need to
-                have acces to the native Java interface to Matlab in order to launch the Matlab engines. It's already
-                compiled for a set of Matlab versions and architectures as shown in the following list (it's not
-                compatible with Matlab versions prior to 7.1):
-            </para>
-            <itemizedlist>
-                <listitem>
-                    <para>
-                        Linux 32 bits / Matlab 7.1,7.3,7.5
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        Linux 64 bits / Matlab 7.5,7.7,7.9
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        Windows 32 bits / Matlab 7.1,7.2,7.3,7.4,7.5,7.7,7.9
-                    </para>
-                </listitem>
-            <listitem>
-                    <para>
-                        Windows 64 bits / Matlab 7.5,7.7,7.9
-                    </para>
-                </listitem>
-        </itemizedlist>
-            <para>
-                If your architecture/version is not in the list, you'll need to compile the interface as described in
-                <xref linkend="SciMat_Matlab_Installation"/>. The compilation process will
-                put the generated native library inside the ProActive library directory. You can then launch the
-                Scheduler : it will have access to the native libraries you've compiled.
-            </para>
-            <para>
-                One other step needed before using the toolkit it to create a file that grants the matlab jvm the necessary rights to work with ProActive.
-                There are two ways of doing this. Both ways have pros and cons and users must determine what's best for them:
-            </para>
-            <itemizedlist>
-                <listitem>
-                    <para>
-                        Create a file called <emphasis>.java.policy</emphasis> (notice the "dot" in front of the file name) in the <emphasis>HOME</emphasis> directory of the current user.
-                For Windows users the HOME directory is the folder "\Documents And Settings\username". The file must contain the following text:
-                    </para>
-                    <screen>grant {
-  permission java.security.AllPermission;
-};</screen>
-                    <para>
-                        Pros of this method is that it has to be done once and will remain for every matlab session afterwards for the same user. Cons is that it overrides the default security scheme used by java, and thus every jvm started by the user will have a relaxed security scheme.
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        Create a <emphasis>java.opts</emphasis> file in the bin/_arch_ directory of your matlab installation. _arch_ is a directory found in MATLAB_HOME/bin which countains executables for your specific environment (i.e. "win32" for Windows 32 bit, "glnxa64" for Linux 64-bit etc). Create as well a <emphasis>matlab.java.policy</emphasis> file in the same directory. The matlab.java.policy must have the same content as the .java.policy file above. The java.opts file should contain:
-                    </para>
-                    <screen>-Djava.security.manager -Djava.security.policy=/full/path/to/the/matlab.java.policy/file</screen>
-                    <para>WARNING: be very careful on the format of the java.opts file. as the content of this file is read to add command line arguments to the Java Virtual Machine run with Matlab, the format is very sensible and depends on the Operating System. On some systems, Matlab doesn't accept if you simply write the two options -D... on a single line. You'll have to write them separately in two lines. If even this doesn't work, you can try adding a backslash at the end of the first line. You can make sure that Matlab correctly read the file by typing the following command at the Matlab prompt : java.lang.System.getProperty('java.security.policy'). If the command returns the path to the matlab.java.policy file, then everything is fine.</para>
-                    <para>
-                        Pros of this method is that it allows users to specify that only the matlab jvm has relaxed permission and not every jvms run on the computer. Cons is that it needs write access to the directories where matlab is installed, and it's bit more complicated to set up than the other method.
-                    </para>
-                </listitem>
-            </itemizedlist>
-            <para>
-                Finally, on Windows systems, it is strongly recommended to add the different ProActive jar (library) files to the collection of libraries used by Matlab at startup. It has been often observed on Windows that Matlab fails to load the ProActive libraries dynamically after being started. Adding the libraries statically before Matlab starts solve this problem.
-                In order to do that, you'll need to edit the file "classpath.txt" located in MATLAB_HOME/toolbox/local directory and add the following lines at the end:
-            </para>
-            <screen>path_to_scheduler\dist\lib\ProActive.jar
-path_to_scheduler\dist\lib\ProActive_Scheduler-core.jar
-path_to_scheduler\dist\lib\ProActive_ResourceManager.jar
-path_to_scheduler\dist\lib\ProActive_SRM-common.jar</screen>
-        </section>
-        <section xml:id="SciMat_Embedded_Usage">
-            <info>
-                <title>Usage</title>
-            </info>
-            <para>
-                Once the Scheduler and Resource Mananger are running, here is the procedure to use the toolkit :
-            </para>
-            <orderedlist>
-                <listitem>
-                    <para>
-                        Start a Matlab session.
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        Add the scripts contained in <emphasis>SCHEDULER/extensions/matlab/embedded</emphasis> to your Matlab path :
-                    </para>
-                    <screen>&gt;&gt; addpath('/mypath-to-scheduler/extensions/matlab/embedded');</screen>
-                    <para>
-                        Alternatively and for repeated use, you can add this line at the end of the matlabrc.m file - used by Matlab at startup - and located in  the MATLAB_HOME/toolbox/local folder.
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        Execute the following command on the Matlab prompt:
-                    </para>
-                    <screen>&gt;&gt; PAconnect('//machine-where-the scheduler-is-running');</screen>
-                    <para>
-                        This will try to connect to the Scheduler at the specified location.
-                        If the scheduler can be found on the machine you specified, a pop up window will
-                        appear asking you to enter your login information. In order to create accounts for the
-                        scheduler, read the scheduler documentation.
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>
-                        You're now ready to run some parallel scripts. In order to run a Matlab function in parallel you'll need to call the function PAsolve() as
-                        follows:
-                    </para>
-                    <screen>&gt;&gt; resl = PAsolve( @factorial, {{1}, {2}, {3}, {4}, {5}} );</screen>
-                    <para>
-                        This for example will execute the factorial function on 5 different machines, the first machine
-                        using the parameter 1, the second, the parameter 2, etc...
-                        The second argument to PAsolve is a cell array of cell arrays. Each internal cell array represents the list of arguments to give to the desired function.
-                        Here factorial takes only one argument, accordingly each internal cell array is of length 1.
-                        The function used cannot be a Mex function, unless the same mex function is made manually available on the remote engines.
-                    </para>
-                    <para>
-                        The file system between your Matlab session and the remote engines needs to be shared (through
-                        NFS or something equivalent). Your local user path will be automatically copied to the remote
-                        engine. Meaning that if you are using a Matlab function f located in the m-file f.m at path P,
-                        then the remote engine will try to look at the function at the same path P. That's why it is mandatory that the path P is accessible from both the local session and remote engine.
-                    </para>
-                    <para>
-                        The result of the PAsolve function is a Matlab Object of type PAResultList. When displayed this object will print:
-                    </para>
-                    <screen>&gt;&gt; resl
-Awaited Result List</screen>
-                    <para>
-			This means that the result from the PAsolve function is not yet available. The PAsolve is thus called "asynchronously" and doesn't block the matlab interpreter execution.
-			This allows for example to run other PAsolve(s) while the first PAsolve is still computing the result. If, at some point, the results of a PAsolve function is needed, this can be achieved by manipulating the PAResultList object.
-			A manipulation of the object will trigger a wait-by-necessity mechanism, this means that the matlab interpreter will block and wait until the result is available. The object can be manipulated either by using indexation, thus displaying a single member of the list (or more, depending on the index):
-                    </para>
-                    <screen>&gt;&gt; resl(3) # triggers wait_by_necessity
-6  # fact(3)</screen>
-                    <para>
-			Or by using the object attribute <emphasis>wait</emphasis>, in that case the result of the wait attribute will be the whole result list:
-                    </para>
-                    <screen>&gt;&gt; resl.wait # triggers wait_by_necessity
-[1] [2] [6] [24] [120]</screen>
-                </listitem>
-                <listitem>
-			<para>
-				Finally a PAeval function exists, it is similar to PAsolve but takes only one argument instead of a list of argument and returns only a PAResult instead of a PAResultList:
-			</para>
-			<screen>&gt;&gt; res = PAeval( @factorial, {5} )
-Awaited Result
-&gt;&gt; res.wait   # wait_by_necessity
-120</screen>
-                </listitem>
-            </orderedlist>
-            <para>
-		Thanks to the mechanism of asynchronous results, the ProActive Matlab interface can help you run Matlab code in parallel, or turn algorithms to parallel versions, thus improving their speed.
-		Each invidual task submitted in parallel should take enough time in order to have a benefit from the parallelization.
-		For example, if each matlab task run remotely would run locally in less than a milisecond, no gain would be observed from the parallelization, as the overhead from the network and the different layers in action are far above a milisecond time.
-            </para>
-        </section>
-    </section>
-
 
 </chapter>

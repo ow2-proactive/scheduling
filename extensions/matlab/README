@@ -7,7 +7,7 @@ The Matlab interface to the ProActive Scheduler allows you to schedule Matlab sc
 1) job descriptors of the ProActive Scheduler
 2) Directly from the Matlab envrionment
 
-The interface is compatible with Matlab 7.1 (R14.3) and later.
+The interface is compatible with Matlab 7.2 (R14.3) and later.
 
 ------------- Ptolemy library -----------------
 
@@ -15,9 +15,10 @@ You need to compile a native library called Ptolemy that will link against the n
 A few percompiled libraries are bundled with the Scheduler, if your architecture matches one of the following,
 you don't need to compile the ptolemy library :
 
-Linux 32bits : Matlab 7.1,7.3,7.5
-Linux 64bits : Matlab 7.5
-Windows 32bits : Matlab 7.1,7.2,7.3,7.4,7.5
+Linux 32bits : Matlab 7.3,7.5
+Linux 64bits : Matlab 7.5,7.7,7.9
+Windows 32bits : Matlab 7.2,7.3,7.4,7.5,7.7,7.9
+Windows 64bits : Matlab 7.5,7.7,7.9
 
 If your architecture is different, you need to run scripts bundled in SCHEDULER/extensions/matlab.
 The scripts in this directory can be run either Linux or Cygwin(under Windows)
