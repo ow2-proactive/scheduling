@@ -49,8 +49,6 @@ import java.util.Enumeration;
 import javax.management.MBeanPermission;
 import javax.security.auth.AuthPermission;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.permissions.ClientPermission;
 import org.ow2.proactive.permissions.PrincipalPermission;
@@ -77,14 +75,28 @@ public class ClientsPolicy extends Policy {
     private static final Class<?>[] ALLOWED_PERMISSION_TYPES = new Class<?>[] { ClientPermission.class,
             MBeanPermission.class, AuthPermission.class };
 
-    private final static Logger logger = ProActiveLogger.getLogger("proactive.security");
     private static ClientsPolicy instance;
+    // WARNING debug trace should be done only to system.out (instead of log4j)
+    // to avoid recursive permission check
+    private boolean debug = false;
 
     private Policy original;
 
     private ClientsPolicy(Policy original) {
-        logger.info("Security policy file " + System.getProperty("java.security.policy"));
         this.original = original;
+
+        String debugProperty = System.getProperty("java.security.debug");
+        if (debugProperty != null) {
+            // with "custompolicy" only traces of this policy will be printed
+            if (debugProperty.contains("all") || debugProperty.contains("policy") ||
+                debugProperty.contains("clients")) {
+                debug = true;
+            }
+        }
+
+        if (debug) {
+            System.out.println("Security policy file " + System.getProperty("java.security.policy"));
+        }
     }
 
     @Override
@@ -108,8 +120,9 @@ public class ClientsPolicy extends Policy {
                         Permission permission = new PrincipalPermission((IdentityPrincipal) principal);
                         // always adding identity permission
                         permissions.add(permission);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(principal + " has " + permission);
+                        if (debug) {
+                            // WARNING cannot use log4j as it may lead to recursive permission check
+                            System.out.println(principal + " has " + permission);
                         }
 
                         for (Enumeration<Permission> en = pc.elements(); en.hasMoreElements();) {
@@ -127,8 +140,9 @@ public class ClientsPolicy extends Policy {
                             // is among allowed permissions
                             for (Class<?> permType : ALLOWED_PERMISSION_TYPES) {
                                 if (permType.isAssignableFrom(permission.getClass())) {
-                                    if (logger.isDebugEnabled()) {
-                                        logger.debug(principal + " has " + permission);
+                                    if (debug) {
+                                        // WARNING cannot use log4j as it may lead to recursive permission check
+                                        System.out.println(principal + " has " + permission);
                                     }
                                     permissions.add(permission);
                                     break;
@@ -172,7 +186,9 @@ public class ClientsPolicy extends Policy {
                 return (Permission) instance;
             }
         } catch (Exception ex) {
-            logger.debug(ex.getMessage(), ex);
+            if (debug) {
+                ex.printStackTrace();
+            }
         }
         return null;
     }
@@ -180,7 +196,9 @@ public class ClientsPolicy extends Policy {
     @Override
     public void refresh() {
         //original.refresh();
-        logger.info("Reloading policy file " + System.getProperty("java.security.policy"));
+        if (debug) {
+            System.out.println("Reloading policy file " + System.getProperty("java.security.policy"));
+        }
         Policy.setPolicy(null);
         // force file reloading
         original = Policy.getPolicy();
