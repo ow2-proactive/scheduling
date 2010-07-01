@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.common.util.IOTools;
@@ -166,7 +167,7 @@ public class MatlabTask extends JavaExecutable {
     private static boolean threadstarted = false;
 
     private static final long SEMAPHORE_TIMEOUT = 2;
-    private static final int RETRY_ACQUIRE = 10;
+    private static final int RETRY_ACQUIRE = 30;
     private Semaphore semaphore = new Semaphore(0);
 
     private RegistrationListener registrationListener;
@@ -238,8 +239,8 @@ public class MatlabTask extends JavaExecutable {
     protected void destroyProcessWindows(MatlabJVMInfo jvminfo) {
 
         if (debug) {
-            System.out.println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Destroying JVM");
-            outDebug.println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Destroying JVM");
+            System.out.println("[" + new java.util.Date() + " " + host + " MatlabTask] Destroying JVM");
+            outDebug.println("[" + new java.util.Date() + " " + host + " MatlabTask] Destroying JVM");
         }
         try {
             jvminfo.getWorker().terminate();
@@ -265,9 +266,9 @@ public class MatlabTask extends JavaExecutable {
         modelEnv.put("NODE_NAME", nodeName);
         if (debug) {
             System.out.println("[" + new java.util.Date() + " " + host +
-                " MATLAB TASK] Destroying processes with NODE_NAME=" + nodeName);
+                " MatlabTask] Destroying processes with NODE_NAME=" + nodeName);
             outDebug.println("[" + new java.util.Date() + " " + host +
-                " MATLAB TASK] Destroying processes with NODE_NAME=" + nodeName);
+                " MatlabTask] Destroying processes with NODE_NAME=" + nodeName);
         }
 
         for (WinProcess p : WinProcess.all()) {
@@ -308,8 +309,8 @@ public class MatlabTask extends JavaExecutable {
 
     protected void destroyProcessUnix(MatlabJVMInfo jvminfo) {
         if (debug) {
-            System.out.println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Destroying JVM");
-            outDebug.println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Destroying JVM");
+            System.out.println("[" + new java.util.Date() + " " + host + " MatlabTask] Destroying JVM");
+            outDebug.println("[" + new java.util.Date() + " " + host + " MatlabTask] Destroying JVM");
         }
         try {
             jvminfo.getWorker().terminate();
@@ -322,9 +323,9 @@ public class MatlabTask extends JavaExecutable {
         modelEnv.put("NODE_NAME", nodeName);
         if (debug) {
             System.out.println("[" + new java.util.Date() + " " + host +
-                " MATLAB TASK] Destroying processes with NODE_NAME=" + nodeName);
+                " MatlabTask] Destroying processes with NODE_NAME=" + nodeName);
             outDebug.println("[" + new java.util.Date() + " " + host +
-                " MATLAB TASK] Destroying processes with NODE_NAME=" + nodeName);
+                " MatlabTask] Destroying processes with NODE_NAME=" + nodeName);
         }
 
         ProcessTreeKiller.get().kill(proc, modelEnv);
@@ -368,18 +369,18 @@ public class MatlabTask extends JavaExecutable {
 
     protected void handleProcess(MatlabJVMInfo jvminfo) throws Throwable {
         if (debug) {
-            System.out.println("[" + new java.util.Date() + " " + host +
-                " MATLAB TASK] Checking Processes...");
-            outDebug.println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Checking Processes...");
+            System.out
+                    .println("[" + new java.util.Date() + " " + host + " MatlabTask] Checking Processes...");
+            outDebug.println("[" + new java.util.Date() + " " + host + " MatlabTask] Checking Processes...");
         }
         if (jvminfo.getProcess() == null) {
             // First we try to find MATLAB
             if (matlabConfig == null) {
                 if (debug) {
                     System.out.println("[" + new java.util.Date() + " " + host +
-                        " MATLAB TASK] Looking for Matlab...");
+                        " MatlabTask] Looking for Matlab...");
                     outDebug.println("[" + new java.util.Date() + " " + host +
-                        " MATLAB TASK] Looking for Matlab...");
+                        " MatlabTask] Looking for Matlab...");
                 }
                 matlabConfig = MatlabFinder.findMatlab(debug);
                 if (debug) {
@@ -390,9 +391,9 @@ public class MatlabTask extends JavaExecutable {
 
             if (debug) {
                 System.out.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Starting the Java Process");
+                    " MatlabTask] Starting the Java Process");
                 outDebug.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Starting the Java Process");
+                    " MatlabTask] Starting the Java Process");
             }
 
             // We spawn a new JVM with the MATLAB library paths
@@ -400,16 +401,16 @@ public class MatlabTask extends JavaExecutable {
             jvminfo.setProcess(p);
             if (debug) {
                 System.out.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Process successfully started");
+                    " MatlabTask] Process successfully started");
                 outDebug.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Process successfully started");
+                    " MatlabTask] Process successfully started");
             }
             if (!shutdownhookSet) {
                 if (debug) {
                     System.out.println("[" + new java.util.Date() + " " + host +
-                        " MATLAB TASK] Adding shutDownHook");
+                        " MatlabTask] Adding shutDownHook");
                     outDebug.println("[" + new java.util.Date() + " " + host +
-                        " MATLAB TASK] Adding shutDownHook");
+                        " MatlabTask] Adding shutDownHook");
                 }
                 addShutdownHook();
             }
@@ -419,9 +420,9 @@ public class MatlabTask extends JavaExecutable {
         if (!threadstarted) {
             if (debug) {
                 System.out.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Starting the Threads");
+                    " MatlabTask] Starting the Threads");
                 outDebug.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Starting the Threads");
+                    " MatlabTask] Starting the Threads");
             }
             // We define the loggers which will write on standard output what comes from the java process
             LoggingThread lt1;
@@ -454,15 +455,15 @@ public class MatlabTask extends JavaExecutable {
 
             threadstarted = true;
             if (debug) {
-                System.out.println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Threads started");
-                outDebug.println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Threads started");
+                System.out.println("[" + new java.util.Date() + " " + host + " MatlabTask] Threads started");
+                outDebug.println("[" + new java.util.Date() + " " + host + " MatlabTask] Threads started");
             }
         } else if (startingProcess) {
             if (debug) {
                 System.out.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Connecting process out to threads");
+                    " MatlabTask] Connecting process out to threads");
                 outDebug.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Connecting process out to threads");
+                    " MatlabTask] Connecting process out to threads");
             }
             jvminfo.getLogger().setInputStream(jvminfo.getProcess().getInputStream());
             jvminfo.getEsLogger().setInputStream(jvminfo.getProcess().getErrorStream());
@@ -490,9 +491,9 @@ public class MatlabTask extends JavaExecutable {
         if (sw == null) {
             if (debug) {
                 System.out.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] waiting for deployment");
+                    " MatlabTask] waiting for deployment");
                 outDebug.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] waiting for deployment");
+                    " MatlabTask] waiting for deployment");
             }
             waitForRegistration();
 
@@ -518,12 +519,14 @@ public class MatlabTask extends JavaExecutable {
 
         if (numberOfTrials == RETRY_ACQUIRE) {
             if (debug) {
-                System.out.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Unable to create a separate java process after " + RETRY_ACQUIRE +
-                    " tries");
-                outDebug.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Unable to create a separate java process after " + RETRY_ACQUIRE +
-                    " tries");
+                System.out
+                        .println("[" + new java.util.Date() + " " + host +
+                            " MatlabTask] Unable to create a separate java process after " + RETRY_ACQUIRE +
+                            " tries");
+                outDebug
+                        .println("[" + new java.util.Date() + " " + host +
+                            " MatlabTask] Unable to create a separate java process after " + RETRY_ACQUIRE +
+                            " tries");
             }
             throw new IllegalStateException("Unable to create a separate java process after " +
                 RETRY_ACQUIRE + " tries");
@@ -575,9 +578,9 @@ public class MatlabTask extends JavaExecutable {
             handleProcess(jvminfo);
             if (debug) {
                 System.out.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Executing the task");
+                    " MatlabTask] Executing the task");
                 outDebug.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Executing the task, try " + nbAttempts);
+                    " MatlabTask] Executing the task, try " + nbAttempts);
             }
 
             // finally we call the internal version of the execute method
@@ -589,9 +592,9 @@ public class MatlabTask extends JavaExecutable {
                 if (debug) {
                     e.printStackTrace(outDebug);
                     System.out.println("[" + new java.util.Date() + " " + host +
-                        " MATLAB TASK] Spawned JVM crashed, redeploying");
+                        " MatlabTask] Spawned JVM crashed, redeploying");
                     outDebug.println("[" + new java.util.Date() + " " + host +
-                        " MATLAB TASK] Spawned JVM crashed, redeploying");
+                        " MatlabTask] Spawned JVM crashed, redeploying");
                 }
                 destroyProcess(jvminfo);
 
@@ -605,12 +608,10 @@ public class MatlabTask extends JavaExecutable {
                     jvminfo.getEsLogger().closeStream();
                 }
                 if (res != null && debug) {
-                    outDebug
-                            .println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Closing output");
+                    outDebug.println("[" + new java.util.Date() + " " + host + " MatlabTask] Closing output");
                     outDebug.close();
                 } else if (nbAttempts >= 3 && debug) {
-                    outDebug
-                            .println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Closing output");
+                    outDebug.println("[" + new java.util.Date() + " " + host + " MatlabTask] Closing output");
                     outDebug.close();
                 }
             }
@@ -775,9 +776,9 @@ public class MatlabTask extends JavaExecutable {
 
         if (debug) {
             System.out.println("[" + new java.util.Date() + " " + host +
-                " MATLAB TASK] Task completed successfully");
+                " MatlabTask] Task completed successfully");
             outDebug.println("[" + new java.util.Date() + " " + host +
-                " MATLAB TASK] Task completed successfully");
+                " MatlabTask] Task completed successfully");
 
         }
 
@@ -841,8 +842,41 @@ public class MatlabTask extends JavaExecutable {
 
         // we set as well the java.library.path property (precaution), we forward as well the RMI port in use
 
-        javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
-            " -Dproactive.rmi.port=" + CentralPAPropertyRepository.PA_RMI_PORT.getValue());
+        if (CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().equals("pamr")) {
+            String jvmOptions = "-Djava.library.path=\"" + libPath + "\"" +
+                " -Dproactive.communication.protocol=" +
+                CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue();
+            if (PAMRConfig.PA_NET_ROUTER_ADDRESS.isSet()) {
+                jvmOptions += " -Dproactive.net.router.address=" +
+                    PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue();
+            }
+            if (PAMRConfig.PA_NET_ROUTER_PORT.isSet()) {
+                jvmOptions += " -Dproactive.net.router.port=" + PAMRConfig.PA_NET_ROUTER_PORT.getValue();
+            }
+            if (PAMRConfig.PA_PAMR_SOCKET_FACTORY.isSet()) {
+                jvmOptions += " -Dproactive.communication.pamr.socketfactory=" +
+                    PAMRConfig.PA_PAMR_SOCKET_FACTORY.getValue();
+            }
+            if (PAMRConfig.PA_PAMRSSH_KEY_DIR.isSet()) {
+                jvmOptions += " -Dproactive.communication.pamrssh.key_directory=" +
+                    PAMRConfig.PA_PAMRSSH_KEY_DIR.getValue();
+            }
+            if (PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME.isSet()) {
+                jvmOptions += " -Dproactive.communication.pamrssh.username=" +
+                    PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME.getValue();
+            }
+            if (PAMRConfig.PA_PAMRSSH_REMOTE_PORT.isSet()) {
+                jvmOptions += " -Dproactive.communication.pamrssh.port=" +
+                    PAMRConfig.PA_PAMRSSH_REMOTE_PORT.getValue();
+            }
+
+            javaCommandBuilder.setJvmOptions(jvmOptions);
+        } else {
+            javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
+                " -Dproactive.rmi.port=" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() +
+                " -Dproactive.communication.protocol=" +
+                CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
+        }
 
         if (debug) {
             System.out.println("Starting Process:");
@@ -916,9 +950,9 @@ public class MatlabTask extends JavaExecutable {
         private void subscribeJMXRuntimeEvent() {
             if (debug) {
                 System.out.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Subscribe JMX Runtime");
+                    " MatlabTask] Subscribe JMX Runtime");
                 outDebug.println("[" + new java.util.Date() + " " + host +
-                    " MATLAB TASK] Subscribe JMX Runtime");
+                    " MatlabTask] Subscribe JMX Runtime");
 
             }
             MatlabJVMInfo jvminfo = jvmInfos.get(nodeName);
@@ -926,8 +960,8 @@ public class MatlabTask extends JavaExecutable {
             part.addDeployment(jvminfo.getDeployID());
             JMXNotificationManager.getInstance().subscribe(part.getMBean().getObjectName(), this);
             if (debug) {
-                System.out.println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Subscribed");
-                outDebug.println("[" + new java.util.Date() + " " + host + " MATLAB TASK] Subscribed");
+                System.out.println("[" + new java.util.Date() + " " + host + " MatlabTask] Subscribed");
+                outDebug.println("[" + new java.util.Date() + " " + host + " MatlabTask] Subscribed");
             }
 
         }
@@ -950,9 +984,9 @@ public class MatlabTask extends JavaExecutable {
                 if (NotificationType.GCMRuntimeRegistered.equals(type)) {
                     if (debug) {
                         System.out.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] Notification received");
+                            " MatlabTask] Notification received");
                         outDebug.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] Notification received");
+                            " MatlabTask] Notification received");
                     }
                     GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification
                             .getUserData();
@@ -962,18 +996,18 @@ public class MatlabTask extends JavaExecutable {
                     }
                     if (debug) {
                         System.out.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] Notification accepted");
+                            " MatlabTask] Notification accepted");
                         outDebug.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] Notification accepted");
+                            " MatlabTask] Notification accepted");
                         outDebug.flush();
                     }
 
                     ProActiveRuntime childRuntime = data.getChildRuntime();
                     if (debug) {
                         System.out.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] Creating Node");
+                            " MatlabTask] Creating Node");
                         outDebug.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] Creating Node");
+                            " MatlabTask] Creating Node");
                     }
                     Node scilabNode = null;
                     try {
@@ -989,17 +1023,17 @@ public class MatlabTask extends JavaExecutable {
                     nodeCount++;
                     if (debug) {
                         System.out.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] Node Created : " + scilabNode);
+                            " MatlabTask] Node Created : " + scilabNode);
                         outDebug.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] Node Created :" + scilabNode);
+                            " MatlabTask] Node Created :" + scilabNode);
                     }
                     jvminfo.setNode(scilabNode);
 
                     if (debug) {
                         System.out.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] waking up main thread");
+                            " MatlabTask] waking up main thread");
                         outDebug.println("[" + new java.util.Date() + " " + host +
-                            " MATLAB TASK] waking up main thread");
+                            " MatlabTask] waking up main thread");
 
                     }
 

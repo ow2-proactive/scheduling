@@ -53,12 +53,20 @@ public class ResultsAndLogs implements Serializable {
     private String logs;
     private Throwable exception;
     private boolean scilabError;
+    private boolean schedulerError;
 
-    public ResultsAndLogs(SciData result, String logs, Throwable exception, boolean scilabError) {
+    public boolean isSchedulerError() {
+        return schedulerError;
+    }
+
+    public ResultsAndLogs(SciData result, String logs, Throwable exception, boolean scilabError,
+            boolean schedulerError) {
         this.result = result;
         this.logs = logs;
         this.exception = exception;
         this.scilabError = scilabError;
+        this.schedulerError = schedulerError;
+
     }
 
     public SciData getResult() {
