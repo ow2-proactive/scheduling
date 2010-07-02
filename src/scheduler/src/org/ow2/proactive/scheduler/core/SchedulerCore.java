@@ -77,6 +77,7 @@ import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolExcept
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
+import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerCoreMethods;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -495,7 +496,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             start();
 
             do {
-                service.blockingServeOldest();
 
                 while ((status == SchedulerStatus.STARTED) || (status == SchedulerStatus.PAUSED) ||
                     (status == SchedulerStatus.STOPPED)) {
@@ -537,6 +537,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         }
                     }
                 }
+
+                // allows frozen->other state transition
+                service.blockingServeOldest(SCHEDULER_TIME_OUT);
+
             } while ((status != SchedulerStatus.SHUTTING_DOWN) && (status != SchedulerStatus.KILLED));
 
             logger.info("Scheduler is shutting down...");
@@ -1049,11 +1053,15 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             descriptor = job.terminateTask(errorOccurred, taskId);
 
             //and update database
-            DatabaseManager.getInstance().startTransaction();
-            DatabaseManager.getInstance().synchronize(job.getJobInfo());
-            DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
-            DatabaseManager.getInstance().update(job.getJobResult());
-            DatabaseManager.getInstance().commitTransaction();
+            try {
+                DatabaseManager.getInstance().startTransaction();
+                DatabaseManager.getInstance().synchronize(job.getJobInfo());
+                DatabaseManager.getInstance().synchronize(descriptor.getTaskInfo());
+                DatabaseManager.getInstance().update(job.getJobResult());
+                DatabaseManager.getInstance().commitTransaction();
+            } catch (DatabaseManagerException e) {
+
+            }
 
             //clean the result to improve memory usage
             if (!job.getJobDescriptor().hasChildren(descriptor.getId())) {
