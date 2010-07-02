@@ -81,7 +81,7 @@ public final class MBeanInfoViewer {
         this.auth = auth;
         this.env = new HashMap<String, Object>(2);
         // Fill the env with credentials 
-        this.env.put(JMXConnector.CREDENTIALS, new Object[] { user, creds });
+        this.env.put(JMXConnector.CREDENTIALS, new Object[] { (user == null ? "" : user), creds });
     }
 
     private void lazyConnect() {
