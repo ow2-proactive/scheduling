@@ -473,7 +473,7 @@ Nb of active objects on the remote node: 1 received message: A message from 2667
 	<section xml:id="PWA_OtherInformation"><info><title>Other information</title></info>
 
 		<para>
-			The agent was successfully tested on Windows XP, 2003, Windows Vista.
+			The agent was successfully tested on Windows XP, 2003, Windows Vista and Windows 7.
 			Some problems with service installation can occur on Windows NT.
 		</para>
 
