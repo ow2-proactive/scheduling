@@ -81,10 +81,15 @@ public class ScilabSolver {
 
         if (sciResults != null) {
             if (debug) {
-                System.out.println(sciResults);
                 System.out.println("[ScilabSolver] Solved");
+                System.out.println(sciResults);
             }
             results = new ResultsAndLogs[sciResults.size()];
+
+            // throw general scheduler error (embedded in the first result)
+            if (sciResults.get(0).isSchedulerError()) {
+                throw sciResults.get(0).getException();
+            }
 
             for (int i = 0; i < sciResults.size(); i++) {
                 results[i] = sciResults.get(i);

@@ -109,7 +109,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
     /**
      * Id of the current job running
      */
-    private JobId currentJobId = null;
+    private String currentJobId = null;
 
     /**
      * Internal job id for job description only
@@ -269,24 +269,29 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
             errorToThrow = new IllegalStateException("The job has been killed");
         }
 
-        if (errorToThrow != null) {
+        try {
+            if (errorToThrow != null) {
 
-            // Error inside job
-            if (debug) {
-                System.err.println("[AOScilabEnvironment] Exception inside the job");
-            }
-            answer.add(new ResultsAndLogs(null, null, errorToThrow, false));
+                // Error inside job
+                if (debug) {
+                    System.err.println("[AOScilabEnvironment] Scheduler Exception");
+                }
+                answer.add(new ResultsAndLogs(null, null, errorToThrow, false, true));
 
-        } else {
-            // Normal termination
-            for (int i = 0; i < results.size(); i++) {
-                answer.add(results.get(i));
+            } else {
+                // Normal termination
+                for (int i = 0; i < results.size(); i++) {
+                    answer.add(results.get(i));
+                }
             }
+        } finally {
+
+            results.clear();
+            currentJobId = null;
+            errorToThrow = null;
+            errorLogs = null;
+            jobKilled = false;
         }
-
-        results.clear();
-        currentJobId = null;
-        jobKilled = false;
         return answer;
     }
 
@@ -298,7 +303,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      * @param priority     priority of the job
      */
     public ArrayList<ResultsAndLogs> solve(String[] inputScripts, String functionName,
-            String functionsDefinition, String mainScripts, URL scriptURL, JobPriority priority, boolean debug) {
+            String functionsDefinition, String mainScripts, URL scriptURL, JobPriority priority, boolean debug)
+            throws Throwable {
         if (schedulerStopped) {
             System.err.println("[AOScilabEnvironment] The Scheduler is stopped");
             return new ArrayList<ResultsAndLogs>();
@@ -388,7 +394,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         }
 
         try {
-            currentJobId = scheduler.submit(job);
+            currentJobId = scheduler.submit(job).value();
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
         }
@@ -434,8 +440,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
             case KILLED:
             case SHUTDOWN:
             case SHUTTING_DOWN:
-                if (logger.isDebugEnabled()) {
-                    logger.info("Received Scheduler '" + eventType + "' event");
+                if (debug) {
+                    System.out.println("[AOScilabEnvironment] Received Scheduler '" + eventType + "' event");
                 }
                 schedulerStopped = true;
                 break;
@@ -452,36 +458,43 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                 JobInfo info = notification.getData();
                 String jid = info.getJobId().value();
                 if (info.getStatus() == JobStatus.KILLED) {
-                    if (logger.isDebugEnabled()) {
-                        logger.info("Received job killed event...");
+                    if (debug) {
+                        System.out.println("[AOScilabEnvironment] Received job killed event...");
                     }
 
                     // Filtering the right job
-                    if ((currentJobId == null) || !info.getJobId().equals(currentJobId)) {
+                    if ((currentJobId == null) || !jid.equals(currentJobId)) {
                         return;
                     }
                     this.jobKilled = true;
                 } else {
-                    if (logger.isDebugEnabled()) {
-                        logger.info("Received job finished event...");
+                    if (debug) {
+                        System.out.println("[AOScilabEnvironment] Received job finished event...");
                     }
 
                     if (info == null) {
+                        if (debug) {
+                            System.out.println("[AOScilabEnvironment] Event refused : job info is null...");
+                        }
                         return;
                     }
 
                     // Filtering the right job
-                    if (!info.getJobId().equals(currentJobId)) {
+                    if (!jid.equals(currentJobId)) {
+                        if (debug) {
+                            System.out.println("[AOScilabEnvironment] Event refused : event job id is " +
+                                jid + " , local job id is " + currentJobId + "...");
+                        }
                         return;
                     }
                     // Getting the Job result from the Scheduler
                     JobResult jResult = null;
 
                     try {
-                        jResult = scheduler.getJobResult(info.getJobId());
+                        jResult = scheduler.getJobResult(jid);
                         if (jResult == null) {
                             jobDidNotSucceed(jid, new RuntimeException("[AOScilabEnvironment] Job id = " +
-                                info.getJobId() + " was not returned by the scheduler"), false, null);
+                                info.getJobId() + " was not returned by the scheduler"), true, null);
                             return;
                         }
                     } catch (SchedulerException e) {
@@ -507,13 +520,13 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
         // Geting the task results from the job result
         Map<String, TaskResult> task_results = null;
-        if (jResult.hadException()) {
-            task_results = jResult.getExceptionResults();
-        } else {
-            // sorted results
+        //if (jResult.hadException()) {
+        //    task_results = jResult.getExceptionResults();
+        //} else {
+        // sorted results
 
-            task_results = jResult.getAllResults();
-        }
+        task_results = jResult.getAllResults();
+        //}
         ArrayList<Integer> keys = new ArrayList<Integer>();
         for (String key : task_results.keySet()) {
             keys.add(Integer.parseInt(key));
@@ -547,10 +560,10 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
                 if (res.hadException()) {
                     //Exception took place inside the framework
                     if (res.getException() instanceof ScilabTaskException) {
-                        results.add(new ResultsAndLogs(null, logs, null, true));
+                        results.add(new ResultsAndLogs(null, logs, null, true, false));
                         //jobDidNotSucceed(jid, res.getException(), false, logs);
                     } else {
-                        results.add(new ResultsAndLogs(null, logs, res.getException(), false));
+                        results.add(new ResultsAndLogs(null, logs, res.getException(), false, false));
                         //jobDidNotSucceed(jid, res.getException(), true, logs);
                     }
 
@@ -560,7 +573,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
 
                     try {
                         computedResult = ((ArrayList<SciData>) res.value()).get(0);
-                        results.add(new ResultsAndLogs(computedResult, logs, null, false));
+                        results.add(new ResultsAndLogs(computedResult, logs, null, false, false));
 
                     } catch (Throwable e2) {
                         jobDidNotSucceed(jid, e2, true, logs);

@@ -172,7 +172,7 @@ void C2F(cconnect) (url, login, passwd, u, l, p, err)
     jstring jpasswd = (*env)->NewStringUTF(env,passwd);
     (*env)->CallStaticVoidMethod(env,scilabSolverClass, createConnectionId, jurl, jlogin, jpasswd);
     if (checkException()) {
-        *err = 1;
+        *err = 2;
         return;
     }
 
@@ -198,7 +198,6 @@ void C2F(csciSolve)(inputScripts, functionName, functionsDefinition, mainscript,
     jobjectArray logsArray;
     jobjectArray errorArray;
 
-    int arrayLength;
     int resultsAndLogsArrayLength;
     int nbFailure;
     int i;
@@ -207,7 +206,7 @@ void C2F(csciSolve)(inputScripts, functionName, functionsDefinition, mainscript,
 
     if (*n <= 0) {
         sciprint("[ScilabEmbeddedc] list of input scripts can't be empty (given list size : %d)\n", *n);
-        *err = 1;
+        *err = 2;
         return;
     }
 
@@ -236,13 +235,15 @@ void C2F(csciSolve)(inputScripts, functionName, functionsDefinition, mainscript,
     resultsAndLogsArray = (jobjectArray) (*env)->CallStaticObjectMethod(env,scilabSolverClass, solveId, inputScriptsArray, functionNameJava, functionsDefinitionJava, currentMainScript,selectionScript, 3, debugVal);
     if (checkException()) {
        sciprint("[ScilabEmbeddedc] Exception occured in the job execution\n");
-        *err = 1;
+       returnEmptyOutput(n,results,err);
+        *err = 2;
         return;
     }
     resultsAndLogsArrayLength = (int) (*env)->GetArrayLength(env, resultsAndLogsArray);
     if (resultsAndLogsArrayLength == 0) {
         sciprint("[ScilabEmbeddedc] No result received\n");
-        *err = 1;
+        returnEmptyOutput(n,results,err);
+        *err = 2;
         return;
     }
 
@@ -255,7 +256,7 @@ void C2F(csciSolve)(inputScripts, functionName, functionsDefinition, mainscript,
 
     if (*results == 0) {
         sciprint("[ScilabEmbeddedc] Memory error\n");
-        *err = 1;
+        *err = 2;
         return;
     }
     
@@ -297,11 +298,19 @@ void C2F(csciSolve)(inputScripts, functionName, functionsDefinition, mainscript,
                     sciprint("[ScilabEmbeddedc] Scilab error in task %d\n",i);
                 }
                     // Printing the task log on the scilab console
-                 printLogs(logs, debug);
+                 if (logs != NULL) {
+                    if (*debug) {
+                        printf("[ScilabEmbeddedc] Printing logs for task %d\n",i);
+                        sciprint("[ScilabEmbeddedc] Printing logs for task %d\n",i);
+                    }
+                    printLogs(logs, debug);
+                  }
 
                  nbFailure++;
 
-                 (*results)[i] = (char *) calloc (1,sizeof(char));
+                 (*results)[i] = (char *) malloc ((1)*sizeof(char));
+                 strcpy((*results)[i], "");
+
              }
              else if (exc != NULL) {
                  if (*debug) {
@@ -309,17 +318,29 @@ void C2F(csciSolve)(inputScripts, functionName, functionsDefinition, mainscript,
                     sciprint("[ScilabEmbeddedc] Java Exception in task %d\n",i);
                  }
                  if (logs != NULL) {
+                     if (*debug) {
+                        printf("[ScilabEmbeddedc] Printing logs for task %d\n",i);
+                        sciprint("[ScilabEmbeddedc] Printing logs for task %d\n",i);
+                    }
                     printLogs(logs, debug);
                  }
                  printExceptionObject(exc, debug);
                  nbFailure++;
 
-                 (*results)[i] = (char *) calloc (1,sizeof(char));
+                 (*results)[i] = (char *) malloc ((1)*sizeof(char));
+                 strcpy((*results)[i], "");
              }
              else {
                  if (*debug) {
                     printf("[ScilabEmbeddedc] Normal execution in task %d\n",i);
                     sciprint("[ScilabEmbeddedc] Normal execution in task %d\n",i);
+                 }
+                 if (logs != NULL) {
+                     if (*debug) {
+                        printf("[ScilabEmbeddedc] Printing logs for task %d\n",i);
+                        sciprint("[ScilabEmbeddedc] Printing logs for task %d\n",i);
+                    }
+                    printLogs(logs, debug);
                  }
                  printLogs(logs, debug);
                  if (res != NULL) {
@@ -327,7 +348,7 @@ void C2F(csciSolve)(inputScripts, functionName, functionsDefinition, mainscript,
                     (*results)[i] = (char *) malloc ((resLength+1)*sizeof(char));
                     if ((*results)[i] == 0) {
                         sciprint("[ScilabEmbeddedc] Memory error\n");
-                        *err = 1;
+                        *err = 2;
                         return;
                     }
                     if (*debug) {
@@ -344,7 +365,7 @@ void C2F(csciSolve)(inputScripts, functionName, functionsDefinition, mainscript,
     }
 
     if (nbFailure > 0) {
-        *err = 1;
+        *err = 2;
         return;
     }
 
@@ -420,6 +441,24 @@ int checkException()
         return 1;
     }
     return 0;
+}
+
+void returnEmptyOutput(int *n, char ***results, int *err ) {
+    int i;
+     *results = (char **) malloc((unsigned) ((*n+1)* sizeof(char *)));
+     if (*results == 0) {
+        sciprint("[ScilabEmbeddedc] Memory error\n");
+        *err = 2;
+        return;
+    }
+
+    (*results)[*n] = NULL;
+
+    for (i = 0; i < *n; i++) {
+         (*results)[i] = (char *) malloc ((1)*sizeof(char));
+         strcpy((*results)[i], "");
+    }
+
 }
 
 void printLogs(jstring logs,int *debug) {

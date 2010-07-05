@@ -81,7 +81,13 @@ function out = PAsolve(funcname, args, varargin)
 
              selectionScript = strcat(['file:',fullfile(schedulerdir,'extensions','scilab','checkScilab.js')]);
 
-             results = sciSolve(inputscripts, funcname, funccode_flat, mainscript, selectionScript, debugv);
+             try
+                results = sciSolve(inputscripts, funcname, funccode_flat, mainscript, selectionScript, debugv);
+             catch
+                error('Error in remote execution (see output)');
+             end
+
+
 
              out = list();
              for i=1:max(size(results))
