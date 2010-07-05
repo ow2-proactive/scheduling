@@ -109,6 +109,10 @@ public abstract class TaskLauncher implements InitActive {
             .getLogger(SchedulerDevLoggers.DATASPACE);
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
 
+    // to define the max line number of a task logs
+    // DO NOT USE SCHEDULER PROPERTY FOR THAT (those properties are not available on node side)
+    public static final String MAX_LOG_SIZE_PROPERTY = "proactive.scheduler.logs.maxsize";
+
     protected DataSpacesFileObject SCRATCH = null;
     protected DataSpacesFileObject INPUT = null;
     protected DataSpacesFileObject OUTPUT = null;
@@ -294,8 +298,22 @@ public abstract class TaskLauncher implements InitActive {
         }
         l.removeAllAppenders();
         // create an async appender for multiplexing (storage plus redirect through socketAppender)
-        // int logMaxSize = PASchedulerProperties.LOGS_MAX_SIZE.getValueAsInt();
-        this.logAppender = new AsyncAppenderWithStorage();//logMaxSize);
+        String logMaxSizeProp = System.getProperty(TaskLauncher.MAX_LOG_SIZE_PROPERTY);
+        if (logMaxSizeProp == null || "".equals(logMaxSizeProp.trim())) {
+            this.logAppender = new AsyncAppenderWithStorage();
+        } else {
+            try {
+                int logMaxSize = Integer.parseInt(logMaxSizeProp);
+                this.logAppender = new AsyncAppenderWithStorage(logMaxSize);
+                logger_dev.info("Logs are limited to " + logMaxSize + " lines for task " + this.taskId);
+            } catch (NumberFormatException e) {
+                logger_dev
+                        .warn(
+                                "proactive.scheduler.logs.maxsize property is not correctly defined. Logs size is not bounded for task " +
+                                    this.taskId, e);
+                this.logAppender = new AsyncAppenderWithStorage();
+            }
+        }
         l.addAppender(this.logAppender);
         // redirect stdout and err
         this.redirectedStdout = new PrintStream(new LoggingOutputStream(l, Level.INFO), true);
