@@ -219,7 +219,7 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
                     .toUpperCase());
             // DB field name from annotation for Table Association between job
             // and tasks
-            fn.put("InternalJob_tasks", InternalJob.class.getDeclaredField("tasks").getName().toUpperCase());
+            fn.put("InternalJob_tasks", InternalJob.class.getDeclaredField("tasks").getName());
             fn.put("InternalTFJob_tasks", InternalTaskFlowJob.class.getAnnotation(Table.class).name() + "_" +
                 fn.get("InternalJob_tasks"));
             fn.put("InternalJob_ITasksId", InternalJob.class.getDeclaredField("tasks").getAnnotation(
