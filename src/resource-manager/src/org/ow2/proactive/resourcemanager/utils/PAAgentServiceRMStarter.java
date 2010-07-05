@@ -77,7 +77,7 @@ public final class PAAgentServiceRMStarter {
     private static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
 
     /** Name of the java property to set the rank */
-    private final static String RANK_PROP_NAME = "pa.agent.rank";
+    private final static String RANK_PROP_NAME = "proactive.agent.rank";
 
     /**
      * The starter will try to connect to the Resource Manager before killing
