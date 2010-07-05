@@ -148,7 +148,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
             " - t1.TIMESTAMP) as duration ");
         builder.append("from RMNODEEVENT t1 WHERE ");
         builder.append("t1.TYPE = 6 AND t1.NODESTATE=1 AND ");
-        builder.append("t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2) AND ");
+        builder.append("t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2) AND ");
         builder
                 .append("(NOT EXISTS (select * from RMNODEEVENT WHERE PREVIOUSEVENTID=t1.ID AND PREVIOUSNODESTATE=1)) ");
         builder.append("GROUP BY t1.NODEPROVIDER ");
@@ -188,7 +188,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
     //t1.TYPE = 6 AND t1.NODESTATE=1
     //AND
     // -- From the last start
-    //t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2)
+    //t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2)
     //-- Inconsistent means not stopped and not removed
     //AND
     //(NOT EXISTS
@@ -207,10 +207,10 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         builder.append("from RMNODEEVENT t1 JOIN RMEVENT h1 ON ");
         builder.append("t1.TIMESTAMP < h1.TIMESTAMP WHERE ");
         builder.append("t1.TYPE=5 AND ");
-        builder.append("h1.TIMESTAMP = (select MAX(TIMESTAMP) from RM.RMEVENT h where ");
+        builder.append("h1.TIMESTAMP = (select MAX(TIMESTAMP) from RMEVENT h where ");
         builder.append("h.type = 8 AND ");
         builder
-                .append("h.timestamp < (select MIN(TIMESTAMP) from RM.RMEVENT where type = 2 AND timestamp > t1.timestamp)) ");
+                .append("h.timestamp < (select MIN(TIMESTAMP) from RMEVENT where type = 2 AND timestamp > t1.timestamp)) ");
         builder
                 .append("AND (NOT EXISTS (select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2)))) ");
         builder.append("GROUP BY t1.NODEPROVIDER, t1.NODEURL ");
@@ -219,7 +219,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         builder.append("select t1.NODEPROVIDER as np, SUM(" + System.currentTimeMillis() +
             " - t1.TIMESTAMP) as d, t1.NODEURL as nc from RMNODEEVENT t1 ");
         builder.append("WHERE t1.TYPE=5 AND ");
-        builder.append("(t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2)) AND ");
+        builder.append("(t1.TIMESTAMP > (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2)) AND ");
         builder.append("(NOT EXISTS ");
         builder
                 .append("(select * from RMNODEEVENT WHERE ADDEVENTID = t1.ID AND (TYPE=7 OR (TYPE=6 AND NODESTATE=2)))) ");
@@ -254,11 +254,11 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
 //    t1.TYPE=5 AND
 //    -- Before the last start
 //--            (t1.TIMESTAMP <
-//--                (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2)) AND
+//--                (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2)) AND
 //    -- The next heartbeat before the next start 
-//    h1.TIMESTAMP = (select MAX(TIMESTAMP) from RM.RMEVENT h where
+//    h1.TIMESTAMP = (select MAX(TIMESTAMP) from RMEVENT h where
 //                     h.type = 8 AND
-//                     h.timestamp < (select MIN(TIMESTAMP) from RM.RMEVENT where type = 2 AND timestamp > t1.timestamp))
+//                     h.timestamp < (select MIN(TIMESTAMP) from RMEVENT where type = 2 AND timestamp > t1.timestamp))
 //    -- Inconsistent means not stopped and not removed
 //    AND
 //    (NOT EXISTS
@@ -274,7 +274,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
 //    AND
 //    -- From the last start
 //    (t1.TIMESTAMP >
-//        (SELECT MAX(TIMESTAMP) FROM rm.RMEVENT WHERE type=2))
+//        (SELECT MAX(TIMESTAMP) FROM RMEVENT WHERE type=2))
 //    -- Inconsistent means not stopped and not removed
 //    AND
 //    (NOT EXISTS
