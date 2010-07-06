@@ -66,6 +66,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.Activator;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -330,30 +331,25 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
         if (resultPreview != null) {
             JobState job = JobsController.getLocalView().getJobById(taskId.getJobId());
 
-            // test job owner
-            if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
-                TaskState task = job.getHMTasks().get(taskId);
-                // update its tasks informations if task is finished
-                if (task.getStatus() == TaskStatus.FINISHED || task.getStatus() == TaskStatus.FAULTY ||
-                    task.getStatus() == TaskStatus.WAITING_ON_ERROR) {
-                    TaskResult tr = getTaskResult(job.getId(), taskId);
-                    if (tr != null) {
-                        if (grapchicalPreview) {
-                            displayGraphicalPreview(resultPreview, tr);
-                            resultPreview.putOnTop();
-                        } else {
-                            displayTextualPreview(resultPreview, tr);
-                            resultPreview.putOnTop();
-                        }
+            TaskState task = job.getHMTasks().get(taskId);
+            // update its tasks informations if task is finished
+            if (task.getStatus() == TaskStatus.FINISHED || task.getStatus() == TaskStatus.FAULTY ||
+                task.getStatus() == TaskStatus.WAITING_ON_ERROR) {
+                TaskResult tr = getTaskResult(job.getId(), taskId);
+                if (tr != null) {
+                    if (grapchicalPreview) {
+                        displayGraphicalPreview(resultPreview, tr);
+                        resultPreview.putOnTop();
                     } else {
-                        throw new RuntimeException("Cannot get the result of Task " + taskId + ".");
+                        displayTextualPreview(resultPreview, tr);
+                        resultPreview.putOnTop();
                     }
-                } else { //Not available
-                    resultPreview.update(new SimpleTextPanel("No preview is available because the task is " +
-                        task.getStatus() + "..."));
+                } else {
+                    throw new RuntimeException("Cannot get the result of Task " + taskId + ".");
                 }
-            } else {
-                resultPreview.update(new SimpleTextPanel("You do not have sufficient rights !"));
+            } else { //Not available
+                resultPreview.update(new SimpleTextPanel("No preview is available because the task is " +
+                    task.getStatus() + "..."));
             }
         }
     }
@@ -410,7 +406,10 @@ public class TaskComposite extends Composite implements Comparator<TaskState> {
         TaskResult tr = cachedTaskResult.get(tid);
         if (tr == null) {
             tr = SchedulerProxy.getInstance().getTaskResult(jid, tid.getReadableName());
-            cachedTaskResult.put(tid, tr);
+            tr = PAFuture.getFutureValue(tr);
+            if (tr != null) {
+                cachedTaskResult.put(tid, tr);
+            }
         }
         return tr;
     }
