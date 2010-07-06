@@ -111,11 +111,6 @@ public class IdentifiedJob implements Serializable {
         try {
             //check method call
             userId.checkPermission(jobPermission, "");
-            //check the owner
-            if (userIdentification.getUsername() == null ||
-                !userIdentification.getUsername().equals(userId.getUsername())) {
-                return false;
-            }
         } catch (PermissionException ex) {
             return false;
         }
