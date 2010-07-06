@@ -109,7 +109,13 @@ public class IdentifiedJob implements Serializable {
         Permission jobPermission = new PrincipalPermission(userIdentification.getUsername(),
             userIdentification.getSubject().getPrincipals(UserNamePrincipal.class));
         try {
+            //check method call
             userId.checkPermission(jobPermission, "");
+            //check the owner
+            if (userIdentification.getUsername() == null ||
+                !userIdentification.getUsername().equals(userId.getUsername())) {
+                return false;
+            }
         } catch (PermissionException ex) {
             return false;
         }
