@@ -32,7 +32,7 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package functionaltests.account;
+package functionaltests.jmx.account;
 
 import java.security.PublicKey;
 import java.util.HashMap;

@@ -32,7 +32,7 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package functionaltests.account;
+package functionaltests.jmx.account;
 
 import java.security.PublicKey;
 import java.util.HashMap;
@@ -61,8 +61,8 @@ import functionaltests.RMTHelper;
 
 
 /**
- * Tests account values for inconsistent ADD and GET (not followed by a RELEASE and REMOVE).
- * The scenario is ADD, GET.
+ * Tests account values for inconsistent GET (not followed by a RELEASE).
+ * The scenario is ADD, GET, DOWN, REMOVE.
  * 
  * This test requires the following prerequisites :
  *  - The value of the {@link PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE} property must be 
@@ -72,7 +72,7 @@ import functionaltests.RMTHelper;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetTest extends FunctionalTest {
+public final class AddGetDownRemoveTest extends FunctionalTest {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -123,10 +123,10 @@ public final class AddGetTest extends FunctionalTest {
         Assert.assertTrue("The providedNodeTime attribute must be 0", providedNodeTime == 0);
         Assert.assertTrue("The providedNodesCount attribute must be 0", providedNodesCount == 0);
 
-        // ADD, GET
+        // ADD, GET, DOWN, REMOVE
         // 1) ADD
-        final long beforeAddTime = System.currentTimeMillis();
-        Node node = RMTHelper.createNode("test");
+        final String name = "test";
+        Node node = RMTHelper.createNode(name);
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).booleanValue();
 
@@ -134,13 +134,24 @@ public final class AddGetTest extends FunctionalTest {
         final long beforeGetTime = System.currentTimeMillis();
         node = r.getAtMostNodes(1, null).get(0);
 
-        // Sleep a certain amount of time that will be the minimum amount of the GET duration 
+        // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
         Thread.sleep(GR_DURATION);
+
+        // 3) Kill the node to ensure that the RM considers it as being DOWN
+        node.getProActiveRuntime().killNode(name);
+        while (r.nodeIsAvailable(nodeURL).booleanValue()) {
+            Thread.sleep(500);
+        }
+
+        final long getDownMaxDuration = System.currentTimeMillis() - beforeGetTime;
+
+        // 4) REMOVE  
+        r.removeNode(nodeURL, true).booleanValue();
 
         // Refresh the account manager
         conn.invoke(managementMBeanName, "refreshAllAccounts", null, null);
 
-        // Wait until the refresh is done
+        // Wait until the refresh is done 
         long refreshDuration;
         do {
             Thread.sleep(500);
@@ -148,21 +159,9 @@ public final class AddGetTest extends FunctionalTest {
                     "LastRefreshDurationInMilliseconds");
         } while (refreshDuration <= 0);
 
-        final long currentTime = System.currentTimeMillis();
-        final long addRefreshMaxDuration = currentTime - beforeAddTime;
-        final long getRefreshMaxDuration = currentTime - beforeGetTime;
-
-        // Check account values validity                      
-        atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime", "ProvidedNodeTime",
-                "ProvidedNodesCount" });
-        usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
-        providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
-        providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
-
+        // Check account values validity
+        usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime");
         Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
-            (usedNodeTime <= addRefreshMaxDuration));
-        Assert.assertTrue("Invalid value of the providedNodeTime attribute",
-                (providedNodeTime >= usedNodeTime) && (providedNodeTime <= getRefreshMaxDuration));
-        Assert.assertTrue("Invalid value of the providedNodesCount attribute", (providedNodesCount == 1));
+            (usedNodeTime <= getDownMaxDuration));
     }
 }
