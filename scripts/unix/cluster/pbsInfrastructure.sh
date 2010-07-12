@@ -49,6 +49,7 @@ JARS=$JARS:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-worker.jar"
 $JAVA -cp $JARS \
     -Dpa.scheduler.home=$PA_SCHEDULER \
     -Dpa.rm.home=$PA_SCHEDULER \
+	-Djava.security.policy=$PA_SCHEDULER/config/security.java.policy-client \
     $CONFIG \
     org.ow2.proactive.resourcemanager.utils.PAAgentServiceRMStarter \
     -r $URL -n $NAME -s $NS -v $CRED
