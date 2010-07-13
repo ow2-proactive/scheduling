@@ -173,7 +173,7 @@ public abstract class AbstractSSHInfrastructure extends InfrastructureManager {
         try {
             if (host.equals(InetAddress.getLocalHost()) || host.equals(InetAddress.getByName("127.0.0.1"))) {
                 logger.debug("The command will be executed locally");
-                sshCmd = cmd;
+                sshCmd = cmd.replaceAll("\\\\", "");
             }
         } catch (UnknownHostException e) {
         }
