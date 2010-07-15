@@ -1,0 +1,59 @@
+<!DOCTYPE project>
+
+<project name="proactive_grid_cloud_portal" default="compile" basedir=".">
+	
+	<property name="project-name" value="ProActive Grid Cloud Portal"/>
+	
+	<property file="./build.properties"/>
+	
+	<property name="classes.dir" value="build/classes" />
+	<property name="lib.dir" value="WebContent/WEB-INF/lib" />
+	<property name="src.dir" value="src" />
+	
+	
+	<!-- 
+		 Compile all
+	-->
+
+	<target name="prepare" description="Create dir for class files">
+		<mkdir dir="${classes.dir}" />
+	</target>
+	
+	<target name="clean" description="Delete class files">
+		<delete dir="${classes.dir}" />
+	</target>
+	
+	<path id="src.classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement location="${classes.dir}" />
+	</path>
+
+	<!-- NB: all the source files are the project source files -->
+
+	<target name="compile" depends="clean,prepare" description="Compiles the Java source code">
+		<echo message="Compiling src files"/>
+		<javac
+			srcdir="${src.dir}"
+			destdir="${classes.dir}"
+			deprecation="false"
+			failonerror="true" debug="true">
+			<classpath refid="src.classpath"/>
+		</javac>
+	</target>
+	
+	
+	<target name="war" depends="compile">
+		<!-- copy classes -->
+		
+		<copy todir="WebContent/WEB-INF/classes" >
+			<fileset dir="build/classes" >
+				<include name="**"/>
+			</fileset>
+		</copy>
+		
+		<war destfile="proactive_grid_cloud_portal.war" webxml="WebContent/WEB-INF/web.xml" basedir="WebContent"></war>
+	</target>
+	
+</project>
