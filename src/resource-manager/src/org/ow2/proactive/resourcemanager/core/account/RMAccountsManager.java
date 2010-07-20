@@ -237,6 +237,11 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
         builder.append(") tab GROUP BY tab.np");
         return builder.toString();
     }
+
+    public static void main(String[] args) {
+        System.out.println("RMAccountsManager.main()---> " + Long.MAX_VALUE);
+        System.out.println("RMAccountsManager.main()---> " + (Long.MAX_VALUE >> 1));
+    }
 }
 
 // FULL SQL REQUEST :

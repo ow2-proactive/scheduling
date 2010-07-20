@@ -50,16 +50,15 @@ public final class SchedulerJMXTest extends FunctionalTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        /*
+        /** 
          //Test became useless, next test coming soon
          final String userLogin = "user";
          final String userPassword = "pwd";
          final String adminLogin = "demo";
          final String adminPassword = "demo";
 
-         final SchedulerAuthenticationInterface auth = (SchedulerAuthenticationInterface) SchedulerTHelper
-         .getSchedulerAuth();
-         ;
+         final SchedulerAuthenticationInterface auth = (SchedulerAuthenticationInterface) SchedulerTHelper.getSchedulerAuth();
+         
          final PublicKey pubKey = auth.getPublicKey();
          //final Credentials userCreds = Credentials.createCredentials(userLogin, userPassword, pubKey);
          final Credentials adminCreds = Credentials.createCredentials(adminLogin, adminPassword, pubKey);
@@ -68,7 +67,7 @@ public final class SchedulerJMXTest extends FunctionalTest {
          .getJMXConnectorURL(JMXTransportProtocol.RMI));
          final JMXServiceURL jmxRoServiceURL = new JMXServiceURL(auth
          .getJMXConnectorURL(JMXTransportProtocol.RO));
-         final ObjectName beanName = new ObjectName(JMXMonitoringHelper.SCHEDULER_BEAN_NAME);
+         final ObjectName beanName = new ObjectName(SchedulerJMXHelper.SCHEDULER_BEAN_NAME);
          final String suffix = "/" + PASchedulerProperties.SCHEDULER_JMX_CONNECTOR_NAME.getValueAsString();
 
          {
@@ -150,7 +149,8 @@ public final class SchedulerJMXTest extends FunctionalTest {
 
          SchedulerTHelper.log("Test as user 2 - Check anonymMBean is registered in the MBean server");
          Assert.assertTrue("AnonymMBean is not registered", conn.isRegistered(beanName));
-         /*
+         
+         
          SchedulerTHelper.log("Test as user 3 - Check adminMBean not accessible by queryNames()");
          for (final Object o : conn.queryNames(null, null)) {
          Assert.assertFalse("AdminMBean must not be accessible from user connection", ((ObjectName) o)
@@ -244,7 +244,7 @@ public final class SchedulerJMXTest extends FunctionalTest {
 
          SchedulerTHelper.log("Test as admin 2 - Check adminMBean is registered in the MBean server");
          Assert.assertTrue("AdminMBean is not registered", conn.isRegistered(beanName));
-         /*
+        
          SchedulerTHelper.log("Test as admin 3 - Check anonymMBean not accessible by queryNames()");
          for (final Object o : conn.queryNames(null, null)) {
          Assert.assertFalse(
@@ -320,6 +320,7 @@ public final class SchedulerJMXTest extends FunctionalTest {
          Assert.assertFalse("The helper disconnect() must set the helper as disconnected", client
          .isConnected());
          }
-         */
+         **/
+
     }
 }
