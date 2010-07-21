@@ -5,10 +5,10 @@
 <web-app>
     <display-name>Archetype Created Web Application</display-name>
     <!-- Set this if you want Resteasy to scan for JAX-RS classes -->
-    <context-param>
+   <!--  <context-param>
         <param-name>resteasy.scan</param-name>
         <param-value>false</param-value>
-    </context-param>
+    </context-param> -->
   
     
     <context-param>
