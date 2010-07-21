@@ -1,0 +1,174 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2010 INRIA/University of
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2
+ * or a different license than the GPL.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
+package org.ow2.proactive.scheduler.policy;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.job.JobDescriptor;
+import org.ow2.proactive.scheduler.common.policy.Policy;
+import org.ow2.proactive.scheduler.common.task.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.util.SchedulerDevLoggers;
+
+
+/**
+ * Implementation of the policy according that :
+ * <ul>
+ * 	<li>FIFO priority order is kept</li>
+ * 	<li>Particular number of tasks per loop can be returned</li>
+ *  <li>Number of groups of tasks to be returned is limited to a
+ *  particular number of tasks computed each time the max number of calls is reached</li>
+ * </ul>
+ *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 0.9
+ */
+public class DefaultPolicy extends Policy {
+
+    private static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerDevLoggers.SCHEDULE);
+    /** Configuration file name used to change current configuration */
+    private String CONFIG_FILE_NAME = PASchedulerProperties
+            .getAbsolutePath("config/scheduler/DefaultPolicy.conf");
+    /** Number of loop to wait until the next read of configuration file */
+    private int READ_ARGUMENT_LOOP_FREQUENCY = 21;
+    /** Maximum number of tasks returned by the policy in each loop */
+    private int NB_TASKS_PER_LOOP = Integer.MAX_VALUE;
+
+    private int nbLoop = 0;
+    private int globalNbCalls = 0;
+    private Set<TaskId> ids = new HashSet<TaskId>();
+    private int nbCalls = 0;
+
+    /**
+     * This method return the tasks using FIFO policy according to the jobs priorities.
+     *
+     * @see org.ow2.proactive.scheduler.common.policy.Policy#getOrderedTasks(java.util.List)
+     */
+    @Override
+    public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
+        //read configuration file
+        if (++globalNbCalls % READ_ARGUMENT_LOOP_FREQUENCY == 0) {
+            readConfigFile();
+        }
+
+        //check number of free nodes
+        int freeNodeNb;
+        if (RMState == null) {
+            freeNodeNb = NB_TASKS_PER_LOOP;
+        } else {
+            freeNodeNb = RMState.getFreeNodesNumber();
+        }
+
+        //set max number of loop to do each time the number of calls to this method equals 0
+        if (nbCalls == 0) {
+            nbLoop = 0;
+            //max nb of loops is number of task / nb of tasks per loop
+            for (JobDescriptor jobDescriptor : jobs) {
+                nbLoop += jobDescriptor.getEligibleTasks().size();
+            }
+            nbLoop = nbLoop / NB_TASKS_PER_LOOP;
+        }
+
+        Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();
+        //sort jobs by priority
+        Collections.sort(jobs);
+
+        //fill list of task to be returned by the policy
+        //max number of returned tasks will be the number of tasks per loop
+        int i = 0;
+        forjob: for (int y = 0; y < jobs.size(); y++) {
+            for (EligibleTaskDescriptor etd : jobs.get(y).getEligibleTasks()) {
+                if (!ids.contains(etd.getId())) {
+                    toReturn.add(etd);
+                    ids.add(etd.getId());
+                    if (++i == NB_TASKS_PER_LOOP) {
+                        break forjob;
+                    }
+                }
+            }
+        }
+
+        //clear ids list in some conditions
+        nbCalls++;
+        if (toReturn.size() == 0 || nbCalls == nbLoop || freeNodeNb == 0) {
+            ids.clear();
+            nbCalls = 0;
+        }
+        return toReturn;
+    }
+
+    private void readConfigFile() {
+        File confFile = new File(CONFIG_FILE_NAME);
+        if (!confFile.exists()) {
+            return;
+        }
+        try {
+            Properties prop = new Properties();
+            FileInputStream fis = new FileInputStream(confFile);
+            fis.getFD().sync();
+            prop.load(fis);
+            fis.close();
+            if (prop.containsKey("CONFIG_FILE_NAME")) {
+                CONFIG_FILE_NAME = PASchedulerProperties.getAbsolutePath(prop.get("CONFIG_FILE_NAME")
+                        .toString());
+            }
+            if (prop.containsKey("READ_ARGUMENT_LOOP_FREQUENCY")) {
+                READ_ARGUMENT_LOOP_FREQUENCY = Integer.parseInt(prop.get("READ_ARGUMENT_LOOP_FREQUENCY")
+                        .toString());
+            }
+            if (prop.containsKey("NB_TASKS_PER_LOOP")) {
+                NB_TASKS_PER_LOOP = Integer.parseInt(prop.get("NB_TASKS_PER_LOOP").toString());
+                if (NB_TASKS_PER_LOOP == 0) {
+                    NB_TASKS_PER_LOOP = Integer.MAX_VALUE;
+                }
+            }
+        } catch (Exception e) {
+            //file not read due to exception while reading conf file
+            logger_dev.warn("Exception while reading Policy configuration file", e);
+        }
+    }
+}

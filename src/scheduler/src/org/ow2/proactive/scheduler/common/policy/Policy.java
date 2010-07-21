@@ -59,6 +59,7 @@ public abstract class Policy implements Serializable {
     /**
      * Resources manager state. Can be used in an inherit policy to be aware
      * of resources informations like total nodes number, used nodes, etc.
+     * Can be null the first time the {@link #getOrderedTasks(List)} method is called.
      */
     public RMState RMState = null;
 
