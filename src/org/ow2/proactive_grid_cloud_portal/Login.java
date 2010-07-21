@@ -39,10 +39,11 @@ public class Login {
     
     public static void main(String[] args) {
         GetMethod method = new GetMethod("http://localhost:8080/proactive_grid_cloud_portal/jobs");
-        method.addRequestHeader("sessionid", "23423432");
+        method.addRequestHeader("sessionid", "1");
         HttpClient client = new HttpClient();
         try {
             client.executeMethod(method);
+            System.out.println(method.getResponseBodyAsString());
         } catch (HttpException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
