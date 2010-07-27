@@ -90,7 +90,7 @@ public class IntegerWrapper implements Serializable {
      *
      * @return the Integer value.
      */
-    public Integer integerValue() {
+    public Integer getValue() {
         return value;
     }
 

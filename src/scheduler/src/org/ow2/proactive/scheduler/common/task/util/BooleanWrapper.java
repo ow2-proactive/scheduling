@@ -90,7 +90,7 @@ public class BooleanWrapper implements Serializable {
      *
      * @return the boolean value.
      */
-    public boolean booleanValue() {
+    public boolean getValue() {
         return value;
     }
 

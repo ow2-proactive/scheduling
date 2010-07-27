@@ -115,7 +115,7 @@ public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
         fjei.setForkEnvironment(forkEnvironment);
         Map<String, byte[]> tmp = new HashMap<String, byte[]>();
         for (Entry<String, ByteArrayWrapper> e : this.serializedArguments.entrySet()) {
-            tmp.put(e.getKey(), e.getValue().byteArrayValue());
+            tmp.put(e.getKey(), e.getValue().getValue());
         }
         fjei.setJavaExecutableContainer(new JavaExecutableContainer(this.userExecutableClassName, tmp));
         return fjei;

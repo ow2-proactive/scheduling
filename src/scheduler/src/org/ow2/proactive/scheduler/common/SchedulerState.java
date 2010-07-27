@@ -39,6 +39,9 @@ package org.ow2.proactive.scheduler.common;
 import java.io.Serializable;
 import java.util.Vector;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobState;
 
@@ -51,6 +54,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@XmlRootElement(name="schedulerstate")
 public interface SchedulerState extends Serializable {
 
     /**
@@ -79,6 +83,7 @@ public interface SchedulerState extends Serializable {
      *
      * @return the status of the scheduler
      */
+    @XmlElement(name="status")
     public SchedulerStatus getStatus();
 
     /**

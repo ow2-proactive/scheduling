@@ -177,10 +177,10 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "sleepTime").byteArrayValue()), "1");
+                                "sleepTime").getValue()), "1");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "number").byteArrayValue()), "1");
+                                "number").getValue()), "1");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
@@ -212,13 +212,13 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "sleepTime").byteArrayValue()), "12");
+                                "sleepTime").getValue()), "12");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "number").byteArrayValue()), "21");
+                                "number").getValue()), "21");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "test").byteArrayValue()), "/bin/java/jdk1.5");
+                                "test").getValue()), "/bin/java/jdk1.5");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
@@ -323,10 +323,10 @@ public class TestDatabaseCRUD {
 
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "sleepTime").byteArrayValue()), "1");
+                                "sleepTime").getValue()), "1");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "number").byteArrayValue()), "1");
+                                "number").getValue()), "1");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),
@@ -336,13 +336,13 @@ public class TestDatabaseCRUD {
                 f.setAccessible(true);
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "sleepTime").byteArrayValue()), "12");
+                                "sleepTime").getValue()), "12");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "number").byteArrayValue()), "21");
+                                "number").getValue()), "21");
                 Assert.assertEquals(ByteToObjectConverter.ObjectStream
                         .convert(((Map<String, ByteArrayWrapper>) f.get(it.getExecutableContainer())).get(
-                                "test").byteArrayValue()), "/bin/java/jdk1.5");
+                                "test").getValue()), "/bin/java/jdk1.5");
                 f = JavaExecutableContainer.class.getDeclaredField("userExecutableClassName");
                 f.setAccessible(true);
                 Assert.assertEquals((String) f.get(it.getExecutableContainer()),

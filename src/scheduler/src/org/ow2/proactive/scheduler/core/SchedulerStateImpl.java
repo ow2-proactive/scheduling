@@ -38,6 +38,9 @@ package org.ow2.proactive.scheduler.core;
 
 import java.util.Vector;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
@@ -51,6 +54,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
+@XmlRootElement(name = "schedulerstate")
 public final class SchedulerStateImpl implements SchedulerState {
 
     /** Pending jobs */
@@ -131,6 +135,7 @@ public final class SchedulerStateImpl implements SchedulerState {
     /**
      * @return the status
      */
+    @XmlElement(name = "status")
     public SchedulerStatus getStatus() {
         return status;
     }

@@ -41,6 +41,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
@@ -59,6 +61,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 @Table(name = "JOB_ID")
 @AccessType("field")
 @Proxy(lazy = false)
+@XmlRootElement(name = "jobid")
 public final class JobIdImpl implements JobId {
     @Id
     @GeneratedValue
@@ -73,6 +76,7 @@ public final class JobIdImpl implements JobId {
 
     /** current instance id */
     @Column(name = "ID")
+    @XmlElement(name = "id")
     private int id;
 
     /** Human readable name */
@@ -80,7 +84,7 @@ public final class JobIdImpl implements JobId {
     private String readableName = DEFAULT_JOB_NAME;
 
     /** Hibernate default constructor */
-    private JobIdImpl() {
+    public JobIdImpl() {
     }
 
     /**
@@ -193,4 +197,8 @@ public final class JobIdImpl implements JobId {
         return this.value();
     }
 
+    // added for jaxb
+    public JobIdImpl valueOf(String s ) {
+        return (JobIdImpl) makeJobId(s);
+    }
 }
