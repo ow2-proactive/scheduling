@@ -7,14 +7,14 @@
 # that will create a new runtime and register a node
 # to a remote Resource Manager
 #
-# This script is not meant to be run alone, but more like: 
-#     echo "pbsInfrastructure.sh [params]" | qsub [params]
+# This script is not meant to be run alone, but more like:
+#     echo "jobBatchingInfrastructure.sh [params]" | sumitCommand [params]
 #
 
 cd $(dirname $0) &>/dev/null
 
 if [ $# -lt 5 ]; then
-    echo "Usage: $0 jdk user pass rm nodeName nsName [additional config]"
+    echo "Usage: $0 jdk credentials rm nodeName nsName [additional config]"
     exit 0
 fi
 
