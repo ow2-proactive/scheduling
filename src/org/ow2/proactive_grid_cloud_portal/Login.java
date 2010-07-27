@@ -10,10 +10,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.jboss.resteasy.spi.UnauthorizedException;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.scheduler.ext.filessplitmerge.schedulertools.SchedulerProxyUserInterface;
 
 @Path("/login")
 public class Login {
@@ -23,10 +21,14 @@ public class Login {
     public String login(@FormParam("username") String username, @FormParam("password") String password) {
         
         try {
-        SchedulerAuthenticationInterface sai = SchedulerConnection.join("rmi://localhost:1099");
-        Credentials cred = Credentials.createCredentials(username, password, sai.getPublicKey());
-        Scheduler scheduler = sai.login(cred);
+        
+            SchedulerProxyUserInterface scheduler =  PAActiveObject.newActive(
+                    SchedulerProxyUserInterface.class, new Object[] {});
+        
+            scheduler.init("rmi://localhost:1099/SCHEDULER", username, password);
+        
         return ""+SessionMapper.getInstance().add(scheduler);
+        
         } catch (Throwable e) {
             e.printStackTrace();
             throw new UnauthorizedException(e);

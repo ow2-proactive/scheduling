@@ -4,11 +4,16 @@ import javax.servlet.ServletContextEvent;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 public class MyResteasyBootstrap extends ResteasyBootstrap {
 
     public void contextInitialized(ServletContextEvent event) {
-        RuntimeDelegate.setInstance(new org.jboss.resteasy.spi.ResteasyProviderFactory());
+        ResteasyProviderFactory dispatcher = new ResteasyProviderFactory();
+        RuntimeDelegate.setInstance(dispatcher);
+//        ResteasyProviderFactory.getInstance().addContextResolver(provider)
+        dispatcher.addStringConverter(RestartModeConverter.class);
+
         super.contextInitialized(event);
     }
     
