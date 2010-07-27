@@ -42,15 +42,13 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.KeyException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
-import java.util.Collections;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
-import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -234,63 +232,6 @@ public class PBSInfrastructure extends InfrastructureManager {
     }
 
     /**
-     * Execute a specific command on a remote host through SSH
-     *
-     * @param host the remote host on which to execute the command
-     * @param cmd the command to execute on the remote host
-     * @return the Process in which the SSH command is running;
-     *          NOT the actual process on the remote host, although it can be used
-     *          to read the remote process' output.
-     * @throws RMException SSH command execution failed
-     */
-    protected Process runSSHCommand(InetAddress host, String cmd) throws RMException {
-        // build the SSH command using ProActive's SSH client:
-        // will recover keys/identities if they exist
-        String sshCmd = System.getProperty("java.home") + "/bin/java";
-        sshCmd += " -cp " + PAResourceManagerProperties.RM_HOME.getValueAsString() +
-            "/dist/lib/ProActive.jar";
-        sshCmd += " -Dproactive.useIPaddress=true ";
-        sshCmd += SSHClient.class.getName();
-        sshCmd += " " + sshOptions;
-        sshCmd += " " + host.getHostName();
-        sshCmd += " \"" + cmd + "\"";
-
-        try {
-            if (host.equals(InetAddress.getLocalHost()) || host.equals(InetAddress.getByName("127.0.0.1"))) {
-                logger.debug("The command will be executed locally");
-                sshCmd = cmd.replaceAll("\\\\", "");
-            }
-        } catch (UnknownHostException e) {
-        }
-
-        logger.info("Executing SSH command: '" + sshCmd + "'");
-
-        Process p = null;
-        // start the SSH command in a new process and not a thread:
-        // easier killing, prevents the client from polluting stdout
-        try {
-            String[] cmdArray = null;
-            switch (OperatingSystem.getOperatingSystem()) {
-                case unix:
-                    cmdArray = new String[] { CentralPAPropertyRepository.PA_GCMD_UNIX_SHELL.getValue(),
-                            "-c", sshCmd };
-                    break;
-                case windows:
-                    sshCmd.replaceAll("/", "\\\\");
-                    cmdArray = new String[] { sshCmd };
-                    break;
-            }
-
-            ProcessBuilder pb = new ProcessBuilder(cmdArray);
-            p = pb.start();
-
-        } catch (Exception e1) {
-            throw new RMException("Failed to execute SSH command: " + sshCmd, e1);
-        }
-        return p;
-    }
-
-    /**
      * Builds the command line to execute on the PBS frontend and wait for every launched nodes
      * to register. If the node doesn't register (ie. runs {@link #registerAcquiredNode(Node)} isn't called)
      * before the timeout (configurable) value, an exception is raised.
@@ -331,7 +272,12 @@ public class PBSInfrastructure extends InfrastructureManager {
         expectedNodes.add(nodeName);
 
         // executing the command
-        Process p = runSSHCommand(host, cmd);
+        Process p;
+        try {
+            p = Utils.runSSHCommand(host, cmd, this.sshOptions);
+        } catch (IOException e1) {
+            throw new RMException("Cannot execute ssh command: " + cmd + " on host: " + this.PBSServer, e1);
+        }
 
         // recover the Job ID through stdout
         String id = "";
@@ -524,10 +470,10 @@ public class PBSInfrastructure extends InfrastructureManager {
         String cmd = "qdel " + jobID;
         Process qDel = null;
         try {
-            qDel = runSSHCommand(InetAddress.getByName(this.PBSServer), cmd);
-        } catch (UnknownHostException e1) {
+            qDel = Utils.runSSHCommand(InetAddress.getByName(this.PBSServer), cmd, this.sshOptions);
+        } catch (Exception e1) {
             logger.warn("Cannot ssh " + this.PBSServer + " to issue qDel command. job with jobID: " + jobID +
-                " won't be deleted.");
+                " won't be deleted.", e1);
             throw new RMException("Cannot ssh " + this.PBSServer +
                 " to issue qDel command. job with jobID: " + jobID + " won't be deleted.", e1);
         }
