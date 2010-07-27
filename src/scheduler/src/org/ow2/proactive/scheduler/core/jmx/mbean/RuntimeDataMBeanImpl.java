@@ -46,17 +46,14 @@ import java.util.Set;
 import javax.management.NotCompliantMBeanException;
 import javax.management.StandardMBean;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.utils.Tools;
 
 
@@ -68,80 +65,89 @@ import org.ow2.proactive.utils.Tools;
  */
 public final class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMBean {
 
-    /** Scheduler logger device */
-    public static final Logger logger_dev = ProActiveLogger.getLogger(SchedulerLoggers.FRONTEND);
+    /** The Scheduler Started Time */
+    private final long schedulerStartedTime;
 
-    /** Scheduler current state */
-    protected SchedulerStatus schedulerStatus = SchedulerStatus.STOPPED;
+    /** Current Scheduler status typed as scheduler event */
+    protected SchedulerEvent schedulerStatus;
 
-    /** Variables representing the attributes of the SchedulerWrapperMBean */
-    protected int totalJobsCount = 0;
+    /** The Scheduler clients */
+    private final SchedulerUsers schedulerClients;
 
-    protected int totalTasksCount = 0;
+    /** Various counters changed on incoming events */
+    protected int totalJobsCount;
+    protected int pendingJobsCount;
+    protected int runningJobsCount;
+    protected int finishedJobsCount;
+    protected int totalTasksCount;
 
-    protected int pendingJobsCount = 0;
-
-    protected int runningJobsCount = 0;
-
-    protected int finishedJobsCount = 0;
-
-    protected Map<String, Integer> numberOfPendingTasks = new HashMap<String, Integer>();
-
-    protected Map<String, Integer> numberOfRunningTasks = new HashMap<String, Integer>();
-
-    protected Map<String, Integer> numberOfFinishedTasks = new HashMap<String, Integer>();
-
-    /** Number of Connected Users */
-    protected Set<UserIdentification> users = new HashSet<UserIdentification>();
+    /** Maps for counting tasks per job */
+    protected final Map<String, Integer> numberOfPendingTasks;
+    protected final Map<String, Integer> numberOfRunningTasks;
+    protected final Map<String, Integer> numberOfFinishedTasks;
 
     /** Variables representing the Key Performance Indicators for the SchedulerWrapper */
-    private long meanJobPendingTime = 0;
-
-    private long meanJobExecutionTime = 0;
-
-    private long jobSubmittingPeriod = 0;
+    private long meanJobPendingTime;
+    private long meanJobExecutionTime;
+    private long jobSubmittingPeriod;
 
     /** The counter fields for the KPI values */
-    private long counterJobPendingTime = 0;
-
-    private long counterJobExecutionTime = 0;
-
-    private long counterJobArrivalTime = 0;
+    private long counterJobPendingTime;
+    private long counterJobExecutionTime;
+    private long counterJobArrivalTime;
 
     /** The cumulative Times */
-    private long cumulativePendingTime = 0;
-
-    private long cumulativeExecutionTime = 0;
-
-    private long cumulativeArrivalTime = 0;
+    private long cumulativePendingTime;
+    private long cumulativeExecutionTime;
+    private long cumulativeArrivalTime;
 
     /** The previous submitted time, explained later */
-    private long previousSubmittedTime = 0;
-
-    /** The Scheduler Started Time */
-    private long schedulerStartedTime = 0;
+    private long previousSubmittedTime;
 
     /**
      * Fields to keep the informations need for the Operations to get the Key Performance Indicator values
      * The first two are references to the Map of pending and running time for each job
      */
-    private Map<String, Long> jobPendingTimeMap = new HashMap<String, Long>();
-    private Map<String, Long> jobRunningTimeMap = new HashMap<String, Long>();
+    private final Map<String, Long> jobPendingTimeMap;
+    private final Map<String, Long> jobRunningTimeMap;
+
     /** The task timings list and the mean timings for the tasks of a given job */
-    private Map<String, List<Long>> taskPendingTimeMap = new HashMap<String, List<Long>>();
-    private Map<String, List<Long>> taskRunningTimeMap = new HashMap<String, List<Long>>();
-    private Map<String, Long> meanTaskPendingTimeMap = new HashMap<String, Long>();
-    private Map<String, Long> meanTaskRunningTimeMap = new HashMap<String, Long>();
+    private final Map<String, List<Long>> taskPendingTimeMap;
+    private final Map<String, List<Long>> taskRunningTimeMap;
+    private final Map<String, Long> meanTaskPendingTimeMap;
+    private final Map<String, Long> meanTaskRunningTimeMap;
+
     /** Map of the number of nodes used by the jobs */
-    private Map<String, Integer> nodesUsedByJobMap = new HashMap<String, Integer>();
+    private final Map<String, Integer> nodesUsedByJobMap;
     /** List of execution host for each task of each job */
-    private Map<String, Set<String>> executionHostNames = new HashMap<String, Set<String>>();
+    private final Map<String, Set<String>> executionHostNames;
 
     /**
      * Empty constructor required by JMX
      */
     public RuntimeDataMBeanImpl() throws NotCompliantMBeanException {
         super(RuntimeDataMBean.class);
+
+        // This MBean is instantiated by scheduler core 
+        this.schedulerStartedTime = System.currentTimeMillis();
+
+        // The Scheduler clients
+        this.schedulerClients = new SchedulerUsers();
+
+        // Initialize count maps  
+        this.numberOfPendingTasks = new HashMap<String, Integer>();
+        this.numberOfRunningTasks = new HashMap<String, Integer>();
+        this.numberOfFinishedTasks = new HashMap<String, Integer>();
+
+        // Initialize count maps
+        this.jobPendingTimeMap = new HashMap<String, Long>();
+        this.jobRunningTimeMap = new HashMap<String, Long>();
+        this.taskPendingTimeMap = new HashMap<String, List<Long>>();
+        this.taskRunningTimeMap = new HashMap<String, List<Long>>();
+        this.meanTaskPendingTimeMap = new HashMap<String, Long>();
+        this.nodesUsedByJobMap = new HashMap<String, Integer>();
+        this.meanTaskRunningTimeMap = new HashMap<String, Long>();
+        this.executionHostNames = new HashMap<String, Set<String>>();
     }
 
     /**
@@ -149,33 +155,34 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      *
      * @param jobList the list of job to be recovered
      */
-    public void recover(Set<JobState> jobList) {
-        if (jobList != null) {
-            for (JobState js : jobList) {
-                totalJobsCount++;
-                totalTasksCount += js.getTotalNumberOfTasks();
-                String jobId = js.getId().value();
-                numberOfRunningTasks.put(jobId, js.getNumberOfRunningTasks());
-                numberOfFinishedTasks.put(jobId, js.getNumberOfFinishedTasks());
-                switch (js.getStatus()) {
-                    case PENDING:
-                    case PAUSED:
-                        numberOfPendingTasks.put(jobId, js.getTotalNumberOfTasks());
-                        pendingJobsCount++;
-                        break;
-                    case RUNNING:
-                    case STALLED:
-                        numberOfPendingTasks.put(jobId, js.getNumberOfPendingTasks());
-                        runningJobsCount++;
-                        break;
-                    case CANCELED:
-                    case FAILED:
-                    case FINISHED:
-                    case KILLED:
-                        numberOfPendingTasks.put(jobId, 0);
-                        finishedJobsCount++;
-                        break;
-                }
+    public void recover(final Set<JobState> jobList) {
+        if (jobList == null) {
+            return;
+        }
+        for (final JobState js : jobList) {
+            this.totalJobsCount++;
+            this.totalTasksCount += js.getTotalNumberOfTasks();
+            final String jobId = js.getId().value();
+            this.numberOfRunningTasks.put(jobId, js.getNumberOfRunningTasks());
+            this.numberOfFinishedTasks.put(jobId, js.getNumberOfFinishedTasks());
+            switch (js.getStatus()) {
+                case PENDING:
+                case PAUSED:
+                    numberOfPendingTasks.put(jobId, js.getTotalNumberOfTasks());
+                    pendingJobsCount++;
+                    break;
+                case RUNNING:
+                case STALLED:
+                    numberOfPendingTasks.put(jobId, js.getNumberOfPendingTasks());
+                    runningJobsCount++;
+                    break;
+                case CANCELED:
+                case FAILED:
+                case FINISHED:
+                case KILLED:
+                    numberOfPendingTasks.put(jobId, 0);
+                    finishedJobsCount++;
+                    break;
             }
         }
     }
@@ -190,35 +197,8 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
      * @param eventType the type of the received event
      */
-    public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
-        switch (eventType) {
-            case STARTED:
-                this.schedulerStatus = SchedulerStatus.STARTED;
-                // Set the scheduler started time
-                setSchedulerStartedTime(System.currentTimeMillis());
-                break;
-            case STOPPED:
-                this.schedulerStatus = SchedulerStatus.STOPPED;
-                break;
-            case PAUSED:
-                this.schedulerStatus = SchedulerStatus.PAUSED;
-                break;
-            case FROZEN:
-                this.schedulerStatus = SchedulerStatus.FROZEN;
-                break;
-            case RESUMED:
-                this.schedulerStatus = SchedulerStatus.STARTED;
-                break;
-            case SHUTTING_DOWN:
-                this.schedulerStatus = SchedulerStatus.SHUTTING_DOWN;
-                break;
-            case SHUTDOWN:
-                this.schedulerStatus = SchedulerStatus.STOPPED;
-                break;
-            case KILLED:
-                this.schedulerStatus = SchedulerStatus.KILLED;
-                break;
-        }
+    public void schedulerStateUpdatedEvent(final SchedulerEvent eventType) {
+        this.schedulerStatus = eventType;
     }
 
     /**
@@ -227,7 +207,8 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      * @param notification data containing job info
      */
-    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+    public void jobStateUpdatedEvent(final NotificationData<JobInfo> notification) {
+        final JobInfo jobInfo = notification.getData();
         switch (notification.getEventType()) {
             case JOB_PAUSED:
                 this.runningJobsCount--;
@@ -236,14 +217,19 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
                 this.runningJobsCount++;
                 break;
             case JOB_PENDING_TO_RUNNING:
-                jobPendingToRunningEvent(notification.getData());
+                jobPendingToRunningEvent(jobInfo);
                 break;
             case JOB_RUNNING_TO_FINISHED:
-                jobRunningToFinishedEvent(notification.getData());
+                // Check for killed job (see SCHEDULING-776)
+                if (jobInfo.getStatus() == JobStatus.KILLED) {
+                    this.pendingJobsCount--;
+                    this.finishedJobsCount++;
+                } else {
+                    jobRunningToFinishedEvent(jobInfo);
+                }
                 break;
             case JOB_REMOVE_FINISHED:
-                jobRemoveFinishedEvent(notification.getData());
-                break;
+                jobRemoveFinishedEvent(jobInfo);
         }
     }
 
@@ -253,14 +239,13 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      * @param notification data containing task info
      */
-    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
+    public void taskStateUpdatedEvent(final NotificationData<TaskInfo> notification) {
         switch (notification.getEventType()) {
             case TASK_PENDING_TO_RUNNING:
                 taskPendingToRunningEvent(notification.getData());
                 break;
             case TASK_RUNNING_TO_FINISHED:
                 taskRunningToFinishedEvent(notification.getData());
-                break;
         }
     }
 
@@ -271,7 +256,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      *
      * @param job info
      */
-    protected void jobPendingToRunningEvent(JobInfo info) {
+    protected void jobPendingToRunningEvent(final JobInfo info) {
         // Update the status
         this.pendingJobsCount--;
         this.runningJobsCount++;
@@ -300,10 +285,10 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      *
      * @param info the job's information
      */
-    protected void jobRunningToFinishedEvent(JobInfo info) {
+    protected void jobRunningToFinishedEvent(final JobInfo info) {
         this.runningJobsCount--;
         this.finishedJobsCount++;
-        String jobId = info.getJobId().value();
+        final String jobId = info.getJobId().value();
         this.numberOfPendingTasks.put(jobId, info.getNumberOfPendingTasks());
         this.numberOfRunningTasks.put(jobId, 0);
         this.numberOfFinishedTasks.put(jobId, info.getNumberOfFinishedTasks());
@@ -315,11 +300,12 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
         // Add the meanTaskRunningTime for this job to the meanTaskRunningTimeMap in position [jobId]
         mean = this.computeMean(this.taskRunningTimeMap, jobId);
         this.meanTaskRunningTimeMap.put(jobId, mean);
-        /* put the number of nodes used by the Job and put it in the nodesUsedByJobMap in position [jobId] */
-        try {
-            this.nodesUsedByJobMap.put(jobId, this.executionHostNames.get(info.getJobId().value()).size());
-        } catch (NullPointerException npe) {
+        // Put the number of nodes used by the Job and put it in the nodesUsedByJobMap in position [jobId]
+        final Set<String> hostnames = this.executionHostNames.get(jobId);
+        if (hostnames == null) {
             this.nodesUsedByJobMap.put(jobId, 0);
+        } else {
+            this.nodesUsedByJobMap.put(jobId, hostnames.size());
         }
     }
 
@@ -327,20 +313,21 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * This is a canonical event to calculate the meanJobArrivalTime KPI
      *
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
-     * @param job the state of the job
+     * @param jobState the state of the job
      */
-    public void jobSubmittedEvent(JobState job) {
+    public void jobSubmittedEvent(final JobState jobState) {
         this.totalJobsCount++;
         this.pendingJobsCount++;
-        // For each task of the Job increment the number of pending tasks and the total number of tasks
-        this.totalTasksCount += job.getTotalNumberOfTasks();
-        String jobId = job.getId().value();
-        this.numberOfPendingTasks.put(jobId, job.getTotalNumberOfTasks());
+        final int tasks = jobState.getTotalNumberOfTasks();
+        // For each task of the Job increment the number of pending tasks and the total number of tasks        
+        this.totalTasksCount += tasks;
+        final String jobId = jobState.getId().value();
+        this.numberOfPendingTasks.put(jobId, tasks);
         this.numberOfRunningTasks.put(jobId, 0);
         this.numberOfFinishedTasks.put(jobId, 0);
 
         // Call the private method to calculate the mean arrival time
-        calculateJobSubmittingPeriod(job.getJobInfo());
+        calculateJobSubmittingPeriod(jobState.getSubmittedTime());
     }
 
     /**
@@ -387,26 +374,18 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     /**
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
-    public void usersUpdatedEvent(NotificationData<UserIdentification> notificationData) {
-        // It can be an update to remove or to add a User
-        if (notificationData.getData().isToRemove()) {
-            users.remove(notificationData.getData());
-        } else {
-            users.add(notificationData.getData());
-        }
+    public void usersUpdatedEvent(final NotificationData<UserIdentification> notificationData) {
+        this.schedulerClients.update(notificationData.getData());
     }
 
     // ATTRIBUTES TO CONTROL
 
     /**
-     * The following methods represent the Attributes that is possible to monitor from the MBean
-     *
-     * Methods to get the values of the attributes of the MBean
-     *
+     * Returns the connected clients count     
      * @return current number of connected users
      */
     public int getConnectedUsersCount() {
-        return this.users.size();
+        return this.schedulerClients.getUsers().size();
     }
 
     /**
@@ -468,13 +447,6 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     }
 
     /**
-     * @return current status of the Scheduler as String
-     */
-    public SchedulerStatus getSchedulerStatus() {
-        return this.schedulerStatus;
-    }
-
-    /**
      * @return current number of jobs submitted to the Scheduler
      */
     public int getTotalJobsCount() {
@@ -496,7 +468,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      *
      * @param info the job information
      */
-    private void calculateMeanJobPendingTime(JobInfo info) {
+    private void calculateMeanJobPendingTime(final JobInfo info) {
         // Calculate the Pending time for this Job (startTime - submittedTime)
         long jobPendingTime = (info.getStartTime() - info.getSubmittedTime());
         // Increment the cumulative pending time
@@ -515,7 +487,7 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      *
      * @param info the job information
      */
-    private void computeMeanJobExecutionTime(JobInfo info) {
+    private void computeMeanJobExecutionTime(final JobInfo info) {
         // Calculate the Running time for this Job (finishedTime - startTime)
         long jobRunningTime = (info.getFinishedTime() - info.getStartTime());
         // Increment the cumulative execution time
@@ -534,21 +506,21 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      *
      * @param info the job information
      */
-    private void calculateJobSubmittingPeriod(JobInfo info) {
+    private void calculateJobSubmittingPeriod(final long jobSubmittedTime) {
         // Calculate the arrival time for this Job (currentSubmittedTime - previousSubmittedTime)
         // Only the first time we have this event, we set the cumulative arrival time with the scheduler started time
         // Otherwise we set it with the previous submitted time
         if (this.counterJobArrivalTime == 0) {
-            this.cumulativeArrivalTime = (info.getSubmittedTime() - this.schedulerStartedTime);
+            this.cumulativeArrivalTime = (jobSubmittedTime - this.schedulerStartedTime);
         } else {
-            this.cumulativeArrivalTime += (info.getSubmittedTime() - this.previousSubmittedTime);
+            this.cumulativeArrivalTime += (jobSubmittedTime - this.previousSubmittedTime);
         }
         // Increments the related counter
         this.counterJobArrivalTime++;
         // Update the mean arrival time dividing the cumulative arrival time by the related counter
         this.jobSubmittingPeriod = (this.cumulativeArrivalTime / this.counterJobArrivalTime);
         // This is the previous Submitted Time for the next time that happens this event
-        this.previousSubmittedTime = info.getSubmittedTime();
+        this.previousSubmittedTime = jobSubmittedTime;
 
     }
 
@@ -559,28 +531,17 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * @param map
      * @return a long representation of the mean
      */
-    private long computeMean(Map<String, List<Long>> map, String jobId) {
-        List<Long> list = map.get(jobId);
-        if (list == null || list.size() == 0) {
+    private long computeMean(final Map<String, List<Long>> map, final String jobId) {
+        final int size = map.size();
+        if (size == 0) {
             return 0;
         }
         // Initialize the mean for the given job
         long mean = 0;
-        int counter = 0;
-        for (Long l : list) {
-            mean = mean + l;
-            counter++;
+        for (final Long value : map.get(jobId)) {
+            mean += value;
         }
-        return mean / counter;
-    }
-
-    /**
-     * Set the Scheduler Started Time
-     *
-     * @param time represented as a long
-     */
-    private void setSchedulerStartedTime(long time) {
-        this.schedulerStartedTime = time;
+        return mean / size;
     }
 
     // ATTRIBUTES TO CONTROL
@@ -640,88 +601,70 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * It gives the pending time for a given Job
      *
      * @param jobId, the id of the Job to check
-     * @return a representation as long of the duration of the pending time for the given job.
-     * @throws SchedulerException
+     * @return a representation as long of the duration of the pending time for the given job
      */
-    public long getJobPendingTime(String jobId) {
-        // Check if the jobId inserted is not present in the map
-        long result = 0;
-        try {
-            result = this.jobPendingTimeMap.get(jobId);
-        } catch (Exception e) {
-            logger_dev.error("Job '" + jobId + "' is not present in the job pending time map", e);
+    public long getJobPendingTime(final String jobId) {
+        final Long res = this.jobPendingTimeMap.get(jobId);
+        if (res == null) {
+            throw new RuntimeException("Unknown jobId: " + jobId);
         }
-        return result;
+        return res;
     }
 
     /**
      * This method gives the running time for a given Job
      *
      * @param jobId, the id of the Job to check
-     * @return a representation as long of the duration of the running time for the given job.
-     * @throws SchedulerException
+     * @return a representation as long of the duration of the running time for the given job
      */
-    public long getJobRunningTime(String jobId) {
-        // Check if the jobId inserted is not present in the map
-        long result = 0;
-        try {
-            result = this.jobRunningTimeMap.get(jobId);
-        } catch (Exception e) {
-            logger_dev.error("Job '" + jobId + "' is not present in the job running time map", e);
+    public long getJobRunningTime(final String jobId) {
+        final Long res = this.jobRunningTimeMap.get(jobId);
+        if (res == null) {
+            throw new RuntimeException("Unknown jobId: " + jobId);
         }
-        return result;
+        return res;
     }
 
     /**
      * This method gives the mean task pending time for a given Job
      *
      * @param jobId, the id of the Job to check
-     * @return a representation as long of the duration of the mean task pending time for the given job.
-     * @throws SchedulerException
+     * @return a representation as long of the duration of the mean task pending time for the given job
      */
-    public long getMeanTaskPendingTime(String jobId) {
-        // Check if the jobId inserted is not present in the map
-        long result = 0;
-        try {
-            result = this.meanTaskPendingTimeMap.get(jobId);
-        } catch (Exception e) {
-            logger_dev.error("Job '" + jobId + "' is not present in the task pending time map", e);
+    public long getMeanTaskPendingTime(final String jobId) {
+        final Long res = this.meanTaskPendingTimeMap.get(jobId);
+        if (res == null) {
+            throw new RuntimeException("Unknown jobId: " + jobId);
         }
-        return result;
+        return res;
     }
 
     /**
      * This method gives the mean task running time for a given Job
      *
      * @param jobId, the id of the Job to check
-     * @return a representation as long of the duration of the mean task running time for the given job.
+     * @return a representation as long of the duration of the mean task running time for the given job
      */
-    public long getMeanTaskRunningTime(String jobId) {
-        // Check if the jobId inserted is not present in the map
-        long result = 0;
-        try {
-            result = this.meanTaskRunningTimeMap.get(jobId);
-        } catch (Exception e) {
-            logger_dev.error("Job '" + jobId + "' is not present in the task running time map", e);
+    public long getMeanTaskRunningTime(final String jobId) {
+        final Long res = this.meanTaskRunningTimeMap.get(jobId);
+        if (res == null) {
+            throw new RuntimeException("Unknown jobId: " + jobId);
         }
-        return result;
+        return res;
     }
 
     /**
      * This method gives the total number of nodes used by a given Job
      *
      * @param jobId, the id of the Job to check
-     * @return the total number of nodes used by the given job.
+     * @return the total number of nodes used by the given job
      */
-    public int getTotalNumberOfNodesUsed(String jobId) {
-        // Check if the jobId inserted is not present in the map
-        int result = 0;
-        try {
-            result = this.nodesUsedByJobMap.get(jobId);
-        } catch (Exception e) {
-            logger_dev.error("Job '" + jobId + "' is not present in the nodes used by job map", e);
+    public int getTotalNumberOfNodesUsed(final String jobId) {
+        final Integer res = this.nodesUsedByJobMap.get(jobId);
+        if (res == null) {
+            throw new RuntimeException("Unknown jobId: " + jobId);
         }
-        return result;
+        return res;
     }
 
     // UTILITY OPERATIONS
@@ -731,75 +674,55 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * It gives the pending time for a given Job as String
      *
      * @param jobId, the id of the Job to check
-     * @return a representation as long of the duration of the pending time for the given job.
+     * @return a formatted representation of the duration of the pending time for the given job.
      */
-    public String getFormattedJobPendingTime(String jobId) {
-        // Check if the jobId inserted is not present in the map
-        String result = "";
-        try {
-            result = Tools.getFormattedDuration(0, this.jobPendingTimeMap.get(jobId));
-        } catch (Exception e) {
-            String msg = "Job '" + jobId + "' is not present in the job pending time map";
-            logger_dev.error(msg, e);
-            result = msg;
+    public String getFormattedJobPendingTime(final String jobId) {
+        final Long res = this.jobPendingTimeMap.get(jobId);
+        if (res == null) {
+            throw new RuntimeException("Unknown jobId: " + jobId);
         }
-        return result;
+        return Tools.getFormattedDuration(0, res);
     }
 
     /**
      * This method gives the running time for a given Job as String
      *
      * @param jobId, the id of the Job to check
-     * @return a representation as long of the duration of the running time for the given job.
+     * @return a formatted representation of the duration of the running time for the given job
      */
-    public String getFormattedJobRunningTime(String jobId) {
-        // Check if the jobId inserted is not present in the map
-        String result = "";
-        try {
-            result = Tools.getFormattedDuration(0, this.jobRunningTimeMap.get(jobId));
-        } catch (Exception e) {
-            String msg = "Job '" + jobId + "' is not present in the job running time map";
-            logger_dev.error(msg, e);
-            result = msg;
+    public String getFormattedJobRunningTime(final String jobId) {
+        final Long res = this.jobRunningTimeMap.get(jobId);
+        if (res == null) {
+            throw new RuntimeException("Unknown jobId: " + jobId);
         }
-        return result;
+        return Tools.getFormattedDuration(0, res);
     }
 
     /**
      * This method gives the mean task pending time for a given Job as String
      *
      * @param jobId, the id of the Job to check
-     * @return a representation as long of the duration of the mean task pending time for the given job.
+     * @return a formatted representation of the duration of the mean task pending time for the given job
      */
-    public String getFormattedMeanTaskPendingTime(String jobId) {
-        // Check if the jobId inserted is not present in the map
-        String result = "";
-        try {
-            result = Tools.getFormattedDuration(0, this.meanTaskPendingTimeMap.get(jobId));
-        } catch (Exception e) {
-            String msg = "Job '" + jobId + "' is not present in the task pending time map";
-            logger_dev.error(msg, e);
-            result = msg;
+    public String getFormattedMeanTaskPendingTime(final String jobId) {
+        final Long res = this.meanTaskPendingTimeMap.get(jobId);
+        if (res == null) {
+            throw new RuntimeException("Unknown jobId: " + jobId);
         }
-        return result;
+        return Tools.getFormattedDuration(0, res);
     }
 
     /**
      * This method gives the mean task running time for a given Job as String
      *
      * @param jobId, the id of the Job to check
-     * @return a representation as long of the duration of the mean task running time for the given job.
+     * @return a formatted representation as long of the duration of the mean task running time for the given job.
      */
-    public String getFormattedMeanTaskRunningTime(String jobId) {
-        // Check if the jobId inserted is not present in the map
-        String result = "";
-        try {
-            result = Tools.getFormattedDuration(0, this.meanTaskRunningTimeMap.get(jobId));
-        } catch (Exception e) {
-            String msg = "Job '" + jobId + "' is not present in the task running time map";
-            logger_dev.error(msg, e);
-            result = msg;
+    public String getFormattedMeanTaskRunningTime(final String jobId) {
+        final Long res = this.meanTaskRunningTimeMap.get(jobId);
+        if (res == null) {
+            throw new RuntimeException("Unknown jobId: " + jobId);
         }
-        return result;
+        return Tools.getFormattedDuration(0, res);
     }
 }
