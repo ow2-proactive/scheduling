@@ -349,17 +349,17 @@ public class SchedulerProxyUserInterface implements Scheduler {
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         // TODO Auto-generated method stub
-        return null;
+        return  uischeduler.getJobState(jobId);
     }
 
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         // TODO Auto-generated method stub
-        return null;
+        return uischeduler.getState();
     }
 
     public boolean kill() throws NotConnectedException, PermissionException {
         // TODO Auto-generated method stub
-        return false;
+        return uischeduler.kill();
     }
 
     public boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException {
