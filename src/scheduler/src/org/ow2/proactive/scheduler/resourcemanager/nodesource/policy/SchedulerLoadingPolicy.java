@@ -243,8 +243,10 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                 // new node arrived
                 pendingNodesNumberAcq -= newNodeNumberInNodeSource - currentNodeNumberInNodeSource;
                 // reseting timer for nodes removal
-                timer.cancel();
-                timer = null;
+                if (timer != null) {
+                    timer.cancel();
+                    timer = null;
+                }
             }
 
             currentNodeNumberInNodeSource = newNodeNumberInNodeSource;
