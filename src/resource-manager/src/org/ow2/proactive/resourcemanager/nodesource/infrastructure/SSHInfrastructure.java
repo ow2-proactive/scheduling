@@ -46,11 +46,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.ssh.SSHClient;
+import org.objectweb.proactive.core.util.ProActiveCounter;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -73,7 +79,57 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * @since ProActive Scheduling 2.0
  *
  */
-public class SSHInfrastructure extends AbstractSSHInfrastructure {
+public class SSHInfrastructure extends InfrastructureManager {
+
+    /**
+     * Path to the Java executable on the remote hosts
+     */
+    @Configurable
+    protected String javaPath = System.getProperty("java.home") + "/bin/java";
+
+    /**
+     * Use the Java from JAVA_HOME if defined
+     */
+    {
+        String jhome = System.getenv("JAVA_HOME");
+        File f = new File(jhome);
+        if (f.exists() && f.isDirectory()) {
+            javaPath = jhome + ((jhome.endsWith("/")) ? "" : "/") + "bin/java";
+        }
+    }
+
+    /**
+     * ShhClient options (@see {@link SSHClient})
+     */
+    @Configurable
+    protected String sshOptions;
+    /**
+     * Path to the Scheduling installation on the remote hosts
+     */
+    @Configurable
+    protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
+    /**
+     * Protocol used by remote hosts to expose themselves
+     */
+    @Configurable
+    protected String protocol = Constants.DEFAULT_PROTOCOL_IDENTIFIER;
+    /**
+     * Port used by remote hosts to expose themselves
+     */
+    @Configurable
+    protected String port = "1099";
+    /**
+     * Additional java options to append to the command executed on the remote host
+     */
+    @Configurable
+    protected String javaOptions;
+
+    /**
+     * Shutdown flag
+     */
+    protected boolean shutdown = false;
+
+    protected static org.apache.log4j.Logger logger = ProActiveLogger.getLogger(RMLoggers.NODESOURCE);
 
     /**  */
 	private static final long serialVersionUID = 21L;
@@ -162,20 +218,19 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
         cmd += " " + this.javaOptions + " ";
         cmd += "org.objectweb.proactive.core.node.StartNode ";
 
-        // generate the node name
-        Random rand = new Random();
-        String alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        String nn = "";
-        for (int i = 0; i < 16; i++) {
-            nn += alpha.charAt(rand.nextInt(alpha.length()));
-        }
-        String nodeName = "SSH-" + nodeSource.getName() + "-" + nn;
+        String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         // HACK HACK GNACK
         // node URL is guessed ... FIXME : does not work with PAMR
         String nodeUrl = this.protocol + "://" + host.getHostAddress() + ":" + this.port + "/" + nodeName;
         cmd += nodeName;
 
-        Process p = runSSHCommand(host, cmd);
+        Process p;
+        try {
+            p = Utils.runSSHCommand(host, cmd, this.sshOptions);
+        } catch (IOException e1) {
+            throw new RMException("Cannot execute ssh command: " + cmd + " on host: " + host.getHostName(),
+                e1);
+        }
 
         running.add(host);
 
@@ -236,15 +291,27 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
      * Configures the Infrastructure
      * 
      * @param parameters
-     *            parameters[0;5] : super
+     *            parameters[0]: path to the JVM on the remote host
+     *            parameters[1]: ssh options
+     *            parameters[2]: path to the Scheduling installation on the remote host
+     *            parameters[3]: remote protocol
+     *            parameters[4]: remote port
+     *            parameters[5]: remote java options
      *            parameters[6]   : path to the scheduling installation on the hosts from the list
      * @throws IllegalArgumentException configuration failed
      */
     @Override
     public BooleanWrapper configure(Object... parameters) {
-        super.configure(parameters);
-
         if (parameters != null && parameters.length >= 7) {
+            this.javaPath = parameters[0].toString();
+            if (!new File(this.javaPath).isAbsolute()) {
+                this.javaPath = "java";
+            }
+            this.sshOptions = parameters[1].toString();
+            this.schedulingPath = parameters[2].toString();
+            this.protocol = parameters[3].toString();
+            this.port = parameters[4].toString();
+            this.javaOptions = parameters[5].toString();
             if (parameters[6] == null) {
                 throw new IllegalArgumentException("Host file must be specified");
             }
@@ -345,6 +412,11 @@ public class SSHInfrastructure extends AbstractSSHInfrastructure {
         }
         logger.info("Could not find node at " + node.getVMInformation().getInetAddress() + " to remove");
 
+    }
+
+    @Override
+    public void shutDown() {
+        shutdown = true;
     }
 
     /**
