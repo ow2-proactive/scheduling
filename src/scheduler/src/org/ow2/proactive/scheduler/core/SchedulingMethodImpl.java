@@ -159,6 +159,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             int neededResourcesNumber = getNextcompatibleTasks(taskRetrivedFromPolicy, freeResourcesNb,
                     tasksToSchedule);
             logger.debug("Number of nodes to ask for : " + neededResourcesNumber);
+            if (neededResourcesNumber == 0) {
+                break;
+            }
 
             //ask nodes to the RM, fail tasks and jobs if selection script fails (tasks could never be started)
             NodeSet nodeSet = getRMNodes(neededResourcesNumber, tasksToSchedule);
@@ -273,14 +276,26 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask);
             logger_dev.debug("Get the most nodes matching the current selection");
+            boolean firstLoop = true;
             do {
+                if (!firstLoop) {
+                    //if bagOfTasks is not empty
+                    if (!bagOfTasks.isEmpty()) {
+                        etd = bagOfTasks.removeFirst();
+                        currentJob = core.jobs.get(etd.getJobId());
+                        internalTask = currentJob.getIHMTasks().get(etd.getId());
+                        neededNodes = internalTask.getNumberOfNodesNeeded();
+                    }
+                } else {
+                    firstLoop = false;
+                }
                 if (neededNodes > maxResource) {
-                    //this instruction is important and could be :
-                    //break    : in this case, a multi node task leads the search to be stopped and the
-                    //			 the current task would be retried on the next step (avoid starvation better than the next one)
-                    //continue : in this case, we continue to start the maximum number of task in a single scheduling loop.
-                    //			 this case will focus on starting single node task first if lot of resources are busy.
-                    break;
+                    //no instruction is important :
+                    //in this case, a multi node task leads the search to be stopped and the
+                    //the current task would be retried on the next step
+                    //we continue to start the maximum number of task in a single scheduling loop.
+                    //this case will focus on starting single node task first if lot of resources are busy.
+                    //(multi-nodes starvation may occurs)
                 } else {
                     //check if the task is compatible with the other previous one
                     if (referent.equals(new SchedulingTaskComparator(internalTask))) {
@@ -291,13 +306,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                         bagOfTasks.addFirst(etd);
                         break;
                     }
-                }
-                //if bagOfTasks is not empty
-                if (!bagOfTasks.isEmpty()) {
-                    etd = bagOfTasks.removeFirst();
-                    currentJob = core.jobs.get(etd.getJobId());
-                    internalTask = currentJob.getIHMTasks().get(etd.getId());
-                    neededNodes = internalTask.getNumberOfNodesNeeded();
                 }
             } while (maxResource > 0 && !bagOfTasks.isEmpty());
         }
