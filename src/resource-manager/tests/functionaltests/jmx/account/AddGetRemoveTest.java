@@ -32,7 +32,7 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package functionaltests.account;
+package functionaltests.jmx.account;
 
 import java.security.PublicKey;
 import java.util.HashMap;
@@ -63,14 +63,14 @@ import functionaltests.RMTHelper;
 /**
  * Tests account values for inconsistent GET (not followed by a RELEASE).
  * The scenario is ADD, GET, REMOVE.
- * 
+ *
  * This test requires the following prerequisites :
- *  - The value of the {@link PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE} property must be 
- *  big enough to not let the {@link RMAccountsManager} refresh accounts automatically. This test 
+ *  - The value of the {@link PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE} property must be
+ *  big enough to not let the {@link RMAccountsManager} refresh accounts automatically. This test
  *  will refresh accounts manually by invoking the {@link ManagementMBean#refreshAllAccounts()}.
  *  - Only one single node must be added
- *  
- * @author The ProActive Team 
+ *
+ * @author The ProActive Team
  */
 public final class AddGetRemoveTest extends FunctionalTest {
 
@@ -106,9 +106,9 @@ public final class AddGetRemoveTest extends FunctionalTest {
         final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
 
         // Tests on database
-        //(nodeprovider=demo)                      
+        //(nodeprovider=demo)
 
-        // Ensure that no refreshes was done and all account values are correctly initialized        
+        // Ensure that no refreshes was done and all account values are correctly initialized
         AttributeList atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime",
                 "ProvidedNodeTime", "ProvidedNodesCount" });
         long usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
@@ -133,10 +133,10 @@ public final class AddGetRemoveTest extends FunctionalTest {
         final long beforeGetTime = System.currentTimeMillis();
         node = r.getAtMostNodes(1, null).get(0);
 
-        // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
+        // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration
         Thread.sleep(GR_DURATION);
 
-        // 3) REMOVE  
+        // 3) REMOVE
         r.removeNode(nodeURL, true).booleanValue();
         final long getRemoveMaxDuration = System.currentTimeMillis() - beforeGetTime;
 

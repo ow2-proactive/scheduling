@@ -32,7 +32,7 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package functionaltests.account;
+package functionaltests.jmx.account;
 
 import java.security.PublicKey;
 import java.util.HashMap;
@@ -61,18 +61,18 @@ import functionaltests.RMTHelper;
 
 
 /**
- * Tests account values for consistent ADD (followed by a REMOVE) and consistent GET (followed by a RELEASE).
- * The scenario is ADD, GET, RELEASE, REMOVE.
- * 
+ * Tests account values for inconsistent GET (not followed by a RELEASE).
+ * The scenario is ADD, GET, DOWN, REMOVE.
+ *
  * This test requires the following prerequisites :
- *  - The value of the {@link PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE} property must be 
- *  big enough to not let the {@link RMAccountsManager} refresh accounts automatically. This test 
+ *  - The value of the {@link PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE} property must be
+ *  big enough to not let the {@link RMAccountsManager} refresh accounts automatically. This test
  *  will refresh accounts manually by invoking the {@link ManagementMBean#refreshAllAccounts()}.
  *  - Only one single node must be added
- *  
- * @author The ProActive Team 
+ *
+ * @author The ProActive Team
  */
-public final class AddGetReleaseRemoveTest extends FunctionalTest {
+public final class AddGetDownRemoveTest extends FunctionalTest {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -106,9 +106,9 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
 
         // Tests on database
-        //(nodeprovider=demo)                      
+        //(nodeprovider=demo)
 
-        // Ensure that no refreshes was done and all account values are correctly initialized        
+        // Ensure that no refreshes was done and all account values are correctly initialized
         AttributeList atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime",
                 "ProvidedNodeTime", "ProvidedNodesCount" });
         long usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
@@ -123,10 +123,10 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         Assert.assertTrue("The providedNodeTime attribute must be 0", providedNodeTime == 0);
         Assert.assertTrue("The providedNodesCount attribute must be 0", providedNodesCount == 0);
 
-        // ADD, GET, RELEASE, REMOVE
+        // ADD, GET, DOWN, REMOVE
         // 1) ADD
-        final long beforeAddTime = System.currentTimeMillis();
-        Node node = RMTHelper.createNode("test");
+        final String name = "test";
+        Node node = RMTHelper.createNode(name);
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).booleanValue();
 
@@ -134,16 +134,19 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
         final long beforeGetTime = System.currentTimeMillis();
         node = r.getAtMostNodes(1, null).get(0);
 
-        // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
+        // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration
         Thread.sleep(GR_DURATION);
 
-        // 3) RELEASE
-        r.releaseNode(node).booleanValue();
-        final long getReleaseMaxDuration = System.currentTimeMillis() - beforeGetTime;
+        // 3) Kill the node to ensure that the RM considers it as being DOWN
+        node.getProActiveRuntime().killNode(name);
+        while (r.nodeIsAvailable(nodeURL).booleanValue()) {
+            Thread.sleep(500);
+        }
 
-        // 4) REMOVE  
+        final long getDownMaxDuration = System.currentTimeMillis() - beforeGetTime;
+
+        // 4) REMOVE
         r.removeNode(nodeURL, true).booleanValue();
-        final long addRemoveMaxDuration = System.currentTimeMillis() - beforeAddTime;
 
         // Refresh the account manager
         conn.invoke(managementMBeanName, "refreshAllAccounts", null, null);
@@ -156,17 +159,9 @@ public final class AddGetReleaseRemoveTest extends FunctionalTest {
                     "LastRefreshDurationInMilliseconds");
         } while (refreshDuration <= 0);
 
-        // Check account values validity                      
-        atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime", "ProvidedNodeTime",
-                "ProvidedNodesCount" });
-        usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
-        providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
-        providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
-
+        // Check account values validity
+        usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime");
         Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
-            (usedNodeTime <= getReleaseMaxDuration));
-        Assert.assertTrue("Invalid value of the providedNodeTime attribute",
-                (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveMaxDuration));
-        Assert.assertTrue("Invalid value of the providedNodesCount attribute", (providedNodesCount == 1));
+            (usedNodeTime <= getDownMaxDuration));
     }
 }
