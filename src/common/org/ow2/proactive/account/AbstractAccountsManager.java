@@ -59,8 +59,6 @@ public abstract class AbstractAccountsManager<E extends Account> {
     protected final Logger logger;
     /** The map that contains all statistics */
     private volatile Map<String, E> accountsMap;
-    /** A variable to know if the accounts are being refreshed from the database */
-    private volatile boolean isAlive;
     /** Refresh delay changeable by the user */
     private volatile int refreshRateInSeconds;
     /** Last refresh duration */
@@ -141,7 +139,7 @@ public abstract class AbstractAccountsManager<E extends Account> {
      */
     public synchronized void refreshAllAccounts() {
         // If it is already running just return
-        if (this.refreshFuture.getDelay(TimeUnit.SECONDS) == 0) {
+        if (this.refreshFuture != null && this.refreshFuture.getDelay(TimeUnit.SECONDS) == 0) {
             return;
         }
         // schedule it to run immediately
@@ -153,10 +151,6 @@ public abstract class AbstractAccountsManager<E extends Account> {
      * refreshes the user statistics from the data base.
      */
     public void startAccountsRefresher() {
-        if (isAlive == true) {
-            return;
-        }
-        this.isAlive = true;
         this.internalSchedule(false);
     }
 
@@ -166,32 +160,16 @@ public abstract class AbstractAccountsManager<E extends Account> {
             if (this.refreshFuture != null) {
                 this.refreshFuture.cancel(true);
             }
+            // The refresh rate is set to 0 to comply with the executor schedule() method semantic
+            // that represents the delay (0 delay means immediate)
             refreshRate = 0;
+        } else {
+            // The refresh rate can be set to 0 by the user to disable the accounts refresh
+            if (refreshRate == 0) {
+                return;
+            }
         }
         this.refreshFuture = this.executor.schedule(this.accountsRefresher, refreshRate, TimeUnit.SECONDS);
-    }
-
-    /**
-     * Stops the accounts refresher.
-     */
-    public void stopAccountsRefresher() {
-        if (!this.isAlive) {
-            return; // It is not alive
-        }
-        this.isAlive = false;
-        if (this.refreshFuture != null) {
-            this.refreshFuture.cancel(true);
-            this.refreshFuture = null;
-        }
-    }
-
-    /**
-     * To know if the accounts refresher is running.
-     *
-     * @return <code>true</code> if the accounts refresher is running
-     */
-    public boolean isAcountsRefresherAlive() {
-        return this.isAlive;
     }
 
     /**
@@ -200,7 +178,12 @@ public abstract class AbstractAccountsManager<E extends Account> {
      * @param refreshRateInSeconds the refresh rate
      */
     public void setRefreshRateInSeconds(final int refreshRateInSeconds) {
+        final int oldValue = this.refreshRateInSeconds;
         this.refreshRateInSeconds = refreshRateInSeconds;
+        // Reschedule if the account refresher is currently disabled (=0)
+        if (oldValue == 0 && refreshRateInSeconds > 0) {
+            this.internalSchedule(false);
+        }
     }
 
     /**
@@ -233,15 +216,13 @@ public abstract class AbstractAccountsManager<E extends Account> {
      */
     private final class AccountsRefresher implements Runnable {
         public void run() {
-            long refreshStartTime = System.currentTimeMillis();
+            final long refreshStartTime = System.currentTimeMillis();
             try {
                 internalRefresh();
             } catch (Exception e) {
                 logger.error("Exception when refreshing accounts", e);
             } finally {
-                if (isAlive) {
-                    internalSchedule(false);
-                }
+                internalSchedule(false);
                 lastRefreshDurationInMilliseconds = System.currentTimeMillis() - refreshStartTime;
             }
         }
