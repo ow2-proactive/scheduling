@@ -36,11 +36,12 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
 
 
 /**
@@ -51,19 +52,18 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class MainLoopRequestFilter implements RequestFilter, Serializable {
+public class MainLoopRequestFilter implements RequestFilter {
     private ArrayList<String> methodNames = new ArrayList<String>();
 
     /**
-     * MainLoopRequestFilter Constructor with a list of string method name to filter.
      * When acceptRequest will be invoked,
-     * only the method that have a name matching the args list will return true;
-     *
-     * @param args a list of method names.
+     * the SchedulerCore methods annoted with {@link RunActivityFiltered} will be served first.
      */
-    public MainLoopRequestFilter(String... args) {
-        for (int i = 0; i < args.length; i++) {
-            methodNames.add(args[i]);
+    public MainLoopRequestFilter() {
+        for (Method m : SchedulerCore.class.getDeclaredMethods()) {
+            if (m.isAnnotationPresent(RunActivityFiltered.class)) {
+                methodNames.add(m.getName());
+            }
         }
     }
 

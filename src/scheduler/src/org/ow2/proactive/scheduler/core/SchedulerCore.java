@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -110,6 +111,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
+import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
 import org.ow2.proactive.scheduler.core.db.DatabaseManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
@@ -482,11 +484,20 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
             Service service = new Service(body);
             // immediate services are set with @ImmediateService annotation
-            logger_dev.debug("Core immediate services : isSubmitPossible, getJobResult, getJobState");
+            if (logger_dev.isDebugEnabled()) {
+                String tmp = "Core immediate services :";
+                for (Method m : SchedulerCore.class.getDeclaredMethods()) {
+                    if (m.isAnnotationPresent(ImmediateService.class)) {
+                        tmp += " " + m.getName();
+                    }
+                }
+                logger_dev.debug(tmp);
+            }
 
             //set the filter for serveAll method (user action are privileged)
-            RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenJobLogs",
-                "getState");
+            //Filtered methods must be annoted with @RunActivityFiltered
+            RequestFilter filter = new MainLoopRequestFilter();
+
             createPingThread();
 
             //create scheduling method
@@ -670,6 +681,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * It is not possible to submit the job if the Scheduler is stopped
      * This method must be synchronous !
      */
+    @RunActivityFiltered
     public boolean submit() {
         InternalJob job = currentJobToSubmit.getJob();
         logger_dev.info("Trying to submit new Job '" + job.getId() + "'");
@@ -836,6 +848,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         logger.info("Job '" + job.getId() + "' terminated (" + jobStatus + ")");
     }
 
+    private ExecutorService threadPoolForTerminateTL;
+
     /**
      * Invoke by a task when it is about to finish.
      * This method can be invoke just a little amount of time before the result arrival.
@@ -843,8 +857,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      *
      * @param taskId the identification of the executed task.
      */
-    private ExecutorService threadPoolForTerminateTL;
-
+    @RunActivityFiltered
     public void terminate(final TaskId taskId) {
         boolean hasBeenReleased = false;
         int nativeIntegerResult = 0;
@@ -1153,6 +1166,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
+    @RunActivityFiltered
     public SchedulerState getState() {
         SchedulerStateImpl sState = new SchedulerStateImpl();
         sState.setPendingJobs(convert(pendingJobs));
@@ -1173,6 +1187,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
+    @RunActivityFiltered
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
         logger_dev.info("listen logs of job '" + jobId + "'");
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
