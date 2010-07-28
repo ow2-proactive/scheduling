@@ -51,7 +51,6 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.utils.Tools;
@@ -220,8 +219,8 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
                 jobPendingToRunningEvent(jobInfo);
                 break;
             case JOB_RUNNING_TO_FINISHED:
-                // Check for killed job (see SCHEDULING-776)
-                if (jobInfo.getStatus() == JobStatus.KILLED) {
+                // Check for killed job (see SCHEDULING-776)            	
+                if (jobInfo.getStartTime() == -1) {
                     this.pendingJobsCount--;
                     this.finishedJobsCount++;
                 } else {
