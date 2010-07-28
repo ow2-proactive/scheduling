@@ -94,7 +94,7 @@ public class ByteArrayWrapper implements Serializable {
      *
      * @return the ByteArray value.
      */
-    public byte[] getValue() {
+    public byte[] byteArrayValue() {
         return value;
     }
 

@@ -411,7 +411,7 @@ public abstract class InternalTask extends TaskState {
         tli.setTaskInputFiles(getInputFilesList());
         tli.setTaskOutputFiles(getOutputFilesList());
         tli.setNamingServiceUrl(job.getJobDataSpaceApplication().getNamingServiceURL());
-        if (isWallTimeSet()) {
+        if (isWallTime()) {
             tli.setWalltime(wallTime);
         }
         return tli;

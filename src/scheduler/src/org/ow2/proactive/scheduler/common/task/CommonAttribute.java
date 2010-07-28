@@ -111,7 +111,7 @@ public abstract class CommonAttribute implements Serializable {
      * @return the cancelOnError property
      */
     public boolean isCancelJobOnError() {
-        return cancelJobOnError.getValue().getValue();
+        return cancelJobOnError.getValue().booleanValue();
     }
 
     /**
@@ -165,7 +165,7 @@ public abstract class CommonAttribute implements Serializable {
      * @return the number of execution allowed for this task
      */
     public int getMaxNumberOfExecution() {
-        return maxNumberOfExecution.getValue().getValue();
+        return maxNumberOfExecution.getValue().integerValue();
     }
 
     /**

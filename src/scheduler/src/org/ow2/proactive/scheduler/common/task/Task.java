@@ -440,7 +440,7 @@ public abstract class Task extends CommonAttribute {
      * 
      * @return the isWallTime
      */
-    public boolean isWallTimeSet() {
+    public boolean isWallTime() {
         return wallTime > 0;
     }
 

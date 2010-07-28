@@ -41,10 +41,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
@@ -63,8 +59,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @Table(name = "RESTART_MODE")
 @AccessType("field")
 @Proxy(lazy = false)
-@XmlRootElement(name = "restartmode")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class RestartMode implements java.io.Serializable {
 
     // WARNING, DO NOT CHANGE index property in RestartMode construction,
@@ -85,11 +79,9 @@ public class RestartMode implements java.io.Serializable {
     private long hId;
 
     @Column(name = "INDEX_")
-    @XmlAttribute
     private int index;
 
     @Column(name = "DESCRIPTION")
-    @XmlAttribute
     private String description;
 
     /** HIBERNATE default constructor */
@@ -141,22 +133,5 @@ public class RestartMode implements java.io.Serializable {
             return false;
         }
     }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
 
 }
