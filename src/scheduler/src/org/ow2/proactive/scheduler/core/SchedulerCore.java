@@ -485,8 +485,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             logger_dev.debug("Core immediate services : isSubmitPossible, getJobResult, getJobState");
 
             //set the filter for serveAll method (user action are privileged)
-            RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenLog",
-                "getSchedulerState");
+            RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenJobLogs",
+                "getState");
             createPingThread();
 
             //create scheduling method
