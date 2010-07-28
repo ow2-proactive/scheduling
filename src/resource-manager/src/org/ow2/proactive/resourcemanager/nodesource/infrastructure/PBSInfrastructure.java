@@ -291,21 +291,21 @@ public class PBSInfrastructure extends AbstractSSHInfrastructure {
 
         if (parameters != null && parameters.length >= 10) {
             try {
-                this.maxNodes = Integer.parseInt(parameters[5].toString());
+                this.maxNodes = Integer.parseInt(parameters[6].toString());
             } catch (Exception e) {
                 this.maxNodes = 1;
             }
-            this.PBSServer = parameters[6].toString();
-            this.RMUrl = parameters[7].toString();
-            if (parameters[8] == null) {
+            this.PBSServer = parameters[7].toString();
+            this.RMUrl = parameters[8].toString();
+            if (parameters[9] == null) {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
             try {
-                this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[8]);
+                this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[9]);
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
-            this.qsubOptions = parameters[9].toString().replaceAll("\"", "\\\"");
+            this.qsubOptions = parameters[10].toString().replaceAll("\"", "\\\"");
         } else {
             throw new IllegalArgumentException("Invalid parameters for IM creation");
         }
