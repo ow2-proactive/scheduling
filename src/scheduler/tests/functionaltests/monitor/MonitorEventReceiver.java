@@ -103,6 +103,7 @@ public class MonitorEventReceiver implements SchedulerEventListener {
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
             case JOB_PENDING_TO_RUNNING:
+            case JOB_PENDING_TO_FINISHED:
             case JOB_RUNNING_TO_FINISHED:
             case JOB_REMOVE_FINISHED:
             case JOB_CHANGE_PRIORITY:

@@ -139,6 +139,7 @@ public abstract class AbstractSchedulerUser<V> extends ActiveActor<Scheduler, V>
                     getInitialState,
                     // job-related events
                     SchedulerEvent.JOB_SUBMITTED, SchedulerEvent.JOB_PENDING_TO_RUNNING,
+                    SchedulerEvent.JOB_PENDING_TO_FINISHED,
                     SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                     SchedulerEvent.JOB_PAUSED,
                     SchedulerEvent.JOB_RESUMED,

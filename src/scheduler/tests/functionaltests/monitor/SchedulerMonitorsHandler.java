@@ -233,6 +233,7 @@ public class SchedulerMonitorsHandler {
      * it doesn't wait strictly Job finished event. if job is already
      * on Scheduler's finished jobs list, then methods returns.
      * Otherwise, a wait for is performed.
+     * This method corresponds to the running to finished transition
      *
      * @param id JobId representing the job awaited to be finished.
      * @param timeout in milliseconds
@@ -241,9 +242,9 @@ public class SchedulerMonitorsHandler {
     public void waitForFinishedJob(JobId id, long timeout) throws ProActiveTimeoutException {
         EventMonitor monitor = null;
         synchronized (this) {
-            if (this.finishedJobs.contains(id))
+            if (this.finishedJobs.contains(id)) {
                 return;
-            else {
+            } else {
                 monitor = getMonitor(new JobEventMonitor(SchedulerEvent.JOB_RUNNING_TO_FINISHED, id));
             }
         }
@@ -476,7 +477,8 @@ public class SchedulerMonitorsHandler {
      */
     public void handleJobEvent(SchedulerEvent event, JobInfo jInfo) {
         synchronized (this) {
-            if (event.equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED)) {
+            if (event.equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED) ||
+                event.equals(SchedulerEvent.JOB_PENDING_TO_FINISHED)) {
                 this.finishedJobs.add(jInfo.getJobId());
             }
             if (!lookAndNotifyMonitor(new JobEventMonitor(event, jInfo))) {
@@ -494,7 +496,8 @@ public class SchedulerMonitorsHandler {
      */
     public void handleJobEvent(SchedulerEvent event, JobState jState) {
         synchronized (this) {
-            if (event.equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED)) {
+            if (event.equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED) ||
+                event.equals(SchedulerEvent.JOB_PENDING_TO_FINISHED)) {
                 this.finishedJobs.add(jState.getId());
             }
             if (!lookAndNotifyMonitor(new JobEventMonitor(event, jState))) {

@@ -508,6 +508,7 @@ public class SchedulerTHelper {
      * Wait for a job passing from running to finished state.
      * If corresponding event has been already thrown by scheduler, returns immediately
      * with JobInfo object associated to event, otherwise wait for event reception.
+     *	This method corresponds to the running to finished transition
      *
      * @param id  job identifier, for which event is waited for.
      * @param timeout  max waiting time in milliseconds.

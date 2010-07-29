@@ -79,7 +79,8 @@ public class JobResultSchedulerListener extends SimpleSchedulerListener {
     @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
         super.jobStateUpdatedEvent(jobNotification);
-        if (jobNotification.getEventType().equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED)) {
+        if (jobNotification.getEventType().equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED) ||
+            jobNotification.getEventType().equals(SchedulerEvent.JOB_PENDING_TO_FINISHED)) {
             jobRunningToFinishedEvent(jobNotification);
         }
     }

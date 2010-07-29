@@ -512,6 +512,7 @@ public class InternalSchedulerEventListener extends Observable implements Schedu
             case JOB_PENDING_TO_RUNNING:
                 jobPendingToRunningEvent(data);
                 break;
+            case JOB_PENDING_TO_FINISHED:
             case JOB_RUNNING_TO_FINISHED:
                 jobRunningToFinishedEvent(data);
                 break;

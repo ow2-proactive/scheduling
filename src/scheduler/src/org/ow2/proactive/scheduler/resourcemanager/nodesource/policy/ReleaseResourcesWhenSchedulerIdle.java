@@ -100,7 +100,8 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
 
     @Override
     protected SchedulerEvent[] getEventsList() {
-        return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED };
+        return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED };
     }
 
     @Override
@@ -135,6 +136,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy impl
     @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
+            case JOB_PENDING_TO_FINISHED:
             case JOB_RUNNING_TO_FINISHED:
                 activeJobs--;
                 debug("Job is finished. Total number of jobs is " + activeJobs);

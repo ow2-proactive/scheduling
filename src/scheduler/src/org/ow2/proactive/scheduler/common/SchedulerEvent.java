@@ -97,7 +97,9 @@ public enum SchedulerEvent {
     /** A user has just connect the scheduler or submit a job. */
     USERS_UPDATE("Users updated"),
     /** The scheduling policy has been changed. */
-    POLICY_CHANGED("Policy changed");
+    POLICY_CHANGED("Policy changed"),
+    /** A job has been terminated from pending queue. All tasks are finished. */
+    JOB_PENDING_TO_FINISHED("Job pending to finished");
 
     /** Name of the method */
     private String methodName;

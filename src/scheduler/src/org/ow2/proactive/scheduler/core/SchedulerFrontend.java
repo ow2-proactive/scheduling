@@ -1204,6 +1204,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 dispatchJobStateUpdated(owner, notification);
                 this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
+            case JOB_PENDING_TO_FINISHED:
             case JOB_RUNNING_TO_FINISHED:
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);

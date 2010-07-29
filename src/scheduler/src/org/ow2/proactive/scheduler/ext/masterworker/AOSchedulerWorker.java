@@ -172,8 +172,8 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
         // We register this active object as a listener
         try {
             this.scheduler.addEventListener((AOSchedulerWorker) stubOnThis, false,
-                    SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
-                    SchedulerEvent.SHUTTING_DOWN);
+                    SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_PENDING_TO_FINISHED,
+                    SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN, SchedulerEvent.SHUTTING_DOWN);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
@@ -301,6 +301,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
      */
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
+            case JOB_PENDING_TO_FINISHED:
             case JOB_RUNNING_TO_FINISHED:
                 JobInfo info = notification.getData();
                 if (info.getStatus() == JobStatus.KILLED) {

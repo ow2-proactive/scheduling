@@ -186,7 +186,8 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
         this.scheduler = auth.login(creds);
 
         this.scheduler.addEventListener(stubOnThis, false, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN, SchedulerEvent.SHUTTING_DOWN);
+                SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
+                SchedulerEvent.SHUTTING_DOWN);
 
     }
 
@@ -484,6 +485,7 @@ public class AOMatlabEnvironment implements Serializable, SchedulerEventListener
      */
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
+            case JOB_PENDING_TO_FINISHED:
             case JOB_RUNNING_TO_FINISHED:
                 JobInfo info = notification.getData();
                 String jid = info.getJobId().value();

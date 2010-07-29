@@ -73,7 +73,8 @@ public class SubmitJob implements SchedulerEventListener {
 
             //let the client be notified of its own 'job termination' -> job running to finished event
             user.addEventListener((SubmitJob) PAActiveObject.getStubOnThis(), true,
-                    SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+                    SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                    SchedulerEvent.JOB_PENDING_TO_FINISHED);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

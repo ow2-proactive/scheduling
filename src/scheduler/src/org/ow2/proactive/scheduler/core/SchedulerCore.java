@@ -800,12 +800,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
         }
 
+        boolean pj = false;
         //if job has been killed
         if (jobStatus == JobStatus.KILLED) {
             job.failed(null, jobStatus);
             //the next line will try to remove job from each list.
             //once removed, it won't be removed from remaining list, but we ensure that the job is in only one of the list.
-            if (runningJobs.remove(job) || pendingJobs.remove(job)) {
+            if (runningJobs.remove(job) || (pj = pendingJobs.remove(job))) {
                 finishedJobs.add(job);
             }
         } else {
@@ -843,7 +844,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         terminateJobHandling(job.getId());
 
         //update job and tasks events list and send it to front-end
-        updateTaskInfosList(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+        updateTaskInfosList(job, pj ? SchedulerEvent.JOB_PENDING_TO_FINISHED
+                : SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 
         logger.info("Job '" + job.getId() + "' terminated (" + jobStatus + ")");
     }

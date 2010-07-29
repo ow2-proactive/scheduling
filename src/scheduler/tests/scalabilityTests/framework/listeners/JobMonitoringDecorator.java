@@ -105,7 +105,8 @@ public abstract class JobMonitoringDecorator implements SchedulerEventListener {
     // this is a bit different
     public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
         // take care of this first; decorator's impl could do freaky shiet like call system.exit!
-        if (jobNotification.getEventType().equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED) &&
+        if ((jobNotification.getEventType().equals(SchedulerEvent.JOB_RUNNING_TO_FINISHED) || jobNotification
+                .getEventType().equals(SchedulerEvent.JOB_PENDING_TO_FINISHED)) &&
             this.mapOfJobs.containsKey(jobNotification.getData().getJobId())) {
             jobRunningToFinishedEvent(jobNotification);
         }

@@ -219,14 +219,12 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
                 jobPendingToRunningEvent(jobInfo);
                 break;
             case JOB_RUNNING_TO_FINISHED:
-                // Check for killed job (see SCHEDULING-776)            	
-                if (jobInfo.getStartTime() == -1) {
-                    this.pendingJobsCount--;
-                    this.finishedJobsCount++;
-                } else {
-                    jobRunningToFinishedEvent(jobInfo);
-                }
-                break;
+		jobRunningToFinishedEvent(jobInfo);
+		break;
+	    case JOB_PENDING_TO_FINISHED:
+                this.pendingJobsCount--;
+                this.finishedJobsCount++;
+		break;
             case JOB_REMOVE_FINISHED:
                 jobRemoveFinishedEvent(jobInfo);
         }

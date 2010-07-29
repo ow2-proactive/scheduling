@@ -320,6 +320,9 @@ public class JobsController implements SchedulerEventListener {
             case JOB_PENDING_TO_RUNNING:
                 jobPendingToRunningEvent(notification.getData());
                 break;
+            case JOB_PENDING_TO_FINISHED:
+                jobRunningToFinishedEvent(notification.getData());
+                break;
             case JOB_RUNNING_TO_FINISHED:
                 jobRunningToFinishedEvent(notification.getData());
                 break;
@@ -438,7 +441,7 @@ public class JobsController implements SchedulerEventListener {
             // call method on listeners
             removePendingJobEventInternal(jobId);
 
-            // remove job from the pendinig jobs list
+            // remove job from the pending jobs list
             if (!pendingJobsIds.remove(jobId)) {
                 throw new IllegalStateException("can't remove the job (id = " + jobId +
                     ") from the runningJobsIds list !");

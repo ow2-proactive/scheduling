@@ -195,8 +195,8 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
         loggedin = true;
 
         this.scheduler.addEventListener((AOScilabEnvironment) stubOnThis, false,
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
-                SchedulerEvent.SHUTTING_DOWN);
+                SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_PENDING_TO_FINISHED,
+                SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN, SchedulerEvent.SHUTTING_DOWN);
 
     }
 
@@ -451,6 +451,7 @@ public class AOScilabEnvironment implements Serializable, SchedulerEventListener
      */
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         switch (notification.getEventType()) {
+            case JOB_PENDING_TO_FINISHED:
             case JOB_RUNNING_TO_FINISHED:
                 JobInfo info = notification.getData();
                 String jid = info.getJobId().value();
