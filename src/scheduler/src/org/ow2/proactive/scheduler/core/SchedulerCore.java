@@ -1315,6 +1315,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public JobResult getJobResult(JobId jobId) throws UnknownJobException {
         final InternalJob job = jobs.get(jobId);
         final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
