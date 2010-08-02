@@ -7,18 +7,18 @@ import java.util.Map;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.ow2.proactive.scheduler.common.Scheduler;
 
-public class SessionMapper {
+public class SchedulerSessionMapper {
 
     private Map<String,Scheduler> sessions;
-    private static SessionMapper sessionMapper;
+    private static SchedulerSessionMapper sessionMapper;
     private long currentSessionid = 0l;
-    private SessionMapper() {
+    private SchedulerSessionMapper() {
         sessions = Collections.synchronizedMap(new HashMap<String,Scheduler>()); 
     }
     
-    public static synchronized SessionMapper getInstance() {
+    public static synchronized SchedulerSessionMapper getInstance() {
         if (sessionMapper == null) {
-            sessionMapper = new SessionMapper();
+            sessionMapper = new SchedulerSessionMapper();
         }
         return sessionMapper;
     }

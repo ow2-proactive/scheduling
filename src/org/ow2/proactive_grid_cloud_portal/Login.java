@@ -27,7 +27,7 @@ public class Login {
         
             scheduler.init("rmi://localhost:1099/SCHEDULER", username, password);
         
-        return ""+SessionMapper.getInstance().add(scheduler);
+        return ""+SchedulerSessionMapper.getInstance().add(scheduler);
         
         } catch (Throwable e) {
             e.printStackTrace();
