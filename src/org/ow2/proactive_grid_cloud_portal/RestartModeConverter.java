@@ -11,7 +11,6 @@ public class RestartModeConverter implements StringConverter<RestartMode>
 {
    public RestartMode fromString(String str)
    {
-      System.out.println("FROM STRNG: " + str);
       return RestartMode.getMode(str);
    }
 

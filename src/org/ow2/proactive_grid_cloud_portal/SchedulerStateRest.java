@@ -12,6 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -74,7 +75,7 @@ public class SchedulerStateRest {
     try {
         JobState js = s.getJobState(jobId);
         System.out.println(js);
-        return js;
+        return  PAFuture.getFutureValue(js);
     } catch (NotConnectedException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
@@ -96,7 +97,7 @@ public class SchedulerStateRest {
             @PathParam("jobid") String jobId) {
     Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionId);
     try {
-        return s.getJobResult(jobId);
+        return  PAFuture.getFutureValue(s.getJobResult(jobId));
     } catch (NotConnectedException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
