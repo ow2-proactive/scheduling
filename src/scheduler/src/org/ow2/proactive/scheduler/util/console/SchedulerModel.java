@@ -214,6 +214,20 @@ public class SchedulerModel extends ConsoleModel {
     }
 
     /**
+     * Retrieve a completion list from the list of commands
+     *
+     * @return a completion list as a string array
+     */
+    private String[] getCompletionList() {
+        String[] ret = new String[commands.size()];
+        for (int i = 0; i < commands.size(); i++) {
+            String name = commands.get(i).getName();
+            ret[i] = name.substring(0, name.indexOf('(')) + "();";
+        }
+        return ret;
+    }
+
+    /**
      * @see org.ow2.proactive.scheduler.common.util.userconsole.UserSchedulerModel#initialize()
      */
     @Override
@@ -257,6 +271,7 @@ public class SchedulerModel extends ConsoleModel {
     public void startModel() throws Exception {
         checkIsReady();
         console.start(" > ");
+        console.addCompletion(getCompletionList());
         console.print("Type command here (type '?' or help() to see the list of commands)" + newline);
         initialize();
         SchedulerStatus status;

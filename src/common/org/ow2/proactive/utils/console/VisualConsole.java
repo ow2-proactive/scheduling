@@ -491,4 +491,10 @@ public class VisualConsole extends JFrame implements Console, KeyListener {
     public void keyTyped(KeyEvent e) {
     }
 
+    /**
+     * NOT USED IN THIS CONSOLE
+     */
+    public void addCompletion(String... candidates) {
+    }
+
 }
