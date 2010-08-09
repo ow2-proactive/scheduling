@@ -46,10 +46,14 @@ import jline.SimpleCompletor;
 
 
 /**
- * JlineConsole...
+ * JlineConsole is an implementation of the {@link Console} interface.<br>
+ * It uses the ConsoleReader from Jline package (located in jruby.jar) which provides completion and history.
+ * 
+ * If this console is not started, it ensure that it won't write anything on the display.
+ *
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 2.0
+ * @since ProActive Scheduling 2.1
  */
 public class JlineConsole implements Console {
 
@@ -76,7 +80,7 @@ public class JlineConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#start(java.lang.String)
+     * {@inheritDoc}
      */
     public Console start(String prompt) {
         try {
@@ -90,7 +94,7 @@ public class JlineConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#stop()
+     * {@inheritDoc}
      */
     public void stop() {
         if (this.started) {
@@ -100,7 +104,7 @@ public class JlineConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#flush()
+     * {@inheritDoc}
      */
     public void flush() {
         if (this.started && console != null) {
@@ -112,7 +116,7 @@ public class JlineConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#print(java.lang.String)
+     * {@inheritDoc}
      */
     public Console print(String msg) {
         if (this.started) {
@@ -130,7 +134,7 @@ public class JlineConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#error(java.lang.String)
+     * {@inheritDoc}
      */
     public Console error(String msg) {
         System.err.println(msg);
@@ -138,14 +142,14 @@ public class JlineConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#readStatement()
+     * {@inheritDoc}
      */
     public String readStatement() throws IOException {
         return readStatement(prompt);
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#readStatement(java.lang.String)
+     * {@inheritDoc}
      */
     public String readStatement(String prompt) throws IOException {
         if (this.started) {
@@ -156,21 +160,21 @@ public class JlineConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#reader()
+     * {@inheritDoc}
      */
     public Reader reader() {
         return new InputStreamReader(System.in);
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#writer()
+     * {@inheritDoc}
      */
     public PrintWriter writer() {
         return new PrintWriter(System.out);
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#handleError(java.lang.String, java.lang.Throwable)
+     * {@inheritDoc}
      */
     public void handleExceptionDisplay(String msg, Throwable t) {
         error(msg + " : " + (t.getMessage() == null ? t : t.getMessage()));
@@ -184,7 +188,7 @@ public class JlineConsole implements Console {
     }
 
     /**
-     * @see org.ow2.proactive.utils.console.Console#printStackTrace(java.lang.Throwable)
+     * {@inheritDoc}
      */
     public void printStackTrace(Throwable t) {
         t.printStackTrace();
