@@ -37,16 +37,15 @@
 package org.ow2.proactive.scheduler.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.policy.Policy;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -180,31 +179,6 @@ public interface SchedulerCoreMethods {
      */
     public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
             UnknownJobException, PermissionException, JobAlreadyFinishedException;
-
-    /**
-     * Return the state of the given job.<br>
-     * The state contains informations about the job, every tasks and informations about the tasks.<br><br>
-     * A user can only get the state of HIS job.<br>
-     * If the job does not exist, a schedulerException is sent with the proper message.
-     *
-     * @param jobId the job on which to get the state.
-     * @return the current state of the given job
-     * @throws NotConnectedException if you are not authenticated.
-     * @throws UnknownJobException if the job does not exist.
-     * @throws PermissionException if you can't access to this particular job.
-     */
-    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException;
-
-    /**
-     * Get the list of job states that describe every jobs in the Scheduler.
-     * The SchedulerState contains 3 list of jobs, pending, running, and finished
-     *
-     * @return the list of every jobs in the Scheduler
-     * @throws NotConnectedException if you are not authenticated.
-     * @throws PermissionException if you can't access to this particular method.
-     */
-    public SchedulerState getState() throws NotConnectedException, PermissionException;
 
     /**
      * For administrator only, Change the policy of the scheduler.<br>

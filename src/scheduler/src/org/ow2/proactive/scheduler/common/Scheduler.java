@@ -250,6 +250,31 @@ public interface Scheduler extends SchedulerCoreMethods {
     public SchedulerStatus getStatus() throws NotConnectedException, PermissionException;
 
     /**
+     * Return the state of the given job.<br>
+     * The state contains informations about the job, every tasks and informations about the tasks.<br><br>
+     * A user can only get the state of HIS job.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     *
+     * @param jobId the job on which to get the state.
+     * @return the current state of the given job
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
+     */
+    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException;
+
+    /**
+     * Get the list of job states that describe every jobs in the Scheduler.
+     * The SchedulerState contains 3 list of jobs, pending, running, and finished
+     *
+     * @return the list of every jobs in the Scheduler
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to this particular method.
+     */
+    public SchedulerState getState() throws NotConnectedException, PermissionException;
+
+    /**
      * Add a scheduler event Listener. this listener provides method to notice of
      * new coming job, started task, finished task, running job, finished job, etc...<br>
      * <p>

@@ -43,13 +43,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -64,7 +62,6 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -133,9 +130,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
     private Map<UniqueID, UserIdentificationImpl> identifications;
 
-    /** List of connected user */
-    private SchedulerUsers users;
-
     /** List used to mark the user that does not respond anymore */
     private Set<UniqueID> dirtyList;
 
@@ -166,8 +160,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /** JMX Helper reference */
     private SchedulerJMXHelper jmxHelper;
 
-    /** Current scheduler status */
-    protected SchedulerStatus status;
+    /** Scheduler state maintains by this class : avoid charging the core from some request */
+    private SchedulerStateImpl sState;
+    private Map<JobId, JobState> jobsMap;
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -190,12 +185,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName) {
         this.identifications = new HashMap<UniqueID, UserIdentificationImpl>();
-        this.users = new SchedulerUsers();
         this.dirtyList = new HashSet<UniqueID>();
         this.currentJobToSubmit = new InternalJobWrapper();
-        this.accountsManager = new SchedulerAccountsManager(this.users);
+        this.accountsManager = new SchedulerAccountsManager();
         this.jmxHelper = new SchedulerJMXHelper(this.accountsManager);
-        this.status = SchedulerStatus.STOPPED;
+        this.jobsMap = new HashMap<JobId, JobState>();
 
         logger_dev.info("Creating scheduler Front-end...");
         resourceManager = imp;
@@ -267,34 +261,46 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * 
      * @param jobList the jobList that may appear in this front-end.
      */
-    public void recover(Map<JobId, InternalJob> jobList) {
+    public void recover(SchedulerStateImpl sState) {
+        //default state = started
+        this.sState = sState;
         Set<JobState> jobStates = new HashSet<JobState>();
-        if (jobList != null) {
-            logger_dev.info("job list : " + jobList.size());
-            for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
-                jobStates.add(e.getValue());
-                UserIdentificationImpl uIdent = new UserIdentificationImpl(e.getValue().getOwner());
-                IdentifiedJob ij = new IdentifiedJob(e.getKey(), uIdent);
-                jobs.put(e.getKey(), ij);
+        logger_dev.info("#Pending jobs list : " + sState.getPendingJobs().size());
+        logger_dev.info("#Running jobs list : " + sState.getRunningJobs().size());
+        logger_dev.info("#Finished jobs list : " + sState.getFinishedJobs().size());
 
-                //if the job is finished set it
-                switch (e.getValue().getStatus()) {
-                    case CANCELED:
-                    case FINISHED:
-                    case FAILED:
-                        ij.setFinished(true);
-                        break;
-                }
-            }
-        } else {
-            logger_dev.info("job list empty");
+        for (JobState js : sState.getPendingJobs()) {
+            prepare(jobStates, js, false);
         }
+        for (JobState js : sState.getRunningJobs()) {
+            prepare(jobStates, js, false);
+        }
+        for (JobState js : sState.getFinishedJobs()) {
+            prepare(jobStates, js, true);
+        }
+
         // rebuild JMX object
         this.jmxHelper.getSchedulerRuntimeMBean().recover(jobStates);
         // Start the stats refresher
         this.accountsManager.startAccountsRefresher();
         //once recovered, activate scheduler communication
         authentication.setActivated(true);
+    }
+
+    /**
+     * Prepare the job in the frontend
+     *
+     * @param jobStates a temporary set of jobs
+     * @param js the current job to be prepared
+     * @param finished if the job is finished or not
+     */
+    private void prepare(Set<JobState> jobStates, JobState js, boolean finished) {
+        jobStates.add(js);
+        UserIdentificationImpl uIdent = new UserIdentificationImpl(js.getOwner());
+        IdentifiedJob ij = new IdentifiedJob(js.getId(), uIdent);
+        jobs.put(js.getId(), ij);
+        jobsMap.put(js.getId(), js);
+        ij.setFinished(finished);
     }
 
     /**
@@ -315,7 +321,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         identifications.put(sourceBodyID, identification);
         renewUserSession(sourceBodyID, identification);
         //add this new user in the list of connected user
-        users.update(identification);
+        sState.getUsers().update(identification);
         //send events
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, identification));
     }
@@ -518,7 +524,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         //checking permissions
         checkPermission("getStatus", "You do not have permission to get the status !");
 
-        return this.status;
+        return sState.getStatus();
     }
 
     /**
@@ -527,14 +533,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         //checking permissions
         checkPermission("getState", "You do not have permission to get the state !");
-
-        //get the scheduler State
-        SchedulerStateImpl initState = null;
-        initState = (SchedulerStateImpl) (PAFuture.getFutureValue(scheduler.getState()));
-        //and update the connected users list.
-        initState.setUsers(users);
-        //return to the user
-        return initState;
+        return sState;
     }
 
     /**
@@ -723,7 +722,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             ident.clearListener();
             //remove this user to the list of connected user if it has not already been removed
             ident.setToRemove();
-            users.update(ident);
+            sState.getUsers().update(ident);
             //cancel the timer
             ident.getSession().cancel();
             //log and send events
@@ -841,7 +840,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this job !");
-        return scheduler.getJobState(jobId);
+        return jobsMap.get(jobId);
     }
 
     /**
@@ -1147,28 +1146,28 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public void schedulerStateUpdated(SchedulerEvent eventType) {
         switch (eventType) {
             case STARTED:
-                this.status = SchedulerStatus.STARTED;
+                sState.setState(SchedulerStatus.STARTED);
                 break;
             case STOPPED:
-                this.status = SchedulerStatus.STOPPED;
+                sState.setState(SchedulerStatus.STOPPED);
                 break;
             case PAUSED:
-                this.status = SchedulerStatus.PAUSED;
+                sState.setState(SchedulerStatus.PAUSED);
                 break;
             case FROZEN:
-                this.status = SchedulerStatus.FROZEN;
+                sState.setState(SchedulerStatus.FROZEN);
                 break;
             case RESUMED:
-                this.status = SchedulerStatus.STARTED;
+                sState.setState(SchedulerStatus.STARTED);
                 break;
             case SHUTTING_DOWN:
-                this.status = SchedulerStatus.SHUTTING_DOWN;
+                sState.setState(SchedulerStatus.SHUTTING_DOWN);
                 break;
             case SHUTDOWN:
-                this.status = SchedulerStatus.STOPPED;
+                sState.setState(SchedulerStatus.STOPPED);
                 break;
             case KILLED:
-                this.status = SchedulerStatus.KILLED;
+                sState.setState(SchedulerStatus.KILLED);
                 break;
             case RM_DOWN:
             case RM_UP:
@@ -1188,6 +1187,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public void jobSubmitted(JobState job) {
+        jobsMap.put(job.getId(), job);
+        sState.getPendingJobs().add(job);
         dispatchJobSubmitted(job);
         this.jmxHelper.getSchedulerRuntimeMBean().jobSubmittedEvent(job);
     }
@@ -1196,15 +1197,24 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
+        JobState js = jobsMap.get(notification.getData().getJobId());
+        js.update(notification.getData());
         switch (notification.getEventType()) {
+            case JOB_PENDING_TO_RUNNING:
+                sState.getPendingJobs().remove(js);
+                sState.getRunningJobs().add(js);
+                dispatchJobStateUpdated(owner, notification);
+                this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
+                break;
             case JOB_PAUSED:
             case JOB_RESUMED:
-            case JOB_PENDING_TO_RUNNING:
             case JOB_CHANGE_PRIORITY:
                 dispatchJobStateUpdated(owner, notification);
                 this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             case JOB_RUNNING_TO_FINISHED:
+                sState.getRunningJobs().remove(js);
+                sState.getFinishedJobs().add(js);
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 dispatchJobStateUpdated(owner, notification);
@@ -1212,6 +1222,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 break;
             case JOB_REMOVE_FINISHED:
                 //removing jobs from the global list : this job is no more managed
+                sState.getFinishedJobs().remove(js);
+                jobsMap.remove(js.getId());
                 jobs.remove(notification.getData().getJobId());
                 dispatchJobStateUpdated(owner, notification);
                 this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
@@ -1226,6 +1238,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     public void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
+        jobsMap.get(notification.getData().getJobId()).update(notification.getData());
         switch (notification.getEventType()) {
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:

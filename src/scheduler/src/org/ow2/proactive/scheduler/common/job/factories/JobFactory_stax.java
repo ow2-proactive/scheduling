@@ -480,7 +480,7 @@ public class JobFactory_stax extends JobFactory {
      */
     private String[] getClasspath(XMLStreamReader cursorClasspath) throws JobCreationException {
         try {
-            ArrayList<String> pathEntries = new ArrayList<String>();
+            ArrayList<String> pathEntries = new ArrayList<String>(0);
             int eventType;
             while (cursorClasspath.hasNext()) {
                 eventType = cursorClasspath.next();
@@ -777,7 +777,7 @@ public class JobFactory_stax extends JobFactory {
             if (dependences == null) {
                 dependences = new HashMap<String, ArrayList<String>>();
             }
-            ArrayList<String> depends = new ArrayList<String>();
+            ArrayList<String> depends = new ArrayList<String>(0);
             int eventType;
             while (cursorDepends.hasNext()) {
                 eventType = cursorDepends.next();
@@ -893,7 +893,7 @@ public class JobFactory_stax extends JobFactory {
      */
     private List<SelectionScript> createSelectionScript(XMLStreamReader cursorScript)
             throws JobCreationException {
-        List<SelectionScript> scripts = new ArrayList<SelectionScript>();
+        List<SelectionScript> scripts = new ArrayList<SelectionScript>(0);
         String selectionTag = cursorScript.getLocalName();
         try {
             SelectionScript newOne = null;
@@ -945,7 +945,7 @@ public class JobFactory_stax extends JobFactory {
      */
     private String[] getArguments(XMLStreamReader cursorArgs) throws JobCreationException {
         if (cursorArgs.getLocalName().equals(JobFactory_stax.ELEMENT_SCRIPT_ARGUMENTS)) {
-            ArrayList<String> args = new ArrayList<String>();
+            ArrayList<String> args = new ArrayList<String>(0);
             try {
                 int eventType;
                 while (cursorArgs.hasNext()) {
@@ -985,7 +985,7 @@ public class JobFactory_stax extends JobFactory {
             //one step ahead to go to the command (static or dynamic)
             while (cursorExec.next() != XMLEvent.START_ELEMENT)
                 ;
-            ArrayList<String> command = new ArrayList<String>();
+            ArrayList<String> command = new ArrayList<String>(0);
             if (cursorExec.getLocalName().equals(JobFactory_stax.ELEMENT_SCRIPT_STATICCOMMAND)) {
 
                 for (int i = 0; i < cursorExec.getAttributeCount(); i++) {
