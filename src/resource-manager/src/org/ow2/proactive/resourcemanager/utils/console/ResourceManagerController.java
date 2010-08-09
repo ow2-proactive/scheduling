@@ -68,8 +68,8 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.utils.RMLoggers;
 import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
+import org.ow2.proactive.utils.console.JlineConsole;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
-import org.ow2.proactive.utils.console.SimpleConsole;
 import org.ow2.proactive.utils.console.VisualConsole;
 
 
@@ -439,7 +439,7 @@ public class ResourceManagerController {
         if (cmd.hasOption("g")) {
             console = new VisualConsole();
         } else {
-            console = new SimpleConsole();
+            console = new JlineConsole();
         }
         model.connectConsole(console);
         model.startModel();

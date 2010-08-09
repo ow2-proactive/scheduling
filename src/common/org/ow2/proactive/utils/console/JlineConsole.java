@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,43 +24,44 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $ACTIVEEON_INITIAL_DEV$
  */
 package org.ow2.proactive.utils.console;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 
+import jline.ConsoleReader;
+import jline.SimpleCompletor;
+
 
 /**
- * SimpleConsole is a simple implementation of the {@link Console} interface.<br>
- * If this console is not started, it ensure that it won't write anything on the display.
+ * JlineConsole...
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 1.0
+ * @since ProActive Scheduling 2.0
  */
-public class SimpleConsole implements Console {
+public class JlineConsole implements Console {
 
     private boolean started = false;
-    private String prompt;
-    private BufferedReader reader;
-    private PrintWriter writer;
+    private String prompt = "";
+    private ConsoleReader console;
+    private SimpleCompletor completor;
 
     /**
      * Create a new instance of SimpleConsole.
      */
-    public SimpleConsole() {
+    public JlineConsole() {
     }
 
     /**
@@ -70,7 +71,7 @@ public class SimpleConsole implements Console {
      *
      * @param prompt the prompt to be displayed on the console.
      */
-    public SimpleConsole(String prompt) {
+    public JlineConsole(String prompt) {
         start(prompt);
     }
 
@@ -78,8 +79,11 @@ public class SimpleConsole implements Console {
      * @see org.ow2.proactive.utils.console.Console#start(java.lang.String)
      */
     public Console start(String prompt) {
-        this.reader = new BufferedReader(new InputStreamReader(System.in));
-        this.writer = new PrintWriter(System.out);
+        try {
+            console = new ConsoleReader(System.in, new PrintWriter(System.out, true));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.prompt = prompt;
         this.started = true;
         return this;
@@ -90,13 +94,7 @@ public class SimpleConsole implements Console {
      */
     public void stop() {
         if (this.started) {
-            try {
-                this.reader.close();
-                this.writer.close();
-            } catch (IOException e) {
-            }
-            this.reader = null;
-            this.writer = null;
+            this.console = null;
             this.started = false;
         }
     }
@@ -105,8 +103,11 @@ public class SimpleConsole implements Console {
      * @see org.ow2.proactive.utils.console.Console#flush()
      */
     public void flush() {
-        if (this.started && writer != null) {
-            writer.flush();
+        if (this.started && console != null) {
+            try {
+                console.flushConsole();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -115,8 +116,13 @@ public class SimpleConsole implements Console {
      */
     public Console print(String msg) {
         if (this.started) {
-            writer.println(msg);
-            writer.flush();
+            try {
+                console.printString(msg);
+                console.printNewline();
+                //flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             throw new RuntimeException("Console is not started !");
         }
@@ -143,8 +149,7 @@ public class SimpleConsole implements Console {
      */
     public String readStatement(String prompt) throws IOException {
         if (this.started) {
-            System.out.print(prompt);
-            return reader.readLine();
+            return console.readLine(prompt);
         } else {
             throw new RuntimeException("Console is not started !");
         }
@@ -154,14 +159,14 @@ public class SimpleConsole implements Console {
      * @see org.ow2.proactive.utils.console.Console#reader()
      */
     public Reader reader() {
-        return reader;
+        return new InputStreamReader(System.in);
     }
 
     /**
      * @see org.ow2.proactive.utils.console.Console#writer()
      */
     public PrintWriter writer() {
-        return writer;
+        return new PrintWriter(System.out);
     }
 
     /**
@@ -186,9 +191,20 @@ public class SimpleConsole implements Console {
     }
 
     /**
-     * NOT USED IN THIS CONSOLE
+     * {@inheritDoc}
      */
     public void addCompletion(String... candidates) {
+        if (completor == null) {
+            completor = new SimpleCompletor(candidates);
+            console.addCompletor(completor);
+        }
+        for (String s : candidates) {
+            if (s != null && !"".equals(s)) {
+                completor.addCandidateString(s);
+            } else {
+                throw new IllegalArgumentException("Candidates argument cannot contains null or empty values");
+            }
+        }
     }
 
 }

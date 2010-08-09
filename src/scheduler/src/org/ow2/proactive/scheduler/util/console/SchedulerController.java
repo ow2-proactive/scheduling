@@ -71,8 +71,8 @@ import org.ow2.proactive.scheduler.common.util.SchedulerLoggers;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Console;
 import org.ow2.proactive.utils.console.JVMPropertiesPreloader;
+import org.ow2.proactive.utils.console.JlineConsole;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
-import org.ow2.proactive.utils.console.SimpleConsole;
 import org.ow2.proactive.utils.console.VisualConsole;
 
 
@@ -519,7 +519,7 @@ public class SchedulerController {
         if (cmd.hasOption("gui")) {
             console = new VisualConsole();
         } else {
-            console = new SimpleConsole();
+            console = new JlineConsole();
         }
         model.connectConsole(console);
         model.startModel();

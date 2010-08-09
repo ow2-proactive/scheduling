@@ -134,4 +134,11 @@ public interface Console {
      */
     public void printStackTrace(Throwable t);
 
+    /**
+     * Update list of completion candidates.
+     *
+     * @param candidates list of candidates to add to the completion list
+     */
+    public void addCompletion(String... candidates);
+
 }
