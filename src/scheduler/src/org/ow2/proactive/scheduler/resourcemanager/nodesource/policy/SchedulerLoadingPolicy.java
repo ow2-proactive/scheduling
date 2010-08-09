@@ -38,8 +38,6 @@ package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -51,6 +49,12 @@ import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestExcepti
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.PolicyRestriction;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
@@ -71,7 +75,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.EC2Infrastructure",
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure",
         "org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCInfrastructure" })
-public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive {
+public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive,
+        RMEventListener {
 
     /**  */
 	private static final long serialVersionUID = 21L;
@@ -82,26 +87,24 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private int activeTask = 0;
 
     @Configurable(description = "refresh frequency (ms)")
-    private int refreshTime = 10000;
+    private int refreshTime = 1000;
     @Configurable
     private int minNodes = 0;
     @Configurable
-    private int maxNodes = 100;
+    private int maxNodes = 10;
     @Configurable(description = "number of tasks per node")
     private int loadFactor = 10;
-    @Configurable(description = "delay between each node release (in ms)")
-    private int releaseDelay = 1000;
+    @Configurable()
+    private int nodeDeploymentTimeout = 10000;
 
     // policy state
     private boolean active = false;
-    private int currentNodeNumberInNodeSource = 0;
-    private int currentNodeNumberInResourceManager = 0;
-    private int pendingNodesNumberAcq = 0;
-    private int pendingNodesNumberRel = 0;
-    private int releaseNodesNumber = 0;
-    private transient Timer timer;
-    private transient Object monitor = new Object();
     private SchedulerLoadingPolicy thisStub;
+    private int nodesNumberInNodeSource = 0;
+    private int nodesNumberInRM = 0;
+    private String nodeSourceName = null;
+    // positive when deploying, negative when removing, zero when idle 
+    private long timeStamp = 0;
 
     public SchedulerLoadingPolicy() {
     }
@@ -120,7 +123,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             minNodes = Integer.parseInt(policyParameters[index++].toString());
             maxNodes = Integer.parseInt(policyParameters[index++].toString());
             loadFactor = Integer.parseInt(policyParameters[index++].toString());
-            releaseDelay = Integer.parseInt(policyParameters[index++].toString());
+            nodeDeploymentTimeout = Integer.parseInt(policyParameters[index++].toString());
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(e);
         }
@@ -146,12 +149,10 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             timeStamp = System.currentTimeMillis();
 
             if (delta > refreshTime) {
-                synchronized (monitor) {
-                    if (active && nodeSource != null) {
-                        try {
-                            updateNumberOfNodes();
-                        } catch (BodyTerminatedRequestException e) {
-                        }
+                if (active && nodeSource != null) {
+                    try {
+                        updateNumberOfNodes();
+                    } catch (BodyTerminatedRequestException e) {
                     }
                 }
                 delta = 0;
@@ -173,10 +174,64 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             activeTask += js.getNumberOfPendingTasks();
             activeTask += js.getNumberOfRunningTasks();
         }
+        nodeSourceName = nodeSource.getName();
 
-        active = true;
+        thisStub.registerRMListener();
+
         logger.debug("Policy activated. Current number of tasks " + activeTask);
         return new BooleanWrapper(true);
+    }
+
+    private void updateNumberOfNodes() {
+        logger.debug("Refreshing policy state: " + nodesNumberInNodeSource + " nodes in node source, " +
+            nodesNumberInRM + " nodes in RM");
+
+        if (timeStamp > 0) {
+            logger.debug("Pending node deployment request");
+            // pending node deployment
+            if (System.currentTimeMillis() - timeStamp > nodeDeploymentTimeout) {
+                logger.debug("Node deployment timeout.");
+                timeStamp = 0;
+            }
+        }
+
+        if (timeStamp != 0) {
+            if (timeStamp < 0) {
+                logger.debug("Pending node removal request");
+            }
+            return;
+        }
+
+        if (nodesNumberInNodeSource < minNodes) {
+            logger.debug("Node deployment request");
+            timeStamp = System.currentTimeMillis();
+            acquireNodes(1);
+            return;
+        }
+
+        if (nodesNumberInNodeSource > maxNodes) {
+            logger.debug("Node removal request");
+            timeStamp = -System.currentTimeMillis();
+            removeNodes(1, false);
+            return;
+        }
+
+        int requiredNodesNumber = activeTask / loadFactor + (activeTask % loadFactor == 0 ? 0 : 1);
+        logger.debug("Required node number according to scheduler loading " + requiredNodesNumber);
+
+        if (requiredNodesNumber > nodesNumberInRM && nodesNumberInNodeSource < maxNodes) {
+            logger.debug("Node deployment request");
+            timeStamp = System.currentTimeMillis();
+            acquireNodes(1);
+            return;
+        }
+
+        if (requiredNodesNumber < nodesNumberInRM && nodesNumberInNodeSource > minNodes) {
+            logger.debug("Node removal request");
+            timeStamp = -System.currentTimeMillis();
+            removeNodes(1, false);
+            return;
+        }
     }
 
     @Override
@@ -190,228 +245,16 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         return thisStub;
     }
 
-    private void refreshPolicyState() {
-
-        // recalculating the current node number in resource manager and the node source
-        try {
-            currentNodeNumberInResourceManager = nodeSource.getRMCore().getState().getTotalAliveNodesNumber();
-        } catch (RuntimeException e) {
-            logger.debug(e.getMessage(), e);
-            return;
-        }
-        int newNodeNumberInNodeSource = nodeSource.getNodesCount();
-
-        // recalculating pending nodes to release and to acquire
-        if (pendingNodesNumberRel != 0) {
-            // there are some pending node removal requests
-            if (newNodeNumberInNodeSource < currentNodeNumberInNodeSource) {
-                pendingNodesNumberRel -= currentNodeNumberInNodeSource - newNodeNumberInNodeSource;
-
-                if (pendingNodesNumberRel < 0) {
-                    // possible only if some nodes were removed by user (should not be done for this policy)
-                    // if it's the same this message could be ignored
-                    logger.warn("Incorrect node source state: [pending node removal requests < 0] : " +
-                        "currentNodeNumberInNodeSource" + currentNodeNumberInNodeSource +
-                        ", newNodeNumberInNodeSource=" + newNodeNumberInNodeSource +
-                        ", pendingNodesNumberAcq=" + pendingNodesNumberAcq + ", pendingNodesNumberRel=" +
-                        pendingNodesNumberRel + ", activeTask=" + activeTask);
-                    pendingNodesNumberRel = 0;
-                }
-            } else if (newNodeNumberInNodeSource > currentNodeNumberInNodeSource) {
-                // pending node removal request > 0 => should not acquire nodes at this time
-                logger
-                        .warn("Incorrect node source state: [waiting for node removal and should not acquire nodes at this phase] : " +
-                            "currentNodeNumberInNodeSource" +
-                            currentNodeNumberInNodeSource +
-                            ", newNodeNumberInNodeSource=" +
-                            newNodeNumberInNodeSource +
-                            ", pendingNodesNumberAcq=" +
-                            pendingNodesNumberAcq +
-                            ", pendingNodesNumberRel=" +
-                            pendingNodesNumberRel + ", activeTask=" + activeTask);
+    protected void registerRMListener() {
+        RMInitialState state = nodeSource.getRMCore().getMonitoring().addRMEventListener(
+                (RMEventListener) PAActiveObject.getStubOnThis());
+        for (RMNodeEvent event : state.getNodesEvents()) {
+            if (event.getNodeState() != NodeState.DOWN) {
+                nodesNumberInRM++;
             }
         }
-
-        if (pendingNodesNumberAcq == 0) {
-            // no pending acquisition requests
-            // just updating current node size in the node source
-            currentNodeNumberInNodeSource = newNodeNumberInNodeSource;
-        } else {
-
-            // updating pending node acquisition requests 
-            if (newNodeNumberInNodeSource > currentNodeNumberInNodeSource) {
-                // new node arrived
-                pendingNodesNumberAcq -= newNodeNumberInNodeSource - currentNodeNumberInNodeSource;
-                // reseting timer for nodes removal
-                if (timer != null) {
-                    timer.cancel();
-                    timer = null;
-                }
-            }
-
-            currentNodeNumberInNodeSource = newNodeNumberInNodeSource;
-            if (pendingNodesNumberAcq < 0) {
-                // acquired more nodes than expected
-                logger.warn("Incorrect node source state: [pending node acquisition requests < 0] : " +
-                    "currentNodeNumberInNodeSource" + currentNodeNumberInNodeSource +
-                    ", newNodeNumberInNodeSource=" + newNodeNumberInNodeSource + ", pendingNodesNumberAcq=" +
-                    pendingNodesNumberAcq + ", pendingNodesNumberRel=" + pendingNodesNumberRel +
-                    ", activeTask=" + activeTask);
-                pendingNodesNumberAcq = 0;
-            }
-        }
-
-        // consistence checks
-        if (currentNodeNumberInNodeSource == minNodes && pendingNodesNumberRel > 0) {
-            logger
-                    .warn("Incorrect node source state: [the node source has min number of nodes but pendingNodesNumberRel > 0] : " +
-                        "currentNodeNumberInNodeSource" +
-                        currentNodeNumberInNodeSource +
-                        ", pendingNodesNumberAcq=" +
-                        pendingNodesNumberAcq +
-                        ", pendingNodesNumberRel=" +
-                        pendingNodesNumberRel + ", activeTask=" + activeTask);
-            pendingNodesNumberRel = 0;
-        }
-        if (currentNodeNumberInNodeSource == maxNodes && pendingNodesNumberAcq > 0) {
-            logger
-                    .warn("Incorrect node source state: [the node source has max number of nodes but pendingNodesNumberAcq > 0] : " +
-                        "currentNodeNumberInNodeSource" +
-                        currentNodeNumberInNodeSource +
-                        ", pendingNodesNumberAcq=" +
-                        pendingNodesNumberAcq +
-                        ", pendingNodesNumberRel=" +
-                        pendingNodesNumberRel + ", activeTask=" + activeTask);
-            pendingNodesNumberAcq = 0;
-        }
-
-    }
-
-    private void updateNumberOfNodes() {
-        refreshPolicyState();
-
-        logger.debug("Policy State: currentNodeNumberInNodeSource=" + currentNodeNumberInNodeSource +
-            ", currentNodeNumberInResourceManager=" + currentNodeNumberInResourceManager +
-            ", pendingNodesNumberAcq=" + pendingNodesNumberAcq + ", pendingNodesNumberRel=" +
-            pendingNodesNumberRel + ", activeTask=" + activeTask);
-
-        int potentialNodeNumberInResourceManager = currentNodeNumberInResourceManager +
-            pendingNodesNumberAcq - pendingNodesNumberRel;
-        int potentialNodeNumberInNodeSource = currentNodeNumberInNodeSource + pendingNodesNumberAcq -
-            pendingNodesNumberRel;
-
-        if (potentialNodeNumberInNodeSource < minNodes) {
-            int difference = minNodes - potentialNodeNumberInNodeSource;
-            acquireNNodes(difference);
-            return;
-        }
-
-        if (potentialNodeNumberInNodeSource > maxNodes) {
-            int difference = potentialNodeNumberInNodeSource - maxNodes;
-            removeNodes(difference);
-            return;
-        }
-
-        int requiredNodesNumber = activeTask / loadFactor + (activeTask % loadFactor == 0 ? 0 : 1);
-        logger.debug("Required node number " + requiredNodesNumber);
-
-        if (requiredNodesNumber == potentialNodeNumberInResourceManager) {
-            return;
-        }
-
-        int difference = 0;
-
-        if (requiredNodesNumber < potentialNodeNumberInResourceManager) {
-            // releasing nodes
-
-            // how much do we need in total
-            difference = potentialNodeNumberInResourceManager - requiredNodesNumber;
-            // correction if after removal there will be too few nodes in the node source
-            if (potentialNodeNumberInNodeSource - difference < minNodes) {
-                difference = potentialNodeNumberInNodeSource - minNodes;
-            }
-            removeNodes(difference);
-        } else {
-            // acquiring nodes
-
-            difference = requiredNodesNumber - potentialNodeNumberInResourceManager;
-            // correct it if exceed max node number in the node source
-            if (potentialNodeNumberInNodeSource + difference > maxNodes) {
-                difference = maxNodes - potentialNodeNumberInNodeSource;
-            }
-
-            acquireNNodes(difference);
-        }
-    }
-
-    private void acquireNNodes(int number) {
-        if (pendingNodesNumberRel > 0) {
-            logger.debug("Waiting for nodes to be removed. Acquire request ignored.");
-            return;
-        }
-
-        // cancel the timer properly
-        releaseNodesNumber = 0;
-
-        logger.debug("Acquiring " + number + " nodes");
-        super.acquireNodes(number);
-
-        pendingNodesNumberAcq += number;
-    }
-
-    private void removeNodes(int number) {
-
-        if (number < 0) {
-            throw new RuntimeException("Negative nodes number " + number);
-        }
-        if (number == 0)
-            return;
-
-        if (timer == null) {
-            timer = new Timer(true);
-        }
-
-        if (releaseNodesNumber > 0) {
-            logger.debug("Timer has already been scheduled");
-            releaseNodesNumber = Math.max(number, releaseNodesNumber);
-            return;
-        }
-
-        logger.debug("Setup timer to remove " + number + " nodes");
-        releaseNodesNumber = number;
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            int maxNumberOfAttempts = 100;
-
-            @Override
-            public void run() {
-                synchronized (monitor) {
-                    if (releaseNodesNumber == 0) {
-                        logger.debug("Timer finished releasing nodes");
-                        timer.cancel();
-                        timer = null;
-                        return;
-                    }
-
-                    if (maxNumberOfAttempts > 0 && pendingNodesNumberAcq > 0) {
-                        maxNumberOfAttempts--;
-                        logger.debug("Waiting for nodes to be acquired. Release request ignored.");
-                        return;
-                    } else if (pendingNodesNumberAcq > 0) {
-                        logger
-                                .warn("Some nodes have not been acquired for a long time. It prevents policy to release nodes.");
-                        logger
-                                .warn("Probably maximum number of nodes in policy configuration exeeds the physical capacity of the infrastructure");
-                        logger.warn("Reseting pending acquiring nodes number");
-                        pendingNodesNumberAcq = 0;
-                    }
-
-                    releaseNodesNumber--;
-                    pendingNodesNumberRel++;
-                    thisStub.removeNodes(1, false);
-                }
-            }
-        }, releaseDelay, releaseDelay);
+        logger.debug("RM listener successully registered. RM node number is " + nodesNumberInRM);
+        active = true;
     }
 
     @Override
@@ -449,6 +292,48 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         }
     }
 
+    public void rmEvent(RMEvent event) {
+    }
+
+    public void nodeSourceEvent(RMNodeSourceEvent event) {
+    }
+
+    public void nodeEvent(RMNodeEvent event) {
+        switch (event.getEventType()) {
+            case NODE_ADDED:
+                nodesNumberInRM++;
+                if (event.getNodeSource().equals(nodeSourceName)) {
+                    nodesNumberInNodeSource++;
+
+                    if (timeStamp > 0) {
+                        logger.debug("Requested node arrived " + event.getNodeUrl());
+                        timeStamp = 0;
+                    }
+                    if (timeStamp < 0) {
+                        logger.debug("Waiting for node to be removed but new node arrived " +
+                            event.getNodeUrl());
+                    }
+                }
+                break;
+            case NODE_REMOVED:
+                nodesNumberInRM--;
+                if (event.getNodeSource().equals(nodeSourceName)) {
+                    nodesNumberInNodeSource--;
+
+                    if (timeStamp > 0) {
+                        logger.debug("Waiting for node to be acquired but the node " + event.getNodeUrl() +
+                            " removed");
+                    }
+                    if (timeStamp < 0) {
+                        logger.debug("Requested node removed " + event.getNodeUrl());
+                        timeStamp = 0;
+                    }
+                }
+
+                break;
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -472,4 +357,5 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         active = false;
         super.shutdown(initiator);
     }
+
 }
